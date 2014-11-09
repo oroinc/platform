@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\ActivityListBundle\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -25,7 +26,7 @@ class ActivityListChainProvider
     protected $targetClasses = [];
 
     /**
-     * @param ServiceLink    $securityFacadeLink
+     * @param ServiceLink $securityFacadeLink
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(ServiceLink $securityFacadeLink, DoctrineHelper $doctrineHelper)
@@ -79,69 +80,36 @@ class ActivityListChainProvider
     }
 
     /**
-     * @param object $entity
+     * @param object $activityEntity
      *
-     * @return bool|ActivityList[]
+     * @return ActivityList
      */
     public function getActivityListEntitiesByActivityEntity($activityEntity)
     {
         $provider = $this->getProviderForEntity($activityEntity);
-        return  $this->getNewActivityListEntityForEntity($activityEntity, $provider);
+        return $this->getActivityListEntityForEntity($activityEntity, $provider);
     }
 
     /**
-     * @param               $entity
+     * @param object        $entity
      * @param EntityManager $entityManager
      * @return ActivityList
      */
     public function getUpdatedActivityList($entity, EntityManager $entityManager)
     {
         $provider = $this->getProviderForEntity($entity);
-        $listEntities = [];
         $existListEntity = $entityManager->getRepository('OroActivityListBundle:ActivityList')->findOneBy(
             [
                 'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
                 'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
             ]
         );
-        return $this->getNewActivityListEntityForEntity($entity, $provider, ActivityListManager::STATE_UPDATE, $existListEntity);
-
-        $relatedEntities = $provider->getRelatedEntities($entity);
-        if (!empty($relatedEntities)) {
-            foreach ($relatedEntities as $relatedEntity) {
-                $relatedEntityClass = $this->doctrineHelper->getEntityClass($relatedEntity);
-                $relatedEntityId = $this->doctrineHelper->getSingleEntityIdentifier($relatedEntity);
-                $relatedList = null;
-                foreach ($existListEntities as $id => $existingEntity) {
-                    if (
-                        $existingEntity->getRelatedEntityClass() === $relatedEntityClass
-                        && $existingEntity->getRelatedEntityId() === $relatedEntityId
-                    ) {
-                        $relatedList = $existingEntity;
-                        unset($existListEntities[$id]);
-                        break;
-                    }
-                }
-                if ($relatedList) {
-                    $this->updateListEntity($relatedList, $provider, $entity);
-                } else {
-                    $relatedList = $this->getNewActivityListEntityForEntity(
-                        $entity,
-                        $provider,
-                        ActivityListManager::STATE_UPDATE
-                    );
-                    $relatedList->setRelatedEntityClass($this->doctrineHelper->getEntityClass($relatedEntity));
-                    $relatedList->setRelatedEntityId(
-                        $this->doctrineHelper->getSingleEntityIdentifier($relatedEntity)
-                    );
-                }
-
-
-                $listEntities[] = $relatedList;
-            }
-        }
-
-        return [$relatedEntities, $existListEntities];
+        return $this->getActivityListEntityForEntity(
+            $entity,
+            $provider,
+            ActivityListManager::STATE_UPDATE,
+            $existListEntity
+        );
     }
 
     /**
@@ -161,12 +129,18 @@ class ActivityListChainProvider
     }
 
     /**
-     * @param $entity
-     * @param $provider
+     * @param object                        $entity
+     * @param ActivityListProviderInterface $provider
+     * @param string                        $state
+     * @param null                          $list
      * @return ActivityList
      */
-    protected function getNewActivityListEntityForEntity($entity, ActivityListProviderInterface $provider, $state = ActivityListManager::STATE_CREATE, $list = null)
-    {
+    protected function getActivityListEntityForEntity(
+        $entity,
+        ActivityListProviderInterface $provider,
+        $state = ActivityListManager::STATE_CREATE,
+        $list = null
+    ) {
         if (!$list) {
             $list = new ActivityList();
         }
@@ -176,6 +150,12 @@ class ActivityListChainProvider
         $list->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
         $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
         $targets = $provider->getTargets($entity);
+        if ($state === ActivityListManager::STATE_UPDATE) {
+            $activityListTargets = $list->getActivityListTargetEntities();
+            foreach ($activityListTargets as $target) {
+                $list->removeActivityListTarget($target);
+            }
+        }
         if (!empty($targets)) {
             foreach ($targets as $target) {
                 if ($list->supportActivityListTarget(get_class($target))) {

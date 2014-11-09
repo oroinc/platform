@@ -331,7 +331,11 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
             . " * @return object This object\n"
             . " */";
-
+        $getRelationsMethodDocblock = "/**\n"
+            . " * Returns array with all related entities\n"
+            . " *\n"
+            . " * @return array\n"
+            . " */";
         $class
             ->setMethod(
                 $this
@@ -360,7 +364,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             )->setMethod(
                 $this
                     ->generateClassMethod($getRelationsName, implode("\n", $getRelationsMethodBody))
-                    ->setDocblock($removeMethodDocblock)
+                    ->setDocblock($getRelationsMethodDocblock)
             );
     }
 }

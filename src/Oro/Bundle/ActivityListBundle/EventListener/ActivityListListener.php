@@ -52,7 +52,7 @@ class ActivityListListener
         $unitOfWork = $entityManager->getUnitOfWork();
         $entityManager->getEventManager()->removeEventListener('onFlush', $this);
 
-        $this->collectEntities($this->insertedEntities, $unitOfWork->getScheduledEntityInsertions());
+        $this->collectInsertedEntities($unitOfWork->getScheduledEntityInsertions());
         $this->collectUpdates($unitOfWork);
         $this->collectDeletedEntities($unitOfWork->getScheduledEntityDeletions());
     }
@@ -132,46 +132,46 @@ class ActivityListListener
         }
     }
 
+    /**
+     * Collect updated activities
+     *
+     * @param UnitOfWork $uof
+     */
     protected function collectUpdates(UnitOfWork $uof)
     {
-        $this->updatedEntities['updates'] = [];
-        $this->updatedEntities['collection_updates'] = [];
-        $this->updatedEntities['collection_deletes'] = [];
         $entities = $uof->getScheduledEntityUpdates();
         foreach ($entities as $hash => $entity) {
-            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->updatedEntities['updates'][$hash])) {
-                $this->updatedEntities['updates'][$hash] = [
-                    $entity
-                ];
+            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->updatedEntities[$hash])) {
+                $this->updatedEntities[$hash] = $entity;
             }
         }
-        $updatedCollections = $uof->getScheduledCollectionUpdates();
-        $deletedCollections = $uof->getScheduledCollectionDeletions();
-        foreach ($updatedCollections as $collection) {
+        $updatedCollections = array_merge(
+            $uof->getScheduledCollectionUpdates(),
+            $uof->getScheduledCollectionDeletions()
+        );
+        foreach ($updatedCollections as $hash => $collection) {
             /** @var $collection PersistentCollection */
-            if ($this->activityListManager->isSupportedEntity($collection->getOwner())) {
-                $this->updatedEntities['collection_updates'][] = $collection;
-            }
-        }
-        foreach ($deletedCollections as $collection) {
-            /** @var $collection PersistentCollection */
-            if ($this->activityListManager->isSupportedEntity($collection->getOwner())) {
-                $this->updatedEntities['collection_deletes'][] = $collection;
+            $ownerEntity = $collection->getOwner();
+            $entityHash = spl_object_hash($ownerEntity);
+            if ($this->activityListManager->isSupportedEntity(
+                    $ownerEntity
+                ) && empty($this->updatedEntities[$entityHash])
+            ) {
+                $this->updatedEntities[$entityHash] = $ownerEntity;
             }
         }
     }
 
     /**
-     * Collect inserted or updated activities
+     * Collect inserted activities
      *
-     * @param array $storage
      * @param array $entities
      */
-    protected function collectEntities(array &$storage, array $entities)
+    protected function collectInsertedEntities(array $entities)
     {
         foreach ($entities as $hash => $entity) {
-            if ($this->activityListManager->isSupportedEntity($entity) && empty($storage[$hash])) {
-                $storage[$hash] = $entity;
+            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->insertedEntities[$hash])) {
+                $this->insertedEntities[$hash] = $entity;
             }
         }
     }

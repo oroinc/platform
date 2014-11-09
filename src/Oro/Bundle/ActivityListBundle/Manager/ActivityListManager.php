@@ -54,14 +54,14 @@ class ActivityListManager
     }
 
     /**
-     * @param               $updatedEntities
+     * @param array         $updatedEntities
      * @param EntityManager $entityManager
      * @return bool
      */
     public function processUpdatedEntities($updatedEntities, EntityManager $entityManager)
     {
         if (!empty($updatedEntities)) {
-            foreach ($updatedEntities['updates'] as $entity) {
+            foreach ($updatedEntities as $entity) {
                 $entityManager->persist($this->chainProvider->getUpdatedActivityList($entity, $entityManager));
             }
             return true;
