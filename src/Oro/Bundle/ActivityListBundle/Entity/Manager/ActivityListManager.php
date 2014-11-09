@@ -11,7 +11,6 @@ use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 
 class ActivityListManager
 {
@@ -30,28 +29,22 @@ class ActivityListManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var ActivityListChainProvider */
-    protected $chainProvider;
-
     /**
      * @param Registry       $doctrine
      * @param SecurityFacade $securityFacade
      * @param NameFormatter  $nameFormatter
      * @param Pager          $pager
-     * @param ActivityListChainProvider $chainProvider
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
-        Pager $pager,
-        ActivityListChainProvider $chainProvider
+        Pager $pager
     ) {
         $this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
         $this->nameFormatter  = $nameFormatter;
         $this->pager          = $pager;
-        $this->chainProvider  = $chainProvider;
     }
 
     /**
@@ -134,8 +127,12 @@ class ActivityListManager
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
             'data'                 => $entity->getData(),
+
             //'relatedEntityClass'   => $entity->getRelatedEntityClass(),
+            'relatedEntityClass'   => 'OroCRM\Bundle\ContactBundle\Entity\Contact',
             //'relatedEntityId'      => $entity->getRelatedEntityId(),
+            'relatedEntityId'      => 52,
+
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
@@ -146,71 +143,5 @@ class ActivityListManager
         ];
 
         return $result;
-    }
-
-    /**
-     * Check if given entity supports by activity list providers
-     *
-     * @param $entity
-     * @return bool
-     */
-    public function isSupportedEntity($entity)
-    {
-        return $this->chainProvider->isSupportedEntity($entity);
-    }
-
-    /**
-     * @param array         $deletedEntities
-     * @param EntityManager $entityManager
-     */
-    public function processDeletedEntities($deletedEntities, EntityManager $entityManager)
-    {
-        if (!empty($deletedEntities)) {
-            foreach ($deletedEntities as $entity) {
-                $entityManager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('list')
-                    ->delete()
-                    ->where('list.relatedActivityClass = :relatedActivityClass')
-                    ->andWhere('list.relatedActivityId = :relatedActivityId')
-                    ->setParameter('relatedActivityClass', $entity['class'])
-                    ->setParameter('relatedActivityId', $entity['id'])
-                    ->getQuery()
-                    ->execute();
-            }
-        }
-    }
-
-    /**
-     * @param array         $updatedEntities
-     * @param EntityManager $entityManager
-     * @return bool
-     */
-    public function processUpdatedEntities($updatedEntities, EntityManager $entityManager)
-    {
-        if (!empty($updatedEntities)) {
-            foreach ($updatedEntities as $entity) {
-                $entityManager->persist($this->chainProvider->getUpdatedActivityList($entity, $entityManager));
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param array         $insertedEntities
-     * @param EntityManager $entityManager
-     * @return bool
-     */
-    public function processInsertEntities($insertedEntities, EntityManager $entityManager)
-    {
-        if (!empty($insertedEntities)) {
-            foreach ($insertedEntities as $entity) {
-                $entityManager->persist($this->chainProvider->getActivityListEntitiesByActivityEntity($entity));
-            }
-
-            return true;
-        }
-
-        return false;
     }
 }

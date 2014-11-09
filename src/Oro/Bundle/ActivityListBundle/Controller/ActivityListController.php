@@ -35,7 +35,7 @@ class ActivityListController extends Controller
         $entity = $this->getEntityRoutingHelper()->getEntity($entityClass, $entityId);
 
         /** @var ActivityListChainProvider $activitiesProvider */
-        $activitiesProvider = $this->get('oro.activity_list.provider.chain');
+        $activitiesProvider = $this->get('oro_activity_list.provider.chain');
 
         /** @var DateTimeRangeFilter $dateRangeFilter */
         $dateRangeFilter = $this->get('oro_filter.datetime_range_filter');

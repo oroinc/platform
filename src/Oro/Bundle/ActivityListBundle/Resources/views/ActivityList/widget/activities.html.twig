@@ -74,37 +74,37 @@
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
             {% endfor %}
 
-        <script type="text/javascript">
-            require([
-                'jquery',
-                'oro/filter/multiselect-filter',
-                'oro/filter/datetime-filter',
-                'orofilter/js/datafilter-wrapper',
-            ], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {
-                var choices = {};
-                var dateRangeFilterMetadata = {{ dateRangeFilterMetadata|json_encode()|raw }};
-                var multiSelectLabel = '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}';
-                var datePickerLabel  = '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}';
+        {#<script type="text/javascript">#}
+            {#require([#}
+                {#'jquery',#}
+                {#'oro/filter/multiselect-filter',#}
+                {#'oro/filter/datetime-filter',#}
+                {#'orofilter/js/datafilter-wrapper',#}
+            {#], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {#}
+                {#var choices = {};#}
+                {#var dateRangeFilterMetadata = {{ dateRangeFilterMetadata|json_encode()|raw }};#}
+                {#var multiSelectLabel = '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}';#}
+                {#var datePickerLabel  = '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}';#}
 
-                {% for activityClass, activityOptions in configuration %}
-                    choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';
-                {% endfor %}
+                {#{% for activityClass, activityOptions in configuration %}#}
+                    {#choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';#}
+                {#{% endfor %}#}
 
-                var filter = new MultiSelectFilter({
-                    'label':   multiSelectLabel,
-                    'choices': choices
-                });
+                {#var filter = new MultiSelectFilter({#}
+                    {#'label':   multiSelectLabel,#}
+                    {#'choices': choices#}
+                {#});#}
 
-                var Filter = DatetimeFilter.extend(dateRangeFilterMetadata);
-                dateFilter = new Filter({
-                    'label': datePickerLabel
-                });
-                _.extend(dateFilter, dataFilterWrapper);
+                {#var Filter = DatetimeFilter.extend(dateRangeFilterMetadata);#}
+                {#dateFilter = new Filter({#}
+                    {#'label': datePickerLabel#}
+                {#});#}
+                {#_.extend(dateFilter, dataFilterWrapper);#}
 
-                filter.render().$el.appendTo($('#filter1'));
-                dateFilter.render().$el.appendTo($('#filter2'));
-            });
-        </script>
+                {#filter.render().$el.appendTo($('#filter1'));#}
+                {#dateFilter.render().$el.appendTo($('#filter2'));#}
+            {#});#}
+        {#</script>#}
         {% endblock %}
     {% endblock %}
 </div>

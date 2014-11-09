@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 interface ActivityListProviderInterface
 {
     /**
-     * returns true if given $configId is supported by activity
+     * Returns true if given target $configId is supported by activity
      *
      * @param ConfigIdInterface $configId
      * @param ConfigManager     $configManager
@@ -19,6 +19,7 @@ interface ActivityListProviderInterface
 
     /**
      * @param object $entity
+     *
      * @return string
      */
     public function getSubject($entity);
@@ -62,10 +63,20 @@ interface ActivityListProviderInterface
     public function getActivityId($entity);
 
     /**
-     * Check if provider supports given entity
+     * Check if provider supports given activity
      *
-     * @param  $entity
+     * @param  object $entity
+     *
      * @return bool
      */
     public function isApplicable($entity);
+
+    /**
+     * Returns array of assigned entities for activity
+     *
+     * @param object $entity
+     *
+     * @return array
+     */
+    public function getTargetEntities($entity);
 }

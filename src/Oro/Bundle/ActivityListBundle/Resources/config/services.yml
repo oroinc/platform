@@ -4,6 +4,7 @@ parameters:
 
     # managers
     oro_activity_list.manager.class:     Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
+    oro_activity_list.collect_manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
@@ -22,6 +23,10 @@ services:
             - @oro_security.security_facade
             - @oro_locale.formatter.name
             - @oro_datagrid.extension.pager.orm.pager
+
+    oro_activity_list.collect_manager:
+        class: %oro_activity_list.collect_manager.class%
+        arguments:
             - @oro_activity_list.provider.chain
 
     oro_activity_list.manager.api:
@@ -38,7 +43,7 @@ services:
     oro_activity_list.event_listener.actitity_list_listener:
         class:  %oro_activity_list.event_listener.actitity_list_listener.class%
         arguments:
-            - @oro_activity_list.manager
+            - @oro_activity_list.collect_manager
             - @oro_entity.doctrine_helper
         tags:
             - { name: doctrine.event_listener, event: onFlush }

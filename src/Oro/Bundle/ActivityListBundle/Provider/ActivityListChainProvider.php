@@ -4,11 +4,13 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 class ActivityListChainProvider
 {
@@ -26,11 +28,12 @@ class ActivityListChainProvider
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param ConfigManager  $configManager
      */
     public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->configManager = $configManager;
+        $this->configManager  = $configManager;
     }
 
     /**
@@ -39,6 +42,7 @@ class ActivityListChainProvider
     public function getTargetEntityClasses()
     {
         if (empty($this->targetClasses)) {
+            /** @var ConfigIdInterface[] $configIds */
             $configIds = $this->configManager->getIds('entity');
             foreach ($configIds as $configId) {
                 foreach ($this->providers as $provider) {
@@ -76,6 +80,7 @@ class ActivityListChainProvider
      * Check if given activity entity supports by activity list providers
      *
      * @param $entity
+     *
      * @return bool
      */
     public function isSupportedEntity($entity)
@@ -97,11 +102,12 @@ class ActivityListChainProvider
     /**
      * @param object        $entity
      * @param EntityManager $entityManager
+     *
      * @return ActivityList
      */
     public function getUpdatedActivityList($entity, EntityManager $entityManager)
     {
-        $provider = $this->getProviderForEntity($entity);
+        $provider        = $this->getProviderForEntity($entity);
         $existListEntity = $entityManager->getRepository('OroActivityListBundle:ActivityList')->findOneBy(
             [
                 'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
@@ -118,26 +124,11 @@ class ActivityListChainProvider
     }
 
     /**
-     * @param ActivityList                  $list
-     * @param ActivityListProviderInterface $provider
-     * @param object                        $entity
-     * @param string                        $state
-     */
-    protected function updateListEntity(
-        ActivityList $list,
-        ActivityListProviderInterface $provider,
-        $entity,
-        $state = ActivityListManager::STATE_UPDATE
-    ) {
-        $list->setSubject($provider->getSubject($entity));
-        $list->setVerb($state);
-    }
-
-    /**
      * @param object                        $entity
      * @param ActivityListProviderInterface $provider
      * @param string                        $state
      * @param ActivityList|null             $list
+     *
      * @return ActivityList
      */
     protected function getActivityListEntityForEntity(
@@ -154,13 +145,18 @@ class ActivityListChainProvider
         $list->setOrganization($entity->getOrganization());
         $list->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
         $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
-        $targets = $provider->getTargets($entity);
+        $list->setSubject($provider->getSubject($entity));
+        $list->setVerb($state);
+        $list->setData($provider->getData($entity));
+
+        $targets = $provider->getTargetEntities($entity);
         if ($state === ActivityListManager::STATE_UPDATE) {
             $activityListTargets = $list->getActivityListTargetEntities();
             foreach ($activityListTargets as $target) {
                 $list->removeActivityListTarget($target);
             }
         }
+
         if (!empty($targets)) {
             foreach ($targets as $target) {
                 if ($list->supportActivityListTarget(get_class($target))) {
@@ -169,8 +165,6 @@ class ActivityListChainProvider
             }
         }
 
-        $this->updateListEntity($list, $provider, $entity, $state);
-
         return $list;
     }
 
@@ -178,6 +172,7 @@ class ActivityListChainProvider
      * Get activity list provider for given activity entity
      *
      * @param $entity
+     *
      * @return ActivityListProviderInterface
      */
     protected function getProviderForEntity($entity)
@@ -185,15 +180,16 @@ class ActivityListChainProvider
         return $this->providers[$this->doctrineHelper->getEntityClass($entity)];
     }
 
-
     /**
      * @return array
      */
     public function getActivityListOption()
     {
+        $entityConfigProvider = $this->configManager->getProvider('entity');
+
         $templates = [];
         foreach ($this->providers as $provider) {
-            $entityConfig = $this->entityConfigProvider->getConfig($provider->getActivityClass());
+            $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$provider->getActivityClass()] = [
                 'icon'     => $entityConfig->get('icon'),
                 'label'    => $entityConfig->get('label'),

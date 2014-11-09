@@ -5,24 +5,11 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
 class ActivityListRepository extends EntityRepository
 {
-    /*
-        Usage example in controller:
-
-        $perPage = 5;
-        $pager   = $this->get('oro_datagrid.extension.pager.orm.pager');
-        $qb = $this->getDoctrine()->getManager()->getRepository('OroActivityListBundle:ActivityList')
-            ->getActivityListQueryBuilder(
-                $request->get('class_name'),
-                $request->get('entity_id')
-            );
-        $pager->setQueryBuilder($qb);
-        $pager->setPage($request->get('page', 1));
-        $pager->setMaxPerPage($perPage);
-        $pager->init();
-        $pager->getResults();
-     * */
     /**
      * @param string    $entityClass
      * @param integer   $entityId
@@ -39,10 +26,14 @@ class ActivityListRepository extends EntityRepository
         \DateTime $dateFrom = null,
         \DateTime $dateTo = null
     ) {
+        $associationName = ExtendHelper::buildAssociationName(
+            $entityClass,
+            ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
+        );
+
         $qb = $this->createQueryBuilder('activity')
-            ->where('activity.relatedEntityClass = :class')
-            ->andWhere('activity.relatedEntityId = :entityId')
-            ->setParameter('class', $entityClass)
+            ->join('activity.' . $associationName, 'r')
+            ->where('r.id = :entityId')
             ->setParameter('entityId', $entityId)
             ->orderBy('activity.updatedAt', 'DESC');
 
