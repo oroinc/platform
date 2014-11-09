@@ -64,4 +64,4 @@ class ActivityListExtension  implements ExtendExtensionAwareInterface
             ]
         );
     }
-} 
+}

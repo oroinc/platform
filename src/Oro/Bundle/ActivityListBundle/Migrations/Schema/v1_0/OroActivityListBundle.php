@@ -66,4 +66,4 @@ class OroActivityListBundle implements Migration
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
-} 
+}

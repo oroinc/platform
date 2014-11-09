@@ -179,4 +179,4 @@ class ActivityListChainProvider
     {
         return $this->providers[$this->doctrineHelper->getEntityClass($entity)];
     }
-} 
+}
