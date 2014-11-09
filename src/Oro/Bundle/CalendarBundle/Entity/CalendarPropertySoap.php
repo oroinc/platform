@@ -12,24 +12,34 @@ use Oro\Bundle\SoapBundle\Entity\SoapEntityInterface;
 class CalendarPropertySoap extends CalendarProperty implements SoapEntityInterface
 {
     /**
+     * @var string
+     *
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $calendarName;
 
     /**
-     * @param CalendarProperty $calendarProperty
+     * @var boolean
+     *
+     * @Soap\ComplexType("boolean", nillable=true)
+     */
+    protected $removable;
+
+    /**
+     * @param array $calendarProperty
      */
     public function soapInit($calendarProperty)
     {
-        $this->id = $calendarProperty->id;
-        $this->targetCalendar = $calendarProperty->targetCalendar ? $calendarProperty->targetCalendar->getId() : null;
-        $this->calendarAlias = $calendarProperty->calendarAlias;
-        $this->calendar = $calendarProperty->calendar;
-        $this->position = $calendarProperty->position;
-        $this->visible = $this->visible;
-        $this->color = $calendarProperty->color;
-        $this->backgroundColor = $calendarProperty->backgroundColor;
-        $this->calendarName = $calendarProperty->targetCalendar ? $this->targetCalendar->getName() : null;
+        $this->id = $calendarProperty['id'];
+        $this->targetCalendar = $calendarProperty['targetCalendar'];
+        $this->calendarAlias = $calendarProperty['calendarAlias'];
+        $this->calendar = $calendarProperty['calendar'];
+        $this->position = $calendarProperty['position'];
+        $this->visible = $calendarProperty['visible'];
+        $this->color = $calendarProperty['color'];
+        $this->backgroundColor = $calendarProperty['backgroundColor'];
+        $this->calendarName = $calendarProperty['calendarName'];
+        $this->removable = $calendarProperty['removable'];
     }
 
     /**
@@ -50,5 +60,25 @@ class CalendarPropertySoap extends CalendarProperty implements SoapEntityInterfa
     public function getCalendarName()
     {
         return $this->calendarName;
+    }
+
+    /**
+     * @param boolean $removable
+     *
+     * @return CalendarPropertySoap
+     */
+    public function setRemovable($removable)
+    {
+        $this->removable = $removable;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getRemovable()
+    {
+        return $this->removable;
     }
 }

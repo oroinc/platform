@@ -89,7 +89,7 @@ class CalendarProperty extends ExtendCalendarProperty
      * @var boolean
      *
      * @ORM\Column(name="visible", type="boolean", options={"default"=true})
-     * @Soap\ComplexType("int", nillable=true)
+     * @Soap\ComplexType("boolean", nillable=true)
      */
     protected $visible = true;
 

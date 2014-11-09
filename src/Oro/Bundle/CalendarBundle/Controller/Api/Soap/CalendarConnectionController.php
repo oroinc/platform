@@ -11,6 +11,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
 use Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager;
+use Oro\Bundle\CalendarBundle\Entity\CalendarPropertySoap;
 
 class CalendarConnectionController extends SoapController
 {
@@ -122,5 +123,19 @@ class CalendarConnectionController extends SoapController
         }
 
         return $user;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function transformToSoapEntity($entity)
+    {
+        if (is_array($entity)) {
+            $soapEntity = new CalendarPropertySoap();
+            $soapEntity->soapInit($entity);
+
+            return $soapEntity;
+        }
+        return $entity;
     }
 }
