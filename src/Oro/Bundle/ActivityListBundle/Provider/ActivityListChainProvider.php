@@ -8,6 +8,7 @@ use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class ActivityListChainProvider
 {
@@ -17,15 +18,19 @@ class ActivityListChainProvider
     /** @var ActivityListProviderInterface[] */
     protected $providers;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var array */
     protected $targetClasses = [];
 
     /**
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -34,10 +39,16 @@ class ActivityListChainProvider
     public function getTargetEntityClasses()
     {
         if (empty($this->targetClasses)) {
-            foreach ($this->providers as $provider) {
-                $this->targetClasses = array_merge($this->targetClasses, $provider->getTargetEntityClasses());
+            $configIds = $this->configManager->getIds('entity');
+            foreach ($configIds as $configId) {
+                foreach ($this->providers as $provider) {
+                    if ($provider->isApplicableTarget($configId, $this->configManager)
+                        && !in_array($configId->getClassName(), $this->targetClasses)
+                    ) {
+                        $this->targetClasses[] = $configId->getClassName();
+                    }
+                }
             }
-            $this->targetClasses = array_unique($this->targetClasses);
         }
 
         return $this->targetClasses;

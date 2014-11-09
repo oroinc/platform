@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+
 interface ActivityListProviderInterface
 {
     /**
@@ -12,11 +15,14 @@ interface ActivityListProviderInterface
     public function getTargets($entity);
 
     /**
-     * returns an array of supported target entity classes for activity
+     * returns true if given $configId is supported by activity
      *
-     * @return string[]
+     * @param ConfigIdInterface $configId
+     * @param ConfigManager     $configManager
+     *
+     * @return bool
      */
-    public function getTargetEntityClasses();
+    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager);
 
     /**
      * returns a class name of entity for which we monitor changes
