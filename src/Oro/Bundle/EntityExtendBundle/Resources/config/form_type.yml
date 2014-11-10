@@ -235,11 +235,12 @@ services:
         class: %oro_entity_extend.form.guesser.extend_field.class%
         arguments:
             - @doctrine
-            - @oro_entity_config.config_manager
             - @oro_entity_config.provider.entity
             - @oro_entity_config.provider.form
             - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.enum
         calls:
+            - [addExtendTypeMapping, ["boolean", "choice"]] # extended boolean fields should be choice type
             - [addExtendTypeMapping, ["file", "oro_file"]]
             - [addExtendTypeMapping, ["image", "oro_image"]]
             - [addExtendTypeMapping, ["manyToOne", "oro_entity_select"]]

@@ -11,7 +11,6 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -30,24 +29,24 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
     /** @var ManagerRegistry */
     protected $managerRegistry;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    /** @var ConfigProvider */
+    protected $enumConfigProvider;
 
     /** @var array */
     protected $typeMap = [];
 
     public function __construct(
         ManagerRegistry $managerRegistry,
-        ConfigManager $configManager,
         ConfigProvider $entityConfigProvider,
         ConfigProvider $formConfigProvider,
-        ConfigProvider $extendConfigProvider
+        ConfigProvider $extendConfigProvider,
+        ConfigProvider $enumConfigProvider
     ) {
         $this->formConfigProvider   = $formConfigProvider;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
         $this->managerRegistry      = $managerRegistry;
-        $this->configManager        = $configManager;
+        $this->enumConfigProvider   = $enumConfigProvider;
     }
 
     /**
@@ -135,19 +134,21 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
         $options = [];
 
         switch ($fieldConfigId->getFieldType()) {
+            case 'boolean':
+                $options['empty_value'] = false;
+                $options['choices'] = ['No', 'Yes'];
+                break;
             case 'optionSet':
                 $options['entityClassName'] = $className;
                 $options['entityFieldName'] = $fieldName;
                 break;
             case 'enum':
-                $options['enum_code'] = $this->configManager->getProvider('enum')
-                    ->getConfig($className, $fieldName)
+                $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
                     ->get('enum_code');
                 break;
             case 'multiEnum':
                 $options['expanded']  = true;
-                $options['enum_code'] = $this->configManager->getProvider('enum')
-                    ->getConfig($className, $fieldName)
+                $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
                     ->get('enum_code');
                 break;
             case 'manyToOne':
