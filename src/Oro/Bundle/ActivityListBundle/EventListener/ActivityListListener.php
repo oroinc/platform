@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\PersistentCollection;
 
-use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActivityListListener
@@ -25,15 +25,17 @@ class ActivityListListener
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ActivityListManager */
+    /** @var CollectListManager */
     protected $activityListManager;
 
     /**
-     * @param ActivityListManager $activityListManager
+     * @param CollectListManager $activityListManager
      * @param DoctrineHelper      $doctrineHelper
      */
-    public function __construct(ActivityListManager $activityListManager, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        CollectListManager $activityListManager,
+        DoctrineHelper $doctrineHelper
+    ) {
         $this->activityListManager = $activityListManager;
         $this->doctrineHelper = $doctrineHelper;
     }

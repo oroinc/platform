@@ -3,20 +3,13 @@
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for fieldName, item in dynamicFields %}
-            {{ ui.renderHtmlProperty(
-                item.label|trans,
-                _self.formatDynamicFieldValue(
-                    entity_class,
-                    fieldName,
-                    item.type,
-                    item.value
-                )
-            ) }}
+            {% set itemValue = _self.formatDynamicFieldValue(entity, entity_class, fieldName, item.type, item.value) %}
+            {{ ui.renderHtmlProperty(item.label|trans, itemValue) }}
         {% endfor %}
     {% endif %}
 {% endmacro %}
 
-{% macro formatDynamicFieldValue(entity_class, field_name, type, value) %}
+{% macro formatDynamicFieldValue(entity, entity_class, field_name, type, value) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
     {% set hasLink = false %}
     {% if value is iterable %}
@@ -60,5 +53,5 @@
         {% set value = value|escape %}
     {% endif %}
 
-    {{ value }}
+    {{ value|raw }}
 {% endmacro %}

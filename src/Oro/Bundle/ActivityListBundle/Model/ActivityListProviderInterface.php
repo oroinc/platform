@@ -8,7 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 interface ActivityListProviderInterface
 {
     /**
-     * returns true if given $configId is supported by activity
+     * Returns true if given target $configId is supported by activity
      *
      * @param ConfigIdInterface $configId
      * @param ConfigManager     $configManager
@@ -19,13 +19,34 @@ interface ActivityListProviderInterface
 
     /**
      * @param object $entity
+     *
      * @return string
      */
     public function getSubject($entity);
 
+    /**
+     * @param object $entity
+     *
+     * @return array
+     */
     public function getData($entity);
 
+    /**
+     * @return string
+     */
     public function getTemplate();
+
+    /**
+     * Should return array of route names as key => value
+     * e.g. [
+     *      'itemView'  => 'item_view_route',
+     *      'itemEdit'  => 'item_edit_route',
+     *      'itemDelete => 'item_delete_route'
+     * ]
+     *
+     * @return array
+     */
+    public function getRoutes();
 
     /**
      * returns a class name of entity for which we monitor changes
@@ -34,13 +55,28 @@ interface ActivityListProviderInterface
      */
     public function getActivityClass();
 
+    /**
+     * @param object $entity
+     *
+     * @return integer
+     */
     public function getActivityId($entity);
 
     /**
-     * Check if provider supports given entity
+     * Check if provider supports given activity
      *
-     * @param $entity
+     * @param  object $entity
+     *
      * @return bool
      */
     public function isApplicable($entity);
+
+    /**
+     * Returns array of assigned entities for activity
+     *
+     * @param object $entity
+     *
+     * @return array
+     */
+    public function getTargetEntities($entity);
 }

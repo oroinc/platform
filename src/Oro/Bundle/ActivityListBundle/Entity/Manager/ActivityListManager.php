@@ -2,89 +2,152 @@
 
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
+use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActivityListManager
 {
     const STATE_CREATE = 'create';
     const STATE_UPDATE = 'update';
 
-    /** @var ActivityListChainProvider */
-    protected $chainProvider;
+    /** @var EntityManager */
+    protected $em;
+
+    /** @var Pager */
+    protected $pager;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var NameFormatter */
+    protected $nameFormatter;
 
     /**
-     * @param ActivityListChainProvider $chainProvider
+     * @param Registry       $doctrine
+     * @param SecurityFacade $securityFacade
+     * @param NameFormatter  $nameFormatter
+     * @param Pager          $pager
      */
-    public function __construct(ActivityListChainProvider $chainProvider)
-    {
-        $this->chainProvider = $chainProvider;
+    public function __construct(
+        Registry $doctrine,
+        SecurityFacade $securityFacade,
+        NameFormatter $nameFormatter,
+        Pager $pager
+    ) {
+        $this->em             = $doctrine->getManager();
+        $this->securityFacade = $securityFacade;
+        $this->nameFormatter  = $nameFormatter;
+        $this->pager          = $pager;
     }
 
     /**
-     * Check if given entity supports by activity list providers
+     * @return ActivityListRepository
+     */
+    public function getRepository()
+    {
+        return $this->em->getRepository(ActivityList::ENTITY_NAME);
+    }
+
+    /**
+     * @param string         $entityClass
+     * @param integer        $entityId
+     * @param array          $activityEntityСlasses
+     * @param \DateTime|bool $dateFrom
+     * @param \DateTime|bool $dateTo
+     * @param integer        $page
+     * @param integer        $limit
      *
-     * @param $entity
-     * @return bool
+     * @return ActivityList[]
      */
-    public function isSupportedEntity($entity)
-    {
-        return $this->chainProvider->isSupportedEntity($entity);
+    public function getList(
+        $entityClass,
+        $entityId,
+        $activityEntityСlasses,
+        $dateFrom,
+        $dateTo,
+        $page,
+        $limit = 25
+    ) {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getRepository()->getActivityListQueryBuilder(
+            $entityClass,
+            $entityId,
+            $activityEntityСlasses,
+            $dateFrom,
+            $dateTo
+        );
+
+        $pager = $this->pager;
+        $pager->setQueryBuilder($qb);
+        $pager->setPage($page);
+        $pager->setMaxPerPage($limit);
+        $pager->init();
+
+        /** @var ActivityList[] $result */
+        $results = $pager->getResults();
+
+        $results = $this->getEntityViewModels($results);
+
+        return $results;
     }
 
     /**
-     * @param array         $deletedEntities
-     * @param EntityManager $entityManager
+     * @param integer $activityListItemId
+     *
+     * @return array
      */
-    public function processDeletedEntities($deletedEntities, EntityManager $entityManager)
+    public function getItem($activityListItemId)
     {
-        if (!empty($deletedEntities)) {
-            foreach ($deletedEntities as $entity) {
-                $entityManager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('list')
-                    ->delete()
-                    ->where('list.relatedActivityClass = :relatedActivityClass')
-                    ->andWhere('list.relatedActivityId = :relatedActivityId')
-                    ->setParameter('relatedActivityClass', $entity['class'])
-                    ->setParameter('relatedActivityId', $entity['id'])
-                    ->getQuery()
-                    ->execute();
-            }
-        }
+        /** @var ActivityList $activityListItem */
+        $activityListItem = $this->getRepository()->find($activityListItemId);
+
+        return $this->getEntityViewModel($activityListItem);
     }
 
     /**
-     * @param array         $updatedEntities
-     * @param EntityManager $entityManager
-     * @return bool
+     * @param ActivityList[] $entities
+     *
+     * @return array
      */
-    public function processUpdatedEntities($updatedEntities, EntityManager $entityManager)
+    public function getEntityViewModels($entities)
     {
-        if (!empty($updatedEntities)) {
-            foreach ($updatedEntities as $entity) {
-                $entityManager->persist($this->chainProvider->getUpdatedActivityList($entity, $entityManager));
-            }
-            return true;
+        $result = [];
+        foreach ($entities as $entity) {
+            $result[] = $this->getEntityViewModel($entity);
         }
-
-        return false;
+        return $result;
     }
 
     /**
-     * @param array         $insertedEntities
-     * @param EntityManager $entityManager
-     * @return bool
+     * @param ActivityList $entity
+     *
+     * @return array
      */
-    public function processInsertEntities($insertedEntities, EntityManager $entityManager)
+    public function getEntityViewModel(ActivityList $entity)
     {
-        if (!empty($insertedEntities)) {
-            foreach ($insertedEntities as $entity) {
-                $entityManager->persist($this->chainProvider->getActivityListEntitiesByActivityEntity($entity));
-            }
+        $result = [
+            'id'                   => $entity->getId(),
+            'owner'                => $this->nameFormatter->format($entity->getOwner()),
+            'owner_id'             => $entity->getOwner()->getId(),
+            'owner_route'          => '',
+            'verb'                 => $entity->getVerb(),
+            'subject'              => $entity->getSubject(),
+            'data'                 => $entity->getData(),
+            'relatedActivityClass' => $entity->getRelatedActivityClass(),
+            'relatedActivityId'    => $entity->getRelatedActivityId(),
+            'createdAt'            => $entity->getCreatedAt()->format('c'),
+            'updatedAt'            => $entity->getUpdatedAt()->format('c'),
+            'editable'             => $this->securityFacade->isGranted('EDIT', $entity),
+            'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
+        ];
 
-            return true;
-        }
-
-        return false;
+        return $result;
     }
 }
