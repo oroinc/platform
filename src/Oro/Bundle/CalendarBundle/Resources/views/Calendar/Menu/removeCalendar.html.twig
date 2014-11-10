@@ -1,5 +1,5 @@
 <% if (removable) { %>
-    {% if item.extras is defined and item.extras.module is defined %}
+    {% if item.extras.module is defined %}
         {% set itemAttributes = itemAttributes|merge({'data-module': item.extras.module })%}
     {% endif %}
     <a href="javascript:void(0);"{{ oro_menu.attributes(itemAttributes) }}>{{ label }}</a>
