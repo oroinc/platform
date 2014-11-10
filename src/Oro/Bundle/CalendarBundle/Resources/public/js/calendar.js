@@ -151,26 +151,17 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         },
 
-        renderEventAfterAdd: function (eventModel) {
-            var fcEvent = eventModel.toJSON();
+        onEventAdded: function (eventModel) {
+            var fcEvent = eventModel.toJSON(),
+                model = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
+
             // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
-        },
 
-        onEventAdded: function (eventModel) {
             // make sure that a calendar is visible when a new event is added to it
-            var model = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
             if (!model.get('visible')) {
-                // show a calendar automatically if it is not visible now
-                var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
-                    $visibleButton = this.connectionsView.$el.find(
-                        this.connectionsView.selectors.findItemByCalendar(model.get('calendarUid'))
-                    ).find(this.connectionsView.selectors.visibleButton);
-                this.connectionsView.showCalendar(model, $visibleButton, savingMsg);
-            } else {
-                // just render a new event if a calendar is already visible
-                this.renderEventAfterAdd(eventModel);
+                this.connectionsView.showCalendar(model);
             }
         },
 

@@ -30,7 +30,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             newCalendarSelector: '#new_calendar',
             contextMenuTemplate: '#template-calendar-menu',
             contextMenuSpinnerTemplate: '#template-calendar-menu-spinner',
-            visibleButton: '.calendar-color'
+            visibilityButton: '.calendar-color'
         },
 
         initialize: function (options) {
@@ -42,13 +42,12 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.contextMenuTemplate = _.template($(this.selectors.contextMenuTemplate).html());
 
             // render connected calendars
-            this.collection.each(_.bind(function (model) {
-                this.onModelAdded(model);
-            }, this));
+            this.collection.each(_.bind(this.onModelAdded, this));
 
             // subscribe to connection collection events
             this.listenTo(this.collection, 'add', this.onModelAdded);
             this.listenTo(this.collection, 'change', this.onModelChanged);
+            this.listenTo(this.collection, 'destroy', this.onModelDeleted);
 
             // subscribe to connect new calendar event
             var container = this.$el.closest(this.selectors.container);
@@ -59,8 +58,23 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }, this));
         },
 
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            $(document).off('.' + this.cid);
+            Backbone.View.prototype.dispose.call(this);
+        },
+
         getCollection: function () {
             return this.collection;
+        },
+
+        findItem: function (model) {
+            return this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
         },
 
         onModelAdded: function (model) {
@@ -71,7 +85,11 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 var $last = this.$el.find(this.selectors.lastItem);
                 return $last.attr(this.attrs.calendarAlias) === 'user' ? $last.attr(this.attrs.backgroundColor) : null;
             }, this));
-            this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.color, viewModel.backgroundColor);
+            this.options.colorManager.setCalendarColors(
+                viewModel.calendarUid,
+                viewModel.color,
+                viewModel.backgroundColor
+            );
             model.set('color', viewModel.color);
             model.set('backgroundColor', viewModel.backgroundColor);
 
@@ -87,129 +105,51 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 if ($contextMenu.length) {
                     $contextMenu.remove();
                 } else {
-                    this.contextMenu($currentTarget, model);
+                    this.showContextMenu($currentTarget, model);
                 }
             }, this));
 
             this.$el.find(this.selectors.itemContainer).append($el);
 
-            this.addVisibleEventListener(model);
+            this._addVisibilityButtonEventListener(this.findItem(model), model);
 
             if (model.get('visible')) {
                 this.trigger('connectionAdd', model);
             }
         },
 
-        addVisibleEventListener: function (model) {
-            var $itemConnection = this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
-            $itemConnection.one('click.' + this.cid, this.selectors.visibleButton, _.bind(function (e) {
-                this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
-                this.options.defferedActionEnd = $.Deferred();
-                this.options.defferedActionEnd.then(
-                    _.bind(function () {
-                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
-                    }, this),
-                    _.bind(function () {
-                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
-                    }, this)
-                );
-                this.toggleCalendar($(e.currentTarget), model);
-            }, this));
+        onModelChanged: function (model) {
+            this.options.colorManager.setCalendarColors(
+                model.get('calendarUid'),
+                model.get('color'),
+                model.get('backgroundColor')
+            );
+            this.trigger('connectionChange', model);
         },
 
-        offVisibleEventListener: function (model) {
-            var $itemConnection = this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
-            $itemConnection.off('.' + this.cid);
+        onModelDeleted: function (model) {
+            this.options.colorManager.removeCalendarColors(model.get('calendarUid'));
+            this.findItem(model).remove();
+            this.trigger('connectionRemove', model);
         },
 
-        setDisplayVisibleItem: function (model, $target) {
-            $target.removeClass('un-color');
-            var style = {
-                backgroundColor: "#" + model.get('backgroundColor'),
-                borderColor: "#" + model.get('backgroundColor')
-            };
-            $target.css(style);
+        showCalendar: function (model) {
+            this._showItem(model, true);
         },
 
-        setDisplayNoneItem: function (model, $target) {
-            var style = {
-                backgroundColor: "",
-                borderColor: ""
-            };
-            $target.css(style);
-            $target.addClass('un-color');
+        hideCalendar: function (model) {
+            this._showItem(model, false);
         },
 
-        showCalendar: function (model, $target, savingMsg) {
-            this.offVisibleEventListener(model);
-            this.setDisplayVisibleItem(model, $target);
-            try {
-                model.save('visible', true, {
-                    wait: true,
-                    success: _.bind(function () {
-                        savingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was updated.'));
-                        this.trigger('connectionAdd', model);
-                        this.addVisibleEventListener(model);
-                        this.options.defferedActionEnd.resolve();
-                    }, this),
-                    error: _.bind(function (model, response) {
-                        savingMsg.close();
-                        this.showUpdateError(response.responseJSON || {});
-                        this.addVisibleEventListener(model);
-                        this.setDisplayNoneItem(model, $target);
-                        this.options.defferedActionEnd.resolve();
-                    })
-                });
-            } catch (err) {
-                savingMsg.close();
-                this.showMiscError(err);
-                this.addVisibleEventListener(model);
-                this.setDisplayNoneItem(model, $target);
-                this.options.defferedActionEnd.resolve();
-            }
-        },
-
-        hideCalendar: function (model, $target, savingMsg) {
-            this.offVisibleEventListener(model);
-            this.setDisplayNoneItem(model, $target);
-            try {
-                model.save('visible', false, {
-                    wait: true,
-                    success: _.bind(function () {
-                        savingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was updated.'));
-                        this.trigger('connectionRemove', model);
-                        this.addVisibleEventListener(model);
-                        this.options.defferedActionEnd.resolve();
-                    }, this),
-                    error: _.bind(function (model, response) {
-                        savingMsg.close();
-                        this.showUpdateError(response.responseJSON || {});
-                        this.addVisibleEventListener(model);
-                        this.setDisplayVisibleItem(model, $target);
-                        this.options.defferedActionEnd.resolve();
-                    })
-                });
-            } catch (err) {
-                savingMsg.close();
-                this.showMiscError(err);
-                this.addVisibleEventListener(model);
-                this.setDisplayVisibleItem(model, $target);
-                this.options.defferedActionEnd.resolve();
-            }
-        },
-
-        toggleCalendar: function ($target, model) {
-            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+        toggleCalendar: function (model) {
             if (model.get('visible')) {
-                this.hideCalendar(model, $target, savingMsg);
+                this.hideCalendar(model);
             } else {
-                this.showCalendar(model, $target, savingMsg);
+                this.showCalendar(model);
             }
         },
 
-        contextMenu: function ($container, model) {
+        showContextMenu: function ($container, model) {
             var $el = $(this.contextMenuTemplate(model.toJSON())),
                 options = this.options,
                 modules = _.uniq($el.find("a[data-module]").map(function () {
@@ -232,11 +172,10 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         var  actionModule = new moduleConstructor(options);
                         $el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
                             this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
-                            var dataOptions = $(e.target).attr('data-options') || {};
                             $('.context-menu-button').css('display', '');
                             $el.remove();
                             $(document).off('.' + this.cid);
-                            actionModule.execute(model, dataOptions);
+                            actionModule.execute(model);
                         }, this));
                     }, this));
                     $container.closest(this.selectors.item)
@@ -250,15 +189,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     });
                 }, this));
             }
-        },
-
-        onModelChanged: function (model) {
-            this.options.colorManager.setCalendarColors(
-                model.get('calendarUid'),
-                model.get('color'),
-                model.get('backgroundColor')
-            );
-            this.trigger('connectionChange', model);
         },
 
         addModel: function (calendarId, calendarName) {
@@ -311,15 +241,67 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             messenger.showErrorMessage(message, err);
         },
 
-        /**
-         * @inheritDoc
-         */
-        dispose: function () {
-            if (this.disposed) {
-                return;
+        _showItem: function (model, visible) {
+            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
+                $connection = this.findItem(model),
+                $visibilityButton = $connection.find(this.selectors.visibilityButton);
+            this._removeVisibilityButtonEventListener($connection, model);
+            this._setItemVisibility($visibilityButton, visible ? model.get('backgroundColor') : '');
+            try {
+                model.save('visible', visible, {
+                    wait: true,
+                    success: _.bind(function () {
+                        savingMsg.close();
+                        messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                        this.trigger(visible ? 'connectionAdd' : 'connectionRemove', model);
+                        this._addVisibilityButtonEventListener($connection, model);
+                        this.options.defferedActionEnd.resolve();
+                    }, this),
+                    error: _.bind(function (model, response) {
+                        savingMsg.close();
+                        this.showUpdateError(response.responseJSON || {});
+                        this._addVisibilityButtonEventListener($connection, model);
+                        this._setItemVisibility($visibilityButton, visible ? '' : model.get('backgroundColor'));
+                        this.options.defferedActionEnd.resolve();
+                    }, this)
+                });
+            } catch (err) {
+                savingMsg.close();
+                this.showMiscError(err);
+                this._addVisibilityButtonEventListener($connection, model);
+                this._setItemVisibility($visibilityButton, visible ? '' : model.get('backgroundColor'));
+                this.options.defferedActionEnd.resolve();
             }
-            $(document).off('.' + this.cid);
-            Backbone.View.prototype.dispose.call(this);
+        },
+
+        _setItemVisibility: function ($visibilityButton, backgroundColor) {
+            if (backgroundColor) {
+                $visibilityButton.removeClass('un-color');
+                $visibilityButton.css({backgroundColor: '#' + backgroundColor, borderColor: '#' + backgroundColor});
+            } else {
+                $visibilityButton.css({backgroundColor: '', borderColor: ''});
+                $visibilityButton.addClass('un-color');
+            }
+        },
+
+        _addVisibilityButtonEventListener: function ($connection, model) {
+            $connection.one('click.' + this.cid, this.selectors.visibilityButton, _.bind(function (e) {
+                this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
+                this.options.defferedActionEnd = $.Deferred();
+                this.options.defferedActionEnd.then(
+                    _.bind(function () {
+                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+                    }, this),
+                    _.bind(function () {
+                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
+                    }, this)
+                );
+                this.toggleCalendar(model);
+            }, this));
+        },
+
+        _removeVisibilityButtonEventListener: function ($connection, model) {
+            $connection.off('.' + this.cid);
         }
     });
 });

@@ -29,7 +29,6 @@ oro:
 
         menu:
             view_default: My Calendar
-            context: Context menu
 
         context:
             remove: Remove calendar
