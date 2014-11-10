@@ -113,7 +113,6 @@ class ActivityListController extends RestController
         return new JsonResponse($results);
     }
 
-
     /**
      * Get Activity object
      *

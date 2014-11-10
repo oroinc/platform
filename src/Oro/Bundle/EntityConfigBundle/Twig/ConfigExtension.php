@@ -10,9 +10,7 @@ class ConfigExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
     /**
@@ -89,10 +87,7 @@ class ConfigExtension extends \Twig_Extension
             return null;
         }
 
-        //$entityConfig = new EntityConfigId($scope, $className);
-
         $fieldConfigId = $this->configManager->getId($scope, $className, $fieldName);
-
 
         return $this->configManager->getConfig($fieldConfigId)->get($attrName);
     }

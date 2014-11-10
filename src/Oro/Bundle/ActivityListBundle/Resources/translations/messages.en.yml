@@ -14,5 +14,7 @@ oro:
         created_at.label: Created at
         updated_at.label: Updated at
 
+        no_activities_exist: No activities found
+
         widget.filter.date_picker.title: Date Range
         widget.filter.activity.title: Activity Type
