@@ -74,35 +74,35 @@
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
             {% endfor %}
 
-        <script type="text/javascript">
-            /**
-             * TODO: rewrite filters to be in scope of component (for now component do not known about filters)
-             */
-            require([
-                'jquery',
-                'oro/filter/multiselect-filter',
-                'oro/filter/datetime-filter',
-                'orofilter/js/datafilter-wrapper',
-            ], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {
-                var choices = {};
-                {% for activityClass, activityOptions in configuration %}
-                    choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';
-                {% endfor %}
-                var filter = new MultiSelectFilter({
-                    'label':   '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}',
-                    'choices': choices || {}
-                });
+        {#<script type="text/javascript">#}
+            {#/**#}
+             {#* TODO: rewrite filters to be in scope of component (for now component do not known about filters)#}
+             {#*/#}
+            {#require([#}
+                {#'jquery',#}
+                {#'oro/filter/multiselect-filter',#}
+                {#'oro/filter/datetime-filter',#}
+                {#'orofilter/js/datafilter-wrapper',#}
+            {#], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {#}
+                {#var choices = {};#}
+                {#{% for activityClass, activityOptions in configuration %}#}
+                    {#choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';#}
+                {#{% endfor %}#}
+                {#var filter = new MultiSelectFilter({#}
+                    {#'label':   '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}',#}
+                    {#'choices': choices || {}#}
+                {#});#}
 
-                var Filter = DatetimeFilter.extend({{ dateRangeFilterMetadata|json_encode()|raw }});
-                var dateFilter = new Filter({
-                    'label': '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}'
-                });
-                _.extend(dateFilter, dataFilterWrapper);
+                {#var Filter = DatetimeFilter.extend({{ dateRangeFilterMetadata|json_encode()|raw }});#}
+                {#var dateFilter = new Filter({#}
+                    {#'label': '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}'#}
+                {#});#}
+                {#_.extend(dateFilter, dataFilterWrapper);#}
 
-                filter.render().$el.appendTo($('#filter1'));
-                dateFilter.render().$el.appendTo($('#filter2'));
-            });
-        </script>
+                {#filter.render().$el.appendTo($('#filter1'));#}
+                {#dateFilter.render().$el.appendTo($('#filter2'));#}
+            {#});#}
+        {#</script>#}
         {% endblock %}
     {% endblock %}
 </div>
