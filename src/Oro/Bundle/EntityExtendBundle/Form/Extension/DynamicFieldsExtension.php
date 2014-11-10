@@ -18,9 +18,6 @@ use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
     /** @var ConfigManager */
@@ -86,21 +83,14 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      * @param FormView      $view
      * @param FormInterface $form
      * @param array         $options
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
-            return;
-        }
-
         $className = $options['data_class'];
-        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
+        if ($options['dynamic_fields_disabled'] || empty($options['data_class']) ||
+            !$this->configManager->getProvider('extend')->hasConfig($className)) {
             return;
         }
-
-        $data = $form->getData();
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $formConfigProvider   = $this->configManager->getProvider('form');
@@ -122,35 +112,51 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
             $view->children[$fieldName]->vars['extra_field'] = true;
 
-            if (in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToMany'])) {
-                $dataId = 0;
-                if ($data->getId()) {
-                    $dataId = $data->getId();
-                }
-                $view->children[$fieldName]->vars['grid_url'] =
-                    $this->router->generate(
-                        'oro_entity_relation',
-                        [
-                            'id'         => $dataId,
-                            'entityName' => str_replace('\\', '_', $className),
-                            'fieldName'  => $fieldName
-                        ]
-                    );
-
-                $defaultEntity = null;
-                if (!$extendConfig->is('without_default')) {
-                    $defaultEntity = FieldAccessor::getValue(
-                        $data,
-                        ExtendConfigDumper::DEFAULT_PREFIX . $fieldName
-                    );
-                }
-                $selectedCollection = FieldAccessor::getValue($data, $fieldName);
-
-                if ($data->getId()) {
-                    $view->children[$fieldName]->vars['initial_elements'] =
-                        $this->getInitialElements($selectedCollection, $defaultEntity, $extendConfig);
-                }
+            if (!in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToMany'])) {
+                continue;
             }
+
+            $this->addInitialElements($view, $form, $extendConfig);
+        }
+    }
+
+    /**
+     * @param FormView        $view
+     * @param FormInterface   $form
+     * @param ConfigInterface $extendConfig
+     */
+    protected function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
+    {
+        $data      = $form->getData();
+        $dataId    = $data->getId() ? $data->getId() : 0;
+
+        /** @var FieldConfigId $extendConfigId */
+        $extendConfigId = $extendConfig->getId();
+        $className      = $extendConfigId->getClassName();
+        $fieldName      = $extendConfigId->getFieldName();
+
+        $view->children[$fieldName]->vars['grid_url'] =
+            $this->router->generate(
+                'oro_entity_relation',
+                [
+                    'id'         => $dataId,
+                    'entityName' => str_replace('\\', '_', $className),
+                    'fieldName'  => $fieldName
+                ]
+            );
+
+        $defaultEntity = null;
+        if (!$extendConfig->is('without_default')) {
+            $defaultEntity = FieldAccessor::getValue(
+                $data,
+                ExtendConfigDumper::DEFAULT_PREFIX . $fieldName
+            );
+        }
+        $selectedCollection = FieldAccessor::getValue($data, $fieldName);
+
+        if ($dataId) {
+            $view->children[$fieldName]->vars['initial_elements'] =
+                $this->getInitialElements($selectedCollection, $defaultEntity, $extendConfig);
         }
     }
 
