@@ -72,3 +72,4 @@ datagrid:
                 link: delete_link
         options:
             entityHint: embedded form
+            entity_pagination: true
