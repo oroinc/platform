@@ -72,68 +72,19 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
 
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $formConfig->getId();
-        $fieldName = $fieldConfigId->getFieldName();
+        $fieldName     = $fieldConfigId->getFieldName();
+        $extendConfig  = $this->extendConfigProvider->getConfig($className, $fieldName);
 
-        $extendConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
-        if (!$this->isApplicableField($extendConfig)) {
+        $isTypeNotExists = empty($this->typeMap[$fieldConfigId->getFieldType()]);
+        $options         = $this->getOptions($extendConfig, $fieldConfigId);
+
+        if (!$this->isApplicableField($extendConfig) || $isTypeNotExists || empty($options)) {
             return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
         }
 
-        switch ($fieldConfigId->getFieldType()) {
-            case 'boolean':
-                $options['empty_value'] = false;
-                $options['choices'] = ['No', 'Yes'];
-                break;
-            case 'optionSet':
-                $options['entityClassName'] = $className;
-                $options['entityFieldName'] = $fieldName;
-                break;
-            case 'enum':
-                $options['enum_code'] = $this->configManager->getProvider('enum')
-                    ->getConfig($className, $fieldName)
-                    ->get('enum_code');
-                break;
-            case 'multiEnum':
-                $options['expanded'] = true;
-                $options['enum_code'] = $this->configManager->getProvider('enum')
-                    ->getConfig($className, $fieldName)
-                    ->get('enum_code');
-                break;
-            case 'manyToOne':
-                $options['entity_class'] = $extendConfig->get('target_entity');
-                $options['configs']      = [
-                    'placeholder'   => 'oro.form.choose_value',
-                    'extra_config'  => 'relation',
-                    'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
-                    'target_field'  => $extendConfig->get('target_field'),
-                    'properties'    => [$extendConfig->get('target_field')],
-                ];
-                break;
-            case 'oneToMany':
-            case 'manyToMany':
-                $classArray = explode('\\', $extendConfig->get('target_entity'));
-                $blockName = array_pop($classArray);
-
-                $options['block']                 = $blockName;
-                $options['block_config']          = [
-                    $blockName => ['title' => null, 'subblocks' => [['useSpan' => false]]]
-                ];
-                $options['class']                 = $extendConfig->get('target_entity');
-                $options['selector_window_title'] = 'Select ' . $blockName;
-                $options['initial_elements']      = null;
-                $options['mapped']                = false;
-                $options['extend']                = true;
-                if (!$extendConfig->is('without_default')) {
-                    $options['default_element'] = ExtendConfigDumper::DEFAULT_PREFIX . $property;
-                }
-                break;
-            default:
-                return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
-        }
-
         $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
-        $type    = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
-        $options = array_replace_recursive(
+        $type         = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
+        $options      = array_replace_recursive(
             [
                 'label'    => $entityConfig->get('label'),
                 'required' => false,
@@ -171,7 +122,69 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @param ConfigInterface         $extendConfig
+     * @param ConfigInterface $extendConfig
+     * @param FieldConfigId   $fieldConfigId
+     *
+     * @return array
+     */
+    protected function getOptions(ConfigInterface $extendConfig, FieldConfigId $fieldConfigId)
+    {
+        $className = $fieldConfigId->getClassName();
+        $fieldName = $fieldConfigId->getFieldName();
+
+        $options = [];
+
+        switch ($fieldConfigId->getFieldType()) {
+            case 'optionSet':
+                $options['entityClassName'] = $className;
+                $options['entityFieldName'] = $fieldName;
+                break;
+            case 'enum':
+                $options['enum_code'] = $this->configManager->getProvider('enum')
+                    ->getConfig($className, $fieldName)
+                    ->get('enum_code');
+                break;
+            case 'multiEnum':
+                $options['expanded']  = true;
+                $options['enum_code'] = $this->configManager->getProvider('enum')
+                    ->getConfig($className, $fieldName)
+                    ->get('enum_code');
+                break;
+            case 'manyToOne':
+                $options['entity_class'] = $extendConfig->get('target_entity');
+                $options['configs']      = [
+                    'placeholder'   => 'oro.form.choose_value',
+                    'extra_config'  => 'relation',
+                    'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
+                    'target_field'  => $extendConfig->get('target_field'),
+                    'properties'    => [$extendConfig->get('target_field')],
+                ];
+                break;
+            case 'oneToMany':
+            case 'manyToMany':
+                $classArray = explode('\\', $extendConfig->get('target_entity'));
+                $blockName  = array_pop($classArray);
+
+                $options['block']                 = $blockName;
+                $options['block_config']          = [
+                    $blockName => ['title' => null, 'subblocks' => [['useSpan' => false]]]
+                ];
+                $options['class']                 = $extendConfig->get('target_entity');
+                $options['selector_window_title'] = 'Select ' . $blockName;
+                $options['initial_elements']      = null;
+                $options['mapped']                = false;
+                $options['extend']                = true;
+                if (!$extendConfig->is('without_default')) {
+                    $options['default_element'] = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
+                }
+                break;
+        }
+
+        return $options;
+    }
+
+    /**
+     * @param ConfigInterface $extendConfig
      *
      * @return bool
      */
