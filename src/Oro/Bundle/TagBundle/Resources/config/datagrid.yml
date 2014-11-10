@@ -2,6 +2,7 @@ datagrid:
     tag-grid:
         options:
             entityHint: tag
+            entity_pagination: true
         source:
             acl_resource: oro_tag_view
             type: orm
