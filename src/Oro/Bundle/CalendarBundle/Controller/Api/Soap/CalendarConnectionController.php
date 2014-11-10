@@ -105,18 +105,4 @@ class CalendarConnectionController extends SoapController
     {
         return $this->container->get('oro_calendar.calendar_property.form.handler.soap.api');
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function transformToSoapEntity($entity)
-    {
-        if (is_array($entity)) {
-            $soapEntity = new CalendarPropertySoap();
-            $soapEntity->soapInit($entity);
-
-            return $soapEntity;
-        }
-        return $entity;
-    }
 }
