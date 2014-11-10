@@ -15,8 +15,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
-use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
@@ -93,45 +93,24 @@ class ActivityListController extends RestController
         if (!is_array($requestActivityСlasses)) {
             $requestActivityСlasses = explode(',', $requestActivityСlasses);
         }
+
         foreach ($requestActivityСlasses as $activityClass) {
             if ($activityManager->hasActivityAssociation($entityClass, $activityClass)) {
                 array_push($activityСlasses, $activityClass);
             }
         }
-        $pager       = $this->get('oro_datagrid.extension.pager.orm.pager');
-        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
 
-        /** @var ActivityListRepository $repo */
-        $repo = $this->getManager()->getRepository();
-        $qb   = $repo->getActivityListQueryBuilder($entityClass, $entityId, $activityСlasses, $dateFrom, $dateTo);
+        $results = $this->getManager()->getList(
+            $this->get('oro_entity.routing_helper')->decodeClassName($entityClass),
+            $entityId,
+            $activityСlasses,
+            $dateFrom,
+            $dateTo,
+            $this->getRequest()->get('page', 1),
+            $this->getRequest()->get('limit', self::ITEMS_PER_PAGE)
+        );
 
-        $pager->setQueryBuilder($qb);
-        $pager->setPage($this->getRequest()->get('page', 1));
-        $pager->setMaxPerPage($this->getRequest()->get('limit', self::ITEMS_PER_PAGE));
-        $pager->init();
-        $result = $pager->getResults();
-
-        $items = array();
-        foreach ($result as $item) {
-            $items[] = $this->getPreparedItem(
-                $item,
-                [
-                    'id',
-                    'organizationId',
-                    'verb',
-                    'subject',
-                    'data',
-                    'relatedEntityClass',
-                    'relatedEntityId',
-                    'relatedActivityClass',
-                    'relatedActivityId',
-                    'createdAt',
-                    'updatedAt'
-                ]
-            );
-        }
-
-        return new JsonResponse($items);
+        return new JsonResponse($results);
     }
 
 
@@ -181,7 +160,7 @@ class ActivityListController extends RestController
      */
     public function getManager()
     {
-        return $this->get('oro_activity_list.manager.api');
+        return $this->get('oro_activity_list.manager');
     }
 
     /**

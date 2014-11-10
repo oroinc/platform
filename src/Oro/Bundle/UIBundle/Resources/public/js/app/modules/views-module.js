@@ -16,6 +16,7 @@ require([
             mainMenu: '#main-menu',
             userMenu: '#top-page .user-menu',
             breadcrumb: '#breadcrumb',
+            beforeContentAddition: '#before-content-addition',
             loadingMask: '#main .hash-loading-mask',
             messages: '#flash-messages .flash-messages-holder'
         }
@@ -29,6 +30,17 @@ require([
     ], function (PageContentView) {
         BaseController.addToReuse('content', PageContentView, {
             el: 'mainContainer'
+        });
+    });
+
+    /**
+     * Init PageBeforeContentAdditionView
+     */
+    BaseController.loadBeforeAction([
+        'oroui/js/app/views/page/before-content-addition-view'
+    ], function (PageBeforeContentAdditionView) {
+        BaseController.addToReuse('beforeContentAddition', PageBeforeContentAdditionView, {
+            el: 'beforeContentAddition'
         });
     });
 

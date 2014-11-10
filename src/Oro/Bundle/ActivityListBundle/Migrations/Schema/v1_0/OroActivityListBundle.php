@@ -35,8 +35,6 @@ class OroActivityListBundle implements Migration
         $table->addColumn('verb', 'string', ['length' => 32]);
         $table->addColumn('subject', 'string', ['length' => 255]);
         $table->addColumn('data', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
-        $table->addColumn('related_entity_class', 'string', ['length' => 255]);
-        $table->addColumn('related_entity_id', 'integer', ['notnull' => false]);
         $table->addColumn('related_activity_class', 'string', ['length' => 255]);
         $table->addColumn('related_activity_id', 'integer', []);
         $table->addColumn('created_at', 'datetime', []);
@@ -44,7 +42,6 @@ class OroActivityListBundle implements Migration
         $table->setPrimaryKey(['id']);
         $table->addIndex(['organization_id'], 'IDX_B1F9F0132C8A3DE', []);
         $table->addIndex(['updated_at'], 'oro_activity_list_updated_idx', []);
-        $table->addIndex(['related_entity_class', 'related_entity_id'], 'oro_activity_list_related_idx', []);
         $table->addIndex(['user_owner_id'], 'IDX_B1F9F019EB185F9', []);
     }
 
@@ -69,4 +66,4 @@ class OroActivityListBundle implements Migration
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
-} 
+}

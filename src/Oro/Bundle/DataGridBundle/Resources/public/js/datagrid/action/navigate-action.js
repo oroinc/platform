@@ -52,9 +52,17 @@ define([
 
         /**
          * Execute redirect
+         *  - extends URL with grid state parameter
          */
         execute: function () {
-            mediator.execute('redirectTo', {url: this.getLink()});
+            var url, key, value;
+            url = this.getLink();
+
+            key = this.datagrid.collection.stateHashKey();
+            value = this.datagrid.collection.stateHashValue();
+
+            url = this.addUrlParameter(url, key, value);
+            mediator.execute('redirectTo', {url: url});
         },
 
         /**

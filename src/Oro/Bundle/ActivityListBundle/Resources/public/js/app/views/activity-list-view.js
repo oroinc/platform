@@ -16,8 +16,7 @@ define(function (require) {
 
     ActivityListView = BaseCollectionView.extend({
         options: {
-            briefTemplates: {},
-            fullTemplates: {},
+            configuration: {},
             template: null,
             itemTemplate: null,
             itemAddEvent: 'activity:add',
@@ -178,17 +177,20 @@ define(function (require) {
                 });
                 this.itemEditDialog.render();
 
-                mediator.once('page:request', _.bind(function () {
+                /*mediator.once('page:request', _.bind(function () {
                     if (this.itemEditDialog) {
                         this.itemEditDialog.remove();
                     }
-                }, this));
+                }, this));*/
 
                 this.itemEditDialog.on('formSave', _.bind(function (response) {
+                    debugger;
+
                     var model, insertPosition;
                     this.itemEditDialog.remove();
                     delete this.itemEditDialog;
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
+                    /*
                     model = this.collection.get(response.id);
                     if (model) {
                         model.set(response);
@@ -196,6 +198,7 @@ define(function (require) {
                         insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
                         this.collection.add(response, {at: insertPosition});
                     }
+                    */
                 }, this));
             }
         },
@@ -245,7 +248,7 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            var route = this.options.briefTemplates[model.get('relatedActivityClass')].routes[actionKey];
+            var route = this.options.configuration[model.get('relatedActivityClass')].routes[actionKey];
             return routing.generate(route, {'id': model.get('relatedActivityId')});
         },
 

@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 interface ActivityListProviderInterface
 {
     /**
-     * return pairs of class name and id,
+     * Returns true if given target $configId is supported by activity
      *
-     * @return array
-     */
-    public function getTargets();
-
-    /**
-     * returns a class name of entity for which we monitor changes
+     * @param ConfigIdInterface $configId
+     * @param ConfigManager     $configManager
      *
-     * @return string
+     * @return bool
      */
-    public function getActivityClass();
+    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager);
 
     /**
      * @param object $entity
@@ -36,12 +34,7 @@ interface ActivityListProviderInterface
     /**
      * @return string
      */
-    public function getBriefTemplate();
-
-    /**
-     * @return string
-     */
-    public function getFullTemplate();
+    public function getTemplate();
 
     /**
      * Should return array of route names as key => value
@@ -56,18 +49,34 @@ interface ActivityListProviderInterface
     public function getRoutes();
 
     /**
-     * @param $entity
+     * returns a class name of entity for which we monitor changes
+     *
+     * @return string
+     */
+    public function getActivityClass();
+
+    /**
+     * @param object $entity
      *
      * @return integer
      */
     public function getActivityId($entity);
 
     /**
-     * Check if provider supports given entity
+     * Check if provider supports given activity
      *
-     * @param object|string $entity
+     * @param  object $entity
      *
      * @return bool
      */
     public function isApplicable($entity);
+
+    /**
+     * Returns array of assigned entities for activity
+     *
+     * @param object $entity
+     *
+     * @return array
+     */
+    public function getTargetEntities($entity);
 }

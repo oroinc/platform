@@ -2,38 +2,76 @@ parameters:
     # entity
     oro_activity_list.entity.class:  Oro\Bundle\ActivityListBundle\Entity\ActivityList
 
-    # manager
+    # managers
+    oro_activity_list.manager.class:     Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
+    oro_activity_list.collect_manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
     oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
-    oro.activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
-    oro.activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
+    oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
+    oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
+
+    oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
+    oro_activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
+    oro_activity_list.migration.extension.activity_list: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension
 
     oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
-
 services:
-    oro.activity_list.event_listener.actitity_list_listener:
-        class:  %oro.activity_list.event_listener.actitity_list_listener.class%
+    oro_activity_list.manager:
+        class: %oro_activity_list.manager.class%
         arguments:
-            - @oro.activity_list.provider.chain
-        tags:
-            - { name: doctrine.event_listener, event: onFlush }
-            - { name: doctrine.event_listener, event: postFlush }
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_locale.formatter.name
+            - @oro_datagrid.extension.pager.orm.pager
 
-    oro.activity_list.provider.chain:
-        class: %oro.activity_list.provider.chain.class%
+    oro_activity_list.collect_manager:
+        class: %oro_activity_list.collect_manager.class%
         arguments:
-            - @oro_security.security_facade.link
-            - @oro_entity.doctrine_helper
-            - @oro_entity_config.provider.entity
+            - @oro_activity_list.provider.chain
 
-    oro_activity_list.placeholder.filter:
-        class: %oro_activity_list.placeholder.filter.class%
-        arguments: ~
-
-    # Activity List API
     oro_activity_list.manager.api:
         class: %oro_activity_list.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_activity_list.entity.class%
             - @doctrine.orm.entity_manager
+
+    oro_activity_list.placeholder.filter:
+        class: %oro_activity_list.placeholder.filter.class%
+        arguments: ~
+
+    oro_activity_list.event_listener.actitity_list_listener:
+        class:  %oro_activity_list.event_listener.actitity_list_listener.class%
+        arguments:
+            - @oro_activity_list.collect_manager
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
+
+    oro_activity_list.provider.chain:
+        class: %oro_activity_list.provider.chain.class%
+        arguments:
+           - @oro_entity.doctrine_helper
+           - @oro_entity_config.config_manager
+
+    oro_activity_list.entity_config_dumper.extension:
+        class: %oro_activity_list.entity_config_dumper.extension.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.association_builder
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_activity_list.entity_generator.extension:
+        class: %oro_activity_list.entity_generator.extension.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension }
+
+    oro_activity_list.migration.extension.activity_list:
+        class: %oro_activity_list.migration.extension.activity_list%
+        tags:
+            - { name: oro_migration.extension, extension_name: activity_list }

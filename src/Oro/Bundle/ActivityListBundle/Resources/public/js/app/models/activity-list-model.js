@@ -9,13 +9,13 @@ define([
     ActivityModel = BaseModel.extend({
         defaults: {
             id: '',
+            owner: '',
+            owner_id: '',
+            organization: '',
             verb: '',
             subject: '',
             data: '',
-            briefTemplate: '',
-
-            relatedEntityClass: '',
-            relatedEntityId: '',
+            configuration: '',
 
             activityEntityClass: '',
             activityEntityId: '',

@@ -3,41 +3,31 @@
 <div class="widget-content activity-list {{ containerExtraClass }}">
     {% block widget_content %}
         {% block widget_actions %}
-
         <div class="filter-box oro-clearfix-width">
             <div class="filter-container">
                 <div id="filter1" class="filter-item oro-drop"></div>
                 <div id="filter2" class="filter-item oro-drop"></div>
             </div>
         </div>
-
         <div class="widget-actions">
-
-                {#{{ UI.clientLink({#}
-                    {#'aCss': 'btn apply-button icons-holder-text',#}
-                    {#'iCss': 'icon-play',#}
-                    {#'title' : 'Apply filter'|trans,#}
-                    {#'dataAttributes': {'action-name': 'apply'}#}
-                {#}) }}#}
-                {{ UI.clientLink({
-                    'aCss': 'btn refresh-button icons-holder-text',
-                    'iCss': 'icon-refresh',
-                    'title' : 'Refresh'|trans,
-                    'dataAttributes': {'action-name': 'refresh'}
-                }) }}
-                {{ UI.clientLink({
-                    'aCss': 'collapse-all-button btn-mini',
-                    'label' : 'Expand All'|trans,
-                    'dataAttributes': {'action-name': 'expand_all'}
-                }) }}
-                {{ UI.clientLink({
-                    'aCss': 'collapse-all-button btn-mini',
-                    'label' : 'Collapse All'|trans,
-                    'dataAttributes': {'action-name': 'collapse_all'}
-                }) }}
+            {{ UI.clientLink({
+                'aCss': 'btn refresh-button icons-holder-text',
+                'iCss': 'icon-refresh',
+                'title' : 'Refresh'|trans,
+                'dataAttributes': {'action-name': 'refresh'}
+            }) }}
+            {{ UI.clientLink({
+                'aCss': 'collapse-all-button btn-mini',
+                'label' : 'Expand All'|trans,
+                'dataAttributes': {'action-name': 'expand_all'}
+            }) }}
+            {{ UI.clientLink({
+                'aCss': 'collapse-all-button btn-mini',
+                'label' : 'Collapse All'|trans,
+                'dataAttributes': {'action-name': 'collapse_all'}
+            }) }}
         </div>
         {% endblock %}
-
         {% block items_container %}
             {% set options = {
                 widgetId: app.request.get('_wid'),
@@ -50,8 +40,7 @@
                     }
                 )),
                 activityListOptions: {
-                    briefTemplates: briefTemplates,
-                    fullTemplates: fullTemplates,
+                    configuration: configuration,
                     template: '#template-activity-list',
                     itemTemplate: '#template-activity-item',
                     urls: {
@@ -81,41 +70,41 @@
 
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
             {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
-            {% for activityClass, activityOptions in briefTemplates %}
+            {% for activityClass, activityOptions in configuration %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
             {% endfor %}
 
-        <script type="text/javascript">
-            require([
-                'jquery',
-                'oro/filter/multiselect-filter',
-                'oro/filter/datetime-filter',
-                'orofilter/js/datafilter-wrapper',
-            ], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {
-                var choices = {};
-                var dateRangeFilterMetadata = {{ dateRangeFilterMetadata|json_encode()|raw }};
-                var multiSelectLabel = '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}';
-                var datePickerLabel  = '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}';
+        {#<script type="text/javascript">#}
+            {#require([#}
+                {#'jquery',#}
+                {#'oro/filter/multiselect-filter',#}
+                {#'oro/filter/datetime-filter',#}
+                {#'orofilter/js/datafilter-wrapper',#}
+            {#], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {#}
+                {#var choices = {};#}
+                {#var dateRangeFilterMetadata = {{ dateRangeFilterMetadata|json_encode()|raw }};#}
+                {#var multiSelectLabel = '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}';#}
+                {#var datePickerLabel  = '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}';#}
 
-                {% for activityClass, activityOptions in briefTemplates %}
-                    choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';
-                {% endfor %}
+                {#{% for activityClass, activityOptions in configuration %}#}
+                    {#choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';#}
+                {#{% endfor %}#}
 
-                var filter = new MultiSelectFilter({
-                    'label':   multiSelectLabel,
-                    'choices': choices
-                });
+                {#var filter = new MultiSelectFilter({#}
+                    {#'label':   multiSelectLabel,#}
+                    {#'choices': choices#}
+                {#});#}
 
-                var Filter = DatetimeFilter.extend(dateRangeFilterMetadata);
-                dateFilter = new Filter({
-                    'label': datePickerLabel
-                });
-                _.extend(dateFilter, dataFilterWrapper);
+                {#var Filter = DatetimeFilter.extend(dateRangeFilterMetadata);#}
+                {#dateFilter = new Filter({#}
+                    {#'label': datePickerLabel#}
+                {#});#}
+                {#_.extend(dateFilter, dataFilterWrapper);#}
 
-                filter.render().$el.appendTo($('#filter1'));
-                dateFilter.render().$el.appendTo($('#filter2'));
-            });
-        </script>
+                {#filter.render().$el.appendTo($('#filter1'));#}
+                {#dateFilter.render().$el.appendTo($('#filter2'));#}
+            {#});#}
+        {#</script>#}
         {% endblock %}
     {% endblock %}
 </div>

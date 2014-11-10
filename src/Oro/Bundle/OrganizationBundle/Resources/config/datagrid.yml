@@ -3,6 +3,7 @@ datagrid:
         options:
             entityHint: business unit
             skip_acl_check: true
+            entity_pagination: true
         source:
             acl_resource: oro_business_unit_view
             type: orm

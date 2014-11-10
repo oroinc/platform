@@ -98,16 +98,22 @@
           height: auto;
         }
         .accordion-body {
-          .message {
+          .message, .subject {
             display: none;
             overflow-x: auto;
           }
-          .details {
-            padding-top: 10px;
-          }
+        }
+        .accordion-body.in {
+          padding: 0;
         }
         .accordion-body.in .message {
           display: block;
+          padding-left: 23px;
+        }
+        .accordion-body.in .subject {
+          display: block;
+          padding-left: 23px;
+          border-bottom: 1px solid #ddd;
         }
       }
     }

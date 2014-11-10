@@ -5,34 +5,39 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\UnitOfWork;
+use Doctrine\ORM\PersistentCollection;
 
-use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
-use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListInterface;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActivityListListener
 {
-    const STATE_CREATE = 'create';
-    const STATE_UPDATE = 'update';
-
-    /**  @var array */
+    /** @var array */
     protected $insertedEntities = [];
 
-    /**  @var array */
+    /** @var array */
     protected $updatedEntities = [];
 
-    /**  @var array */
+    /** @var array */
     protected $deletedEntities = [];
 
-    /** @var ActivityListChainProvider */
-    protected $chainProvider;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /** @var CollectListManager */
+    protected $activityListManager;
 
     /**
-     * @param ActivityListChainProvider $chainProvider
+     * @param CollectListManager $activityListManager
+     * @param DoctrineHelper      $doctrineHelper
      */
-    public function __construct(ActivityListChainProvider $chainProvider)
-    {
-        $this->chainProvider = $chainProvider;
+    public function __construct(
+        CollectListManager $activityListManager,
+        DoctrineHelper $doctrineHelper
+    ) {
+        $this->activityListManager = $activityListManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -44,9 +49,10 @@ class ActivityListListener
     {
         $entityManager = $args->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
+        $entityManager->getEventManager()->removeEventListener('onFlush', $this);
 
-        $this->collectEntities($this->insertedEntities, $unitOfWork->getScheduledEntityInsertions());
-        $this->collectEntities($this->updatedEntities, $unitOfWork->getScheduledEntityUpdates());
+        $this->collectInsertedEntities($unitOfWork->getScheduledEntityInsertions());
+        $this->collectUpdates($unitOfWork);
         $this->collectDeletedEntities($unitOfWork->getScheduledEntityDeletions());
     }
 
@@ -57,11 +63,16 @@ class ActivityListListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        /** @var  $entityManager */
+        /** @var $entityManager */
         $entityManager = $args->getEntityManager();
+        $entityManager->getEventManager()->removeEventListener('postFlush', $this);
+
         $this->processInsertEntities($entityManager);
         $this->processUpdatedEntities($entityManager);
         $this->processDeletedEntities($entityManager);
+
+        $entityManager->getEventManager()->addEventListener('onFlush', $this);
+        $entityManager->getEventManager()->addEventListener('postFlush', $this);
     }
 
     /**
@@ -72,11 +83,11 @@ class ActivityListListener
     protected function collectDeletedEntities($entities)
     {
         if (!empty($entities)) {
-            foreach ($entities as $hash=> $entity) {
-                if ($entity instanceof ActivityListInterface && empty($this->deletedEntities[$hash])) {
+            foreach ($entities as $hash => $entity) {
+                if ($this->activityListManager->isSupportedEntity($entity) && empty($this->deletedEntities[$hash])) {
                     $this->deletedEntities[$hash] = [
                         'class' => $this->doctrineHelper->getEntityClass($entity),
-                        'id' => $this->doctrineHelper->getSingleEntityIdentifier($entity)
+                        'id'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
                     ];
                 }
             }
@@ -90,19 +101,8 @@ class ActivityListListener
      */
     protected function processDeletedEntities(EntityManager $entityManager)
     {
-        if (!empty($this->deletedEntities)) {
-            foreach ($this->deletedEntities as $entity) {
-                $entityManager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('list')
-                    ->delete()
-                    ->where('list.relatedActivityClass = :relatedActivityClass')
-                    ->andWhere('list.relatedActivityId = :relatedActivityId')
-                    ->setParameter('relatedEntityClass', $entity['class'])
-                    ->setParameter('relatedEntityId', $entity['id'])
-                    ->getQuery()
-                    ->execute();
-            }
-            $this->deletedEntities = [];
-        }
+        $this->activityListManager->processDeletedEntities($this->deletedEntities, $entityManager);
+        $this->deletedEntities = [];
     }
 
     /**
@@ -112,21 +112,9 @@ class ActivityListListener
      */
     protected function processUpdatedEntities(EntityManager $entityManager)
     {
-        if (!empty($this->updatedEntities)) {
-            foreach ($this->updatedEntities as $entity) {
-                $qb = $entityManager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('list');
-                $qb->update()
-                    ->set('list.verb', $qb->expr()->literal(self::STATE_UPDATE))
-                    ->set('list.subject', $qb->expr()->literal($entity->getActivityListSubject()))
-                    ->set('list.updatedAt', $qb->expr()->literal(new \DateTime('now', new \DateTimeZone('UTC'))))
-                    ->where('list.relatedActivityClass = :relatedActivityClass')
-                    ->andWhere('list.relatedActivityId = :relatedActivityId')
-                    ->setParameter('relatedActivityClass', $this->doctrineHelper->getEntityClass($entity))
-                    ->setParameter('relatedActivityId', $this->doctrineHelper->getSingleEntityIdentifier($entity))
-                    ->getQuery()
-                    ->execute();
-            }
+        if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $entityManager)) {
             $this->updatedEntities = [];
+            $entityManager->flush();
         }
     }
 
@@ -137,29 +125,51 @@ class ActivityListListener
      */
     protected function processInsertEntities(EntityManager $entityManager)
     {
-        if (!empty($this->insertedEntities)) {
-            foreach ($this->insertedEntities as $entity) {
-                $activityList = $this->chainProvider->getActivityListByActivityEntity($entity);
-                if ($activityList) {
-                    $entityManager->persist($activityList);
-                }
-            }
+        if ($this->activityListManager->processInsertEntities($this->insertedEntities, $entityManager)) {
             $this->insertedEntities = [];
             $entityManager->flush();
         }
     }
 
     /**
-     * Collect inserted or updated activities
+     * Collect updated activities
      *
-     * @param array $storage
+     * @param UnitOfWork $uof
+     */
+    protected function collectUpdates(UnitOfWork $uof)
+    {
+        $entities = $uof->getScheduledEntityUpdates();
+        foreach ($entities as $hash => $entity) {
+            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->updatedEntities[$hash])) {
+                $this->updatedEntities[$hash] = $entity;
+            }
+        }
+        $updatedCollections = array_merge(
+            $uof->getScheduledCollectionUpdates(),
+            $uof->getScheduledCollectionDeletions()
+        );
+        foreach ($updatedCollections as $hash => $collection) {
+            /** @var $collection PersistentCollection */
+            $ownerEntity = $collection->getOwner();
+            $entityHash = spl_object_hash($ownerEntity);
+            if ($this->activityListManager->isSupportedEntity($ownerEntity)
+                && empty($this->updatedEntities[$entityHash])
+            ) {
+                $this->updatedEntities[$entityHash] = $ownerEntity;
+            }
+        }
+    }
+
+    /**
+     * Collect inserted activities
+     *
      * @param array $entities
      */
-    protected function collectEntities(array &$storage, array $entities)
+    protected function collectInsertedEntities(array $entities)
     {
         foreach ($entities as $hash => $entity) {
-            if ($entity instanceof ActivityListInterface && empty($storage[$hash])) {
-                $storage[$hash] = $entity;
+            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->insertedEntities[$hash])) {
+                $this->insertedEntities[$hash] = $entity;
             }
         }
     }

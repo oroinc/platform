@@ -8,8 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ActivityListProvidersPass implements CompilerPassInterface
 {
-    const TAG = 'oro.activity_list.provider';
-    const PROVIDER_SERVICE_ID = 'oro.activity_list.provider.chain';
+    const TAG = 'oro_activity_list.provider';
+    const PROVIDER_SERVICE_ID = 'oro_activity_list.provider.chain';
 
     /**
      * {@inheritdoc}
@@ -33,11 +33,12 @@ class ActivityListProvidersPass implements CompilerPassInterface
 
         // sort by priority and flatten
         ksort($providers);
+        $providers = call_user_func_array('array_merge', $providers);
 
         // register
         $serviceDef = $container->getDefinition(self::PROVIDER_SERVICE_ID);
         foreach ($providers as $provider) {
-            $serviceDef->addMethodCall('addProvider', $provider);
+            $serviceDef->addMethodCall('addProvider', [$provider]);
         }
     }
 }

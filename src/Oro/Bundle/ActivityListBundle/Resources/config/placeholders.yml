@@ -1,5 +1,5 @@
 placeholders:
-    view_content_data_activities: #.items.oro_activities: ~
+    view_content_data_activities:
         items:
             oro_activity_list: ~
 
