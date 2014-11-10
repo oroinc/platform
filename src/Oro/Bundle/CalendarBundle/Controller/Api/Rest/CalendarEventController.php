@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller\Api\Rest;
 
-use Doctrine\ORM\QueryBuilder;
-
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -19,12 +17,10 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
 /**
  * @RouteResource("calendarevent")
@@ -73,7 +69,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *      nullable=true,
      *      strict=true,
      *      default="false",
-     *      description="Determine whether events from connected calendars should be included or not."
+     *      description="Determines whether events from connected calendars should be included or not."
      * )
      * @QueryParam(
      *     name="createdAt",
@@ -100,59 +96,50 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $calendarId  = (int)$this->getRequest()->get('calendar');
         $subordinate = (true == $this->getRequest()->get('subordinate'));
 
-        $result = [];
-
-        /** @var SecurityFacade $securityFacade */
-        $securityFacade = $this->get('oro_security.security_facade');
-        if (!$securityFacade->isGranted('oro_calendar_connection_view')) {
-            $subordinate = false;
-        }
-
-        $items     = $this->getEventListQueryBuilder($calendarId, $subordinate)->getQuery()->getArrayResult();
-        $itemIds   = array_map(
-            function ($item) {
-                return $item['id'];
-            },
-            $items
-        );
-        $reminders = $this->getManager()
-            ->getObjectManager()
-            ->getRepository('OroReminderBundle:Reminder')
-            ->findRemindersByEntities($itemIds, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
-
-        foreach ($items as $item) {
-            $resultItem = array();
-            foreach ($item as $field => $value) {
-                $this->transformEntityField($field, $value);
-                $resultItem[$field] = $value;
-            }
-            $resultItem['editable']  =
-                ($resultItem['calendar'] === $calendarId)
-                && $securityFacade->isGranted('oro_calendar_event_update');
-            $resultItem['removable'] =
-                ($resultItem['calendar'] === $calendarId)
-                && $securityFacade->isGranted('oro_calendar_event_delete');
-            $resultReminders         = array_filter(
-                $reminders,
-                function ($reminder) use ($resultItem) {
-                    /* @var Reminder $reminder */
-                    return $reminder->getRelatedEntityId() == $resultItem['id'];
-                }
+        $qb = null;
+        if ($this->getRequest()->get('start') && $this->getRequest()->get('end')) {
+            $result = $this->get('oro_calendar.calendar_manager')->getCalendarEvents(
+                $this->getUser()->getId(),
+                $calendarId,
+                new \DateTime($this->getRequest()->get('start')),
+                new \DateTime($this->getRequest()->get('end')),
+                $subordinate
             );
+        } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
+            $dateClosure      = function ($value) {
+                // datetime value hack due to the fact that some clients pass + encoded as %20 and not %2B,
+                // so it becomes space on symfony side due to parse_str php function in HttpFoundation\Request
+                $value = str_replace(' ', '+', $value);
 
-            $resultItem['reminders'] = [];
-            foreach ($resultReminders as $resultReminder) {
-                /* @var Reminder $resultReminder */
-                $resultItem['reminders'][] = [
-                    'method'   => $resultReminder->getMethod(),
-                    'interval' => [
-                        'number' => $resultReminder->getInterval()->getNumber(),
-                        'unit'   => $resultReminder->getInterval()->getUnit()
-                    ]
-                ];
-            }
+                // The timezone is ignored when DateTime value specifies a timezone (e.g. 2010-01-28T15:00:00+02:00)
+                return new \DateTime($value, new \DateTimeZone('UTC'));
+            };
+            $filterParameters = [
+                'createdAt' => [
+                    'closure' => $dateClosure,
+                ],
+                'updatedAt' => [
+                    'closure' => $dateClosure,
+                ],
+            ];
+            $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
 
-            $result[] = $resultItem;
+            /** @var CalendarEventRepository $repo */
+            $repo  = $this->getManager()->getRepository();
+            $qb    = $repo->getEventListQueryBuilder($calendarId, $subordinate, $filterCriteria);
+            $page  = (int)$this->getRequest()->get('page', 1);
+            $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+            $qb->setMaxResults($limit)
+                ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
+
+            $result = $this->get('oro_calendar.calendar_event.normalizer')->getCalendarEvents(
+                $calendarId,
+                $qb
+            );
+        } else {
+            throw new BadRequestHttpException(
+                'Time interval ("start" and "end") or paging ("page" and "limit") parameters should be specified.'
+            );
         }
 
         return new Response(json_encode($result), Codes::HTTP_OK);
@@ -255,70 +242,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
         // remove auxiliary attributes if any
         unset($data['createdAt']);
         unset($data['updatedAt']);
+        unset($data['calendarAlias']);
         unset($data['editable']);
         unset($data['removable']);
 
         return true;
-    }
-
-    /**
-     * @param int  $calendarId
-     * @param bool $subordinate
-     *
-     * @return QueryBuilder
-     *
-     * @throws BadRequestHttpException
-     */
-    protected function getEventListQueryBuilder($calendarId, $subordinate)
-    {
-        /** @var CalendarEventRepository $repo */
-        $repo = $this->getManager()->getRepository();
-
-        $dateClosure      = function ($value) {
-            // datetime value hack due to the fact that some clients pass + encoded as %20 and not %2B,
-            // so it becomes space on symfony side due to parse_str php function in HttpFoundation\Request
-            $value = str_replace(' ', '+', $value);
-
-            // The timezone is ignored when DateTime value specifies a timezone (e.g. 2010-01-28T15:00:00+02:00)
-            return new \DateTime($value, new \DateTimeZone('UTC'));
-        };
-        $filterParameters = [
-            'createdAt' => [
-                'closure' => $dateClosure,
-            ],
-            'updatedAt' => [
-                'closure' => $dateClosure,
-            ],
-        ];
-        $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
-
-        $qb = null;
-        if ($this->getRequest()->get('start') && $this->getRequest()->get('end')) {
-            $start = new \DateTime($this->getRequest()->get('start'));
-            $end   = new \DateTime($this->getRequest()->get('end'));
-            $qb    = $repo->getEventListByTimeIntervalQueryBuilder(
-                $calendarId,
-                $start,
-                $end,
-                $subordinate,
-                $filterCriteria
-            );
-        }
-        if ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
-            if (!$qb) {
-                $qb = $repo->getEventListQueryBuilder($calendarId, $subordinate, $filterCriteria);
-            }
-            $page  = (int)$this->getRequest()->get('page', 1);
-            $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
-            $qb->setMaxResults($limit)
-                ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
-        }
-        if (!$qb) {
-            throw new BadRequestHttpException(
-                'Time interval ("start" and "end") or paging ("page" and "limit") parameters should be specified.'
-            );
-        }
-
-        return $qb;
     }
 }
