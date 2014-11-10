@@ -22,7 +22,8 @@ class PlaceholderFilter
 
         /**
          * TODO:
-         *  validation should be checked by interface class or by provider
+         *  Do entity can have some activities assigned ??
+         *  validation should be done by chain provider
          */
         return in_array(
             $className,

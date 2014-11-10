@@ -74,6 +74,14 @@
             display: block;
             overflow: hidden;
             height: 20px;
+            .accordion-toggle {
+              &:before {
+                content: '';
+              }
+            }
+            .accordion-toggle.collapsed:before {
+              content: '';
+            }
           }
           .accordion-toggle {
             display: inline-block;
@@ -114,6 +122,10 @@
           display: block;
           padding-left: 23px;
           border-bottom: 1px solid #ddd;
+          .accordion-toggle{
+            display: block;
+            padding-top: 2px;
+          }
         }
       }
     }
