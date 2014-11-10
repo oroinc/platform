@@ -19,18 +19,27 @@ class CalendarConnectionController extends SoapController
      * Get calendar connections.
      *
      * @Soap\Method("getCalendarConnections")
-     * @Soap\Param("id", phpType = "int")
-     * @Soap\Result(phpType = "Oro\Bundle\CalendarBundle\Entity\CalendarPropertySoap[]")
+     * @Soap\Param("page", phpType="int")
+     * @Soap\Param("limit", phpType="int")
+     * @Soap\Result(phpType = "Oro\Bundle\CalendarBundle\Entity\CalendarProperty[]")
      * @AclAncestor("oro_calendar_view")
      *
      * @throws \InvalidArgumentException
      */
-    public function cgetAction($id)
+    public function cgetAction($page = 1, $limit = 10)
     {
-        $items = $this->getManager()->getCalendarManager()
-            ->getCalendars($this->getUser()->getId(), $id);
+        return $this->handleGetListRequest($page, $limit);
+    }
 
-        return $this->transformToSoapEntities($items);
+    /**
+     * @Soap\Method("getCalendarConnection")
+     * @Soap\Param("id", phpType = "int")
+     * @Soap\Result(phpType = "Oro\Bundle\CalendarBundle\Entity\CalendarProperty")
+     * @AclAncestor("oro_calendar_view")
+     */
+    public function getAction($id)
+    {
+        return $this->handleGetRequest($id);
     }
 
     /**
@@ -38,11 +47,11 @@ class CalendarConnectionController extends SoapController
      *
      * @Soap\Method("updateCalendarConnection")
      * @Soap\Param("id", phpType = "int")
-     * @Soap\Param("calendarConnection", phpType = "Oro\Bundle\CalendarBundle\Entity\CalendarProperty")
+     * @Soap\Param("calendarProperty", phpType = "Oro\Bundle\CalendarBundle\Entity\CalendarProperty")
      * @Soap\Result(phpType = "boolean")
      * @AclAncestor("oro_calendar_view")
      */
-    public function updateAction($id, $calendarConnection)
+    public function updateAction($id, $calendarProperty)
     {
         return $this->handleUpdateRequest($id);
     }
@@ -57,8 +66,6 @@ class CalendarConnectionController extends SoapController
      */
     public function createAction($calendarProperty)
     {
-//        var_dump($calendarProperty);
-//        die;
         return $this->handleCreateRequest();
     }
 
@@ -97,32 +104,6 @@ class CalendarConnectionController extends SoapController
     public function getFormHandler()
     {
         return $this->container->get('oro_calendar.calendar_property.form.handler.soap.api');
-    }
-
-    /**
-     * Get a user from the Security Context
-     *
-     * @return mixed
-     *
-     * @throws \LogicException If SecurityBundle is not available
-     *
-     * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
-     */
-    public function getUser()
-    {
-        if (!$this->container->has('security.context')) {
-            throw new \LogicException('The SecurityBundle is not registered in your application.');
-        }
-
-        if (null === $token = $this->container->get('security.context')->getToken()) {
-            return;
-        }
-
-        if (!is_object($user = $token->getUser())) {
-            return;
-        }
-
-        return $user;
     }
 
     /**

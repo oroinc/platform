@@ -57,7 +57,7 @@ class CalendarProperty extends ExtendCalendarProperty
      *
      * @ORM\ManyToOne(targetEntity="Calendar")
      * @ORM\JoinColumn(name="target_calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
-     * @Soap\ComplexType("int")
+     * @Soap\ComplexType("Oro\Bundle\CalendarBundle\Entity\Calendar")
      */
     protected $targetCalendar;
 
