@@ -9,9 +9,7 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-
 use Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager;
-use Oro\Bundle\CalendarBundle\Entity\CalendarPropertySoap;
 
 class CalendarConnectionController extends SoapController
 {
