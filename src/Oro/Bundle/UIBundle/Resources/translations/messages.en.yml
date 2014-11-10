@@ -33,6 +33,8 @@ oro:
         delete_message: %entity_label% deleted
         edit:           Edit
         edit_entity:    Edit %entityName%
+        view:           View
+        view_entity:    View %entityName%
         empty:          N/A
         item:           item
         owner:          Owner

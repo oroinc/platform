@@ -1453,6 +1453,11 @@ footer {
   .ui-widget-header {
     border: 0;
   }
+  .widget-actions {
+    a.action {
+      margin-right: 10px;
+    }
+  }
   .widget-actions.form-actions {
     margin-bottom: 0;
     background: #fafafa;
@@ -2646,6 +2651,16 @@ div.uploader.focus,
   .alert-warning {
     background-image: none;
     padding-left: 20px;
+  }
+  .alert-info {
+    background-color: @infoBackground;
+    border-color: @infoBorder;
+    color: @infoText;
+    background-image: none;
+    padding-left: 20px;
+    .close {
+      color: @infoClose;
+    }
   }
   .alert-empty {
     display: none;

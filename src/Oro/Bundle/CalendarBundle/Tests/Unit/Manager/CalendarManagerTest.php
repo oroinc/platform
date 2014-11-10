@@ -183,27 +183,9 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
         return 'def_opt';
     }
 
-    public function testGetCalendarInfo()
-    {
-        $connection = new CalendarProperty();
-        $connection->setCalendarAlias('provider1');
-
-        $this->provider1->expects($this->once())
-            ->method('getCalendarName')
-            ->with($this->identicalTo($connection))
-            ->will($this->returnValue('calendar1'));
-
-        $result = $this->manager->getCalendarInfo($connection);
-        $this->assertEquals(
-            [
-                'calendarName' => 'calendar1'
-            ],
-            $result
-        );
-    }
-
     public function testGetCalendarEvents()
     {
+        $userId      = 123;
         $calendarId  = 1;
         $start       = new \DateTime();
         $end         = new \DateTime();
@@ -211,7 +193,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->provider1->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($calendarId, $start, $end, $subordinate)
+            ->with($userId, $calendarId, $start, $end, $subordinate)
             ->will(
                 $this->returnValue(
                     [
@@ -220,15 +202,16 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                             'title' => 'event1',
                         ],
                         [
-                            'id'    => 2,
-                            'title' => 'event2',
+                            'id'        => 2,
+                            'title'     => 'event2',
+                            'removable' => false
                         ],
                     ]
                 )
             );
         $this->provider2->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($calendarId, $start, $end, $subordinate)
+            ->with($userId, $calendarId, $start, $end, $subordinate)
             ->will(
                 $this->returnValue(
                     [
@@ -237,35 +220,45 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                             'title' => 'event3',
                         ],
                         [
-                            'id'    => 3,
-                            'title' => 'event4',
+                            'id'        => 3,
+                            'title'     => 'event4',
+                            'editable'  => false,
+                            'removable' => false
                         ],
                     ]
                 )
             );
 
-        $result = $this->manager->getCalendarEvents($calendarId, $start, $end, $subordinate);
+        $result = $this->manager->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
         $this->assertEquals(
             [
                 [
                     'id'            => 1,
                     'title'         => 'event1',
-                    'calendarAlias' => 'provider1'
+                    'calendarAlias' => 'provider1',
+                    'editable'      => true,
+                    'removable'     => true
                 ],
                 [
                     'id'            => 2,
                     'title'         => 'event2',
-                    'calendarAlias' => 'provider1'
+                    'calendarAlias' => 'provider1',
+                    'editable'      => true,
+                    'removable'     => false
                 ],
                 [
                     'id'            => 1,
                     'title'         => 'event3',
-                    'calendarAlias' => 'provider2'
+                    'calendarAlias' => 'provider2',
+                    'editable'      => true,
+                    'removable'     => true
                 ],
                 [
                     'id'            => 3,
                     'title'         => 'event4',
-                    'calendarAlias' => 'provider2'
+                    'calendarAlias' => 'provider2',
+                    'editable'      => false,
+                    'removable'     => false
                 ],
             ],
             $result

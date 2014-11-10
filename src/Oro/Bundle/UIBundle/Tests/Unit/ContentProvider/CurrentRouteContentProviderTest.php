@@ -24,7 +24,7 @@ class CurrentRouteContentProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetContent()
     {
-        $this->request->attributes->set('_route', 'test_route');
+        $this->request->attributes->set('_master_request_route', 'test_route');
         $this->provider->setRequest($this->request);
         $this->assertEquals('test_route', $this->provider->getContent());
     }

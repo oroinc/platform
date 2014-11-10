@@ -213,8 +213,18 @@
 
 .calendar-connections .context-menu-button {
     display: none;
+    color: #000;
 }
 
 .calendar-connections .connection-item:hover .context-menu-button {
     display: block;
+}
+
+.calendar-connections .un-color {
+    background-color: #f6f6f6;
+    border: 1px solid #AEAEAE;
+}
+
+.connection-item span {
+    cursor: pointer;
 }

@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'routing', 'orocalendar/js/calendar/connection/collection'
-    ], function (_, Backbone, routing, ConnectionCollection) {
+define(['underscore', 'backbone', 'routing'
+    ], function (_, Backbone, routing) {
     'use strict';
 
     /**
@@ -10,8 +10,6 @@ define(['underscore', 'backbone', 'routing', 'orocalendar/js/calendar/connection
      * @extends Backbone.Model
      */
     return Backbone.Model.extend({
-        /** @property */
-        collection: ConnectionCollection,
         route: 'oro_api_post_calendar_connection',
         urlRoot: null,
 
@@ -20,19 +18,20 @@ define(['underscore', 'backbone', 'routing', 'orocalendar/js/calendar/connection
             targetCalendar: null,
             calendarAlias: null,
             calendar: null, // calendarId
-            calendarUid: null, // calculated automatically
+            calendarUid: null, // calculated automatically, equals to calendarAlias + calendarId
             position: 0,
             visible: true,
             color: null,
             backgroundColor: null,
             calendarName: null,
-            removable: true
+            removable: true,
+            options: null
         },
 
         initialize: function () {
             this.urlRoot = routing.generate(this.route);
-            this._updateCalendarAttribute();
-            this.on('change:calendarAlias change:calendarId', this._updateCalendarAttribute, this);
+            this._updateCalendarUidAttribute();
+            this.on('change:calendarAlias change:calendar', this._updateCalendarUidAttribute, this);
         },
 
         save: function (key, val, options) {
@@ -55,7 +54,11 @@ define(['underscore', 'backbone', 'routing', 'orocalendar/js/calendar/connection
             Backbone.Model.prototype.save.call(this, attrs, options);
         },
 
-        _updateCalendarAttribute: function () {
+        toJSON: function (options) {
+            return _.omit(Backbone.Model.prototype.toJSON.call(this, options), ['options']);
+        },
+
+        _updateCalendarUidAttribute: function () {
             var calendarAlias = this.get('calendarAlias'),
                 calendarId = this.get('calendar'),
                 calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;

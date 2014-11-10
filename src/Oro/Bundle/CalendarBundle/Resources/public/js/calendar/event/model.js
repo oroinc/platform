@@ -12,9 +12,10 @@ define(['underscore', 'backbone', 'routing'
     return Backbone.Model.extend({
         route: 'oro_api_get_calendarevents',
         urlRoot: null,
+        originalId: null, // original id received from a server
 
         defaults: {
-            id: null,
+            id: null, // original id is copied to originalId property and this attribute is replaced with calendarUid + originalId
             title : null,
             description : null,
             start: null,
@@ -25,13 +26,24 @@ define(['underscore', 'backbone', 'routing'
             removable: false,
             calendarAlias: null,
             calendar: null, // calendarId
-            calendarUid: null // calculated automatically
+            calendarUid: null // calculated automatically, equals to calendarAlias + calendarId
         },
 
         initialize: function () {
             this.urlRoot = routing.generate(this.route);
-            this._updateCalendarAttribute();
-            this.on('change:calendarAlias change:calendarId', this._updateCalendarAttribute, this);
+            this._updateComputableAttributes();
+            this.on('change:id change:calendarAlias change:calendar', this._updateComputableAttributes, this);
+        },
+
+        url: function () {
+            var url,
+                id = this.id;
+
+            this.id = this.originalId;
+            url = Backbone.Model.prototype.url.call(this, arguments);
+            this.id = id;
+
+            return url;
         },
 
         save: function (key, val, options) {
@@ -47,18 +59,26 @@ define(['underscore', 'backbone', 'routing'
             }
 
             options.contentType = 'application/json';
-            options.data = JSON.stringify(
-                _.extend({}, _.omit(this.toJSON(), ['calendarUid', 'editable', 'removable']), attrs || {})
-            );
+            options.data = JSON.stringify(_.extend(
+                {id: this.originalId},
+                _.omit(this.toJSON(), ['id', 'editable', 'removable', 'calendarUid']),
+                attrs || {}
+            ));
 
             Backbone.Model.prototype.save.call(this, attrs, options);
         },
 
-        _updateCalendarAttribute: function () {
+        _updateComputableAttributes: function () {
             var calendarAlias = this.get('calendarAlias'),
                 calendarId = this.get('calendar'),
                 calendarUid = calendarAlias && calendarId ? calendarAlias + '_' + calendarId : null;
+
             this.set('calendarUid', calendarUid);
+
+            if (!this.originalId && this.id && calendarUid) {
+                this.originalId = this.id;
+                this.set('id', calendarUid + '_' + this.originalId);
+            }
         }
     });
 });

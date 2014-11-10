@@ -126,39 +126,10 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetCalendarName()
-    {
-        $connection = new CalendarProperty();
-        $connection->setCalendar(123);
-
-        $calendar = new Calendar();
-        $user     = new User();
-        $calendar->setOwner($user);
-
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepository')
-            ->with('OroCalendarBundle:Calendar')
-            ->will($this->returnValue($repo));
-        $repo->expects($this->once())
-            ->method('find')
-            ->with($connection->getCalendar())
-            ->will($this->returnValue($calendar));
-
-        $this->nameFormatter->expects($this->at(0))
-            ->method('format')
-            ->with($this->identicalTo($user))
-            ->will($this->returnValue('John Doo'));
-
-        $result = $this->provider->getCalendarName($connection);
-        $this->assertEquals('John Doo', $result);
-    }
-
     public function testGetCalendarEvents()
     {
         $calendarId  = 123;
+        $userId      = 123;
         $start       = new \DateTime();
         $end         = new \DateTime();
         $subordinate = true;
@@ -184,7 +155,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->with($calendarId, $this->identicalTo($qb))
             ->will($this->returnValue($events));
 
-        $result = $this->provider->getCalendarEvents($calendarId, $start, $end, $subordinate);
+        $result = $this->provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
         $this->assertEquals($events, $result);
     }
 }
