@@ -34,7 +34,7 @@ class ConfigExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_entity_config', [$this, 'getClassConfig']),
-            new \Twig_SimpleFunction('oro_entity_config_value', [$this, 'getClassConfigValue'])
+            new \Twig_SimpleFunction('oro_entity_config_value', [$this, 'getClassConfigValue']),
         ];
     }
 
