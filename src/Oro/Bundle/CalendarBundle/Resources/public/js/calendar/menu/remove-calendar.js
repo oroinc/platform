@@ -5,8 +5,8 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
     'use strict';
 
     /**
-     * @export  orocalendar/js/calendar/menu/hide-calendar-action
-     * @class   orocalendar.calendar.menu.HideCalendarAction
+     * @export  orocalendar/js/calendar/menu/remove-calendar
+     * @class   orocalendar.calendar.menu.RemoveCalendar
      * @extends oroui/js/app/views/base/view
      */
     return BaseView.extend({

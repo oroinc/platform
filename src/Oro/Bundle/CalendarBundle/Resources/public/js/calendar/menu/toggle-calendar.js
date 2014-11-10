@@ -1,13 +1,12 @@
 /*jslint nomen:true*/
 /*global define, console*/
-define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'orocalendar/js/calendar/connection/collection'
-], function ($, _, BaseView, __, messenger, ConnectionCollection) {
+define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger'
+    ], function (_, BaseView, __, messenger) {
     'use strict';
 
     /**
-     * @export  orocalendar/js/calendar/menu/visible-calendar-action
-     * @class   orocalendar.calendar.menu.VisibleCalendarAction
+     * @export  orocalendar/js/calendar/menu/toggle-calendar
+     * @class   orocalendar.calendar.menu.ToggleCalendar
      * @extends oroui/js/app/views/base/view
      */
     return BaseView.extend({

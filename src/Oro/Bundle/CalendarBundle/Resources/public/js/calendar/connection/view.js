@@ -106,14 +106,14 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
                 this.options.defferedActionEnd = $.Deferred();
                 this.options.defferedActionEnd.then(
-                    _.bind(function (){
+                    _.bind(function () {
                         this.menu = _.template($(this.selectors.contextMenuTemplate).html());
                     }, this),
-                    _.bind(function (){
+                    _.bind(function () {
                         this.menu = _.template($(this.selectors.contextMenuTemplate).html());
                     }, this)
                 );
-                this.visibleCalendar($(e.currentTarget), model);
+                this.toggleCalendar($(e.currentTarget), model);
             }, this));
         },
 
@@ -161,7 +161,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         this.options.defferedActionEnd.resolve();
                     })
                 });
-            }  catch (err) {
+            } catch (err) {
                 savingMsg.close();
                 this.showMiscError(err);
                 this.addVisibleEventListener(model);
@@ -191,7 +191,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         this.options.defferedActionEnd.resolve();
                     })
                 });
-            }  catch (err) {
+            } catch (err) {
                 savingMsg.close();
                 this.showMiscError(err);
                 this.addVisibleEventListener(model);
@@ -200,7 +200,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }
         },
 
-        visibleCalendar: function ($target, model) {
+        toggleCalendar: function ($target, model) {
             var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
             if (model.get('visible')) {
                 this.hideCalendar(model, $target, savingMsg);
