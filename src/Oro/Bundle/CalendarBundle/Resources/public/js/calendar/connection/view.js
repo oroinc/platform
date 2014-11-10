@@ -29,7 +29,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             findItemByCalendar: function (calendarUid) { return '.connection-item[data-calendar-uid="' + calendarUid + '"]'; },
             newCalendarSelector: '#new_calendar',
             contextMenuTemplate: '#template-calendar-menu',
-            contextMenuSpinnerTemplate: '#template-calendar-menu-spinner',
             visibilityButton: '.calendar-color'
         },
 
@@ -151,42 +150,48 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         showContextMenu: function ($container, model) {
             var $el = $(this.contextMenuTemplate(model.toJSON())),
-                options = this.options,
                 modules = _.uniq($el.find("a[data-module]").map(function () {
                     return $(this).data('module');
-                }).get());
+                }).get()),
+                options = this.options,
+                containerHtml = $container.html(),
+                showLoadingTimeout;
 
-            if (modules.length > 0) {
-                this.options.defferedActionEnd = $.Deferred();
-                this.options.defferedActionEnd.then(
-                    _.bind(function () {
-                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
-                    }, this),
-                    _.bind(function () {
-                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
-                    }, this)
-                );
+            if (modules.length > 0 && this._initActionSyncObject()) {
+                // show loading message, if loading takes more than 100ms
+                showLoadingTimeout = setTimeout(_.bind(function () {
+                    $container.html('<span class="loading-indicator"></span>');
+                }, this), 100);
+                // load context menu
                 modules = _.object(modules, modules);
                 tools.loadModules(modules, _.bind(function (modules) {
+                    clearTimeout(showLoadingTimeout);
+                    $container.html(containerHtml);
+
                     _.each(modules, _.bind(function (moduleConstructor, moduleName) {
-                        var  actionModule = new moduleConstructor(options);
+                        var actionModule = new moduleConstructor(options);
                         $el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
-                            this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
-                            $('.context-menu-button').css('display', '');
-                            $el.remove();
-                            $(document).off('.' + this.cid);
-                            actionModule.execute(model);
+                            if (this._initActionSyncObject()) {
+                                $('.context-menu-button').css('display', '');
+                                $el.remove();
+                                $(document).off('.' + this.cid);
+                                actionModule.execute(model, this._actionSyncObject);
+                            }
                         }, this));
                     }, this));
+
                     $container.closest(this.selectors.item)
                         .append($el)
                         .find('.context-menu-button').css('display', 'block');
+
                     $(document).one('click.' + this.cid, function (event) {
                         if (!$(event.target).hasClass('context-menu')) {
                             $('.context-menu-button').css('display', '');
                             $el.remove();
                         }
                     });
+
+                    this._actionSyncObject.resolve();
                 }, this));
             }
         },
@@ -255,14 +260,18 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         messenger.notificationFlashMessage('success', __('The calendar was updated.'));
                         this.trigger(visible ? 'connectionAdd' : 'connectionRemove', model);
                         this._addVisibilityButtonEventListener($connection, model);
-                        this.options.defferedActionEnd.resolve();
+                        if (this._actionSyncObject) {
+                            this._actionSyncObject.resolve();
+                        }
                     }, this),
                     error: _.bind(function (model, response) {
                         savingMsg.close();
                         this.showUpdateError(response.responseJSON || {});
                         this._addVisibilityButtonEventListener($connection, model);
                         this._setItemVisibility($visibilityButton, visible ? '' : model.get('backgroundColor'));
-                        this.options.defferedActionEnd.resolve();
+                        if (this._actionSyncObject) {
+                            this._actionSyncObject.reject();
+                        }
                     }, this)
                 });
             } catch (err) {
@@ -270,7 +279,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 this.showMiscError(err);
                 this._addVisibilityButtonEventListener($connection, model);
                 this._setItemVisibility($visibilityButton, visible ? '' : model.get('backgroundColor'));
-                this.options.defferedActionEnd.resolve();
+                if (this._actionSyncObject) {
+                    this._actionSyncObject.reject();
+                }
             }
         },
 
@@ -285,23 +296,31 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         _addVisibilityButtonEventListener: function ($connection, model) {
-            $connection.one('click.' + this.cid, this.selectors.visibilityButton, _.bind(function (e) {
-                this.menu = _.template($(this.selectors.contextMenuSpinnerTemplate).html());
-                this.options.defferedActionEnd = $.Deferred();
-                this.options.defferedActionEnd.then(
-                    _.bind(function () {
-                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
-                    }, this),
-                    _.bind(function () {
-                        this.menu = _.template($(this.selectors.contextMenuTemplate).html());
-                    }, this)
-                );
-                this.toggleCalendar(model);
+            $connection.on('click.' + this.cid, this.selectors.visibilityButton, _.bind(function (e) {
+                if (this._initActionSyncObject()) {
+                    this.toggleCalendar(model);
+                }
             }, this));
         },
 
         _removeVisibilityButtonEventListener: function ($connection, model) {
             $connection.off('.' + this.cid);
+        },
+
+        _initActionSyncObject: function () {
+            if (this._actionSyncObject) {
+                return false;
+            }
+            this._actionSyncObject = $.Deferred();
+            this._actionSyncObject.then(
+                _.bind(function () {
+                    delete this._actionSyncObject;
+                }, this),
+                _.bind(function () {
+                    delete this._actionSyncObject;
+                }, this)
+            );
+            return true;
         }
     });
 });

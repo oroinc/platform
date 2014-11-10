@@ -13,42 +13,33 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
         initialize: function (options) {
             this.colorManager = options.colorManager;
             this.connectionsView = options.connectionsView;
-            this.defferedActionEnd = options.defferedActionEnd;
         },
 
-        execute: function (model) {
-            var deletingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...')),
+        execute: function (model, promise) {
+            var removingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...')),
                 $connection = this.connectionsView.findItem(model);
             try {
                 $connection.hide();
                 model.destroy({
                     wait: true,
                     success: _.bind(function () {
-                        deletingMsg.close();
+                        removingMsg.close();
                         messenger.notificationFlashMessage('success', __('The calendar was removed.'));
-                        this.defferedActionEnd.resolve();
+                        promise.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
-                        deletingMsg.close();
-                        this.showDeleteError(response.responseJSON || {});
-                        this.defferedActionEnd.resolve();
+                        removingMsg.close();
+                        this._showError(__('Sorry, the calendar removing was failed'), response.responseJSON || {});
                         $connection.show();
+                        promise.reject();
                     }, this)
                 });
             } catch (err) {
-                deletingMsg.close();
-                this.showMiscError(err);
-                this.defferedActionEnd.resolve();
+                removingMsg.close();
+                this._showError(__('Sorry, unexpected error was occurred'), err);
                 $connection.show();
+                promise.reject();
             }
-        },
-
-        showDeleteError: function (err) {
-            this._showError(__('Sorry, the calendar removing was failed'), err);
-        },
-
-        showMiscError: function (err) {
-            this._showError(__('Sorry, unexpected error was occurred'), err);
         },
 
         _showError: function (message, err) {

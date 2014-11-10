@@ -15,7 +15,7 @@ define(['oroui/js/app/views/base/view'
             this.connectionsView = options.connectionsView;
         },
 
-        execute: function (model) {
+        execute: function (model, promise) {
             this.connectionsView.toggleCalendar(model);
         }
     });
