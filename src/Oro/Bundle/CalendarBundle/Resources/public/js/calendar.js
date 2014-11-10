@@ -41,6 +41,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 editable: true,
                 removable: true,
                 collection: null,
+                itemViewTemplateSelector: null,
                 itemFormTemplateSelector: null,
                 itemFormDeleteButtonSelector: null,
                 calendar: null
@@ -102,6 +103,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 // create a view for event details
                 this.eventView = new EventView(_.extend({}, options, {
                     model: eventModel,
+                    viewTemplateSelector: this.options.eventsOptions.itemViewTemplateSelector,
                     formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector
                 }));
                 // subscribe to event view collection events

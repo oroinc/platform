@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
-
 interface CalendarProviderInterface
 {
     /**

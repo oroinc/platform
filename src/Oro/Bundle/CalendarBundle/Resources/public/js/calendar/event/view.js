@@ -1,8 +1,8 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation'
-], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation) {
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
+], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -26,6 +26,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         initialize: function (options) {
             this.options = _.defaults(_.pick(options || {}, _.keys(this.options)), this.options);
+            this.viewTemplate = _.template($(options.viewTemplateSelector).html());
             this.template = _.template($(options.formTemplateSelector).html());
 
             this.listenTo(this.model, 'sync', this.onModelSave);
@@ -52,7 +53,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         render: function () {
             var widgetOptions = this.options.widgetOptions || {},
                 defaultOptions = {
-                    title: this.model.isNew() ? __('Add New Event') : __('Edit Event'),
+                    title: this.model.isNew() ? __('Add New Event') : __('View Event'),
                     stateEnabled: false,
                     incrementalPosition: false,
                     dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
@@ -63,14 +64,36 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         close: _.bind(this.remove, this)
                     }),
                     submitHandler: _.bind(this.saveModel, this)
-                };
+                },
+                onDelete = _.bind(function (e) {
+                    var el = $(e.currentTarget),
+                        deleteUrl = el.data('url'),
+                        confirm = new DeleteConfirmation({
+                            content: el.data('message')
+                        });
+                    e.preventDefault();
+                    confirm.on('ok', _.bind(function () {
+                        this.deleteModel(deleteUrl);
+                    }, this));
+                    confirm.open();
+                }, this),
+                onEdit = _.bind(function (e) {
+                    var $content = $('<div class="widget-content"></div>');
+                    $content.append(this.getEventForm());
+                    this.eventDialog.setTitle(__('Edit Event'));
+                    this.eventDialog.setContent($content);
+                    // subscribe to 'delete event' event
+                    this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
+                        deleteAction.on('click', onDelete);
+                    });
+                }, this);
 
             if (this.options.widgetRoute) {
                 defaultOptions.el = $('<div></div>');
                 defaultOptions.url = routing.generate(this.options.widgetRoute, {id: this.model.originalId});
                 defaultOptions.type = 'Calendar';
             } else {
-                defaultOptions.el = this.getEventForm();
+                defaultOptions.el = this.model.isNew() ? this.getEventForm() : this.getEventView();
                 defaultOptions.loadingMaskEnabled = false;
             }
 
@@ -82,15 +105,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
             // subscribe to 'delete event' event
             this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
-                deleteAction.on('click', _.bind(function (e) {
-                    var el = $(e.target),
-                        confirm = new DeleteConfirmation({
-                            content: el.data('message')
-                        });
-                    e.preventDefault();
-                    confirm.on('ok', _.bind(this.deleteModel, this));
-                    confirm.open();
-                }, this));
+                deleteAction.on('click', onDelete);
+            });
+            // subscribe to 'switch to edit' event
+            this.eventDialog.getAction('edit', 'adopted', function (editAction) {
+                editAction.on('click', onEdit);
             });
 
             // init loading mask control
@@ -112,13 +131,17 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
         },
 
-        deleteModel: function () {
+        deleteModel: function (deleteUrl) {
             this.showDeletingMask();
             try {
-                this.model.destroy({
+                var options = {
                     wait: true,
                     error: _.bind(this._handleResponseError, this)
-                });
+                };
+                if (deleteUrl) {
+                    options.url = deleteUrl;
+                }
+                this.model.destroy(options);
             } catch (err) {
                 this.showError(err);
             }
@@ -211,6 +234,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             });
         },
 
+        getEventView: function () {
+            return this.viewTemplate(_.extend(this.model.toJSON(), {
+                formatter: fieldFormatter
+            }));
+        },
+
         getEventForm: function () {
             var modelData = this.model.toJSON(),
                 form = this.fillForm(this.template(modelData), modelData);
@@ -264,6 +293,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
 
             return current;
-        },
+        }
     });
 });
