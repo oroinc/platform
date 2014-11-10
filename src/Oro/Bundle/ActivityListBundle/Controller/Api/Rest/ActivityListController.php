@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
-use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
@@ -25,6 +24,8 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
  */
 class ActivityListController extends RestController
 {
+    const ITEMS_PER_PAGE = 25;
+
     /**
      * Get activity lists for given entity
      *
@@ -32,14 +33,11 @@ class ActivityListController extends RestController
      * @param integer $entityId    Entity id
      *
      * @QueryParam(
-     *      name="page", requirements="\d+", nullable=true, description="Page number, starting from 1. Defaults to 1."
+     *      name="page", requirements="\d+", nullable=true, description="Page number, starting from 1. Default is 1."
      * )
      * @QueryParam(
-     *      name="limit", requirements="\d+", nullable=true, description="Number of items per page. defaults to 10."
-     * )
-     * @QueryParam(
-     *      name="activityClasses", requirements="\d+", nullable=true,
-     *      description="Comma separated value of activityClass names or it can be array"
+     *      name="activityClasses", requirements="\s+", nullable=true,
+     *      description="Comma separated value of activity Class names"
      * )
      * @QueryParam(
      *     name="dateFrom",
@@ -66,38 +64,23 @@ class ActivityListController extends RestController
      *      permission="VIEW",
      *      class="OroActivityListBundle:ActivityList"
      * )
+     *
      * @return Response
      */
     public function cgetAction($entityClass, $entityId)
     {
-        $dateFrom               = null;
-        $dateTo                 = null;
-        $activityСlasses        = [];
-        $requestActivityСlasses = $this->getRequest()->get('activityClasses');
-        $intDateFrom            = strtotime($this->getRequest()->get('dateFrom'));
-        $intDateTo              = strtotime($this->getRequest()->get('dateTo'));
+        $activityСlasses = $this->getRequest()->get('activityClasses', []);
+        $dateFrom        = strtotime($this->getRequest()->get('dateFrom', null));
+        $dateTo          = strtotime($this->getRequest()->get('dateTo', null));
 
-        /** @var ActivityManager $activityManager */
-        $activityManager = $this->get('oro_activity.manager');
-
-        if ($intDateFrom) {
-            $dateFrom = new \DateTime();
-            $dateFrom->setTimestamp($intDateFrom);
-            $dateFrom->setTimezone(new \DateTimeZone('UTC'));
+        if ($dateFrom) {
+            $dateFrom = new \DateTime($dateFrom, new \DateTimeZone('UTC'));
         }
-        if ($intDateTo) {
-            $dateTo = new \DateTime();
-            $dateTo->setTimestamp($intDateTo);
-            $dateTo->setTimezone(new \DateTimeZone('UTC'));
+        if ($dateTo) {
+            $dateTo = new \DateTime($dateTo, new \DateTimeZone('UTC'));
         }
-        if (!is_array($requestActivityСlasses)) {
-            $requestActivityСlasses = explode(',', $requestActivityСlasses);
-        }
-
-        foreach ($requestActivityСlasses as $activityClass) {
-            if ($activityManager->hasActivityAssociation($entityClass, $activityClass)) {
-                array_push($activityСlasses, $activityClass);
-            }
+        if (!is_array($activityСlasses)) {
+            $activityСlasses = explode(',', $activityСlasses);
         }
 
         $results = $this->getManager()->getList(
@@ -106,18 +89,15 @@ class ActivityListController extends RestController
             $activityСlasses,
             $dateFrom,
             $dateTo,
-            $this->getRequest()->get('page', 1),
-            $this->getRequest()->get('limit', self::ITEMS_PER_PAGE)
+            $this->getRequest()->get('page', 1)
         );
 
         return new JsonResponse($results);
     }
 
     /**
-     * Get Activity object
+     * Get ActivityList single object
      *
-     * @param string  $entityClass Entity class name
-     * @param string  $activityClass Activity class name
      * @param integer $activityId Entity id
      *
      * @ApiDoc(
@@ -130,28 +110,14 @@ class ActivityListController extends RestController
      * )
      * @return Response
      */
-    public function getActivityAction($entityClass, $activityClass, $activityId)
+    public function getActivityAction($activityId)
     {
-        $routingHelper = $this->get('oro_entity.routing_helper');
-        $entityClass   = $routingHelper->decodeClassName($entityClass);
-        $activityClass = $routingHelper->decodeClassName($activityClass);
-
-        /** @var ActivityManager $activityManager */
-        $activityManager = $this->get('oro_activity.manager');
-
-        if (!$activityManager->hasActivityAssociation($entityClass, $activityClass)) {
-            return new Response(json_encode([]), Codes::HTTP_NOT_FOUND);
-        }
-
-        $repo = $this->getManager()->getObjectManager()->getRepository($activityClass);
-        $activityEntity = $repo->find($activityId);
+        $activityEntity = $this->getManager()->getItem($activityId);
         if (!$activityEntity) {
-            return new Response(json_encode([]), Codes::HTTP_NOT_FOUND);
+            return new JsonResponse([], Codes::HTTP_NOT_FOUND);
         }
 
-        $result = $this->getPreparedItem($activityEntity);
-
-        return new Response(json_encode($result));
+        return new JsonResponse($activityEntity);
     }
 
     /**

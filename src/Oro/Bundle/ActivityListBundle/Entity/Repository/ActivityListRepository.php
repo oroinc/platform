@@ -11,11 +11,11 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class ActivityListRepository extends EntityRepository
 {
     /**
-     * @param string    $entityClass
-     * @param integer   $entityId
-     * @param array     $activityClasses
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
+     * @param string         $entityClass
+     * @param integer        $entityId
+     * @param array          $activityClasses
+     * @param \DateTime|bool $dateFrom
+     * @param \DateTime|bool $dateTo
      *
      * @return QueryBuilder
      */
@@ -23,8 +23,8 @@ class ActivityListRepository extends EntityRepository
         $entityClass,
         $entityId,
         $activityClasses = array(),
-        \DateTime $dateFrom = null,
-        \DateTime $dateTo = null
+        $dateFrom = null,
+        $dateTo = null
     ) {
         $associationName = ExtendHelper::buildAssociationName(
             $entityClass,
