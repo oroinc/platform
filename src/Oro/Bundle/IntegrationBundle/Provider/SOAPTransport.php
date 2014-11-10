@@ -36,7 +36,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     protected $multipleAttemptsEnabled = true;
 
     /** @var array */
-    protected $sleepBetweenAttempt;
+    protected $sleepBetweenAttempt = [5, 10, 20, 40];
 
     /**
      * {@inheritdoc}
@@ -44,7 +44,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     public function init(Transport $transportEntity)
     {
         $this->resetAttemptCount();
-        $this->setSleepBetweenAttempts([5, 10, 20, 40]);
         $this->settings = $transportEntity->getSettingsBag();
         $wsdlUrl        = $this->settings->get('wsdl_url');
 
@@ -63,6 +62,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
+
         try {
             $result = $this->client->__soapCall($action, $params);
         } catch (\Exception $e) {
@@ -129,14 +129,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
-     * @return boolean
-     */
-    public function getMultipleAttemptsEnabled()
-    {
-        return $this->multipleAttemptsEnabled;
-    }
-
-    /**
      * @param string $wsdlUrl
      *
      * @return \SoapClient
@@ -178,14 +170,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
-     * @return bool
-     */
-    protected function shouldAttempt()
-    {
-        return $this->multipleAttemptsEnabled && ($this->attempted < count($this->sleepBetweenAttempt) - 1);
-    }
-
-    /**
      * Get last request headers as array
      *
      * @return array
@@ -206,6 +190,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         if (Codes::HTTP_OK === $this->getHttpStatusCode($headers)) {
             return true;
         }
+
         return false;
     }
 
@@ -224,7 +209,9 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
      */
     protected function isAttemptNecessary()
     {
-        if ($this->shouldAttempt()) {
+        $couldPerform = $this->multipleAttemptsEnabled && ($this->attempted < count($this->sleepBetweenAttempt) - 1);
+
+        if ($couldPerform) {
             $headers  = $this->getLastResponseHeaders();
             $response = $this->getLastResponse();
 
@@ -240,6 +227,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
                 return true;
             }
         }
+
         return false;
     }
 
@@ -267,14 +255,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         }
 
         return (int)end($this->sleepBetweenAttempt);
-    }
-
-    /**
-     * @param array $range
-     */
-    protected function setSleepBetweenAttempts(array $range)
-    {
-        $this->sleepBetweenAttempt = $range;
     }
 
     /**
