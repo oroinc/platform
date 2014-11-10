@@ -30,7 +30,7 @@ class ActivityListListener
 
     /**
      * @param CollectListManager $activityListManager
-     * @param DoctrineHelper      $doctrineHelper
+     * @param DoctrineHelper     $doctrineHelper
      */
     public function __construct(
         CollectListManager $activityListManager,
@@ -49,11 +49,15 @@ class ActivityListListener
     {
         $entityManager = $args->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
-        $entityManager->getEventManager()->removeEventListener('onFlush', $this);
 
         $this->collectInsertedEntities($unitOfWork->getScheduledEntityInsertions());
         $this->collectUpdates($unitOfWork);
         $this->collectDeletedEntities($unitOfWork->getScheduledEntityDeletions());
+
+        if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $entityManager)
+        ) {
+            $this->updatedEntities = [];
+        }
     }
 
     /**
@@ -65,14 +69,15 @@ class ActivityListListener
     {
         /** @var $entityManager */
         $entityManager = $args->getEntityManager();
-        $entityManager->getEventManager()->removeEventListener('postFlush', $this);
 
-        $this->processInsertEntities($entityManager);
-        $this->processUpdatedEntities($entityManager);
-        $this->processDeletedEntities($entityManager);
+        $this->activityListManager->processDeletedEntities($this->deletedEntities, $entityManager);
+        $this->deletedEntities = [];
 
-        $entityManager->getEventManager()->addEventListener('onFlush', $this);
-        $entityManager->getEventManager()->addEventListener('postFlush', $this);
+        if ($this->activityListManager->processInsertEntities($this->insertedEntities, $entityManager)
+        ) {
+            $this->insertedEntities = [];
+            $entityManager->flush();
+        }
     }
 
     /**
@@ -91,43 +96,6 @@ class ActivityListListener
                     ];
                 }
             }
-        }
-    }
-
-    /**
-     * Delete activity lists on delete activities
-     *
-     * @param EntityManager $entityManager
-     */
-    protected function processDeletedEntities(EntityManager $entityManager)
-    {
-        $this->activityListManager->processDeletedEntities($this->deletedEntities, $entityManager);
-        $this->deletedEntities = [];
-    }
-
-    /**
-     * Update Activity lists
-     *
-     * @param EntityManager $entityManager
-     */
-    protected function processUpdatedEntities(EntityManager $entityManager)
-    {
-        if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $entityManager)) {
-            $this->updatedEntities = [];
-            $entityManager->flush();
-        }
-    }
-
-    /**
-     * Process new records.
-     *
-     * @param EntityManager $entityManager
-     */
-    protected function processInsertEntities(EntityManager $entityManager)
-    {
-        if ($this->activityListManager->processInsertEntities($this->insertedEntities, $entityManager)) {
-            $this->insertedEntities = [];
-            $entityManager->flush();
         }
     }
 
@@ -153,6 +121,7 @@ class ActivityListListener
             $ownerEntity = $collection->getOwner();
             $entityHash = spl_object_hash($ownerEntity);
             if ($this->activityListManager->isSupportedEntity($ownerEntity)
+                && $this->doctrineHelper->getSingleEntityIdentifier($ownerEntity) !== null
                 && empty($this->updatedEntities[$entityHash])
             ) {
                 $this->updatedEntities[$entityHash] = $ownerEntity;

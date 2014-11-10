@@ -13,6 +13,7 @@ parameters:
     oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
     oro_activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
     oro_activity_list.migration.extension.activity_list: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension
+    oro_activity_list.migration.activity_list.post_up.listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListPostUpMigrationListener
 
     oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
 services:
@@ -46,8 +47,8 @@ services:
             - @oro_activity_list.collect_manager
             - @oro_entity.doctrine_helper
         tags:
-            - { name: doctrine.event_listener, event: onFlush }
-            - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: onFlush, priority: -200 }
+            - { name: doctrine.event_listener, event: postFlush, priority: -200 }
 
     oro_activity_list.provider.chain:
         class: %oro_activity_list.provider.chain.class%
@@ -75,3 +76,13 @@ services:
         class: %oro_activity_list.migration.extension.activity_list%
         tags:
             - { name: oro_migration.extension, extension_name: activity_list }
+
+    oro_activity_list.migration.activity_list.post_up.listener:
+        class: %oro_activity_list.migration.activity_list.post_up.listener.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+            - @oro_activity_list.migration.extension.activity_list
+            - @oro_entity_extend.migration.entity_metadata_helper
+            - @oro_migration.db_id_name_generator
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -110 }

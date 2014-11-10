@@ -21,7 +21,7 @@ class CollectListManager
     public function __construct(
         ActivityListChainProvider $chainProvider
     ) {
-        $this->chainProvider  = $chainProvider;
+        $this->chainProvider = $chainProvider;
     }
 
     /**
@@ -63,9 +63,18 @@ class CollectListManager
     public function processUpdatedEntities($updatedEntities, EntityManager $entityManager)
     {
         if (!empty($updatedEntities)) {
+            $metaData = $entityManager->getClassMetadata(ActivityList::ENTITY_CLASS);
             foreach ($updatedEntities as $entity) {
-                $entityManager->persist($this->chainProvider->getUpdatedActivityList($entity, $entityManager));
+                $activityList = $this->chainProvider->getUpdatedActivityList($entity, $entityManager);
+                if ($activityList) {
+                    $entityManager->persist($activityList);
+                    $entityManager->getUnitOfWork()->computeChangeSet(
+                        $metaData,
+                        $activityList
+                    );
+                }
             }
+
             return true;
         }
 
