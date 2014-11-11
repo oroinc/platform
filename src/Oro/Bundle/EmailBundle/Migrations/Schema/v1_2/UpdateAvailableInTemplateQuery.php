@@ -74,11 +74,16 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
      * @param bool            $dryRun
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $classNames = $this->getAllConfigurableEntities($logger);
         foreach ($classNames as $className) {
+            if (!class_exists($className)) {
+                // skip if a class no longer exists
+                continue;
+            }
             $fieldConfigs        = $this->loadFieldConfigs($logger, $className);
             $fieldsChangedByUser = $this->loadFieldsChangedByUser($logger, $className);
             /** @var EntityMetadata $metadata */
