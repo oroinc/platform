@@ -11,7 +11,7 @@ So, to define custom form type for particular field there are few ways:
 ```php
 <?php
 
-namespace Oro\Bundle\AcmeBundle\DependencyInjection\Compiler;
+namespace Acme\Bundle\AcmeBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -79,6 +79,21 @@ class CustomTypeGuesser implements FormTypeGuesserInterface
 }
 
 ```
+
+And register it in services.yml:
+
+```yaml
+    acme.form.guesser.extend_field:
+        class: %acme.form.guesser.extend_field.class%
+        tags:
+            - { name: form.type_guesser, priority: N }
+```
+
+Here is some idea of what N should be, existing guessers have priorities:
+* DoctrineTypeGuesser - 10
+* FormConfigGuesser - 15
+* ExtendFieldTypeGuesser - 20
+Select it according to what you need to achieve.
 
 - Using annotation to field or related entity (if extended field is a relation)
 
