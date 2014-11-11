@@ -1,2 +1,2 @@
 bundles:
-    - {name: Oro\Bundle\EntityConfigBundle\OroEntityConfigBundle, priority: -84 }
+    - {name: Oro\Bundle\EntityConfigBundle\OroEntityConfigBundle, priority: -68 }
