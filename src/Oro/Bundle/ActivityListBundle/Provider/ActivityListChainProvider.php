@@ -4,6 +4,8 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
@@ -12,7 +14,6 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActivityListChainProvider
@@ -32,9 +33,13 @@ class ActivityListChainProvider
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager  $configManager
+     * @param ConfigProvider $configProvider
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager, ConfigProvider $configProvider)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager,
+        ConfigProvider $configProvider
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
         $this->configProvider = $configProvider;

@@ -65,6 +65,8 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All day event
+            updated_by:           updated by {{ user }} at {{ date }}
+            added_by:             added by {{ user }} at {{ date }}
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php
