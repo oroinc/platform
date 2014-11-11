@@ -554,8 +554,8 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $routeName
-     * @param $class
+     * @param string $routeName
+     * @param string $class
      */
     protected function setupEntityMetadata($routeName, $class)
     {
