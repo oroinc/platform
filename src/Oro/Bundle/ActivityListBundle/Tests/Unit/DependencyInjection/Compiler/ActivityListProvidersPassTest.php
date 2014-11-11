@@ -8,9 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ActivityListProvidersPassTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $container;
 
     protected function setUp()

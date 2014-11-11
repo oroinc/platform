@@ -61,8 +61,8 @@
             <div data-section="bottom" class="container-fluid actions-bottom">
                 {{ UI.button({
                     'path': '#',
-                    'label': 'oro.activitylist.widget.load_more.title'|trans({'%count%': oro_config_value('oro_activity_list.per_page')}),
-                    'title': 'oro.activitylist.widget.load_more.title'|trans({'%count%': oro_config_value('oro_activity_list.per_page')}),
+                    'label': 'oro.activitylist.widget.load_more.title'|trans({'{{ count }}': oro_config_value('oro_activity_list.per_page')}),
+                    'title': 'oro.activitylist.widget.load_more.title'|trans({'{{ count }}': oro_config_value('oro_activity_list.per_page')}),
                     'aCss': 'no-hash',
                     'dataAttributes': {'action-name': 'more'}
                 }) }}
