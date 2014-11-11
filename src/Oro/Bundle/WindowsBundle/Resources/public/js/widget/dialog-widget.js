@@ -219,7 +219,9 @@ define(function (require) {
 
         _renderActions: function() {
             DialogWidget.__super__._renderActions.apply(this);
-            this.widget.dialog('showActionsContainer');
+            if (this.hasActions()) {
+                this.widget.dialog('showActionsContainer');
+            }
         },
 
         /**
