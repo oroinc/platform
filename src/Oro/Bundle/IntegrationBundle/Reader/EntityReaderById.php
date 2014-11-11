@@ -50,10 +50,7 @@ class EntityReaderById extends BaseReader
                 $entityNames = $this->qb->getRootEntities();
 
                 $classMetadata = $em->getClassMetadata(reset($entityNames));
-                $identifiers   = $classMetadata->getIdentifier();
-
-                // only non-composite identifiers are supported
-                $identifier = reset($identifiers);
+                $identifier    = $classMetadata->getSingleIdentifierFieldName();
 
                 if (is_array($optionValue)) {
                     $this->qb->andWhere(

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -20,7 +18,6 @@ use Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderType;
-use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
 
@@ -121,9 +118,10 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->method('setDefaults')
             ->with(
                 array(
-                    'data_class'      => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                    'intention'       => 'calendar_event',
-                    'csrf_protection' => false,
+                    'data_class'           => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                    'intention'            => 'calendar_event',
+                    'csrf_protection'      => false,
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 )
             );
 

@@ -50,6 +50,7 @@ oro_entity_config:
                         translatable:       true
                         priority:           35
                     constraints:
+                        - NotBlank:         ~
                         - Length:
                             min:            2
                             max:            50
