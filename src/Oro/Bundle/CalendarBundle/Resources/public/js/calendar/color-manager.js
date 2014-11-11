@@ -9,7 +9,7 @@ define(['underscore'], function (_) {
      */
     var ColorManager = {
         /**
-         * A list of text/background colors are used to determine colors of events of connected calendars
+         * A list of background colors are used to determine colors of events of connected calendars
          *  @property {Array}
          */
         colors: [
@@ -31,7 +31,7 @@ define(['underscore'], function (_) {
 
         setCalendarColors: function (calendarId, backgroundColor) {
             this.calendarColors[calendarId] = {
-                color: '#' + this.getColor(backgroundColor),
+                color: '#' + this.getContrastColor(backgroundColor),
                 backgroundColor: '#' + backgroundColor
             };
         },
@@ -53,7 +53,7 @@ define(['underscore'], function (_) {
             } else if (_.isEmpty(obj.backgroundColor)) {
                 obj.backgroundColor = this.defaultColor;
             }
-            obj.color = this.getColor(obj.backgroundColor);
+            obj.color = this.getContrastColor(obj.backgroundColor);
         },
 
         findColors: function (bgColor) {
@@ -98,32 +98,26 @@ define(['underscore'], function (_) {
         },
 
         rgb2hex: function (r, g, b) {
-            var filter = function(dec) {
+            var filter = function (dec) {
                 var hex = dec.toString(16).toUpperCase();
-                return hex.length == 1 ? '0' + hex : hex;
-            }
-            return filter(r) + filter(g) + filter(b)
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+            return filter(r) + filter(g) + filter(b);
         },
 
         /**
          * Calculates contrast color
          * @see http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
          *
-         * @param backgroundColor {string} The background color in sixdigit hexadecimal form.
+         * @param {string} color A color in sixdigit hexadecimal form.
          * @returns {string|null} Calculated sufficient contrast color, currently black or white.
+         *                        If the given color is invalid or cannot be parsed, returns black.
          */
-        getColor: function(backgroundColor) {
-            var color = this.hex2rgb(backgroundColor);
-            if (color) {
-                var d = 0;
-                var a = 1 - (0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255;
-                if (a < 0.5) {
-                    d = 0;
-                } else {
-                    d = 255;
-                }
-                return this.rgb2hex(d, d, d);
-            }
+        getContrastColor: function (color) {
+            var rgb = this.hex2rgb(color),
+                yiq = rgb ? ((299 * rgb.r + 587 * rgb.g + 114 * rgb.b) / 1000) : 255,
+                clrDiff = rgb ? (rgb.r + rgb.g + rgb.b) : 0;
+            return yiq > 125 && clrDiff > 500 ? this.rgb2hex(0, 0, 0) : this.rgb2hex(255, 255, 255);
         }
     };
 
