@@ -106,9 +106,67 @@ class ReminderManager
     }
 
     /**
+     * Finds reminders for the given entities of the given type
+     * and sets them to each item
+     *
+     * @param array  $items
+     * @param string $entityClassName
+     */
+    public function applyReminders(array &$items, $entityClassName)
+    {
+        if (empty($items)
+            || !is_subclass_of($entityClassName, 'Oro\Bundle\ReminderBundle\Entity\RemindableInterface')
+        ) {
+            return;
+        }
+
+        $repository       = $this->entityManager->getRepository('OroReminderBundle:Reminder');
+        $reminders        = $repository
+            ->findRemindersByEntitiesQueryBuilder($entityClassName, $this->extractProperty($items, 'id'))
+            ->select('reminder.relatedEntityId, reminder.method, reminder.intervalNumber, reminder.intervalUnit')
+            ->getQuery()
+            ->getArrayResult();
+        $groupedReminders = [];
+        foreach ($reminders as $reminder) {
+            $groupedReminders[$reminder['relatedEntityId']][] = $reminder;
+        }
+
+        foreach ($items as &$item) {
+            if (isset($groupedReminders[$item['id']])) {
+                foreach ($groupedReminders[$item['id']] as $reminder) {
+                    $item['reminders'][] = [
+                        'method'   => $reminder['method'],
+                        'interval' => [
+                            'number' => $reminder['intervalNumber'],
+                            'unit'   => $reminder['intervalUnit']
+                        ]
+                    ];
+                }
+            }
+        }
+    }
+
+    /**
+     * @param array  $items
+     * @param string $property
+     *
+     * @return array
+     */
+    protected function extractProperty(array $items, $property)
+    {
+        return array_map(
+            function ($item) use ($property) {
+                return $item[$property];
+            },
+            $items
+        );
+    }
+
+    /**
      * Gets entity class name
      *
      * @param RemindableInterface $entity
+     *
      * @return string
      */
     protected function getEntityClassName(RemindableInterface $entity)
@@ -120,6 +178,7 @@ class ReminderManager
      * Gets single identifier of entity
      *
      * @param RemindableInterface $entity
+     *
      * @return mixed
      * @throws InvalidArgumentException If entity has multiple identifiers
      */

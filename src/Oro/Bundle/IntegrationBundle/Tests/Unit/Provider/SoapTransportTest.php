@@ -123,7 +123,7 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
         return [
             'Attempts'              => [
                 "HTTP/1.1 502 Bad gateway\n\r",
-                (SOAPTransport::ATTEMPTS+1),
+                4,
                 502
             ],
             'Internal server error' => [

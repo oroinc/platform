@@ -11,6 +11,21 @@ use Oro\Bundle\UserBundle\Entity\User;
 class BusinessUnitRepository extends EntityRepository
 {
     /**
+     * Finds the first record
+     *
+     * @return BusinessUnit
+     */
+    public function getFirst()
+    {
+        return $this->createQueryBuilder('businessUnit')
+            ->select('businessUnit')
+            ->orderBy('businessUnit.id')
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getSingleResult();
+    }
+
+    /**
      * Build business units tree for user page
      *
      * @param User     $user

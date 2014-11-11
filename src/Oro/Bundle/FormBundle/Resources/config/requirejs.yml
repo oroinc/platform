@@ -23,6 +23,8 @@ config:
         'oroform/js/validator/repeated': 'bundles/oroform/js/validator/repeated.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
 
+        'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
+
         'oroform/js/select2-config': 'bundles/oroform/js/select2-config.js'
         'oroform/js/multiple-entity': 'bundles/oroform/js/multiple-entity.js'
         'oroform/js/multiple-entity/view': 'bundles/oroform/js/multiple-entity/view.js'
