@@ -17,14 +17,14 @@ define(['underscore'], function (_) {
             '9A9CFF', 'B99AFF', 'C2C2C2', 'CABDBF', 'CCA6AC', 'F691B2', 'CD74E6', 'A47AE2'
         ],
 
-        /** @property {Object} */
-        defaultColors: null,
+        /** @property {String} */
+        defaultColor: null,
 
         /** @property {Object} */
         calendarColors: null,
 
         initialize: function () {
-            this.defaultColors = this.findColors('4986E7');
+            this.defaultColor = this.findColors('4986E7');
             this.calendarColors = {};
         },
 
@@ -48,28 +48,28 @@ define(['underscore'], function (_) {
         applyColors: function (obj, getLastBackgroundColor) {
             if (_.isEmpty(obj.color) && _.isEmpty(obj.backgroundColor)) {
                 var colors = this.findNextColors(getLastBackgroundColor());
-                obj.backgroundColor = colors[1];
+                obj.backgroundColor = colors;
             } else if (_.isEmpty(obj.backgroundColor)) {
-                obj.backgroundColor = this.defaultColors[1];
+                obj.backgroundColor = this.defaultColor;
             }
             obj.color = this.getColor(obj.backgroundColor);
         },
 
         findColors: function (bgColor) {
             if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
+                return this.findColors(this.defaultColor);
             }
             bgColor = bgColor.toUpperCase();
             var result = _.find(this.colors, function (item) { return item === bgColor; });
             if (_.isUndefined(result)) {
-                result = this.findColors(this.defaultColors[1]);
+                result = this.findColors(this.defaultColor);
             }
             return result;
         },
 
         findNextColors: function (bgColor) {
             if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
+                return this.findColors(this.defaultColor);
             }
             bgColor = bgColor.toUpperCase();
             var i = -1;
@@ -79,7 +79,7 @@ define(['underscore'], function (_) {
                 }
             });
             if (i === -1) {
-                return this.findColors(this.defaultColors[1]);
+                return this.findColors(this.defaultColor);
             }
             if ((i + 1) === _.size(this.colors)) {
                 return _.first(this.colors);
