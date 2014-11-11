@@ -115,12 +115,16 @@ class ActivityListChainProvider
             ]
         );
 
-        return $this->getActivityListEntityForEntity(
-            $entity,
-            $provider,
-            ActivityListManager::STATE_UPDATE,
-            $existListEntity
-        );
+        if ($existListEntity) {
+            return $this->getActivityListEntityForEntity(
+                $entity,
+                $provider,
+                ActivityListManager::STATE_UPDATE,
+                $existListEntity
+            );
+        }
+
+        return null;
     }
 
     /**
