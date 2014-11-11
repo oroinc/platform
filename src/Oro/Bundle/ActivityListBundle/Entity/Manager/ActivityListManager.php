@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
+use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -29,6 +30,9 @@ class ActivityListManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
+    /** @var UserConfigManager */
+    protected $config;
+
     /**
      * @param Registry       $doctrine
      * @param SecurityFacade $securityFacade
@@ -39,12 +43,14 @@ class ActivityListManager
         Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
-        Pager $pager
+        Pager $pager,
+        UserConfigManager $config
     ) {
         $this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
         $this->nameFormatter  = $nameFormatter;
         $this->pager          = $pager;
+        $this->config         = $config;
     }
 
     /**
@@ -62,7 +68,6 @@ class ActivityListManager
      * @param \DateTime|bool $dateFrom
      * @param \DateTime|bool $dateTo
      * @param integer        $page
-     * @param integer        $limit
      *
      * @return ActivityList[]
      */
@@ -72,8 +77,7 @@ class ActivityListManager
         $activityEntityСlasses,
         $dateFrom,
         $dateTo,
-        $page,
-        $limit = 25
+        $page
     ) {
         /** @var QueryBuilder $qb */
         $qb = $this->getRepository()->getActivityListQueryBuilder(
@@ -81,13 +85,15 @@ class ActivityListManager
             $entityId,
             $activityEntityСlasses,
             $dateFrom,
-            $dateTo
+            $dateTo,
+            $this->config->get('oro_activity_list.sorting_field'),
+            $this->config->get('oro_activity_list.sorting_direction')
         );
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
         $pager->setPage($page);
-        $pager->setMaxPerPage($limit);
+        $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
         $pager->init();
 
         /** @var ActivityList[] $result */

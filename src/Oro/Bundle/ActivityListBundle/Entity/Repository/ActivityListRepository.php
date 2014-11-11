@@ -16,6 +16,8 @@ class ActivityListRepository extends EntityRepository
      * @param array          $activityClasses
      * @param \DateTime|bool $dateFrom
      * @param \DateTime|bool $dateTo
+     * @param string         $orderField
+     * @param string         $orderDirection
      *
      * @return QueryBuilder
      */
@@ -24,7 +26,9 @@ class ActivityListRepository extends EntityRepository
         $entityId,
         $activityClasses = array(),
         $dateFrom = null,
-        $dateTo = null
+        $dateTo = null,
+        $orderField = 'updatedAt',
+        $orderDirection = 'DESC'
     ) {
         $associationName = ExtendHelper::buildAssociationName(
             $entityClass,
@@ -35,7 +39,7 @@ class ActivityListRepository extends EntityRepository
             ->join('activity.' . $associationName, 'r')
             ->where('r.id = :entityId')
             ->setParameter('entityId', $entityId)
-            ->orderBy('activity.updatedAt', 'DESC');
+            ->orderBy('activity.' . $orderField, $orderDirection);
 
         if ($activityClasses) {
             $qb->andWhere($qb->expr()->in('activity.relatedActivityClass', ':activityClasses'))

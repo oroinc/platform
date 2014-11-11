@@ -24,6 +24,7 @@ services:
             - @oro_security.security_facade
             - @oro_locale.formatter.name
             - @oro_datagrid.extension.pager.orm.pager
+            - @oro_config.user
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%
