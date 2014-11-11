@@ -12,12 +12,9 @@ define(['underscore'], function (_) {
          *  @property {Array}
          */
         colors: [
-            ['FFFFFF', 'AC725E'], ['FFFFFF', 'D06B64'], ['FFFFFF', 'F83A22'], ['000000', 'FA573C'],
-            ['000000', 'FF7537'], ['000000', 'FFAD46'], ['000000', '42D692'], ['FFFFFF', '16A765'],
-            ['000000', '7BD148'], ['000000', 'B3DC6C'], ['000000', 'FBE983'], ['000000', 'FAD165'],
-            ['000000', '92E1C0'], ['000000', '9FE1E7'], ['000000', '9FC6E7'], ['FFFFFF', '4986E7'],
-            ['000000', '9A9CFF'], ['000000', 'B99AFF'], ['000000', 'C2C2C2'], ['000000', 'CABDBF'],
-            ['000000', 'CCA6AC'], ['000000', 'F691B2'], ['FFFFFF', 'CD74E6'], ['FFFFFF', 'A47AE2']
+            'AC725E', 'D06B64', 'F83A22', 'FA573C', 'FF7537', 'FFAD46', '42D692', '16A765',
+            '7BD148', 'B3DC6C', 'FBE983', 'FAD165', '92E1C0', '9FE1E7', '9FC6E7', '4986E7',
+            '9A9CFF', 'B99AFF', 'C2C2C2', 'CABDBF', 'CCA6AC', 'F691B2', 'CD74E6', 'A47AE2'
         ],
 
         /** @property {Object} */
@@ -31,9 +28,9 @@ define(['underscore'], function (_) {
             this.calendarColors = {};
         },
 
-        setCalendarColors: function (calendarId, color, backgroundColor) {
+        setCalendarColors: function (calendarId, backgroundColor) {
             this.calendarColors[calendarId] = {
-                color: '#' + color,
+                color: '#' + this.getColor(backgroundColor),
                 backgroundColor: '#' + backgroundColor
             };
         },
@@ -51,13 +48,11 @@ define(['underscore'], function (_) {
         applyColors: function (obj, getLastBackgroundColor) {
             if (_.isEmpty(obj.color) && _.isEmpty(obj.backgroundColor)) {
                 var colors = this.findNextColors(getLastBackgroundColor());
-                obj.color = colors[0];
                 obj.backgroundColor = colors[1];
-            } else if (_.isEmpty(obj.color)) {
-                obj.color = this.defaultColors[0];
             } else if (_.isEmpty(obj.backgroundColor)) {
                 obj.backgroundColor = this.defaultColors[1];
             }
+            obj.color = this.getColor(obj.backgroundColor);
         },
 
         findColors: function (bgColor) {
@@ -65,7 +60,7 @@ define(['underscore'], function (_) {
                 return this.findColors(this.defaultColors[1]);
             }
             bgColor = bgColor.toUpperCase();
-            var result = _.find(this.colors, function (item) { return item[1] === bgColor; });
+            var result = _.find(this.colors, function (item) { return item === bgColor; });
             if (_.isUndefined(result)) {
                 result = this.findColors(this.defaultColors[1]);
             }
@@ -79,7 +74,7 @@ define(['underscore'], function (_) {
             bgColor = bgColor.toUpperCase();
             var i = -1;
             _.each(this.colors, function (item, index) {
-                if (item[1] === bgColor) {
+                if (item === bgColor) {
                     i = index;
                 }
             });
@@ -90,7 +85,36 @@ define(['underscore'], function (_) {
                 return _.first(this.colors);
             }
             return this.colors[i + 1];
-        }
+        },
+
+        hex2rgb: function (hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        },
+
+        rgb2hex: function (r, g, b) {
+            var filter = function(dec) {
+                var hex = dec.toString(16).toUpperCase();
+                return hex.length == 1 ? '0' + hex : hex;
+            }
+            return filter(r) + filter(g) + filter(b)
+        },
+
+        getColor: function(color) {
+            var color = this.hex2rgb(color);
+            var d = 0;
+            var a = 1 - (0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255;
+            if (a < 0.5) {
+                d = 0;
+            } else {
+                d = 255;
+            }
+            return this.rgb2hex(d, d, d);
+}
     };
 
     return function () {

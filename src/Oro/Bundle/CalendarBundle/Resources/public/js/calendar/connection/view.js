@@ -66,7 +66,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options.colorManager.applyColors(viewModel, _.bind(function () {
                 return this.$el.find(this.selectors.lastItem).attr(this.attrs.backgroundColor);
             }, this));
-            this.options.colorManager.setCalendarColors(viewModel.calendar, viewModel.color, viewModel.backgroundColor);
+            this.options.colorManager.setCalendarColors(viewModel.calendar, viewModel.backgroundColor);
 
             el = $(this.template(viewModel));
             // set 'data-' attributes
@@ -84,7 +84,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         onModelChanged: function (model) {
-            this.options.colorManager.setCalendarColors(model.get('calendar'), model.get('color'), model.get('backgroundColor'));
+            this.options.colorManager.setCalendarColors(model.get('calendar'), model.get('backgroundColor'));
             this.trigger('connectionChange', model);
         },
 

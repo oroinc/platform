@@ -417,7 +417,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 this.colorManager.applyColors(obj, function () {
                     return lastBackgroundColor;
                 });
-                this.colorManager.setCalendarColors(obj.calendar, obj.color, obj.backgroundColor);
+                this.colorManager.setCalendarColors(obj.calendar, obj.backgroundColor);
                 lastBackgroundColor = obj.backgroundColor;
             }, this));
         },
