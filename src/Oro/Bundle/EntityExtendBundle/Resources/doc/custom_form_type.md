@@ -90,10 +90,10 @@ And register it in services.yml:
 ```
 
 Here is some idea of what N should be, existing guessers have priorities:
-* DoctrineTypeGuesser - 10
-* FormConfigGuesser - 15
-* ExtendFieldTypeGuesser - 20
+DoctrineTypeGuesser - 10, FormConfigGuesser - 15, ExtendFieldTypeGuesser - 20.
+
 Select it according to what you need to achieve.
+
 
 - Using annotation to field or related entity (if extended field is a relation)
 
