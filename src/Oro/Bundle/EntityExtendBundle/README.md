@@ -311,3 +311,10 @@ The following command removes all data related to entity extend functionality fr
 php app/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
+
+Extend Fields View
+---------------------
+
+Before extend fields rendering in view page, event "oro.entity_extend_event.before_value_render" fired. 
+There is possibility for customize field rendering using this event. 
+There is an example here: Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener .
