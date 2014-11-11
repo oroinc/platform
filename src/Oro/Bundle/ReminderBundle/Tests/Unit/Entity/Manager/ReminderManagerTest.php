@@ -5,6 +5,7 @@ namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
+use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 
 class ReminderManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -149,6 +150,155 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->manager->loadReminders($entity);
+    }
+
+    public function testApplyRemindersNoItems()
+    {
+        $entityClassName = 'Oro\Bundle\ReminderBundle\Entity\Reminder';
+        $items           = [];
+
+        $this->entityManager->expects($this->never())
+            ->method('getRepository');
+
+        $this->manager->applyReminders($items, $entityClassName);
+    }
+
+    public function testApplyRemindersNotRemindableEntity()
+    {
+        $entityClassName = 'Oro\Bundle\ReminderBundle\Entity\Reminder';
+        $items           = [
+            [
+                'id'      => 1,
+                'subject' => 'item1',
+            ],
+            [
+                'id'      => 2,
+                'subject' => 'item2',
+            ],
+        ];
+
+        $this->entityManager->expects($this->never())
+            ->method('getRepository');
+
+        $this->manager->applyReminders($items, $entityClassName);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testApplyReminders()
+    {
+        $entityClassName = 'Oro\Bundle\ReminderBundle\Tests\Unit\Fixtures\RemindableEntity';
+        $items           = [
+            [
+                'id'      => 1,
+                'subject' => 'item1',
+            ],
+            [
+                'id'      => 2,
+                'subject' => 'item2',
+            ],
+            [
+                'id'      => 3,
+                'subject' => 'item3',
+            ],
+        ];
+
+        $query        = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getArrayResult'])
+            ->getMockForAbstractClass();
+        $qb           = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $reminderRepo = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->with('OroReminderBundle:Reminder')
+            ->will($this->returnValue($reminderRepo));
+        $reminderRepo->expects($this->once())
+            ->method('findRemindersByEntitiesQueryBuilder')
+            ->with($entityClassName, [1, 2, 3])
+            ->will($this->returnValue($qb));
+        $qb->expects($this->once())
+            ->method('select')
+            ->with('reminder.relatedEntityId, reminder.method, reminder.intervalNumber, reminder.intervalUnit')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $query->expects($this->once())
+            ->method('getArrayResult')
+            ->will(
+                $this->returnValue(
+                    [
+                        [
+                            'relatedEntityId' => 3,
+                            'method'          => 'email',
+                            'intervalNumber'  => 1,
+                            'intervalUnit'    => ReminderInterval::UNIT_HOUR
+                        ],
+                        [
+                            'relatedEntityId' => 2,
+                            'method'          => 'email',
+                            'intervalNumber'  => 15,
+                            'intervalUnit'    => ReminderInterval::UNIT_MINUTE
+                        ],
+                        [
+                            'relatedEntityId' => 2,
+                            'method'          => 'flash',
+                            'intervalNumber'  => 10,
+                            'intervalUnit'    => ReminderInterval::UNIT_MINUTE
+                        ],
+                    ]
+                )
+            );
+
+        $this->manager->applyReminders($items, $entityClassName);
+        $this->assertEquals(
+            [
+                [
+                    'id'      => 1,
+                    'subject' => 'item1',
+                ],
+                [
+                    'id'        => 2,
+                    'subject'   => 'item2',
+                    'reminders' => [
+                        [
+                            'method'   => 'email',
+                            'interval' => [
+                                'number' => 15,
+                                'unit'   => ReminderInterval::UNIT_MINUTE
+                            ]
+                        ],
+                        [
+                            'method'   => 'flash',
+                            'interval' => [
+                                'number' => 10,
+                                'unit'   => ReminderInterval::UNIT_MINUTE
+                            ]
+                        ],
+                    ]
+                ],
+                [
+                    'id'        => 3,
+                    'subject'   => 'item3',
+                    'reminders' => [
+                        [
+                            'method'   => 'email',
+                            'interval' => [
+                                'number' => 1,
+                                'unit'   => ReminderInterval::UNIT_HOUR
+                            ]
+                        ],
+                    ]
+                ],
+            ],
+            $items
+        );
     }
 
     // @codingStandardsIgnoreStart

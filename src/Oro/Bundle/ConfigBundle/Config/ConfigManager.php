@@ -17,35 +17,22 @@ class ConfigManager
     const SECTION_MODEL_SEPARATOR = '.';
     const SCOPE_NAME              = 'app';
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $om;
 
-    /**
-     * @var EventDispatcher
-     */
+    /** @var EventDispatcher */
     protected $eventDispatcher;
 
-    /**
-     * Settings array, initiated with global application settings
-     *
-     * @var array
-     */
+    /** @var array Settings array, initiated with global application settings */
     protected $settings;
 
-    /**
-     * @var array
-     */
-    protected $storedSettings = array();
+    /** @var array */
+    protected $storedSettings = [];
+
+    /** @var array */
+    protected $changedSettings = [];
 
     /**
-     * @var array
-     */
-    protected $changedSettings = array();
-
-    /**
-     *
      * @param EventDispatcher              $eventDispatcher
      * @param ObjectManager                $om
      * @param ConfigDefinitionImmutableBag $configDefinition
@@ -74,10 +61,7 @@ class ConfigManager
         $entity   = $this->getScopedEntityName();
         $entityId = $this->getScopeId();
         $this->loadStoredSettings($entity, $entityId);
-
-        $name    = explode(self::SECTION_MODEL_SEPARATOR, $name);
-        $section = $name[0];
-        $key     = $name[1];
+        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
 
         if ($default) {
             $settings = $this->settings;
@@ -107,9 +91,7 @@ class ConfigManager
         $entity   = $this->getScopedEntityName();
         $entityId = $this->getScopeId();
         $this->loadStoredSettings($entity, $entityId);
-        $name    = explode(self::SECTION_MODEL_SEPARATOR, $name);
-        $section = $name[0];
-        $key     = $name[1];
+        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
 
         $createdAt = null;
         $updatedAt = null;
@@ -125,10 +107,7 @@ class ConfigManager
             }
         }
 
-        return array(
-            'createdAt' => $createdAt,
-            'updatedAt' => $updatedAt,
-        );
+        return ['createdAt' => $createdAt, 'updatedAt' => $updatedAt];
     }
 
     /**
@@ -162,17 +141,10 @@ class ConfigManager
         $entityId = $this->getScopeId();
         $this->loadStoredSettings($entity, $entityId);
 
-        $pair    = explode(self::SECTION_MODEL_SEPARATOR, $name);
-        $section = $pair[0];
-        $key     = $pair[1];
-
+        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
         unset($this->storedSettings[$entity][$entityId][$section][$key]);
 
-        $changeKey                         = str_replace(
-            self::SECTION_MODEL_SEPARATOR,
-            self::SECTION_VIEW_SEPARATOR,
-            $name
-        );
+        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
         $this->changedSettings[$changeKey] = ['use_parent_scope_value' => true];
     }
 
@@ -183,7 +155,7 @@ class ConfigManager
     {
         if (!empty($this->changedSettings)) {
             $this->save($this->changedSettings);
-            $this->changedSettings = array();
+            $this->changedSettings = [];
         }
     }
 
@@ -237,8 +209,7 @@ class ConfigManager
     public function calculateChangeSet($newSettings)
     {
         // find new and updated
-        $updated = array();
-        $removed = array();
+        $updated = $removed = [];
         foreach ($newSettings as $key => $value) {
             $currentValue = $this->get(
                 str_replace(
@@ -261,12 +232,11 @@ class ConfigManager
                 && $value['use_parent_scope_value'] == false;
 
             if ($valueDefined && !$valueStillDefined) {
-                $key       = explode(self::SECTION_VIEW_SEPARATOR, $key);
-                $removed[] = array($key[0], $key[1]);
+                $removed[] = array_slice(explode(self::SECTION_VIEW_SEPARATOR, $key), 0, 2);
             }
         }
 
-        return array($updated, $removed);
+        return [$updated, $removed];
     }
 
     /**
@@ -317,7 +287,7 @@ class ConfigManager
      */
     public function getSettingsByForm(FormInterface $form)
     {
-        $settings = array();
+        $settings = [];
 
         /** @var FormInterface $child */
         foreach ($form as $child) {

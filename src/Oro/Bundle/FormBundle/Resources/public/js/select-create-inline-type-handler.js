@@ -21,7 +21,7 @@ function (routing, DialogWidget, widgetManager, __) {
                 title: __('Select {{ entity }}', {'entity': label}),
                 url: routing.generate(urlParts.grid.route, urlParts.grid.parameters),
                 stateEnabled: false,
-                incrementalPosition: false,
+                incrementalPosition: true,
                 dialogOptions: {
                     modal: true,
                     allowMaximize: true,
@@ -55,7 +55,7 @@ function (routing, DialogWidget, widgetManager, __) {
                 title: __('Create {{ entity }}', {'entity': label}),
                 url: routing.generate(urlParts.create.route, urlParts.create.parameters),
                 stateEnabled: false,
-                incrementalPosition: false,
+                incrementalPosition: true,
                 dialogOptions: {
                     modal: true,
                     allowMaximize: true,

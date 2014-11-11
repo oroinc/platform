@@ -12,6 +12,7 @@ function ($, _, tools) {
         },
         queue = [],
         storageKey = 'flash',
+        notFlashTypes = ['error', 'danger', 'warning', 'alert'],
 
         /**
          * Same arguments as for Oro.NotificationMessage
@@ -97,7 +98,8 @@ function ($, _, tools) {
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationFlashMessage: function(type, message, options) {
-                return this.notificationMessage(type, message, _.extend({flash: true}, options));
+                var isFlash = notFlashTypes.indexOf(type) == -1;
+                return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
             },
 
             /**

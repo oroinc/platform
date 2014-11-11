@@ -5,10 +5,11 @@ namespace Oro\Bundle\CalendarBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository")
@@ -48,6 +49,7 @@ class Calendar
      * @ORM\Id
      * @ORM\Column(type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $id;
 
@@ -55,6 +57,7 @@ class Calendar
      * @var string|null
      *
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $name;
 
@@ -65,13 +68,6 @@ class Calendar
      * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
-
-    /**
-     * @var ArrayCollection|CalendarConnection[]
-     *
-     * @ORM\OneToMany(targetEntity="CalendarConnection", mappedBy="calendar", cascade={"persist"}, orphanRemoval=true)
-     */
-    protected $connections;
 
     /**
      * @var ArrayCollection|CalendarEvent[]
@@ -93,7 +89,6 @@ class Calendar
      */
     public function __construct()
     {
-        $this->connections = new ArrayCollection();
         $this->events = new ArrayCollection();
     }
 
@@ -160,55 +155,6 @@ class Calendar
     public function setOwner($owningUser)
     {
         $this->owner = $owningUser;
-
-        return $this;
-    }
-
-    /**
-     * Gets connections represent calendars connected to this calendar
-     *
-     * @return CalendarConnection[]
-     */
-    public function getConnections()
-    {
-        return $this->connections;
-    }
-
-    /**
-     * Connects another calendar to this calendar
-     *
-     * @param CalendarConnection $connection
-     * @return Calendar
-     * @throws InvalidEntityException
-     */
-    public function addConnection(CalendarConnection $connection)
-    {
-        if ($connection->getCalendar() !== null) {
-            throw new InvalidEntityException("The already connected calendar cannot be re-connected.");
-        }
-        if ($connection->getConnectedCalendar() === null) {
-            throw new InvalidEntityException("The connected calendar must be specified.");
-        }
-
-        if (!$this->connections->contains($connection)) {
-            $connection->setCalendar($this);
-            $this->connections->add($connection);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Detaches another calendar from this calendar
-     *
-     * @param CalendarConnection $connection
-     * @return Calendar
-     */
-    public function removeConnection(CalendarConnection $connection)
-    {
-        if ($this->connections->contains($connection)) {
-            $this->connections->removeElement($connection);
-        }
 
         return $this;
     }
