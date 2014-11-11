@@ -6,7 +6,7 @@ In case of extend fields, platform has three guessers (with increasing priority 
 each provide own guesses and best guess selected based on guesser's confidence (low, medium, high, very high).
 
 So, to define custom form type for particular field there are few ways:
-- Through the compiler pass to add or override guesser's mappings 
+### Through the compiler pass to add or override guesser's mappings 
 
 ```php
 <?php
@@ -32,7 +32,7 @@ class AcmeExtendGuesserPass implements CompilerPassInterface
 }
 ```
 
-- With custom guesser, that will have higher priority or will provide guess with highest confidence value.
+###With custom guesser, that will have higher priority or will provide guess with highest confidence value.
 
 ```php
 class CustomTypeGuesser implements FormTypeGuesserInterface
@@ -90,12 +90,13 @@ And register it in services.yml:
 ```
 
 Here is some idea of what N should be, existing guessers have priorities:
-DoctrineTypeGuesser - 10, FormConfigGuesser - 15, ExtendFieldTypeGuesser - 20.
+* DoctrineTypeGuesser - 10
+* FormConfigGuesser - 15
+* ExtendFieldTypeGuesser - 20
 
 Select it according to what you need to achieve.
 
-
-- Using annotation to field or related entity (if extended field is a relation)
+###Using annotation to field or related entity (if extended field is a relation)
 
 ```php
 /*
@@ -111,4 +112,3 @@ Select it according to what you need to achieve.
  */
 
 ```
-
