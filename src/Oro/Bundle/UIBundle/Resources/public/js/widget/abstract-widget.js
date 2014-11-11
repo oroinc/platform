@@ -436,6 +436,26 @@ define(function (require) {
         },
 
         /**
+         * Check if there is at least one action.
+         *
+         * @param {string} section section name
+         * @returns {boolean}
+         */
+        hasActions: function(section) {
+            if (section !== undefined) {
+                return this.actions.hasOwnProperty(section) && !_.isEmpty(this.actions[section]);
+            } else {
+                var hasActions = false;
+                _.each(this.actions, function(actions) {
+                    if (!_.isEmpty(actions)) {
+                        hasActions = true;
+                    }
+                });
+                return hasActions;
+            }
+        },
+
+        /**
          * Get action element when after render.
          *
          * @param {string} key action name

@@ -103,16 +103,16 @@
 
     <script type="text/html" id="template-calendar-connection-item">
         <li class="media connection-item" >
-                <span
-                    <% if (visible) { %>
-                    class="calendar-color"
-                        <% if (!_.isEmpty(backgroundColor)) { %>
-                        style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
-                        <% } %>
-                    <% } else { %>
-                        class="calendar-color un-color"
+            <span
+                <% if (visible) { %>
+                class="calendar-color"
+                    <% if (!_.isEmpty(backgroundColor)) { %>
+                    style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
                     <% } %>
-                ></span>
+                <% } else { %>
+                    class="calendar-color un-color"
+                <% } %>
+            ></span>
             <div class="media-body">
                 <div
                     <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
@@ -137,11 +137,13 @@
     } %}
     {% set eventsOptions = {
         'containerSelector': '.calendar-events',
+        'itemViewTemplateSelector': '#template-view-calendar-event',
         'itemFormTemplateSelector': '#template-calendar-event',
         'leftHeader': 'prev,next today title',
         'centerHeader': '',
         'rightHeader': 'month,agendaWeek,agendaDay',
     } %}
+    {{ c.calendar_event_view_template('template-view-calendar-event') }}
     {{ c.calendar_event_form_template('template-calendar-event', event_form) }}
     {{ c.renderCalendar('#calendar', entity, startDate, endDate, calendar, eventsOptions, connectionsOptions) }}
 
