@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Controller;
 
-use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -10,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 
 /**
  * @Route("/activity-list")
@@ -41,9 +41,9 @@ class ActivityListController extends Controller
         $dateRangeFilter = $this->get('oro_filter.datetime_range_filter');
 
         return [
-            'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
             'entity'                  => $entity,
             'configuration'           => $activitiesProvider->getActivityListOption(),
+            'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
         ];
     }
 

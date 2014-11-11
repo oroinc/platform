@@ -56,15 +56,14 @@ class ActivityListManager
     }
 
     /**
-     * @param string    $entityClass
-     * @param integer   $entityId
-     * @param array     $activityEntityСlasses
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param integer   $page
-     * @param integer   $limit
+     * @param string         $entityClass
+     * @param integer        $entityId
+     * @param array          $activityEntityСlasses
+     * @param \DateTime|bool $dateFrom
+     * @param \DateTime|bool $dateTo
+     * @param integer        $page
+     * @param integer        $limit
      *
-     * @internal param array $activityClasses
      * @return ActivityList[]
      */
     public function getList(
@@ -74,7 +73,7 @@ class ActivityListManager
         $dateFrom,
         $dateTo,
         $page,
-        $limit
+        $limit = 25
     ) {
         /** @var QueryBuilder $qb */
         $qb = $this->getRepository()->getActivityListQueryBuilder(
@@ -97,6 +96,19 @@ class ActivityListManager
         $results = $this->getEntityViewModels($results);
 
         return $results;
+    }
+
+    /**
+     * @param integer $activityListItemId
+     *
+     * @return array
+     */
+    public function getItem($activityListItemId)
+    {
+        /** @var ActivityList $activityListItem */
+        $activityListItem = $this->getRepository()->find($activityListItemId);
+
+        return $this->getEntityViewModel($activityListItem);
     }
 
     /**
@@ -124,6 +136,7 @@ class ActivityListManager
             'id'                   => $entity->getId(),
             'owner'                => $this->nameFormatter->format($entity->getOwner()),
             'owner_id'             => $entity->getOwner()->getId(),
+            'owner_route'          => '',
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
             'data'                 => $entity->getData(),
@@ -131,7 +144,6 @@ class ActivityListManager
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
             'updatedAt'            => $entity->getUpdatedAt()->format('c'),
-            'hasUpdate'            => $entity->getCreatedAt() != $entity->getUpdatedAt(),
             'editable'             => $this->securityFacade->isGranted('EDIT', $entity),
             'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
         ];

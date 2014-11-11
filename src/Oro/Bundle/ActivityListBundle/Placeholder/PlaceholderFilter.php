@@ -7,7 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 class PlaceholderFilter
 {
     /**
-     * Checks if the entity can has notes
+     * Checks if the entity can have activities
      *
      * @param object $entity
      * @return bool
@@ -22,7 +22,8 @@ class PlaceholderFilter
 
         /**
          * TODO:
-         *  validation should be checked by interface class or by provider
+         *  Can entity have some activities assigned ??
+         *  validation should be done by chain provider
          */
         return in_array(
             $className,

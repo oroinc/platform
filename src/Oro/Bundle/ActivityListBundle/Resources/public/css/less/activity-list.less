@@ -1,5 +1,4 @@
 @import "../../../oroui/css/less/mixins";
-
 .activity-list-widget {
   border: 1px solid #ddd;
   position: relative;
@@ -12,20 +11,16 @@
   }
   .activity-list {
     position: relative;
+    .no-data{
+      margin: 18px 20px 0;
+    }
     .list-box {
       margin-top: 10px;
       .list-item {
         padding: 3px 10px 5px 10px;
         .visual {
-          .border-radius(2px);
-          img {
-            margin-top: -3px;
-            .border-radius(2px);
-            width: 16px;
-          }
-          .user {
-            padding-left: 3px;
-          }
+          position: relative;
+          top: -2px;
         }
         .user {
           font-style: normal;
@@ -35,23 +30,24 @@
           font-size: smaller;
         }
         .title-item {
-          float: left;
+          //float: left;
           white-space: nowrap;
-          .details {
-            padding-left: 7px;
+          .icon {
+            display: inline-block;
+            width: 28px;
+            font-size: 21px;
+            margin: 0 0 0 7px;
+          }
+          .message-item {
+            display: block;
+            line-height: 12px;
+            padding: 0 0 1px 60px;
           }
         }
         .actions {
           white-space: nowrap;
           float: right;
           margin: 0;
-        }
-        .message-item {
-          width: 100%;
-          padding-left: 23px;
-          float: left;
-          .message {
-          }
         }
       }
       .list-item:last-child {
@@ -60,8 +56,9 @@
     }
     .accordion {
       padding: 0;
+      margin: 0;
       .accordion-group {
-        overflow: hidden;
+        //overflow: hidden;
         border: 0;
         margin: 0;
         .accordion-heading {
@@ -71,9 +68,17 @@
             display: table-cell;
           }
           .message {
-            display: block;
-            overflow: hidden;
-            height: 20px;
+            .accordion-toggle {
+              &:before {
+                content: '';
+              }
+            }
+            .accordion-toggle.collapsed:before {
+              content: '';
+            }
+            .control-group{
+              max-width: none;
+            }
           }
           .accordion-toggle {
             display: inline-block;
@@ -82,7 +87,7 @@
             &:before {
               content: '\f117';
               font-family: FontAwesome;
-              font-size: 18px;
+              font-size: 24px;
               color: #727272;
             }
           }
@@ -112,8 +117,9 @@
         }
         .accordion-body.in .subject {
           display: block;
-          padding-left: 23px;
+          padding: 0 0 0 60px;
           border-bottom: 1px solid #ddd;
+          margin-top: -2px;
         }
       }
     }

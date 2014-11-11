@@ -5,8 +5,8 @@
         {% block widget_actions %}
         <div class="filter-box oro-clearfix-width">
             <div class="filter-container">
-                <div id="filter1" class="filter-item oro-drop"></div>
                 <div id="filter2" class="filter-item oro-drop"></div>
+                <div id="filter1" class="filter-item oro-drop"></div>
             </div>
         </div>
         <div class="widget-actions">
@@ -75,6 +75,9 @@
             {% endfor %}
 
         {#<script type="text/javascript">#}
+            {#/**#}
+             {#* TODO: rewrite filters to be in scope of component (for now component do not known about filters)#}
+             {#*/#}
             {#require([#}
                 {#'jquery',#}
                 {#'oro/filter/multiselect-filter',#}
@@ -82,22 +85,17 @@
                 {#'orofilter/js/datafilter-wrapper',#}
             {#], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {#}
                 {#var choices = {};#}
-                {#var dateRangeFilterMetadata = {{ dateRangeFilterMetadata|json_encode()|raw }};#}
-                {#var multiSelectLabel = '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}';#}
-                {#var datePickerLabel  = '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}';#}
-
                 {#{% for activityClass, activityOptions in configuration %}#}
                     {#choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';#}
                 {#{% endfor %}#}
-
                 {#var filter = new MultiSelectFilter({#}
-                    {#'label':   multiSelectLabel,#}
-                    {#'choices': choices#}
+                    {#'label':   '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}',#}
+                    {#'choices': choices || {}#}
                 {#});#}
 
-                {#var Filter = DatetimeFilter.extend(dateRangeFilterMetadata);#}
-                {#dateFilter = new Filter({#}
-                    {#'label': datePickerLabel#}
+                {#var Filter = DatetimeFilter.extend({{ dateRangeFilterMetadata|json_encode()|raw }});#}
+                {#var dateFilter = new Filter({#}
+                    {#'label': '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}'#}
                 {#});#}
                 {#_.extend(dateFilter, dataFilterWrapper);#}
 
