@@ -52,8 +52,8 @@ class DynamicFieldsExtension extends \Twig_Extension
     protected $eventDispatcher;
 
     /**
-     * @param ConfigManager $configManager
-     * @param FieldTypeHelper $fieldTypeHelper
+     * @param ConfigManager            $configManager
+     * @param FieldTypeHelper          $fieldTypeHelper
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(

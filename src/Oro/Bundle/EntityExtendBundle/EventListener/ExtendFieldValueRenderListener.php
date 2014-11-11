@@ -180,6 +180,7 @@ class ExtendFieldValueRenderListener
     /**
      * @param object $entity
      * @param FieldConfigId $fieldConfig
+     *
      * @return OptionSetRelation[]
      */
     protected function getValueForOptionSet($entity, FieldConfigId $fieldConfig)
@@ -236,7 +237,6 @@ class ExtendFieldValueRenderListener
             $targetMetadata->getSingleIdentifierFieldName()
         );
 
-
         $relationExtendConfig = $this->extendProvider->getConfig($targetClassName);
         $routeOptions = $relationExtendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
             ? $this->getCustomEntityViewRouteOptions($targetClassName, $id)
@@ -267,8 +267,8 @@ class ExtendFieldValueRenderListener
             $routeOptions['route_params'] = [
                 'id' => $id
             ];
-            return $routeOptions;
         }
+
         return $routeOptions;
     }
 
