@@ -83,10 +83,7 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
 
             if ($event->getCouldBeSkipped()) {
                 $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
-                $importContext->setValue(
-                    'error_entries_count',
-                    (int)$importContext->getValue('error_entries_count') + count($items)
-                );
+                $importContext->incrementErrorEntriesCount();
                 $importContext->addError($event->getWarning());
 
                 if ($event->getException() === $exception) {
