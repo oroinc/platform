@@ -15,6 +15,9 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -34,10 +37,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
      */
     public function getRoutes()
     {
-        return [
-            'itemView'   => 'oro_email_view',
-            'itemDelete' => 'oro_api_delete_call'
-        ];
+        return ['itemDelete' => 'oro_api_delete_email'];
     }
 
     /**
@@ -62,16 +62,14 @@ class EmailActivityListProvider implements ActivityListProviderInterface
      */
     public function getData($entity)
     {
-        $recipientNames = [];
-        $data = $entity->getRecipients();
-        foreach ($data as $recipient) {
-            array_push($recipientNames, $recipient->getName());
-        }
-
         /** @var Email $entity */
         return [
-            'oro.email.from_name.label'=> $entity->getFromName(),
-            'oro.email.to_name.label'  => join(', ', $recipientNames),
+            'from'            => $entity->getFromName(),
+            'sent_at'         => $entity->getSentAt(),
+            'subject'         => $entity->getSubject(),
+            'body_content'    => $entity->getEmailBody()->getBodyContent(),
+            'body_id'         => $entity->getEmailBody()->getId(),
+            'is_body_as_text' => $entity->getEmailBody()->getBodyIsText()
         ];
     }
 

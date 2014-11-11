@@ -8,13 +8,13 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActivityListChainProvider
 {
@@ -33,16 +33,11 @@ class ActivityListChainProvider
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager  $configManager
-     * @param ConfigProvider $configProvider
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper,
-        ConfigManager $configManager,
-        ConfigProvider $configProvider
-    ) {
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
+    {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
-        $this->configProvider = $configProvider;
     }
 
     /**
@@ -150,10 +145,13 @@ class ActivityListChainProvider
             $list = new ActivityList();
         }
 
-        $accessor  = PropertyAccess::createPropertyAccessor();
-        $className = $this->doctrineHelper->getEntityClass($entity);
-        if ($this->configProvider->hasConfig($className)) {
-            $config = $this->configProvider->getConfig($className);
+        /** @var ConfigProvider $configProvider */
+        $configProvider = $this->configManager->getProvider('ownership');
+        $accessor       = PropertyAccess::createPropertyAccessor();
+        $className      = $this->doctrineHelper->getEntityClass($entity);
+
+        if ($configProvider->hasConfig($className)) {
+            $config = $configProvider->getConfig($className);
             if ($config->get('owner_type') == OwnershipType::OWNER_TYPE_USER) {
                 $list->setOrganization($accessor->getValue($entity, $config->get('organization_field_name')));
                 $list->setOwner($accessor->getValue($entity, $config->get('owner_field_name')));

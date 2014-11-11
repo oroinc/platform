@@ -15,6 +15,9 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -35,9 +38,8 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getRoutes()
     {
         return [
-            'itemView'   => 'oro_calendar_event_widget_info',
             'itemEdit'   => 'oro_calendar_event_update',
-            'itemDelete' => 'oro_api_delete_call'
+            'itemDelete' => 'oro_api_delete_calendar_event'
         ];
     }
 
@@ -65,8 +67,10 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     {
         /** @var CalendarEvent $entity */
         return [
-            'oro.calendar.calendarevent.title.label'        => $entity->getTitle(),
-            'oro.calendar.calendarevent.description.label'  => $entity->getDescription()
+            'title'        => $entity->getTitle(),
+            'description'  => $entity->getDescription(),
+            'start_date'   => $entity->getStart(),
+            'end_date'     => $entity->getEnd(),
         ];
     }
 
@@ -79,7 +83,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function getActivityId($entity)
     {
@@ -87,7 +91,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function isApplicable($entity)
     {

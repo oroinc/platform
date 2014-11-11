@@ -16,8 +16,5 @@ oro:
 
         no_activities_exist: No activities found
 
-        widget:
-            filter.activity.title: Activity Type
-            filter.date_picker.title: Date Range
-            update: Update {{ entity }}
-            delete: Delete entry
+        widget.filter.date_picker.title: Date Range
+        widget.filter.activity.title: Activity Type

@@ -15,6 +15,9 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
     public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
@@ -25,8 +28,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
      */
     public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
-        $provider = $configManager->getProvider('activity');
-        return $provider->hasConfigById($configId) && $provider->getConfigById($configId)->has('activities');
+        return false;
     }
 
     /**
@@ -36,7 +38,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     {
         return [
             'itemEdit'   => 'oro_note_update',
-            'itemDelete' => 'oro_api_delete_call'
+            'itemDelete' => 'oro_api_delete_note'
         ];
     }
 
@@ -76,7 +78,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function getActivityId($entity)
     {
@@ -84,7 +86,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function isApplicable($entity)
     {
