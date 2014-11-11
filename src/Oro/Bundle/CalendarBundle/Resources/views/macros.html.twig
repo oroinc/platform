@@ -1,30 +1,32 @@
-{% macro calendar_event_view_template(id, form) %}
+{% macro calendar_event_view_template(id) %}
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
-    <div class="row-fluid form-horizontal">
-        <div class="responsive-block">
-            {{ UI.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, '<%= formatter.string(title) %>') }}
-            {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, '<%= formatter.text(description) %>') }}
-            {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
-            {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
-            {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
-        </div>
-        <div class="widget-actions form-actions" style="display: none;">
-            <% if (id != null && removable) { %>
-            {{
-                UI.deleteButton({
-                    'aCss': 'no-hash',
-                    'id': 'btn-remove-calendarevent',
-                    'dataMessage': 'Are you sure you want to delete this event?',
-                    'title': 'Delete event',
-                    'label': 'Delete',
-                    'data': {'action-name': 'delete'}
-                })
-            }}
-            <% } %>
-            <% if (id == null || (id != null && editable)) { %>
-            <button class="btn" type="button" data-action-name="edit">{{ 'oro.ui.edit'|trans }}</button>
-            <% } %>
+    <div class="widget-content">
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, '<%= formatter.string(title) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, '<%= formatter.text(description) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+            </div>
+            <div class="widget-actions form-actions" style="display: none;">
+                <% if (id != null && removable) { %>
+                {{
+                    UI.deleteButton({
+                        'aCss': 'no-hash',
+                        'id': 'btn-remove-calendarevent',
+                        'dataMessage': 'Are you sure you want to delete this event?',
+                        'title': 'Delete event',
+                        'label': 'Delete',
+                        'data': {'action-name': 'delete'}
+                    })
+                }}
+                <% } %>
+                <% if (id == null || (id != null && editable)) { %>
+                <button class="btn" type="button" data-action-name="edit">{{ 'oro.ui.edit'|trans }}</button>
+                <% } %>
+            </div>
         </div>
     </div>
 </script>
@@ -42,31 +44,33 @@
             form_row(form.reminders)
         ]
     %}
-    <div class="alert alert-error" style="display: none;"></div>
-    <form id="{{ form.vars.name }}" action="#">
-        <fieldset class="form-horizontal">
-            {{ UI.scrollSubblock(null, data, true, false)|replace({'<script': '<% print("<sc" + "ript") %>', '</script>': '<% print("</sc" + "ript>") %>'})|raw }}
-            <div class="widget-actions form-actions" style="display: none;">
-                <% if (id != null && removable) { %>
-                {{
-                    UI.deleteButton({
-                        'aCss': 'no-hash',
-                        'id': 'btn-remove-calendarevent',
-                        'dataMessage': 'Are you sure you want to delete this event?',
-                        'title': 'Delete event',
-                        'label': 'Delete',
-                        'data': {'action-name': 'delete'}
-                    })
-                }}
-                <% } %>
-                <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                <% if (id == null || (id != null && editable)) { %>
-                <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
-                <% } %>
-            </div>
-        </fieldset>
-    </form>
-    {{ oro_form_js_validation(form)|replace({'<script': '<% print("<sc" + "ript") %>', '</script>': '<% print("</sc" + "ript>") %>'})|raw }}
+    <div class="widget-content">
+        <div class="alert alert-error" style="display: none;"></div>
+        <form id="{{ form.vars.name }}" action="#">
+            <fieldset class="form-horizontal">
+                {{ UI.scrollSubblock(null, data, true, false)|replace({'<script': '<% print("<sc" + "ript") %>', '</script>': '<% print("</sc" + "ript>") %>'})|raw }}
+                <div class="widget-actions form-actions" style="display: none;">
+                    <% if (id != null && removable) { %>
+                    {{
+                        UI.deleteButton({
+                            'aCss': 'no-hash',
+                            'id': 'btn-remove-calendarevent',
+                            'dataMessage': 'Are you sure you want to delete this event?',
+                            'title': 'Delete event',
+                            'label': 'Delete',
+                            'data': {'action-name': 'delete'}
+                        })
+                    }}
+                    <% } %>
+                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                    <% if (id == null || (id != null && editable)) { %>
+                    <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                    <% } %>
+                </div>
+            </fieldset>
+        </form>
+        {{ oro_form_js_validation(form)|replace({'<script': '<% print("<sc" + "ript") %>', '</script>': '<% print("</sc" + "ript>") %>'})|raw }}
+    </div>
 </script>
 {% endmacro %}
 

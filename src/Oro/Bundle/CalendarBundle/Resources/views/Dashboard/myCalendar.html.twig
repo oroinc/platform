@@ -20,7 +20,7 @@
             ~ ' calendar.getCalendarElement().fullCalendar("option", "contentHeight", contentHeight);'
             ~ ' }'
     } %}
-    {{ c.calendar_event_form_template('template-view-calendar-event-' ~ widgetId, event_form) }}
+    {{ c.calendar_event_view_template('template-view-calendar-event-' ~ widgetId) }}
     {{ c.calendar_event_form_template('template-calendar-event-' ~ widgetId, event_form) }}
     {{ c.renderCalendar('#' ~ calendarId, entity, startDate, endDate, calendar, eventsOptions) }}
 

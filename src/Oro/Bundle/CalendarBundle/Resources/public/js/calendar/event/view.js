@@ -78,10 +78,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     confirm.open();
                 }, this),
                 onEdit = _.bind(function (e) {
-                    var $content = $('<div class="widget-content"></div>');
-                    $content.append(this.getEventForm());
                     this.eventDialog.setTitle(__('Edit Event'));
-                    this.eventDialog.setContent($content);
+                    this.eventDialog.setContent(this.getEventForm());
                     // subscribe to 'delete event' event
                     this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
                         deleteAction.on('click', onDelete);

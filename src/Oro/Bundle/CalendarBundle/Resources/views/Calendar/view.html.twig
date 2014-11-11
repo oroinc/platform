@@ -143,7 +143,7 @@
         'centerHeader': '',
         'rightHeader': 'month,agendaWeek,agendaDay',
     } %}
-    {{ c.calendar_event_view_template('template-view-calendar-event', event_form) }}
+    {{ c.calendar_event_view_template('template-view-calendar-event') }}
     {{ c.calendar_event_form_template('template-calendar-event', event_form) }}
     {{ c.renderCalendar('#calendar', entity, startDate, endDate, calendar, eventsOptions, connectionsOptions) }}
 
