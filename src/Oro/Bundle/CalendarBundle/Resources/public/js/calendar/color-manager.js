@@ -105,17 +105,26 @@ define(['underscore'], function (_) {
             return filter(r) + filter(g) + filter(b)
         },
 
-        getColor: function(color) {
-            var color = this.hex2rgb(color);
-            var d = 0;
-            var a = 1 - (0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255;
-            if (a < 0.5) {
-                d = 0;
-            } else {
-                d = 255;
+        /**
+         * Calculates contrast color
+         * @see http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
+         *
+         * @param backgroundColor {string} The background color in sixdigit hexadecimal form.
+         * @returns {string|null} Calculated sufficient contrast color, currently black or white.
+         */
+        getColor: function(backgroundColor) {
+            var color = this.hex2rgb(backgroundColor);
+            if (color) {
+                var d = 0;
+                var a = 1 - (0.299 * color.r + 0.587 * color.g + 0.114 * color.b) / 255;
+                if (a < 0.5) {
+                    d = 0;
+                } else {
+                    d = 255;
+                }
+                return this.rgb2hex(d, d, d);
             }
-            return this.rgb2hex(d, d, d);
-}
+        }
     };
 
     return function () {
