@@ -1,22 +1,28 @@
 parameters:
     oro_calendar.calendar.entity.class:                          Oro\Bundle\CalendarBundle\Entity\Calendar
-    oro_calendar.calendar_connection.entity.class:               Oro\Bundle\CalendarBundle\Entity\CalendarConnection
     oro_calendar.calendar_event.entity.class:                    Oro\Bundle\CalendarBundle\Entity\CalendarEvent
+    oro_calendar.calendar_property.entity.class:                 Oro\Bundle\CalendarBundle\Entity\CalendarProperty
     oro_calendar.listener.entity_listener.class:                 Oro\Bundle\CalendarBundle\EventListener\EntityListener
     oro_calendar.listener.datagrid.activity.class:               Oro\Bundle\CalendarBundle\EventListener\Datagrid\ActivityGridListener
-    oro_calendar.calendar_connection.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_calendar.calendar_property.manager.api.class:            Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
     oro_calendar.format_converter.date_time.full_calendar.class: Oro\Bundle\CalendarBundle\Converter\FullCalendarDateTimeFormatConverter
     oro_calendar.owner_assignment_checker.calendar.class:        Oro\Bundle\CalendarBundle\Ownership\CalendarOwnerAssignmentChecker
     oro_calendar.activity_list.provider.class:                   Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
+    oro_calendar.calendar_manager.class:                         Oro\Bundle\CalendarBundle\Manager\CalendarManager
+    oro_calendar.calendar_property_provider.class:               Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider
+    oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
+    oro_calendar.calendar_event.normalizer.class:                Oro\Bundle\CalendarBundle\Provider\CalendarEventNormalizer
+    oro_calendar.autocomplete.user_calendar_handler.class:       Oro\Bundle\CalendarBundle\Autocomplete\UserCalendarHandler
 
 services:
     oro_calendar.listener.entity_listener:
         class: %oro_calendar.listener.entity_listener.class%
         tags:
             - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_calendar.listener.datagrid.activity:
         class: %oro_calendar.listener.datagrid.activity.class%
@@ -27,19 +33,20 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-calendar-event-grid, method: onBuildAfter }
 
-    oro_calendar.calendar_connection.manager.api:
-        class: %oro_calendar.calendar_connection.manager.api.class%
-        parent: oro_soap.manager.entity_manager.abstract
-        arguments:
-            - %oro_calendar.calendar_connection.entity.class%
-            - @doctrine.orm.entity_manager
-
     oro_calendar.calendar_event.manager.api:
         class: %oro_calendar.calendar_event.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_calendar.calendar_event.entity.class%
             - @doctrine.orm.entity_manager
+
+    oro_calendar.calendar_property.manager.api:
+        class: %oro_calendar.calendar_property.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_calendar.calendar_property.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_calendar.calendar_manager
 
     oro_calendar.twig.dateformat:
         class: %oro_calendar.twig.dateformat.class%
@@ -73,9 +80,46 @@ services:
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
 
+    oro_calendar.calendar_manager:
+        class: %oro_calendar.calendar_manager.class%
+        arguments:
+            - @oro_calendar.calendar_property_provider
+
+    oro_calendar.calendar_property_provider:
+        class: %oro_calendar.calendar_property_provider.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.field_type_helper
+
+    oro_calendar.calendar_provider.user:
+        class: %oro_calendar.calendar_provider.user.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_locale.formatter.name
+            - @oro_calendar.calendar_event.normalizer
+        tags:
+            - { name: oro_calendar.calendar_provider, alias: user }
+
+    oro_calendar.calendar_event.normalizer:
+        class: %oro_calendar.calendar_event.normalizer.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_reminder.entity.manager
+
+    oro_calendar.autocomplete.user_calendar_handler:
+        parent: oro_user.autocomplete.user.search_acl_handler.abstract
+        class: %oro_calendar.autocomplete.user_calendar_handler.class%
+        calls:
+            - [ setProperties, [["namePrefix", "firstName", "middleName", "lastName", "nameSuffix"]] ]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: user_calendars, acl_resource: oro_user_user_view }
+        lazy: true
+
     oro_calendar.activity_list.provider:
         class: %oro_calendar.activity_list.provider.class%
         arguments:
            - @oro_entity.doctrine_helper
         tags:
-           - {name: oro_activity_list.provider, priority: 50}
+           - {name: oro_activity_list.provider, priority: 50}        

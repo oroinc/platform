@@ -18,19 +18,19 @@ class ActivityListEntityGeneratorExtension extends AbstractAssociationEntityGene
     /**
      * {@inheritdoc}
      */
-    protected function getAssociationKind()
-    {
-        return ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function supports(array $schema)
     {
         return
             $schema['class'] === ActivityListEntityConfigDumperExtension::ENTITY_CLASS
             && parent::supports($schema);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationKind()
+    {
+        return ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND;
     }
 
     /**

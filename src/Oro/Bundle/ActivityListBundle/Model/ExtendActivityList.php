@@ -15,39 +15,77 @@ class ExtendActivityList
     }
 
     /**
-     * Checks if this attachment can be associated with the given target entity type
+     * Checks if an entity of the given type can be associated with this entity
      *
      * The real implementation of this method is auto generated.
      *
      * @param string $targetClass The class name of the target entity
      * @return bool
      */
-    public function supportTarget($targetClass)
+    public function supportActivityListTarget($targetClass)
     {
         return false;
     }
 
     /**
-     * Gets the entity this attachment is associated with
+     * Removes the association of the given entity and this entity
+     *
      * The real implementation of this method is auto generated.
      *
-     * @return object|null Any configurable entity
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
      */
-    public function getTarget()
+    public function removeActivityListTarget($target)
     {
-        return null;
     }
 
     /**
-     * Sets the entity this attachment is associated with
+     * Checks is the given entity is associated with this entity
+     *
      * The real implementation of this method is auto generated.
      *
-     * @param object $target Any configurable entity that can have notes
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return bool
+     */
+    public function hasActivityListTarget($target)
+    {
+        return false;
+    }
+
+    /**
+     * Gets entities of the given type associated with this entity
      *
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return object[]
+     */
+    public function getActivityListTargets($targetClass)
+    {
+        return [];
+    }
+
+    /**
+     * Returns array with all associated entities
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @return array
+     */
+    public function getActivityListTargetEntities()
+    {
+        return [];
+    }
+
+    /**
+     * Associates the given entity with this entity
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
      * @return object This object
      */
-    public function setTarget($target)
+    public function addActivityListTarget($target)
     {
-        return $this;
     }
 }

@@ -53,8 +53,16 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
             ['relatedActivityClass', 'testRelatedActivityClass'],
             ['relatedActivityId', 123],
             ['updatedAt', new \DateTime('now')],
+            ['createdAt', new \DateTime('now')],
             ['organization', new Organization()]
         ];
+    }
+
+    public function testToString()
+    {
+        $obj = new ActivityList();
+        $obj->setSubject('test subject');
+        $this->assertEquals('test subject', (string)$obj);
     }
 
     public function testPrePersist()

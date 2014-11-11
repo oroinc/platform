@@ -41,6 +41,14 @@ class ActivityListChainProvider
     }
 
     /**
+     * @param ActivityListProviderInterface $provider
+     */
+    public function addProvider(ActivityListProviderInterface $provider)
+    {
+        $this->providers[$provider->getActivityClass()] = $provider;
+    }
+
+    /**
      * @return array
      */
     public function getTargetEntityClasses()
@@ -60,14 +68,6 @@ class ActivityListChainProvider
         }
 
         return $this->targetClasses;
-    }
-
-    /**
-     * @param ActivityListProviderInterface $provider
-     */
-    public function addProvider(ActivityListProviderInterface $provider)
-    {
-        $this->providers[$provider->getActivityClass()] = $provider;
     }
 
     /**
@@ -119,12 +119,16 @@ class ActivityListChainProvider
             ]
         );
 
-        return $this->getActivityListEntityForEntity(
-            $entity,
-            $provider,
-            ActivityListManager::STATE_UPDATE,
-            $existListEntity
-        );
+        if ($existListEntity) {
+            return $this->getActivityListEntityForEntity(
+                $entity,
+                $provider,
+                ActivityListManager::STATE_UPDATE,
+                $existListEntity
+            );
+        }
+
+        return null;
     }
 
     /**
@@ -184,18 +188,6 @@ class ActivityListChainProvider
     }
 
     /**
-     * Get activity list provider for given activity entity
-     *
-     * @param $entity
-     *
-     * @return ActivityListProviderInterface
-     */
-    protected function getProviderForEntity($entity)
-    {
-        return $this->providers[$this->doctrineHelper->getEntityClass($entity)];
-    }
-
-    /**
      * @return array
      */
     public function getActivityListOption()
@@ -230,5 +222,17 @@ class ActivityListChainProvider
         }
 
         return null;
+    }
+
+    /**
+     * Get activity list provider for given activity entity
+     *
+     * @param $entity
+     *
+     * @return ActivityListProviderInterface
+     */
+    protected function getProviderForEntity($entity)
+    {
+        return $this->providers[$this->doctrineHelper->getEntityClass($entity)];
     }
 }
