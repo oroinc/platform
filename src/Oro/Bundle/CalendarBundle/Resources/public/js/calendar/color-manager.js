@@ -25,13 +25,13 @@ define(['underscore'], function (_) {
         calendarColors: null,
 
         initialize: function () {
-            this.defaultColor = this.findColors('4986E7');
+            this.defaultColor = this._findColor('4986E7');
             this.calendarColors = {};
         },
 
         setCalendarColors: function (calendarId, backgroundColor) {
             this.calendarColors[calendarId] = {
-                color: '#' + this.getContrastColor(backgroundColor),
+                color: '#' + this._getContrastColor(backgroundColor),
                 backgroundColor: '#' + backgroundColor
             };
         },
@@ -48,39 +48,40 @@ define(['underscore'], function (_) {
 
         applyColors: function (obj, getLastBackgroundColor) {
             if (_.isEmpty(obj.color) && _.isEmpty(obj.backgroundColor)) {
-                var colors = this.findNextColors(getLastBackgroundColor());
-                obj.backgroundColor = colors;
+                obj.backgroundColor = this._findNextColor(getLastBackgroundColor());
+                obj.color = this._getContrastColor(obj.backgroundColor);
+            } else if (_.isEmpty(obj.color)) {
+                obj.color = this._getContrastColor(this.defaultColor);
             } else if (_.isEmpty(obj.backgroundColor)) {
                 obj.backgroundColor = this.defaultColor;
             }
-            obj.color = this.getContrastColor(obj.backgroundColor);
         },
 
-        findColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColor);
+        _findColor: function (color) {
+            if (_.isEmpty(color)) {
+                return this._findColor(this.defaultColor);
             }
-            bgColor = bgColor.toUpperCase();
-            var result = _.find(this.colors, function (item) { return item === bgColor; });
+            color = color.toUpperCase();
+            var result = _.find(this.colors, function (clr) { return clr === color; });
             if (_.isUndefined(result)) {
-                result = this.findColors(this.defaultColor);
+                result = this._findColor(this.defaultColor);
             }
             return result;
         },
 
-        findNextColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColor);
+        _findNextColor: function (color) {
+            if (_.isEmpty(color)) {
+                return this._findColor(this.defaultColor);
             }
-            bgColor = bgColor.toUpperCase();
+            color = color.toUpperCase();
             var i = -1;
-            _.each(this.colors, function (item, index) {
-                if (item === bgColor) {
+            _.each(this.colors, function (clr, index) {
+                if (clr === color) {
                     i = index;
                 }
             });
             if (i === -1) {
-                return this.findColors(this.defaultColor);
+                return this._findColor(this.defaultColor);
             }
             if ((i + 1) === _.size(this.colors)) {
                 return _.first(this.colors);
@@ -88,7 +89,7 @@ define(['underscore'], function (_) {
             return this.colors[i + 1];
         },
 
-        hex2rgb: function (hex) {
+        _hex2rgb: function (hex) {
             var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
             return result ? {
                 r: parseInt(result[1], 16),
@@ -97,7 +98,7 @@ define(['underscore'], function (_) {
             } : null;
         },
 
-        rgb2hex: function (r, g, b) {
+        _rgb2hex: function (r, g, b) {
             var filter = function (dec) {
                 var hex = dec.toString(16).toUpperCase();
                 return hex.length === 1 ? '0' + hex : hex;
@@ -113,11 +114,11 @@ define(['underscore'], function (_) {
          * @returns {string|null} Calculated sufficient contrast color, currently black or white.
          *                        If the given color is invalid or cannot be parsed, returns black.
          */
-        getContrastColor: function (color) {
-            var rgb = this.hex2rgb(color),
+        _getContrastColor: function (color) {
+            var rgb = this._hex2rgb(color),
                 yiq = rgb ? ((299 * rgb.r + 587 * rgb.g + 114 * rgb.b) / 1000) : 255,
                 clrDiff = rgb ? (rgb.r + rgb.g + rgb.b) : 0;
-            return yiq > 125 && clrDiff > 500 ? this.rgb2hex(0, 0, 0) : this.rgb2hex(255, 255, 255);
+            return yiq > 125 && clrDiff > 500 ? this._rgb2hex(0, 0, 0) : this._rgb2hex(255, 255, 255);
         }
     };
 
