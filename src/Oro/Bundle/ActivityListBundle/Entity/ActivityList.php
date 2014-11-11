@@ -308,6 +308,20 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
+     * Set creation date
+     *
+     * @param \DateTime %createdAt
+     *
+     * @return self
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
      * Get creation date
      *
      * @return \DateTime

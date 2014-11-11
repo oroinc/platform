@@ -61,4 +61,4 @@ class ActivityListMigration implements Migration
             );
         }
     }
-} 
+}

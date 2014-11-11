@@ -114,4 +114,4 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
             }
         }
     }
-} 
+}
