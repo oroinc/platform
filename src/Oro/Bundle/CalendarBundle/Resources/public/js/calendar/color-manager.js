@@ -9,32 +9,29 @@ define(['underscore'], function (_) {
      */
     var ColorManager = {
         /**
-         * A list of text/background colors are used to determine colors of events of connected calendars
+         * A list of background colors are used to determine colors of events of connected calendars
          *  @property {Array}
          */
         colors: [
-            ['FFFFFF', 'AC725E'], ['FFFFFF', 'D06B64'], ['FFFFFF', 'F83A22'], ['000000', 'FA573C'],
-            ['000000', 'FF7537'], ['000000', 'FFAD46'], ['000000', '42D692'], ['FFFFFF', '16A765'],
-            ['000000', '7BD148'], ['000000', 'B3DC6C'], ['000000', 'FBE983'], ['000000', 'FAD165'],
-            ['000000', '92E1C0'], ['000000', '9FE1E7'], ['000000', '9FC6E7'], ['FFFFFF', '4986E7'],
-            ['000000', '9A9CFF'], ['000000', 'B99AFF'], ['000000', 'C2C2C2'], ['000000', 'CABDBF'],
-            ['000000', 'CCA6AC'], ['000000', 'F691B2'], ['FFFFFF', 'CD74E6'], ['FFFFFF', 'A47AE2']
+            'AC725E', 'D06B64', 'F83A22', 'FA573C', 'FF7537', 'FFAD46', '42D692', '16A765',
+            '7BD148', 'B3DC6C', 'FBE983', 'FAD165', '92E1C0', '9FE1E7', '9FC6E7', '4986E7',
+            '9A9CFF', 'B99AFF', 'C2C2C2', 'CABDBF', 'CCA6AC', 'F691B2', 'CD74E6', 'A47AE2'
         ],
 
-        /** @property {Object} */
-        defaultColors: null,
+        /** @property {String} */
+        defaultColor: null,
 
         /** @property {Object} */
         calendarColors: null,
 
         initialize: function () {
-            this.defaultColors = this.findColors('4986E7');
+            this.defaultColor = this._findColor('4986E7');
             this.calendarColors = {};
         },
 
-        setCalendarColors: function (calendarId, color, backgroundColor) {
+        setCalendarColors: function (calendarId, backgroundColor) {
             this.calendarColors[calendarId] = {
-                color: '#' + color,
+                color: '#' + this._getContrastColor(backgroundColor),
                 backgroundColor: '#' + backgroundColor
             };
         },
@@ -51,46 +48,77 @@ define(['underscore'], function (_) {
 
         applyColors: function (obj, getLastBackgroundColor) {
             if (_.isEmpty(obj.color) && _.isEmpty(obj.backgroundColor)) {
-                var colors = this.findNextColors(getLastBackgroundColor());
-                obj.color = colors[0];
-                obj.backgroundColor = colors[1];
+                obj.backgroundColor = this._findNextColor(getLastBackgroundColor());
+                obj.color = this._getContrastColor(obj.backgroundColor);
             } else if (_.isEmpty(obj.color)) {
-                obj.color = this.defaultColors[0];
+                obj.color = this._getContrastColor(this.defaultColor);
             } else if (_.isEmpty(obj.backgroundColor)) {
-                obj.backgroundColor = this.defaultColors[1];
+                obj.backgroundColor = this.defaultColor;
             }
         },
 
-        findColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
+        _findColor: function (color) {
+            if (_.isEmpty(color)) {
+                return this._findColor(this.defaultColor);
             }
-            bgColor = bgColor.toUpperCase();
-            var result = _.find(this.colors, function (item) { return item[1] === bgColor; });
+            color = color.toUpperCase();
+            var result = _.find(this.colors, function (clr) { return clr === color; });
             if (_.isUndefined(result)) {
-                result = this.findColors(this.defaultColors[1]);
+                result = this._findColor(this.defaultColor);
             }
             return result;
         },
 
-        findNextColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
+        _findNextColor: function (color) {
+            if (_.isEmpty(color)) {
+                return this._findColor(this.defaultColor);
             }
-            bgColor = bgColor.toUpperCase();
+            color = color.toUpperCase();
             var i = -1;
-            _.each(this.colors, function (item, index) {
-                if (item[1] === bgColor) {
+            _.each(this.colors, function (clr, index) {
+                if (clr === color) {
                     i = index;
                 }
             });
             if (i === -1) {
-                return this.findColors(this.defaultColors[1]);
+                return this._findColor(this.defaultColor);
             }
             if ((i + 1) === _.size(this.colors)) {
                 return _.first(this.colors);
             }
             return this.colors[i + 1];
+        },
+
+        _hex2rgb: function (hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        },
+
+        _rgb2hex: function (r, g, b) {
+            var filter = function (dec) {
+                var hex = dec.toString(16).toUpperCase();
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+            return filter(r) + filter(g) + filter(b);
+        },
+
+        /**
+         * Calculates contrast color
+         * @see http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
+         *
+         * @param {string} color A color in sixdigit hexadecimal form.
+         * @returns {string|null} Calculated sufficient contrast color, currently black or white.
+         *                        If the given color is invalid or cannot be parsed, returns black.
+         */
+        _getContrastColor: function (color) {
+            var rgb = this._hex2rgb(color),
+                yiq = rgb ? ((299 * rgb.r + 587 * rgb.g + 114 * rgb.b) / 1000) : 255,
+                clrDiff = rgb ? (rgb.r + rgb.g + rgb.b) : 0;
+            return yiq > 125 && clrDiff > 500 ? this._rgb2hex(0, 0, 0) : this._rgb2hex(255, 255, 255);
         }
     };
 

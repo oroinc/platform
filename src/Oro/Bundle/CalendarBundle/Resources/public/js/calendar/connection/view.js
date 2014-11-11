@@ -84,11 +84,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 var $last = this.$el.find(this.selectors.lastItem);
                 return $last.attr(this.attrs.calendarAlias) === 'user' ? $last.attr(this.attrs.backgroundColor) : null;
             }, this));
-            this.options.colorManager.setCalendarColors(
-                viewModel.calendarUid,
-                viewModel.color,
-                viewModel.backgroundColor
-            );
+            this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.backgroundColor);
             model.set('color', viewModel.color);
             model.set('backgroundColor', viewModel.backgroundColor);
 
@@ -118,11 +114,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         onModelChanged: function (model) {
-            this.options.colorManager.setCalendarColors(
-                model.get('calendarUid'),
-                model.get('color'),
-                model.get('backgroundColor')
-            );
+            this.options.colorManager.setCalendarColors(model.get('calendarUid'), model.get('backgroundColor'));
             this.trigger('connectionChange', model);
         },
 
