@@ -311,3 +311,41 @@ The following command removes all data related to entity extend functionality fr
 php app/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
+
+Validation for extended fields
+---------------------
+By default all extended fields are not validated. In general extended fields rendered as usual forms, same way as not extended,
+but there's a way to define validation constraints for all extended fields by their type.
+This is done through the configuration of oro_entity_extend.validation_loader:
+
+```yaml
+    oro_entity_extend.validation_loader:
+        class: %oro_entity_extend.validation_loader.class%
+        public: false
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.form
+        calls:
+            -
+                - addConstraints
+                -
+                    - integer
+                    -
+                        - NotNull: ~
+                        - Regex:
+                            pattern: "/^[\d+]*$/"
+                            message: "This value should contain only numbers."
+
+            - [addConstraints, ["boolean", [{ NotBlank: ~ }]]]
+```
+
+To pass constraints there are two ways:
+- use compiler pass to add 'addConstraints' call with necessary constraint configuration
+- directly call service
+
+Pay attention to the fact that all constraints defined here applied to all extended fields with corresponding type.
+
+Another point to keep in mind - integer fields should be rendered as text. Because html5 validation works only in case 
+when form submitted directly by user, and platform use javascript to submit forms. 
+Platform relates on jQuery validation, but due to the nature of input[type=number] - it's not possible to get it's raw value when it's not number.
+
