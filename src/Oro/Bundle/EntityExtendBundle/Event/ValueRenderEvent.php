@@ -29,6 +29,7 @@ class ValueRenderEvent extends Event
     protected $fieldViewValue;
 
     /**
+     * @param object        $entity
      * @param mixed         $fieldValue
      * @param FieldConfigId $fieldConfigId
      */
