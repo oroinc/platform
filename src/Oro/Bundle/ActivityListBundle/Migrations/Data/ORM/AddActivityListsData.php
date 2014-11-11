@@ -32,21 +32,15 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
     }
 
     /**
-     * Adds activity lists data for existing activity records.
+     * Adds activity lists data for existing activity records only if we are in update process
+     * (check on installed parameter)
      *
      * @param ObjectManager $manager
      * @param string        $activityClass Activity class we need to add activity list data
      */
     public function addActivityListsForActivityClass(ObjectManager $manager, $activityClass)
     {
-        $recordsCount = $manager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('al')
-            ->select('COUNT(al.id)')
-            ->where('al.relatedActivityClass = :activityClass')
-            ->setParameter('activityClass', $activityClass)
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        if ($recordsCount === 0) {
+        if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
             $provider = $this->container->get('oro_activity_list.provider.chain');
             $queryBuilder = $manager->getRepository($activityClass)->createQueryBuilder('entity');
             $iterator = new BufferedQueryResultIterator($queryBuilder);
