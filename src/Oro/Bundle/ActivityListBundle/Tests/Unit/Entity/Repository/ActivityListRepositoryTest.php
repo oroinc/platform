@@ -4,11 +4,12 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Entity\Repository;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
-
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 
 class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
 {
+    const ENTITY_NAME = 'ActivityListEntityName';
+
     /**
      * @var ActivityListRepository
      */
@@ -36,6 +37,7 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
     {
         unset($this->entityManager, $this->repository);
     }
+
 
     /**
      * @dataProvider paramsProvider
@@ -73,6 +75,10 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $qb->expects($this->once())
             ->method('where')
+            ->will($this->returnSelf());
+
+        $qb->expects($this->once())
+            ->method('join')
             ->will($this->returnSelf());
 
         $qb->expects($this->once())
@@ -115,65 +121,19 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function paramsProvider()
     {
-        $now  = new \DateTime();
-        $past = clone $now;
-        $past = $past->sub(new \DateInterval("P2M"));
+        $now          = new \DateTime();
+        $past         = clone $now;
+        $past         = $past->sub(new \DateInterval("P2M"));
+        $className    = 'Acme\Bundle\AcmeBundle\Entity\Test';
+        $activityName = 'Acme\Bundle\AcmeBundle\Activity\Test';
 
         return [
-            'default' => [
-                'entityClass' => 'OroCRM\Bundle\AccountBundle\Entity\Account',
-                'entityId' => 1,
-                [],
-                null,
-                null,
-                1,
-                2
-            ],
-            'both_date_empty' => [
-                'entityClass' => 'OroCRM\Bundle\AccountBundle\Entity\Account',
-                'entityId' => 1,
-                ['activityClass1', 'activityClass2', 'activityClass3'],
-                null,
-                null,
-                2,
-                3
-            ],
-            'dateFrom_empty' => [
-                'entityClass' => 'OroCRM\Bundle\AccountBundle\Entity\Account',
-                'entityId' => 1,
-                ['activityClass1', 'activityClass2', 'activityClass3'],
-                null,
-                $now,
-                2,
-                3
-            ],
-            'dateTo_classes_empty' => [
-                'entityClass' => 'OroCRM\Bundle\AccountBundle\Entity\Account',
-                'entityId' => 1,
-                [],
-                $past,
-                null,
-                2,
-                3
-            ],
-            'dateTo_empty' => [
-                'entityClass' => 'OroCRM\Bundle\AccountBundle\Entity\Account',
-                'entityId' => 1,
-                ['activityClass1'],
-                $past,
-                null,
-                3,
-                4
-            ],
-            'all_params' => [
-                'entityClass' => 'OroCRM\Bundle\AccountBundle\Entity\Account',
-                'entityId' => 1,
-                ['activityClass1'],
-                $past,
-                $now,
-                3,
-                5
-            ]
+            'default'              => [$className, 1, [], null, null, 0, 1],
+            'both_date_empty'      => [$className, 1, [$activityName], null, null, 1, 2],
+            'dateFrom_empty'       => [$className, 1, [$activityName], null, $now, 1, 2],
+            'dateTo_classes_empty' => [$className, 1, [], $past, null, 1, 2],
+            'dateTo_empty'         => [$className, 1, [$activityName], $past, null, 2, 3],
+            'all_params'           => [$className, 1, [$activityName], $past, $now, 2, 4]
         ];
     }
 }
