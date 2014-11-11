@@ -537,7 +537,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param $expectedClass
+     * @param string $expectedClass
      */
     protected function setupManyToOneMetadata($expectedClass)
     {
