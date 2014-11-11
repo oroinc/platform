@@ -66,10 +66,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     submitHandler: _.bind(this.saveModel, this)
                 },
                 onDelete = _.bind(function (e) {
-                    var el = $(e.currentTarget),
-                        deleteUrl = el.data('url'),
+                    var $el = $(e.currentTarget),
+                        deleteUrl = $el.data('url'),
                         confirm = new DeleteConfirmation({
-                            content: el.data('message')
+                            content: $el.data('message')
                         });
                     e.preventDefault();
                     confirm.on('ok', _.bind(function () {
