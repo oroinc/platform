@@ -39,6 +39,8 @@ parameters:
     oro_integration.action.save_fields_changes.class:                     Oro\Bundle\IntegrationBundle\Model\Action\SaveFieldsChangesAction
     oro_integration.action.remove_fields_changes.class:                   Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction
 
+    oro_integration.workflow.condition.has_active_integration.class:      Oro\Bundle\IntegrationBundle\Model\Condition\HasActiveIntegration
+    oro_integration.workflow.action.populate_integration_owner.class:     Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner
 services:
     oro_integration.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -237,3 +239,11 @@ services:
         parent: oro_integration.action.abstract_fields_changes
         tags:
             - { name: oro_workflow.action, alias: remove_fields_changes }
+
+    oro_integration.workflow.action.populate_integration_owner:
+        class: %oro_integration.workflow.action.populate_integration_owner.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_integration.helper.default_owner_helper
+        tags:
+            - { name: oro_workflow.action, alias: populate_integration_owner }
