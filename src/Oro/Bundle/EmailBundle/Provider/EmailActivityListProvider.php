@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 
 class EmailActivityListProvider implements ActivityListProviderInterface
@@ -19,10 +21,12 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
-    public function getTargets()
+    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
+        $provider = $configManager->getProvider('activity');
+        return $provider->hasConfigById($configId) && $provider->getConfigById($configId)->has('activities');
     }
 
     /**
@@ -72,23 +76,15 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
-    public function getBriefTemplate()
+    public function getTemplate()
     {
         return 'OroEmailBundle:Email:js/activityItemTemplate.js.twig';
     }
 
     /**
-     * {@inheritdoc
-     */
-    public function getFullTemplate()
-    {
-        return 'OroEmailBundle:Email:view.html.twig';
-    }
-
-    /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function getActivityId($entity)
     {
@@ -96,7 +92,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
     public function isApplicable($entity)
     {
@@ -105,5 +101,13 @@ class EmailActivityListProvider implements ActivityListProviderInterface
         }
 
         return $entity == self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetEntities($entity)
+    {
+        return $entity->getActivityTargetEntities();
     }
 }

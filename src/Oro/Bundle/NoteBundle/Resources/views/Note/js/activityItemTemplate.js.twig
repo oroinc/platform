@@ -9,7 +9,20 @@
                 <span class="visual">
                     <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
                     <span>{{ entityName }}</span>
-                    <span>{{ 'oro.activitylist.widget.logged_by'|trans({'{{ user }}': 'User'})|raw }} <i class="date"><%= updatedAt %></i></span>
+                    <span>
+                        <% var template = (verb == 'create')
+                            ? {{ 'oro.note.added_by'|trans|lower|json_encode|raw }}
+                        : {{ 'oro.note.updated_by'|trans|lower|json_encode|raw }};
+                        %>
+                        <%= _.template(
+                            template,
+                            {
+                                user: '<a class="user" href="' + actor_url + '">' +  _.escape(owner) + '</a>',
+                                date: '<i class="date">' + updatedAt + '</i>'
+                            },
+                            { interpolate: /\{\{(.+?)\}\}/g }
+                        ) %>
+                    </span>
                 </span>
             </div>
             <div class="actions">
@@ -28,7 +41,6 @@
         </div>
         <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
             <div class="message">
-                <%= subject %>
                 <% if (data != null) { %>
                     <div class="control-group">
                         <%= data['message'] %>

@@ -19,3 +19,4 @@ oro:
 
         no_notes_exist:       No notes found
         updated_by:           Updated by {{ user }} at {{ date }}
+        added_by:             Added by {{ user }} at {{ date }}

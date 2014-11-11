@@ -11,6 +11,9 @@ use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActivityListChainProvider
 {
@@ -30,10 +33,11 @@ class ActivityListChainProvider
      * @param DoctrineHelper $doctrineHelper
      * @param ConfigManager  $configManager
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
+    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager, ConfigProvider $configProvider)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -141,8 +145,16 @@ class ActivityListChainProvider
             $list = new ActivityList();
         }
 
-        $list->setOwner($entity->getOwner());
-        $list->setOrganization($entity->getOrganization());
+        $accessor  = PropertyAccess::createPropertyAccessor();
+        $className = $this->doctrineHelper->getEntityClass($entity);
+        if ($this->configProvider->hasConfig($className)) {
+            $config = $this->configProvider->getConfig($className);
+            if ($config->get('owner_type') == OwnershipType::OWNER_TYPE_USER) {
+                $list->setOrganization($accessor->getValue($entity, $config->get('organization_field_name')));
+                $list->setOwner($accessor->getValue($entity, $config->get('owner_field_name')));
+            }
+        }
+
         $list->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
         $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
         $list->setSubject($provider->getSubject($entity));

@@ -5,6 +5,8 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 class CalendarEventActivityListProvider implements ActivityListProviderInterface
 {
@@ -19,10 +21,12 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
-    public function getTargets()
+    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
+        $provider = $configManager->getProvider('activity');
+        return $provider->hasConfigById($configId) && $provider->getConfigById($configId)->has('activities');
     }
 
     /**
@@ -50,7 +54,8 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
      */
     public function getSubject($entity)
     {
-        return $entity->getSubject();
+        /** @var $entity CalendarEvent */
+        return $entity->getTitle();
     }
 
     /**
@@ -60,23 +65,17 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     {
         /** @var CalendarEvent $entity */
         return [
-            'message'=> $entity->getMessage()
+            'oro.calendar.calendarevent.title.label'        => $entity->getTitle(),
+            'oro.calendar.calendarevent.description.label'  => $entity->getDescription()
         ];
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
-    public function getBriefTemplate()
+    public function getTemplate()
     {
         return 'OroCalendarBundle:CalendarEvent:js/activityItemTemplate.js.twig';
-    }
-
-    /**
-     * {@inheritdoc
-     */
-    public function getFullTemplate()
-    {
     }
 
     /**
@@ -97,5 +96,13 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
         }
 
         return $entity == self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetEntities($entity)
+    {
+        return $entity->getActivityTargetEntities();
     }
 }

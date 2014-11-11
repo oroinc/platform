@@ -4,7 +4,9 @@ namespace Oro\Bundle\NoteBundle\Provider;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class NoteActivityListProvider implements ActivityListProviderInterface
 {
@@ -19,10 +21,12 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
-    public function getTargets()
+    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
+        $provider = $configManager->getProvider('activity');
+        return $provider->hasConfigById($configId) && $provider->getConfigById($configId)->has('activities');
     }
 
     /**
@@ -49,7 +53,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
      */
     public function getSubject($entity)
     {
-        return $entity->getSubject();
+        return '';
     }
 
     /**
@@ -64,18 +68,11 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
-     * {@inheritdoc
+     * {@inheritdoc}
      */
-    public function getBriefTemplate()
+    public function getTemplate()
     {
         return 'OroNoteBundle:Note:js/activityItemTemplate.js.twig';
-    }
-
-    /**
-     * {@inheritdoc
-     */
-    public function getFullTemplate()
-    {
     }
 
     /**
@@ -96,5 +93,13 @@ class NoteActivityListProvider implements ActivityListProviderInterface
         }
 
         return $entity == self::ACTIVITY_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetEntities($entity)
+    {
+        return array();
     }
 }
