@@ -16,5 +16,22 @@ oro:
 
         no_activities_exist: No activities found
 
-        widget.filter.date_picker.title: Date Range
-        widget.filter.activity.title: Activity Type
+        widget:
+            filter:
+                date_picker.title: Date Range
+                activity.title: Activity Type
+            load_more.title: Load %count% more
+        system_configuration:
+            activity_list.label: Activity lists
+            fields:
+                sorting_field:
+                    label:     Sort by field
+                    choices:
+                        createdAt: Created at
+                        updatedAt: Updated at
+                sorting_direction:
+                    label: Sorting direction
+                    choices:
+                        DESC: Descending
+                        ASC:  Ascending
+                per_page.label:          Number of records
