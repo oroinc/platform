@@ -316,5 +316,36 @@ Extend Fields View
 ---------------------
 
 Before extend fields rendering in view page, event "oro.entity_extend_event.before_value_render" fired. 
-There is possibility for customize field rendering using this event. 
-There is an example here: Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener .
+There is possibility for customize field rendering using this event.
+
+As example you can create Event Listener. Example:
+
+	oro_entity_extend.listener.extend_field_value_render:
+        class: %oro_entity_extend.listener.extend_field_value_render.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @router
+            - @oro_entity_extend.extend.field_type_helper
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
+
+In method `beforeValueRender` we have access to current entity, current `FieldConfigId`, rendering field value and value, which will be used to field render in page view. Each event listener try to made decision how we need to show field value and if it know how value need to be shown, he use `$event->setFieldViewValue($viewData);` to change field view value. Example:
+
+	$underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
+        if ($value && $underlyingFieldType == 'manyToOne') {
+            $viewData = $this->getValueForManyToOne(
+                $value,
+                $this->extendProvider->getConfigById($event->getFieldConfigId())
+            );
+
+            $event->setFieldViewValue($viewData);
+        }
+
+In this code we: 
+
+
+- check if value not null and field type is "manyToOne". 
+- calculate field view value and set it using `$event->setFieldViewValue($viewData);` 
+
+In variable `$viewData` can be simple string or array `[ 'link' => 'example.com', 'title' => 'some text representation']`. In case of string it will be formatted in twig template automatically based on field type. In case of array we show field with text equal to `'title'`. Also title will be escaped. If `'link'` option exists we show field as link with href equal to `'link'` option value.
