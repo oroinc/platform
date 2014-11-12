@@ -49,6 +49,8 @@ class Calendar extends AbstractPage
     {
         $this->test->byXpath("//div[@class='fc-event-container']//span[normalize-space(.)='{$event}']")->click();
         $this->waitForAjax();
+        $this->test->byXpath("//button[@type='button'][normalize-space(.)='Edit']")->click();
+        $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
             "/span[normalize-space(.)='Edit Event']"
