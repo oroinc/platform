@@ -9,21 +9,29 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 class ValueRenderEvent extends Event
 {
     /**
+     * Current entity
+     *
      * @var object
      */
     protected $entity;
 
     /**
+     * Entity field value
+     *
      * @var mixed
      */
     protected $fieldValue;
 
     /**
+     * Entity field config id
+     *
      * @var FieldConfigId
      */
     protected $fieldConfigId;
 
     /**
+     * Value, which will be used for field display
+     *
      * @var mixed
      */
     protected $fieldViewValue;
