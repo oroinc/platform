@@ -28,7 +28,11 @@ class NoteActivityListProvider implements ActivityListProviderInterface
      */
     public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
-        return false;
+        $provider = $configManager->getProvider('note');
+
+        return $provider->hasConfigById($configId)
+            && $provider->getConfigById($configId)->has('enabled')
+            && $provider->getConfigById($configId)->get('enabled');
     }
 
     /**
@@ -55,7 +59,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
      */
     public function getSubject($entity)
     {
-        return '';
+        return substr($entity->getMessage(), 0, 100);
     }
 
     /**
@@ -65,7 +69,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     {
         /** @var Note $entity */
         return [
-            'message'=> $entity->getMessage()
+            'message' => $entity->getMessage()
         ];
     }
 
@@ -102,6 +106,6 @@ class NoteActivityListProvider implements ActivityListProviderInterface
      */
     public function getTargetEntities($entity)
     {
-        return array();
+        return $entity->getTargetEntities();
     }
 }
