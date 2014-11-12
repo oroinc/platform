@@ -14,7 +14,6 @@ define(function (require) {
         ActivityListView   = require('../views/activity-list-view'),
         ActivityModel      = require('../models/activity-list-model'),
         ActivityCollection = require('../models/activity-list-collection');
-    require('jquery');
 
     ActivityListComponent = BaseComponent.extend({
         defaults: {
