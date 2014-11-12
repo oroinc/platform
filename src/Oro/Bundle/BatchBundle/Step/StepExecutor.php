@@ -150,6 +150,16 @@ class StepExecutor
                         continue;
                     }
 
+                    if (isset($readItem['items']) && count($readItem['items']) > 0) {
+                        $incrementItem = 0;
+                        foreach($readItem['items'] as $item) {
+                            if (empty($item['name'])){
+                                $readItem['items'][$incrementItem]['name'] = "Unknown";
+                            }
+                            $incrementItem++;
+                        }
+                    }
+
                 } catch (InvalidItemException $e) {
                     $this->handleStepExecutionWarning($this->reader, $e, $warningHandler);
 
