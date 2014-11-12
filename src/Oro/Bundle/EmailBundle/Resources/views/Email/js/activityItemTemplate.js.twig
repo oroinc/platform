@@ -49,7 +49,7 @@
                         '</div>';
                     var iframeTemplate = '<iframe sandbox="" class="email-body" src="[[ src ]]"></iframe>';
                     var preTagTemplate = '<pre class="email-body">[[ content ]]</pre>';
-                    %>
+                %>
 
                     <%= _.template(templateEmail,
                         {label: '{{ 'From'|trans|raw }}', value: data['from']},
@@ -75,7 +75,6 @@
                             {interpolate: /\[\[(.+?)\]\]/g})
                         %>
                     <% } %>
-
                 <% } %>
             </div>
         </div>
