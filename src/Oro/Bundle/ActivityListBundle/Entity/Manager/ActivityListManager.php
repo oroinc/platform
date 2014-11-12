@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -34,10 +33,11 @@ class ActivityListManager
     protected $config;
 
     /**
-     * @param Registry       $doctrine
-     * @param SecurityFacade $securityFacade
-     * @param NameFormatter  $nameFormatter
-     * @param Pager          $pager
+     * @param Registry          $doctrine
+     * @param SecurityFacade    $securityFacade
+     * @param NameFormatter     $nameFormatter
+     * @param Pager             $pager
+     * @param UserConfigManager $config
      */
     public function __construct(
         Registry $doctrine,
@@ -79,7 +79,6 @@ class ActivityListManager
         $dateTo,
         $page
     ) {
-        /** @var QueryBuilder $qb */
         $qb = $this->getRepository()->getActivityListQueryBuilder(
             $entityClass,
             $entityId,
@@ -140,8 +139,8 @@ class ActivityListManager
     {
         $result = [
             'id'                   => $entity->getId(),
-            'owner'                => $this->nameFormatter->format($entity->getOwner()),
-            'owner_id'             => $entity->getOwner()->getId(),
+            'owner'                => $entity->getOwner() ? $this->nameFormatter->format($entity->getOwner()) : '',
+            'owner_id'             => $entity->getOwner() ? $entity->getOwner()->getId() : '',
             'owner_route'          => '',
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),

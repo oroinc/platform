@@ -41,6 +41,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     public function getRoutes()
     {
         return [
+            'itemView'   => 'oro_note_widget_info',
             'itemEdit'   => 'oro_note_update',
             'itemDelete' => 'oro_api_delete_note'
         ];
@@ -68,9 +69,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     public function getData($entity)
     {
         /** @var Note $entity */
-        return [
-            'message' => $entity->getMessage()
-        ];
+        return [];
     }
 
     /**

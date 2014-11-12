@@ -66,11 +66,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getData($entity)
     {
         /** @var CalendarEvent $entity */
-        return [
-            'description'  => $entity->getDescription(),
-            'start_date'   => $entity->getStart(),
-            'end_date'     => $entity->getEnd(),
-        ];
+        return [];
     }
 
     /**

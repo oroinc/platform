@@ -45,19 +45,7 @@
                 <a href="#" class="no-hash accordion-toggle"><%= subject %></a>
             </div>
             <div class="message">
-                <% if (data != null) {
-                    var templateNote = '<div class="control-group">' +
-                        '<label class="control-label">[[ label ]]</label>' +
-                        '<div class="controls">' +
-                            '<div class="control-label">[[ value ]]</div>' +
-                            '</div>' +
-                        '</div>';
-                %>
-                    <%= _.template(templateNote,
-                        {label: '{{ 'oro.note.message.label'|trans|raw }}', value: data['message']},
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
-                <% } %>
+                <!-- Do NOT remove. Placeholder for activity view -->
             </div>
         </div>
     </div>

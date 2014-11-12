@@ -37,7 +37,10 @@ class EmailActivityListProvider implements ActivityListProviderInterface
      */
     public function getRoutes()
     {
-        return ['itemDelete' => 'oro_api_delete_email'];
+        return [
+            'itemView'   => 'oro_email_view',
+            'itemDelete' => 'oro_api_delete_email'
+        ];
     }
 
     /**
@@ -63,13 +66,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function getData($entity)
     {
         /** @var Email $entity */
-        return [
-            'from'            => $entity->getFromName(),
-            'sent_at'         => $entity->getSentAt(),
-            'body_content'    => $entity->getEmailBody()->getBodyContent(),
-            'body_id'         => $entity->getEmailBody()->getId(),
-            'is_body_as_text' => $entity->getEmailBody()->getBodyIsText()
-        ];
+        return [];
     }
 
     /**
