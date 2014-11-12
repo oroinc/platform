@@ -10,10 +10,10 @@
                 </span>
                 <span class="visual">
                     <span class="details">
-                        {{ entityName|e('html_attr')|raw }}
+                        {{ entityName|raw }}
                         <% var template = (verb == 'create')
-                            ? {{ 'oro.calendar.calendarevent.added_by'|trans|lower|json_encode|raw }}
-                        : {{ 'oro.calendar.calendarevent.updated_by'|trans|lower|json_encode|raw }};
+                            ? {{ 'oro.calendar.calendarevent.added_by'|trans|json_encode|raw }}
+                            : {{ 'oro.calendar.calendarevent.updated_by'|trans|json_encode|raw }};
                         %>
                         <%= _.template(
                             template,
@@ -47,24 +47,20 @@
             <div class="message">
                 <% if (data != null) {
                     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
-                    var templateCall = '<div class="control-group">' +
+                    var templateCalendarEvent = '<div class="control-group">' +
                         '<label class="control-label">[[ label ]]</label>' +
                         '<div class="controls">' +
                             '<div class="control-label">[[ value ]]</div>' +
                             '</div>' +
                         '</div>';
                     %>
-                    <%= _.template(templateCall,
-                        {label: '{{ 'oro.calendar.calendarevent.title.label'|trans|raw }}', value: data['title']},
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
 
-                    <%= _.template(templateCall,
+                    <%= _.template(templateCalendarEvent,
                         {label: '{{ 'oro.calendar.calendarevent.description.label'|trans|raw }}', value: data['description']},
                         {interpolate: /\[\[(.+?)\]\]/g}
                     ) %>
 
-                    <%= _.template(templateCall,
+                    <%= _.template(templateCalendarEvent,
                         {
                             label: '{{ 'oro.calendar.calendarevent.start.label'|trans|raw }}',
                             value: dateTimeFormatter.formatDateTime(data['start_date'])
@@ -72,7 +68,7 @@
                         {interpolate: /\[\[(.+?)\]\]/g}
                     ) %>
 
-                    <%= _.template(templateCall,
+                    <%= _.template(templateCalendarEvent,
                         {
                             label: '{{ 'oro.calendar.calendarevent.end.label'|trans|raw }}',
                             value: dateTimeFormatter.formatDateTime(data['end_date'])

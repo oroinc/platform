@@ -13,7 +13,7 @@
                         {{ entityName }}
                         <% var template = (verb == 'create')
                             ? {{ 'oro.note.note_added_by'|trans|json_encode|raw }}
-                        : {{ 'oro.note.note_updated_by'|trans|json_encode|raw }};
+                            : {{ 'oro.note.note_updated_by'|trans|json_encode|raw }};
                         %>
                         <%= _.template(
                             template,
