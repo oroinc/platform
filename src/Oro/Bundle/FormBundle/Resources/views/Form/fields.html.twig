@@ -684,3 +684,17 @@
         </a>
     {% endif %}
 {% endblock %}
+
+{% block oro_simple_color_picker_widget %}
+    {{ form_widget(form) }}
+    {{ form_javascript(form) }}
+{% endblock %}
+
+{% block oro_simple_color_picker_javascript %}
+    <script type="text/javascript">
+        require(['jquery', 'jquery.simplecolorpicker'],
+        function ($) {
+            $('#{{ id }}').simplecolorpicker($.extend({theme: 'fontawesome'}, {{ configs|json_encode|raw }}));
+        });
+    </script>
+{% endblock %}

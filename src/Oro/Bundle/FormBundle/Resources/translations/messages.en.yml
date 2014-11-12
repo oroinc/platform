@@ -7,3 +7,17 @@ Choose: Choose
 Cancel: Cancel
 oro.form.tooltip.read_more: Read more
 "Please select": "Please select"
+oro:
+  form:
+    color:
+        bold_blue:      Bold blue
+        blue:           Blue
+        turquoise:      Turquoise
+        green:          Green
+        bold_green:     Bold green
+        yellow:         Yellow
+        orange:         Orange
+        red:            Red
+        bold_red:       Bold red
+        purple:         Purple
+        gray:           Gray
