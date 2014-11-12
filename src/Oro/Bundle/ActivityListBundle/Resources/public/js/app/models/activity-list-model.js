@@ -23,7 +23,9 @@ define([
             createdAt: '',
             updatedAt: '',
 
-            hasUpdate: false,
+            is_loaded: false,
+            contentHTML: '',
+
             editable: true,
             removable: true
         }
