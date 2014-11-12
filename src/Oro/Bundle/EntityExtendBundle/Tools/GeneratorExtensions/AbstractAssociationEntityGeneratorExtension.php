@@ -116,6 +116,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $getMethodName     = sprintf('get%sTarget', $prefix);
         $setMethodName     = sprintf('set%sTarget', $prefix);
         $resetMethodName   = sprintf('reset%sTargets', $prefix);
+        $getAssociationsName = sprintf('get%sTargetEntities', $prefix);
 
         $supportMethodBody = [
             '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
@@ -127,6 +128,9 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             '// This entity can be associated with only one another entity',
         ];
         $resetMethodBody   = [];
+        $getAssociationsMethodBody = [
+            '$associationEntities = [];',
+        ];
 
         foreach ($schema['relationData'] as $relationData) {
             if (!$this->isSupportedRelation($relationData)) {
@@ -157,12 +161,21 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                 '$this->%s = null;',
                 $fieldName
             );
+            $getAssociationsMethodBody[] = str_replace(
+                ['{field}'],
+                [$fieldName],
+                "\$entity = \$this->{field};\n"
+                . "if (\$entity) {\n"
+                . "    \$associationEntities[] = \$entity;\n"
+                . "}"
+            );
         }
 
         $supportMethodBody[] = 'return false;';
         $getMethodBody[]     = 'return null;';
         $setMethodBody[]     = 'throw new \RuntimeException(sprintf('
             . '\'The association with "%s" entity was not configured.\', $className));';
+        $getAssociationsMethodBody[] = "return \$associationEntities;";
 
         $supportMethodDocblock = "/**\n"
             . " * Checks if this entity can be associated with the given target entity type\n"
@@ -180,6 +193,11 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             . " *\n"
             . " * @param object \$target Any configurable entity that can be associated with this type of entity\n"
             . " * @return object This object\n"
+            . " */";
+        $getAssociationsMethodDocblock = "/**\n"
+            . " * Returns array with all associated entities\n"
+            . " *\n"
+            . " * @return array\n"
             . " */";
 
         $class
@@ -202,6 +220,11 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
                 $this
                     ->generateClassMethod($setMethodName, implode("\n", $setMethodBody), ['target'])
                     ->setDocblock($setMethodDocblock)
+            )
+            ->setMethod(
+                $this
+                    ->generateClassMethod($getAssociationsName, implode("\n", $getAssociationsMethodBody))
+                    ->setDocblock($getAssociationsMethodDocblock)
             );
     }
 

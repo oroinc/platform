@@ -4,13 +4,17 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 class ActivityListChainProvider
 {
@@ -145,8 +149,19 @@ class ActivityListChainProvider
             $list = new ActivityList();
         }
 
-        $list->setOwner($entity->getOwner());
-        $list->setOrganization($entity->getOrganization());
+        /** @var ConfigProvider $configProvider */
+        $configProvider = $this->configManager->getProvider('ownership');
+        $accessor       = PropertyAccess::createPropertyAccessor();
+        $className      = $this->doctrineHelper->getEntityClass($entity);
+
+        if ($configProvider->hasConfig($className)) {
+            $config = $configProvider->getConfig($className);
+            if ($config->get('owner_type') == OwnershipType::OWNER_TYPE_USER) {
+                $list->setOrganization($accessor->getValue($entity, $config->get('organization_field_name')));
+                $list->setOwner($accessor->getValue($entity, $config->get('owner_field_name')));
+            }
+        }
+
         $list->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
         $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
         $list->setSubject($provider->getSubject($entity));

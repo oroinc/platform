@@ -100,11 +100,13 @@ oro:
         recipients.label:         Recipients
         send_email:               Send email
         sent_at.label:            Sent at
+        sent_by.label:            sent by {{ user }} on {{ date }}
         subject.label:            Subject
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
         template.label:           Template
         type.label:               Type
+        delete_email:             Delete {{ entity }}
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately we could not load the email body from the server. It is possible that it has been deleted.
