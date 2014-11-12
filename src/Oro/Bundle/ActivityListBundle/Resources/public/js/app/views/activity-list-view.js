@@ -56,7 +56,7 @@ define(function (require) {
             this.template = _.template($(this.options.template).html());
 
             // create communication in scope of active controller
-            //mediator.on(this.options.itemAddEvent, this._addItem, this);
+            mediator.on(this.options.itemAddEvent, this._addItem, this);
 
             ActivityListView.__super__.initialize.call(this, options);
         },
@@ -69,7 +69,6 @@ define(function (require) {
                 return;
             }
             delete this.itemEditDialog;
-            delete this.itemViewDialog;
             delete this.$loadingMaskContainer;
             ActivityListView.__super__.dispose.call(this);
         },
@@ -139,23 +138,32 @@ define(function (require) {
             alert('more');
         },
 
-        _viewItem: function (model) {
-            this.itemViewDialog = new DialogWidget({
-                'url': this._getUrl('itemView', model),
-                'title': model.get('subject'),
-                'regionEnabled': false,
-                'incrementalPosition': false,
-                'dialogOptions': {
-                    'modal': true,
-                    'resizable': false,
-                    'width': 675,
-                    'autoResize': true,
-                    'close': _.bind(function () {
-                        delete this.itemEditDialog;
-                    }, this)
-                }
-            });
-            this.itemViewDialog.render();
+        _viewItem: function (model, modelView) {
+            var that = this,
+                currentModel = model,
+                currentModelView = modelView,
+                options = {
+                    url: this._getUrl('itemView', model),
+                    type: 'get',
+                    dataType: 'html',
+                    data: {
+                        _widgetContainer: 'block'
+                    }
+                };
+
+            if (currentModel.get('is_loaded') !== true) {
+                this._showLoading();
+                Backbone.$.ajax(options)
+                    .done(function (response) {
+                        currentModel.set('is_loaded', true);
+                        currentModel.set('contentHTML', jQuery(response).find('.control-group'));
+                        that._hideLoading();
+                        currentModelView.toggle();
+                    })
+                    .fail(_.bind(this._showLoadItemsError, this));
+            } else {
+                currentModelView.toggle();
+            }
         },
 
         _editItem: function (model) {

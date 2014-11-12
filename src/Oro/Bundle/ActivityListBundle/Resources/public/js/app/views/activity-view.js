@@ -11,6 +11,7 @@ define([
 
     var ActivityView;
     ActivityView = BaseView.extend({
+        //collapsed: true,
         options: {
             configuration: {},
             template: null,
@@ -24,7 +25,6 @@ define([
             'class': 'list-item'
         },
         events: {
-            'click .item-view-button': 'onView',
             'click .item-edit-button': 'onEdit',
             'click .item-remove-button': 'onDelete',
             'click .accordion-toggle': 'onToggle'
@@ -39,8 +39,8 @@ define([
             if (this.options.template) {
                 this.template = _.template($(this.options.template).html());
             }
-            if (this.model.attributes.relatedActivityClass) {
-                var templateName = '#template-activity-item-' + this.model.attributes.relatedActivityClass;
+            if (this.model.get('relatedActivityClass')) {
+                var templateName = '#template-activity-item-' + this.model.get('relatedActivityClass');
                 templateName = templateName.replace(/\\/g, '_');
                 this.template = _.template($(templateName).html());
             }
@@ -58,10 +58,6 @@ define([
             return data;
         },
 
-        onView: function () {
-            this.model.collection.trigger('toView', this.model);
-        },
-
         onEdit: function () {
             this.model.collection.trigger('toEdit', this.model);
         },
@@ -72,7 +68,7 @@ define([
 
         onToggle: function (e) {
             e.preventDefault();
-            this.toggle();
+            this.model.collection.trigger('toView', this.model, this);
         },
 
         /**
@@ -86,6 +82,7 @@ define([
             }
             this.$('.accordion-toggle').toggleClass('collapsed', collapse);
             this.$('.collapse').toggleClass('in', !collapse);
+            this.$('.accordion-body .message').empty().html(this.model.get('contentHTML'));
         },
 
         isCollapsed: function () {
