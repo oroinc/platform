@@ -86,7 +86,7 @@
 
         var $colorSpan = $('<span class="color"'
                          + title
-                         + ' style="background-color: ' + color + ';"'
+                         + ' style="background-color: ' + (!color && self.options.emptyColor ? self.options.emptyColor : color) + ';"'
                          + ' data-color="' + color + '"'
                          + selected
                          + disabled
@@ -229,7 +229,10 @@
     picker: false,
 
     // Animation delay in milliseconds
-    pickerDelay: 0
+    pickerDelay: 0,
+
+    // A color for empty option
+    emptyColor: null
   };
 
 })(jQuery);

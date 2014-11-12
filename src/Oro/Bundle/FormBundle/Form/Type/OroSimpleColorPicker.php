@@ -64,32 +64,29 @@ class OroSimpleColorPicker extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $defaultConfigs = array(
-            'is_translated_option' => false
-        );
-
         $resolver
             ->setDefaults(
                 [
                     'choices'      => function (Options $options) {
                         return $this->getChoices($options['color_schema']);
                     },
+                    'translatable' => false,
+                    'empty_color'  => null,
                     'color_schema' => 'short', // short, long, custom/null
                     'picker'       => false,
-                    'picker_delay' => 0,
-                    'configs'      => $defaultConfigs
+                    'picker_delay' => 0
                 ]
             )
             ->setNormalizers(
                 [
-                    'configs' => function (Options $options, $configs) use ($defaultConfigs) {
+                    'translatable' => function (Options $options, $translatable) {
                         if (isset(static::$colorSchema[$options['color_schema']])
-                            && !static::$colorSchema[$options['color_schema']]['translatable']
+                            && static::$colorSchema[$options['color_schema']]['translatable']
                         ) {
-                            $defaultConfigs['is_translated_option'] = true;
+                            $translatable = true;
                         }
 
-                        return array_merge($defaultConfigs, $configs);
+                        return $translatable;
                     }
                 ]
             );
@@ -100,7 +97,9 @@ class OroSimpleColorPicker extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['configs'] = $options['picker']
+        $view->vars['translatable'] = $options['translatable'];
+        $view->vars['empty_color']  = $options['empty_color'];
+        $view->vars['configs']      = $options['picker']
             ? ['picker' => true, 'pickerDelay' => $options['picker_delay']]
             : [];
     }

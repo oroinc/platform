@@ -686,15 +686,28 @@
 {% endblock %}
 
 {% block oro_simple_color_picker_widget %}
-    {{ form_widget(form) }}
-    {{ form_javascript(form) }}
+    {% if required and empty_value is none and not empty_value_in_choices and not multiple -%}
+        {% set required = false %}
+    {%- endif -%}
+    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'no-uniform' }) %}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}
+        data-page-component-module="oroform/js/app/components/simple-color-picker"
+        data-page-component-options="{{ configs|merge({el: '#' ~id, theme: 'fontawesome', emptyColor: empty_color})|json_encode }}">
+        {% if empty_color is not none -%}
+            <option value=""{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
+            <optgroup label="---"></optgroup>
+        {%- endif %}
+        {% set options = choices -%}
+        {{- block('oro_simple_color_picker_widget_options') -}}
+    </select>
 {% endblock %}
 
-{% block oro_simple_color_picker_javascript %}
-    <script type="text/javascript">
-        require(['jquery', 'jquery.simplecolorpicker'],
-        function ($) {
-            $('#{{ id }}').simplecolorpicker($.extend({theme: 'fontawesome'}, {{ configs|json_encode|raw }}));
-        });
-    </script>
-{% endblock %}
+{% block oro_simple_color_picker_widget_options %}
+    {% for group_label, choice in options %}
+        {%- if choice is iterable -%}
+            <optgroup label="{{ group_label }}"></optgroup>
+        {%- else -%}
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ translatable ? choice.label|trans({}, translation_domain) : choice.label }}</option>
+        {%- endif -%}
+    {% endfor %}
+{% endblock oro_simple_color_picker_widget_options %}

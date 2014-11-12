@@ -35,3 +35,5 @@ config:
         'oroform/js/select-create-inline-type-handler': 'bundles/oroform/js/select-create-inline-type-handler.js'
 
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
+
+        'oroform/js/app/components/simple-color-picker': 'bundles/oroform/js/app/components/simple-color-picker.js'
