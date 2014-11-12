@@ -217,7 +217,7 @@ define(function (require) {
          */
         _initSectionActions: function() {
             var widget = this,
-                sections = this.widget.find('                                                                               [data-section]');
+                sections = this.widget.find('[data-section]');
             sections.each(function (i, sectionEl) {
                 var $sectionEl = $(sectionEl),
                     sectionName = $sectionEl.attr('data-section'),
