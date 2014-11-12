@@ -19,7 +19,7 @@ define(function (require) {
             configuration: {},
             template: null,
             itemTemplate: null,
-            itemAddEvent: 'activity:add',
+            itemAddEvent: 'activity:added',
             itemViewIdPrefix: 'activity-',
             listSelector: '.items.list-box',
             fallbackSelector: '.no-data',
@@ -148,17 +148,20 @@ define(function (require) {
                     type: 'get',
                     dataType: 'html',
                     data: {
-                        _widgetContainer: 'block'
+                        _widgetContainer: 'dialog'
                     }
                 };
 
             if (currentModel.get('is_loaded') !== true) {
                 this._showLoading();
                 Backbone.$.ajax(options)
-                    .done(function (response) {
+                    .done(function (data) {
+                        var response = jQuery('<html />').html(data);
                         currentModel.set('is_loaded', true);
-                        currentModel.set('contentHTML', jQuery(response).find('.control-group'));
+                        currentModel.set('contentHTML', jQuery(response).find('.widget-content').html());
+
                         that._hideLoading();
+
                         currentModelView.toggle();
                     })
                     .fail(_.bind(this._showLoadItemsError, this));

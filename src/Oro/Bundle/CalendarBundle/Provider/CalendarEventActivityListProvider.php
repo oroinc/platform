@@ -17,7 +17,6 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-
     /**
      * @param DoctrineHelper $doctrineHelper
      */

@@ -38,44 +38,7 @@
                 <a href="#" class="no-hash accordion-toggle"><%= subject %></a>
             </div>
             <div class="message">
-                <% if (data != null) {
-                    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
-                    var routing = require('routing');
-                    var templateEmail = '<div class="control-group">' +
-                        '<label class="control-label">[[ label ]]</label>' +
-                        '<div class="controls">' +
-                            '<div class="control-label">[[ value ]]</div>' +
-                            '</div>' +
-                        '</div>';
-                    var iframeTemplate = '<iframe sandbox="" class="email-body" src="[[ src ]]"></iframe>';
-                    var preTagTemplate = '<pre class="email-body">[[ content ]]</pre>';
-                %>
-
-                    <%= _.template(templateEmail,
-                        {label: '{{ 'From'|trans|raw }}', value: data['from']},
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
-
-                    <%= _.template(templateEmail,
-                    {
-                        label: '{{ 'oro.email.sent_at.label'|trans|raw }}',
-                        value: dateTimeFormatter.formatDateTime(data['sent_at'])
-                    },
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
-
-                    <% if (data['is_body_as_text'] == 1) { %>
-                        <%= _.template(preTagTemplate,
-                            {content: data['body_content']},
-                            {interpolate: /\[\[(.+?)\]\]/g})
-                        %>
-                    <% } else { %>
-                        <%= _.template(iframeTemplate,
-                            {src: routing.generate('oro_email_body', {'id': data['body_id']})},
-                            {interpolate: /\[\[(.+?)\]\]/g})
-                        %>
-                    <% } %>
-                <% } %>
+                <!-- Do NOT remove. Placeholder for activity view -->
             </div>
         </div>
     </div>

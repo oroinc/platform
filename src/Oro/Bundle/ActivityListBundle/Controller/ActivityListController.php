@@ -43,7 +43,7 @@ class ActivityListController extends Controller
         return [
             'entity'                  => $entity,
             'configuration'           => $activitiesProvider->getActivityListOption(),
-            'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
+            //'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
         ];
     }
 

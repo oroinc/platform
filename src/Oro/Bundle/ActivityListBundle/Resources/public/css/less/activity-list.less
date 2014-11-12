@@ -1,6 +1,6 @@
 @import "../../../oroui/css/less/mixins";
 .activity-list-widget {
-  border: 1px solid #ddd;
+  //border: 1px solid #ddd;
   position: relative;
   .actions-bottom{
     border-top: 1px solid #ddd;
@@ -30,7 +30,6 @@
           font-size: smaller;
         }
         .title-item {
-          //float: left;
           white-space: nowrap;
           .icon {
             display: inline-block;
@@ -58,7 +57,6 @@
       padding: 0;
       margin: 0;
       .accordion-group {
-        //overflow: hidden;
         border: 0;
         margin: 0;
         .accordion-heading {
@@ -75,9 +73,6 @@
             }
             .accordion-toggle.collapsed:before {
               content: '';
-            }
-            .control-group{
-              max-width: none;
             }
           }
           .accordion-toggle {
@@ -105,7 +100,13 @@
         .accordion-body {
           .message, .subject {
             display: none;
-            overflow-x: auto;
+          }
+          .message .responsive-block{
+            width: auto;
+            float: none;
+          }
+          .control-group{
+            max-width: none;
           }
         }
         .accordion-body.in {

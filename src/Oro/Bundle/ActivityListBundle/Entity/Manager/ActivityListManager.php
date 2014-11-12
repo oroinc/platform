@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
@@ -38,10 +37,11 @@ class ActivityListManager
     protected $chainProvider;
 
     /**
-     * @param Registry       $doctrine
-     * @param SecurityFacade $securityFacade
-     * @param NameFormatter  $nameFormatter
-     * @param Pager          $pager
+     * @param Registry          $doctrine
+     * @param SecurityFacade    $securityFacade
+     * @param NameFormatter     $nameFormatter
+     * @param Pager             $pager
+     * @param UserConfigManager $config
      */
     public function __construct(
         Registry $doctrine,
@@ -85,7 +85,6 @@ class ActivityListManager
         $dateTo,
         $page
     ) {
-        /** @var QueryBuilder $qb */
         $qb = $this->getRepository()->getActivityListQueryBuilder(
             $entityClass,
             $entityId,
