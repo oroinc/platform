@@ -54,7 +54,7 @@ class ActivityListListener
         $this->collectUpdates($unitOfWork);
         $this->collectDeletedEntities($unitOfWork->getScheduledEntityDeletions());
 
-        if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $entityManager)) {
+        if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $this->insertedEntities, $entityManager)) {
             $this->updatedEntities = [];
         }
     }

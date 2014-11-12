@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
@@ -33,6 +34,9 @@ class ActivityListManager
     /** @var UserConfigManager */
     protected $config;
 
+    /** @var ActivityListChainProvider */
+    protected $chainProvider;
+
     /**
      * @param Registry       $doctrine
      * @param SecurityFacade $securityFacade
@@ -44,13 +48,15 @@ class ActivityListManager
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config
+        UserConfigManager $config,
+        ActivityListChainProvider $provider
     ) {
         $this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
         $this->nameFormatter  = $nameFormatter;
         $this->pager          = $pager;
         $this->config         = $config;
+        $this->chainProvider  = $provider;
     }
 
     /**
@@ -138,14 +144,18 @@ class ActivityListManager
      */
     public function getEntityViewModel(ActivityList $entity)
     {
+        $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
         $result = [
             'id'                   => $entity->getId(),
-            'owner'                => $this->nameFormatter->format($entity->getOwner()),
-            'owner_id'             => $entity->getOwner()->getId(),
+            'owner'                => $entity->getOwner() ? $this->nameFormatter->format($entity->getOwner()) : '',
+            'owner_id'             => $entity->getOwner() ? $entity->getOwner()->getId() : '',
             'owner_route'          => '',
+            'editor'               => $entity->getEditor() ? $this->nameFormatter->format($entity->getEditor()) : '',
+            'editor_id'            => $entity->getEditor() ? $entity->getEditor()->getId() : '',
+            'editor_route'         => '',
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
-            'data'                 => $entity->getData(),
+            'data'                 => $entityProvider->getDataForView($entity),
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),

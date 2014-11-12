@@ -31,6 +31,7 @@ class OroActivityListBundle implements Migration
         $table = $schema->createTable('oro_activity_list');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('user_editor_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('verb', 'string', ['length' => 32]);
         $table->addColumn('subject', 'string', ['length' => 255]);
@@ -43,6 +44,7 @@ class OroActivityListBundle implements Migration
         $table->addIndex(['organization_id'], 'IDX_B1F9F0132C8A3DE', []);
         $table->addIndex(['updated_at'], 'oro_activity_list_updated_idx', []);
         $table->addIndex(['user_owner_id'], 'IDX_B1F9F019EB185F9', []);
+        $table->addIndex(['user_editor_id'], 'IDX_B1F9F01697521A8', []);
     }
 
     /**
@@ -56,6 +58,12 @@ class OroActivityListBundle implements Migration
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
             ['user_owner_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_editor_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );

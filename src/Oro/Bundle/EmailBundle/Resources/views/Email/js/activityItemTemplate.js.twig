@@ -15,7 +15,7 @@
                         <%= _.template(
                             template,
                             {
-                                user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
+                                user: '<a class="user" href="' + data.owner_route + '">' +  _.escape(data.owner_name) + '</a>',
                                 date: '<i class="date">' + updatedAt + '</i>'
                             },
                             { interpolate: /\{\{(.+?)\}\}/g }

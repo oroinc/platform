@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -14,6 +16,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
 
     /**
      * @param DoctrineHelper $doctrineHelper
@@ -38,6 +41,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getRoutes()
     {
         return [
+            'itemView'   => 'oro_calendar_event_view',
             'itemEdit'   => 'oro_calendar_event_update',
             'itemDelete' => 'oro_api_delete_calendar_event'
         ];
@@ -63,14 +67,29 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getData($entity)
+    public function setData(ActivityList $activityList, $activityEntity)
     {
-        /** @var CalendarEvent $entity */
-        return [
-            'description'  => $entity->getDescription(),
-            'start_date'   => $entity->getStart(),
-            'end_date'     => $entity->getEnd(),
-        ];
+        /** @var CalendarEvent $activityEntity */
+        if ($activityList->getVerb() === CollectListManager::STATE_CREATE) {
+            $activityList->setOwner($activityEntity->getCalendar()->getOwner());
+        } else {
+            $activityList->setEditor($activityEntity->getCalendar()->getOwner());
+        }
+        $activityList->setData(
+            [
+                'description'  => $activityEntity->getDescription(),
+                'start_date'   => $activityEntity->getStart(),
+                'end_date'     => $activityEntity->getEnd(),
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataForView(ActivityList $activityEntity)
+    {
+        return $activityEntity->getData();
     }
 
     /**

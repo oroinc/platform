@@ -29,6 +29,7 @@ class PlaceholderFilter
             $className,
             [
                 'OroCRM\Bundle\ContactBundle\Entity\Contact',
+              //  'Oro\Bundle\UserBundle\Entity\User',
             ]
         );
     }

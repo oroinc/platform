@@ -149,24 +149,9 @@ class ActivityListChainProvider
             $list = new ActivityList();
         }
 
-        /** @var ConfigProvider $configProvider */
-        $configProvider = $this->configManager->getProvider('ownership');
-        $accessor       = PropertyAccess::createPropertyAccessor();
-        $className      = $this->doctrineHelper->getEntityClass($entity);
-
-        if ($configProvider->hasConfig($className)) {
-            $config = $configProvider->getConfig($className);
-            if ($config->get('owner_type') == OwnershipType::OWNER_TYPE_USER) {
-                $list->setOrganization($accessor->getValue($entity, $config->get('organization_field_name')));
-                $list->setOwner($accessor->getValue($entity, $config->get('owner_field_name')));
-            }
-        }
-
-        $list->setRelatedActivityClass($this->doctrineHelper->getEntityClass($entity));
-        $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
         $list->setSubject($provider->getSubject($entity));
         $list->setVerb($state);
-        $list->setData($provider->getData($entity));
+        $provider->setData($list, $entity);
 
         $targets = $provider->getTargetEntities($entity);
         if ($state === ActivityListManager::STATE_UPDATE) {
@@ -174,13 +159,28 @@ class ActivityListChainProvider
             foreach ($activityListTargets as $target) {
                 $list->removeActivityListTarget($target);
             }
+        } else {
+            $className = $this->doctrineHelper->getEntityClass($entity);
+            $list->setRelatedActivityClass($className);
+            $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
+
+            /** @var ConfigProvider $configProvider */
+            $configProvider = $this->configManager->getProvider('ownership');
+            $accessor       = PropertyAccess::createPropertyAccessor();
+
+            if ($configProvider->hasConfig($className)) {
+                $config = $configProvider->getConfig($className);
+                if ($config->get('owner_type') !== OwnershipType::OWNER_TYPE_ORGANIZATION) {
+                    $list->setOrganization($accessor->getValue($entity, $config->get('organization_field_name')));
+                } else {
+                    $list->setOrganization($accessor->getValue($entity, $config->get('owner_field_name')));
+                }
+            }
         }
 
-        if (!empty($targets)) {
-            foreach ($targets as $target) {
-                if ($list->supportActivityListTarget(get_class($target))) {
-                    $list->addActivityListTarget($target);
-                }
+        foreach ($targets as $target) {
+            if ($list->supportActivityListTarget(get_class($target))) {
+                $list->addActivityListTarget($target);
             }
         }
 
@@ -227,12 +227,12 @@ class ActivityListChainProvider
     /**
      * Get activity list provider for given activity entity
      *
-     * @param $entity
+     * @param $activityEntity
      *
      * @return ActivityListProviderInterface
      */
-    protected function getProviderForEntity($entity)
+    public function getProviderForEntity($activityEntity)
     {
-        return $this->providers[$this->doctrineHelper->getEntityClass($entity)];
+        return $this->providers[$this->doctrineHelper->getEntityClass($activityEntity)];
     }
 }

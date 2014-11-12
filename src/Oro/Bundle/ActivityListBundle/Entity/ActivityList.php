@@ -58,6 +58,14 @@ class ActivityList extends ExtendActivityList
     protected $owner;
 
     /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $editor;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="verb", type="string", length=32)
@@ -267,6 +275,28 @@ class ActivityList extends ExtendActivityList
     {
         return $this->relatedActivityClass;
     }
+
+    /**
+     * @param User $editor
+     *
+     * @return self
+     */
+    public function setEditor(User $editor)
+    {
+        $this->editor = $editor;
+
+        return $this;
+    }
+
+
+    /**
+     * @return User
+     */
+    public function getEditor()
+    {
+        return $this->editor;
+    }
+
 
     /**
      * @param $relatedActivityClass
