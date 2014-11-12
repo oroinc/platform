@@ -330,7 +330,7 @@ As example you can create Event Listener. Example:
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
 
-In method `beforeValueRender` we have access to current entity, current `FieldConfigId`, rendering field value and value, which will be used to field render in page view. Each event listener try to made decision how we need to show field value and if it know how value need to be shown, he use `$event->setFieldViewValue($viewData);` to change field view value. Example:
+Each event listener try to made decision how we need to show field value and if it know how value need to be shown, he use `$event->setFieldViewValue($viewData);` to change field view value. Example:
 
 	$underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
         if ($value && $underlyingFieldType == 'manyToOne') {
