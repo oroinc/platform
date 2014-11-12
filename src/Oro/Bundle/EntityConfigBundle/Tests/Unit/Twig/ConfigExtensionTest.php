@@ -3,7 +3,10 @@
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
 
 class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
@@ -36,7 +39,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(2, $functions);
+        $this->assertCount(3, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $function = $functions[0];
@@ -49,6 +52,12 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_entity_config_value', $function->getName());
         $this->assertEquals(array($this->twigExtension, 'getClassConfigValue'), $function->getCallable());
+
+        /** @var \Twig_SimpleFunction $function */
+        $function = $functions[2];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_entity_route', $function->getName());
+        $this->assertEquals(array($this->twigExtension, 'getClassRoute'), $function->getCallable());
     }
 
     public function testGetName()
@@ -180,6 +189,65 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         // test undefined attribute
         $this->assertNull(
             $this->twigExtension->getClassConfigValue($className, 'undefined')
+        );
+    }
+
+    public function testGetClassRoute()
+    {
+        $classNameWithRouteData = 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\EntityForAnnotationTests';
+        $classNameWithoutRouteData = 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity';
+
+        $this->configManager->expects($this->any())
+            ->method('getEntityMetadata')
+            ->with($this->logicalOr(
+                $this->equalTo($classNameWithRouteData),
+                $this->equalTo($classNameWithoutRouteData)
+            ))
+            ->will(
+                $this->returnCallback(
+                    function($className) use ($classNameWithRouteData, $classNameWithoutRouteData)
+                    {
+                        $metadata = new EntityMetadata($className);
+                        switch ($className) {
+                            case $classNameWithRouteData:
+                                $metadata->routeView = 'test_route_view';
+                                $metadata->routeName = 'test_route_name';
+                                break;
+                        }
+                        return $metadata;
+                    }
+                )
+            );
+
+        $this->assertNull(
+            $this->twigExtension->getClassRoute($classNameWithRouteData, 'undefined')
+        );
+        $this->assertEquals(
+            'test_route_view',
+            $this->twigExtension->getClassRoute($classNameWithRouteData)
+        );
+        $this->assertEquals(
+            'test_route_view',
+            $this->twigExtension->getClassRoute($classNameWithRouteData, 'view')
+        );
+        $this->assertEquals(
+            'test_route_name',
+            $this->twigExtension->getClassRoute($classNameWithRouteData, 'name')
+        );
+
+        $this->assertNull(
+            $this->twigExtension->getClassRoute($classNameWithoutRouteData, 'undefined')
+        );
+        $this->assertEquals(
+            'oro_demoentity_view',
+            $this->twigExtension->getClassRoute($classNameWithoutRouteData)
+        );
+        $this->assertEquals(
+            'oro_demoentity_view',
+            $this->twigExtension->getClassRoute($classNameWithoutRouteData, 'view')
+        );
+        $this->assertNull(
+            $this->twigExtension->getClassRoute($classNameWithoutRouteData, 'name')
         );
     }
 }
