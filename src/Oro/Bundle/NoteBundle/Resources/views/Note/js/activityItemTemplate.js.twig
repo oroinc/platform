@@ -46,14 +46,14 @@
             </div>
             <div class="message">
                 <% if (data != null) {
-                    var templateCall = '<div class="control-group">' +
+                    var templateNote = '<div class="control-group">' +
                         '<label class="control-label">[[ label ]]</label>' +
                         '<div class="controls">' +
                             '<div class="control-label">[[ value ]]</div>' +
                             '</div>' +
                         '</div>';
-                    %>
-                    <%= _.template(templateCall,
+                %>
+                    <%= _.template(templateNote,
                         {label: '{{ 'oro.note.message.label'|trans|raw }}', value: data['message']},
                         {interpolate: /\[\[(.+?)\]\]/g}
                     ) %>
