@@ -45,7 +45,6 @@ class AssignConstantValue extends AbstractAction
             );
         }
 
-
         $this->contextAccessor->setValue(
             $context,
             $this->attribute,
