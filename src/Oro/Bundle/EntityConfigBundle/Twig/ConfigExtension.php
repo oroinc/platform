@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Twig;
 
-use Metadata\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
@@ -18,8 +17,9 @@ class ConfigExtension extends \Twig_Extension
     /**
      * @param ConfigManager $configManager
      */
-    public function __construct(ConfigManager $configManager) {
-        $this->configManager    = $configManager;
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
     }
 
     /**
@@ -93,21 +93,23 @@ class ConfigExtension extends \Twig_Extension
             return $metadata->{$property};
         }
 
-        if ($routeType == 'view') {
-            return $this->getDefaultRouteView($entityClass);
-        }
-
-        return null;
+        return $this->getDefaultClassRoute($entityClass, $routeType);
     }
 
     /**
      * @param $className
+     * @param $routeType
      *
      * @return string
      */
-    protected function getDefaultRouteView($className)
+    protected function getDefaultClassRoute($className, $routeType)
     {
+        static $routeMap = [
+            'view' => 'view',
+            'name' => 'index',
+        ];
+        $postfix = $routeMap[$routeType];
         $parts = explode('\\', $className);
-        return strtolower($parts[0]) . '_' . strtolower($parts[count($parts) - 1]) . '_view';
+        return strtolower($parts[0]) . '_' . strtolower($parts[count($parts) - 1]) . '_' . $postfix;
     }
 }
