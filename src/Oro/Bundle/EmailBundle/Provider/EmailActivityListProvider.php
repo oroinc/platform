@@ -66,7 +66,6 @@ class EmailActivityListProvider implements ActivityListProviderInterface
         return [
             'from'            => $entity->getFromName(),
             'sent_at'         => $entity->getSentAt(),
-            'subject'         => $entity->getSubject(),
             'body_content'    => $entity->getEmailBody()->getBodyContent(),
             'body_id'         => $entity->getEmailBody()->getId(),
             'is_body_as_text' => $entity->getEmailBody()->getBodyIsText()

@@ -11,8 +11,7 @@
                 <span class="visual">
                     <span class="details">
                         {{ entityName }}
-                        <% var template = {{ 'oro.email.sent_by.label'|trans|json_encode|raw }};
-                        %>
+                        <% var template = {{ 'oro.email.sent_by.label'|trans|json_encode|raw }}; %>
                         <%= _.template(
                             template,
                             {
@@ -41,13 +40,14 @@
             <div class="message">
                 <% if (data != null) {
                     var dateTimeFormatter = require('orolocale/js/formatter/datetime');
+                    var routing = require('routing');
                     var templateEmail = '<div class="control-group">' +
                         '<label class="control-label">[[ label ]]</label>' +
                         '<div class="controls">' +
                             '<div class="control-label">[[ value ]]</div>' +
                             '</div>' +
                         '</div>';
-                    var iframeTemplate = '<iframe sandbox="" class="email-body" src="[[ path ]]/[[ id ]]"></iframe>';
+                    var iframeTemplate = '<iframe sandbox="" class="email-body" src="[[ src ]]"></iframe>';
                     var preTagTemplate = '<pre class="email-body">[[ content ]]</pre>';
                     %>
 
@@ -64,11 +64,6 @@
                         {interpolate: /\[\[(.+?)\]\]/g}
                     ) %>
 
-                    <%= _.template(templateEmail,
-                        {label: '{{ 'Subject'|trans|raw }}', value: data['subject']},
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
-
                     <% if (data['is_body_as_text'] == 1) { %>
                         <%= _.template(preTagTemplate,
                             {content: data['body_content']},
@@ -76,7 +71,7 @@
                         %>
                     <% } else { %>
                         <%= _.template(iframeTemplate,
-                            {path: '/email/body', id: data['body_id']},
+                            {src: routing.generate('oro_email_body', {'id': data['body_id']})},
                             {interpolate: /\[\[(.+?)\]\]/g})
                         %>
                     <% } %>
