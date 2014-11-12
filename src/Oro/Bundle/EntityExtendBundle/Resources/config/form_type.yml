@@ -240,7 +240,23 @@ services:
             - @oro_entity_config.provider.extend
             - @oro_entity_config.provider.enum
         calls:
+            - [addExtendTypeMapping, ["string", "text"]]
+            - [addExtendTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addExtendTypeMapping, ["smallint", "integer", { precision: 0 }]]
+            - [addExtendTypeMapping, ["bigint", "integer", { precision: 0 }]]
+            - [addExtendTypeMapping, ["decimal", "number"]]
+            - [addExtendTypeMapping, ["date", "oro_date"]]
+            - [addExtendTypeMapping, ["time", "time", { model_timezone: "UTC", view_timezone: "UTC" }]]
+            - [addExtendTypeMapping, ["datetime", "oro_datetime"]]
+            - [addExtendTypeMapping, ["datetimetz", "oro_datetime"]]
+            - [addExtendTypeMapping, ["text", "textarea"]]
+            - [addExtendTypeMapping, ["float", "number"]]
+            - [addExtendTypeMapping, ["guid", "text"]]
+            # custom types
+            - [addExtendTypeMapping, ["percent", "oro_percent"]]
+            - [addExtendTypeMapping, ["money", "oro_money"]]
             - [addExtendTypeMapping, ["boolean", "choice"]] # extended boolean fields should be choice type
+
             - [addExtendTypeMapping, ["file", "oro_file"]]
             - [addExtendTypeMapping, ["image", "oro_image"]]
             - [addExtendTypeMapping, ["manyToOne", "oro_entity_select"]]
