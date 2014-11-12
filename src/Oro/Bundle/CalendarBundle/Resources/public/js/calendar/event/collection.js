@@ -20,7 +20,7 @@ define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
         calendar: null,
 
         /**
-         * Determine whether events from connected calendars should be included or not
+         * Determines whether events from connected calendars should be included or not
          * @property {bool}
          */
         subordinate: false,

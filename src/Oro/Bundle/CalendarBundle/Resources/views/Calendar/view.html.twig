@@ -4,18 +4,60 @@
 {% set name = entity.owner|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name, "%calendarname%": entity.name|default(name) }}) %}
 
-{% block head_script %}
-    {{ parent() }}
-{% endblock %}
-
 {% block navButtons %}
     {% if resource_granted('oro_calendar_event_view') %}
         <div class="btn-group">
             {{ UI.button({
                 'path' : path('oro_calendar_event_index'),
+                'iCss': 'icon-time',
                 'label': 'oro.calendar.view_events'|trans,
                 'title': 'oro.calendar.view_events'|trans
             }) }}
+        </div>
+        {# TODO: The Print button is a temporary solution untill we switch to latest version FullCalendar component #}
+        {# should be removed in https://magecore.atlassian.net/browse/BAP-3826 #}
+        <div class="btn-group">
+            {{ UI.clientButton({
+                'id': 'add-entity-note-button',
+                'aCss': 'no-hash',
+                'iCss': 'icon-print  hide-text',
+                'label' : 'oro.calendar.print'|trans
+            }) }}
+            <script type="text/javascript">
+                require(['jquery'],
+                function($){
+                    $('#add-entity-note-button').on('click', function(e) {
+                        e.preventDefault();
+                        var calendar = $('#calendar').data('calendar'),
+                            $el = calendar.getCalendarElement(),
+                            $agendaEl = $el.find('.fc-agenda-slots').parent().parent(),
+                            contentElOverflowX,
+                            contentElOverflowY,
+                            contentElHeight;
+                        $el.width('960px');
+                        $el.fullCalendar('render');
+                        if ($agendaEl.length) {
+                            contentElOverflowX = $agendaEl.css('overflow-x');
+                            contentElOverflowY = $agendaEl.css('overflow-y');
+                            contentElHeight = $agendaEl.css('height');
+                            $agendaEl.css('overflow-x', 'visible');
+                            $agendaEl.css('overflow-y', 'visible');
+                            $agendaEl.css('height', 'auto');
+                            //debugger;
+                            $el.fullCalendar('option', 'contentHeight', 3000);
+                        }
+                        window.print();
+                        if ($agendaEl.length) {
+                            $agendaEl.css('overflow-x', contentElOverflowX);
+                            $agendaEl.css('overflow-y', contentElOverflowY);
+                            $agendaEl.css('height', contentElHeight);
+                            $el.fullCalendar('option', 'contentHeight', null);
+                        }
+                        $el.css('width', '');
+                        $el.fullCalendar('render');
+                    });
+                });
+            </script>
         </div>
     {% endif %}
 {% endblock navButtons %}
@@ -42,15 +84,17 @@
         <div class="span2">
             <div class="calendars">
                 <div class="calendar-connections"></div>
-                {% if resource_granted('oro_calendar_connection_view') %}
-                    <form action="#">
-                        {{ form_row(user_select_form) }}
-                    </form>
-                {% endif %}
+                <form action="#">
+                    {{ form_row(user_select_form) }}
+                </form>
             </div>
         </div>
         <div class="span10 calendar-events scrollable-container"></div>
     </div>
+
+    <script type="text/html" id="template-calendar-menu">
+        {{ oro_menu_render('calendar_menu') }}
+    </script>
 
     <script type="text/html" id="template-calendar-connections">
         <ul class="media-list connection-container">
@@ -59,9 +103,16 @@
 
     <script type="text/html" id="template-calendar-connection-item">
         <li class="media connection-item" >
-                <span class="calendar-color" <% if (!_.isEmpty(backgroundColor)) { %>
-                style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
-            <% } %> ></span>
+            <span
+                <% if (visible) { %>
+                class="calendar-color"
+                    <% if (!_.isEmpty(backgroundColor)) { %>
+                    style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
+                    <% } %>
+                <% } else { %>
+                    class="calendar-color un-color"
+                <% } %>
+            ></span>
             <div class="media-body">
                 <div
                     <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
@@ -70,17 +121,11 @@
                 >
                     <%- calendarName %>
                 </div>
-                <% if (removable) { %>
-                    <div class="pull-right icons-holder">
-                        <a
-                            href="javascript: void(0);"
-                            class="icons-holder-text no-hash remove-connection-button"
-                            title="{{ 'oro.calendar.form.exclude_calendar'|trans }}"
-                        >
-                                <i class="icon-remove hide-text"></i>
-                        </a>
-                    </div>
-                <% } %>
+                <div class="pull-right icons-holder">
+                    <a href="javascript: void(0);" class="icons-holder-text no-hash context-menu-button">
+                        <i class="icon-ellipsis-horizontal"></i>
+                    </a>
+                </div>
             </div>
         </li>
     </script>
@@ -92,11 +137,13 @@
     } %}
     {% set eventsOptions = {
         'containerSelector': '.calendar-events',
+        'itemViewTemplateSelector': '#template-view-calendar-event',
         'itemFormTemplateSelector': '#template-calendar-event',
         'leftHeader': 'prev,next today title',
         'centerHeader': '',
         'rightHeader': 'month,agendaWeek,agendaDay',
     } %}
+    {{ c.calendar_event_view_template('template-view-calendar-event') }}
     {{ c.calendar_event_form_template('template-calendar-event', event_form) }}
     {{ c.renderCalendar('#calendar', entity, startDate, endDate, calendar, eventsOptions, connectionsOptions) }}
 

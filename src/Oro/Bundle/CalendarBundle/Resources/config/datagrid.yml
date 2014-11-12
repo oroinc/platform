@@ -16,12 +16,15 @@ datagrid:
                     inner:
                         - { join: event.calendar, alias: calendar }
                         - { join: calendar.owner, alias: owner }
-                    left:
-                        - { join: %oro_calendar.calendar_connection.entity.class%, alias: connectCalendar, conditionType: WITH, condition: "connectCalendar.connectedCalendar = calendar"  }
+                        -
+                            join: %oro_calendar.calendar_property.entity.class%
+                            alias: connection
+                            conditionType: WITH
+                            condition: "connection.calendarAlias = 'user' AND connection.calendar = calendar.id AND connection.visible = true"
+                        - { join: connection.targetCalendar, alias: targetCalendar }
                 where:
-                    or:
-                        - connectCalendar.calendar = @oro_security.security_facade->getLoggedUserId
-                        - calendar.owner = @oro_security.security_facade->getLoggedUserId
+                    and:
+                        - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
         columns:
             title:
                 label: oro.calendar.calendarevent.title.label
@@ -148,3 +151,17 @@ datagrid:
                 end:
                     type: datetime
                     data_name: event.end
+
+    users-calendar-select-grid-exclude-owner:
+        extends: users-select-grid-exclude-owner
+        source:
+            query:
+                select:
+                    - calendar.id
+                join:
+                    inner:
+                        -
+                            join: %oro_calendar.calendar.entity.class%
+                            alias: calendar
+                            conditionType: WITH
+                            condition: 'calendar.owner = u'
