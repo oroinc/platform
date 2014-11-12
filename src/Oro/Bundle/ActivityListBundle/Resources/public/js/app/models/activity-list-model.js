@@ -21,7 +21,7 @@ define([
             activityEntityId: '',
 
             createdAt: '',
-            updatedAt:'',
+            updatedAt: '',
 
             is_loaded: false,
             contentHTML: '',

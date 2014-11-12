@@ -11,7 +11,6 @@ define([
 
     var ActivityView;
     ActivityView = BaseView.extend({
-        //collapsed: true,
         options: {
             configuration: {},
             template: null,

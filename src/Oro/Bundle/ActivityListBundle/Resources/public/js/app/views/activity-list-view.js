@@ -104,21 +104,22 @@ define(function (require) {
         },
 
         _reload: function (sorting) {
-            var state = {};
+            //var state = {};
             if (!_.isUndefined(sorting)) {
                 this.collection.setSorting(sorting);
             }
             this._showLoading();
             try {
-                _.each(this.subviews, function (itemView) {
-                    state[itemView.model.get('id')] = itemView.isCollapsed();
-                });
+                //_.each(this.subviews, function (itemView) {
+                //    state[itemView.model.get('id')] = itemView.isCollapsed();
+                //    state[itemView.model.get('id')] = true;
+                //});
                 this.collection.fetch({
                     reset: true,
                     success: _.bind(function () {
-                        _.each(this.subviews, function (itemView) {
-                            itemView.toggle(state[itemView.model.get('id')]);
-                        });
+                        //_.each(this.subviews, function (itemView) {
+                        //    itemView.toggle(state[itemView.model.get('id')]);
+                        //});
                         this._hideLoading();
                     }, this),
                     error: _.bind(function (collection, response) {
