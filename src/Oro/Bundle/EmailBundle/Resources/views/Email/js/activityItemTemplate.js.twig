@@ -10,7 +10,7 @@
                 </span>
                 <span class="visual">
                     <span class="details">
-                        {{ entityName }}
+                        {{ entityName|raw }}
                         <% var template = {{ 'oro.email.sent_by.label'|trans|json_encode|raw }}; %>
                         <%= _.template(
                             template,
