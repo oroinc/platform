@@ -70,7 +70,8 @@ class MessageManager
 
         $count = $this->navigation->getTotalCount($entity, $scope);
         if ($count) {
-            $message .= ' ' . $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
+            $message .= ' ' .
+                $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
         }
 
         return $message;
@@ -87,7 +88,8 @@ class MessageManager
 
         $count = $this->navigation->getTotalCount($entity, $scope);
         if ($count) {
-            $message .= ' ' . $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
+            $message .= ' ' .
+                $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
         }
 
         return $message;
@@ -107,22 +109,30 @@ class MessageManager
             return null;
         }
 
-        $count = $this->navigation->getTotalCount($entity, $scope);
-        if (!$count) {
+        $viewCount = $this->navigation->getTotalCount($entity, EntityPaginationManager::VIEW_SCOPE);
+        $editCount = $this->navigation->getTotalCount($entity, EntityPaginationManager::EDIT_SCOPE);
+        if (!$viewCount || !$editCount || $viewCount == $editCount) {
             return null;
         }
 
         $message = '';
+        $count = null;
 
         // if scope is changing from "view" to "edit" and number of entities is decreased
         if ($scope == EntityPaginationManager::EDIT_SCOPE) {
-            $viewCount = $this->navigation->getTotalCount($entity, EntityPaginationManager::VIEW_SCOPE);
-            if ($viewCount && $count < $viewCount) {
+            if ($editCount < $viewCount) {
                 $message .= $this->translator->trans('oro.entity_pagination.message.stats_changed_view_to_edit') . ' ';
             }
+            $count = $editCount;
+        } elseif ($scope == EntityPaginationManager::VIEW_SCOPE) {
+            $count = $viewCount;
         }
 
-        $message .= $this->translator->trans($this->getStatsMessage($scope), ['%count%' => $count]);
+        if (!$count) {
+            return null;
+        }
+
+        $message .= $this->translator->transChoice($this->getStatsMessage($scope), $count, ['%count%' => $count]);
 
         $this->storage->setInfoMessageShown($entityName, $scope);
 
@@ -140,10 +150,14 @@ class MessageManager
     {
         switch ($scope) {
             case EntityPaginationManager::VIEW_SCOPE:
-                $message = 'oro.entity_pagination.message.stats_number_view_%count%';
+                $message =
+                    'oro.entity_pagination.message.' .
+                    'stats_number_view_%count%_record|stats_number_view_%count%_records';
                 break;
             case EntityPaginationManager::EDIT_SCOPE:
-                $message = 'oro.entity_pagination.message.stats_number_edit_%count%';
+                $message =
+                    'oro.entity_pagination.message.' .
+                    'stats_number_edit_%count%_record|stats_number_edit_%count%_records';
                 break;
             default:
                 throw new \LogicException(sprintf('Scope "%s" is not available.', $scope));
