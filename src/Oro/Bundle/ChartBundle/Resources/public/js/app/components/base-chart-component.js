@@ -1,16 +1,16 @@
 define(function(require) {
+    'use strict';
 
-    var _ = require("underscore");
-    var $ = require("jquery");
-    var chartTemplate = require("text!orochart/js/templates/base-chart-template.html");
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var BaseChartComponent;
-
+    var BaseChartComponent,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        chartTemplate = require('text!orochart/js/templates/base-chart-template.html'),
+        BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
-     *
-     * @class orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BaseCharComponent
+     * @class orochart.app.components.BaseChartComponent
+     * @extends oroui.app.components.base.Component
+     * @exports orochart/app/components/base-chart-component
      */
     BaseChartComponent = BaseComponent.extend({
         template: _.template(chartTemplate),
@@ -18,14 +18,14 @@ define(function(require) {
         /**
          *
          * @constructor
-         * @param {object} params
+         * @param {Object} options
          */
-        initialize: function(params) {
-            this.data = params.data;
-            this.options = params.options;
-            this.config = params.config;
+        initialize: function(options) {
+            this.data = options.data;
+            this.options = options.options;
+            this.config = options.config;
 
-            this.$el = $(params._sourceElement);
+            this.$el = $(options._sourceElement);
             this.$chart = null;
 
             this.renderBaseLayout();
@@ -94,7 +94,7 @@ define(function(require) {
          */
         fixSize: function() {
             var $chart = this.$chart;
-            var $labels = $chart.find(".flotr-grid-label-x");
+            var $labels = $chart.find('.flotr-grid-label-x');
             var labelMaxHeight = $labels.height();
             var labelMinHeight = $labels.height();
 
@@ -116,7 +116,7 @@ define(function(require) {
          * Draw comonent
          */
         draw: function() {
-            this.$el.html("copmonent");
+            this.$el.html('copmonent');
         }
     });
 

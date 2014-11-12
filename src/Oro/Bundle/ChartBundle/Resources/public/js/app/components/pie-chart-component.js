@@ -1,23 +1,23 @@
 define(function(require) {
-    var Flotr = require('flotr2');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    var BarChartComponent;
+    'use strict';
 
+    var PieChartComponent,
+        Flotr = require('flotr2'),
+        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
-     *
-     * @class orochart.app.components.BarCharComponent
-     * @extends orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BarCharComponent
+     * @class orochart.app.components.PieChartComponent
+     * @extends orochart.app.components.BaseChartComponent
+     * @exports orochart/app/components/pie-chart-component
      */
-    BarChartComponent = BaseChartComponent.extend({
+    PieChartComponent = BaseChartComponent.extend({
         /**
          *
          * @overrides
-         * @param {object} options
+         * @param {Object} options
          */
         initialize: function(options) {
-            BaseChartComponent.prototype.initialize.call(this, options);
+            PieChartComponent.__super__.initialize.call(this, options);
 
             this.$legend = this.$el.find('.chart-legend');
             this.options.settings.ratio = options.ratio;
@@ -31,7 +31,7 @@ define(function(require) {
             var $chartLegend = this.$legend;
             var chartWidth = Math.min(Math.round($widgetContent.width() * Number(this.options.settings.ratio)), 350);
 
-            if (chartWidth > 0 && chartWidth != $chart.width()) {
+            if (chartWidth > 0 && chartWidth !== $chart.width()) {
                 $chart.width(chartWidth);
                 $chart.height(chartWidth);
                 $chartLegend.height(chartWidth);
@@ -134,5 +134,5 @@ define(function(require) {
         }
     });
 
-    return BarChartComponent;
+    return PieChartComponent;
 });

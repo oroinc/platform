@@ -1,25 +1,26 @@
 define(function(require) {
-    var Flotr = require('flotr2');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    var BarChartComponent;
+    'use strict';
 
+    var FlowChartComponent,
+        _ = require('underscore'),
+        Flotr = require('flotr2'),
+        numberFormatter = require('orolocale/js/formatter/number'),
+        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
     require('orochart/js/flotr2/funnel');
 
     /**
-     *
-     * @class orochart.app.components.BarCharComponent
-     * @extends orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BarCharComponent
+     * @class orochart.app.components.FlowChartComponent
+     * @extends orochart.app.components.BaseChartComponent
+     * @exports orochart/app/components/flow-chart-component
      */
-    BarChartComponent = BaseChartComponent.extend({
+    FlowChartComponent = BaseChartComponent.extend({
         /**
          *
          * @overrides
-         * @param {object} options
+         * @param {Object} options
          */
         initialize: function(options) {
-            BaseChartComponent.prototype.initialize.call(this, options);
+            FlowChartComponent.__super__.initialize.call(this, options);
 
             this.date = options.date;
 
@@ -66,9 +67,9 @@ define(function(require) {
                             return label + ': ' + numberFormatter.formatCurrency(value);
                         },
                         nozzleFormatter: function (label, value) {
-                            return label
-                                    + ' (from ' + scope.date + '): '
-                                    + numberFormatter.formatCurrency(value);
+                            return label +
+                                ' (from ' + scope.date + '): ' +
+                                numberFormatter.formatCurrency(value);
                         }
                     },
                     mouse: {
@@ -83,5 +84,5 @@ define(function(require) {
         }
     });
 
-    return BarChartComponent;
+    return FlowChartComponent;
 });
