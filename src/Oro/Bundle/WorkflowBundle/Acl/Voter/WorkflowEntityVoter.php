@@ -89,7 +89,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter
         ];
 
         /** @var WorkflowEntityAclIdentityRepository $repository */
-        $repository = $this->doctrineHelper->getRepository('OroWorkflowBundle:WorkflowEntityAclIdentity');
+        $repository = $this->doctrineHelper->getEntityRepository('OroWorkflowBundle:WorkflowEntityAclIdentity');
         $identities = $repository->findByClassAndIdentifier($class, $identifier);
 
         foreach ($identities as $identity) {
@@ -120,7 +120,7 @@ class WorkflowEntityVoter extends AbstractEntityVoter
 
         /** @var WorkflowEntityAcl[] $entityAcls */
         $entityAcls = $this->doctrineHelper
-            ->getRepository('OroWorkflowBundle:WorkflowEntityAcl')
+            ->getEntityRepository('OroWorkflowBundle:WorkflowEntityAcl')
             ->findAll();
 
         $this->entityAcls = [];

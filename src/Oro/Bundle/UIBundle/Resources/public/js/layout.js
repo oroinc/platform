@@ -32,7 +32,8 @@ define(function (require) {
 
             container.find('[data-toggle="tooltip"]').tooltip();
 
-            this.initPopover(container.find('form label'));
+            this.initPopover(container.find('label'));
+            widgetControlInitializer.init(container);
 
             promise = this.initPageComponents(container);
             return promise;

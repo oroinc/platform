@@ -577,7 +577,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ->with($class)
             ->will($this->returnValue(null));
 
-        $this->doctrineHelper->getRepository($data);
+        $this->doctrineHelper->getEntityRepository($data);
     }
 
     /**
@@ -607,7 +607,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             $repository,
-            $this->doctrineHelper->getRepository($data)
+            $this->doctrineHelper->getEntityRepository($data)
         );
     }
 
