@@ -34,7 +34,7 @@ class ReminderManager
      */
     public function saveReminders(RemindableInterface $entity)
     {
-        $entityId = $this->doctrineHelper->getEntityIdentifier($entity);
+        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
         if (!$entityId) {
             return;
         }
@@ -94,7 +94,7 @@ class ReminderManager
         $reminders = new RemindersPersistentCollection(
             $this->getRemindersRepository(),
             $this->doctrineHelper->getEntityClass($entity),
-            $this->doctrineHelper->getEntityIdentifier($entity)
+            $this->doctrineHelper->getSingleEntityIdentifier($entity)
         );
 
         $entity->setReminders($reminders);

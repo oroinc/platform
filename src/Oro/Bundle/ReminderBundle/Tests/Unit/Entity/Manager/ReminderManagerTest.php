@@ -73,7 +73,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper
             ->expects($this->once())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->will($this->returnValue($entityId));
 
         $this->doctrineHelper
@@ -136,7 +136,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper
             ->expects($this->once())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->will($this->returnValue($entityId));
 
         $this->doctrineHelper
@@ -176,7 +176,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrineHelper
             ->expects($this->once())
-            ->method('getEntityIdentifier')
+            ->method('getSingleEntityIdentifier')
             ->will($this->returnValue($entityId));
 
         $this->doctrineHelper
