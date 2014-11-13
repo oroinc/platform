@@ -19,7 +19,6 @@ define(function(require) {
         initialize: function(options) {
             PieChartComponent.__super__.initialize.call(this, options);
 
-            this.$legend = this.$el.find('.chart-legend');
             this.options.settings.ratio = options.ratio;
 
             this.update();
@@ -77,7 +76,7 @@ define(function(require) {
          */
         draw: function() {
             var $chart = this.$chart;
-            var $chartLegend = this.$legend;
+            var $legend = this.$legend;
             var data = this.data;
             var settings = this.options.settings;
             var chartData = [];
@@ -124,7 +123,7 @@ define(function(require) {
                     },
                     legend : {
                         position : 'ne',
-                        container: $chartLegend.get(0),
+                        container: $legend.get(0),
                         labelBoxWidth: 20,
                         labelBoxHeight: 13,
                         labelBoxMargin: 0

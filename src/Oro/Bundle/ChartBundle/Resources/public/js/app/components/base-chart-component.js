@@ -48,6 +48,7 @@ define(function(require) {
         renderBaseLayout: function() {
             this.$el.html(this.template());
             this.$chart = this.$el.find('.chart-content');
+            this.$legend = this.$el.find('.chart-legend');
         },
 
         /**

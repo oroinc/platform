@@ -3,6 +3,7 @@ define(function(require) {
 
     var FlowChartComponent,
         _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
         Flotr = require('flotr2'),
         numberFormatter = require('orolocale/js/formatter/number'),
         BaseChartComponent = require('orochart/js/app/components/base-chart-component');
@@ -23,8 +24,30 @@ define(function(require) {
             FlowChartComponent.__super__.initialize.call(this, options);
 
             this.date = options.date;
+            this._prepareData();
 
             this.update();
+        },
+
+        /**
+         * Prepares proper data structure
+         *
+         * @protected
+         */
+        _prepareData: function () {
+            var date = this.date;
+            _.each(this.data, function(item) {
+                var params, format;
+                params = {
+                    label: item.label,
+                    date: date,
+                    value: numberFormatter.formatCurrency(item.value)
+                };
+                format = 'oro.chart.flow_chart.label_fromatter.' + (item.isNozzle ? 'nozzle' : 'tick');
+                item.originalLabel = item.label;
+                item.label = __(format, params);
+                item.data = [item.value];
+            });
         },
 
         /**
@@ -33,7 +56,6 @@ define(function(require) {
          * @overrides
          */
         draw: function () {
-            var scope = this;
             var $chart = this.$chart;
             var options = this.options;
 
@@ -41,36 +63,15 @@ define(function(require) {
                 return;
             }
 
-            var data = this.data;
-            var chartData = {};
-            var nozzleSteps = [];
-
-            _.each(data, function(value, key) {
-                if (value.value <= 0) {
-                    data[key].value = 0.0001;
-                }
-                chartData[value.label] = value.value;
-                if (value.isNozzle) {
-                    nozzleSteps.push(value.label);
-                }
-            });
             Flotr.draw(
                 $chart.get(0),
-                new Array(chartData),
+                this.data,
                 {
-                    funnel : {
-                        show : true,
+                    funnel: {
+                        show: true,
+                        showLabels: true,
                         formatter: numberFormatter.formatCurrency,
-                        nozzleSteps: nozzleSteps,
-                        colors: options.settings.chartColors,
-                        tickFormatter: function (label, value) {
-                            return label + ': ' + numberFormatter.formatCurrency(value);
-                        },
-                        nozzleFormatter: function (label, value) {
-                            return label +
-                                ' (from ' + scope.date + '): ' +
-                                numberFormatter.formatCurrency(value);
-                        }
+                        colors: options.settings.chartColors
                     },
                     mouse: {
                         track: true,
@@ -78,6 +79,9 @@ define(function(require) {
                     },
                     grid: {
                         outlineWidth: 0
+                    },
+                    legend : {
+                        show: false
                     }
                 }
             );
