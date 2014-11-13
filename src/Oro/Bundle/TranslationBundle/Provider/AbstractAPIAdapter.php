@@ -86,8 +86,11 @@ abstract class AbstractAPIAdapter implements APIAdapterInterface
             $options
         );
 
-        $this->preprocessRequest($request);
+        if (!in_array($method, ['POST', 'PUT'], true)) {
+            $request->getQuery()->merge($data);
+        }
 
+        $this->preprocessRequest($request);
         try {
             $response = $request->send();
         } catch (BadResponseException $e) {

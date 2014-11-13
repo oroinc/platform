@@ -1914,7 +1914,7 @@ ul.inline-extra {
 }
 .row-oro {
   width: 100%;
-  margin: 0 0 10px;
+  margin: 0;
 }
 .clearfix-oro {
   width: 100%;
@@ -1941,7 +1941,7 @@ label.required em,
     width:292px;
   }
 }*/
-.form-horizontal .controls  .removeRow{
+.controls .removeRow{
   position: relative;
   margin: 0 0 0 -24px;
 }
@@ -2833,7 +2833,43 @@ label.radio.error {
   top: -3px;
 }
 
-#orocrm_contact_form_addresses_collection.oro-item-collection {
+.add-list-item {
+  i.icon-plus{
+    font-size: 12px;
+  }
+}
+.oro-item-collection {
+  &>div {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    border: none;
+  }
+  .add-list-item {
+    margin-left: 183px;
+  }
+  .removeRow {
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 5px;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f00d";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
+  .row-oro.oro-multiselect-holder {
+    margin: 0 0 5px;
+  }
+}
+
+.oro-address-collection.oro-item-collection {
   &>div {
     position: relative;
     padding: 10px 15px 0 0;
@@ -2854,36 +2890,6 @@ label.radio.error {
     &:after {
       color: #bbb;
     }
-  }
-}
-
-.mobile-version #orocrm_contact_form_addresses_collection.oro-item-collection {
-  &>div {
-    padding: 10px 15px 0;
-  }
-}
-.add-list-item {
-  i.icon-plus{
-    font-size: 12px;
-  }
-}
-.oro-item-collection {
-  &>div {
-    position: relative;
-    padding: 0;
-    margin: 0;
-    border: none;
-  }
-  .add-list-item {
-    margin-left: 183px;
-  }
-  .removeRow {
-    position: absolute;
-    top: 0;
-    right: 10px;
-  }
-  .row-oro.oro-multiselect-holder {
-    margin: 0 0 5px;
   }
 }
 
@@ -2988,23 +2994,6 @@ label.radio.error {
   float: left;
   .removeRow {
     margin: 0;
-  }
-}
-#orocrm_contact_form .removeRow,
-#oro_entity_config_type .removeRow{
-  text-indent:-999;
-  font-size:0;
-  line-height:0;
-  margin: 0 0 0 15px;
-  &:after {
-    display:inline-block;
-    font:14px/1em 'FontAwesome';
-    color:#ddd;
-    content: "\f00d";
-    text-indent:0;
-  }
-  &:hover:after {
-    color:#888;
   }
 }
 pre.email-body {

@@ -170,6 +170,11 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
         $this->extendConfigProvider->persist($selfConfig);
 
+        //Disable auto create reverse relation for self referenced
+        if (!$targetFieldId && $targetEntityClass == $fieldConfigId->getClassName()) {
+            return;
+        }
+
         $targetConfig = $this->extendConfigProvider->getConfig($targetEntityClass);
 
         $targetRelationConfig = [

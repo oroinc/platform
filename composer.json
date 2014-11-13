@@ -23,7 +23,7 @@
         "ext-xml": "*",
         "symfony/symfony": "2.3.*",
         "twig/twig": "<=1.16.0",
-        "doctrine/orm": "2.4.5",
+        "doctrine/orm": "2.4.6",
         "doctrine/doctrine-bundle": "1.2.0",
         "doctrine/dbal": "2.4.x-dev",
         "doctrine/data-fixtures": "1.0.0",
@@ -71,11 +71,6 @@
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.x-dev"
-        }
-    },
     "autoload": {
         "psr-0": {
               "Oro\\Component": "src/",
