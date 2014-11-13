@@ -8,7 +8,8 @@
         "php": ">=5.4",
         "symfony/symfony": "2.3.*",
         "doctrine/orm": ">=2.3,<2.4-dev",
-        "oro/log": "dev-master"
+        "oro/log": "dev-master",
+        "oro/workflow-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": {
