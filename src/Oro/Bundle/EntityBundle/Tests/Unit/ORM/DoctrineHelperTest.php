@@ -220,7 +220,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     * @expectedExceptionMessage Can't get single identifier for the entity
+     * @expectedExceptionMessage Can't get single identifier for "ItemStubProxy" entity.
      */
     public function testGetSingleEntityIdentifierIncorrectIdentifier()
     {
@@ -356,9 +356,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
-     * @expectedExceptionMessage Can't get single identifier field name for the entity
+     * @expectedExceptionMessage Can't get single identifier field name for "ItemStubProxy" entity.
      */
-    public function testGetSingleEntityIdentifierIncorrectIdentifierFieldName()
+    public function testGetSingleEntityIdentifierFieldNameIncorrectIdentifier()
     {
         $identifiers = array('key1' => 'value1', 'key2' => 'value2');
 
@@ -378,6 +378,120 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->em));
 
         $this->doctrineHelper->getSingleEntityIdentifierFieldName($entity);
+    }
+
+    /**
+     * @param       $expected
+     * @param array $identifiers
+     * @param bool  $exception
+     * @dataProvider getSingleEntityIdentifierFieldTypeDataProvider
+     */
+    public function testGetSingleEntityIdentifierFieldType($expected, array $identifiers, $exception = true)
+    {
+        $entity = new ItemStubProxy();
+        $class  = 'ItemStubProxy';
+
+        $this->classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array_keys($identifiers)));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($this->classMetadata));
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+        $this->classMetadata->expects($this->any())
+            ->method('getTypeOfField')
+            ->will(
+                $this->returnCallback(
+                    function ($fieldName) use ($identifiers) {
+                        return $identifiers[$fieldName];
+                    }
+                )
+            );
+
+        $this->assertEquals(
+            $expected,
+            $this->doctrineHelper->getSingleEntityIdentifierFieldType($entity, $exception)
+        );
+    }
+
+    public function getSingleEntityIdentifierFieldTypeDataProvider()
+    {
+        return array(
+            'valid identifier'                  => array(
+                'expected' => 'integer',
+                'actual'   => array('id' => 'integer'),
+            ),
+            'empty identifier'                  => array(
+                'expected' => null,
+                'actual'   => array(),
+                'exception' => false,
+            ),
+            'multiple identifier, no exception' => array(
+                'expected'  => null,
+                'actual'    => array('first_id' => 'integer', 'second_id' => 'string'),
+                'exception' => false,
+            ),
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
+     * @expectedExceptionMessage Can't get single identifier field type for "ItemStubProxy" entity.
+     */
+    public function testGetSingleEntityIdentifierFieldTypeIncorrectIdentifier()
+    {
+        $identifiers = array('key1' => 'integer', 'key2' => 'string');
+
+        $entity = new ItemStubProxy();
+        $class  = 'ItemStubProxy';
+
+        $this->classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array_keys($identifiers)));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($this->classMetadata));
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+        $this->classMetadata->expects($this->never())
+            ->method('getTypeOfField');
+
+        $this->doctrineHelper->getSingleEntityIdentifierFieldType($entity);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\InvalidEntityException
+     * @expectedExceptionMessage Can't get single identifier field type for "ItemStubProxy" entity.
+     */
+    public function testGetSingleEntityIdentifierFieldTypeEmptyIdentifier()
+    {
+        $identifiers = array();
+
+        $entity = new ItemStubProxy();
+        $class  = 'ItemStubProxy';
+
+        $this->classMetadata->expects($this->once())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(array_keys($identifiers)));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->with($class)
+            ->will($this->returnValue($this->classMetadata));
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+        $this->classMetadata->expects($this->never())
+            ->method('getTypeOfField');
+
+        $this->doctrineHelper->getSingleEntityIdentifierFieldType($entity);
     }
 
     public function testIsManageableEntity()
@@ -509,6 +623,66 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->doctrineHelper->getEntityManager($class);
+    }
+
+    public function testGetEntityRepositoryByEntity()
+    {
+        $entity      = new ItemStubProxy();
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository');
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->will($this->returnValue($this->em));
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->with($entityClass)
+            ->will($this->returnValue($repo));
+
+        $this->assertSame(
+            $repo,
+            $this->doctrineHelper->getEntityRepository($entity)
+        );
+    }
+
+    public function testGetEntityRepositoryByClass()
+    {
+        $class = 'ItemStubProxy';
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository');
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+        $this->em->expects($this->once())
+            ->method('getRepository')
+            ->with($class)
+            ->will($this->returnValue($repo));
+
+        $this->assertSame(
+            $repo,
+            $this->doctrineHelper->getEntityRepository($class)
+        );
+    }
+
+    public function testGetEntityRepositoryNotManageableEntity()
+    {
+        $class = 'ItemStubProxy';
+
+        $this->setExpectedException(
+            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
+            sprintf('Entity class "%s" is not manageable', $class)
+        );
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->getEntityRepository($class);
     }
 
     public function testGetEntityReference()

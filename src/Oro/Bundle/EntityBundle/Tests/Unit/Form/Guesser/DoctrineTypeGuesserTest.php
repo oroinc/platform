@@ -92,7 +92,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->guesser->addDoctrineTypeMapping($doctrineType, $formType);
 
         $guess = $this->guesser->guessType($class, $firstField);
-        $this->assertGuess($guess, $formType, array(), TypeGuess::VERY_HIGH_CONFIDENCE);
+        $this->assertGuess($guess, $formType, array(), TypeGuess::HIGH_CONFIDENCE);
 
         $this->assertDefaultGuess($this->guesser->guessType($class, $secondField));
     }
@@ -122,7 +122,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
             $this->guesser->guessType($class, $property),
             'entity',
             array('class' => $associationClass, 'multiple' => false),
-            TypeGuess::VERY_HIGH_CONFIDENCE
+            TypeGuess::HIGH_CONFIDENCE
         );
     }
 
@@ -151,7 +151,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit_Framework_TestCase
             $this->guesser->guessType($class, $property),
             'entity',
             array('class' => $associationClass, 'multiple' => true),
-            TypeGuess::VERY_HIGH_CONFIDENCE
+            TypeGuess::HIGH_CONFIDENCE
         );
     }
 
