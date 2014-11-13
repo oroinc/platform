@@ -312,6 +312,92 @@ php app/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
 
+Custom form type and options
+---------------------
+Extended fields rendered as html controls, and control type (text, textarea, number, checkbox, etc) guessed by 
+classes implementing FormTypeGuesserInterface. 
+In case of extend fields, platform has three guessers (with increasing priority : DoctrineTypeGuesser, FormConfigGuesser and ExtendFieldTypeGuesser,
+each provide own guesses and best guess selected based on guesser's confidence (low, medium, high, very high).
+
+So, to define custom form type for particular field there are few ways:
+- Through the compiler pass to add or override guesser's mappings 
+
+```yaml
+ oro_entity_extend.form.guesser.extend_field:
+        ...
+        calls:
+            - [addExtendTypeMapping, ["extend-type", "form-type", {option1: 12, option2: false, ...}]]
+        tags:
+            - { name: form.type_guesser, priority: 15 }
+
+```
+
+- With custom guesser, that will have higher priority or will provide guess with highest confidence value.
+
+```php
+class CustomTypeGuesser implements FormTypeGuesserInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function guessType($className, $property)
+    {
+        // some conditions here
+        if ($className == '...' && $property == '') {
+            $guessedType = '';
+            $options = [...];
+            return new TypeGuess($guessedType, $options, TypeGuess::HIGH_CONFIDENCE);
+        }
+        
+        // not guessed
+        return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function guessRequired($class, $property)
+    {
+        return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function guessMaxLength($class, $property)
+    {
+        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function guessPattern($class, $property)
+    {
+        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
+    }    
+}
+
+```
+
+- Using annotation to field or related entity (if extended field is a relation)
+
+```php
+/*
+ * @Config(
+ *      defaultValues={
+            ...
+ *          "form"={
+ *              "form_type"="oro_user_select",
+ *              "form_option"="{option1: ..., ...}"
+ *          }
+ *      }
+ * )
+ */
+
+```
+
+
 Extend Fields View
 ---------------------
 
