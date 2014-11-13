@@ -7,13 +7,18 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         $ = require('jquery'),
         _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
         routing       = require('routing'),
         tools         = require('oroui/js/tools'),
         mediator      = require('oroui/js/mediator'),
         ActivityView       = require('../views/activity-view'),
         ActivityListView   = require('../views/activity-list-view'),
         ActivityModel      = require('../models/activity-list-model'),
-        ActivityCollection = require('../models/activity-list-collection');
+        ActivityCollection = require('../models/activity-list-collection'),
+        MultiSelectFilter  = require('oro/filter/multiselect-filter'),
+        DatetimeFilter     = require('oro/filter/datetime-filter'),
+        dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
+    require('jquery');
 
     ActivityListComponent = BaseComponent.extend({
         defaults: {
@@ -29,45 +34,55 @@ define(function (require) {
             modules: {}
         },
 
-        initialize: function (options) {
-            options = options || {};
-            this.processOptions(options);
+        /**
+         * @type MultiSelectFilter
+         */
+        activityTypeFilter: null,
 
-            if (!_.isEmpty(options.modules)) {
+        /**
+         * @type DatetimeFilter
+         */
+        dateRangeFilter: null,
+
+        initialize: function (options) {
+            this.options = options || {};
+            this.processOptions();
+
+            if (!_.isEmpty(this.options.modules)) {
                 this._deferredInit();
-                tools.loadModules(options.modules, function (modules) {
-                    _.extend(options.activityListOptions, modules);
-                    this.initView(options);
+                tools.loadModules(this.options.modules, function (modules) {
+                    _.extend(this.options.activityListOptions, modules);
+                    this.initView();
                     this._resolveDeferredInit();
                 }, this);
             } else {
-                this.initView(options);
+                this.initView();
             }
         },
 
-        processOptions: function (options) {
+        processOptions: function () {
             var defaults;
             defaults = $.extend(true, {}, this.defaults);
-            _.defaults(options, defaults);
-            _.defaults(options.activityListOptions, defaults.activityListOptions);
+            _.defaults(this.options, defaults);
+            _.defaults(this.options.activityListOptions, defaults.activityListOptions);
 
-            options.activityListData = JSON.parse(options.activityListData);
-            options.activityListOptions.el = options._sourceElement;
+            this.options.activityListData = JSON.parse(this.options.activityListData);
+            this.options.activityListOptions.el = this.options._sourceElement;
 
-            // collect modules which should be loaded before initialization
-            _.each(['itemView', 'itemModel'], function (name) {
-                if (typeof options.activityListOptions[name] === 'string') {
-                    options.modules[name] = options.activityListOptions[name];
-                }
-            });
+            if (typeof this.options.activityListOptions.itemView === 'string') {
+                this.options.modules.itemView = this.options.activityListOptions.itemView;
+            }
+            if (typeof this.options.activityListOptions.itemModel === 'string') {
+                this.options.modules.itemModel = this.options.activityListOptions.itemModel;
+            }
         },
 
-        initView: function (options) {
+        initView: function () {
             var activityOptions, collection;
-            activityOptions = options.activityListOptions;
+            activityOptions = this.options.activityListOptions;
 
             // setup activity list collection
-            collection = new ActivityCollection(options.activityListData, {
+            collection = new ActivityCollection(this.options.activityListData, {
                 model: activityOptions.itemModel
             });
             collection.baseUrl = activityOptions.urls.list;
@@ -80,34 +95,95 @@ define(function (require) {
             });
 
             this.list = new ActivityListView(activityOptions);
-            this.registerWidget(options);
+            this.registerWidget();
         },
 
-        registerWidget: function (options) {
+        /**
+         * Returns filter state
+         *
+         * @returns {{dateRange: (*|Object), activityType: (*|Object)}}
+         */
+        getFilterState: function () {
+            return {
+                dateRange: this.dateRangeFilter.getValue(),
+                activityType: this.activityTypeFilter.getValue()
+            }
+        },
+
+        /**
+         * Triggered when filter state is changed
+         */
+        onFilterStateChange: function () {
+            console.warn('filter state update', this.getFilterState());
+        },
+
+        /**
+         * Renders filters and binds update event
+         *
+         * @param $el
+         */
+        renderFilters: function ($el) {
+            var activityClass, activityOptions, activityTypeChoices, DateRangeFilterWithMeta;
+
+            /*
+             * render "Activity Type" filter
+             */
+            // prepare choices
+            activityTypeChoices = {};
+            for (activityClass in this.options.activityListOptions.configuration) {
+                activityOptions = this.options.activityListOptions.configuration[activityClass];
+                activityTypeChoices[activityClass] = __(activityOptions.label);
+            }
+
+            // create and render
+            this.activityTypeFilter = new MultiSelectFilter({
+                'label': __('oro.activitylist.widget.filter.activity.title'),
+                'choices': activityTypeChoices || {}
+            });
+
+            this.activityTypeFilter.render();
+            this.activityTypeFilter.on('update', this.onFilterStateChange, this);
+            $el.find('.activity-type-filter').append(this.activityTypeFilter.$el);
+
+            /*
+             * Render "Date Range" filter
+             */
+            // create instance
+            DateRangeFilterWithMeta = DatetimeFilter.extend(this.options.activityListOptions.dateRangeFilterMetadata);
+            this.dateRangeFilter = new DateRangeFilterWithMeta({
+                'label': __('oro.activitylist.widget.filter.date_picker.title')
+            });
+            // tell that it should be rendered with dropdown
+            _.extend(this.dateRangeFilter, dataFilterWrapper);
+            // render
+            this.dateRangeFilter.render();
+            this.dateRangeFilter.on('update', this.onFilterStateChange, this);
+            $el.find('.date-range-filter').append(this.dateRangeFilter.$el)
+        },
+
+        registerWidget: function () {
             var list = this.list;
-            mediator.execute('widgets:getByIdAsync', options.widgetId, function (widget) {
+            mediator.execute('widgets:getByIdAsync', this.options.widgetId, _.bind(function (widget) {
                 widget.getAction('refresh', 'adopted', function (action) {
                     action.on('click', _.bind(list.refresh, list));
                 });
-                /*widget.getAction('filter', 'adopted', function(action) {
-                    action.on('click', _.bind(list.filter, list));
-                });*/
                 widget.getAction('collapse_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.collapseAll, list));
                 });
                 widget.getAction('expand_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.expandAll, list));
                 });
-
                 widget.getAction('more', 'bottom', function (action) {
                     action.on('click', _.bind(list.more, list));
                 });
-                /*
-                widget.getAction('toggle_sorting', 'adopted', function (action) {
-                    action.on('click', _.bind(list.toggleSorting, list));
-                });
-                */
-            });
+
+                // render filters
+                if (!widget.containerFilled) {
+                    this.renderFilters(widget.widget);
+                } else {
+                    widget.on('widgetRender', this.renderFilters, this);
+                }
+            }, this));
         }
     });
 
