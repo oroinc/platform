@@ -2,91 +2,47 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-class OroSimpleColorPicker extends AbstractType
+class OroSimpleColorPicker extends AbstractSimpleColorPicker
 {
-    /** @var array */
-    protected static $colorSchema = [
-        'short' => [
-            'translatable' => true,
-            'colors'       => [
-                '#5484ED' => 'oro.form.color.bold_blue',
-                '#A4BDFC' => 'oro.form.color.blue',
-                '#46D6DB' => 'oro.form.color.turquoise',
-                '#7AE7BF' => 'oro.form.color.green',
-                '#51B749' => 'oro.form.color.bold_green',
-                '#FBD75B' => 'oro.form.color.yellow',
-                '#FFB878' => 'oro.form.color.orange',
-                '#FF887C' => 'oro.form.color.red',
-                '#DC2127' => 'oro.form.color.bold_red',
-                '#DBADFF' => 'oro.form.color.purple',
-                '#E1E1E1' => 'oro.form.color.gray'
-            ]
-        ],
-        'long'  => [
-            'translatable' => false,
-            'colors'       => [
-                '#AC725E' => '#AC725E',
-                '#D06B64' => '#D06B64',
-                '#F83A22' => '#F83A22',
-                '#FA573C' => '#FA573C',
-                '#FF7537' => '#FF7537',
-                '#FFAD46' => '#FFAD46',
-                '#42D692' => '#42D692',
-                '#16A765' => '#16A765',
-                '#7BD148' => '#7BD148',
-                '#B3DC6C' => '#B3DC6C',
-                '#FBE983' => '#FBE983',
-                '#FAD165' => '#FAD165',
-                '#92E1C0' => '#92E1C0',
-                '#9FE1E7' => '#9FE1E7',
-                '#9FC6E7' => '#9FC6E7',
-                '#4986E7' => '#4986E7',
-                '#9A9CFF' => '#9A9CFF',
-                '#B99AFF' => '#B99AFF',
-                '#C2C2C2' => '#C2C2C2',
-                '#CABDBF' => '#CABDBF',
-                '#CCA6AC' => '#CCA6AC',
-                '#F691B2' => '#F691B2',
-                '#CD74E6' => '#CD74E6',
-                '#A47AE2' => '#A47AE2'
-            ]
-        ]
-    ];
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /**
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        parent::setDefaultOptions($resolver);
+
         $resolver
             ->setDefaults(
                 [
-                    'choices'      => function (Options $options) {
-                        return $this->getChoices($options['color_schema']);
-                    },
-                    'translatable' => false,
-                    'empty_color'  => null,
-                    'color_schema' => 'short', // short, long, custom/null
-                    'picker'       => false,
-                    'picker_delay' => 0
+                    'colors'               => [],
+                    'empty_value'          => null,
+                    'allow_custom_color'   => false,
+                    'custom_color_control' => null // hue, brightness, saturation, or wheel. defaults wheel
                 ]
             )
             ->setNormalizers(
                 [
-                    'translatable' => function (Options $options, $translatable) {
-                        if (isset(static::$colorSchema[$options['color_schema']])
-                            && static::$colorSchema[$options['color_schema']]['translatable']
-                        ) {
-                            $translatable = true;
-                        }
-
-                        return $translatable;
+                    'colors' => function (Options $options, $colors) {
+                        return $options['color_schema'] === 'custom'
+                            ? $colors
+                            : $this->getColors($options['color_schema']);
                     }
                 ]
             );
@@ -97,11 +53,55 @@ class OroSimpleColorPicker extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['translatable'] = $options['translatable'];
-        $view->vars['empty_color']  = $options['empty_color'];
-        $view->vars['configs']      = $options['picker']
-            ? ['picker' => true, 'pickerDelay' => $options['picker_delay']]
-            : [];
+        parent::buildView($view, $form, $options);
+
+        $data       = $form->getData();
+        $pickerData = $this->convertColorsToPickerData($options['colors'], $options['translatable']);
+
+        if ($options['empty_color']) {
+            $emptyColorItem = [
+                'id'    => null,
+                'text'  => $this->translator->trans($options['empty_value']),
+                'class' => 'empty-color'
+            ];
+            if (!$data) {
+                $emptyColorItem['selected'] = true;
+            }
+            array_unshift($pickerData, $emptyColorItem, []);
+        }
+
+        $view->vars['allow_custom_color'] = $options['allow_custom_color'];
+        if ($options['allow_custom_color']) {
+            $this->appendTheme($view->vars['configs'], 'with-custom-color');
+            $customColor           = '#FFFFFF';
+            $isCustomColorSelected = false;
+            if ($data && !isset($options['colors'][$data])) {
+                $customColor           = $data;
+                $isCustomColorSelected = true;
+            }
+
+            $customColorItem = [
+                'id'    => $customColor,
+                'text'  => $this->translator->trans('oro.form.color.custom'),
+                'class' => 'custom-color'
+            ];
+            if ($isCustomColorSelected) {
+                $customColorItem['selected'] = true;
+            }
+            array_push($pickerData, [], $customColorItem);
+
+            $view->vars['custom_color']          = $customColor;
+            $view->vars['custom_color_selected'] = $isCustomColorSelected;
+
+            $view->vars['configs']['custom_color'] = [
+                'defaultValue' => $customColor
+            ];
+            if ($options['custom_color_control']) {
+                $view->vars['configs']['custom_color']['control'] = $options['custom_color_control'];
+            }
+        }
+
+        $view->vars['configs']['data'] = $pickerData;
     }
 
     /**
@@ -109,7 +109,7 @@ class OroSimpleColorPicker extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return 'hidden';
     }
 
     /**
@@ -121,12 +121,21 @@ class OroSimpleColorPicker extends AbstractType
     }
 
     /**
-     * @param string $colorSchema
+     * @param array $colors
+     * @param bool  $translatable
      *
-     * @return mixed
+     * @return array
      */
-    protected function getChoices($colorSchema)
+    protected function convertColorsToPickerData($colors, $translatable)
     {
-        return static::$colorSchema[$colorSchema]['colors'];
+        $data = [];
+        foreach ($colors as $clr => $text) {
+            $data[] = [
+                'id'   => $clr,
+                'text' => $translatable ? $this->translator->trans($text) : $text
+            ];
+        }
+
+        return $data;
     }
 }

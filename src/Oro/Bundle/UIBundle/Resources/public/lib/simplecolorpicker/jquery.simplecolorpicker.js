@@ -35,11 +35,13 @@
 
       self.$colorList = null;
 
+      var selectedVal = self.$select.val();
+
       if (self.options.picker === true) {
-        var selectText = self.$select.find('> option:selected').text();
+        var selectText = self.$select.is('select') ? self.$select.find('> option:selected').text() : this._getSelectedText(self.options.data);
         self.$icon = $('<span class="simplecolorpicker icon"'
                      + ' title="' + selectText + '"'
-                     + ' style="background-color: ' + self.$select.val() + ';"'
+                     + ' style="background-color: ' + selectedVal + ';"'
                      + ' role="button" tabindex="0">'
                      + '</span>').insertAfter(self.$select);
         self.$icon.on('click.' + self.type, $.proxy(self.showPicker, self));
@@ -57,12 +59,17 @@
 
       // Build the list of colors
       // <span class="color selected" title="Green" style="background-color: #7bd148;" role="button"></span>
-      self.$select.find('> option').each(function() {
-        var $option = $(this);
-        var color = $option.val();
+      var buildItemFunc = function($option, isSelect) {
+        if (!isSelect && (($.isArray($option) && !$option.length) || $.isEmptyObject($option))) {
+            // Vertical break, like hr
+            self.$colorList.append('<span class="vr"></span>');
+            return;
+        }
 
-        var isSelected = $option.is(':selected');
-        var isDisabled = $option.is(':disabled');
+        var color = isSelect ? $option.val() : $option.id;
+
+        var isSelected = isSelect ? $option.is(':selected') : ($option.selected ? true : false);
+        var isDisabled = isSelect ? $option.is(':disabled') : ($option.disabled ? true : false);
 
         var selected = '';
         if (isSelected === true) {
@@ -76,7 +83,7 @@
 
         var title = '';
         if (isDisabled === false) {
-          title = ' title="' + $option.text() + '"';
+          title = ' title="' + (isSelect ? $option.text() : $option.text) + '"';
         }
 
         var role = '';
@@ -84,7 +91,10 @@
           role = ' role="button" tabindex="0"';
         }
 
-        var $colorSpan = $('<span class="color"'
+        var cssClass = isSelect ? $option.prop('class') : $option.class;
+        cssClass = cssClass ? 'color ' + cssClass : 'color';
+
+        var $colorSpan = $('<span class="' + cssClass + '"'
                          + title
                          + ' style="background-color: ' + (!color && self.options.emptyColor ? self.options.emptyColor : color) + ';"'
                          + ' data-color="' + color + '"'
@@ -96,12 +106,37 @@
         self.$colorList.append($colorSpan);
         $colorSpan.on('click.' + self.type, $.proxy(self.colorSpanClicked, self));
 
+        if (!isSelect) {
+            return;
+        }
         var $next = $option.next();
         if ($next.is('optgroup') === true) {
           // Vertical break, like hr
           self.$colorList.append('<span class="vr"></span>');
         }
-      });
+      };
+
+      if (self.$select.is('select')) {
+          self.$select.find('> option').each(function () {
+              buildItemFunc($(this), true);
+          });
+      } else {
+          var selected = null;
+          $.each(self.options.data, function(index, value) {
+              if (value.selected) {
+                  selected = index;
+              }
+          });
+          $.each(self.options.data, function(index, value) {
+              if (selected === null) {
+                  if ((value.id && selectedVal && value.id.toLowerCase() === selectedVal.toLowerCase()) || (!value.id && !selectedVal)) {
+                      value.selected = true;
+                      selected = index;
+                  }
+              }
+              buildItemFunc(value, false);
+          });
+      }
     },
 
     /**
@@ -193,6 +228,16 @@
 
       this.$select.removeData(this.type);
       this.$select.show();
+    },
+
+    _getSelectedText: function(data) {
+        var text = null;
+        $.each(data, function(index, value) {
+            if (value.selected) {
+                text = value.text;
+            }
+        });
+        return text;
     }
   };
 
@@ -232,7 +277,11 @@
     pickerDelay: 0,
 
     // A color for empty option
-    emptyColor: null
+    emptyColor: null,
+
+    // The list of options in case when the picker is applied for non SELECT
+    // array of {id: ..., text: ..., class: ..., selected: ..., disabled: ...}
+    data: null
   };
 
 })(jQuery);

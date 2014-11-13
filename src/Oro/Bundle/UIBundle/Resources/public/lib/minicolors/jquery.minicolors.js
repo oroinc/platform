@@ -147,10 +147,8 @@ if(jQuery) (function($) {
 		input
 			.addClass('minicolors-input')
 			.data('minicolors-initialized', false)
-			.data('minicolors-settings', settings)
-			.prop('size', 7)
-			.wrap(minicolors)
-			.after(
+			.data('minicolors-settings', settings);
+		var panel =
 				'<div class="minicolors-panel minicolors-slider-' + settings.control + '">' +
 					'<div class="minicolors-slider minicolors-sprite">' +
 						'<div class="minicolors-picker"></div>' +
@@ -163,15 +161,32 @@ if(jQuery) (function($) {
 						'<div class="minicolors-picker"><div></div></div>' +
 					'</div>' +
 				'</div>'
-			);
+			;
+        if (input.is('input')) {
+            input
+                .prop('size', 7)
+                .wrap(minicolors)
+                .after(panel);
+        } else {
+            input
+                .after(minicolors.append(panel));
+        }
 
 		// The swatch
 		if( !settings.inline ) {
-			input.after('<span class="minicolors-swatch minicolors-sprite"><span class="minicolors-swatch-color"></span></span>');
-			input.next('.minicolors-swatch').on('click', function(event) {
-				event.preventDefault();
-				input.focus();
-			});
+            if (input.is('input')) {
+                input.after('<span class="minicolors-swatch minicolors-sprite"><span class="minicolors-swatch-color"></span></span>');
+                input.next('.minicolors-swatch').on('click', function(event) {
+                    event.preventDefault();
+                    input.focus();
+                });
+            } else {
+                input
+                    .addClass('minicolors-swatch minicolors-sprite')
+                    .on('click', function(event) {
+                        event.preventDefault();
+                    });
+            }
 		}
 
 		// Prevent text selection in IE
@@ -249,8 +264,11 @@ if(jQuery) (function($) {
 	// Moves the selected picker
 	function move(target, event, animate) {
 
-		var input = target.parents('.minicolors').find('.minicolors-input'),
-			settings = input.data('minicolors-settings'),
+		var input = target.parents('.minicolors').find('.minicolors-input');
+        if (!input.length) {
+            input = target.closest('.minicolors').parent().find('.minicolors-input');
+        }
+		var settings = input.data('minicolors-settings'),
 			picker = target.find('[class$=-picker]'),
 			offsetX = target.offset().left,
 			offsetY = target.offset().top,
@@ -334,7 +352,8 @@ if(jQuery) (function($) {
 			// Helpful references
 			minicolors = input.parent(),
 			settings = input.data('minicolors-settings'),
-			swatch = minicolors.find('.minicolors-swatch'),
+			swatch = input.is('input') ? minicolors.find('.minicolors-swatch') : input,
+            swatchColorHolder = input.is('input') ? input.find('SPAN') : input,
 
 			// Panel objects
 			grid = minicolors.find('.minicolors-grid'),
@@ -447,7 +466,7 @@ if(jQuery) (function($) {
 		}
 
 		// Set swatch color
-		swatch.find('SPAN').css({
+        swatchColorHolder.css({
 			backgroundColor: hex,
 			opacity: opacity
 		});
@@ -468,7 +487,8 @@ if(jQuery) (function($) {
 			// Helpful references
 			minicolors = input.parent(),
 			settings = input.data('minicolors-settings'),
-			swatch = minicolors.find('.minicolors-swatch'),
+			swatch = input.is('input') ? minicolors.find('.minicolors-swatch') : input,
+            swatchColorHolder = input.is('input') ? input.find('SPAN') : input,
 
 			// Panel objects
 			grid = minicolors.find('.minicolors-grid'),
@@ -496,7 +516,7 @@ if(jQuery) (function($) {
 			opacity = input.attr('data-opacity') === '' ? 1 : keepWithin(parseFloat(input.attr('data-opacity')).toFixed(2), 0, 1);
 			if( isNaN(opacity) ) opacity = 1;
 			input.attr('data-opacity', opacity);
-			swatch.find('SPAN').css('opacity', opacity);
+            swatchColorHolder.css('opacity', opacity);
 
 			// Set opacity picker position
 			y = keepWithin(opacitySlider.height() - (opacitySlider.height() * opacity), 0, opacitySlider.height());
@@ -504,7 +524,7 @@ if(jQuery) (function($) {
 		}
 
 		// Update swatch
-		swatch.find('SPAN').css('backgroundColor', hex);
+        swatchColorHolder.css('backgroundColor', hex);
 
 		// Determine picker locations
 		switch(settings.control) {
@@ -616,7 +636,7 @@ if(jQuery) (function($) {
 					}, settings.changeDelay));
 				} else {
 					// Call immediately
-					settings.change.call(input.get(0), hex, opacity);
+					settings.change.call(input.get(0), convertCase(hex, settings.letterCase), opacity);
 				}
 			}
 			input.trigger('change').trigger('input');
@@ -765,7 +785,8 @@ if(jQuery) (function($) {
 	$(document)
 		// Hide on clicks outside of the control
 		.on('mousedown.minicolors touchstart.minicolors', function(event) {
-			if( !$(event.target).parents().add(event.target).hasClass('minicolors') ) {
+            var elements = $(event.target).parents().add(event.target);
+			if( !elements.hasClass('minicolors-input') && !elements.hasClass('minicolors') ) {
 				hide();
 			}
 		})

@@ -14,6 +14,7 @@ parameters:
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
     oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
     oro_form.type.simple_color_picker.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPicker
+    oro_form.type.simple_color_choice.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoice
     oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
     oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\AbstractApiType
 
@@ -104,8 +105,15 @@ services:
 
     oro_form.type.simple_color_picker:
         class: %oro_form.type.simple_color_picker.class%
+        arguments:
+            - @translator
         tags:
             - { name: form.type, alias: oro_simple_color_picker }
+
+    oro_form.type.simple_color_choice:
+        class: %oro_form.type.simple_color_choice.class%
+        tags:
+            - { name: form.type, alias: oro_simple_color_choice }
 
     # Form extensions
     oro_form.extension.data_block:

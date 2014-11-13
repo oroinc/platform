@@ -10,6 +10,7 @@ oro.form.tooltip.read_more: Read more
 oro:
   form:
     color:
+        custom:         Choose another color ...
         bold_blue:      Bold blue
         blue:           Blue
         turquoise:      Turquoise

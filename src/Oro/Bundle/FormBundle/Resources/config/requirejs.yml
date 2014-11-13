@@ -37,3 +37,4 @@ config:
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
 
         'oroform/js/app/components/simple-color-picker': 'bundles/oroform/js/app/components/simple-color-picker.js'
+        'oroform/js/app/components/simple-color-choice': 'bundles/oroform/js/app/components/simple-color-choice.js'
