@@ -27,10 +27,6 @@
                 </span>
             </div>
             <div class="actions">
-                <button class="btn item-remove-button<% if (!removable) { %> disabled<% } %>" <% if (!removable) { %> disabled="disabled"<% } %>
-                    title="{{ 'oro.email.delete_email'|trans({'{{ entity }}': entityName})|e('html_attr')|raw }}">
-                    <i class="icon-trash hide-text">{{ 'oro.email.delete_email'|trans({'{{ entity }}': entityName})|e('html')|raw }}</i>
-                </button>
             </div>
         </div>
         <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">

@@ -30,18 +30,15 @@ define(function (require) {
                 itemModel: ActivityModel
             },
             activityListData: '[]',
+            activityListCount: 0,
             widgetId: '',
             modules: {}
         },
 
-        /**
-         * @type MultiSelectFilter
-         */
+        /** @type MultiSelectFilter */
         activityTypeFilter: null,
 
-        /**
-         * @type DatetimeFilter
-         */
+        /** @type DatetimeFilter */
         dateRangeFilter: null,
 
         initialize: function (options) {
@@ -66,7 +63,10 @@ define(function (require) {
             _.defaults(this.options, defaults);
             _.defaults(this.options.activityListOptions, defaults.activityListOptions);
 
-            this.options.activityListData = JSON.parse(this.options.activityListData);
+            var activityListData = JSON.parse(this.options.activityListData);
+            this.options.activityListData  = activityListData.data;
+            this.options.activityListCount = activityListData.count;
+
             this.options.activityListOptions.el = this.options._sourceElement;
 
             if (typeof this.options.activityListOptions.itemView === 'string') {
@@ -114,7 +114,7 @@ define(function (require) {
          * Triggered when filter state is changed
          */
         onFilterStateChange: function () {
-            console.warn('filter state update', this.getFilterState());
+            console.log(this.getFilterState());
         },
 
         /**
@@ -132,7 +132,7 @@ define(function (require) {
             activityTypeChoices = {};
             for (activityClass in this.options.activityListOptions.configuration) {
                 activityOptions = this.options.activityListOptions.configuration[activityClass];
-                activityTypeChoices[activityClass] = __(activityOptions.label);
+                activityTypeChoices[activityClass] = activityOptions.label;
             }
 
             // create and render
@@ -167,14 +167,30 @@ define(function (require) {
                 widget.getAction('refresh', 'adopted', function (action) {
                     action.on('click', _.bind(list.refresh, list));
                 });
-                widget.getAction('collapse_all', 'adopted', function (action) {
-                    action.on('click', _.bind(list.collapseAll, list));
-                });
-                widget.getAction('expand_all', 'adopted', function (action) {
-                    action.on('click', _.bind(list.expandAll, list));
-                });
+                //widget.getAction('collapse_all', 'adopted', function (action) {
+                //    action.on('click', _.bind(list.collapseAll, list));
+                //});
+                //widget.getAction('expand_all', 'adopted', function (action) {
+                //    action.on('click', _.bind(list.expandAll, list));
+                //});
                 widget.getAction('more', 'bottom', function (action) {
                     action.on('click', _.bind(list.more, list));
+                });
+
+                /**
+                 * pager actions
+                 */
+                widget.getAction('goto_first', 'bottom', function (action) {
+                    action.on('click', _.bind(list.goto_first, list));
+                });
+                widget.getAction('goto_next', 'bottom', function (action) {
+                    action.on('click', _.bind(list.goto_next, list));
+                });
+                widget.getAction('goto_previous', 'bottom', function (action) {
+                    action.on('click', _.bind(list.goto_previous, list));
+                });
+                widget.getAction('goto_last', 'bottom', function (action) {
+                    action.on('click', _.bind(list.goto_last, list));
                 });
 
                 // render filters

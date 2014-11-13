@@ -16,11 +16,6 @@
                 'title' : 'Refresh'|trans,
                 'dataAttributes': {'action-name': 'refresh'}
             }) }}
-            {{ UI.clientLink({
-                'aCss': 'collapse-all-button btn-mini',
-                'label' : 'Collapse All'|trans,
-                'dataAttributes': {'action-name': 'collapse_all'}
-            }) }}
         </div>
         {% endblock %}
         {% block items_container %}
@@ -55,6 +50,7 @@
                 data-page-component-options="{{ options|json_encode }}"></div>
 
             <div class="container-fluid actions-bottom">
+                {#
                 {{ UI.button({
                     'path': '#',
                     'label': 'oro.activitylist.widget.load_more.title'|trans({'{{ count }}': oro_config_value('oro_activity_list.per_page')}),
@@ -62,6 +58,52 @@
                     'aCss': 'no-hash',
                     'data': {'section': 'bottom', 'action-name': 'more'}
                 }) }}
+                #}
+                {% set pager = {
+                    current: 1,
+                    pagesize: oro_config_value('oro_activity_list.per_page'),
+                    total: (count/oro_config_value('oro_activity_list.per_page'))|round(0, 'ceil'),
+                    count: count
+                } %}
+                {#
+                    current:  1,  current page number, always 1
+                    pagesize: 5,  limit
+                    count:  100   total records
+                    total:   10,  total pages:  (count/pagesize)|round(0, ceil)
+                #}
+                {{ dump(pager) }}
+                <div class="pull-left">
+                    <div class="entity-pagination">
+                        <div class="pagination">
+                            <ul class="icons-holder">
+                                <li {% if pager.current == 1 %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_first">
+                                        {{ 'oro.entity_pagination.first'|trans }}
+                                    </a>
+                                </li>
+                                <li {% if pager.current == 1 %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_previous">
+                                        <i class="icon-chevron-left hide-text"></i>
+                                    </a>
+                                </li>
+                                <li><div class="pagination-current">{{ pager.current }}</div></li>
+                                <li {% if pager.current == pager.total %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_next">
+                                        <i class="icon-chevron-right hide-text"></i>
+                                    </a>
+                                </li>
+                                <li {% if pager.current == pager.total %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_last">
+                                        {{ 'oro.entity_pagination.last'|trans }}
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="dib pagination-total">
+                                {{ 'oro.entity_pagination.pager_of_%total%_pages'|trans({'%total%' : pager.total}) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}

@@ -15,9 +15,11 @@ define([
         fromDate: '',
         toDate:   '',
         filter:   '',
+        page: 1,
+        count: 0,
 
         url: function () {
-            return this.baseUrl + '?sorting=' + this.sorting;
+            return this.baseUrl + '?page=' + this.page;
         },
 
         getSorting: function () {
@@ -34,7 +36,27 @@ define([
         setToDate: function () {},
 
         getFilter: function () {},
-        setFilter: function () {}
+        setFilter: function () {},
+
+        getPage: function () {
+            return this.page;
+        },
+        setPage: function (page) {
+            this.page = page;
+        },
+
+        getCount: function () {
+            return this.count;
+        },
+        setCount: function (count) {
+            this.count = count;
+        },
+
+        parse: function(response) {
+            this.setCount(response.count);
+
+            return response.data;
+        }
     });
 
     return ActivityCollection;

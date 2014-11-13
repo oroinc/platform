@@ -24,8 +24,6 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
  */
 class ActivityListController extends RestController
 {
-    const ITEMS_PER_PAGE = 25;
-
     /**
      * Get activity lists for given entity
      *
@@ -83,14 +81,17 @@ class ActivityListController extends RestController
             $activityСlasses = explode(',', $activityСlasses);
         }
 
-        $results = $this->getManager()->getList(
-            $this->get('oro_entity.routing_helper')->decodeClassName($entityClass),
-            $entityId,
-            $activityСlasses,
-            $dateFrom,
-            $dateTo,
-            $this->getRequest()->get('page', 1)
-        );
+        $results = [
+            'count' => 100,
+            'data'  => $this->getManager()->getList(
+                $this->get('oro_entity.routing_helper')->decodeClassName($entityClass),
+                $entityId,
+                $activityСlasses,
+                $dateFrom,
+                $dateTo,
+                $this->getRequest()->get('page', 1)
+            )
+        ];
 
         return new JsonResponse($results);
     }

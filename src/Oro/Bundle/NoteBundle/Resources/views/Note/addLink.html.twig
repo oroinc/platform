@@ -1,18 +1,3 @@
-{#{{ UI.clientLink({#}
-    {#'id': 'add-entity-note-link',#}
-    {#'aCss': 'no-hash',#}
-    {#'iCss': 'icon-comment-alt hide-text',#}
-    {#'label' : 'oro.note.action.add'|trans#}
-{#}) }}#}
-{#<script type="text/javascript">#}
-    {#require(['jquery', 'oroui/js/mediator'],#}
-    {#function($, mediator){#}
-        {#$('#add-entity-note-link').on('click', function(e) {#}
-            {#e.preventDefault();#}
-            {#mediator.trigger('note:add');#}
-        {#});#}
-    {#});#}
-{#</script>#}
 {{ UI.clientLink({
     'dataUrl': path(
         'oro_note_create', {
@@ -26,6 +11,7 @@
     'widget': {
         'type': 'dialog',
         'multiple': false,
+        'reload-widget-alias': 'activity-list-widget',
         'options': {
             'alias': 'note-dialog',
             'dialogOptions': {

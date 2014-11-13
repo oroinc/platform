@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -27,17 +28,25 @@ class ActivityListChainProvider
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var TranslatorInterface */
+    protected $translator;
+
     /** @var array */
     protected $targetClasses = [];
 
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ConfigManager  $configManager
+     * @param DoctrineHelper       $doctrineHelper
+     * @param ConfigManager        $configManager
+     * @param TranslatorInterface $translator
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ConfigManager $configManager)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ConfigManager $configManager,
+        TranslatorInterface $translator
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
+        $this->translator     = $translator;
     }
 
     /**
@@ -199,7 +208,7 @@ class ActivityListChainProvider
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$provider->getActivityClass()] = [
                 'icon'     => $entityConfig->get('icon'),
-                'label'    => $entityConfig->get('label'),
+                'label'    => $this->translator->trans($entityConfig->get('label')),
                 'template' => $provider->getTemplate(),
                 'routes'   => $provider->getRoutes(),
             ];

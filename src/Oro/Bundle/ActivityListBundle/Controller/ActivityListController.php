@@ -42,8 +42,9 @@ class ActivityListController extends Controller
 
         return [
             'entity'                  => $entity,
+            'count'                   => 55,
             'configuration'           => $activitiesProvider->getActivityListOption(),
-            //'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
+            'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
         ];
     }
 

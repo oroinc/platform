@@ -39,7 +39,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     {
         return [
             'itemEdit'   => 'oro_calendar_event_update',
-            'itemDelete' => 'oro_api_delete_calendar_event'
+            'itemDelete' => 'oro_api_delete_calendarevent'
         ];
     }
 
