@@ -694,7 +694,8 @@ footer {
     cursor: move;
   }
 }
-.ui-dialog .widget-actions-section button.btn {
+.ui-dialog .widget-actions-section .btn,
+.ui-dialog .widget-actions-section a.action {
   margin-left: 5px;
 }
 .ui-dialog .ui-resizable-se {
@@ -1926,6 +1927,7 @@ ul.inline-extra {
   display: block;
   height: 0;
   clear: both;
+  line-height: 0;
 }
 
 label.required em,
@@ -2646,6 +2648,16 @@ div.uploader.focus,
   .alert-warning {
     background-image: none;
     padding-left: 20px;
+  }
+  .alert-info {
+    background-color: @infoBackground;
+    border-color: @infoBorder;
+    color: @infoText;
+    background-image: none;
+    padding-left: 20px;
+    .close {
+      color: @infoClose;
+    }
   }
   .alert-empty {
     display: none;

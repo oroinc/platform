@@ -59,8 +59,10 @@ class MigrationQueryExecutor
             }
             if ($dryRun) {
                 $descriptions = $query->getDescription();
-                foreach ((array)$descriptions as $description) {
-                    $this->logger->notice($description);
+                if (!empty($descriptions)) {
+                    foreach ((array)$descriptions as $description) {
+                        $this->logger->notice($description);
+                    }
                 }
             } else {
                 $query->execute($this->logger);

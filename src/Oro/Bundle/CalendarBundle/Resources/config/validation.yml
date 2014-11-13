@@ -11,3 +11,20 @@ Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
         end:
             - DateTime:     ~
             - NotBlank:     ~
+
+Oro\Bundle\CalendarBundle\Entity\CalendarProperty:
+    properties:
+        targetCalendar:
+            - NotBlank:     ~
+        calendarAlias:
+            - NotBlank:     ~
+            - Length:
+                max: 32
+        calendar:
+            - NotBlank:     ~
+        color:
+            - Length:
+                max: 6
+        backgroundColor:
+            - Length:
+                max: 6

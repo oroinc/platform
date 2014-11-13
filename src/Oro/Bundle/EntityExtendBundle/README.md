@@ -312,6 +312,10 @@ php app/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
 
+Custom form type and options
+---------------------
+To configure custom form type and options for extended field, read [Custom form type and options]$
+
 Validation for extended fields
 ---------------------
 By default all extended fields are not validated. In general extended fields rendered as usual forms, same way as not extended,
@@ -348,4 +352,3 @@ Pay attention to the fact that all constraints defined here applied to all exten
 Another point to keep in mind - integer fields should be rendered as text. Because html5 validation works only in case 
 when form submitted directly by user, and platform use javascript to submit forms. 
 Platform relates on jQuery validation, but due to the nature of input[type=number] - it's not possible to get it's raw value when it's not number.
-
