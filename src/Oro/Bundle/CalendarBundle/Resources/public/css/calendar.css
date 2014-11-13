@@ -198,6 +198,7 @@
     z-index: 999;
     left: 100%;
     margin: 0 0 0 -20px;
+    width: 170px;
 }
 
 .calendar-connections .context-menu a {
@@ -228,3 +229,8 @@
 .connection-item span {
     cursor: pointer;
 }
+
+.connection-item .simplecolorpicker.inline {
+    padding: 3px 13px;
+}
+

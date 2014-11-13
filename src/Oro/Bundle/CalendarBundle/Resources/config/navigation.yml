@@ -22,6 +22,12 @@ oro_menu_config:
                 position: 10
                 module: 'orocalendar/js/calendar/menu/toggle-calendar'
                 template: 'OroCalendarBundle:Calendar:Menu/toggleCalendar.html.twig'
+        oro_calendar_color_action:
+            uri: '#'
+            extras:
+                position: 100
+                module: 'orocalendar/js/calendar/menu/color-calendar'
+                template: 'OroCalendarBundle:Calendar:Menu/colorCalendar.html.twig'
         calendar_event_list:
             label: 'oro.calendar.calendarevent.entity_plural_label'
             route: 'oro_calendar_event_index'
@@ -44,6 +50,7 @@ oro_menu_config:
             children:
                 oro_calendar_remove_action: ~
                 oro_calendar_toggle_action: ~
+                oro_calendar_color_action: ~
 
 oro_titles:
     oro_calendar_view_default: "My Calendar - %%username%%"

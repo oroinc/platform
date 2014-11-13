@@ -142,7 +142,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         showContextMenu: function ($container, model) {
             var $el = $(this.contextMenuTemplate(model.toJSON())),
-                modules = _.uniq($el.find("a[data-module]").map(function () {
+                modules = _.uniq($el.find("li[data-module]").map(function () {
                     return $(this).data('module');
                 }).get()),
                 options = this.options,
@@ -155,6 +155,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     $container.html('<span class="loading-indicator"></span>');
                 }, this), 100);
                 // load context menu
+                options._actionSyncObject = this._actionSyncObject;
+                options.$el = $el;
+                options.model = model;
                 modules = _.object(modules, modules);
                 tools.loadModules(modules, _.bind(function (modules) {
                     clearTimeout(showLoadingTimeout);
@@ -162,12 +165,12 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
                     _.each(modules, _.bind(function (moduleConstructor, moduleName) {
                         var actionModule = new moduleConstructor(options);
-                        $el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
+                        $el.one('click', "li[data-module='" + moduleName + "'] .action", _.bind(function (e) {
                             if (this._initActionSyncObject()) {
                                 $('.context-menu-button').css('display', '');
                                 $el.remove();
                                 $(document).off('.' + this.cid);
-                                actionModule.execute(model, this._actionSyncObject);
+                                actionModule.execute(model);
                             }
                         }, this));
                     }, this));
