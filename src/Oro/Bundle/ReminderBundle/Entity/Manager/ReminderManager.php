@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ReminderBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
-
-use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 
 /**
  * Manages reminder persistence
@@ -17,16 +15,16 @@ use Oro\Bundle\ReminderBundle\Entity\Reminder;
 class ReminderManager
 {
     /**
-     * @var EntityManager
+     * @var DoctrineHelper
      */
-    protected $entityManager;
+    protected $doctrineHelper;
 
     /**
-     * @param EntityManager $entityManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->entityManager = $entityManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -36,30 +34,29 @@ class ReminderManager
      */
     public function saveReminders(RemindableInterface $entity)
     {
-        // Persist and flush new entity to get id
-        if (!$entityId = $this->getEntityIdentifier($entity)) {
-            $this->entityManager->persist($entity);
-            $this->entityManager->flush($entity);
-
-            $entityId = $this->getEntityIdentifier($entity);
+        $entityId = $this->doctrineHelper->getEntityIdentifier($entity);
+        if (!$entityId) {
+            return;
         }
 
-        $reminders    = $entity->getReminders();
+        $reminders = $entity->getReminders();
         $reminderData = $entity->getReminderData();
-        $entityClass  = $this->getEntityClassName($entity);
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
+
+        $em = $this->doctrineHelper->getEntityManager($reminders->first());
 
         if (!$reminders instanceof RemindersPersistentCollection) {
             foreach ($reminders as $reminder) {
                 $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
-                $this->entityManager->persist($reminder);
+                $em->persist($reminder);
             }
         } else {
             if ($reminders->isDirty()) {
                 foreach ($reminders->getInsertDiff() as $reminder) {
-                    $this->entityManager->persist($reminder);
+                    $em->persist($reminder);
                 }
                 foreach ($reminders->getDeleteDiff() as $reminder) {
-                    $this->entityManager->remove($reminder);
+                    $em->remove($reminder);
                 }
             }
             foreach ($reminders as $reminder) {
@@ -94,12 +91,10 @@ class ReminderManager
      */
     public function loadReminders(RemindableInterface $entity)
     {
-        $repository = $this->entityManager->getRepository('OroReminderBundle:Reminder');
-
         $reminders = new RemindersPersistentCollection(
-            $repository,
-            $this->getEntityClassName($entity),
-            $this->getEntityIdentifier($entity)
+            $this->getRemindersRepository(),
+            $this->doctrineHelper->getEntityClass($entity),
+            $this->doctrineHelper->getEntityIdentifier($entity)
         );
 
         $entity->setReminders($reminders);
@@ -120,12 +115,12 @@ class ReminderManager
             return;
         }
 
-        $repository       = $this->entityManager->getRepository('OroReminderBundle:Reminder');
-        $reminders        = $repository
+        $reminders = $this->getRemindersRepository()
             ->findRemindersByEntitiesQueryBuilder($entityClassName, $this->extractProperty($items, 'id'))
             ->select('reminder.relatedEntityId, reminder.method, reminder.intervalNumber, reminder.intervalUnit')
             ->getQuery()
             ->getArrayResult();
+
         $groupedReminders = [];
         foreach ($reminders as $reminder) {
             $groupedReminders[$reminder['relatedEntityId']][] = $reminder;
@@ -163,40 +158,12 @@ class ReminderManager
     }
 
     /**
-     * Gets entity class name
-     *
-     * @param RemindableInterface $entity
-     *
-     * @return string
+     * @return ReminderRepository
      */
-    protected function getEntityClassName(RemindableInterface $entity)
+    protected function getRemindersRepository()
     {
-        return ClassUtils::getRealClass($entity);
-    }
-
-    /**
-     * Gets single identifier of entity
-     *
-     * @param RemindableInterface $entity
-     *
-     * @return mixed
-     * @throws InvalidArgumentException If entity has multiple identifiers
-     */
-    protected function getEntityIdentifier(RemindableInterface $entity)
-    {
-        $className   = $this->getEntityClassName($entity);
-        $identifiers = $this->entityManager->getClassMetadata($className)->getIdentifierValues($entity);
-
-        if (count($identifiers) > 1) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'Entity "%s" with multiple identifiers "%s" is not supported by OroReminderBundle.',
-                    $className,
-                    implode('", "', array_keys($identifiers))
-                )
-            );
-        }
-
-        return current($identifiers);
+        return $this->doctrineHelper
+            ->getEntityManager('OroReminderBundle:Reminder')
+            ->getRepository('OroReminderBundle:Reminder');
     }
 }
