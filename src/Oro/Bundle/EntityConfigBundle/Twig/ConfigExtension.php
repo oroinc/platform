@@ -109,7 +109,8 @@ class ConfigExtension extends \Twig_Extension
             'name' => 'index',
         ];
         $postfix = $routeMap[$routeType];
-        $parts = explode('\\', $className);
-        return strtolower($parts[0]) . '_' . strtolower($parts[count($parts) - 1]) . '_' . $postfix;
+        $parts   = explode('\\', $className);
+
+        return strtolower(reset($parts)) . '_' . strtolower(end($parts)) . '_' . $postfix;
     }
 }

@@ -191,56 +191,47 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getClassRouteProvider
+     *
      * @param $metadata
      * @param $expectedRouteView
      * @param $expectedRouteName
-     * @dataProvider getClassRouteProvider
      */
     public function testGetClassRoute($metadata, $expectedRouteView, $expectedRouteName)
     {
         $className = $metadata->name;
 
-        $this->configManager->expects($this->any())
-            ->method('getEntityMetadata')
+        $this->configManager->expects($this->any())->method('getEntityMetadata')
             ->will($this->returnValue($metadata));
 
-        $this->assertNull(
-            $this->twigExtension->getClassRoute($className, 'undefined')
-        );
-        $this->assertEquals(
-            $expectedRouteView,
-            $this->twigExtension->getClassRoute($className)
-        );
-        $this->assertEquals(
-            $expectedRouteView,
-            $this->twigExtension->getClassRoute($className, 'view')
-        );
-        $this->assertEquals(
-            $expectedRouteName,
-            $this->twigExtension->getClassRoute($className, 'name')
-        );
+        $this->assertNull($this->twigExtension->getClassRoute($className, 'undefined'));
+        $this->assertEquals($expectedRouteView, $this->twigExtension->getClassRoute($className));
+        $this->assertEquals($expectedRouteView, $this->twigExtension->getClassRoute($className, 'view'));
+        $this->assertEquals($expectedRouteName, $this->twigExtension->getClassRoute($className, 'name'));
     }
 
+    /**
+     * @return array
+     */
     public function getClassRouteProvider()
     {
-        $metadataWithRoutes = new EntityMetadata(
+        $metadataWithoutRoutes         = new EntityMetadata(
+            'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity'
+        );
+        $metadataWithRoutes            = new EntityMetadata(
             'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\EntityForAnnotationTests'
         );
         $metadataWithRoutes->routeView = 'test_route_view';
         $metadataWithRoutes->routeName = 'test_route_name';
 
-        $metadataWithoutRoutes = new EntityMetadata(
-            'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity'
-        );
-
         return [
-            'with_routes' => [
-                'metadata' => $metadataWithRoutes,
+            'with_routes'    => [
+                'metadata'          => $metadataWithRoutes,
                 'expectedRouteView' => 'test_route_view',
                 'expectedRouteName' => 'test_route_name',
             ],
             'without_routes' => [
-                'metadata' => $metadataWithoutRoutes,
+                'metadata'          => $metadataWithoutRoutes,
                 'expectedRouteView' => 'oro_demoentity_view',
                 'expectedRouteName' => 'oro_demoentity_index',
             ],
