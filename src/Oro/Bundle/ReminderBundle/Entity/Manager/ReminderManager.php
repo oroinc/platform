@@ -43,7 +43,7 @@ class ReminderManager
         $reminderData = $entity->getReminderData();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
-        $em = $this->doctrineHelper->getEntityManager($reminders->first());
+        $em = $this->doctrineHelper->getEntityManager('OroReminderBundle:Reminder');
 
         if (!$reminders instanceof RemindersPersistentCollection) {
             foreach ($reminders as $reminder) {
