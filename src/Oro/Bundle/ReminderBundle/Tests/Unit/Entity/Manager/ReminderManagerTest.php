@@ -60,7 +60,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
         $entity = $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\RemindableInterface');
         $entityClass = get_class($entity);
 
-        $entity->expects($this->once(0))
+        $entity->expects($this->once())
             ->method('getReminders')
             ->will($this->returnValue($reminders));
 
@@ -88,6 +88,23 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->at(1))
             ->method('persist')
             ->with($barReminder);
+
+        $this->manager->saveReminders($entity);
+    }
+
+    public function testSaveEmptyEntityId()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|RemindableInterface $entity */
+        $entity = $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\RemindableInterface');
+
+        $this->doctrineHelper
+            ->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->will($this->returnValue(null));
+
+        $this->entityManager
+            ->expects($this->never())
+            ->method('persist');
 
         $this->manager->saveReminders($entity);
     }
@@ -124,7 +141,7 @@ class ReminderManagerTest extends \PHPUnit_Framework_TestCase
         $entity = $this->getMock('Oro\\Bundle\\ReminderBundle\\Entity\\RemindableInterface');
         $entityClass = get_class($entity);
 
-        $entity->expects($this->once(0))
+        $entity->expects($this->once())
             ->method('getReminders')
             ->will($this->returnValue($remindersCollection));
 

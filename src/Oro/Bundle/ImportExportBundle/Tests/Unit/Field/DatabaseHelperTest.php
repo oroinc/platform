@@ -234,4 +234,23 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             'many to many' => array(ClassMetadata::MANY_TO_MANY, false),
         );
     }
+
+    public function testGetEntityReference()
+    {
+        $entity = new \stdClass();
+        $reference = new \stdClass();
+        $entityName = get_class($entity);
+        $identifier = 1;
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($entity)
+            ->will($this->returnValue($identifier));
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityReference')
+            ->with($entityName, $identifier)
+            ->will($this->returnValue($reference));
+
+        $this->assertEquals($reference, $this->helper->getEntityReference($entity));
+    }
 }

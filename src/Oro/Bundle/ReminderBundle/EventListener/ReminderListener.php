@@ -48,10 +48,6 @@ class ReminderListener
             return;
         }
 
-        if ($entity->getReminders()->isEmpty()) {
-            return;
-        }
-
         $this->reminderManager->saveReminders($entity);
     }
 }
