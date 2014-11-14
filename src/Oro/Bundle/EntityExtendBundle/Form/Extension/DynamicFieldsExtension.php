@@ -18,9 +18,6 @@ use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
     /** @var ConfigManager */
@@ -31,31 +28,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
     /** @var TranslatorInterface */
     protected $translator;
-
-    // TODO: Replace manual mapping with form type guessing,
-    // TODO: should be done in scope https://magecore.atlassian.net/browse/BAP-3351
-    protected $typeMap = [
-        'string'     => 'text',
-        'integer'    => 'integer',
-        'smallint'   => 'integer',
-        'bigint'     => 'integer',
-        'boolean'    => 'choice',
-        'decimal'    => 'number',
-        'money'      => 'oro_money',
-        'percent'    => 'oro_percent',
-        'date'       => 'oro_date',
-        'datetime'   => 'oro_datetime',
-        'text'       => 'textarea',
-        'float'      => 'number',
-        'file'       => 'oro_file',
-        'image'      => 'oro_image',
-        'manyToOne'  => 'oro_entity_select',
-        'oneToMany'  => 'oro_multiple_entity',
-        'manyToMany' => 'oro_multiple_entity',
-        'optionSet'  => 'oro_option_select',
-        'enum'       => 'oro_enum_select',
-        'multiEnum'  => 'oro_enum_choice',
-    ];
 
     /**
      * @param ConfigManager       $configManager
@@ -74,10 +46,6 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
     /**
      * {@inheritdoc}
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -90,13 +58,9 @@ class DynamicFieldsExtension extends AbstractTypeExtension
             return;
         }
 
-        $data = $builder->getData();
-
-        $formConfigProvider   = $this->configManager->getProvider('form');
-        $entityConfigProvider = $this->configManager->getProvider('entity');
         $extendConfigProvider = $this->configManager->getProvider('extend');
+        $formConfigs          = $this->configManager->getProvider('form')->getConfigs($className);
 
-        $formConfigs = $formConfigProvider->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
@@ -105,95 +69,13 @@ class DynamicFieldsExtension extends AbstractTypeExtension
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $formConfig->getId();
             $fieldName     = $fieldConfigId->getFieldName();
+            $extendConfig  = $extendConfigProvider->getConfig($className, $fieldName);
 
-            $extendConfig = $extendConfigProvider->getConfig($className, $fieldName);
             if (!$this->isApplicableField($extendConfig, $extendConfigProvider)) {
                 continue;
             }
 
-            $entityConfig = $entityConfigProvider->getConfig($className, $fieldName);
-
-            $options = [
-                'label'    => $entityConfig->get('label'),
-                'required' => false,
-                'block'    => 'general',
-            ];
-
-            switch ($fieldConfigId->getFieldType()) {
-                case 'boolean':
-                    $options['empty_value'] = false;
-                    $options['choices']     = ['No', 'Yes'];
-                    break;
-                case 'optionSet':
-                    $options['entityClassName'] = $className;
-                    $options['entityFieldName'] = $fieldName;
-                    break;
-                case 'enum':
-                    $options['enum_code'] = $this->configManager->getProvider('enum')
-                        ->getConfig($className, $fieldName)
-                        ->get('enum_code');
-                    break;
-                case 'multiEnum':
-                    $options['expanded']  = true;
-                    $options['enum_code'] = $this->configManager->getProvider('enum')
-                        ->getConfig($className, $fieldName)
-                        ->get('enum_code');
-                    break;
-                case 'manyToOne':
-                    $options['entity_class'] = $extendConfig->get('target_entity');
-                    $options['configs']      = [
-                        'placeholder'   => 'oro.form.choose_value',
-                        'extra_config'  => 'relation',
-                        'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
-                        'target_field'  => $extendConfig->get('target_field'),
-                        'properties'    => [$extendConfig->get('target_field')],
-                    ];
-                    break;
-                case 'oneToMany':
-                case 'manyToMany':
-                    $classArray          = explode('\\', $extendConfig->get('target_entity'));
-                    $blockName           = array_pop($classArray);
-                    $selectorWindowTitle = 'Select ' . $blockName;
-
-                    $options = [
-                        'label'                 => $entityConfig->get('label'),
-                        'required'              => false,
-                        'block'                 => $blockName,
-                        'block_config'          => [
-                            $blockName => ['title' => null, 'subblocks' => [['useSpan' => false]]]
-                        ],
-                        'class'                 => $extendConfig->get('target_entity'),
-                        'grid_url'              => $this->router->generate(
-                            'oro_entity_relation',
-                            [
-                                'id'         => (($data && $data->getId()) ? $data->getId() : 0),
-                                'entityName' => str_replace('\\', '_', $className),
-                                'fieldName'  => $fieldName
-                            ]
-                        ),
-                        'selector_window_title' => $selectorWindowTitle,
-                        'initial_elements'      => null,
-                        'mapped'                => false,
-                        'extend'                => true,
-                    ];
-
-                    if (!$extendConfig->is('without_default')) {
-                        $defaultFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-                        $builder->add(
-                            $defaultFieldName,
-                            'oro_entity_identifier',
-                            [
-                                'class'    => $extendConfig->get('target_entity'),
-                                'multiple' => false
-                            ]
-                        );
-                        $options['default_element'] = $defaultFieldName;
-                    }
-
-                    break;
-            }
-
-            $builder->add($fieldName, $this->typeMap[$fieldConfigId->getFieldType()], $options);
+            $builder->add($fieldName);
         }
     }
 
@@ -201,21 +83,14 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      * @param FormView      $view
      * @param FormInterface $form
      * @param array         $options
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
-            return;
-        }
-
         $className = $options['data_class'];
-        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
+        if ($options['dynamic_fields_disabled'] || empty($options['data_class']) ||
+            !$this->configManager->getProvider('extend')->hasConfig($className)) {
             return;
         }
-
-        $data = $form->getData();
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $formConfigProvider   = $this->configManager->getProvider('form');
@@ -237,35 +112,51 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
             $view->children[$fieldName]->vars['extra_field'] = true;
 
-            if (in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToMany'])) {
-                $dataId = 0;
-                if ($data->getId()) {
-                    $dataId = $data->getId();
-                }
-                $view->children[$fieldName]->vars['grid_url'] =
-                    $this->router->generate(
-                        'oro_entity_relation',
-                        [
-                            'id'         => $dataId,
-                            'entityName' => str_replace('\\', '_', $className),
-                            'fieldName'  => $fieldName
-                        ]
-                    );
-
-                $defaultEntity = null;
-                if (!$extendConfig->is('without_default')) {
-                    $defaultEntity = FieldAccessor::getValue(
-                        $data,
-                        ExtendConfigDumper::DEFAULT_PREFIX . $fieldName
-                    );
-                }
-                $selectedCollection = FieldAccessor::getValue($data, $fieldName);
-
-                if ($data->getId()) {
-                    $view->children[$fieldName]->vars['initial_elements'] =
-                        $this->getInitialElements($selectedCollection, $defaultEntity, $extendConfig);
-                }
+            if (!in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToMany'])) {
+                continue;
             }
+
+            $this->addInitialElements($view, $form, $extendConfig);
+        }
+    }
+
+    /**
+     * @param FormView        $view
+     * @param FormInterface   $form
+     * @param ConfigInterface $extendConfig
+     */
+    protected function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
+    {
+        $data      = $form->getData();
+        $dataId    = $data->getId() ? $data->getId() : 0;
+
+        /** @var FieldConfigId $extendConfigId */
+        $extendConfigId = $extendConfig->getId();
+        $className      = $extendConfigId->getClassName();
+        $fieldName      = $extendConfigId->getFieldName();
+
+        $view->children[$fieldName]->vars['grid_url'] =
+            $this->router->generate(
+                'oro_entity_relation',
+                [
+                    'id'         => $dataId,
+                    'entityName' => str_replace('\\', '_', $className),
+                    'fieldName'  => $fieldName
+                ]
+            );
+
+        $defaultEntity = null;
+        if (!$extendConfig->is('without_default')) {
+            $defaultEntity = FieldAccessor::getValue(
+                $data,
+                ExtendConfigDumper::DEFAULT_PREFIX . $fieldName
+            );
+        }
+        $selectedCollection = FieldAccessor::getValue($data, $fieldName);
+
+        if ($dataId) {
+            $view->children[$fieldName]->vars['initial_elements'] =
+                $this->getInitialElements($selectedCollection, $defaultEntity, $extendConfig);
         }
     }
 

@@ -21,7 +21,6 @@ define(['underscore', 'backbone', 'routing'
             calendarUid: null, // calculated automatically, equals to calendarAlias + calendarId
             position: 0,
             visible: true,
-            color: null,
             backgroundColor: null,
             calendarName: null,
             removable: true,
