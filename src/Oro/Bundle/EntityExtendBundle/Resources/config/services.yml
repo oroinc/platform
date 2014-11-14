@@ -35,6 +35,7 @@ parameters:
     oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
     oro_entity_extend.datagrid.action.type.ajaxdeletefield.class:  Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction
     oro_entity_extend.validation_loader.class:                Oro\Bundle\EntityExtendBundle\Validator\ExtendFieldValidationLoader
+    oro_entity_extend.listener.extend_field_value_render.class:  Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -263,8 +264,7 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity_extend.extend.field_type_helper
-            - @oro_locale.formatter.date_time
-            - @router
+            - @event_dispatcher
         tags:
             - { name: twig.extension }
 
@@ -304,3 +304,12 @@ services:
                             pattern: "/^[\d+]*$/"
                             message: "This value should contain only numbers."
 
+    oro_entity_extend.listener.extend_field_value_render:
+        class: %oro_entity_extend.listener.extend_field_value_render.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @router
+            - @oro_entity_extend.extend.field_type_helper
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
