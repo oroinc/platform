@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-abstract class AbstractSimpleColorPicker extends AbstractType
+abstract class AbstractSimpleColorPickerType extends AbstractType
 {
     /** @var array */
     protected static $colorSchema = [

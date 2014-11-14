@@ -120,7 +120,7 @@
           self.$select.find('> option').each(function () {
               buildItemFunc($(this), true);
           });
-      } else {
+      } else if (!self.options.table) {
           var selected = null;
           $.each(self.options.data, function(index, value) {
               if (value.selected) {
@@ -134,6 +134,16 @@
                       selected = index;
                   }
               }
+              buildItemFunc(value, false);
+          });
+      } else {
+          var data = [];
+          if (selectedVal) {
+              $.each(JSON.parse(selectedVal), function(index, value) {
+                  data.push({id: value, text: value});
+              });
+          }
+          $.each(data, function(index, value) {
               buildItemFunc(value, false);
           });
       }
@@ -155,6 +165,41 @@
         self.selectColorSpan($colorSpan);
       } else {
         console.error("The given color '" + color + "' could not be found");
+      }
+    },
+
+    /**
+     * Replace the color.
+     * This method can be used if `options.table` is true
+     *
+     * @param {string} oldColor the hexadecimal color to be replaced, ex: '#fbd75b'
+     * @param {string} newColor the hexadecimal color to replace, ex: '#fbd75b'
+     */
+    replaceColor: function(oldColor, newColor) {
+      var self = this;
+
+      var $colorSpan = self.$colorList.find('> span.color').filter(function() {
+        return $(this).data('color').toLowerCase() === oldColor.toLowerCase();
+      });
+
+      if ($colorSpan.length > 0) {
+        $colorSpan.data('color', newColor);
+        $colorSpan.css('background-color', newColor);
+        $colorSpan.prop('title', newColor);
+        // Change HTML select value
+        var val = JSON.parse(this.$select.val()),
+            foundIndex = -1;
+          $.each(val, function(index, value) {
+              if (value.toLowerCase() === oldColor.toLowerCase()) {
+                  foundIndex = index;
+              }
+          });
+          if (foundIndex !== -1) {
+              val[foundIndex] = newColor;
+              this.$select.val(JSON.stringify(val));
+          }
+      } else {
+        console.error("The given color '" + oldColor + "' could not be found");
       }
     },
 
@@ -183,9 +228,11 @@
       var color = $colorSpan.data('color');
       var title = $colorSpan.prop('title');
 
-      // Mark this span as the selected one
-      $colorSpan.siblings().removeAttr('data-selected');
-      $colorSpan.attr('data-selected', '');
+      if (!this.options.table) {
+        // Mark this span as the selected one
+        $colorSpan.siblings().removeAttr('data-selected');
+        $colorSpan.attr('data-selected', '');
+      }
 
       if (this.options.picker === true) {
         this.$icon.css('background-color', color);
@@ -194,7 +241,9 @@
       }
 
       // Change HTML select value
-      this.$select.val(color);
+      if (!this.options.table) {
+          this.$select.val(color);
+      }
     },
 
     /**
@@ -281,7 +330,13 @@
 
     // The list of options in case when the picker is applied for non SELECT
     // array of {id: ..., text: ..., class: ..., selected: ..., disabled: ...}
-    data: null
+    data: null,
+
+    // Allows to use this control to edit any color in the list, rather than select one color
+    // Note that this control has not integrated color picker and it should be added outside
+    // The 'picker' property must be false then this property is true,
+    // also 'pickerDelay' and 'data' properties are ignored in this case
+    table: false
   };
 
 })(jQuery);

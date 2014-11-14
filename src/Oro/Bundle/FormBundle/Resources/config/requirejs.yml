@@ -38,3 +38,4 @@ config:
 
         'oroform/js/app/components/simple-color-picker': 'bundles/oroform/js/app/components/simple-color-picker.js'
         'oroform/js/app/components/simple-color-choice': 'bundles/oroform/js/app/components/simple-color-choice.js'
+        'oroform/js/app/components/color-table': 'bundles/oroform/js/app/components/color-table.js'

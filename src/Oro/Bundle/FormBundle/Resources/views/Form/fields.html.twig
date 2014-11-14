@@ -723,3 +723,16 @@
         {%- endif -%}
     {% endfor %}
 {% endblock %}
+
+{% block oro_color_table_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_color_table_widget %}
+    {% set attr = attr|merge({
+        'data-page-component-module': 'oroform/js/app/components/color-table',
+        'data-page-component-options': configs|json_encode
+    }) %}
+    {% set type = 'hidden' %}
+    {{ block('form_widget_simple') }}
+{% endblock %}
