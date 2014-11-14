@@ -13,9 +13,8 @@ define([
             fillOpacity: 0.5,
             fontColor: '#B2B2B2',
             explode: 5,
-            marginX: 450,
+            marginX: 250,
             marginY: 20,
-            leftMargin: 160,
             colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF',
                 '#65BC87', '#8985C2', '#ECB574', '#84A377']
         },
@@ -163,8 +162,7 @@ define([
                 shiftY = options.marginY || 0,
                 frameWidth = options.width - shiftX,
                 frameHeight = options.height - shiftY * 2 - shift,
-                extraHeight = options.extraHeight || 0,
-                leftMargin = options.leftMargin || 0;
+                extraHeight = options.extraHeight || 0;
 
             leftHeight = index > 0 ? this.shapes[index - 1].leftHeight : frameHeight + extraHeight;
             width = index > 0 ? this.shapes[index - 1].bottomWidth : frameWidth;
@@ -214,7 +212,7 @@ define([
             shape.topWidth = AD * 2;
             shape.bottomWidth = (series.isNozzle ? AD : BC) * 2;
 
-            shape.x1 = Math.ceil((frameWidth - width) / 2) + leftMargin;
+            shape.x1 = Math.ceil((frameWidth - width) / 2);
             shape.x2 = shape.x1 + shape.topWidth;
             shape.x3 = shape.x1 + (shape.topWidth + shape.bottomWidth) / 2;
             shape.x4 = shape.x1 + (shape.topWidth - shape.bottomWidth) / 2;
@@ -234,9 +232,9 @@ define([
                 index = options.index,
                 series = this.allSeries[index],
                 $prev = $(options.element).find('.flotr-grid-label').last(),
-                distX = (options.width - options.marginX) / 2,
+                distX = options.width - options.marginX * 0.8,
                 distY = !$prev[0] ? options.marginY :
-                    $prev.position().top + $prev.height() + options.fontSize * 1.2,
+                    $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2,
                 style = {
                     size : options.fontSize * 1.2,
                     color : options.fontColor,
@@ -249,11 +247,10 @@ define([
 
             var html = [],
                 divStyle =
-                    'position:absolute;' +
                     style.textBaseline + ':' + (distY - style.size)  + 'px;' +
-                    style.textAlign + ':' + (distX + (options.marginX + options.width)/3 + 10) + 'px;';
+                    style.textAlign + ':' + (distX + 10) + 'px;';
 
-            html.push('<div style="', divStyle, '" class="flotr-grid-label">', series.label, '</div>');
+            html.push('<div style="', divStyle, '" class="flotr-grid-label funnel-label">', series.label, '</div>');
 
             var div = Flotr.DOM.node('<div style="color:#454545" class="flotr-labels"></div>');
             Flotr.DOM.insert(div, html.join(''));
@@ -264,7 +261,7 @@ define([
             context.lineWidth = 1;
             context.strokeStyle = options.fontColor;
             context.moveTo(shape.x2, shape.y2);
-            context.lineTo(distX + (options.marginX + options.width)/3, distY);
+            context.lineTo(distX, distY);
             context.stroke();
         },
 

@@ -31,7 +31,10 @@ define(function(require) {
             this.renderBaseLayout();
 
             this.$chart.bind('update.' + this.cid, $.proxy(this.update, this));
-            $(window).bind('resize.' + this.cid, $.proxy(this.update, this));
+            // updates the chart on resize once per frame (1000/25)
+            $(window).bind('resize.' + this.cid, _.throttle($.proxy(this.update, this), 40, {leading: false}));
+
+            _.defer(_.bind(this.update, this));
         },
 
         /**
@@ -42,6 +45,10 @@ define(function(require) {
         dispose: function() {
             this.$chart.unbind('.' + this.cid);
             $(window).unbind('.' + this.cid);
+            delete this.$el;
+            delete this.$chart;
+            delete this.$legend;
+            delete this.$container;
             BaseChartComponent.__super__.dispose.call(this);
         },
 
@@ -49,6 +56,7 @@ define(function(require) {
             this.$el.html(this.template());
             this.$chart = this.$el.find('.chart-content');
             this.$legend = this.$el.find('.chart-legend');
+            this.$container = this.$el.find('.chart-container');
         },
 
         /**

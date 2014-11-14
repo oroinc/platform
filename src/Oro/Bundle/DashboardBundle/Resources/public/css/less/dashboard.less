@@ -321,29 +321,36 @@
 .chart-container {
   position: relative;
   overflow-x: visible;
+  &.wrapped-chart-legend {
+    margin: 0 auto;
+  }
   &>.clearfix {
     margin: 0 auto;
-    .pie-chart {
-      z-index: 1;
-    }
-    .bar-chart{
-      margin-top: 20px;
-    }
-    .pie-chart-legend {
+    .chart-legend {
       position: relative;
+      min-width: 250px; // to wrap legend event if it's empty yet
+      height: auto !important;
+      padding-bottom: 20px;
       table {
-        position: absolute;
+        position: relative;
         top: 0;
         left: 0;
         bottom: 0;
         right: 0;
         margin: auto 0 auto 30px;
-        width: 50%;
+        width: 90%;
         height: auto;
         td {
           padding-bottom: 7px;
         }
+        .flotr-legend-color-box {
+          width: 30px;
+        }
       }
+    }
+    .funnel-label {
+      position: absolute;
+      padding-bottom: .5em;
     }
   }
 }

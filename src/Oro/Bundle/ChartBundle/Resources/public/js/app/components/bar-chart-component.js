@@ -13,17 +13,6 @@ define(function(require) {
      */
     BarChartComponent = BaseChartComponent.extend({
         /**
-         *
-         * @overrides
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            BarChartComponent.__super__.initialize.call(this, options);
-
-            this.update();
-        },
-
-        /**
          * Draw chart
          *
          * @overrides

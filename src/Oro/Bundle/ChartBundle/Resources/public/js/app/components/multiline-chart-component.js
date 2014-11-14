@@ -13,17 +13,6 @@ define(function(require) {
      */
     MultilineChartComponent = BaseChartComponent.extend({
         /**
-         *
-         * @overrides
-         * @param {Object} options
-         */
-        initialize: function(options) {
-            MultilineChartComponent.__super__.initialize.call(this, options);
-
-            this.update();
-        },
-
-        /**
          * Draw chart
          *
          * @overrides

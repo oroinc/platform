@@ -6,15 +6,15 @@ define(function(require) {
         __ = require('orotranslation/js/translator'),
         Flotr = require('flotr2'),
         numberFormatter = require('orolocale/js/formatter/number'),
-        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+        PieChartComponent = require('orochart/js/app/components/pie-chart-component');
     require('orochart/js/flotr2/funnel');
 
     /**
      * @class orochart.app.components.FlowChartComponent
-     * @extends orochart.app.components.BaseChartComponent
+     * @extends orochart.app.components.PieChartComponent
      * @exports orochart/app/components/flow-chart-component
      */
-    FlowChartComponent = BaseChartComponent.extend({
+    FlowChartComponent = PieChartComponent.extend({
         /**
          *
          * @overrides
@@ -25,8 +25,6 @@ define(function(require) {
 
             this.date = options.date;
             this._prepareData();
-
-            this.update();
         },
 
         /**
@@ -56,11 +54,22 @@ define(function(require) {
          * @overrides
          */
         draw: function () {
-            var $chart = this.$chart;
-            var options = this.options;
+            var labelsWidth,
+                $chart = this.$chart,
+                $legend = this.$legend,
+                options = this.options,
+                hasPlaceForLabels = !this.$container.hasClass('wrapped-chart-legend');
 
             if (!$chart.get(0).clientWidth) {
                 return;
+            }
+
+            labelsWidth = 0;
+            $legend.html('');
+
+            if (hasPlaceForLabels) {
+                labelsWidth = 250;// width for embedded labels
+                $chart.width($chart.width() + labelsWidth);
             }
 
             Flotr.draw(
@@ -69,9 +78,10 @@ define(function(require) {
                 {
                     funnel: {
                         show: true,
-                        showLabels: true,
+                        showLabels: hasPlaceForLabels,
                         formatter: numberFormatter.formatCurrency,
-                        colors: options.settings.chartColors
+                        colors: options.settings.chartColors,
+                        marginX: labelsWidth
                     },
                     mouse: {
                         track: true,
@@ -81,7 +91,11 @@ define(function(require) {
                         outlineWidth: 0
                     },
                     legend : {
-                        show: false
+                        show: !hasPlaceForLabels,
+                        container: $legend.get(0),
+                        labelBoxWidth: 20,
+                        labelBoxHeight: 13,
+                        labelBoxMargin: 0
                     }
                 }
             );
