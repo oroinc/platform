@@ -4,8 +4,18 @@ namespace Oro\Bundle\ActivityListBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+
 class PlaceholderFilter
 {
+    /** @var ActivityListChainProvider */
+    protected $activityListProvider;
+
+    public function __construct(ActivityListChainProvider $activityListChainProvider)
+    {
+        $this->activityListProvider = $activityListChainProvider;
+    }
+
     /**
      * Checks if the entity can have activities
      *
@@ -20,17 +30,9 @@ class PlaceholderFilter
 
         $className = ClassUtils::getClass($entity);
 
-        /**
-         * TODO:
-         *  Can entity have some activities assigned ??
-         *  validation should be done by chain provider
-         */
         return in_array(
             $className,
-            [
-                'OroCRM\Bundle\ContactBundle\Entity\Contact',
-              //  'Oro\Bundle\UserBundle\Entity\User',
-            ]
+            $this->activityListProvider->getTargetEntityClasses()
         );
     }
 }

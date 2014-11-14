@@ -5,11 +5,11 @@ namespace Oro\Bundle\EmailBundle\Provider;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class EmailActivityListProvider implements ActivityListProviderInterface
@@ -31,8 +31,12 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     /**
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, ServiceLink $doctrineRegistryLink, ServiceLink $nameFormatterLink, Router $router)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ServiceLink $doctrineRegistryLink,
+        ServiceLink $nameFormatterLink,
+        Router $router
+    ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
         $this->nameFormatterLink = $nameFormatterLink;
@@ -45,6 +49,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
         $provider = $configManager->getProvider('activity');
+
         return $provider->hasConfigById($configId) && $provider->getConfigById($configId)->has('activities');
     }
 
@@ -79,27 +84,21 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function setData(ActivityList $activityList, $activityEntity)
+    public function getOrganization($activityEntity)
     {
-        /** @var Email $activityEntity */
-        $activityList->setData(
-            [
-                'from'            => $activityEntity->getFromName(),
-                'sent_at'         => $activityEntity->getSentAt(),
-                'body_content'    => $activityEntity->getEmailBody()->getBodyContent(),
-                'body_id'         => $activityEntity->getEmailBody()->getId(),
-                'is_body_as_text' => $activityEntity->getEmailBody()->getBodyIsText()
-            ]
-        );
+        /** @var $activityEntity Email */
+        return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDataForView(ActivityList $activityEntity)
+    public function getData(ActivityList $activityListEntity)
     {
         /** @var Email $email */
-        $email = $this->doctrineRegistryLink->getService()->getRepository($activityEntity->getRelatedActivityClass())->find($activityEntity->getRelatedActivityId());
+        $email = $this->doctrineRegistryLink->getService()
+            ->getRepository($activityListEntity->getRelatedActivityClass())
+            ->find($activityListEntity->getRelatedActivityId());
         $owner = $email->getFromEmailAddress()->getOwner();
 
         // TODO: we need EntityConfig to get view url for an entities
@@ -107,13 +106,10 @@ class EmailActivityListProvider implements ActivityListProviderInterface
         $routeName = strtolower(array_shift($classParts)) . '_' . strtolower(array_pop($classParts)) . '_view';
 
 
-        return array_merge(
-            $activityEntity->getData(),
-            [
-                'owner_name' => $this->nameFormatterLink->getService()->format($owner),
-                'owner_route' => $this->router->generate($routeName, ['id' => $owner->getId()]),
-            ]
-        );
+        return [
+            'owner_name'  => $this->nameFormatterLink->getService()->format($owner),
+            'owner_route' => $this->router->generate($routeName, ['id' => $owner->getId()]),
+        ];
     }
 
     /**

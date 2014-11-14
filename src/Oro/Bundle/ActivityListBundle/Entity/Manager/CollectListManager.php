@@ -9,9 +9,6 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 
 class CollectListManager
 {
-    const STATE_CREATE = 'create';
-    const STATE_UPDATE = 'update';
-
     /** @var ActivityListChainProvider */
     protected $chainProvider;
 

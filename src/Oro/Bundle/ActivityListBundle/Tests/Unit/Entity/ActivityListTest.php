@@ -49,7 +49,6 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
         return [
             ['verb', 'testVerb'],
             ['subject', 'testSubject'],
-            ['data', ['test' => 'val']],
             ['relatedActivityClass', 'testRelatedActivityClass'],
             ['relatedActivityId', 123],
             ['updatedAt', new \DateTime('now')],
@@ -63,28 +62,6 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
         $obj = new ActivityList();
         $obj->setSubject('test subject');
         $this->assertEquals('test subject', (string)$obj);
-    }
-
-    public function testPrePersist()
-    {
-        $obj = new ActivityList();
-
-        $this->assertNull($obj->getCreatedAt());
-        $this->assertNull($obj->getUpdatedAt());
-
-        $obj->prePersist();
-        $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
-    }
-
-    public function testPreUpdate()
-    {
-        $obj = new ActivityList();
-
-        $this->assertNull($obj->getUpdatedAt());
-
-        $obj->preUpdate();
-        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
     }
 
     /**

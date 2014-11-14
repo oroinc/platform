@@ -17,7 +17,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
- * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -39,6 +38,9 @@ class ActivityList extends ExtendActivityList
 {
     const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
     const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
+
+    const VERB_CREATE = 'create';
+    const VERB_UPDATE = 'update';
 
     /**
      * @var integer
@@ -78,13 +80,6 @@ class ActivityList extends ExtendActivityList
      * @ORM\Column(name="subject", type="string", length=255)
      */
     protected $subject;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="data", type="array", nullable=true)
-     */
-    protected $data;
 
     /**
      * @var string
@@ -196,30 +191,6 @@ class ActivityList extends ExtendActivityList
     public function setSubject($subject)
     {
         $this->subject = $subject;
-
-        return $this;
-    }
-
-    /**
-     * Get an additional data of the related record
-     *
-     * @return array|null
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Set an additional data of the related record
-     *
-     * @param array|null $data
-     *
-     * @return self
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
 
         return $this;
     }
@@ -384,26 +355,5 @@ class ActivityList extends ExtendActivityList
     public function __toString()
     {
         return (string)$this->subject;
-    }
-
-    /**
-     * Pre persist event handler
-     *
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = clone $this->createdAt;
-    }
-
-    /**
-     * Pre update event handler
-     *
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }
