@@ -184,7 +184,7 @@ define([
                 return;
             }
             this.frontend_options = this.frontend_options || {};
-            this.frontend_options.url = this.frontend_options.url || this.getLinkWithParameters();
+            this.frontend_options.url = this.getLinkWithParameters();
             this.frontend_options.title = this.frontend_options.title || this.label;
             require(['oro/' + this.frontend_handle + '-widget'], _.bind(function (WidgetType) {
                 var widget = new WidgetType(this.frontend_options);
