@@ -37,7 +37,7 @@ define(function (require) {
             }
 
             var self = this;
-            this.element.on('click', function(e) {
+            this.element.on('click.' + this.cid, function (e) {
                 e.preventDefault();
                 $.ajax({
                     url: self.element.attr('href'),
@@ -57,11 +57,13 @@ define(function (require) {
          * @inheritDoc
          */
         dispose: function () {
-            if (!this.element) {
+            if (this.disposed || !this.element) {
                 return;
             }
 
-            this.element.off('click');
+            this.element.off('.' + this.cid);
+
+            HiddenRedirectComponent.__super__.dispose.call(this);
         },
 
         /**
@@ -69,9 +71,9 @@ define(function (require) {
          * @param {string|null} message
          */
         _processResponse: function(url, message) {
-            var self = this;
             if (url) {
                 if (message) {
+                    var self = this;
                     mediator.once('page:afterChange', function() {
                         self._showMessage(self.type, message);
                     });
