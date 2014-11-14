@@ -31,4 +31,5 @@ oro_system_configuration:
     api_tree:
         outlook:
             contacts:
+                oro_calendar.calendar_colors: ~
                 oro_calendar.event_colors: ~
