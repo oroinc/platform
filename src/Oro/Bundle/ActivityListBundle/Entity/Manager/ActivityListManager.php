@@ -104,6 +104,37 @@ class ActivityListManager
     }
 
     /**
+     * @param string         $entityClass
+     * @param integer        $entityId
+     * @param array          $activityEntityСlasses
+     * @param \DateTime|bool $dateFrom
+     * @param \DateTime|bool $dateTo
+     *
+     * @return ActivityList[]
+     */
+    public function getListCount(
+        $entityClass,
+        $entityId,
+        $activityEntityСlasses,
+        $dateFrom,
+        $dateTo
+    ) {
+        $qb = $this->getRepository()->getActivityListQueryBuilder(
+            $entityClass,
+            $entityId,
+            $activityEntityСlasses,
+            $dateFrom,
+            $dateTo,
+            $this->config->get('oro_activity_list.sorting_field'),
+            $this->config->get('oro_activity_list.sorting_direction')
+        );
+
+        $qb->select('COUNT(activity.id)');
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
      * @param integer $activityListItemId
      *
      * @return array

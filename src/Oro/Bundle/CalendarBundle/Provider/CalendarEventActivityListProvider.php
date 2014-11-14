@@ -38,6 +38,7 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getRoutes()
     {
         return [
+            'itemView'   => 'oro_calendar_event_widget_info',
             'itemEdit'   => 'oro_calendar_event_update',
             'itemDelete' => 'oro_api_delete_calendarevent'
         ];

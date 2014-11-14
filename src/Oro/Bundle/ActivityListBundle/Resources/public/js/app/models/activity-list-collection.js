@@ -15,11 +15,15 @@ define([
         fromDate: '',
         toDate:   '',
         filter:   '',
-        page: 1,
-        count: 0,
+        pager: {
+            count:    1, //total activities count
+            current:  1, //current page
+            pagesize: 1, //items per page
+            total:    1  //total pages
+        },
 
         url: function () {
-            return this.baseUrl + '?page=' + this.page;
+            return this.baseUrl + '?page=' + this.getPage();
         },
 
         getSorting: function () {
@@ -39,16 +43,26 @@ define([
         setFilter: function () {},
 
         getPage: function () {
-            return this.page;
+            return this.pager.current;
         },
         setPage: function (page) {
-            this.page = page;
+            this.pager.current = page;
+        },
+
+        getPageSize: function () {
+            return this.pager.pagesize;
+        },
+        setPageSize: function (pagesize) {
+            this.pager.pagesize = pagesize;
         },
 
         getCount: function () {
-            return this.count;
+            return this.pager.count;
         },
         setCount: function (count) {
+            this.pager.count = count;
+            this.pager.total = Math.ceil(count/this.pager.pagesize);
+
             this.count = count;
         },
 
