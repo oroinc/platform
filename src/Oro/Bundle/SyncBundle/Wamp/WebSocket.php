@@ -39,7 +39,7 @@ class WebSocket
      */
     public function sendData($data)
     {
-        if (!fwrite($this->socket, "\x00" . $data . "\xff")) {
+        if (!@fwrite($this->socket, "\x00" . $data . "\xff")) {
             throw new \RuntimeException('WebSocket write error');
         }
 
