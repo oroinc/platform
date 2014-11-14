@@ -86,16 +86,6 @@ define(function (require) {
             return this;
         },
 
-        _initPager: function () {
-            if (this.collection.getPageSize() > this.collection.getCount()) {
-                //enable "next" & "last"
-                jQuery('.activity-list-widget .pagination-next').removeClass('disabled');
-                jQuery('.activity-list-widget .pagination-last').removeClass('disabled');
-
-                jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
-            }
-        },
-
         expandAll: function () {
             _.each(this.subviews, function (itemView) {
                 itemView.toggle(false);
@@ -118,35 +108,32 @@ define(function (require) {
             this._filter();
         },
 
+        _initPager: function () {
+            if (this.collection.getPageSize() < this.collection.getCount()) {
+                this._toggleNext(true);
+                jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
+            }
+        },
+
         goto_first: function () {
             this.collection.setPage(1);
+
+            this._toggleNext(true);
+            this._togglePrevious();
+
             this._setPageNumber();
-
-            //enable "next" & "last"
-            jQuery('.activity-list-widget .pagination-next').removeClass('disabled');
-            jQuery('.activity-list-widget .pagination-last').removeClass('disabled');
-            //disable "first" & "previous"
-            jQuery('.activity-list-widget .pagination-first').addClass('disabled');
-            jQuery('.activity-list-widget .pagination-previous').addClass('disabled');
-
             this._reload();
         },
         goto_next: function () {
             var currentPage = this.collection.getPage();
             if (currentPage < this.collection.pager.total) {
-            //if (currentPage < this.options.pager.total) {
                 var nextPage = currentPage + 1;
-
                 this.collection.setPage(nextPage);
-                if (nextPage == this.options.pager.total) {
-                    //disable "next" & "last" (on last page)
-                    jQuery('.activity-list-widget .pagination-next').addClass('disabled');
-                    jQuery('.activity-list-widget .pagination-last').addClass('disabled');
-                } else {
-                    //enable "first" & "next"
-                    jQuery('.activity-list-widget .pagination-previous').removeClass('disabled');
-                    jQuery('.activity-list-widget .pagination-first').removeClass('disabled');
+                if (nextPage == this.collection.pager.total) {
+                    this._toggleNext();
                 }
+
+                this._togglePrevious(true);
 
                 this._setPageNumber(nextPage);
                 this._reload();
@@ -156,23 +143,15 @@ define(function (require) {
             var currentPage = this.collection.getPage();
             if (currentPage > 1) {
                 var nextPage = currentPage - 1;
-
                 this.collection.setPage(nextPage);
                 if (nextPage == 1) {
-                    //disable "first" & "previous" (on first page)
-                    jQuery('.activity-list-widget .pagination-previous').addClass('disabled');
-                    jQuery('.activity-list-widget .pagination-first').addClass('disabled');
+                    this._togglePrevious();
                 }
 
-                //if (this.options.pager.total > 1) {
                 if (this.collection.pager.total > 1) {
-                    //enable "next" & "last"
-                    jQuery('.activity-list-widget .pagination-next').removeClass('disabled');
-                    jQuery('.activity-list-widget .pagination-last').removeClass('disabled');
+                    this._toggleNext(true);
                 } else {
-                    //disable "first" & "next"
-                    jQuery('.activity-list-widget .pagination-next').addClass('disabled');
-                    jQuery('.activity-list-widget .pagination-last').addClass('disabled');
+                    this._toggleNext();
                 }
 
                 this._setPageNumber(nextPage);
@@ -182,25 +161,41 @@ define(function (require) {
         goto_last: function () {
             var nextPage = this.collection.pager.total;
             this.collection.setPage(nextPage);
+
+            this._togglePrevious(true);
+            this._toggleNext();
+
             this._setPageNumber(nextPage);
-
-            //enable "first" & "previous"
-            jQuery('.activity-list-widget .pagination-first').removeClass('disabled');
-            jQuery('.activity-list-widget .pagination-previous').removeClass('disabled');
-            //disable "next" & "last"
-            jQuery('.activity-list-widget .pagination-next').addClass('disabled');
-            jQuery('.activity-list-widget .pagination-last').addClass('disabled');
-
             this._reload();
-
         },
 
         _setPageNumber: function (pageNumber) {
             if (_.isUndefined(pageNumber)) {
                 pageNumber = 1;
             }
-
             jQuery('.activity-list-widget .pagination-current').html(pageNumber);
+        },
+        _togglePrevious: function (enable) {
+            if (_.isUndefined(enable)) {
+                //disable "first" & "previous"
+                jQuery('.activity-list-widget .pagination-first').addClass('disabled');
+                jQuery('.activity-list-widget .pagination-previous').addClass('disabled');
+            } else {
+                //enable "first" & "previous"
+                jQuery('.activity-list-widget .pagination-first').removeClass('disabled');
+                jQuery('.activity-list-widget .pagination-previous').removeClass('disabled');
+            }
+        },
+        _toggleNext: function (enable) {
+            if (_.isUndefined(enable)) {
+                //disable "next" & "last"
+                jQuery('.activity-list-widget .pagination-next').addClass('disabled');
+                jQuery('.activity-list-widget .pagination-last').addClass('disabled');
+            } else {
+                //enable "next" & "last"
+                jQuery('.activity-list-widget .pagination-next').removeClass('disabled');
+                jQuery('.activity-list-widget .pagination-last').removeClass('disabled');
+            }
         },
 
         _reload: function () {
@@ -219,30 +214,6 @@ define(function (require) {
                 this._showLoadItemsError(err);
             }
         },
-
-        //_filter: function () {
-        //    alert('filter');
-        //},
-
-        //_more: function (page) {
-        //    if (_.isUndefined(page)) {
-        //        this.collection.setPage(this.collection.getPage() + 1);
-        //    }
-        //    this._showLoading();
-        //    try {
-        //        this.collection.fetch({
-        //            reset: false,
-        //            success: _.bind(function () {
-        //                this._hideLoading();
-        //            }, this),
-        //            error: _.bind(function (collection, response) {
-        //                this._showLoadItemsError(response.responseJSON || {});
-        //            }, this)
-        //        });
-        //    } catch (err) {
-        //        this._showLoadItemsError(err);
-        //    }
-        //},
 
         _viewItem: function (model, modelView) {
             var that = this,
