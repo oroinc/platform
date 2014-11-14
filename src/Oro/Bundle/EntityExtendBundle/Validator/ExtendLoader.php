@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-class ExtendLoader extends AbstractLoader
+class ExtendFieldValidationLoader extends AbstractLoader
 {
     /** @var array assoc array [fieldType => contraints]*/
     protected $constraintsMapping;
@@ -22,6 +22,10 @@ class ExtendLoader extends AbstractLoader
     /** @var array */
     protected $constraintsByType;
 
+    /**
+     * @param ConfigProvider $extendConfigProvider
+     * @param ConfigProvider $formConfigProvider
+     */
     public function __construct(
         ConfigProvider $extendConfigProvider,
         ConfigProvider $formConfigProvider
@@ -30,6 +34,10 @@ class ExtendLoader extends AbstractLoader
         $this->formConfigProvider   = $formConfigProvider;
     }
 
+    /**
+     * @param string $fieldType
+     * @param array  $constraintData
+     */
     public function addConstraints($fieldType, $constraintData)
     {
         $this->constraintsMapping[$fieldType] = $constraintData;
@@ -54,8 +62,8 @@ class ExtendLoader extends AbstractLoader
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $formConfig->getId();
             $fieldName     = $fieldConfigId->getFieldName();
-            $extendConfig  = $this->extendConfigProvider->getConfig($className, $fieldName);
-            if ($extendConfig->is('is_deleted') || !$extendConfig->is('is_extend')) {
+
+            if (!$this->isApplicable($className, $fieldName)) {
                 continue;
             }
 
@@ -68,6 +76,26 @@ class ExtendLoader extends AbstractLoader
         return true;
     }
 
+    /**
+     * Check if field applicable to add constraint
+     *
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isApplicable($className, $fieldName)
+    {
+        $extendConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
+
+        return !$extendConfig->is('is_deleted') && $extendConfig->is('is_extend');
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return array
+     */
     protected function getConstraintsByFieldType($type)
     {
         if (empty($this->constraintsByType)) {
@@ -94,7 +122,7 @@ class ExtendLoader extends AbstractLoader
      */
     protected function parseNodes(array $nodes)
     {
-        $values = array();
+        $constraints = [];
 
         foreach ($nodes as $name => $childNodes) {
             if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
@@ -104,16 +132,16 @@ class ExtendLoader extends AbstractLoader
                     $options = $this->parseNodes($options);
                 }
 
-                $values[] = $this->newConstraint(key($childNodes), $options);
+                $constraints[] = $this->newConstraint(key($childNodes), $options);
             } else {
                 if (is_array($childNodes)) {
                     $childNodes = $this->parseNodes($childNodes);
                 }
 
-                $values[$name] = $childNodes;
+                $constraints[$name] = $childNodes;
             }
         }
 
-        return $values;
+        return $constraints;
     }
 }

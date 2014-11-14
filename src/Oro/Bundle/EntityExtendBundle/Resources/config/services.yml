@@ -34,7 +34,7 @@ parameters:
     oro_entity_extend.twig.extension.enum.class:              Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
     oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
     oro_entity_extend.datagrid.action.type.ajaxdeletefield.class:  Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction
-    oro_entity_extend.validation_loader.class:                Oro\Bundle\EntityExtendBundle\Validator\ExtendLoader
+    oro_entity_extend.validation_loader.class:                Oro\Bundle\EntityExtendBundle\Validator\ExtendFieldValidationLoader
 
 services:
     oro_entity_extend.entity.cache.warmer:
