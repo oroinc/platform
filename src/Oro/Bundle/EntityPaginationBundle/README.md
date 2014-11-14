@@ -69,9 +69,9 @@ System Configuration
 Entity pagination has two system configuration options to handle pagination process. These options are accessible
 in section "System configuration" > "General setup" > "Display settings" > "Data Grid settings".
 
-* **Entity Pagination**, default is **true**, key _oro\_entity\_pagination.enabled_ - used to enable or disable
+* **Record Pagination**, default is **true**, key _oro\_entity\_pagination.enabled_ - used to enable or disable
 entity pagination all over the system
-* **Entity Pagination limit**, default is **1000**, key _oro\_entity\_pagination.limit_ - allows to set maximum number
+* **Record Pagination limit**, default is **1000**, key _oro\_entity\_pagination.limit_ - allows to set maximum number
 of entities in grid for entity pagination (i.e. if number of entities in grid more than limit then entity pagination
 will not be available)
 
@@ -85,7 +85,7 @@ get all records with this grid parameters considering ACL permissions (for examp
 than view). There are two different scopes in storage for collect data. One scope is used to collect view pagination entities
 identifiers and other scope to collect edit pagination entities identifiers.
 Then collector fill view or edit scope storage depending on which page user visit. If limit of records count is more than
-**Entity Pagination limit** collector set empty array for this scope. Next time if storage has data for current scope
+**Record Pagination limit** collector set empty array for this scope. Next time if storage has data for current scope
 for current grid parameters, collector will not send request to get records. 
 After switching back to datagrid both storage scopes are cleared.
 There are ``EntityPaginationController`` actions for entity pagination navigation. Each action checks if pagination

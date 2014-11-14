@@ -26,9 +26,13 @@
     padding: 6px;
     text-align: center;
     line-height: 10px;
-    border: 1px solid;
-    border-color: #ccc #ccc #b3b3b3;
+    border: 1px solid #ddd;
     border-left: none;
+    background-color: #f7f7f7;
+}
+
+#entity-pagination .pagination div.pagination-current:hover {
+    cursor: default;
 }
 
 #entity-pagination .pagination input[type=number]::-webkit-inner-spin-button,
@@ -52,7 +56,6 @@
 #entity-pagination .pagination ul > li > a {
     font-weight: normal;
     padding: 1px 10px;
-    border-color: #ccc #ccc #b3b3b3;
 }
 
 #entity-pagination .dib.pagination-total {

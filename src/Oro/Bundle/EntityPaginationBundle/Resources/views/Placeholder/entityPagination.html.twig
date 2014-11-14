@@ -22,11 +22,7 @@
                 </ul>
 
                 <div class="dib pagination-total">
-                    {% if pager.total > 1 %}
-                        {{ 'oro.entity_pagination.pager_of_%total%_records'|trans({'%total%' : pager.total}) }}
-                    {% else %}
-                        {{ 'oro.entity_pagination.pager_of_%total%_record'|trans({'%total%' : pager.total}) }}
-                    {% endif %}
+                    {{ 'oro.entity_pagination.pager_of_%total%_record|pager_of_%total%_records'|transchoice(pager.total, {'%total%': pager.total}) }}
                 </div>
             </div>
         </div>

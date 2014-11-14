@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -15,28 +13,34 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 abstract class AbstractEntityVoter implements VoterInterface
 {
     /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
      * @var DoctrineHelper
      */
     protected $doctrineHelper;
 
     /**
-     * @var array
+     * @var string
      */
-    protected $supportedAttributes = array();
+    protected $className;
 
     /**
-     * @param ManagerRegistry $registry
+     * @var array
+     */
+    protected $supportedAttributes = [];
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
-        $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
+    }
+
+    /**
+     * @param string $className
+     */
+    public function setClassName($className)
+    {
+        $this->className = $className;
     }
 
     /**
@@ -45,6 +49,18 @@ abstract class AbstractEntityVoter implements VoterInterface
     public function supportsAttribute($attribute)
     {
         return in_array($attribute, $this->supportedAttributes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsClass($class)
+    {
+        if (!$this->className) {
+            throw new \InvalidArgumentException('className was not provided');
+        }
+
+        return $class === $this->className;
     }
 
     /**
