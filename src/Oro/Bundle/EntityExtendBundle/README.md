@@ -311,3 +311,7 @@ The following command removes all data related to entity extend functionality fr
 php app/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
+
+Custom form type and options
+---------------------
+To configure custom form type and options for extended field, read [Custom form type and options](Resources/doc/custom_form_type.md)
