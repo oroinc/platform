@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
@@ -137,6 +138,36 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
         $listener = $this->createListener($realTime);
         $listener->onFlush(new OnFlushEventArgs($entityManager));
         $listener->postFlush(new PostFlushEventArgs($entityManager));
+
+        $this->assertAttributeEmpty('savedEntities', $listener);
+        $this->assertAttributeEmpty('deletedEntities', $listener);
+    }
+
+    public function testOnClear()
+    {
+        $insertedEntity = $this->createTestEntity('inserted');
+        $insertedEntities = array('inserted' => $insertedEntity);
+        $deletedEntity = $this->createTestEntity('deleted');
+        $deletedEntities = array('deleted' => $deletedEntity);
+
+        $unitOfWork = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
+            ->disableOriginalConstructor()->getMock();
+        $unitOfWork->expects($this->once())->method('getScheduledEntityInsertions')
+            ->will($this->returnValue($insertedEntities));
+        $unitOfWork->expects($this->once())->method('getScheduledEntityUpdates')
+            ->will($this->returnValue(array()));
+        $unitOfWork->expects($this->once())->method('getScheduledEntityDeletions')
+            ->will($this->returnValue($deletedEntities));
+
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->any())->method('getUnitOfWork')
+            ->will($this->returnValue($unitOfWork));
+        $entityManager->expects($this->once())->method('getReference')
+            ->will($this->returnValue($deletedEntity));
+
+        $listener = $this->createListener();
+        $listener->onFlush(new OnFlushEventArgs($entityManager));
+        $listener->onClear(new OnClearEventArgs($entityManager));
 
         $this->assertAttributeEmpty('savedEntities', $listener);
         $this->assertAttributeEmpty('deletedEntities', $listener);
