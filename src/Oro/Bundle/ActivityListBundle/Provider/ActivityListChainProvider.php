@@ -4,17 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
 class ActivityListChainProvider
 {
@@ -100,6 +94,7 @@ class ActivityListChainProvider
     public function getActivityListEntitiesByActivityEntity($activityEntity)
     {
         $provider = $this->getProviderForEntity($activityEntity);
+
         return $this->getActivityListEntityForEntity($activityEntity, $provider);
     }
 
@@ -123,7 +118,7 @@ class ActivityListChainProvider
             return $this->getActivityListEntityForEntity(
                 $entity,
                 $provider,
-                ActivityListManager::STATE_UPDATE,
+                ActivityList::VERB_UPDATE,
                 $existListEntity
             );
         }
@@ -134,7 +129,7 @@ class ActivityListChainProvider
     /**
      * @param object                        $entity
      * @param ActivityListProviderInterface $provider
-     * @param string                        $state
+     * @param string                        $verb
      * @param ActivityList|null             $list
      *
      * @return ActivityList
@@ -142,7 +137,7 @@ class ActivityListChainProvider
     protected function getActivityListEntityForEntity(
         $entity,
         ActivityListProviderInterface $provider,
-        $state = ActivityListManager::STATE_CREATE,
+        $verb = ActivityList::VERB_CREATE,
         $list = null
     ) {
         if (!$list) {
@@ -150,11 +145,9 @@ class ActivityListChainProvider
         }
 
         $list->setSubject($provider->getSubject($entity));
-        $list->setVerb($state);
-        $provider->setData($list, $entity);
+        $list->setVerb($verb);
 
-        $targets = $provider->getTargetEntities($entity);
-        if ($state === ActivityListManager::STATE_UPDATE) {
+        if ($verb === ActivityList::VERB_UPDATE) {
             $activityListTargets = $list->getActivityListTargetEntities();
             foreach ($activityListTargets as $target) {
                 $list->removeActivityListTarget($target);
@@ -163,21 +156,10 @@ class ActivityListChainProvider
             $className = $this->doctrineHelper->getEntityClass($entity);
             $list->setRelatedActivityClass($className);
             $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
-
-            /** @var ConfigProvider $configProvider */
-            $configProvider = $this->configManager->getProvider('ownership');
-            $accessor       = PropertyAccess::createPropertyAccessor();
-
-            if ($configProvider->hasConfig($className)) {
-                $config = $configProvider->getConfig($className);
-                if ($config->get('owner_type') !== OwnershipType::OWNER_TYPE_ORGANIZATION) {
-                    $list->setOrganization($accessor->getValue($entity, $config->get('organization_field_name')));
-                } else {
-                    $list->setOrganization($accessor->getValue($entity, $config->get('owner_field_name')));
-                }
-            }
+            $list->setOrganization($provider->getOrganization($entity));
         }
 
+        $targets = $provider->getTargetEntities($entity);
         foreach ($targets as $target) {
             if ($list->supportActivityListTarget(get_class($target))) {
                 $list->addActivityListTarget($target);

@@ -3,55 +3,72 @@
     {% set dynamicFields = oro_get_dynamic_fields(entity, entity_class) %}
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for fieldName, item in dynamicFields %}
-            {% set itemValue = _self.formatDynamicFieldValue(entity, entity_class, fieldName, item.type, item.value) %}
-            {{ ui.renderHtmlProperty(item.label|trans, itemValue) }}
+            {{ ui.renderHtmlProperty(
+                item.label|trans,
+                _self.formatDynamicFieldValue(
+                    entity,
+                    entity_class,
+                    fieldName,
+                    item.type,
+                    item.value
+                )
+            ) }}
         {% endfor %}
     {% endif %}
 {% endmacro %}
 
-{% macro formatDynamicFieldValue(entity, entity_class, field_name, type, value) %}
-    {% import 'OroUIBundle::macros.html.twig' as ui %}
+{% macro formatDynamicFieldValue(entity, entity_class, field_name, type, fieldValue) %}
     {% set hasLink = false %}
-    {% if value is iterable %}
-        {% set data = '' %}
-        {% for value in value.values %}
-            {% if value.link is defined and value.link != false  %}
-                {% set hasLink = true %}
-                {% set data = data ~ ui.renderUrl(value.link, value.title) %}
-            {% else %}
-                {% set data = data ~ value.title|escape %}
-            {% endif %}
-            {% if not loop.last %}
-                {% set data = data ~ ', ' %}
-            {% endif %}
-        {% endfor %}
-        {% set value = data %}
+    {% if fieldValue is iterable %}
+        {% if fieldValue.values is defined %}
+            {% for value in fieldValue.values %}
+                {{ _self.renderLinkIfDefined(value) }}
+                {% if not loop.last %}
+                    ,&nbsp;
+                {% endif %}
+            {% endfor %}
+        {% else %}
+            {{ _self.renderLinkIfDefined(fieldValue) }}
+        {% endif %}
+    {% else %}
+        {{ _self.resolveSimpleTypes(entity, entity_class, field_name, type, fieldValue) }}
     {% endif %}
 
+{% endmacro %}
+
+{% macro resolveSimpleTypes(entity, entity_class, field_name, type, value) %}
     {% if type == 'text' %}
-        {% set value = value|escape|nl2br %}
+        {{ value|escape|nl2br }}
     {% elseif type == 'boolean' %}
-        {% set value = value ? 'Yes'|trans : 'No'|trans %}
+        {{ value ? 'Yes'|trans : 'No'|trans }}
     {% elseif type == 'money' %}
-        {% set value = value ? value | oro_format_currency : null %}
+        {{ value ? value | oro_format_currency : null }}
     {% elseif type == 'percent' %}
-        {% set value = value ? value | oro_format_percent : null %}
+        {{ value ? value | oro_format_percent : null }}
     {% elseif type == 'date' %}
-        {% set value = value ? value | oro_format_date : null %}
+        {{ value ? value | oro_format_date : null }}
     {% elseif type == 'datetime' %}
-        {% set value = value ? value | oro_format_datetime : null %}
+        {{ value ? value | oro_format_datetime : null }}
     {% elseif type == 'file' %}
-        {% set value = oro_file_view(entity, field_name, value) %}
+        {{ oro_file_view(entity, field_name, value) }}
     {% elseif type == 'image' %}
         {% if entity_class is null %}
             {% set entityInfo = entity %}
-        {% else  %}
+        {% else %}
             {% set entityInfo = entity_class %}
         {% endif %}
-        {% set value = oro_image_view(entity, value, entityInfo, field_name) %}
-    {% elseif not hasLink %}
-        {% set value = value|escape %}
+        {{ oro_image_view(entity, value, entityInfo, field_name) }}
+    {% else %}
+        {{ value|escape }}
     {% endif %}
+{% endmacro %}
 
-    {{ value|raw }}
+{% macro renderLinkIfDefined(value) %}
+    {% import 'OroUIBundle::macros.html.twig' as ui %}
+
+    {% if value.link is defined and value.link != false  %}
+        {{ ui.renderUrl(value.link, value.title) }}
+    {% else %}
+        {{ value.title|escape }}
+    {% endif %}
 {% endmacro %}

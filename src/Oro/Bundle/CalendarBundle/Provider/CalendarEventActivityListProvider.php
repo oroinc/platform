@@ -66,29 +66,18 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function setData(ActivityList $activityList, $activityEntity)
+    public function getData(ActivityList $activityListEntity)
     {
-        /** @var CalendarEvent $activityEntity */
-        if ($activityList->getVerb() === CollectListManager::STATE_CREATE) {
-            $activityList->setOwner($activityEntity->getCalendar()->getOwner());
-        } else {
-            $activityList->setEditor($activityEntity->getCalendar()->getOwner());
-        }
-        $activityList->setData(
-            [
-                'description'  => $activityEntity->getDescription(),
-                'start_date'   => $activityEntity->getStart(),
-                'end_date'     => $activityEntity->getEnd(),
-            ]
-        );
+        return [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDataForView(ActivityList $activityEntity)
+    public function getOrganization($activityEntity)
     {
-        return $activityEntity->getData();
+        /** @var $activityEntity CalendarEvent */
+        return $activityEntity->getCalendar()->getOrganization();
     }
 
     /**

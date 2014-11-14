@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\PersistentCollection;
 
@@ -54,7 +53,7 @@ class ActivityListListener
         $this->collectUpdates($unitOfWork);
         $this->collectDeletedEntities($unitOfWork->getScheduledEntityDeletions());
 
-        if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $this->insertedEntities, $entityManager)) {
+        if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $entityManager)) {
             $this->updatedEntities = [];
         }
     }

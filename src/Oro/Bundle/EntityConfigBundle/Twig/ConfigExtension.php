@@ -35,6 +35,7 @@ class ConfigExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('oro_entity_config', [$this, 'getClassConfig']),
             new \Twig_SimpleFunction('oro_entity_config_value', [$this, 'getClassConfigValue']),
+            new \Twig_SimpleFunction('oro_entity_route', [$this, 'getClassRoute']),
         ];
     }
 
@@ -71,5 +72,45 @@ class ConfigExtension extends \Twig_Extension
         $entityConfig = new EntityConfigId($scope, $className);
 
         return $this->configManager->getConfig($entityConfig)->get($attrName);
+    }
+
+    /**
+     * @param string $entityClass The entity class name
+     * @param string $routeType   Route Type
+     *
+     * @return string
+     */
+    public function getClassRoute($entityClass, $routeType = 'view')
+    {
+        if (!in_array($routeType, ['view', 'name'])) {
+            return null;
+        }
+
+        $property = 'route' . ucfirst($routeType);
+        $metadata = $this->configManager->getEntityMetadata($entityClass);
+
+        if ($metadata && $metadata->{$property}) {
+            return $metadata->{$property};
+        }
+
+        return $this->getDefaultClassRoute($entityClass, $routeType);
+    }
+
+    /**
+     * @param $className
+     * @param $routeType
+     *
+     * @return string
+     */
+    protected function getDefaultClassRoute($className, $routeType)
+    {
+        static $routeMap = [
+            'view' => 'view',
+            'name' => 'index',
+        ];
+        $postfix = $routeMap[$routeType];
+        $parts   = explode('\\', $className);
+
+        return strtolower(reset($parts)) . '_' . strtolower(end($parts)) . '_' . $postfix;
     }
 }

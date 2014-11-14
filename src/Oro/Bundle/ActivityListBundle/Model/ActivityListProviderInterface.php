@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
 interface ActivityListProviderInterface
 {
@@ -26,12 +27,17 @@ interface ActivityListProviderInterface
     public function getSubject($entity);
 
     /**
-     * @param ActivityList $activityList
-     * @param object       $activityEntity
+     * @param ActivityList $activityListEntity
      *
      * @return array
      */
-    public function setData(ActivityList $activityList, $activityEntity);
+    public function getData(ActivityList $activityListEntity);
+
+    /**
+     * @param object $activityEntity
+     * @return Organization|null
+     */
+    public function getOrganization($activityEntity);
 
     /**
      * @return string

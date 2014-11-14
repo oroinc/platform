@@ -15,9 +15,6 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActivityListManager
 {
-    const STATE_CREATE = 'create';
-    const STATE_UPDATE = 'update';
-
     /** @var EntityManager */
     protected $em;
 
@@ -51,12 +48,12 @@ class ActivityListManager
         UserConfigManager $config,
         ActivityListChainProvider $provider
     ) {
-        $this->em             = $doctrine->getManager();
+        $this->em = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
-        $this->nameFormatter  = $nameFormatter;
-        $this->pager          = $pager;
-        $this->config         = $config;
-        $this->chainProvider  = $provider;
+        $this->nameFormatter = $nameFormatter;
+        $this->pager = $pager;
+        $this->config = $config;
+        $this->chainProvider = $provider;
     }
 
     /**
@@ -133,6 +130,7 @@ class ActivityListManager
         foreach ($entities as $entity) {
             $result[] = $this->getEntityViewModel($entity);
         }
+
         return $result;
     }
 
@@ -144,17 +142,30 @@ class ActivityListManager
     public function getEntityViewModel(ActivityList $entity)
     {
         $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
+
+        $ownerName = '';
+        $ownerId   = '';
+        if ($entity->getOwner()) {
+            $ownerName = $this->nameFormatter->format($entity->getOwner());
+            $ownerId   = $entity->getOwner()->getId();
+        }
+
+        $editorName = '';
+        $editorId   = '';
+        if ($entity->getEditor()) {
+            $editorName = $this->nameFormatter->format($entity->getEditor());
+            $editorId   = $entity->getEditor()->getId();
+        }
+
         $result = [
             'id'                   => $entity->getId(),
-            'owner'                => $entity->getOwner() ? $this->nameFormatter->format($entity->getOwner()) : '',
-            'owner_id'             => $entity->getOwner() ? $entity->getOwner()->getId() : '',
-            'owner_route'          => '',
-            'editor'               => $entity->getEditor() ? $this->nameFormatter->format($entity->getEditor()) : '',
-            'editor_id'            => $entity->getEditor() ? $entity->getEditor()->getId() : '',
-            'editor_route'         => '',
+            'owner'                => $ownerName,
+            'owner_id'             => $ownerId,
+            'editor'               => $editorName,
+            'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
-            'data'                 => $entityProvider->getDataForView($entity),
+            'data'                 => $entityProvider->getData($entity),
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
