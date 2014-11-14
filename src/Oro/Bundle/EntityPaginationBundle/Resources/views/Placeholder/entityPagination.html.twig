@@ -7,7 +7,7 @@
         {% set currentRoute = app.request.attributes.get('_route') %}
         {% set currentParams = app.request.attributes.get('_route_params') %}
         {% set queryParams = app.request.query.all %}
-        {% set allParams = {'entityName': oro_class_name(entity), 'scope': scope, 'routeName': currentRoute} %}
+        {% set allParams = {'entityName': oro_class_name(entity, true), 'scope': scope, 'routeName': currentRoute} %}
         {% set allParams = allParams|merge(currentParams) %}
         {% set allParams = allParams|merge(queryParams) %}
 
