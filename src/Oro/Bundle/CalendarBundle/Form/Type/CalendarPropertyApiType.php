@@ -30,7 +30,6 @@ class CalendarPropertyApiType extends AbstractType
             ->add('calendar', 'integer', ['required' => true])
             ->add('position', 'integer', ['required' => false])
             ->add('visible', 'checkbox', ['required' => false])
-            ->add('color', 'text', ['required' => false])
             ->add('backgroundColor', 'text', ['required' => false]);
 
         $builder->addEventSubscriber(new PatchSubscriber());
