@@ -8,7 +8,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class OroSimpleColorPicker extends AbstractSimpleColorPicker
+class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
 {
     /** @var TranslatorInterface */
     protected $translator;

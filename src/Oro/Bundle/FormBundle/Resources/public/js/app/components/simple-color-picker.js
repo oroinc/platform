@@ -7,7 +7,7 @@ define(['underscore', 'orotranslation/js/translator', 'jquery.simplecolorpicker'
     return function (options) {
         var $customColor;
         options._sourceElement.simplecolorpicker(_.omit(options, ['_sourceElement', 'custom_color']));
-        $customColor = options._sourceElement.parent().find('span.custom-color')
+        $customColor = options._sourceElement.parent().find('span.custom-color');
         if ($customColor.length) {
             $customColor.minicolors(_.defaults(options.custom_color, {
                 control: 'wheel',
