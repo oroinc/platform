@@ -107,7 +107,7 @@
                 <% if (visible) { %>
                 class="calendar-color"
                     <% if (!_.isEmpty(backgroundColor)) { %>
-                    style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
+                    style="background-color: <%- backgroundColor %>; border-color: <%- backgroundColor %>"
                     <% } %>
                 <% } else { %>
                     class="calendar-color un-color"
@@ -115,7 +115,7 @@
             ></span>
             <div class="media-body">
                 <div
-                    <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
+                    <% if (!_.isEmpty(color)) { %> style="color: <%- color %>"<% } %>
                     class="user-calendar"
                     title="<%- calendarName %>"
                 >

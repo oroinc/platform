@@ -19,7 +19,6 @@ class CalendarConnectionControllerTest extends WebTestCase
         'targetCalendar' => ['id' => 1],
         'visible' => true,
         'position' => 0,
-        'color' => 'FFFFFF',
         'backgroundColor' => 'FFFFFF',
     ];
 
@@ -69,7 +68,7 @@ class CalendarConnectionControllerTest extends WebTestCase
      */
     public function testUpdate($id)
     {
-        $calendarProperty =  array_merge($this->calendarProperty, ['color' => '000000']);
+        $calendarProperty =  array_merge($this->calendarProperty, ['backgroundColor' => '000000']);
 
         $result = $this->soapClient->updateCalendarConnection($id, $calendarProperty);
         $this->assertTrue($result);
@@ -77,7 +76,7 @@ class CalendarConnectionControllerTest extends WebTestCase
         $calendarConnection = $this->soapClient->getCalendarConnection($id);
         $calendarConnection = $this->valueToArray($calendarConnection);
 
-        $this->assertEquals($calendarConnection['color'], $calendarProperty['color']);
+        $this->assertEquals($calendarConnection['backgroundColor'], $calendarProperty['backgroundColor']);
     }
 
     /**
