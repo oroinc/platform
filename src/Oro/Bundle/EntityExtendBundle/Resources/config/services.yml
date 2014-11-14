@@ -306,5 +306,3 @@ services:
                         - Regex:
                             pattern: "/^[\d+]*$/"
                             message: "This value should contain only numbers."
-
-            - [addConstraints, ["boolean", [{ NotBlank: ~ }]]]
