@@ -171,7 +171,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $this->extendConfigProvider->persist($selfConfig);
 
         //Disable auto create reverse relation for self referenced
-        if (!$targetFieldId && $targetEntityClass == $fieldConfigId->getClassName()) {
+        if ($this->isManyToOneSelfRelation($selfFieldId, $targetEntityClass)) {
             return;
         }
 
@@ -226,5 +226,16 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $targetConfig->set('relation', $targetRelations);
 
         $this->extendConfigProvider->persist($targetConfig);
+    }
+
+    /**
+     * @param FieldConfigId $selfFieldId
+     * @param string $targetEntityClass
+     *
+     * @return bool
+     */
+    protected function isManyToOneSelfRelation(FieldConfigId $selfFieldId, $targetEntityClass)
+    {
+        return $selfFieldId->getFieldType() == 'manyToOne' && $targetEntityClass == $selfFieldId->getClassName();
     }
 }
