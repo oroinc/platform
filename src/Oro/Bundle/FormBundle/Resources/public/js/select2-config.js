@@ -130,6 +130,9 @@ define(['jquery', 'underscore'
             };
 
             var setSelect2ValueById = function(id) {
+                if (_.isArray(id)) {
+                    id = id.join(',');
+                }
                 var select2Obj = element.data('select2');
                 var select2AjaxOptions = select2Obj.opts.ajax;
                 var searchData = select2AjaxOptions.data(id, 1, true);
@@ -152,10 +155,19 @@ define(['jquery', 'underscore'
                 });
             };
 
-            var currentValue = element.val();
+            var currentValue = element.select2('val');
             var elementData = element.data('selected-data');
-            if (_.isArray(elementData) && elementData.length > 0 && elementData[0].id == currentValue) {
-                handleResults(elementData);
+
+            if (_.isArray(elementData) && elementData.length > 0) {
+                var dataIds = _.map(elementData, function(item) {
+                    return item.id;
+                });
+
+                if (dataIds.sort().join(',') === currentValue.sort().join(',')) {
+                    handleResults(elementData);
+                } else {
+                    setSelect2ValueById(currentValue);
+                }
             } else {
                 setSelect2ValueById(currentValue);
             }
