@@ -5,8 +5,8 @@
         {% block widget_actions %}
         <div class="filter-box oro-clearfix-width">
             <div class="filter-container">
-                <div id="filter2" class="filter-item oro-drop"></div>
-                <div id="filter1" class="filter-item oro-drop"></div>
+                <div class="date-range-filter filter-item oro-drop"></div>
+                <div class="activity-type-filter filter-item oro-drop"></div>
             </div>
         </div>
         <div class="widget-actions">
@@ -15,11 +15,6 @@
                 'iCss': 'icon-refresh',
                 'title' : 'Refresh'|trans,
                 'dataAttributes': {'action-name': 'refresh'}
-            }) }}
-            {{ UI.clientLink({
-                'aCss': 'collapse-all-button btn-mini',
-                'label' : 'Collapse All'|trans,
-                'dataAttributes': {'action-name': 'collapse_all'}
             }) }}
         </div>
         {% endblock %}
@@ -45,6 +40,7 @@
                             entityId: entity.id
                         })
                     },
+                    dateRangeFilterMetadata: dateRangeFilterMetadata,
                     routes: {}
                 }
             } %}
@@ -53,51 +49,68 @@
                 data-page-component-module="oroactivitylist/js/app/components/activity-list-component"
                 data-page-component-options="{{ options|json_encode }}"></div>
 
-            {#<div data-section="bottom" class="container-fluid actions-bottom">#}
-                {#{{ UI.button({#}
-                    {#'path': '#',#}
-                    {#'label': 'oro.activitylist.widget.load_more.title'|trans({'{{ count }}': oro_config_value('oro_activity_list.per_page')}),#}
-                    {#'title': 'oro.activitylist.widget.load_more.title'|trans({'{{ count }}': oro_config_value('oro_activity_list.per_page')}),#}
-                    {#'aCss': 'no-hash',#}
-                    {#'dataAttributes': {'action-name': 'more'}#}
-                {#}) }}#}
-            {#</div>#}
+            <div class="container-fluid actions-bottom">
+                {#
+                {{ UI.button({
+                    'path': '#',
+                    'label': 'oro.activitylist.widget.load_more.title'|trans({'{{ count }}': oro_config_value('oro_activity_list.per_page')}),
+                    'title': 'oro.activitylist.widget.load_more.title'|trans({'{{ count }}': oro_config_value('oro_activity_list.per_page')}),
+                    'aCss': 'no-hash',
+                    'data': {'section': 'bottom', 'action-name': 'more'}
+                }) }}
+                #}
+                {% set pager = {
+                    current: 1,
+                    pagesize: oro_config_value('oro_activity_list.per_page'),
+                    total: (count/oro_config_value('oro_activity_list.per_page'))|round(0, 'ceil'),
+                    count: count
+                } %}
+                {#
+                    current:  1,  current page number, always 1
+                    pagesize: 5,  limit
+                    count:  100   total records
+                    total:   10,  total pages:  (count/pagesize)|round(0, ceil)
+                #}
+                {{ dump(pager) }}
+                <div class="pull-left">
+                    <div class="entity-pagination">
+                        <div class="pagination">
+                            <ul class="icons-holder">
+                                <li {% if pager.current == 1 %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_first">
+                                        {{ 'oro.entity_pagination.first'|trans }}
+                                    </a>
+                                </li>
+                                <li {% if pager.current == 1 %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_previous">
+                                        <i class="icon-chevron-left hide-text"></i>
+                                    </a>
+                                </li>
+                                <li><div class="pagination-current">{{ pager.current }}</div></li>
+                                <li {% if pager.current == pager.total %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_next">
+                                        <i class="icon-chevron-right hide-text"></i>
+                                    </a>
+                                </li>
+                                <li {% if pager.current == pager.total %} class="disabled" {% endif %}>
+                                    <a href="#" data-section="bottom" data-action-name="goto_last">
+                                        {{ 'oro.entity_pagination.last'|trans }}
+                                    </a>
+                                </li>
+                            </ul>
+                            <div class="dib pagination-total">
+                                {{ 'oro.entity_pagination.pager_of_%total%_pages'|trans({'%total%' : pager.total}) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
             {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
             {% for activityClass, activityOptions in configuration %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
             {% endfor %}
-
-        {#<script type="text/javascript">#}
-            {#/**#}
-             {#* TODO: rewrite filters to be in scope of component (for now component do not known about filters)#}
-             {#*/#}
-            {#require([#}
-                {#'jquery',#}
-                {#'oro/filter/multiselect-filter',#}
-                {#'oro/filter/datetime-filter',#}
-                {#'orofilter/js/datafilter-wrapper',#}
-            {#], function ($, MultiSelectFilter, DatetimeFilter, dataFilterWrapper) {#}
-                {#var choices = {};#}
-                {#{% for activityClass, activityOptions in configuration %}#}
-                    {#choices['{{ activityClass|replace('\\', '_') }}'] = '{{ activityOptions.label|trans }}';#}
-                {#{% endfor %}#}
-                {#var filter = new MultiSelectFilter({#}
-                    {#'label':   '{{ 'oro.activitylist.widget.filter.activity.title'|trans }}',#}
-                    {#'choices': choices || {}#}
-                {#});#}
-
-                {#var Filter = DatetimeFilter.extend({{ dateRangeFilterMetadata|json_encode()|raw }});#}
-                {#var dateFilter = new Filter({#}
-                    {#'label': '{{ 'oro.activitylist.widget.filter.date_picker.title'|trans }}'#}
-                {#});#}
-                {#_.extend(dateFilter, dataFilterWrapper);#}
-
-                {#filter.render().$el.appendTo($('#filter1'));#}
-                {#dateFilter.render().$el.appendTo($('#filter2'));#}
-            {#});#}
-        {#</script>#}
         {% endblock %}
     {% endblock %}
 </div>

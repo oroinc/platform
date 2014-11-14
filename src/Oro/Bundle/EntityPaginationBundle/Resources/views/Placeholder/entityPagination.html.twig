@@ -11,7 +11,7 @@
         {% set allParams = allParams|merge(currentParams) %}
         {% set allParams = allParams|merge(queryParams) %}
         
-        <div id="entity-pagination">
+        <div class="entity-pagination">
             <div class="pagination">
                 <ul class="icons-holder">
                     <li {% if pager.current == 1 %} class="disabled" {% endif %}><a href="{{ path('oro_entity_pagination_first', allParams) }}">{{ 'oro.entity_pagination.first'|trans }}</a></li>

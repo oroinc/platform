@@ -84,7 +84,7 @@ abstract class AbstractFilter implements FilterInterface
         ];
 
         $metadata = array_diff_key(
-            $this->get(),
+            $this->get() ?: [],
             array_flip($this->util->getExcludeParams())
         );
         $metadata = $this->mapParams($metadata);

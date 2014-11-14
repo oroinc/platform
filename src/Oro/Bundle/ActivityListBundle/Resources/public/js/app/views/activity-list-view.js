@@ -19,7 +19,6 @@ define(function (require) {
             configuration: {},
             template: null,
             itemTemplate: null,
-            itemAddEvent: 'activity:added',
             itemViewIdPrefix: 'activity-',
             listSelector: '.items.list-box',
             fallbackSelector: '.no-data',
@@ -55,8 +54,12 @@ define(function (require) {
 
             this.template = _.template($(this.options.template).html());
 
-            // create communication in scope of active controller
-            mediator.on(this.options.itemAddEvent, this._addItem, this);
+            /**
+             * on editing activity item listen to "widget_success:activity_list:item:update"
+             */
+            mediator.on('widget_success:activity_list:item:update', _.bind(function () {
+                this.refresh();
+            }, this));
 
             ActivityListView.__super__.initialize.call(this, options);
         },
@@ -92,6 +95,7 @@ define(function (require) {
         },
 
         refresh: function () {
+            this.collection.setPage(1);
             this._reload();
         },
 
@@ -103,23 +107,25 @@ define(function (require) {
             this._more();
         },
 
-        _reload: function (sorting) {
-            //var state = {};
-            if (!_.isUndefined(sorting)) {
-                this.collection.setSorting(sorting);
-            }
+        goto_first: function () {
+            alert('first');
+        },
+        goto_next: function () {
+            alert('next');
+        },
+        goto_previous: function () {
+            alert('previous');
+        },
+        goto_last: function () {
+            alert('last');
+        },
+
+        _reload: function () {
             this._showLoading();
             try {
-                //_.each(this.subviews, function (itemView) {
-                //    state[itemView.model.get('id')] = itemView.isCollapsed();
-                //    state[itemView.model.get('id')] = true;
-                //});
                 this.collection.fetch({
                     reset: true,
                     success: _.bind(function () {
-                        //_.each(this.subviews, function (itemView) {
-                        //    itemView.toggle(state[itemView.model.get('id')]);
-                        //});
                         this._hideLoading();
                     }, this),
                     error: _.bind(function (collection, response) {
@@ -135,8 +141,24 @@ define(function (require) {
             alert('filter');
         },
 
-        _more: function () {
-            alert('more');
+        _more: function (page) {
+            if (_.isUndefined(page)) {
+                this.collection.setPage(this.collection.getPage() + 1);
+            }
+            this._showLoading();
+            try {
+                this.collection.fetch({
+                    reset: false,
+                    success: _.bind(function () {
+                        this._hideLoading();
+                    }, this),
+                    error: _.bind(function (collection, response) {
+                        this._showLoadItemsError(response.responseJSON || {});
+                    }, this)
+                });
+            } catch (err) {
+                this._showLoadItemsError(err);
+            }
         },
 
         _viewItem: function (model, modelView) {
@@ -177,6 +199,7 @@ define(function (require) {
                     'title': model.get('subject'),
                     'regionEnabled': false,
                     'incrementalPosition': false,
+                    'alias': 'activity_list:item:update',
                     'dialogOptions': {
                         'modal': true,
                         'resizable': false,
@@ -184,32 +207,11 @@ define(function (require) {
                         'autoResize': true,
                         'close': _.bind(function () {
                             delete this.itemEditDialog;
-                            this.refresh();
                         }, this)
                     }
                 });
+
                 this.itemEditDialog.render();
-
-                //mediator.once('page:request', _.bind(function () {
-                //    if (this.itemEditDialog) {
-                //        this.itemEditDialog.remove();
-                //    }
-                //}, this));
-
-                //this.itemEditDialog.on('formSave', _.bind(function (response) {
-                //    var model, insertPosition;
-                //    this.itemEditDialog.remove();
-                //    delete this.itemEditDialog;
-                //    mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
-                //
-                //    model = this.collection.get(response.id);
-                //    if (model) {
-                //        model.set(response);
-                //    } else {
-                //        insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
-                //        this.collection.add(response, {at: insertPosition});
-                //    }
-                //}, this));
             }
         },
 
@@ -242,8 +244,8 @@ define(function (require) {
                     }, this)
                 });
 
-                this._hideLoading();
-                mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
+                this.refresh();
+
             } catch (err) {
                 this._showDeleteItemError(err);
             }

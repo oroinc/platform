@@ -31,6 +31,10 @@ oro_system_configuration:
                 label: oro.activitylist.system_configuration.fields.per_page.label
                 tooltip: oro.activitylist.system_configuration.fields.per_page.tooltip
                 choices:
+                    1: 1
+                    2: 2
+                    3: 3
+                    5: 5
                     10:     10
                     25:     25
                     50:     50

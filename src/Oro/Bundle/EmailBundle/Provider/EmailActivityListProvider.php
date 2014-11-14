@@ -60,7 +60,6 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     {
         return [
             'itemView'   => 'oro_email_view',
-            'itemDelete' => 'oro_api_delete_email'
         ];
     }
 
