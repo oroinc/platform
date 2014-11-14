@@ -115,6 +115,10 @@ define(function (require) {
          */
         onFilterStateChange: function () {
             console.log(this.getFilterState());
+            var filter = this.getFilterState();
+            var list = this.list;
+            list.collection.setFilter(filter.activityType.value);
+            this.list.refresh();
         },
 
         /**

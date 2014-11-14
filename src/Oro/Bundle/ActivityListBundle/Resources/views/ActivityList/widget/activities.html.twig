@@ -109,7 +109,7 @@
             {% include 'OroActivityListBundle:ActivityList:js/list.js.twig' with {'id': 'template-activity-list'} %}
             {% include 'OroActivityListBundle:ActivityList:js/view.js.twig' with {'id': 'template-activity-item'} %}
             {% for activityClass, activityOptions in configuration %}
-                {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass|replace('\\', '_')) } %}
+                {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass) } %}
             {% endfor %}
         {% endblock %}
     {% endblock %}

@@ -17,9 +17,10 @@ define([
         filter:   '',
         page: 1,
         count: 0,
+        classFilters: [],
 
         url: function () {
-            return this.baseUrl + '?page=' + this.page;
+            return this.baseUrl + '?page=' + this.page + '&activityClasses=' + this.getFilter();
         },
 
         getSorting: function () {
@@ -35,8 +36,12 @@ define([
         getToDate: function () {},
         setToDate: function () {},
 
-        getFilter: function () {},
-        setFilter: function () {},
+        setFilter: function (classFilters) {
+            this.classFilters = classFilters;
+        },
+        getFilter: function () {
+            return this.classFilters;
+        },
 
         getPage: function () {
             return this.page;

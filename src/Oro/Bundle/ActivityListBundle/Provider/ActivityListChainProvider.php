@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -26,22 +27,28 @@ class ActivityListChainProvider
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var EntityRoutingHelper */
+    protected $routingHelper;
+
     /** @var array */
     protected $targetClasses = [];
 
     /**
-     * @param DoctrineHelper       $doctrineHelper
-     * @param ConfigManager        $configManager
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
+     * @param EntityRoutingHelper $routingHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        EntityRoutingHelper $routingHelper
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->configManager  = $configManager;
         $this->translator     = $translator;
+        $this->routingHelper  = $routingHelper;
     }
 
     /**
@@ -189,7 +196,7 @@ class ActivityListChainProvider
         $templates = [];
         foreach ($this->providers as $provider) {
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
-            $templates[$provider->getActivityClass()] = [
+            $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
                 'icon'     => $entityConfig->get('icon'),
                 'label'    => $this->translator->trans($entityConfig->get('label')),
                 'template' => $provider->getTemplate(),

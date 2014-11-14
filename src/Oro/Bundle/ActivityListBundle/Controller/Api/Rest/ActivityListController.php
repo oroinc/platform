@@ -70,6 +70,7 @@ class ActivityListController extends RestController
         $activityСlasses = $this->getRequest()->get('activityClasses', []);
         $dateFrom        = strtotime($this->getRequest()->get('dateFrom', null));
         $dateTo          = strtotime($this->getRequest()->get('dateTo', null));
+        $routingHelper   = $this->get('oro_entity.routing_helper');
 
         if ($dateFrom) {
             $dateFrom = new \DateTime($dateFrom, new \DateTimeZone('UTC'));
@@ -77,14 +78,19 @@ class ActivityListController extends RestController
         if ($dateTo) {
             $dateTo = new \DateTime($dateTo, new \DateTimeZone('UTC'));
         }
-        if (!is_array($activityСlasses)) {
-            $activityСlasses = explode(',', $activityСlasses);
+        if (!is_array($activityСlasses) && $activityСlasses  !== '') {
+            $activityСlasses = array_map(
+                function ($activityСlass) use ($routingHelper) {
+                    return $routingHelper->decodeClassName($activityСlass);
+                },
+                explode(',', $activityСlasses)
+            );
         }
 
         $results = [
             'count' => 100,
             'data'  => $this->getManager()->getList(
-                $this->get('oro_entity.routing_helper')->decodeClassName($entityClass),
+                $routingHelper->decodeClassName($entityClass),
                 $entityId,
                 $activityСlasses,
                 $dateFrom,
