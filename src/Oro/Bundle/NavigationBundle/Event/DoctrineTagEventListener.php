@@ -7,6 +7,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\NavigationBundle\Content\TopicSender;
+use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 
 class DoctrineTagEventListener
 {
