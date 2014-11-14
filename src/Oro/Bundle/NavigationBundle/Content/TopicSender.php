@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NavigationBundle\Content;
 
 use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
