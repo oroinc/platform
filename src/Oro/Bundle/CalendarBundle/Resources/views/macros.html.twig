@@ -153,6 +153,9 @@
                 itemTemplateSelector: {{ connectionsOptions.itemTemplateSelector|json_encode|raw }},
                 {% endif %}
                 collection: connections
+            },
+            managerOptions: {
+                colors: {{ oro_config_value('oro_calendar.calendar_colors')|json_encode|raw }}
             }
         };
         _.extend(options.eventsOptions, {{ calendar|json_encode|raw }});
