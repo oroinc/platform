@@ -234,3 +234,34 @@
     padding: 3px 13px;
 }
 
+.connection-item span.menu-custom-color:after {
+    content: '\00a0\00a0\00a0\00a0';
+}
+
+.connection-item .menu-custom-color {
+    margin-left: 13px;
+}
+
+.connection-item .custom-color-link {
+    line-height: 22px;
+    margin-left: 13px;
+}
+
+.connection-item .minicolors-panel {
+    top: 8px;
+    left: -18px;
+}
+
+.connection-item span.menu-custom-color[data-selected]:after {
+    font-family: 'FontAwesome';
+    -webkit-font-smoothing: antialiased;
+    content: '\f00c';
+    margin-right: 1px;
+    margin-left: 1px;
+    color: #fff;
+}
+
+.connection-item span.menu-custom-color[data-selected],
+.connection-item span.menu-custom-color[data-selected]:hover {
+  border: 1px solid #222; /* @gray-dark */
+}

@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define, console*/
 define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger',
-    'jquery.simplecolorpicker'
+    'jquery.simplecolorpicker', 'jquery.minicolors'
 ], function ($, _, BaseView, __, messenger) {
     'use strict';
 
@@ -19,16 +19,56 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             var colors = _.map(this.colorManager.colors, function (value) {
                 return {'id': '#' + value, 'text': '#' + value};
             });
+            //Initialize color picker
             options.$el.find('#calendar-color-picker').simplecolorpicker({theme: 'fontawesome', data: colors});
-            if (this.model.get('backgroundColor')) {
-                options.$el.find('#calendar-color-picker').simplecolorpicker('selectColor', '#' + this.model.get('backgroundColor'));
-            }
             options.$el.find('#calendar-color-picker').one('change', _.bind(function(e) {
-                this.onChangePicker(e.currentTarget.value);
+                options.$el.remove();
+                this.onChangeColor(e.currentTarget.value);
             }, this));
+            //Initialize minicolors
+            var $customColor = options.$el.find('span.menu-custom-color');
+            $customColor.minicolors({
+                control: 'wheel',
+                letterCase: 'uppercase',
+                defaultValue: '#' + this.model.get('backgroundColor'),
+                show: function () {
+                    $(this).minicolors('value', $(this).minicolors('value'));
+                }
+            });
+            //Add buttons to minicolors
+            $customColor.parent().find('.minicolors-panel').append(
+                '<div class="form-actions">' +
+                    '<button class="btn pull-right" data-action="ok" type="button">' + __('Ok') + '</button>' +
+                    '<button class="btn pull-right" data-action="cancel" type="button">' + __('Cancel') + '</button>' +
+                    '</div>'
+            );
+            $customColor.parent().find('button[data-action=ok]').one('click', _.bind(function (e) {
+                e.preventDefault();
+                $customColor.minicolors('hide');
+                $('.context-menu-button').css('display', '');
+                options.$el.remove();
+                this.onChangeColor($customColor.minicolors('value'));
+            }, this));
+            $customColor.parent().find('button[data-action=cancel]').on('click', function (e) {
+                e.preventDefault();
+                $customColor.minicolors('hide');
+            });
+            $customColor.parent().find('.custom-color-link').on('click', function () {
+                $customColor.minicolors('show');
+                $customColor.show();
+                $(this).css('margin-left', '5px');
+            });
+            //Define current model color
+            if (this.model.get('backgroundColor') && _.where(colors, {'id': '#' + this.model.get('backgroundColor')}).length) {
+                options.$el.find('#calendar-color-picker').simplecolorpicker('selectColor', '#' + this.model.get('backgroundColor'));
+                $customColor.hide();
+            } else {
+                $customColor.attr('data-selected', true);
+                $(this).css('margin-left', '5px');
+            }
         },
 
-        onChangePicker: function (color) {
+        onChangeColor: function (color) {
             var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
             try {
                 this.model.save('backgroundColor', color.substring(1), {

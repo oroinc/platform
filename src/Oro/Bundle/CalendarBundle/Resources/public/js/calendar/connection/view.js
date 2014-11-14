@@ -154,11 +154,11 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 showLoadingTimeout = setTimeout(_.bind(function () {
                     $container.html('<span class="loading-indicator"></span>');
                 }, this), 100);
-                // load context menu
                 options._actionSyncObject = this._actionSyncObject;
                 options.$el = $el;
                 options.model = model;
                 modules = _.object(modules, modules);
+                // load context menu
                 tools.loadModules(modules, _.bind(function (modules) {
                     clearTimeout(showLoadingTimeout);
                     $container.html(containerHtml);
@@ -179,12 +179,13 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         .append($el)
                         .find('.context-menu-button').css('display', 'block');
 
-                    $(document).one('click.' + this.cid, function (event) {
-                        if (!$(event.target).hasClass('context-menu')) {
+                    $(document).on('click.' + this.cid, _.bind(function (event) {
+                        if (!$(event.target).hasClass('context-menu') && !$(event.target).closest('.context-menu').length) {
                             $('.context-menu-button').css('display', '');
                             $el.remove();
+                            $(document).off('.' + this.cid);
                         }
-                    });
+                    }, this));
 
                     this._actionSyncObject.resolve();
                 }, this));

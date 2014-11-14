@@ -2,4 +2,5 @@ css:
     'orocalendar':
         - 'bundles/orocalendar/css/calendar.css'
         - 'bundles/orocalendar/css/less/print.less'
+        - 'bundles/orocalendar/css/less/oro.less'
         - 'bundles/orocalendar/lib/fullcalendar/fullcalendar.css'
