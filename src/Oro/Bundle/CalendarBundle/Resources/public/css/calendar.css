@@ -198,7 +198,7 @@
     z-index: 999;
     left: 100%;
     margin: 0 0 0 -20px;
-    width: 170px;
+    min-width: 170px;
 }
 
 .calendar-connections .context-menu a {
@@ -259,6 +259,10 @@
     margin-right: 1px;
     margin-left: 1px;
     color: #fff;
+}
+
+.connection-item span.menu-custom-color {
+    border: none;
 }
 
 .connection-item span.menu-custom-color[data-selected],

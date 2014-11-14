@@ -33,8 +33,10 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                 defaultValue: '#' + this.model.get('backgroundColor'),
                 show: function () {
                     $(this).minicolors('value', $(this).minicolors('value'));
+                    $(this).parent().find('.minicolors-picker').show();
                 }
             });
+            $customColor.parent().find('.minicolors-picker').hide();
             //Add buttons to minicolors
             $customColor.parent().find('.minicolors-panel').append(
                 '<div class="form-actions">' +
@@ -64,7 +66,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                 $customColor.hide();
             } else {
                 $customColor.attr('data-selected', true);
-                $(this).css('margin-left', '5px');
+                $customColor.parent().find('.custom-color-link').css('margin-left', '5px');
             }
         },
 
