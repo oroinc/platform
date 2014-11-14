@@ -139,10 +139,10 @@ class SearchHandler implements SearchHandlerInterface
             $items = array_slice($items, 0, $perPage - 1);
         }
 
-        return array(
+        return [
             'results' => $this->convertItems($items),
             'more'    => $hasMore
-        );
+        ];
     }
 
     /**
@@ -167,7 +167,7 @@ class SearchHandler implements SearchHandlerInterface
     {
         $entityIds = $this->searchIds($search, $firstResult, $maxResults);
 
-        $resultEntities = array();
+        $resultEntities = [];
 
         if ($entityIds) {
             $resultEntities = $this->getEntitiesByIds($entityIds);
@@ -201,7 +201,7 @@ class SearchHandler implements SearchHandlerInterface
         $result   = $this->indexer->simpleSearch($search, $firstResult, $maxResults, $this->entitySearchAlias);
         $elements = $result->getElements();
 
-        $ids = array();
+        $ids = [];
         foreach ($elements as $element) {
             $ids[] = $element->getRecordId();
         }
@@ -228,7 +228,7 @@ class SearchHandler implements SearchHandlerInterface
      */
     protected function convertItems(array $items)
     {
-        $result = array();
+        $result = [];
         foreach ($items as $item) {
             $result[] = $this->convertItem($item);
         }
@@ -240,7 +240,7 @@ class SearchHandler implements SearchHandlerInterface
      */
     public function convertItem($item)
     {
-        $result = array();
+        $result = [];
 
         if ($this->idFieldName) {
             $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);
