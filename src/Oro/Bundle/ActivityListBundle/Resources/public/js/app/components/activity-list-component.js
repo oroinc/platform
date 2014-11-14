@@ -26,6 +26,7 @@ define(function (require) {
                 configuration: {},
                 urls: {},
                 routes: {},
+                pager: {},
                 itemView: ActivityView,
                 itemModel: ActivityModel
             },
@@ -86,6 +87,8 @@ define(function (require) {
                 model: activityOptions.itemModel
             });
             collection.baseUrl = activityOptions.urls.list;
+            collection.setPageSize(this.options.activityListOptions.pager.pagesize);
+            collection.setCount(this.options.activityListCount);
 
             activityOptions.collection = collection;
 
@@ -95,6 +98,7 @@ define(function (require) {
             });
 
             this.list = new ActivityListView(activityOptions);
+
             this.registerWidget();
         },
 
@@ -171,12 +175,6 @@ define(function (require) {
                 widget.getAction('refresh', 'adopted', function (action) {
                     action.on('click', _.bind(list.refresh, list));
                 });
-                //widget.getAction('collapse_all', 'adopted', function (action) {
-                //    action.on('click', _.bind(list.collapseAll, list));
-                //});
-                //widget.getAction('expand_all', 'adopted', function (action) {
-                //    action.on('click', _.bind(list.expandAll, list));
-                //});
                 widget.getAction('more', 'bottom', function (action) {
                     action.on('click', _.bind(list.more, list));
                 });

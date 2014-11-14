@@ -67,6 +67,7 @@ class ActivityListController extends RestController
      */
     public function cgetAction($entityClass, $entityId)
     {
+        $entityClass     = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
         $activityСlasses = $this->getRequest()->get('activityClasses', []);
         $dateFrom        = strtotime($this->getRequest()->get('dateFrom', null));
         $dateTo          = strtotime($this->getRequest()->get('dateTo', null));
@@ -88,9 +89,15 @@ class ActivityListController extends RestController
         }
 
         $results = [
-            'count' => 100,
+            'count' => $this->getManager()->getListCount(
+                $entityClass,
+                $entityId,
+                $activityСlasses,
+                $dateFrom,
+                $dateTo
+            ),
             'data'  => $this->getManager()->getList(
-                $routingHelper->decodeClassName($entityClass),
+                $entityClass,
                 $entityId,
                 $activityСlasses,
                 $dateFrom,
