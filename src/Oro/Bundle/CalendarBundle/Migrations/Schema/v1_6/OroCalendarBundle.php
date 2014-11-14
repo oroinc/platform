@@ -4,29 +4,12 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
 
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarPropertyRepository;
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-class OroCalendarBundle implements Migration, ContainerAwareInterface
+class OroCalendarBundle implements Migration
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
 
     /**
      * {@inheritdoc}
@@ -41,26 +24,15 @@ class OroCalendarBundle implements Migration, ContainerAwareInterface
     }
 
     /**
-     * Updates backgroundColor fields to full hex format (e.g. '#FFFFFF') in multi-platform way
+     * Updates backgroundColor fields to full hex format (e.g. '#FFFFFF')
      *
      * @param QueryBag $queries
      */
     protected function updateBackgroundColorValues(QueryBag $queries)
     {
-        $em = $this->container->get('doctrine.orm.entity_manager');
-
-        /** @var CalendarPropertyRepository $repo */
-        $repo = $em->getRepository('OroCalendarBundle:CalendarProperty');
-        $query = $repo->createQueryBuilder('c')
-            ->where('c.backgroundColor IS NOT NULL')
-            ->getQuery();
-        /** @var CalendarProperty $item */
-        foreach($query->execute() as $item) {
-            $queries->addPostQuery(new ParametrizedSqlMigrationQuery('UPDATE oro_calendar_property
-              SET background_color = :color WHERE id = :id', [
-                'color' => '#' . $item->getBackgroundColor(),
-                'id'    => $item->getId(),
-            ]));
-        }
+        $queries->addPostQuery(new ParametrizedSqlMigrationQuery('UPDATE oro_calendar_property
+            SET background_color = concat(:prefix, background_color) WHERE background_color IS NOT NULL',
+            ['prefix' => '#'])
+        );
     }
 }
