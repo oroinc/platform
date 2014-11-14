@@ -23,7 +23,6 @@ class CalendarConnectionControllerTest extends WebTestCase
         'backgroundColor' => 'FFFFFF',
     ];
 
-
     protected function setUp()
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
@@ -46,9 +45,24 @@ class CalendarConnectionControllerTest extends WebTestCase
      */
     public function testCget()
     {
-        $calendarConnections = $this->soapClient->getCalendarConnections();
-        $calendarConnections = $this->valueToArray($calendarConnections);
-        $this->assertCount(2, $calendarConnections['item']);
+        $calendarConnections = array_filter(
+            $this->valueToArray($this->soapClient->getCalendarConnections())['item'],
+            function ($item) {
+                $property = array_filter($this->calendarProperty, function ($item) {
+                    return !is_array($item);
+                });
+
+                $item = array_filter($item, function ($item) {
+                    return !is_array($item);
+                });
+
+                $diff = array_diff($property, $item);
+
+                return empty($diff);
+            }
+        );
+
+        $this->assertNotEmpty($calendarConnections);
     }
 
     /**
