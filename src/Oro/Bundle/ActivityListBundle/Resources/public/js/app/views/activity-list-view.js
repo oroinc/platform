@@ -147,6 +147,8 @@ define(function (require) {
                 this.collection.setPage(nextPage);
                 if (nextPage == this.collection.pager.total) {
                     this._toggleNext();
+                } else {
+                    this._toggleNext(true);
                 }
                 this._togglePrevious(true);
 
@@ -159,7 +161,7 @@ define(function (require) {
             if (_.isUndefined(pageNumber)) {
                 pageNumber = 1;
             }
-            jQuery('.activity-list-widget .pagination-current').html(pageNumber);
+            jQuery('.activity-list-widget .pagination-current').val(pageNumber);
         },
 
         _togglePrevious: function (enable) {
