@@ -111,9 +111,9 @@ define(function (require) {
         _initPager: function () {
             if (this.collection.getPageSize() < this.collection.getCount()) {
                 this._toggleNext(true);
-                jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
-                jQuery('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
             }
+            jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
+            jQuery('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
         },
 
         goto_previous: function () {
@@ -135,9 +135,11 @@ define(function (require) {
                 this._reload();
             }
         },
-        goto_page: function () {
 
+        goto_page: function () {
+            alert('page changed');
         },
+
         goto_next: function () {
             var currentPage = this.collection.getPage();
             if (currentPage < this.collection.pager.total) {
@@ -159,26 +161,20 @@ define(function (require) {
             }
             jQuery('.activity-list-widget .pagination-current').html(pageNumber);
         },
+
         _togglePrevious: function (enable) {
             if (_.isUndefined(enable)) {
-                //disable "first" & "previous"
-                jQuery('.activity-list-widget .pagination-first').addClass('disabled');
                 jQuery('.activity-list-widget .pagination-previous').addClass('disabled');
             } else {
-                //enable "first" & "previous"
-                jQuery('.activity-list-widget .pagination-first').removeClass('disabled');
                 jQuery('.activity-list-widget .pagination-previous').removeClass('disabled');
             }
         },
+
         _toggleNext: function (enable) {
             if (_.isUndefined(enable)) {
-                //disable "next" & "last"
                 jQuery('.activity-list-widget .pagination-next').addClass('disabled');
-                jQuery('.activity-list-widget .pagination-last').addClass('disabled');
             } else {
-                //enable "next" & "last"
                 jQuery('.activity-list-widget .pagination-next').removeClass('disabled');
-                jQuery('.activity-list-widget .pagination-last').removeClass('disabled');
             }
         },
 

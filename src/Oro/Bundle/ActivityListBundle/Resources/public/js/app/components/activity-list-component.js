@@ -182,7 +182,7 @@ define(function (require) {
                     action.on('click', _.bind(list.goto_previous, list));
                 });
                 widget.getAction('goto_page', 'bottom', function (action) {
-                    action.on('click', _.bind(list.goto_page, list));
+                    action.on('change', _.bind(list.goto_page, list));
                 });
                 widget.getAction('goto_next', 'bottom', function (action) {
                     action.on('click', _.bind(list.goto_next, list));

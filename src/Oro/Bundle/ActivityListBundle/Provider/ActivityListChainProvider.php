@@ -35,8 +35,8 @@ class ActivityListChainProvider
     protected $targetClasses = [];
 
     /**
-     * @param DoctrineHelper       $doctrineHelper
-     * @param ConfigManager        $configManager
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      */
     public function __construct(
