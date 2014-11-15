@@ -64,27 +64,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          * @private
          */
         _processOptions: function (options) {
-            var selectedVal = options._sourceElement.val(),
-                selectedIndex = null,
-                customIndex = null;
-
             options = _.defaults(options, this.defaults);
-
-            // set custom color
-            if (selectedVal) {
-                _.each(options.data, function (value, index) {
-                    if (value.class) {
-                        if (value.class === 'custom-color') {
-                            customIndex = index;
-                        }
-                    } else if (value.id === selectedVal) {
-                        selectedIndex = index;
-                    }
-                });
-                if (customIndex !== null && selectedIndex === null) {
-                    options.data[customIndex].id = selectedVal;
-                }
-            }
         },
 
         /**

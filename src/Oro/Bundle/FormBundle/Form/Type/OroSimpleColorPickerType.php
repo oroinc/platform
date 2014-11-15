@@ -8,16 +8,20 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
 {
     /** @var TranslatorInterface */
     protected $translator;
 
     /**
+     * @param ConfigManager       $configManager
      * @param TranslatorInterface $translator
      */
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(ConfigManager $configManager, TranslatorInterface $translator)
     {
+        parent::__construct($configManager);
         $this->translator = $translator;
     }
 
@@ -55,7 +59,6 @@ class OroSimpleColorPickerType extends AbstractSimpleColorPickerType
     {
         parent::buildView($view, $form, $options);
 
-        $data       = $form->getData();
         $pickerData = $this->convertColorsToPickerData($options['colors'], $options['translatable']);
 
         if ($options['allow_empty_color']) {

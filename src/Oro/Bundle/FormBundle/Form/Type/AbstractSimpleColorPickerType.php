@@ -8,6 +8,8 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+
 abstract class AbstractSimpleColorPickerType extends AbstractType
 {
     /** @var array */
@@ -59,6 +61,17 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
         ]
     ];
 
+    /** @var ConfigManager */
+    protected $configManager;
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -70,7 +83,7 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
                     'translatable'      => false,
                     'allow_empty_color' => false,
                     'empty_color'       => null,
-                    'color_schema'      => 'short', // short, long, custom/null
+                    'color_schema'      => 'short', // short, long, config value name, custom/null
                     'picker'            => false,
                     'picker_delay'      => 0
                 ]
@@ -115,10 +128,21 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
      * @param string $colorSchema
      *
      * @return mixed
+     *
+     * @throws \RuntimeException if the given color schema is unknown
      */
     protected function getColors($colorSchema)
     {
-        return static::$colorSchema[$colorSchema]['colors'];
+        if (isset(static::$colorSchema[$colorSchema])) {
+            return static::$colorSchema[$colorSchema]['colors'];
+        }
+
+        $colors = $this->configManager->get($colorSchema);
+        if ($colors) {
+            return array_combine($colors, $colors);
+        }
+
+        throw new \RuntimeException(sprintf('Unknown color schema: "%s".', $colorSchema));
     }
 
     /**
