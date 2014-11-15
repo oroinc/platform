@@ -1,6 +1,9 @@
 parameters:
-    oro_soap.loader.class:            Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
-    oro_soap.handler.delete.class:    Oro\Bundle\SoapBundle\Handler\DeleteHandler
+    oro_soap.loader.class:                      Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
+    oro_soap.handler.delete.class:              Oro\Bundle\SoapBundle\Handler\DeleteHandler
+
+    oro_soap.provider.metadata.chain.class:     Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider
+    oro_soap.provider.metadata.entity.class:    Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider
 
 services:
     oro_soap.loader:
@@ -25,3 +28,14 @@ services:
         abstract: true
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
+
+    oro_soap.provider.metadata.chain:
+        class: %oro_soap.provider.metadata.chain.class%
+
+    oro_soap.provider.metadata.entity:
+        class: %oro_soap.provider.metadata.entity.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @translator
+        tags:
+            - { name: oro_soap.metadata_provider }

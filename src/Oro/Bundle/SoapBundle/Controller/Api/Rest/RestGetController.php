@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use Doctrine\Common\Collections\Criteria;
@@ -51,6 +53,24 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         $responseData = $item ? json_encode($item) : '';
 
         return new Response($responseData, $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND);
+    }
+
+    /**
+     * Returns resource's metadata that might be useful for some another API requests.
+     * For example it might be: structure of resource object, special identifier of resource for another API method etc.
+     *
+     * @ApiDoc(
+     *      description="Retrieve service metadata for resource",
+     *      resource=false
+     * )
+     */
+    public function optionsAction()
+    {
+        $metadata = $this->get('oro_soap.provider.metadata.chain')->getMetadataFor($this);
+
+        return $this->handleView(
+            $this->view($metadata, Codes::HTTP_OK)
+        );
     }
 
     /**
