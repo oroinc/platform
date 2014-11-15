@@ -62,6 +62,20 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 array('required' => false, 'label' => 'oro.calendar.calendarevent.all_day.label')
             )
             ->will($this->returnSelf());
+        $builder->expects($this->at(5))
+            ->method('add')
+            ->with(
+                'backgroundColor',
+                'oro_simple_color_picker',
+                array(
+                    'required'           => false,
+                    'label'              => 'oro.calendar.calendarevent.backgroundColor.label',
+                    'empty_value'        => 'oro.calendar.form.no_color',
+                    'allow_empty_color'  => true,
+                    'allow_custom_color' => true
+                )
+            )
+            ->will($this->returnSelf());
 
         $this->type->buildForm($builder, array());
     }

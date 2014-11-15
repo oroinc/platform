@@ -104,7 +104,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 this.eventView = new EventView(_.extend({}, options, {
                     model: eventModel,
                     viewTemplateSelector: this.options.eventsOptions.itemViewTemplateSelector,
-                    formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector
+                    formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector,
+                    colorManager: this.colorManager
                 }));
                 // subscribe to event view collection events
                 this.listenTo(this.eventView, 'addEvent', this.handleEventViewAdd);

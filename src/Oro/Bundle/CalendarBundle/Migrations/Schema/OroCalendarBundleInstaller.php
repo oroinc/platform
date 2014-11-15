@@ -65,6 +65,7 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('start_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('end_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('all_day', 'boolean', []);
+        $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 7]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);

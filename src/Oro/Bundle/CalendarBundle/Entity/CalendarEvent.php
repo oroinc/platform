@@ -156,7 +156,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var string|null
      *
      * @ORM\Column(name="background_color", type="string", length=7, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      */
     protected $backgroundColor;
 
