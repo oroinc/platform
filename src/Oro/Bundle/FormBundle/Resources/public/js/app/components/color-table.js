@@ -1,73 +1,67 @@
 /*jslint nomen: true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.simplecolorpicker', 'jquery.minicolors'
-    ], function ($, _, __) {
+define(['jquery', 'underscore', 'oroform/js/app/components/base-simple-color-picker', 'oroui/js/tools/color-util'
+    ], function ($, _, BaseSimpleColorPicker, colorUtil) {
     'use strict';
 
-    return function (options) {
-        var $parent = options._sourceElement.parent(),
-            pickerId = options._sourceElement.prop('id') + '_picker',
-            $picker,
-            $current;
+    var ColorTable = BaseSimpleColorPicker.extend({
+        /**
+         * @constructor
+         * @param {object} options
+         */
+        initialize: function (options) {
+            ColorTable.__super__.initialize.call(this, options);
+        },
 
-        options._sourceElement.simplecolorpicker(_.omit(options, ['_sourceElement', 'picker']));
+        /**
+         * @inheritDoc
+         */
+        _getSimpleColorPickerOptions: function (options) {
+            options = ColorTable.__super__._getSimpleColorPickerOptions.call(this, options);
+            return _.omit(options, ['picker']);
+        },
 
-        $parent.append('<span id="' + pickerId + '" style="display: none;"></span>');
-        $picker = $parent.find('#' + pickerId);
-        $picker.minicolors(_.defaults(options.picker, {
-            control: 'wheel',
-            letterCase: 'uppercase',
-            change: function(hex, opacity) {
-                if ($current) {
-                    $current.css('background-color', hex);
-                }
-            },
-            hide: function () {
-                if ($current) {
-                    options._sourceElement.simplecolorpicker(
-                        'replaceColor',
-                        $current.data('color'),
-                        $picker.minicolors('value')
-                    );
-                    $current = null;
-                }
-            }
-        }));
-        $picker.siblings('.minicolors').css({'position': 'static', 'display': 'block'});
+        /**
+         * @inheritDoc
+         */
+        _getPickerOptions: function (options) {
+            options = ColorTable.__super__._getPickerOptions.call(this, options.picker);
+            return _.extend({
+                change: _.bind(function (hex, opacity) {
+                    if (this.$current && this.$current.data('color') !== hex) {
+                        this.$element.simplecolorpicker('replaceColor', this.$current.data('color'), hex);
+                        this.$current.data('color', hex);
+                        this.$current.css('color', colorUtil.getContrastColor(hex));
+                    }
+                }, this)
+            }, options);
+        },
 
-        $parent.find('.minicolors-panel').append(
-            '<div class="form-actions">' +
-                '<button class="btn pull-right" data-action="cancel" type="button">' + __('Close') + '</button>' +
-            '</div>'
-        );
-        $parent.find('button[data-action=cancel]').on('click', function (e) {
-            e.preventDefault();
-            $picker.minicolors('hide');
-        });
+        /**
+         * @inheritDoc
+         */
+        _getPicker: function () {
+            var pickerId = this.$element.prop('id') + '_picker';
+            this.$parent.append('<span id="' + pickerId + '" style="display: none;"></span>');
+            return this.$parent.find('#' + pickerId);
+        },
 
-        $parent.on('click', 'span.color', function (e) {
-            e.preventDefault();
-            if (!options._sourceElement.is(':disabled')) {
-                $current = $(e.currentTarget);
-                var $panel = $parent.find('.minicolors-panel'),
-                    pos = $current.position(),
-                    x = pos.left + 5,
-                    y = pos.top + $current.outerHeight() + 3,
-                    w = $panel.outerWidth(),
-                    h = $panel.outerHeight() + 39,
-                    width = $current.offsetParent().width(),
-                    height = $current.offsetParent().height();
-                if (x > width - w) {
-                    x -= w;
+        /**
+         * @inheritDoc
+         */
+        _addPickerHandlers: function () {
+            this.$parent.on('click', 'span.color', _.bind(function (e) {
+                e.preventDefault();
+                if (!this.$element.is(':disabled')) {
+                    this.$current = $(e.currentTarget);
+                    this.$parent.find('.minicolors-panel').css(this._getPickerPos(this.$current));
+                    this.$parent.removeClass('minicolors-focus');
+                    this.$picker.minicolors('value', this.$current.data('color'));
+                    this.$picker.minicolors('show');
                 }
-                if (y > height - h) {
-                    y -= h + $current.outerHeight() + 6;
-                }
-                $panel.css({'left': x, 'top': y});
-                $parent.removeClass('minicolors-focus');
-                $picker.minicolors('value', $current.data('color'));
-                $picker.minicolors('show');
-            }
-        });
-    };
+            }, this));
+        }
+    });
+
+    return ColorTable;
 });

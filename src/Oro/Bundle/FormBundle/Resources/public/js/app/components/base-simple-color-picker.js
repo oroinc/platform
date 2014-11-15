@@ -42,20 +42,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
                 this.$picker.minicolors(this._getPickerOptions(options));
                 this._addPickerActions();
                 this._preparePicker();
-
-                this.$picker.siblings('.minicolors').css({'position': 'static', 'display': 'block'});
-
-                this.$parent.on('click', 'span.color', _.bind(function (e) {
-                    if (!this.$element.is(':disabled')) {
-                        this.$current = $(e.currentTarget);
-                    }
-                }, this));
-                this.$picker.on('click', _.bind(function (e) {
-                    if (!this.$element.is(':disabled')) {
-                        this.$parent.find('.minicolors-panel').css(this._getPickerPos());
-                        this.$picker.minicolors('show');
-                    }
-                }, this));
+                this._addPickerHandlers();
             }
         },
 
@@ -100,7 +87,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
                     if (this.$current) {
                         this.$current.data('color', hex);
                         this.$current.css('color', colorUtil.getContrastColor(hex));
-                        this.$element.val(this.$picker.minicolors('value'));
+                        this.$element.val(hex);
                     }
                 }, this),
                 hide: _.bind(function () {
@@ -123,6 +110,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
         _preparePicker: function () {
             $(document).off('mousedown.minicolors touchstart.minicolors', '.minicolors-swatch');
             $(document).off('focus.minicolors', '.minicolors-input');
+            this.$picker.siblings('.minicolors').css({'position': 'static', 'display': 'block'});
         },
 
         /**
@@ -137,23 +125,41 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
         },
 
         /**
+         * @private
+         */
+        _addPickerHandlers: function () {
+            this.$parent.on('click', 'span.color', _.bind(function (e) {
+                if (!this.$element.is(':disabled')) {
+                    this.$current = $(e.currentTarget);
+                }
+            }, this));
+            this.$picker.on('click', _.bind(function (e) {
+                if (!this.$element.is(':disabled')) {
+                    this.$parent.find('.minicolors-panel').css(this._getPickerPos(this.$picker));
+                    this.$picker.minicolors('show');
+                }
+            }, this));
+        },
+
+        /**
+         * @param {jQuery} $swatch
          * @returns {{left: int, top: int}}
          * @private
          */
-        _getPickerPos: function () {
+        _getPickerPos: function ($swatch) {
             var $panel = this.$parent.find('.minicolors-panel'),
-                pos = this.$picker.position(),
-                x = pos.left + this.$picker.offsetParent().scrollLeft() + 5,
-                y = pos.top + this.$picker.offsetParent().scrollTop() + this.$picker.outerHeight() + 3,
+                pos = $swatch.position(),
+                x = pos.left + $swatch.offsetParent().scrollLeft() + 5,
+                y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3,
                 w = $panel.outerWidth(),
                 h = $panel.outerHeight() + 39,
-                width = this.$picker.offsetParent().width(),
-                height = this.$picker.offsetParent().height();
+                width = $swatch.offsetParent().width(),
+                height = $swatch.offsetParent().height();
             if (x > width - w) {
                 x -= w;
             }
             if (y > height - h) {
-                y -= h + this.$picker.outerHeight() + 6;
+                y -= h + $swatch.outerHeight() + 6;
             }
             return {left: x, top: y};
         }
