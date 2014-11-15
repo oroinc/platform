@@ -4,6 +4,7 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 use Doctrine\Common\Collections\Criteria;
@@ -149,6 +150,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      * @param array $supportedApiParams valid parameters that can be passed
      * @param array $filterParameters   assoc array with filter params, like closure
      *                                  [filterName => [closure => \Closure(...), ...]]
+     *                                  or [filterName => ParameterFilterInterface]
      *
      * @return array
      * @throws \Exception
@@ -161,11 +163,17 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         foreach ($allowedFilters as $filterName => $filterData) {
             list ($operator, $value) = $filterData;
 
-            $closure = empty($filterParameters[$filterName]['closure']) ?
-                false :
-                $filterParameters[$filterName]['closure'];
-
-            $value = is_callable($closure) ? $closure($value, $operator) : $value;
+            $filter = isset($filterParameters[$filterName]) ? $filterParameters[$filterName] : false;
+            if ($filter) {
+                switch (true) {
+                    case $filter instanceof ParameterFilterInterface:
+                        $value = $filter->filter($value, $operator);
+                        break;
+                    case is_array($filter) && isset($filter['closure']) && is_callable($filter['closure']):
+                        $value = call_user_func($filter['closure'], $value, $operator);
+                        break;
+                }
+            }
 
             $this->addCriteria($criteria, $filterName, $operator, $value);
         }
