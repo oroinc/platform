@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
@@ -33,12 +34,17 @@ class ActivityListManager
     /** @var ActivityListChainProvider */
     protected $chainProvider;
 
+    /** @var ActivityListFilterHelper */
+    protected $activityListFilterHelper;
+
     /**
-     * @param Registry          $doctrine
-     * @param SecurityFacade    $securityFacade
-     * @param NameFormatter     $nameFormatter
-     * @param Pager             $pager
-     * @param UserConfigManager $config
+     * @param Registry                  $doctrine
+     * @param SecurityFacade            $securityFacade
+     * @param NameFormatter             $nameFormatter
+     * @param Pager                     $pager
+     * @param UserConfigManager         $config
+     * @param ActivityListChainProvider $provider
+     * @param ActivityListFilterHelper  $activityListFilterHelper
      */
     public function __construct(
         Registry $doctrine,
@@ -46,14 +52,16 @@ class ActivityListManager
         NameFormatter $nameFormatter,
         Pager $pager,
         UserConfigManager $config,
-        ActivityListChainProvider $provider
+        ActivityListChainProvider $provider,
+        ActivityListFilterHelper $activityListFilterHelper
     ) {
-        $this->em = $doctrine->getManager();
-        $this->securityFacade = $securityFacade;
-        $this->nameFormatter = $nameFormatter;
-        $this->pager = $pager;
-        $this->config = $config;
-        $this->chainProvider = $provider;
+        $this->em                       = $doctrine->getManager();
+        $this->securityFacade           = $securityFacade;
+        $this->nameFormatter            = $nameFormatter;
+        $this->pager                    = $pager;
+        $this->config                   = $config;
+        $this->chainProvider            = $provider;
+        $this->activityListFilterHelper = $activityListFilterHelper;
     }
 
     /**
@@ -65,32 +73,23 @@ class ActivityListManager
     }
 
     /**
-     * @param string         $entityClass
-     * @param integer        $entityId
-     * @param array          $activityEntityСlasses
-     * @param \DateTime|bool $dateFrom
-     * @param \DateTime|bool $dateTo
-     * @param integer        $page
+     * @param string  $entityClass
+     * @param integer $entityId
+     * @param integer $page
+     * @param array   $filter
      *
      * @return ActivityList[]
      */
-    public function getList(
-        $entityClass,
-        $entityId,
-        $activityEntityСlasses,
-        $dateFrom,
-        $dateTo,
-        $page
-    ) {
-        $qb = $this->getRepository()->getActivityListQueryBuilder(
+    public function getList($entityClass, $entityId, $page, $filter)
+    {
+        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
             $entityId,
-            $activityEntityСlasses,
-            $dateFrom,
-            $dateTo,
             $this->config->get('oro_activity_list.sorting_field'),
             $this->config->get('oro_activity_list.sorting_direction')
         );
+
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -98,41 +97,28 @@ class ActivityListManager
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
         $pager->init();
 
-        /** @var ActivityList[] $result */
-        $results = $pager->getResults();
-
-        $results = $this->getEntityViewModels($results);
-
-        return $results;
+        return $this->getEntityViewModels($pager->getResults());
     }
 
     /**
-     * @param string         $entityClass
-     * @param integer        $entityId
-     * @param array          $activityEntityСlasses
-     * @param \DateTime|bool $dateFrom
-     * @param \DateTime|bool $dateTo
+     * @param string  $entityClass
+     * @param integer $entityId
+     * @param array   $filter
      *
      * @return ActivityList[]
      */
-    public function getListCount(
-        $entityClass,
-        $entityId,
-        $activityEntityСlasses,
-        $dateFrom,
-        $dateTo
-    ) {
-        $qb = $this->getRepository()->getActivityListQueryBuilder(
+    public function getListCount($entityClass, $entityId, $filter)
+    {
+        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
             $entityId,
-            $activityEntityСlasses,
-            $dateFrom,
-            $dateTo,
             $this->config->get('oro_activity_list.sorting_field'),
             $this->config->get('oro_activity_list.sorting_direction')
         );
 
         $qb->select('COUNT(activity.id)');
+
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
 
         return $qb->getQuery()->getSingleScalarResult();
     }

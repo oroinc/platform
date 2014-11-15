@@ -37,7 +37,7 @@
             {% set options = {
                 widgetId: app.request.get('_wid'),
                 activityListData: render(path(
-                    'oro_activity_list_api_get_all',
+                    'oro_activity_list_api_get_filtered',
                     {
                         version: 'latest',
                         entityClass: oro_class_name(entity, true),
@@ -49,11 +49,12 @@
                     template: '#template-activity-list',
                     itemTemplate: '#template-activity-item',
                     urls: {
-                        list: path('oro_activity_list_api_get_all', {
+                        route: 'oro_activity_list_api_get_filtered',
+                        parameters: {
                             version: 'latest',
                             entityClass: oro_class_name(entity, true),
                             entityId: entity.id
-                        })
+                        }
                     },
                     pager: pager,
                     dateRangeFilterMetadata: dateRangeFilterMetadata,

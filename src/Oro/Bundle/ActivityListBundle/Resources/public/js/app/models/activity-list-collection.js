@@ -2,49 +2,38 @@
 /*global define*/
 define([
     'oroui/js/app/models/base/collection',
-    './activity-list-model'
-], function (BaseCollection, ActivityModel) {
+    './activity-list-model',
+    'underscore',
+    'routing',
+], function (BaseCollection, ActivityModel, _, routing) {
     'use strict';
 
     var ActivityCollection;
 
     ActivityCollection = BaseCollection.extend({
         model:    ActivityModel,
-        baseUrl:  '',
-        sorting:  'DESC',
-        fromDate: '',
-        toDate:   '',
-        filter:   '',
+        route: '',
+        routeParameters: {},
+        filter:   {},
         pager: {
             count:    1, //total activities count
             current:  1, //current page
             pagesize: 1, //items per page
             total:    1  //total pages
         },
-        classFilters: [],
 
         url: function () {
-            return this.baseUrl + '?page=' + this.getPage() + '&activityClasses=' + this.getFilter();
+            return routing.generate(
+                this.route,
+                _.extend(
+                    _.extend([], this.routeParameters),
+                    _.extend({page: this.getPage()}, {filter: this.filter})
+                )
+            );
         },
 
-        getSorting: function () {
-            return this.sorting;
-        },
-        setSorting: function (mode) {
-            this.sorting = mode;
-        },
-
-        getFromDate: function () {},
-        setFromDate: function () {},
-
-        getToDate: function () {},
-        setToDate: function () {},
-
-        setFilter: function (classFilters) {
-            this.classFilters = classFilters;
-        },
-        getFilter: function () {
-            return this.classFilters;
+        setFilter: function (filter) {
+            this.filter = filter;
         },
 
         getPage: function () {

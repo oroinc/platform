@@ -86,7 +86,8 @@ define(function (require) {
             collection = new ActivityCollection(this.options.activityListData, {
                 model: activityOptions.itemModel
             });
-            collection.baseUrl = activityOptions.urls.list;
+            collection.route = activityOptions.urls.route;
+            collection.routeParameters = activityOptions.urls.parameters;
             collection.setPageSize(this.options.activityListOptions.pager.pagesize);
             collection.setCount(this.options.activityListCount);
 
@@ -118,10 +119,7 @@ define(function (require) {
          * Triggered when filter state is changed
          */
         onFilterStateChange: function () {
-            console.log(this.getFilterState());
-            var filter = this.getFilterState();
-            var list = this.list;
-            list.collection.setFilter(filter.activityType.value);
+            this.list.collection.setFilter(this.getFilterState());
             this.list.refresh();
         },
 

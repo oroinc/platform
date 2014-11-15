@@ -16,6 +16,12 @@ oro_activity_list_bundle_api:
 #
 # REST actions
 #
+oro_activity_list_api_get_filtered:
+    pattern: api/rest/{version}/activitylists/filtered/{entityClass}/{entityId}.{_format}
+    defaults: {_controller: OroActivityListBundle:Api/Rest/ActivityList:getFilteredActivityList, _format: json}
+    requirements:
+         _method: GET
+
 oro_activity_list_api_get_all:
     pattern: api/rest/{version}/activitylists/{entityClass}/{entityId}.{_format}
     defaults: {_controller: OroActivityListBundle:Api/Rest/ActivityList:cget, _format: json}
