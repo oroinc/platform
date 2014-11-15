@@ -67,11 +67,12 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
         $resolver
             ->setDefaults(
                 [
-                    'translatable' => false,
-                    'empty_color'  => null,
-                    'color_schema' => 'short', // short, long, custom/null
-                    'picker'       => false,
-                    'picker_delay' => 0
+                    'translatable'      => false,
+                    'allow_empty_color' => false,
+                    'empty_color'       => null,
+                    'color_schema'      => 'short', // short, long, custom/null
+                    'picker'            => false,
+                    'picker_delay'      => 0
                 ]
             )
             ->setNormalizers(
@@ -98,9 +99,11 @@ abstract class AbstractSimpleColorPickerType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $config = ['theme' => 'fontawesome'];
-        if ($options['empty_color']) {
+        if ($options['allow_empty_color']) {
             $this->appendTheme($config, 'with-empty-color');
-            $config['emptyColor'] = $options['empty_color'];
+            if ($options['empty_color']) {
+                $config['emptyColor'] = $options['empty_color'];
+            }
         }
         if ($options['picker']) {
             $config = array_merge($config, ['picker' => true, 'pickerDelay' => $options['picker_delay']]);

@@ -33,22 +33,23 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.simpleco
                 }
             }
         }));
-        $picker.parent().find('.minicolors-panel').append(
+        $picker.siblings('.minicolors').css({'position': 'static', 'display': 'block'});
+
+        $parent.find('.minicolors-panel').append(
             '<div class="form-actions">' +
                 '<button class="btn pull-right" data-action="cancel" type="button">' + __('Close') + '</button>' +
             '</div>'
         );
-        $picker.parent().find('button[data-action=cancel]').on('click', function (e) {
+        $parent.find('button[data-action=cancel]').on('click', function (e) {
             e.preventDefault();
             $picker.minicolors('hide');
         });
-        $picker.siblings('.minicolors').css({'position': 'static', 'display': 'block'});
 
         $parent.on('click', 'span.color', function (e) {
             e.preventDefault();
             if (!options._sourceElement.is(':disabled')) {
                 $current = $(e.currentTarget);
-                var $panel = $picker.parent().find('.minicolors-panel'),
+                var $panel = $parent.find('.minicolors-panel'),
                     pos = $current.position(),
                     x = pos.left + 5,
                     y = pos.top + $current.outerHeight() + 3,
@@ -63,7 +64,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.simpleco
                     y -= h + $current.outerHeight() + 6;
                 }
                 $panel.css({'left': x, 'top': y});
-                $picker.parent().removeClass('minicolors-focus');
+                $parent.removeClass('minicolors-focus');
                 $picker.minicolors('value', $current.data('color'));
                 $picker.minicolors('show');
             }

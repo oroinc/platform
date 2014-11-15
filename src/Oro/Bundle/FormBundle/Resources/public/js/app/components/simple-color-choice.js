@@ -5,6 +5,8 @@ define(['underscore', 'jquery.simplecolorpicker'
     'use strict';
 
     return function (options) {
-        options._sourceElement.simplecolorpicker(_.omit(options, ['_sourceElement']));
+        options._sourceElement.simplecolorpicker(_.defaults(_.omit(options, ['_sourceElement']), {
+            emptyColor: '#FFFFFF'
+        }));
     };
 });

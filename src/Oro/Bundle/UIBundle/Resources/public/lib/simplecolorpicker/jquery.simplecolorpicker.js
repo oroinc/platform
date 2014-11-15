@@ -38,7 +38,7 @@
       var selectedVal = self.$select.val();
 
       if (self.options.picker === true) {
-        var selectText = self.$select.is('select') ? self.$select.find('> option:selected').text() : this._getSelectedText(self.options.data);
+        var selectText = self.$select.is('select') ? self.$select.find('> option:selected').text() : this.getSelectedText(self.options.data);
         self.$icon = $('<span class="simplecolorpicker icon"'
                      + ' title="' + selectText + '"'
                      + ' style="background-color: ' + selectedVal + ';"'
@@ -66,7 +66,8 @@
             return;
         }
 
-        var color = isSelect ? $option.val() : $option.id;
+        var color = isSelect ? $option.val() : ($option.id || '');
+        var bgColor = !color && self.options.emptyColor ? self.options.emptyColor : color;
 
         var isSelected = isSelect ? $option.is(':selected') : ($option.selected ? true : false);
         var isDisabled = isSelect ? $option.is(':disabled') : ($option.disabled ? true : false);
@@ -96,7 +97,7 @@
 
         var $colorSpan = $('<span class="' + cssClass + '"'
                          + title
-                         + ' style="background-color: ' + (!color && self.options.emptyColor ? self.options.emptyColor : color) + ';"'
+                         + ' style="color: ' + self.getContrastColor(bgColor) + '; background-color: ' + bgColor + ';"'
                          + ' data-color="' + color + '"'
                          + selected
                          + disabled
@@ -121,18 +122,24 @@
               buildItemFunc($(this), true);
           });
       } else if (!self.options.table) {
-          var selected = null;
+          var selected = null, selectedId = null, matched = null;
           $.each(self.options.data, function(index, value) {
-              if (value.selected) {
+              if (selected === null && value.selected) {
                   selected = index;
+                  selectedId = value.id;
+              }
+              if (matched === null && (
+                  (!value.id && !selectedVal) ||
+                  (value.id && selectedVal && value.id.toLowerCase() === selectedVal.toLowerCase())
+              )) {
+                  matched = index;
               }
           });
           $.each(self.options.data, function(index, value) {
-              if (selected === null) {
-                  if ((value.id && selectedVal && value.id.toLowerCase() === selectedVal.toLowerCase()) || (!value.id && !selectedVal)) {
-                      value.selected = true;
-                      selected = index;
-                  }
+              if (value.selected && selected !== null && matched !== null && matched !== selected) {
+                  value.selected = false;
+              } else if (!value.selected && matched !== null && matched === index) {
+                  value.selected = true;
               }
               buildItemFunc(value, false);
           });
@@ -165,6 +172,27 @@
         self.selectColorSpan($colorSpan);
       } else {
         console.error("The given color '" + color + "' could not be found");
+      }
+    },
+
+    /**
+     * Sets empty color.
+     *
+     * @param color the hexadecimal color to select, ex: '#fbd75b'
+     */
+    setEmptyColor: function(color) {
+      var self = this;
+
+      var $colorSpan = self.$colorList.find('> span.color').filter(function() {
+        return $(this).data('color').toLowerCase() === self.options.emptyColor.toLowerCase();
+      });
+
+      if ($colorSpan.length > 0) {
+        $colorSpan.data('color', color);
+        $colorSpan.css({'backgroung-color': color, 'color': this.getContrastColor(color)});
+        self.options.emptyColor = color;
+      } else {
+        console.error("The empty color could not be found");
       }
     },
 
@@ -232,6 +260,7 @@
         // Mark this span as the selected one
         $colorSpan.siblings().removeAttr('data-selected');
         $colorSpan.attr('data-selected', '');
+        $colorSpan.css('color', this.getContrastColor(color || this.options.emptyColor));
       }
 
       if (this.options.picker === true) {
@@ -279,7 +308,7 @@
       this.$select.show();
     },
 
-    _getSelectedText: function(data) {
+    getSelectedText: function(data) {
         var text = null;
         $.each(data, function(index, value) {
             if (value.selected) {
@@ -287,6 +316,36 @@
             }
         });
         return text;
+    },
+
+    /**
+     * Converts a hex string to an RGB object
+     *
+     * @param {string} hex A color in six-digit hexadecimal form.
+     * @returns {Object|null}
+     */
+    hex2rgb: function (hex) {
+        var result = /^#([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : null;
+    },
+
+    /**
+     * Calculates contrast color
+     * @see http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
+     *
+     * @param {string} hex A color in six-digit hexadecimal form.
+     * @returns {string} Calculated sufficient contrast color, black or white.
+     *                   If the given color is invalid or cannot be parsed, returns black.
+     */
+    getContrastColor: function (hex) {
+        var rgb = this.hex2rgb(hex),
+            yiq = rgb ? ((299 * rgb.r + 587 * rgb.g + 114 * rgb.b) / 1000) : 255,
+            clrDiff = rgb ? (rgb.r + rgb.g + rgb.b) : 1000;
+        return yiq > 125 && clrDiff > 500 ? '#000000' : '#FFFFFF';
     }
   };
 
@@ -338,5 +397,4 @@
     // also 'pickerDelay' and 'data' properties are ignored in this case
     table: false
   };
-
 })(jQuery);

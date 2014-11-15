@@ -1,30 +1,41 @@
 /*jslint nomen: true*/
 /*global define*/
-define(['underscore', 'orotranslation/js/translator', 'jquery.simplecolorpicker', 'jquery.minicolors'
-    ], function (_, __) {
+define(['underscore', 'oroform/js/app/components/base-simple-color-picker'
+    ], function (_, BaseSimpleColorPicker) {
     'use strict';
 
-    return function (options) {
-        var $customColor;
-        options._sourceElement.simplecolorpicker(_.omit(options, ['_sourceElement', 'custom_color']));
-        $customColor = options._sourceElement.parent().find('span.custom-color');
-        if ($customColor.length) {
-            $customColor.minicolors(_.defaults(options.custom_color, {
-                control: 'wheel',
-                letterCase: 'uppercase',
-                hide: function () {
-                    options._sourceElement.val($customColor.minicolors('value'));
-                }
-            }));
-            $customColor.parent().find('.minicolors-panel').append(
-                '<div class="form-actions">' +
-                    '<button class="btn pull-right" data-action="cancel" type="button">' + __('Close') + '</button>' +
-                '</div>'
-            );
-            $customColor.parent().find('button[data-action=cancel]').on('click', function (e) {
-                e.preventDefault();
-                $customColor.minicolors('hide');
-            });
+    var SimpleColorPicker = BaseSimpleColorPicker.extend({
+        /**
+         * @constructor
+         * @param {object} options
+         */
+        initialize: function (options) {
+            SimpleColorPicker.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _getSimpleColorPickerOptions: function (options) {
+            return _.omit(SimpleColorPicker.__super__._getSimpleColorPickerOptions.call(this, options),
+                    ['custom_color']
+                );
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _getPickerOptions: function (options) {
+            return SimpleColorPicker.__super__._getPickerOptions.call(this, options.custom_color);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _getPicker: function () {
+            return this.$parent.find('span.custom-color');
         }
-    };
+    });
+
+    return SimpleColorPicker;
 });
