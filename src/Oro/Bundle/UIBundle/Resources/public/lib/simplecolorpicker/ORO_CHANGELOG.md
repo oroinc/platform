@@ -8,3 +8,4 @@ Changes in BAP 1.5.0
 * grab CSS class from option element.
 * Allow to apply the picker to INPUT element.
 * Add `table` option to allow using this control to edit any color in the list.
+* Add contrast color for Ok/check mark.

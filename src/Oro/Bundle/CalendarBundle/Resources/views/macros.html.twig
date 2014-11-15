@@ -9,6 +9,7 @@
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.backgroundColor.label'|trans, '<%= formatter.color(backgroundColor) %>') }}
             </div>
             <div class="widget-actions form-actions" style="display: none;">
                 <% if (id != null && removable) { %>
@@ -41,6 +42,7 @@
             form_row(form.start),
             form_row(form.end),
             form_row(form.allDay),
+            form_row(form.backgroundColor),
             form_row(form.reminders)
         ]
     %}
