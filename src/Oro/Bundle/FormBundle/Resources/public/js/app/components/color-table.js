@@ -26,7 +26,7 @@ define(['jquery', 'underscore', 'oroform/js/app/components/base-simple-color-pic
          */
         _getPickerOptions: function (options) {
             options = ColorTable.__super__._getPickerOptions.call(this, options.picker);
-            return _.extend({
+            return _.extend(options, {
                 change: _.bind(function (hex, opacity) {
                     if (this.$current && this.$current.data('color') !== hex) {
                         this.$element.simplecolorpicker('replaceColor', this.$current.data('color'), hex);
@@ -34,7 +34,7 @@ define(['jquery', 'underscore', 'oroform/js/app/components/base-simple-color-pic
                         this.$current.css('color', colorUtil.getContrastColor(hex));
                     }
                 }, this)
-            }, options);
+            });
         },
 
         /**
@@ -54,7 +54,7 @@ define(['jquery', 'underscore', 'oroform/js/app/components/base-simple-color-pic
                 e.preventDefault();
                 if (!this.$element.is(':disabled')) {
                     this.$current = $(e.currentTarget);
-                    this.$parent.find('.minicolors-panel').css(this._getPickerPos(this.$current));
+                    this.$picker.parent().find('.minicolors-panel').css(this._getPickerPos(this.$current));
                     this.$parent.removeClass('minicolors-focus');
                     this.$picker.minicolors('value', this.$current.data('color'));
                     this.$picker.minicolors('show');

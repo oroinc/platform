@@ -59,7 +59,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          */
         dispose: function () {
             if (!this.disposed && this.$element) {
-                this.$element.off('.' + this.cid);
+                this.$current = null;
+                this.$parent.off();
+                this.$picker.off();
             }
             BaseSimpleColorPicker.__super__.dispose.call(this);
         },
@@ -118,7 +120,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          */
         _addPickerActions: function () {
             this.$picker.parent().find('.minicolors-panel').append(this.pickerActionsTemplate({__: __}));
-            this.$picker.parent().find('button[data-action=cancel]').on('click', _.bind(function (e) {
+            this.$parent.on('click', 'button[data-action=cancel]', _.bind(function (e) {
                 e.preventDefault();
                 this.$picker.minicolors('hide');
             }, this));
@@ -135,7 +137,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
             }, this));
             this.$picker.on('click', _.bind(function (e) {
                 if (!this.$element.is(':disabled')) {
-                    this.$parent.find('.minicolors-panel').css(this._getPickerPos(this.$picker));
+                    this.$picker.parent().find('.minicolors-panel').css(this._getPickerPos(this.$picker));
                     this.$picker.minicolors('show');
                 }
             }, this));
@@ -147,7 +149,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          * @private
          */
         _getPickerPos: function ($swatch) {
-            var $panel = this.$parent.find('.minicolors-panel'),
+            var $panel = this.$picker.parent().find('.minicolors-panel'),
                 pos = $swatch.position(),
                 x = pos.left + $swatch.offsetParent().scrollLeft() + 5,
                 y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3,
