@@ -8,7 +8,6 @@ interface ParameterFilterInterface
      * Process filtering of request parameter
      *
      * @param mixed $rawValue
-     *
      * @param string $operator
      *
      * @return mixed

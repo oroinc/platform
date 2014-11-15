@@ -4,7 +4,6 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 use Doctrine\Common\Collections\Criteria;
@@ -16,6 +15,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
 
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
 {
