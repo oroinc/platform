@@ -18,6 +18,13 @@ oro:
         assign_event.widget_title:  Assign Event to %username%
         view_events:                Events
 
+        system_configuration:
+            groups:
+                calendar_settings.title:  Calendar settings
+            fields:
+                calendar_colors.label:    Calendar colors
+                event_colors.label:       Event colors
+
         controller:
             event.saved.message:  Calendar event saved
 

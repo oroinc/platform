@@ -55,8 +55,8 @@ class DatabaseHelper
      */
     public function findOneBy($entityName, array $criteria)
     {
-        $serializationCriteria = array();
-        $where = array();
+        $serializationCriteria = [];
+        $where = [];
 
         foreach ($criteria as $field => $value) {
             if (is_object($value)) {
@@ -114,6 +114,18 @@ class DatabaseHelper
         }
 
         return $existingEntity;
+    }
+
+    /**
+     * @param object $entity
+     * @return object
+     */
+    public function getEntityReference($entity)
+    {
+        $entityName = ClassUtils::getClass($entity);
+        $identifier = $this->getIdentifier($entity);
+
+        return $this->doctrineHelper->getEntityReference($entityName, $identifier);
     }
 
     /**
@@ -190,7 +202,7 @@ class DatabaseHelper
         $entityManager = $this->registry->getManagerForClass($entityName);
         $association = $entityManager->getClassMetadata($entityName)->getAssociationMapping($fieldName);
 
-        return in_array($association['type'], array(ClassMetadata::ONE_TO_ONE, ClassMetadata::ONE_TO_MANY));
+        return in_array($association['type'], [ClassMetadata::ONE_TO_ONE, ClassMetadata::ONE_TO_MANY]);
     }
 
     /**
@@ -202,7 +214,7 @@ class DatabaseHelper
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityName);
         $identifierField = $this->getIdentifierFieldName($entityName);
-        $entityManager->getClassMetadata($entityName)->setIdentifierValues($entity, array($identifierField => null));
+        $entityManager->getClassMetadata($entityName)->setIdentifierValues($entity, [$identifierField => null]);
     }
 
     /**

@@ -14,7 +14,7 @@ class OroCalendarBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -125,8 +125,7 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('calendar_id', 'integer', []);
         $table->addColumn('position', 'integer', ['default' => 0]);
         $table->addColumn('visible', 'boolean', ['default' => true]);
-        $table->addColumn('color', 'string', ['notnull' => false, 'length' => 6]);
-        $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 6]);
+        $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 7]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['target_calendar_id'], 'IDX_660946D18D7AEDC2', []);
         $table->addUniqueIndex(['calendar_alias', 'calendar_id', 'target_calendar_id'], 'oro_calendar_prop_uq');

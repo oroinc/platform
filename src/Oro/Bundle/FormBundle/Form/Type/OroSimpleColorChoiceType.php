@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 
-class OroSimpleColorChoice extends AbstractSimpleColorPicker
+class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
 {
     /**
      * {@inheritdoc}

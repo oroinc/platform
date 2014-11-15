@@ -85,7 +85,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 return $last.attr(this.attrs.calendarAlias) === 'user' ? $last.attr(this.attrs.backgroundColor) : null;
             }, this));
             this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.backgroundColor);
-            model.set('color', viewModel.color);
             model.set('backgroundColor', viewModel.backgroundColor);
 
             $el = $(this.template(viewModel));
@@ -284,7 +283,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         _setItemVisibility: function ($visibilityButton, backgroundColor) {
             if (backgroundColor) {
                 $visibilityButton.removeClass('un-color');
-                $visibilityButton.css({backgroundColor: '#' + backgroundColor, borderColor: '#' + backgroundColor});
+                $visibilityButton.css({backgroundColor: backgroundColor, borderColor: backgroundColor});
             } else {
                 $visibilityButton.css({backgroundColor: '', borderColor: ''});
                 $visibilityButton.addClass('un-color');
