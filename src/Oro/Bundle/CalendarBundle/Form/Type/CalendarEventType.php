@@ -56,6 +56,18 @@ class CalendarEventType extends AbstractType
                 ]
             )
             ->add(
+                'backgroundColor',
+                'oro_simple_color_picker',
+                [
+                    'required'           => false,
+                    'label'              => 'oro.calendar.calendarevent.backgroundColor.label',
+                    'color_schema'       => 'oro_calendar.event_colors',
+                    'empty_value'        => 'oro.calendar.form.no_color',
+                    'allow_empty_color'  => true,
+                    'allow_custom_color' => true
+                ]
+            )
+            ->add(
                 'reminders',
                 'oro_reminder_collection',
                 [

@@ -15,6 +15,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
     return Backbone.View.extend({
         /** @property {Object} */
         options: {
+            colorManager: null,
             widgetRoute: null,
             widgetOptions: null
         },
@@ -240,8 +241,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         getEventForm: function () {
             var modelData = this.model.toJSON(),
-                form = this.fillForm(this.template(modelData), modelData);
+                form = this.fillForm(this.template(modelData), modelData),
+                calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
             form.find('[name]').uniform('update');
+            form.find('[name*="backgroundColor"]')
+                .data('page-component-options').emptyColor = calendarColors.backgroundColor;
             return form;
         },
 

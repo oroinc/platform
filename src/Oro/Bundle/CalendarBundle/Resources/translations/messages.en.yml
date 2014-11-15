@@ -30,6 +30,7 @@ oro:
 
         form:
             choose_user_to_add_calendar: "Choose a user to add..."
+            no_color: None
 
         my_calendar_widget_descriptions: This widget displays a calendar for today.
         print: Print
@@ -80,6 +81,7 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All day event
+            backgroundColor.label: Color
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty

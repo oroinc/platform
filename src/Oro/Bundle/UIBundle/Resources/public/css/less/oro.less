@@ -147,10 +147,21 @@ label, input, button, select, textarea { font-size:13px;}
   }
 }
 .simplecolorpicker {
+  span.color[data-color=''],
   span.color[data-color='#FFFFFF'],
   span.color[data-color='#ffffff'] {
     border: 1px solid rgba(0,0,0,0.2);
   }
+  span.color[data-selected]:after {
+    color: inherit !important;
+  }
+}
+i.color {
+  display: block;
+  border: 1px solid rgba(0,0,0,0.2);
+  width: 18px;
+  height: 18px;
+  margin-top: -3px;
 }
 .controls {
   .minicolors {

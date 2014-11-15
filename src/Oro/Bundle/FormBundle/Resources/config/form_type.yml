@@ -107,12 +107,15 @@ services:
     oro_form.type.simple_color_picker:
         class: %oro_form.type.simple_color_picker.class%
         arguments:
+            - @oro_config.global
             - @translator
         tags:
             - { name: form.type, alias: oro_simple_color_picker }
 
     oro_form.type.simple_color_choice:
         class: %oro_form.type.simple_color_choice.class%
+        arguments:
+            - @oro_config.global
         tags:
             - { name: form.type, alias: oro_simple_color_choice }
 
