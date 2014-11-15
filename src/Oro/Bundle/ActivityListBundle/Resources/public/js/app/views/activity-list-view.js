@@ -112,7 +112,7 @@ define(function (require) {
             if (this.collection.getPageSize() < this.collection.getCount()) {
                 this._toggleNext(true);
                 jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
-                jQuery('.activity-list-widget .pagination-total-count').html(this.collection.pager.count);
+                jQuery('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
             }
         },
 
