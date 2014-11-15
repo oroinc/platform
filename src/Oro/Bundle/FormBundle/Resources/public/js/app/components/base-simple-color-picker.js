@@ -83,9 +83,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          * @private
          */
         _getSimpleColorPickerOptions: function (options) {
-            return _.defaults(_.omit(options, ['_sourceElement', 'pickerActionsTemplate']), {
-                emptyColor: '#FFFFFF'
-            });
+            return _.omit(options, ['_sourceElement', 'pickerActionsTemplate']);
         },
 
         /**

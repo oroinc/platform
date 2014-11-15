@@ -42,9 +42,10 @@ define(['underscore', 'oroform/js/app/components/base-simple-color-picker'
          * @inheritDoc
          */
         _getSimpleColorPickerOptions: function (options) {
-            return _.omit(SimpleColorPicker.__super__._getSimpleColorPickerOptions.call(this, options),
-                    ['custom_color']
-                );
+            options = SimpleColorPicker.__super__._getSimpleColorPickerOptions.call(this, options);
+            return _.defaults(_.omit(options, ['custom_color']), {
+                emptyColor: '#FFFFFF'
+            });
         },
 
         /**
