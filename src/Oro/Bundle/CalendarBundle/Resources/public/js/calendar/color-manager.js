@@ -20,9 +20,9 @@ define(['underscore'], function (_) {
         /** @property {Object} */
         calendarColors: null,
 
-        initialize: function (colors) {
-            this.colors = colors;
-            this.defaultColor = this._findColor('#4986E7');
+        initialize: function (options) {
+            this.colors = options.colors;
+            this.defaultColor = options.colors[15];
             this.calendarColors = {};
         },
 
@@ -119,9 +119,9 @@ define(['underscore'], function (_) {
         }
     };
 
-    return function (colors) {
+    return function (options) {
         var obj = _.extend({}, ColorManager);
-        obj.initialize(colors);
+        obj.initialize(options);
         return obj;
     };
 });

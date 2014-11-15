@@ -80,7 +80,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             this.listenTo(this.collection, 'add', this.onEventAdded);
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
-            this.colorManager = new ColorManager(this.options.colorManagerOptions.colors);
+            this.colorManager = new ColorManager(this.options.colorManagerOptions);
         },
 
         /**
