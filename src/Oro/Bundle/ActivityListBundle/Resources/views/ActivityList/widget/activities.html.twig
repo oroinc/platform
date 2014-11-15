@@ -63,32 +63,26 @@
                 data-page-component-options="{{ options|json_encode }}"></div>
 
             <div class="container-fluid actions-bottom">
-                <div class="pull-left">
-                    <div class="entity-pagination">
-                        <div class="pagination">
-                            <ul class="icons-holder">
-                                <li class="pagination-first {% if pager.current == 1 %} disabled {% endif %}">
-                                    <a href="#" data-section="bottom" data-action-name="goto_first">{{ 'oro.entity_pagination.first'|trans }}</a>
-                                </li>
-                                <li class="pagination-previous {% if pager.current == 1 %} disabled {% endif %}">
-                                    <a href="#" data-section="bottom" data-action-name="goto_previous"><i class="icon-chevron-left hide-text"></i></a>
-                                </li>
-                                <li>
-                                    <div class="pagination-current">{{ pager.current }}</div>
-                                </li>
-                                <li class="pagination-next {% if pager.current == pager.total %} disabled {% endif %}">
-                                    <a href="#" data-section="bottom" data-action-name="goto_next"><i class="icon-chevron-right hide-text"></i></a>
-                                </li>
-                                <li class="pagination-last {% if pager.current == pager.total %} disabled {% endif %}">
-                                    <a href="#" data-section="bottom" data-action-name="goto_last">{{ 'oro.entity_pagination.last'|trans }}</a>
-                                </li>
-                            </ul>
-                            <div class="dib pagination-total">
-                                {{ 'oro.entity_pagination.pager_of_%total%_pages'|trans(
-                                    {'%total%' : '<span class="pagination-total-num">' ~ pager.total ~ '</span>'}
-                                )|raw }}
-                            </div>
-                        </div>
+                <div class="pull-left grid-toolbar">
+                    <div class="pagination">
+                        <label class="dib">{{ 'oro.activitylist.pagination.page'|trans }}</label>
+                        <ul class="icons-holder">
+                            <li class="pagination-previous {% if pager.current == 1 %} disabled {% endif %}">
+                                <a href="#" data-section="bottom" data-action-name="goto_previous"><i class="icon-chevron-left hide-text"></i></a>
+                            </li>
+                            <li>
+                                <input class="pagination-current" type="number" value="1" />
+                            </li>
+                            <li class="pagination-last {% if pager.current == pager.total %} disabled {% endif %}">
+                                <a href="#" data-section="bottom" data-action-name="goto_next"><i class="icon-chevron-right hide-text"></i></a>
+                            </li>
+                        </ul>
+                        <label class="dib">
+                            {{ 'oro.activitylist.pagination.total'|trans({
+                                '{{ pages }}': '<span class="pagination-total-num">#</span>',
+                                '{{ records }}': '<span class="pagination-total-count">#</span>'
+                            })|raw }}
+                        </label>
                     </div>
                 </div>
             </div>

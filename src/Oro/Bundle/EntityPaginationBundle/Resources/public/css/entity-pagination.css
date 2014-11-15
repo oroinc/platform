@@ -1,8 +1,8 @@
-.entity-pagination {
+#entity-pagination {
     float: right;
 }
 
-.entity-pagination .pagination a {
+#entity-pagination .pagination a {
     color: #666;
     font-weight: bold;
     background-color: #f7f7f7;
@@ -10,16 +10,16 @@
     background-repeat: repeat-x;
 }
 
-.entity-pagination .pagination {
+#entity-pagination .pagination {
     margin: 4px 0 0;
     line-height: 0;
 }
 
-.entity-pagination .pagination ul {
+#entity-pagination .pagination ul {
     box-shadow: none;
 }
 
-.entity-pagination .pagination div.pagination-current{
+#entity-pagination .pagination div.pagination-current{
     float: left;
     height: 24px;
     min-width: 30px;
@@ -31,16 +31,16 @@
     border-left: none;
 }
 
-.entity-pagination .pagination input[type=number]::-webkit-inner-spin-button,
-.entity-pagination .pagination input[type=number]::-webkit-outer-spin-button {
+#entity-pagination .pagination input[type=number]::-webkit-inner-spin-button,
+#entity-pagination .pagination input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-.entity-pagination .pagination > ul > .disabled a,
-.entity-pagination .pagination > ul > .disabled a:active,
-.entity-pagination .pagination > ul > .disabled a:hover,
-.entity-pagination .pagination > ul > .disabled a:focus {
+#entity-pagination .pagination > ul > .disabled a,
+#entity-pagination .pagination > ul > .disabled a:active,
+#entity-pagination .pagination > ul > .disabled a:hover,
+#entity-pagination .pagination > ul > .disabled a:focus {
     background-color: #f7f7f7;
     background-image: linear-gradient(to bottom, #fdfdfd, #efefef);
     background-repeat: repeat-x;
@@ -49,12 +49,12 @@
     opacity: 0.65;
 }
 
-.entity-pagination .pagination ul > li > a {
+#entity-pagination .pagination ul > li > a {
     font-weight: normal;
     padding: 1px 10px;
     border-color: #ccc #ccc #b3b3b3;
 }
 
-.entity-pagination .dib.pagination-total {
+#entity-pagination .dib.pagination-total {
     line-height: 24px;
 }

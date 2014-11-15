@@ -112,33 +112,10 @@ define(function (require) {
             if (this.collection.getPageSize() < this.collection.getCount()) {
                 this._toggleNext(true);
                 jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
+                jQuery('.activity-list-widget .pagination-total-count').html(this.collection.pager.count);
             }
         },
 
-        goto_first: function () {
-            this.collection.setPage(1);
-
-            this._toggleNext(true);
-            this._togglePrevious();
-
-            this._setPageNumber();
-            this._reload();
-        },
-        goto_next: function () {
-            var currentPage = this.collection.getPage();
-            if (currentPage < this.collection.pager.total) {
-                var nextPage = currentPage + 1;
-                this.collection.setPage(nextPage);
-                if (nextPage == this.collection.pager.total) {
-                    this._toggleNext();
-                }
-
-                this._togglePrevious(true);
-
-                this._setPageNumber(nextPage);
-                this._reload();
-            }
-        },
         goto_previous: function () {
             var currentPage = this.collection.getPage();
             if (currentPage > 1) {
@@ -158,15 +135,22 @@ define(function (require) {
                 this._reload();
             }
         },
-        goto_last: function () {
-            var nextPage = this.collection.pager.total;
-            this.collection.setPage(nextPage);
+        goto_page: function () {
 
-            this._togglePrevious(true);
-            this._toggleNext();
+        },
+        goto_next: function () {
+            var currentPage = this.collection.getPage();
+            if (currentPage < this.collection.pager.total) {
+                var nextPage = currentPage + 1;
+                this.collection.setPage(nextPage);
+                if (nextPage == this.collection.pager.total) {
+                    this._toggleNext();
+                }
+                this._togglePrevious(true);
 
-            this._setPageNumber(nextPage);
-            this._reload();
+                this._setPageNumber(nextPage);
+                this._reload();
+            }
         },
 
         _setPageNumber: function (pageNumber) {
