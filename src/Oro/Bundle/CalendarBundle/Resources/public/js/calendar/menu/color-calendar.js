@@ -2,7 +2,7 @@
 /*global define, console*/
 define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger',
     'jquery.simplecolorpicker', 'jquery.minicolors'
-], function ($, _, BaseView, __, messenger) {
+    ], function ($, _, BaseView, __, messenger) {
     'use strict';
 
     /**
@@ -17,7 +17,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             this._actionSyncObject = options._actionSyncObject;
             this.model = options.model;
             var colors = _.map(this.colorManager.colors, function (value) {
-                return {'id': '#' + value, 'text': '#' + value};
+                return {'id': value, 'text': value};
             });
             //Initialize color picker
             options.$el.find('#calendar-color-picker').simplecolorpicker({theme: 'fontawesome', data: colors});
@@ -30,7 +30,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             $customColor.minicolors({
                 control: 'wheel',
                 letterCase: 'uppercase',
-                defaultValue: '#' + this.model.get('backgroundColor'),
+                defaultValue: this.model.get('backgroundColor'),
                 show: function () {
                     $(this).minicolors('value', $(this).minicolors('value'));
                     $(this).parent().find('.minicolors-picker').show();
@@ -61,8 +61,8 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                 $(this).css('margin-left', '5px');
             });
             //Define current model color
-            if (this.model.get('backgroundColor') && _.where(colors, {'id': '#' + this.model.get('backgroundColor')}).length) {
-                options.$el.find('#calendar-color-picker').simplecolorpicker('selectColor', '#' + this.model.get('backgroundColor'));
+            if (this.model.get('backgroundColor') && _.where(colors, {'id': this.model.get('backgroundColor')}).length) {
+                options.$el.find('#calendar-color-picker').simplecolorpicker('selectColor', this.model.get('backgroundColor'));
                 $customColor.hide();
             } else {
                 $customColor.attr('data-selected', true);
@@ -73,7 +73,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
         onChangeColor: function (color) {
             var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
             try {
-                this.model.save('backgroundColor', color.substring(1), {
+                this.model.save('backgroundColor', color, {
                     wait: true,
                     success: _.bind(function () {
                         savingMsg.close();
@@ -102,7 +102,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             }
         },
 
-        changeVisibleButton: function(model) {
+        changeVisibleButton: function (model) {
             if (model.get('visible')) {
                 var $connection = this.connectionsView.findItem(model),
                     $visibilityButton = $connection.find(this.connectionsView.selectors.visibilityButton);
