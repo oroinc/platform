@@ -11,9 +11,8 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
      */
     return BaseView.extend({
         initialize: function (options) {
-            this.colorManager = options.colorManager;
             this.connectionsView = options.connectionsView;
-            this._actionSyncObject = options._actionSyncObject;
+            this.actionSyncObject = options.actionSyncObject;
         },
 
         execute: function (model) {
@@ -26,20 +25,20 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
                     success: _.bind(function () {
                         removingMsg.close();
                         messenger.notificationFlashMessage('success', __('The calendar was removed.'));
-                        this._actionSyncObject.resolve();
+                        this.actionSyncObject.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         removingMsg.close();
                         this._showError(__('Sorry, the calendar removing was failed'), response.responseJSON || {});
                         $connection.show();
-                        this._actionSyncObject.reject();
+                        this.actionSyncObject.reject();
                     }, this)
                 });
             } catch (err) {
                 removingMsg.close();
                 this._showError(__('Sorry, unexpected error was occurred'), err);
                 $connection.show();
-                this._actionSyncObject.reject();
+                this.actionSyncObject.reject();
             }
         },
 

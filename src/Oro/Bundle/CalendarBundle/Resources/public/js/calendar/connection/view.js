@@ -140,11 +140,10 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         showContextMenu: function ($container, model) {
-            var $el = $(this.contextMenuTemplate(model.toJSON())),
-                modules = _.uniq($el.find("li[data-module]").map(function () {
+            var $contextMenu = $(this.contextMenuTemplate(model.toJSON())),
+                modules = _.uniq($contextMenu.find("li[data-module]").map(function () {
                     return $(this).data('module');
                 }).get()),
-                options = this.options,
                 containerHtml = $container.html(),
                 showLoadingTimeout;
 
@@ -153,35 +152,40 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 showLoadingTimeout = setTimeout(_.bind(function () {
                     $container.html('<span class="loading-indicator"></span>');
                 }, this), 100);
-                options._actionSyncObject = this._actionSyncObject;
-                options.$el = $el;
-                options.model = model;
-                modules = _.object(modules, modules);
                 // load context menu
-                tools.loadModules(modules, _.bind(function (modules) {
+                tools.loadModules(_.object(modules, modules), _.bind(function (modules) {
                     clearTimeout(showLoadingTimeout);
                     $container.html(containerHtml);
 
                     _.each(modules, _.bind(function (moduleConstructor, moduleName) {
-                        var actionModule = new moduleConstructor(options);
-                        $el.one('click', "li[data-module='" + moduleName + "'] .action", _.bind(function (e) {
-                            if (this._initActionSyncObject()) {
-                                $('.context-menu-button').css('display', '');
-                                $el.remove();
-                                $(document).off('.' + this.cid);
-                                actionModule.execute(model);
-                            }
+                        $contextMenu.find('li[data-module="' + moduleName + '"]').each(_.bind(function (index, el) {
+                            var action = new moduleConstructor({
+                                    el: el,
+                                    model: model,
+                                    collection: this.options.collection,
+                                    connectionsView: this.options.connectionsView,
+                                    colorManager: this.options.colorManager,
+                                    actionSyncObject: this._actionSyncObject
+                                });
+                            action.$el.one('click', '.action', _.bind(function (e) {
+                                if (this._initActionSyncObject()) {
+                                    $('.context-menu-button').css('display', '');
+                                    $contextMenu.remove();
+                                    $(document).off('.' + this.cid);
+                                    action.execute(model);
+                                }
+                            }, this));
                         }, this));
                     }, this));
 
                     $container.closest(this.selectors.item)
-                        .append($el)
+                        .append($contextMenu)
                         .find('.context-menu-button').css('display', 'block');
 
                     $(document).on('click.' + this.cid, _.bind(function (event) {
                         if (!$(event.target).hasClass('context-menu') && !$(event.target).closest('.context-menu').length) {
                             $('.context-menu-button').css('display', '');
-                            $el.remove();
+                            $contextMenu.remove();
                             $(document).off('.' + this.cid);
                         }
                     }, this));

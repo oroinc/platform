@@ -226,46 +226,28 @@
     border: 1px solid #AEAEAE;
 }
 
-.connection-item span {
-    cursor: pointer;
-}
-
 .connection-item .simplecolorpicker.inline {
     padding: 3px 13px;
 }
 
-.connection-item span.menu-custom-color:after {
+.connection-item .custom-color:after {
     content: '\00a0\00a0\00a0\00a0';
 }
 
-.connection-item .menu-custom-color {
-    margin-left: 13px;
-}
-
-.connection-item .custom-color-link {
-    line-height: 22px;
-    margin-left: 13px;
-}
-
-.connection-item .minicolors-panel {
-    top: 8px;
-    left: -18px;
-}
-
-.connection-item span.menu-custom-color[data-selected]:after {
+.connection-item .custom-color[data-selected]:after {
     font-family: 'FontAwesome';
     -webkit-font-smoothing: antialiased;
     content: '\f00c';
-    margin-right: 1px;
-    margin-left: 1px;
-    color: #fff;
+    position: absolute;
+    top: -2px;
+    left: 2px;
 }
 
-.connection-item span.menu-custom-color {
-    border: none;
+.connection-item .custom-color-link {
+    cursor: pointer;
+    color: #666;
 }
 
-.connection-item span.menu-custom-color[data-selected],
-.connection-item span.menu-custom-color[data-selected]:hover {
-  border: 1px solid #222; /* @gray-dark */
+.connection-item .custom-color-link:hover {
+    color: #333;
 }

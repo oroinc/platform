@@ -22,6 +22,12 @@ oro_menu_config:
                 position: 10
                 module: 'orocalendar/js/calendar/menu/toggle-calendar'
                 template: 'OroCalendarBundle:Calendar:Menu/toggleCalendar.html.twig'
+        oro_calendar_menu_divider:
+            label: ''
+            extras:
+                position: 95
+            attributes:
+                class: 'divider'
         oro_calendar_color_action:
             uri: '#'
             extras:
@@ -50,6 +56,7 @@ oro_menu_config:
             children:
                 oro_calendar_remove_action: ~
                 oro_calendar_toggle_action: ~
+                oro_calendar_menu_divider: ~
                 oro_calendar_color_action: ~
 
 oro_titles:

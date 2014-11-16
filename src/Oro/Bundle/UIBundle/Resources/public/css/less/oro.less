@@ -120,29 +120,6 @@ label, input, button, select, textarea { font-size:13px;}
       label.control-label {
         width: auto;
       }
-      .simplecolorpicker {
-        .minicolors-swatch {
-          position: relative;
-          vertical-align: top;
-          background-position: -63px -1px;
-        }
-      }
-      .simplecolorpicker.icon {
-        margin-top: 3px;
-      }
-      .simplecolorpicker.inline {
-        padding-top: 3px;
-        padding-bottom: 0px;
-        margin-bottom: -3px;
-        max-width: 283px;
-      }
-      .simplecolorpicker.inline.with-empty-color,
-      .simplecolorpicker.inline.with-custom-color {
-        max-width: 306px;
-      }
-      .simplecolorpicker.inline.with-empty-color.with-custom-color {
-        max-width: 329px;
-      }
     }
   }
 }
@@ -163,7 +140,31 @@ i.color {
   height: 18px;
   margin-top: -3px;
 }
+.context-menu,
 .controls {
+  .simplecolorpicker.icon {
+    margin-top: 3px;
+  }
+  .simplecolorpicker.inline {
+    padding-top: 3px;
+    padding-bottom: 0px;
+    margin-bottom: -3px;
+    max-width: 283px;
+  }
+  .simplecolorpicker.inline.with-empty-color,
+  .simplecolorpicker.inline.with-custom-color {
+    max-width: 306px;
+  }
+  .simplecolorpicker.inline.with-empty-color.with-custom-color {
+    max-width: 329px;
+  }
+  .simplecolorpicker {
+    .minicolors-swatch {
+      position: relative;
+      vertical-align: top;
+      background-position: -62px -1px;
+    }
+  }
   .minicolors {
     .minicolors-panel {
       padding: 5px;
@@ -187,7 +188,41 @@ i.color {
       margin: 0;
       background-color: #fff;
       box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+      .btn {
+        margin-left: 5px;
+      }
     }
+  }
+}
+.context-menu {
+  .simplecolorpicker.icon,
+  .simplecolorpicker span.color {
+    width: 18px;
+    height: 18px;
+  }
+  .simplecolorpicker.fontawesome span.color {
+    position: relative;
+    margin: 0 3px -3px 0;
+  }
+  .simplecolorpicker.fontawesome span.color[data-selected]:after {
+    margin: 0;
+    display: block;
+    position: absolute;
+    top: -2px;
+    left: 2px;
+  }
+  .minicolors-swatch {
+    cursor: pointer;
+    position: relative;
+    vertical-align: top;
+    background-position: -62px -1px;
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+    border: 1px solid rgba(0,0,0,0.2);
+  }
+  .minicolors-swatch:hover {
+    border: 1px solid #222; /* @gray-dark */
   }
 }
 
@@ -237,6 +272,9 @@ body .select2-container {
 }
 
 // Bootstrap - Nav
+.dropdown-menu > li > div {
+  padding: 3px 13px;
+}
 .dropdown-menu > li > a {
   padding-left:13px;
   padding-right:13px;

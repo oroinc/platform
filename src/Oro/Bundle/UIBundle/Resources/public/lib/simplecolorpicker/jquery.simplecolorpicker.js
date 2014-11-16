@@ -165,12 +165,17 @@
       var self = this;
 
       var $colorSpan = self.$colorList.find('> span.color').filter(function() {
-        return $(this).data('color').toLowerCase() === color.toLowerCase();
+        var $el = $(this);
+        return (!color && $el.data('selected') !== undefined) || (color && $el.data('color').toLowerCase() === color.toLowerCase());
       });
 
       if ($colorSpan.length > 0) {
-        self.selectColorSpan($colorSpan);
-      } else {
+        if (color) {
+          self.selectColorSpan($colorSpan);
+        } else {
+          self.unselectColorSpan($colorSpan);
+        }
+      } else if (color) {
         console.error("The given color '" + color + "' could not be found");
       }
     },
@@ -273,6 +278,13 @@
       if (!this.options.table) {
           this.$select.val(color);
       }
+    },
+
+    /**
+     * Remove selection from the given span inside $colorList.
+     */
+    unselectColorSpan: function($colorSpan) {
+      $colorSpan.removeAttr('data-selected');
     },
 
     /**
