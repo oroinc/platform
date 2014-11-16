@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityPaginationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
@@ -18,7 +18,7 @@ class EntityPaginationController extends Controller
      * @param $entityName
      * @param $scope
      * @param $routeName
-     * @return RedirectResponse
+     * @return JsonResponse
      */
     public function firstAction($entityName, $scope, $routeName)
     {
@@ -31,7 +31,7 @@ class EntityPaginationController extends Controller
      * @param $entityName
      * @param $scope
      * @param $routeName
-     * @return RedirectResponse
+     * @return JsonResponse
      */
     public function previousAction($entityName, $scope, $routeName)
     {
@@ -44,7 +44,7 @@ class EntityPaginationController extends Controller
      * @param $entityName
      * @param $scope
      * @param $routeName
-     * @return RedirectResponse
+     * @return JsonResponse
      */
     public function nextAction($entityName, $scope, $routeName)
     {
@@ -57,7 +57,7 @@ class EntityPaginationController extends Controller
      * @param $entityName
      * @param $scope
      * @param $routeName
-     * @return RedirectResponse
+     * @return JsonResponse
      */
     public function lastAction($entityName, $scope, $routeName)
     {
@@ -69,7 +69,7 @@ class EntityPaginationController extends Controller
      * @param string $scope
      * @param string $routeName
      * @param string $navigation
-     * @return RedirectResponse
+     * @return JsonResponse
      */
     protected function getLink($entityName, $scope, $routeName, $navigation)
     {
@@ -77,7 +77,9 @@ class EntityPaginationController extends Controller
         $navigationService = $this->get('oro_entity_pagination.navigation');
 
         $params = $this->getRequest()->query->all();
+        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
         $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
+        $message = null;
 
         if (!empty($params[$identifier])) {
             $identifierValue = $params[$identifier];
@@ -108,19 +110,15 @@ class EntityPaginationController extends Controller
                 $messageManager = $this->get('oro_entity_pagination.message_manager');
 
                 if (!$result->isAvailable()) {
-                    $messageManager->addFlashMessage(
-                        'warning',
-                        $messageManager->getNotAvailableMessage($entity, $scope)
-                    );
+                    $message = $messageManager->getNotAvailableMessage($entity, $scope);
                 } elseif (!$result->isAccessible()) {
-                    $messageManager->addFlashMessage(
-                        'warning',
-                        $messageManager->getNotAccessibleMessage($entity, $scope)
-                    );
+                    $message = $messageManager->getNotAccessibleMessage($entity, $scope);
                 }
             }
         }
 
-        return $this->redirect($this->generateUrl($routeName, $params));
+        $url = $this->generateUrl($routeName, $params);
+
+        return new JsonResponse(['url' => $url, 'message' => $message]);
     }
 }
