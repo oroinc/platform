@@ -59,7 +59,12 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                     this.$customColor.css('color', this.colorManager.getContrastColor(hex));
                 }, this),
                 show: _.bind(function () {
-                    var color = this.customColor || this.model.get('backgroundColor');
+                    var color = this.customColor || this.model.get('backgroundColor'),
+                        $panel = this.$customColorParent.find('.minicolors-panel'),
+                        h;
+                    $panel.css('top', 0);
+                    h = $panel.outerHeight() + 39;
+                    $panel.css('top', $(document).height() < $panel.offset().top + h ? -h : 0);
                     this.$colorPicker.simplecolorpicker('selectColor', null);
                     this.$customColor.minicolors('value', color);
                     this.$customColor.attr('data-selected', '');

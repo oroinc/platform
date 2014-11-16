@@ -99,7 +99,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 if ($contextMenu.length) {
                     $contextMenu.remove();
                 } else {
-                    this.showContextMenu($currentTarget, model);
+                    this.showContextMenu($currentTarget, model, e.pageX, e.pageY);
                 }
             }, this));
 
@@ -139,23 +139,24 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }
         },
 
-        showContextMenu: function ($container, model) {
-            var $contextMenu = $(this.contextMenuTemplate(model.toJSON())),
+        showContextMenu: function ($button, model, posX, posY) {
+            var $container = $button.closest(this.selectors.item),
+                $contextMenu = $(this.contextMenuTemplate(model.toJSON())),
                 modules = _.uniq($contextMenu.find("li[data-module]").map(function () {
                     return $(this).data('module');
                 }).get()),
-                containerHtml = $container.html(),
+                buttonHtml = $button.html(),
                 showLoadingTimeout;
 
             if (modules.length > 0 && this._initActionSyncObject()) {
                 // show loading message, if loading takes more than 100ms
                 showLoadingTimeout = setTimeout(_.bind(function () {
-                    $container.html('<span class="loading-indicator"></span>');
+                    $button.html('<span class="loading-indicator"></span>');
                 }, this), 100);
                 // load context menu
                 tools.loadModules(_.object(modules, modules), _.bind(function (modules) {
                     clearTimeout(showLoadingTimeout);
-                    $container.html(containerHtml);
+                    $button.html(buttonHtml);
 
                     _.each(modules, _.bind(function (moduleConstructor, moduleName) {
                         $contextMenu.find('li[data-module="' + moduleName + '"]').each(_.bind(function (index, el) {
@@ -178,9 +179,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         }, this));
                     }, this));
 
-                    $container.closest(this.selectors.item)
-                        .append($contextMenu)
+                    $container.append($contextMenu)
                         .find('.context-menu-button').css('display', 'block');
+                    $contextMenu.css(this._getContextMenuPos(posX, posY, $container.find('.context-menu')));
 
                     $(document).on('click.' + this.cid, _.bind(function (event) {
                         if (!$(event.target).hasClass('context-menu') && !$(event.target).closest('.context-menu').length) {
@@ -243,6 +244,15 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         _showError: function (message, err) {
             messenger.showErrorMessage(message, err);
+        },
+
+        _getContextMenuPos: function (posX, posY, $contextMenu) {
+            var y = posY + 5,
+                h = $contextMenu.outerHeight();
+            if ($(document).height() < y + h) {
+                y -= h + 10;
+            }
+            return {left: posX + 10, top: y};
         },
 
         _showItem: function (model, visible) {
