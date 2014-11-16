@@ -28,6 +28,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             this.colorManager = options.colorManager;
             this.connectionsView = options.connectionsView;
             this.actionSyncObject = options.actionSyncObject;
+            this.closeContextMenu = options.closeContextMenu;
             this.$colorPicker = this.$el.find('.color-picker');
             this.$customColor = this.$el.find('.custom-color');
             this.$customColorParent = this.$customColor.parent();
@@ -88,7 +89,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
         },
 
         onChange: function (e) {
-            this.$el.remove();
+            this.closeContextMenu();
             this.changeColor(e.currentTarget.value);
         },
 
@@ -99,8 +100,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
 
         onOk: function () {
             this.$customColor.minicolors('hide');
-            $('.context-menu-button').css('display', '');
-            this.$el.remove();
+            this.closeContextMenu();
             this.changeColor(this.$customColor.minicolors('value'));
         },
 
@@ -119,42 +119,34 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
         },
 
         changeColor: function (color) {
-            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
+            var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
+                $connection = this.connectionsView.findItem(this.model),
+                saveAttributes = {backgroundColor: color};
+            if (!this.model.get('visible')) {
+                saveAttributes.visible = true;
+            }
+            this.connectionsView.setItemVisibility($connection, color);
             try {
-                this.model.save('backgroundColor', color, {
+                this.model.save(saveAttributes, {
                     wait: true,
                     success: _.bind(function () {
                         savingMsg.close();
                         messenger.notificationFlashMessage('success', __('The calendar was updated.'));
                         this.colorManager.setCalendarColors(this.model.get('calendarUid'), this.model.get('backgroundColor'));
-                        this.changeVisibleButton(this.model);
-                        this.connectionsView.trigger('connectionAdd', this.model);
-                        if (this.actionSyncObject) {
-                            this.actionSyncObject.resolve();
-                        }
+                        this.connectionsView.setItemVisibility($connection, this.model.get('backgroundColor'));
+                        this.actionSyncObject.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         savingMsg.close();
                         this._showError(__('Sorry, the calendar updating was failed'), response.responseJSON || {});
-                        if (this.actionSyncObject) {
-                            this.actionSyncObject.reject();
-                        }
+                        this.connectionsView.setItemVisibility($connection, model.get('visible') ? model.get('backgroundColor') : '');
+                        this.actionSyncObject.reject();
                     }, this)
                 });
             } catch (err) {
                 savingMsg.close();
                 this._showError(__('Sorry, unexpected error was occurred'), err);
-                if (this.actionSyncObject) {
-                    this.actionSyncObject.reject();
-                }
-            }
-        },
-
-        changeVisibleButton: function (model) {
-            if (model.get('visible')) {
-                var $connection = this.connectionsView.findItem(model),
-                    $visibilityButton = $connection.find(this.connectionsView.selectors.visibilityButton);
-                this.connectionsView._setItemVisibility($visibilityButton, model.get('backgroundColor'));
+                this.actionSyncObject.reject();
             }
         },
 
