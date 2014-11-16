@@ -6,8 +6,8 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
     'use strict';
 
     /**
-     * @export  orocalendar/js/calendar/menu/color-calendar
-     * @class   orocalendar.calendar.menu.ColorCalendar
+     * @export  orocalendar/js/calendar/menu/change-calendar-color
+     * @class   orocalendar.calendar.menu.ChangeCalendarColor
      * @extends oroui/js/app/views/base/view
      */
     return BaseView.extend({

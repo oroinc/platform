@@ -26,8 +26,8 @@ oro_menu_config:
             uri: '#'
             extras:
                 position: 100
-                module: 'orocalendar/js/calendar/menu/color-calendar'
-                template: 'OroCalendarBundle:Calendar:Menu/colorCalendar.html.twig'
+                module: 'orocalendar/js/calendar/menu/change-calendar-color'
+                template: 'OroCalendarBundle:Calendar:Menu/changeCalendarColor.html.twig'
         calendar_event_list:
             label: 'oro.calendar.calendarevent.entity_plural_label'
             route: 'oro_calendar_event_index'
