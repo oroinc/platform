@@ -17,6 +17,13 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                 '<button class="btn pull-right" data-action="cancel" type="button"><%= __("Cancel") %></button>' +
             '</div>'),
 
+        events: {
+            'change .color-picker': 'onChange',
+            'click .custom-color-link': 'onOpen',
+            'click button[data-action=ok]': 'onOk',
+            'click button[data-action=cancel]': 'onCancel'
+        },
+
         initialize: function (options) {
             this.colorManager = options.colorManager;
             this.connectionsView = options.connectionsView;
@@ -39,12 +46,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                     return {'id': value, 'text': value};
                 });
 
-            this.$colorPicker
-                .simplecolorpicker({theme: 'fontawesome', data: colors})
-                .one('change', _.bind(function (e) {
-                    this.$el.remove();
-                    this.onChangeColor(e.currentTarget.value);
-                }, this));
+            this.$colorPicker.simplecolorpicker({theme: 'fontawesome', data: colors});
             if (!this.customColor) {
                 this.$colorPicker.simplecolorpicker('selectColor', this.model.get('backgroundColor'));
             }
@@ -81,37 +83,42 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                 this.$customColor.hide();
             }
 
-            this.$customColorParent.on('click', '.custom-color-link', _.bind(function () {
-                this.$customColor.minicolors('show');
-                this.$customColor.show();
-            }, this));
-
             // add buttons
             this.$customColorParent.find('.minicolors-panel').append(this.customColorPickerActionsTemplate({__: __}));
-            this.$customColorParent.one('click', 'button[data-action=ok]', _.bind(function (e) {
-                e.preventDefault();
-                this.$customColor.minicolors('hide');
-                $('.context-menu-button').css('display', '');
-                this.$el.remove();
-                this.onChangeColor(this.$customColor.minicolors('value'));
-            }, this));
-            this.$customColorParent.on('click', 'button[data-action=cancel]', _.bind(function (e) {
-                e.preventDefault();
-                this.$customColor.minicolors('hide');
-                if (this.customColor) {
-                    this.$customColor.css({
-                        'background-color': this.customColor,
-                        'color': this.colorManager.getContrastColor(this.customColor)
-                    });
-                } else {
-                    this.$customColor.removeAttr('data-selected');
-                    this.$colorPicker.simplecolorpicker('selectColor', this.model.get('backgroundColor'));
-                    this.$customColor.hide();
-                }
-            }, this));
         },
 
-        onChangeColor: function (color) {
+        onChange: function (e) {
+            this.$el.remove();
+            this.changeColor(e.currentTarget.value);
+        },
+
+        onOpen: function () {
+            this.$customColor.minicolors('show');
+            this.$customColor.show();
+        },
+
+        onOk: function () {
+            this.$customColor.minicolors('hide');
+            $('.context-menu-button').css('display', '');
+            this.$el.remove();
+            this.changeColor(this.$customColor.minicolors('value'));
+        },
+
+        onCancel: function () {
+            this.$customColor.minicolors('hide');
+            if (this.customColor) {
+                this.$customColor.css({
+                    'background-color': this.customColor,
+                    'color': this.colorManager.getContrastColor(this.customColor)
+                });
+            } else {
+                this.$customColor.removeAttr('data-selected');
+                this.$colorPicker.simplecolorpicker('selectColor', this.model.get('backgroundColor'));
+                this.$customColor.hide();
+            }
+        },
+
+        changeColor: function (color) {
             var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...'));
             try {
                 this.model.save('backgroundColor', color, {
