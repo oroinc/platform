@@ -14,7 +14,7 @@ define([
 
     FavoriteComponent = BaseBookmarkComponent.extend({
         _createSubViews: function () {
-            this._createButtonView()
+            this._createButtonView();
             this._createTabView();
         },
 
@@ -60,45 +60,35 @@ define([
             this.tabs = new CollectionView(options);
         },
 
-        toAdd: function (model) {
-            var collection;
-            collection = this.collection;
-            this.actualizeAttributes(model);
-            var url = model.get('url');
-            this.removeUrlParams(model, url);
-            model.save(null, {
-                success: function () {
-                    var item;
-                    item = collection.find(function (item) {
-                        return item.get('url') === model.get('url');
-                    });
-                    if (item) {
-                        model.destroy();
-                    } else {
-                        collection.unshift(model);
-                    }
-                }
-            });
-        },
-
         onPageStateChange: function () {
             var model, url;
             model = this.collection.getCurrentModel();
             if (model) {
                 url = mediator.execute('currentUrl');
-                this.removeUrlParams(model, url);
+                this._setUrlWithoutParams(model, url);
                 model.save();
             }
         },
 
-        removeUrlParams: function (model, url) {
+        /**
+         * Set url without GET parameters
+         *
+         * @param model
+         * @param url
+         * @protected
+         */
+        _setUrlWithoutParams: function (model, url) {
             var urlPart = url.split('?');
-            model.set('url', urlPart[0]);
+            if (model.get('url') !== urlPart[0]) {
+                model.set('url', urlPart[0]);
+            }
         },
 
         actualizeAttributes: function (model) {
             model.set('type', 'favorite');
             model.set('position', this.collection.length);
+            var url = model.get('url');
+            this._setUrlWithoutParams(model, url);
         }
     });
 
