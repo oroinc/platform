@@ -34,7 +34,7 @@ class EntityMetadataProvider implements MetadataProviderInterface
         $metadata = [];
 
         if ($object instanceof EntityManagerAwareInterface) {
-            $entityFQCN         = $object->getManager()->getRepository()->getClassName();
+            $entityFQCN         = $object->getManager()->getMetadata()->name;
             $metadata['entity'] = [];
 
             $metadata['entity']['phpType'] = $entityFQCN;

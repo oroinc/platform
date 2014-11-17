@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 
-use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -17,6 +16,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter;
 
 /**
  * @NamePrefix("oro_api_")

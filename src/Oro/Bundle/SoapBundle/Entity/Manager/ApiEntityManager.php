@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\SoapBundle\Entity\Manager;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -25,7 +26,7 @@ class ApiEntityManager
     protected $om;
 
     /**
-     * @var ClassMetadata
+     * @var ClassMetadata|ClassMetadataInfo
      */
     protected $metadata;
 
@@ -58,9 +59,7 @@ class ApiEntityManager
     }
 
     /**
-     * Get entity metadata
-     *
-     * @return ClassMetadata
+     * @return ClassMetadata|ClassMetadataInfo
      */
     public function getMetadata()
     {
@@ -74,7 +73,7 @@ class ApiEntityManager
      */
     public function createEntity()
     {
-        return new $this->class;
+        return $this->metadata->newInstance();
     }
 
     /**
