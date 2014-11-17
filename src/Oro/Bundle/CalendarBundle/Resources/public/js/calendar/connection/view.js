@@ -32,6 +32,11 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             visibilityButton: '.calendar-color'
         },
 
+        events: {
+            'mouseover .connection-item': 'onOverCalendarItem',
+            'mouseout .connection-item': 'onOutCalendarItem'
+        },
+
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             this.collection = this.collection || new ConnectionCollection();
@@ -132,6 +137,20 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             this.options.colorManager.removeCalendarColors(model.get('calendarUid'));
             this.findItem(model).remove();
             this.trigger('connectionRemove', model);
+        },
+
+        onOverCalendarItem: function (e) {
+            var $connection = $(e.currentTarget);
+            if (!$connection.data('visible')) {
+                this.setItemVisibility($connection, $connection.data('bg-color'));
+            }
+        },
+
+        onOutCalendarItem: function (e) {
+            var $connection = $(e.currentTarget);
+            if (!$connection.data('visible')) {
+                this.setItemVisibility($connection, '');
+            }
         },
 
         showCalendar: function (model) {
