@@ -156,6 +156,10 @@ define(['jquery', 'underscore'
             };
 
             var currentValue = element.select2('val');
+            if (!_.isArray(currentValue)) {
+                currentValue = [currentValue];
+            }
+
             var elementData = element.data('selected-data');
 
             if (_.isArray(elementData) && elementData.length > 0) {
