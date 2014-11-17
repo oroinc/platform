@@ -151,8 +151,8 @@ class ActivityListController extends RestController
             'data'  => $this->getManager()->getList(
                 $entityClass,
                 $entityId,
-                $this->getRequest()->get('page', 1),
-                $filter
+                $filter,
+                $this->getRequest()->get('page', 1)
             )
         ];
 

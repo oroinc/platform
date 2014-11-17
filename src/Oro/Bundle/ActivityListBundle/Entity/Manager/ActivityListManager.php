@@ -75,12 +75,12 @@ class ActivityListManager
     /**
      * @param string  $entityClass
      * @param integer $entityId
-     * @param integer $page
      * @param array   $filter
+     * @param integer $page
      *
      * @return ActivityList[]
      */
-    public function getList($entityClass, $entityId, $page, $filter)
+    public function getList($entityClass, $entityId, $filter, $page)
     {
         $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
