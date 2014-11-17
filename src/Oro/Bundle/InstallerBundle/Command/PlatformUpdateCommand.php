@@ -8,7 +8,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\InstallerBundle\CommandExecutor;
-use Oro\Bundle\PlatformBundle\Maintenance\Mode;
 
 class PlatformUpdateCommand extends ContainerAwareCommand
 {
