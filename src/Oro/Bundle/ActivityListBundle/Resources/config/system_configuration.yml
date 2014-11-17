@@ -30,10 +30,6 @@ oro_system_configuration:
             options:
                 label: oro.activitylist.system_configuration.fields.per_page.label
                 choices:
-                    1: 1
-                    2: 2
-                    3: 3
-                    5: 5
                     10:     10
                     25:     25
                     50:     50

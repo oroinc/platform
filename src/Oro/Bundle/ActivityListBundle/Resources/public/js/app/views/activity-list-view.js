@@ -136,8 +136,30 @@ define(function (require) {
             }
         },
 
-        goto_page: function () {
-            alert('page changed');
+        goto_page: function (e) {
+            var that = this.list,
+                currentPage = that.collection.getPage(),
+                maxPage = that.collection.pager.total,
+                nextPage = parseInt($(e.target).val());
+
+            if (_.isNaN(nextPage) || nextPage <= 0 || nextPage > maxPage || nextPage == currentPage) {
+                $(e.target).val(currentPage);
+                return;
+            }
+
+            that._togglePrevious(true);
+            that._toggleNext(true);
+
+            if (nextPage == 1) {
+                that._togglePrevious();
+            }
+            if (nextPage == maxPage) {
+                that._toggleNext();
+            }
+
+            that.collection.setPage(nextPage);
+            that._setPageNumber(nextPage);
+            that._reload();
         },
 
         goto_next: function () {
