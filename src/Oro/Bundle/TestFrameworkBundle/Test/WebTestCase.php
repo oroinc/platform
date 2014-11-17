@@ -243,12 +243,10 @@ abstract class WebTestCase extends BaseWebTestCase
             $client = $this->getClientInstance();
             $client->request('GET', $wsdl);
             $status = $client->getResponse()->getStatusCode();
-            $statusText = Response::$statusTexts[$status];
-            if ($status >= 400) {
-                throw new \Exception($statusText, $status);
-            }
-
             $wsdl = $client->getResponse()->getContent();
+            if ($status >= 400) {
+                throw new \Exception($wsdl, $status);
+            }
             //save to file
             $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
             $fl = fopen($file, "w");
