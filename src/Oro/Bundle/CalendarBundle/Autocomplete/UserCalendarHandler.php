@@ -12,9 +12,13 @@ class UserCalendarHandler extends UserAclHandler
     protected function getSearchQueryBuilder($search)
     {
         $qb = parent::getSearchQueryBuilder($search);
+        $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
+
         $qb
             ->select('calendar')
-            ->innerJoin('OroCalendarBundle:Calendar', 'calendar', 'WITH', 'calendar.owner = users');
+            ->innerJoin('OroCalendarBundle:Calendar', 'calendar', 'WITH', 'calendar.owner = users')
+            ->andWhere('calendar.organization = :organizationId')
+            ->setParameter('organizationId', $organization->getId());
 
         return $qb;
     }
