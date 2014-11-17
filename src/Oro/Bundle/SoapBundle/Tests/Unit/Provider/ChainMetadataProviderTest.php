@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider;
