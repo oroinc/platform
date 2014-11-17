@@ -34,7 +34,10 @@ class ActivityListController extends RestController
      *      name="page", requirements="\d+", nullable=true, description="Page number, starting from 1. Default is 1."
      * )
      * @QueryParam(
-     *      name="limit", requirements="\d+", nullable=true, description="Number of records in result. Default is 25."
+     *      name="limit",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Number of records in result. Default value takes from system config"
      * )
      * @QueryParam(
      *      name="activityClasses", requirements="\s+", nullable=true,
@@ -100,7 +103,12 @@ class ActivityListController extends RestController
         $pager = $this->container->get('oro_datagrid.extension.pager.orm.pager');
         $pager->setQueryBuilder($qb);
         $pager->setPage($this->getRequest()->get('page', 1));
-        $pager->setMaxPerPage($this->getRequest()->get('limit', 25));
+        $pager->setMaxPerPage(
+            $this->getRequest()->get(
+                'limit',
+                $this->get('oro_config.user')->get('oro_activity_list.per_page')
+            )
+        );
         $pager->init();
 
         return new JsonResponse($pager->getResults());

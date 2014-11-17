@@ -259,7 +259,6 @@ class ActivityList extends ExtendActivityList
         return $this;
     }
 
-
     /**
      * @return User
      */
@@ -267,7 +266,6 @@ class ActivityList extends ExtendActivityList
     {
         return $this->editor;
     }
-
 
     /**
      * @param $relatedActivityClass

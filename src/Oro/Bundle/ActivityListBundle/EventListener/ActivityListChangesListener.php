@@ -5,8 +5,8 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\EntityManager;
-
 use Doctrine\ORM\UnitOfWork;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
@@ -18,9 +18,10 @@ class ActivityListChangesListener
     protected $securityFacadeLink;
 
     /**
-     * @param ServiceLink        $securityFacadeLink
+     * @param ServiceLink $securityFacadeLink
      */
-    public function __construct(ServiceLink $securityFacadeLink) {
+    public function __construct(ServiceLink $securityFacadeLink)
+    {
         $this->securityFacadeLink = $securityFacadeLink;
     }
 
@@ -107,4 +108,4 @@ class ActivityListChangesListener
         $activityList->setUpdatedAt($newUpdatedAt);
         $activityList->setEditor($newUpdatedBy);
     }
-} 
+}

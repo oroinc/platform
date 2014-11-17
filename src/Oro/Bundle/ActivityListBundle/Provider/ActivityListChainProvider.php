@@ -4,15 +4,15 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+
 class ActivityListChainProvider
 {
     /** @var DoctrineHelper */
@@ -144,49 +144,6 @@ class ActivityListChainProvider
     }
 
     /**
-     * @param object                        $entity
-     * @param ActivityListProviderInterface $provider
-     * @param string                        $verb
-     * @param ActivityList|null             $list
-     *
-     * @return ActivityList
-     */
-    protected function getActivityListEntityForEntity(
-        $entity,
-        ActivityListProviderInterface $provider,
-        $verb = ActivityList::VERB_CREATE,
-        $list = null
-    ) {
-        if (!$list) {
-            $list = new ActivityList();
-        }
-
-        $list->setSubject($provider->getSubject($entity));
-        $list->setVerb($verb);
-
-        if ($verb === ActivityList::VERB_UPDATE) {
-            $activityListTargets = $list->getActivityListTargetEntities();
-            foreach ($activityListTargets as $target) {
-                $list->removeActivityListTarget($target);
-            }
-        } else {
-            $className = $this->doctrineHelper->getEntityClass($entity);
-            $list->setRelatedActivityClass($className);
-            $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
-            $list->setOrganization($provider->getOrganization($entity));
-        }
-
-        $targets = $provider->getTargetEntities($entity);
-        foreach ($targets as $target) {
-            if ($list->supportActivityListTarget(get_class($target))) {
-                $list->addActivityListTarget($target);
-            }
-        }
-
-        return $list;
-    }
-
-    /**
      * @return array
      */
     public function getActivityListOption()
@@ -233,5 +190,48 @@ class ActivityListChainProvider
     public function getProviderForEntity($activityEntity)
     {
         return $this->providers[$this->doctrineHelper->getEntityClass($activityEntity)];
+    }
+
+    /**
+     * @param object                        $entity
+     * @param ActivityListProviderInterface $provider
+     * @param string                        $verb
+     * @param ActivityList|null             $list
+     *
+     * @return ActivityList
+     */
+    protected function getActivityListEntityForEntity(
+        $entity,
+        ActivityListProviderInterface $provider,
+        $verb = ActivityList::VERB_CREATE,
+        $list = null
+    ) {
+        if (!$list) {
+            $list = new ActivityList();
+        }
+
+        $list->setSubject($provider->getSubject($entity));
+        $list->setVerb($verb);
+
+        if ($verb === ActivityList::VERB_UPDATE) {
+            $activityListTargets = $list->getActivityListTargetEntities();
+            foreach ($activityListTargets as $target) {
+                $list->removeActivityListTarget($target);
+            }
+        } else {
+            $className = $this->doctrineHelper->getEntityClass($entity);
+            $list->setRelatedActivityClass($className);
+            $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
+            $list->setOrganization($provider->getOrganization($entity));
+        }
+
+        $targets = $provider->getTargetEntities($entity);
+        foreach ($targets as $target) {
+            if ($list->supportActivityListTarget(get_class($target))) {
+                $list->addActivityListTarget($target);
+            }
+        }
+
+        return $list;
     }
 }

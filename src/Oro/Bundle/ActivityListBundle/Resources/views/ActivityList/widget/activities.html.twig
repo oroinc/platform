@@ -25,12 +25,6 @@
                 total: 1,
                 count: 1
             } %}
-            {#
-                current:  1,  current page number, always 1
-                pagesize: 5,  limit
-                count:  100   total records
-                total:   10,  total pages:  (count/pagesize)|round(0, ceil)
-            #}
             {% set options = {
                 widgetId: app.request.get('_wid'),
                 activityListData: render(path(

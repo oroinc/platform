@@ -29,4 +29,4 @@ class AddCalendarEventActivityLists extends AddActivityListsData implements Depe
             'calendar.organization'
         );
     }
-} 
+}

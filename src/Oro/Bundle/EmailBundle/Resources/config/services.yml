@@ -376,6 +376,7 @@ services:
            - @router
         tags:
            - {name: oro_activity_list.provider, priority: 30}
+
     oro_email.link.formatter.name:
         tags:
             - { name: oro_service_link,  service: oro_locale.formatter.name }

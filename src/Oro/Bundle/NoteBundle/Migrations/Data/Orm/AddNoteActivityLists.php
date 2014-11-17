@@ -19,7 +19,6 @@ class AddNoteActivityLists extends AddActivityListsData implements DependentFixt
         ];
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -32,4 +31,4 @@ class AddNoteActivityLists extends AddActivityListsData implements DependentFixt
             'organization'
         );
     }
-} 
+}
