@@ -15,12 +15,20 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
      */
     private $securityFacade;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    private $logger;
+
     protected function setUp()
     {
         $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -41,7 +49,11 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getLoggedUserId')
             ->will($this->returnValue($expectedUserId));
         /** @var MaintenanceListener $publisher */
-        $publisher = new MaintenanceListener($this->topicPublisher, $this->securityFacade);
+        $publisher = new MaintenanceListener(
+            $this->topicPublisher,
+            $this->securityFacade,
+            $this->logger
+        );
         $publisher->onModeOn();
     }
 
@@ -56,7 +68,11 @@ class MaintenanceListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getLoggedUserId')
             ->will($this->returnValue($expectedUserId));
         /** @var MaintenanceListener $publisher */
-        $publisher = new MaintenanceListener($this->topicPublisher, $this->securityFacade);
+        $publisher = new MaintenanceListener(
+            $this->topicPublisher,
+            $this->securityFacade,
+            $this->logger
+        );
         $publisher->onModeOff();
     }
 }
