@@ -29,6 +29,7 @@
     border-radius: 2px;
     margin: 2px 0 0;
     float: left;
+    cursor: pointer;
 }
 
 .calendars .media-body {
@@ -172,6 +173,7 @@
 
 #calendar > .span2 {
     width: 15.8936%;
+    overflow: auto !important;
 }
 
 #calendar > .span2 .calendars {
@@ -190,20 +192,6 @@
 
 .connection-container .media > .pull-right {
     margin-top: -3px;
-}
-
-.calendar-connections .context-menu {
-    display: inline;
-    top: inherit;
-    z-index: 999;
-    left: 100%;
-    margin: 0 0 0 -20px;
-}
-
-.calendar-connections .context-menu a {
-    color: #444 !important;
-    font-weight: normal;
-    line-height: 20px;
 }
 
 .connection-item {
@@ -225,6 +213,29 @@
     border: 1px solid #AEAEAE;
 }
 
-.connection-item span {
+.connection-item .simplecolorpicker.inline {
+    padding: 3px 13px;
+    max-width: 170px;
+}
+
+.connection-item .custom-color:after {
+    content: '\00a0\00a0\00a0\00a0';
+}
+
+.connection-item .custom-color[data-selected]:after {
+    font-family: 'FontAwesome';
+    -webkit-font-smoothing: antialiased;
+    content: '\f00c';
+    position: absolute;
+    top: -2px;
+    left: 2px;
+}
+
+.connection-item .custom-color-link {
     cursor: pointer;
+    color: #666;
+}
+
+.connection-item .custom-color-link:hover {
+    color: #333;
 }

@@ -76,6 +76,17 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             return this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
         },
 
+        setItemVisibility: function ($item, backgroundColor) {
+            var $visibilityButton = $item.find(this.selectors.visibilityButton);
+            if (backgroundColor) {
+                $visibilityButton.removeClass('un-color');
+                $visibilityButton.css({backgroundColor: backgroundColor, borderColor: backgroundColor});
+            } else {
+                $visibilityButton.css({backgroundColor: '', borderColor: ''});
+                $visibilityButton.addClass('un-color');
+            }
+        },
+
         onModelAdded: function (model) {
             var $el,
                 viewModel = model.toJSON();
@@ -99,7 +110,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 if ($contextMenu.length) {
                     $contextMenu.remove();
                 } else {
-                    this.showContextMenu($currentTarget, model);
+                    this.showContextMenu($currentTarget, model, e.pageX, e.pageY);
                 }
             }, this));
 
@@ -139,48 +150,58 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }
         },
 
-        showContextMenu: function ($container, model) {
-            var $el = $(this.contextMenuTemplate(model.toJSON())),
-                modules = _.uniq($el.find("a[data-module]").map(function () {
+        showContextMenu: function ($button, model, posX, posY) {
+            var $container = $button.closest(this.selectors.item),
+                $contextMenu = $(this.contextMenuTemplate(model.toJSON())),
+                closeContextMenu = _.bind(function () {
+                    $('.context-menu-button').css('display', '');
+                    $contextMenu.remove();
+                    $(document).off('.' + this.cid);
+                }, this),
+                modules = _.uniq($contextMenu.find("li[data-module]").map(function () {
                     return $(this).data('module');
                 }).get()),
-                options = this.options,
-                containerHtml = $container.html(),
+                buttonHtml = $button.html(),
                 showLoadingTimeout;
 
             if (modules.length > 0 && this._initActionSyncObject()) {
                 // show loading message, if loading takes more than 100ms
                 showLoadingTimeout = setTimeout(_.bind(function () {
-                    $container.html('<span class="loading-indicator"></span>');
+                    $button.html('<span class="loading-indicator"></span>');
                 }, this), 100);
                 // load context menu
-                modules = _.object(modules, modules);
-                tools.loadModules(modules, _.bind(function (modules) {
+                tools.loadModules(_.object(modules, modules), _.bind(function (modules) {
                     clearTimeout(showLoadingTimeout);
-                    $container.html(containerHtml);
+                    $button.html(buttonHtml);
 
                     _.each(modules, _.bind(function (moduleConstructor, moduleName) {
-                        var actionModule = new moduleConstructor(options);
-                        $el.one('click', "a[data-module='" + moduleName + "']", _.bind(function (e) {
-                            if (this._initActionSyncObject()) {
-                                $('.context-menu-button').css('display', '');
-                                $el.remove();
-                                $(document).off('.' + this.cid);
-                                actionModule.execute(model, this._actionSyncObject);
-                            }
+                        $contextMenu.find('li[data-module="' + moduleName + '"]').each(_.bind(function (index, el) {
+                            var action = new moduleConstructor({
+                                    el: el,
+                                    model: model,
+                                    collection: this.options.collection,
+                                    connectionsView: this.options.connectionsView,
+                                    colorManager: this.options.colorManager,
+                                    closeContextMenu: closeContextMenu
+                                });
+                            action.$el.one('click', '.action', _.bind(function (e) {
+                                if (this._initActionSyncObject()) {
+                                    closeContextMenu();
+                                    action.execute(model, this._actionSyncObject);
+                                }
+                            }, this));
                         }, this));
                     }, this));
 
-                    $container.closest(this.selectors.item)
-                        .append($el)
+                    $container.append($contextMenu)
                         .find('.context-menu-button').css('display', 'block');
+                    $contextMenu.css(this._getContextMenuPos(posX, posY, $container.find('.context-menu')));
 
-                    $(document).one('click.' + this.cid, function (event) {
-                        if (!$(event.target).hasClass('context-menu')) {
-                            $('.context-menu-button').css('display', '');
-                            $el.remove();
+                    $(document).on('click.' + this.cid, _.bind(function (event) {
+                        if (!$(event.target).hasClass('context-menu') && !$(event.target).closest('.context-menu').length) {
+                            closeContextMenu();
                         }
-                    });
+                    }, this));
 
                     this._actionSyncObject.resolve();
                 }, this));
@@ -197,12 +218,13 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             } else {
                 savingMsg = messenger.notificationMessage('warning', __('Adding the calendar, please wait ...'));
                 try {
-                    model = new ConnectionModel();
-                    model.set('targetCalendar', this.options.calendar);
-                    model.set('calendarName', calendarName);
-                    model.set('calendarAlias', calendarAlias);
-                    model.set('calendar', calendarId);
-                    model.set('calendarUid', calendarUid);
+                    model = new ConnectionModel({
+                        targetCalendar: this.options.calendar,
+                        calendarName: calendarName,
+                        calendarAlias: calendarAlias,
+                        calendar: calendarId,
+                        calendarUid: calendarUid
+                    });
                     this.collection.create(model, {
                         wait: true,
                         success: _.bind(function () {
@@ -237,19 +259,26 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             messenger.showErrorMessage(message, err);
         },
 
+        _getContextMenuPos: function (posX, posY, $contextMenu) {
+            var y = posY + 5,
+                h = $contextMenu.outerHeight();
+            if ($(document).height() < y + h) {
+                y -= h + 10;
+            }
+            return {left: posX + 10, top: y};
+        },
+
         _showItem: function (model, visible) {
             var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
-                $connection = this.findItem(model),
-                $visibilityButton = $connection.find(this.selectors.visibilityButton);
+                $connection = this.findItem(model);
             this._removeVisibilityButtonEventListener($connection, model);
-            this._setItemVisibility($visibilityButton, visible ? model.get('backgroundColor') : '');
+            this.setItemVisibility($connection, visible ? model.get('backgroundColor') : '');
             try {
                 model.save('visible', visible, {
                     wait: true,
                     success: _.bind(function () {
                         savingMsg.close();
                         messenger.notificationFlashMessage('success', __('The calendar was updated.'));
-                        this.trigger(visible ? 'connectionAdd' : 'connectionRemove', model);
                         this._addVisibilityButtonEventListener($connection, model);
                         if (this._actionSyncObject) {
                             this._actionSyncObject.resolve();
@@ -259,7 +288,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         savingMsg.close();
                         this.showUpdateError(response.responseJSON || {});
                         this._addVisibilityButtonEventListener($connection, model);
-                        this._setItemVisibility($visibilityButton, visible ? '' : model.get('backgroundColor'));
+                        this.setItemVisibility($connection, visible ? '' : model.get('backgroundColor'));
                         if (this._actionSyncObject) {
                             this._actionSyncObject.reject();
                         }
@@ -269,20 +298,10 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 savingMsg.close();
                 this.showMiscError(err);
                 this._addVisibilityButtonEventListener($connection, model);
-                this._setItemVisibility($visibilityButton, visible ? '' : model.get('backgroundColor'));
+                this.setItemVisibility($connection, visible ? '' : model.get('backgroundColor'));
                 if (this._actionSyncObject) {
                     this._actionSyncObject.reject();
                 }
-            }
-        },
-
-        _setItemVisibility: function ($visibilityButton, backgroundColor) {
-            if (backgroundColor) {
-                $visibilityButton.removeClass('un-color');
-                $visibilityButton.css({backgroundColor: backgroundColor, borderColor: backgroundColor});
-            } else {
-                $visibilityButton.css({backgroundColor: '', borderColor: ''});
-                $visibilityButton.addClass('un-color');
             }
         },
 

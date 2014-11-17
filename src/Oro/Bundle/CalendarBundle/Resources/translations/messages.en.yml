@@ -42,6 +42,7 @@ oro:
             remove: Remove calendar
             hide: Hide calendar
             show: Show calendar
+            edit_color: Edit color...
 
         control:
             all_day: ""
