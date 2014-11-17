@@ -80,10 +80,9 @@ define([
         },
 
         /**
-         * Collapses/expands view elements
-         *
-         * @param {boolean=} collapse
-         */
+        * Collapses/expands view elements
+        * @param {boolean=} collapse
+        */
         toggle: function (collapse) {
             if (_.isUndefined(collapse)) {
                 collapse = !this.isCollapsed();

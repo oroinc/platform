@@ -15,7 +15,6 @@ define(function (require) {
         ActivityListView   = require('../views/activity-list-view'),
         ActivityModel      = require('../models/activity-list-model'),
         ActivityCollection = require('../models/activity-list-collection'),
-        //PaginationIntput   = require('orodatagrid/js/datagrid/pagination-input'),
         MultiSelectFilter  = require('oro/filter/multiselect-filter'),
         DatetimeFilter     = require('oro/filter/datetime-filter'),
         dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
@@ -121,7 +120,8 @@ define(function (require) {
          */
         onFilterStateChange: function () {
             this.list.collection.setFilter(this.getFilterState());
-            this.list.refresh();
+            this.list.collection.setPage(1);
+            this.list._reload();
         },
 
         /**

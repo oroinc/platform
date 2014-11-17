@@ -55,7 +55,7 @@ define([
         },
         setCount: function (count) {
             this.pager.count = count;
-            this.pager.total = Math.ceil(count/this.pager.pagesize);
+            this.pager.total = count == 0 ? 1 : Math.ceil(count/this.pager.pagesize);
 
             this.count = count;
         },
