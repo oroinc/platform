@@ -2,11 +2,12 @@
 /*global define*/
 define([
     'underscore',
+    'oroui/js/mediator',
     './base/bookmark-component',
     '../views/bookmark-button-view',
     'oroui/js/app/views/base/collection-view',
     '../views/bookmark-item-view'
-], function (_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
+], function (_, mediator, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
     'use strict';
 
     var FavoriteComponent;
@@ -57,6 +58,43 @@ define([
             });
 
             this.tabs = new CollectionView(options);
+        },
+
+        toAdd: function (model) {
+            var collection;
+            collection = this.collection;
+            this.actualizeAttributes(model);
+            var self = this;
+            model.save(null, {
+                success: function () {
+                    var item;
+                    item = collection.find(function (item) {
+                        return item.get('url') === model.get('url');
+                    });
+                    if (item) {
+                        model.destroy();
+                    } else {
+                        var url = model.get('url');
+                        self.removeUrlParams(model, url);
+                        collection.unshift(model);
+                    }
+                }
+            });
+        },
+
+        onPageStateChange: function () {
+            var model, url;
+            model = this.collection.getCurrentModel();
+            if (model) {
+                url = mediator.execute('currentUrl');
+                this.removeUrlParams(model, url);
+                model.save();
+            }
+        },
+
+        removeUrlParams: function (model, url) {
+            var urlPart = url.split('?');
+            model.set('url', urlPart[0]);
         },
 
         actualizeAttributes: function (model) {
