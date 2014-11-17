@@ -128,7 +128,10 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                         success: _.bind(function () {
                             savingMsg.close();
                             messenger.notificationFlashMessage('success', __('The calendar was updated.'));
-                            this.colorManager.setCalendarColors(this.model.get('calendarUid'), this.model.get('backgroundColor'));
+                            this.colorManager.setCalendarColors(this.model.get('calendarUid'), color);
+                            if (this.model.get('visible')) {
+                                this.connectionsView.setItemVisibility($connection, color);
+                            }
                             this.connectionsView._actionSyncObject.resolve();
                         }, this),
                         error: _.bind(function (model, response) {
