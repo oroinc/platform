@@ -2,12 +2,11 @@
 /*global define*/
 define([
     'underscore',
-    'oroui/js/mediator',
     './base/bookmark-component',
     '../views/bookmark-button-view',
     'oroui/js/app/views/base/collection-view',
     '../views/bookmark-item-view'
-], function (_, mediator, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
+], function (_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
     'use strict';
 
     var FavoriteComponent;
