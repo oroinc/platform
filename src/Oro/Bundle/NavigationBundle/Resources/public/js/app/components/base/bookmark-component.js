@@ -20,9 +20,7 @@ define([
 
         listen: {
             'toAdd collection': 'toAdd',
-            'toRemove collection': 'toRemove',
-
-            'pagestate:change mediator': 'onPageStateChange'
+            'toRemove collection': 'toRemove'
         },
 
         initialize: function (options) {
@@ -81,16 +79,6 @@ define([
 
         actualizeAttributes: function (model) {
             // should be implemented in descendants
-        },
-
-        onPageStateChange: function () {
-            var model, url;
-            model = this.collection.getCurrentModel();
-            if (model) {
-                url = mediator.execute('currentUrl');
-                model.set('url', url);
-                model.save();
-            }
         }
     });
 

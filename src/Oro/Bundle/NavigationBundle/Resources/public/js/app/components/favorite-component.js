@@ -60,35 +60,15 @@ define([
             this.tabs = new CollectionView(options);
         },
 
-        onPageStateChange: function () {
-            var model, url;
-            model = this.collection.getCurrentModel();
-            if (model) {
-                url = mediator.execute('currentUrl');
-                this._setUrlWithoutParams(model, url);
-                model.save();
-            }
-        },
+        actualizeAttributes: function (model) {
+            model.set('type', 'favorite');
+            model.set('position', this.collection.length);
 
-        /**
-         * Set url without GET parameters
-         *
-         * @param model
-         * @param url
-         * @protected
-         */
-        _setUrlWithoutParams: function (model, url) {
+            var url = model.get('url');
             var urlPart = url.split('?');
             if (model.get('url') !== urlPart[0]) {
                 model.set('url', urlPart[0]);
             }
-        },
-
-        actualizeAttributes: function (model) {
-            model.set('type', 'favorite');
-            model.set('position', this.collection.length);
-            var url = model.get('url');
-            this._setUrlWithoutParams(model, url);
         }
     });
 
