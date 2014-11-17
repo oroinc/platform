@@ -41,6 +41,8 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
      *
      * @param ObjectManager $manager
      * @param string        $activityClass Activity class we need to add activity list data
+     * @param string        $ownerField
+     * @param string        $organizationField
      */
     public function addActivityListsForActivityClass(
         ObjectManager $manager,
@@ -49,13 +51,13 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $organizationField = ''
     ) {
         if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
-            $provider = $this->container->get('oro_activity_list.provider.chain');
+            $provider     = $this->container->get('oro_activity_list.provider.chain');
             $queryBuilder = $manager->getRepository($activityClass)->createQueryBuilder('entity');
-            $iterator = new BufferedQueryResultIterator($queryBuilder);
+            $iterator     = new BufferedQueryResultIterator($queryBuilder);
             $iterator->setBufferSize(self::BATCH_SIZE);
 
             $itemsCount = 0;
-            $entities = [];
+            $entities   = [];
 
             foreach ($iterator as $entity) {
                 $entities[] = $entity;
@@ -77,6 +79,8 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
      * @param ObjectManager             $manager
      * @param ActivityListChainProvider $provider
      * @param array                     $entities
+     * @param string                    $ownerField
+     * @param string                    $organizationField
      */
     protected function saveActivityLists(
         ObjectManager $manager,
@@ -88,7 +92,10 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $accessor = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
             if ($ownerField && $organizationField) {
-                $this->setSecurityContext();
+                $this->setSecurityContext(
+                    $accessor->getValue($entity, $ownerField),
+                    $accessor->getValue($entity, $organizationField)
+                );
             }
             $manager->persist($provider->getActivityListEntitiesByActivityEntity($entity));
         }
@@ -101,7 +108,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
     protected function setSecurityContext(User $user, Organization $organization)
     {
         $securityContext = $this->container->get('security.context');
-        $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+        $token           = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
         $securityContext->setToken($token);
     }
 }
