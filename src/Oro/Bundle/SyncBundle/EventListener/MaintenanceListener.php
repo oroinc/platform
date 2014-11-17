@@ -27,6 +27,7 @@ class MaintenanceListener
     /**
      * @param TopicPublisher $publisher
      * @param SecurityFacade $securityFacade
+     * @param LoggerInterface $logger
      */
     public function __construct(
         TopicPublisher $publisher,
@@ -40,21 +41,23 @@ class MaintenanceListener
 
     public function onModeOn()
     {
-        $userId = $this->securityFacade->getLoggedUserId();
-
-        try {
-            $this->publisher->send('oro/maintenance', array('isOn' => true, 'userId' => $userId));
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
-        }
+        $this->onMode(true);
     }
 
     public function onModeOff()
     {
+        $this->onMode(false);
+    }
+
+    /**
+     * @param bool $isOn
+     */
+    protected function onMode($isOn)
+    {
         $userId = $this->securityFacade->getLoggedUserId();
 
         try {
-            $this->publisher->send('oro/maintenance', array('isOn' => false, 'userId' => $userId));
+            $this->publisher->send('oro/maintenance', array('isOn' => (bool)$isOn, 'userId' => $userId));
         } catch (\Exception $e) {
             $this->logger->error($e->getMessage());
         }

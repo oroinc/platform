@@ -29,12 +29,12 @@ class TopicSender
         TopicPublisher $publisher,
         ServiceLink $generatorLink,
         ServiceLink $securityContextLink,
-        LoggerInterface $loggerInterface
+        LoggerInterface $logger
     ) {
         $this->publisher           = $publisher;
         $this->generatorLink       = $generatorLink;
         $this->securityContextLink = $securityContextLink;
-        $this->logger              = $loggerInterface;
+        $this->logger              = $logger;
     }
 
     /**
