@@ -97,18 +97,23 @@ services:
             - @doctrine.orm.entity_manager
 
     # Autocomplete acl user search handler
-    oro_user.autocomplete.user.search_acl_handler:
+    oro_user.autocomplete.user.search_acl_handler.abstract:
+        abstract: true
         class: %oro_user.autocomplete.user.search_acl_handler.class%
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_attachment.manager
             - %oro_user.entity.class%
-            - ["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
             - @oro_entity_config.link.security_context
             - @oro_security.ownership_tree_provider
             - @?security.acl.voter.basic_permissions
         calls:
             - [ setNameFormatter, [@oro_locale.formatter.name] ]
+
+    oro_user.autocomplete.user.search_acl_handler:
+        parent: oro_user.autocomplete.user.search_acl_handler.abstract
+        calls:
+            - [ setProperties, [["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]] ]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: acl_users, acl_resource: oro_user_user_view }
         lazy: true

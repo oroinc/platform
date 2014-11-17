@@ -436,6 +436,26 @@ define(function (require) {
         },
 
         /**
+         * Check if there is at least one action.
+         *
+         * @param {string} section section name
+         * @returns {boolean}
+         */
+        hasActions: function(section) {
+            if (section !== undefined) {
+                return this.actions.hasOwnProperty(section) && !_.isEmpty(this.actions[section]);
+            } else {
+                var hasActions = false;
+                _.each(this.actions, function(actions) {
+                    if (!_.isEmpty(actions)) {
+                        hasActions = true;
+                    }
+                });
+                return hasActions;
+            }
+        },
+
+        /**
          * Get action element when after render.
          *
          * @param {string} key action name
@@ -553,6 +573,21 @@ define(function (require) {
         },
 
         /**
+         * Updates content of a widget.
+         *
+         * @param {String} content
+         */
+        setContent: function (content) {
+            this.actionsEl = null;
+            this.actions = {};
+            this.setElement($(content).filter('.widget-content:first'));
+            this._show();
+            mediator.execute('layout:init', this.widget);
+            mediator.trigger('widget:contentLoad', this.widget);
+            mediator.trigger('layout:adjustHeight');
+        },
+
+        /**
          * Load content
          *
          * @param {Object=} data
@@ -612,13 +647,7 @@ define(function (require) {
         _onContentLoad: function(content) {
             this.loading = false;
             this.trigger('contentLoad', content, this);
-            this.actionsEl = null;
-            this.actions = {};
-            this.setElement($(content).filter('.widget-content:first'));
-            this._show();
-            mediator.execute('layout:init', this.widget);
-            mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
+            this.setContent(content);
         },
 
         /**
