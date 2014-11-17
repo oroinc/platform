@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ReminderBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
@@ -11,16 +10,16 @@ use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 class ReminderListener
 {
     /**
-     * @var ContainerInterface
+     * @var ReminderManager
      */
-    protected $container;
+    protected $reminderManager;
 
     /**
-     * @param ContainerInterface $container
+     * @param ReminderManager $reminderManager
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ReminderManager $reminderManager)
     {
-        $this->container = $container;
+        $this->reminderManager = $reminderManager;
     }
 
     /**
@@ -33,15 +32,22 @@ class ReminderListener
         $entity = $args->getEntity();
 
         if ($entity instanceof RemindableInterface) {
-            $this->getReminderManager()->loadReminders($entity);
+            $this->reminderManager->loadReminders($entity);
         }
     }
 
     /**
-     * @return ReminderManager
+     * Save reminders for new entities
+     *
+     * @param LifecycleEventArgs $event
      */
-    protected function getReminderManager()
+    public function postPersist(LifecycleEventArgs $event)
     {
-        return $this->container->get('oro_reminder.entity.manager');
+        $entity = $event->getEntity();
+        if (!$entity instanceof RemindableInterface) {
+            return;
+        }
+
+        $this->reminderManager->saveReminders($entity);
     }
 }

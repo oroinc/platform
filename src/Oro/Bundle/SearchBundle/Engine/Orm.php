@@ -244,10 +244,8 @@ class Orm extends AbstractEngine
      */
     protected function getIndexRepository()
     {
-        if (!$this->indexRepository) {
-            $this->indexRepository = $this->registry->getRepository('OroSearchBundle:Item');
-            $this->indexRepository->setDriversClasses($this->drivers);
-        }
+        $this->indexRepository = $this->registry->getRepository('OroSearchBundle:Item');
+        $this->indexRepository->setDriversClasses($this->drivers);
 
         return $this->indexRepository;
     }
