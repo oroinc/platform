@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Rest;
 
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpEntityNameParameterFilter;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -55,6 +56,12 @@ class AuditController extends RestGetController implements ClassResourceInterfac
      *     nullable=true,
      *     description="ID of User who has performed action"
      * )
+     * @QueryParam(
+     *     name="objectClass",
+     *     requirements="\w+",
+     *     nullable=true,
+     *     description="Entity full class name; backslashes (\) should be replaced with underscore (_)."
+     * )
      *
      * @ApiDoc(
      *  description="Get list of all logged entities",
@@ -66,10 +73,11 @@ class AuditController extends RestGetController implements ClassResourceInterfac
     public function cgetAction()
     {
         $page             = (int)$this->getRequest()->get('page', 1);
-        $limit            = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+        $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
         $filterParameters = [
-            'loggedAt' => new HttpDateTimeParameterFilter(),
-            'user'     => new IdentifierToReferenceFilter($this->getDoctrine(), 'OroUserBundle:User')
+            'loggedAt'    => new HttpDateTimeParameterFilter(),
+            'user'        => new IdentifierToReferenceFilter($this->getDoctrine(), 'OroUserBundle:User'),
+            'objectClass' => new HttpEntityNameParameterFilter($this->get('oro_entity.routing_helper'))
         ];
 
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters('cgetAction'), $filterParameters);

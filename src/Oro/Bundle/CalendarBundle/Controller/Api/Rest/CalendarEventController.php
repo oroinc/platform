@@ -107,10 +107,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
                 $subordinate
             );
         } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
-            $filterParameters = [
-                'createdAt' => new HttpDateTimeParameterFilter(),
-                'updatedAt' => new HttpDateTimeParameterFilter()
-            ];
+            $dateParamFilter  = new HttpDateTimeParameterFilter();
+            $filterParameters = ['createdAt' => $dateParamFilter, 'updatedAt' => $dateParamFilter];
             $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
 
             /** @var CalendarEventRepository $repo */

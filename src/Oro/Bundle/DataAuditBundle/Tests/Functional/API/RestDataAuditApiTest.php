@@ -116,23 +116,35 @@ class RestDataAuditApiTest extends WebTestCase
     public function actionFilterProvider()
     {
         return [
-            'should filter by action and found "create" log entries'    => [
+            'should filter by action and found "create" log entries'                          => [
                 '$filterField'    => 'action',
                 '$filterOperator' => '=',
                 '$filterValue'    => 'create',
                 '$expectedCount'  => 1,
             ],
-            'should filter by action and not found "remove" actions'    => [
+            'should filter by action and not found "remove" actions'                          => [
                 '$filterField'    => 'action',
                 '$filterOperator' => '=',
                 '$filterValue'    => 'remove',
                 '$expectedCount'  => 0,
             ],
-            'should filter by action and found all not equals "update"' => [
+            'should filter by action and found all not equals "update"'                       => [
                 '$filterField'    => 'action',
                 '$filterOperator' => '<>',
                 '$filterValue'    => 'update',
                 '$expectedCount'  => 1,
+            ],
+            'should filter by objectClass and found entry for User entity'                    => [
+                '$filterField'    => 'objectClass',
+                '$filterOperator' => '=',
+                '$filterValue'    => 'Oro_Bundle_UserBundle_Entity_User',
+                '$expectedCount'  => 1,
+            ],
+            'should filter by objectClass and returns empty result if not existing one given' => [
+                '$filterField'    => 'objectClass',
+                '$filterOperator' => '=',
+                '$filterValue'    => 'Oro_Bundle_DataAuditBundle_Entity_TestEntity',
+                '$expectedCount'  => 0,
             ]
         ];
     }
