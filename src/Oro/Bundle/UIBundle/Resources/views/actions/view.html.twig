@@ -29,7 +29,7 @@
                                         {% if breadcrumbs.indexLabel is defined %}
                                         <div class="sub-title">
                                         {%- if breadcrumbs.indexPath is defined -%}
-                                            <a href="{{ breadcrumbs.indexPath }}">{{ breadcrumbs.indexLabel }}</a>
+                                            <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
                                         {%- else -%}
                                             {{ breadcrumbs.indexLabel }}
                                         {%- endif -%}
@@ -38,7 +38,7 @@
                                         {% endif %}
                                         {% if breadcrumbs.additional is defined %}
                                             {% for breadcrumb in breadcrumbs.additional %}
-                                                <div class="sub-title"><a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a></div>
+                                                <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
                                                 <span class="separator">/</span>
                                             {% endfor %}
                                         {% endif %}
