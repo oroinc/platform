@@ -13,7 +13,7 @@ define([
 
     FavoriteComponent = BaseBookmarkComponent.extend({
         _createSubViews: function () {
-            this._createButtonView()
+            this._createButtonView();
             this._createTabView();
         },
 
@@ -62,6 +62,12 @@ define([
         actualizeAttributes: function (model) {
             model.set('type', 'favorite');
             model.set('position', this.collection.length);
+
+            var url = model.get('url');
+            var urlPart = url.split('?');
+            if (model.get('url') !== urlPart[0]) {
+                model.set('url', urlPart[0]);
+            }
         }
     });
 

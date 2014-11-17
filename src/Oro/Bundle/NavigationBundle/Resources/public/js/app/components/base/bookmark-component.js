@@ -20,10 +20,7 @@ define([
 
         listen: {
             'toAdd collection': 'toAdd',
-            'toRemove collection': 'toRemove',
-
-            'pagestate:change mediator': 'onPageStateChange',
-            'page:beforeChange mediator': 'onPageChange'
+            'toRemove collection': 'toRemove'
         },
 
         initialize: function (options) {
@@ -82,37 +79,6 @@ define([
 
         actualizeAttributes: function (model) {
             // should be implemented in descendants
-        },
-
-        onPageStateChange: function () {
-            var model, url;
-            model = this.collection.getCurrentModel();
-            if (model) {
-                url = mediator.execute('currentUrl');
-                model.set('url', url);
-                model.save();
-            }
-        },
-
-        /**
-         * Handles page change
-         *  - if there's related model in collection, updates route query
-         * @param oldRoute
-         * @param newRoute
-         * @param options
-         */
-        onPageChange: function (oldRoute, newRoute, options) {
-            var model, _ref;
-            if (!newRoute || newRoute.query !== '') {
-                return;
-            }
-            model = this.collection.find(function (model) {
-                return mediator.execute('compareUrl', model.get('url'), newRoute.path);
-            });
-            if (model) {
-                _ref = model.get('url').split('?');
-                newRoute.query = _ref[1] || '';
-            }
         }
     });
 
