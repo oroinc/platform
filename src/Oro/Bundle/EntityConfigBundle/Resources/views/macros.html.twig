@@ -56,6 +56,11 @@
                 {% set itemValue = itemValue|escape %}
             {% endif %}
 
+            {% if item.value.raw is defined %}
+                {# override value with raw value if flag defined #}
+                {% set itemValue = item.value.title %}
+            {% endif %}
+
             {{ ui.renderHtmlProperty(item.label|trans, itemValue) }}
         {% endfor %}
     {% endif %}
