@@ -64,7 +64,8 @@ define([
             var collection;
             collection = this.collection;
             this.actualizeAttributes(model);
-            var self = this;
+            var url = model.get('url');
+            this.removeUrlParams(model, url);
             model.save(null, {
                 success: function () {
                     var item;
@@ -74,8 +75,6 @@ define([
                     if (item) {
                         model.destroy();
                     } else {
-                        var url = model.get('url');
-                        self.removeUrlParams(model, url);
                         collection.unshift(model);
                     }
                 }
