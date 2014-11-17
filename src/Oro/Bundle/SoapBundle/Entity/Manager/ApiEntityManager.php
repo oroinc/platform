@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\SoapBundle\Entity\Manager;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -25,7 +26,7 @@ class ApiEntityManager
     protected $om;
 
     /**
-     * @var ClassMetadata
+     * @var ClassMetadata|ClassMetadataInfo
      */
     protected $metadata;
 
@@ -60,7 +61,7 @@ class ApiEntityManager
     /**
      * Get entity metadata
      *
-     * @return ClassMetadata
+     * @return ClassMetadata|ClassMetadataInfo
      */
     public function getMetadata()
     {
@@ -106,8 +107,7 @@ class ApiEntityManager
             throw new \InvalidArgumentException('Expected instance of ' . $this->class);
         }
 
-        $idFields = $this->metadata->getIdentifierFieldNames();
-        $idField = current($idFields);
+        $idField   = $this->metadata->getSingleIdentifierFieldName();
         $entityIds = $this->metadata->getIdentifierValues($entity);
 
         return $entityIds[$idField];
@@ -138,6 +138,7 @@ class ApiEntityManager
      *
      * In case when limit and offset set to null QueryBuilder instance will be returned.
      *
+     * @deprecated since 1.4.1 use getListQueryBuilder instead
      * @param int        $limit
      * @param int        $page
      * @param array      $criteria
@@ -172,6 +173,44 @@ class ApiEntityManager
         return $this->getRepository()
             ->matching($criteria)
             ->toArray();
+    }
+
+    /**
+     * @param int   $limit
+     * @param int   $page
+     * @param array $criteria
+     * @param null  $orderBy
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null)
+    {
+        $page = $page > 0 ? $page : 1;
+        $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
+
+        if (is_array($criteria)) {
+            $newCriteria = new Criteria();
+            foreach ($criteria as $fieldName => $value) {
+                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+            }
+
+            $criteria = $newCriteria;
+        }
+
+        // dispatch oro_api.request.get_list.before event
+        $event = new GetListBefore($criteria, $this->class);
+        $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
+        $criteria = $event->getCriteria();
+
+        $criteria
+            ->setMaxResults($limit)
+            ->orderBy($this->getOrderBy($orderBy))
+            ->setFirstResult($this->getOffset($page, $limit));
+
+        $qb = $this->getRepository()->createQueryBuilder('e');
+        $qb->addCriteria($criteria);
+
+        return $qb;
     }
 
     /**

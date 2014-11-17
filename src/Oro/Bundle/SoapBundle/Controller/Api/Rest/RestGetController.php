@@ -4,11 +4,14 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\ORM\Proxy\Proxy;
+use Doctrine\Common\Collections\Criteria;
+
+use JMS\Serializer\SerializationContext;
 
 use FOS\Rest\Util\Codes;
+use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
@@ -32,7 +35,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
         unset($items);
 
-        return new Response(json_encode($result), Codes::HTTP_OK);
+        return $this->handleView($this->view($result, Codes::HTTP_OK));
     }
 
     /**
@@ -48,9 +51,8 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         if ($item) {
             $item = $this->getPreparedItem($item);
         }
-        $responseData = $item ? json_encode($item) : '';
 
-        return new Response($responseData, $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND);
+        return $this->handleView($this->view($item ?: null, $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND));
     }
 
     /**
@@ -232,5 +234,29 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function handleView(View $view)
+    {
+        // TODO BAP-6122 remove this code when FOSRestBundle version >= 1.4.2
+        $context = $view->getSerializationContext() ?: new SerializationContext();
+
+        $groups = $this->container->getParameter('fos_rest.serializer.exclusion_strategy.groups');
+        if ($groups) {
+            $context->setGroups($groups);
+        }
+
+        $version = $this->container->getParameter('fos_rest.serializer.exclusion_strategy.version');
+        if ($version) {
+            $context->setVersion($version);
+        }
+
+        $context->setSerializeNull(true);
+        $view->setSerializationContext($context);
+
+        return parent::handleView($view);
     }
 }
