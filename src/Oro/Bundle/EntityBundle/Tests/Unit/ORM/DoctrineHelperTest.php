@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
@@ -12,7 +14,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
     const TEST_IDENTIFIER = 42;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
     protected $registry;
 
@@ -72,29 +74,29 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function getEntityClassDataProvider()
     {
-        return array(
-            'existing entity'    => array(
+        return [
+            'existing entity'    => [
                 'entity'        => new ItemStub(),
                 'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
-            ),
-            'entity proxy'       => array(
+            ],
+            'entity proxy'       => [
                 'entity'        => new ItemStubProxy(),
                 'expectedClass' => 'ItemStubProxy',
-            ),
-            'real entity class'  => array(
+            ],
+            'real entity class'  => [
                 'entity'        => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
                 'expectedClass' => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
-            ),
-            'proxy entity class' => array(
+            ],
+            'proxy entity class' => [
                 'entity'        => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy',
                 'expectedClass' => 'ItemStubProxy',
-            ),
-        );
+            ],
+        ];
     }
 
     public function testGetEntityIdentifierWithGetIdMethod()
     {
-        $identifiers = array('id' => self::TEST_IDENTIFIER);
+        $identifiers = ['id' => self::TEST_IDENTIFIER];
 
         $entity = new TestEntity($identifiers['id']);
 
@@ -114,7 +116,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityIdentifier($entity, $class)
     {
-        $identifiers = array('id' => self::TEST_IDENTIFIER);
+        $identifiers = ['id' => self::TEST_IDENTIFIER];
 
         $this->classMetadata->expects($this->once())
             ->method('getIdentifierValues')
@@ -157,16 +159,16 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function getEntityIdentifierDataProvider()
     {
-        return array(
-            'existing entity' => array(
+        return [
+            'existing entity' => [
                 'entity' => new ItemStub(),
                 'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
-            ),
-            'entity proxy'    => array(
+            ],
+            'entity proxy'    => [
                 'entity' => new ItemStubProxy(),
                 'class'  => 'ItemStubProxy',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -199,23 +201,26 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getSingleEntityIdentifierDataProvider()
     {
-        return array(
-            'valid identifier'                  => array(
+        return [
+            'valid identifier'                  => [
                 'expected' => self::TEST_IDENTIFIER,
-                'actual'   => array('id' => self::TEST_IDENTIFIER),
-            ),
-            'empty identifier'                  => array(
+                'actual'   => ['id' => self::TEST_IDENTIFIER],
+            ],
+            'empty identifier'                  => [
                 'expected' => null,
-                'actual'   => array(),
-            ),
-            'multiple identifier, no exception' => array(
+                'actual'   => [],
+            ],
+            'multiple identifier, no exception' => [
                 'expected'  => null,
-                'actual'    => array('first_id' => 1, 'second_id' => 2),
+                'actual'    => ['first_id' => 1, 'second_id' => 2],
                 'exception' => false,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -224,7 +229,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSingleEntityIdentifierIncorrectIdentifier()
     {
-        $identifiers = array('key1' => 'value1', 'key2' => 'value2');
+        $identifiers = ['key1' => 'value1', 'key2' => 'value2'];
 
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
@@ -252,7 +257,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntityIdentifierFieldNames($entity, $class)
     {
-        $identifiers = array('id' => self::TEST_IDENTIFIER);
+        $identifiers = ['id' => self::TEST_IDENTIFIER];
 
         $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
@@ -294,16 +299,16 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function getEntityIdentifierFieldNamesDataProvider()
     {
-        return array(
-            'existing entity' => array(
+        return [
+            'existing entity' => [
                 'entity' => new ItemStub(),
                 'class'  => 'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
-            ),
-            'entity proxy'    => array(
+            ],
+            'entity proxy'    => [
                 'entity' => new ItemStubProxy(),
                 'class'  => 'ItemStubProxy',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -335,23 +340,26 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getSingleEntityIdentifierFieldNameDataProvider()
     {
-        return array(
-            'valid identifier'                  => array(
+        return [
+            'valid identifier'                  => [
                 'expected' => 'id',
-                'actual'   => array('id' => self::TEST_IDENTIFIER),
-            ),
-            'empty identifier'                  => array(
+                'actual'   => ['id' => self::TEST_IDENTIFIER],
+            ],
+            'empty identifier'                  => [
                 'expected' => null,
-                'actual'   => array(),
-            ),
-            'multiple identifier, no exception' => array(
+                'actual'   => [],
+            ],
+            'multiple identifier, no exception' => [
                 'expected'  => null,
-                'actual'    => array('first_id' => 1, 'second_id' => 2),
+                'actual'    => ['first_id' => 1, 'second_id' => 2],
                 'exception' => false,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -360,7 +368,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSingleEntityIdentifierIncorrectIdentifierFieldName()
     {
-        $identifiers = array('key1' => 'value1', 'key2' => 'value2');
+        $identifiers = ['key1' => 'value1', 'key2' => 'value2'];
 
         $entity = new ItemStubProxy();
         $class  = 'ItemStubProxy';
@@ -408,30 +416,14 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetEntityMetadataByEntity()
+    /**
+     * @param mixed $data
+     * @param string $class
+     *
+     * @dataProvider dataProvider
+     */
+    public function testGetEntityMetadata($data, $class)
     {
-        $entity = new ItemStubProxy();
-        $class  = 'ItemStubProxy';
-
-        $this->em->expects($this->once())
-            ->method('getClassMetadata')
-            ->with($class)
-            ->will($this->returnValue($this->classMetadata));
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->with($this->doctrineHelper->getEntityClass($entity))
-            ->will($this->returnValue($this->em));
-
-        $this->assertSame(
-            $this->classMetadata,
-            $this->doctrineHelper->getEntityMetadata($entity)
-        );
-    }
-
-    public function testGetEntityMetadataByClass()
-    {
-        $class = 'ItemStubProxy';
-
         $this->em->expects($this->once())
             ->method('getClassMetadata')
             ->with($class)
@@ -443,18 +435,17 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $this->classMetadata,
-            $this->doctrineHelper->getEntityMetadata($class)
+            $this->doctrineHelper->getEntityMetadata($data)
         );
     }
 
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedExceptionMessage Entity class "ItemStubProxy" is not manageable
+     */
     public function testGetEntityMetadataNotManageableEntity()
     {
         $class = 'ItemStubProxy';
-
-        $this->setExpectedException(
-            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
-            sprintf('Entity class "%s" is not manageable', $class)
-        );
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -464,44 +455,31 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper->getEntityMetadata($class);
     }
 
-    public function testGetEntityManagerByEntity()
+    /**
+     * @param mixed $data
+     *
+     * @dataProvider dataProvider
+     */
+    public function testGetEntityManager($data)
     {
-        $entity = new ItemStubProxy();
-
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
-            ->with($this->doctrineHelper->getEntityClass($entity))
+            ->with($this->doctrineHelper->getEntityClass($data))
             ->will($this->returnValue($this->em));
 
         $this->assertSame(
             $this->em,
-            $this->doctrineHelper->getEntityManager($entity)
+            $this->doctrineHelper->getEntityManager($data)
         );
     }
 
-    public function testGetEntityManagerByClass()
-    {
-        $class = 'ItemStubProxy';
-
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->with($class)
-            ->will($this->returnValue($this->em));
-
-        $this->assertSame(
-            $this->em,
-            $this->doctrineHelper->getEntityManager($class)
-        );
-    }
-
+    /**
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedExceptionMessage Entity class "ItemStubProxy" is not manageable
+     */
     public function testGetEntityManagerNotManageableEntity()
     {
         $class = 'ItemStubProxy';
-
-        $this->setExpectedException(
-            'Oro\Bundle\EntityBundle\Exception\NotManageableEntityException',
-            sprintf('Entity class "%s" is not manageable', $class)
-        );
 
         $this->registry->expects($this->once())
             ->method('getManagerForClass')
@@ -581,5 +559,66 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
             $entity,
             $this->doctrineHelper->createEntityInstance($class)
         );
+    }
+
+    /**
+     * @param mixed $data
+     * @param string $class
+     *
+     * @expectedException \Oro\Bundle\EntityBundle\Exception\NotManageableEntityException
+     * @expectedExceptionMessage Entity class "ItemStubProxy" is not manageable
+     *
+     * @dataProvider dataProvider
+     */
+    public function testGetRepositoryWithoutEm($data, $class)
+    {
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue(null));
+
+        $this->doctrineHelper->getEntityRepository($data);
+    }
+
+    /**
+     * @param mixed $data
+     * @param string $class
+     *
+     * @dataProvider dataProvider
+     */
+    public function testGetRepository($data, $class)
+    {
+        $this->registry
+            ->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($class)
+            ->will($this->returnValue($this->em));
+
+        $repository = $this
+            ->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->em
+            ->expects($this->once())
+            ->method('getRepository')
+            ->with($class)
+            ->will($this->returnValue($repository));
+
+        $this->assertEquals(
+            $repository,
+            $this->doctrineHelper->getEntityRepository($data)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProvider()
+    {
+        return [
+            ['ItemStubProxy', 'ItemStubProxy'],
+            [new ItemStubProxy(), 'ItemStubProxy']
+        ];
     }
 }

@@ -1,3 +1,15 @@
+CHANGELOG for 1.4.1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.1 versions.
+* 1.4.1 (2014-11-17)
+ * List of improvements and fixed bugs
+ <ul><li>Refactor extended entity to prevent class name collisions</li>
+ <li>Implement form type guessers for custom fields of existing entities</li>
+ <li>Use route from config in email address link to avoid potential errors</li>
+ <li>Fixed duplicates of entities during magento import</li>
+ <li>Error in "oro_multiple_entity" if it's used without "default_element" option</li>
+ <li>Lost organization name after upgrade</li></ul>
+
 CHANGELOG for 1.4.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.4.0 versions.
