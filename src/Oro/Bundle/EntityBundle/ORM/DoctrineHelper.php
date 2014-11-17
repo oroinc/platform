@@ -186,15 +186,11 @@ class DoctrineHelper
     /**
      * @param string|object $entityOrClass
      * @return EntityRepository
-     * @throws Exception\NotManageableEntityException
      */
     public function getEntityRepository($entityOrClass)
     {
         $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
-            throw new Exception\NotManageableEntityException($entityClass);
-        }
+        $entityManager = $this->getEntityManager($entityClass);
 
         return $entityManager->getRepository($entityClass);
     }

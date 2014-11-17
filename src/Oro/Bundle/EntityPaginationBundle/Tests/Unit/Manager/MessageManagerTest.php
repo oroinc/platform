@@ -49,6 +49,19 @@ class MessageManagerTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $this->translator->expects($this->any())
+            ->method('transChoice')
+            ->will(
+                $this->returnCallback(
+                    function ($id, $count, array $parameters = []) {
+                        return str_replace(
+                            array_keys($parameters),
+                            array_values($parameters),
+                            $id . '.trans.' . $count
+                        );
+                    }
+                )
+            );
 
         $this->navigation =
             $this->getMockBuilder('Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation')
@@ -103,14 +116,14 @@ class MessageManagerTest extends \PHPUnit_Framework_TestCase
             'view with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_available.trans ' .
-                    'oro.entity_pagination.message.stats_number_view_12.trans',
+                    'oro.entity_pagination.message.stats_number_view_12_record|stats_number_view_12_records.trans.12',
                 'scope' => EntityPaginationManager::VIEW_SCOPE,
                 'count' => 12,
             ],
             'edit with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_available.trans ' .
-                    'oro.entity_pagination.message.stats_number_edit_23.trans',
+                    'oro.entity_pagination.message.stats_number_edit_23_record|stats_number_edit_23_records.trans.23',
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'count' => 23,
             ],
@@ -165,14 +178,14 @@ class MessageManagerTest extends \PHPUnit_Framework_TestCase
             'view with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_accessible.trans ' .
-                    'oro.entity_pagination.message.stats_number_view_12.trans',
+                    'oro.entity_pagination.message.stats_number_view_12_record|stats_number_view_12_records.trans.12',
                 'scope' => EntityPaginationManager::VIEW_SCOPE,
                 'count' => 12,
             ],
             'edit with count' => [
                 'expected' =>
                     'oro.entity_pagination.message.not_accessible.trans ' .
-                    'oro.entity_pagination.message.stats_number_edit_23.trans',
+                    'oro.entity_pagination.message.stats_number_edit_23_record|stats_number_edit_23_records.trans.23',
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'count' => 23,
             ],
@@ -239,29 +252,60 @@ class MessageManagerTest extends \PHPUnit_Framework_TestCase
                 'viewCount' => null
             ],
             'only view' => [
-                'expected' => 'oro.entity_pagination.message.stats_number_view_10.trans',
+                'expected' => null,
                 'scope' => EntityPaginationManager::VIEW_SCOPE,
                 'shown' => false,
                 'viewCount' => 10
             ],
             'only edit' => [
-                'expected' => 'oro.entity_pagination.message.stats_number_edit_10.trans',
+                'expected' => null,
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'shown' => false,
                 'viewCount' => null,
                 'editCount' => 10,
             ],
-            'view to edit equals' => [
-                'expected' => 'oro.entity_pagination.message.stats_number_edit_10.trans',
+            'view to edit equals view scope' => [
+                'expected' => null,
+                'scope' => EntityPaginationManager::VIEW_SCOPE,
+                'shown' => false,
+                'viewCount' => 10,
+                'editCount' => 10,
+            ],
+            'view to edit equals edit scope' => [
+                'expected' => null,
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'shown' => false,
                 'viewCount' => 10,
                 'editCount' => 10,
             ],
+            'edit to view increased' => [
+                'expected' =>
+                    'oro.entity_pagination.message.stats_number_view_5_record|stats_number_view_5_records.trans.5',
+                'scope' => EntityPaginationManager::VIEW_SCOPE,
+                'shown' => false,
+                'viewCount' => 5,
+                'editCount' => 10,
+            ],
+            'edit to view decreased' => [
+                'expected' =>
+                    'oro.entity_pagination.message.stats_number_view_10_record|stats_number_view_10_records.trans.10',
+                'scope' => EntityPaginationManager::VIEW_SCOPE,
+                'shown' => false,
+                'viewCount' => 10,
+                'editCount' => 5,
+            ],
+            'view to edit increased' => [
+                'expected' =>
+                    'oro.entity_pagination.message.stats_number_edit_10_record|stats_number_edit_10_records.trans.10',
+                'scope' => EntityPaginationManager::EDIT_SCOPE,
+                'shown' => false,
+                'viewCount' => 5,
+                'editCount' => 10,
+            ],
             'view to edit decreased' => [
                 'expected' =>
                     'oro.entity_pagination.message.stats_changed_view_to_edit.trans ' .
-                    'oro.entity_pagination.message.stats_number_edit_5.trans',
+                    'oro.entity_pagination.message.stats_number_edit_5_record|stats_number_edit_5_records.trans.5',
                 'scope' => EntityPaginationManager::EDIT_SCOPE,
                 'shown' => false,
                 'viewCount' => 10,
