@@ -182,13 +182,12 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                                     collection: this.options.collection,
                                     connectionsView: this.options.connectionsView,
                                     colorManager: this.options.colorManager,
-                                    actionSyncObject: this._actionSyncObject,
                                     closeContextMenu: closeContextMenu
                                 });
                             action.$el.one('click', '.action', _.bind(function (e) {
                                 if (this._initActionSyncObject()) {
                                     closeContextMenu();
-                                    action.execute(model);
+                                    action.execute(model, this._actionSyncObject);
                                 }
                             }, this));
                         }, this));

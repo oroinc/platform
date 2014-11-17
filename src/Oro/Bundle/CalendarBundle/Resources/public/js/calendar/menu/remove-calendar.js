@@ -12,10 +12,9 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
     return BaseView.extend({
         initialize: function (options) {
             this.connectionsView = options.connectionsView;
-            this.actionSyncObject = options.actionSyncObject;
         },
 
-        execute: function (model) {
+        execute: function (model, actionSyncObject) {
             var removingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...')),
                 $connection = this.connectionsView.findItem(model);
             try {
@@ -25,13 +24,13 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
                     success: _.bind(function () {
                         removingMsg.close();
                         messenger.notificationFlashMessage('success', __('The calendar was removed.'));
-                        this.actionSyncObject.resolve();
+                        actionSyncObject.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
                         removingMsg.close();
                         this._showError(__('Sorry, the calendar removing was failed'), response.responseJSON || {});
                         $connection.show();
-                        this.actionSyncObject.reject();
+                        actionSyncObject.reject();
                     }, this)
                 });
             } catch (err) {
