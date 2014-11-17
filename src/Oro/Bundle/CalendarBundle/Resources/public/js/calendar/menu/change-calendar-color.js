@@ -122,9 +122,10 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                 var savingMsg = messenger.notificationMessage('warning', __('Updating the calendar, please wait ...')),
                     $connection = this.connectionsView.findItem(this.model),
                     saveAttributes = {backgroundColor: color};
-                if (this.model.get('visible')) {
-                    this.connectionsView.setItemVisibility($connection, color);
+                if (!this.model.get('visible')) {
+                    saveAttributes.visible = true;
                 }
+                this.connectionsView.setItemVisibility($connection, color);
                 try {
                     this.model.save(saveAttributes, {
                         wait: true,
