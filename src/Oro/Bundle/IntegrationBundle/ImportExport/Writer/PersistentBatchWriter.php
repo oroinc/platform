@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -34,20 +36,26 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
     /** @var ContextRegistry */
     protected $contextRegistry;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param RegistryInterface        $registry
      * @param EventDispatcherInterface $eventDispatcher
      * @param ContextRegistry          $contextRegistry
+     * @param LoggerInterface          $logger
      */
     public function __construct(
         RegistryInterface $registry,
         EventDispatcherInterface $eventDispatcher,
-        ContextRegistry $contextRegistry
+        ContextRegistry $contextRegistry,
+        LoggerInterface $logger
     ) {
         $this->registry        = $registry;
         $this->eventDispatcher = $eventDispatcher;
         $this->contextRegistry = $contextRegistry;
         $this->ensureEntityManagerReady();
+        $this->logger = $logger;
     }
 
     /**
@@ -84,7 +92,8 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
             if ($event->getCouldBeSkipped()) {
                 $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
                 $importContext->incrementErrorEntriesCount();
-                $importContext->addError($event->getWarning());
+
+                $this->logger->warning($event->getWarning());
 
                 if ($event->getException() === $exception) {
                     // exception are already handled and job can move forward
