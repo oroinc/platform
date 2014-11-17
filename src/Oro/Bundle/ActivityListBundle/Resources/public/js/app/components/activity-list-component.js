@@ -120,7 +120,8 @@ define(function (require) {
          */
         onFilterStateChange: function () {
             this.list.collection.setFilter(this.getFilterState());
-            this.list.refresh();
+            this.list.collection.setPage(1);
+            this.list._reload();
         },
 
         /**

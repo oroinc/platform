@@ -58,7 +58,7 @@ define(function (require) {
              * on editing activity item listen to "widget_success:activity_list:item:update"
              */
             mediator.on('widget_success:activity_list:item:update', _.bind(function () {
-                this.refresh();
+                this._reload();
             }, this));
 
             ActivityListView.__super__.initialize.call(this, options);
@@ -207,6 +207,7 @@ define(function (require) {
                     reset: true,
                     success: _.bind(function () {
                         this._hideLoading();
+                        this._initPager();
                         this._initActionMenus();
                     }, this),
                     error: _.bind(function (collection, response) {
@@ -242,6 +243,7 @@ define(function (require) {
                         that._hideLoading();
 
                         currentModelView.toggle();
+                        that._initActionMenus();
                     })
                     .fail(_.bind(this._showLoadItemsError, this));
             } else {
