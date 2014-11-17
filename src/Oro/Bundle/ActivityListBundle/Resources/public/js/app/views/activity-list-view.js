@@ -83,19 +83,8 @@ define(function (require) {
         render: function () {
             ActivityListView.__super__.render.apply(this, arguments);
             this.$loadingMaskContainer = this.$('.loading-mask');
+            this._initActionMenus();
             return this;
-        },
-
-        expandAll: function () {
-            _.each(this.subviews, function (itemView) {
-                itemView.toggle(false);
-            });
-        },
-
-        collapseAll: function () {
-            _.each(this.subviews, function (itemView) {
-                itemView.toggle(true);
-            });
         },
 
         refresh: function () {
@@ -106,6 +95,15 @@ define(function (require) {
 
         filter: function () {
             this._filter();
+        },
+
+        _initActionMenus: function () {
+            jQuery('.activity-list a.dropdown-toggle').mouseover(function () {
+                jQuery(this).trigger('click');
+            });
+            jQuery('.activity-list .dropdown-menu').mouseleave(function () {
+                jQuery('a.dropdown-toggle', jQuery(this).parent()).trigger('click');
+            });
         },
 
         _initPager: function () {
@@ -209,6 +207,7 @@ define(function (require) {
                     reset: true,
                     success: _.bind(function () {
                         this._hideLoading();
+                        this._initActionMenus();
                     }, this),
                     error: _.bind(function (collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
