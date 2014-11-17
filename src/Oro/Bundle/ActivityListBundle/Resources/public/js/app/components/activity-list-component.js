@@ -15,6 +15,7 @@ define(function (require) {
         ActivityListView   = require('../views/activity-list-view'),
         ActivityModel      = require('../models/activity-list-model'),
         ActivityCollection = require('../models/activity-list-collection'),
+        //PaginationIntput   = require('orodatagrid/js/datagrid/pagination-input'),
         MultiSelectFilter  = require('oro/filter/multiselect-filter'),
         DatetimeFilter     = require('oro/filter/datetime-filter'),
         dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
@@ -173,24 +174,18 @@ define(function (require) {
                 widget.getAction('refresh', 'adopted', function (action) {
                     action.on('click', _.bind(list.refresh, list));
                 });
-                widget.getAction('more', 'bottom', function (action) {
-                    action.on('click', _.bind(list.more, list));
-                });
 
                 /**
                  * pager actions
                  */
-                widget.getAction('goto_first', 'bottom', function (action) {
-                    action.on('click', _.bind(list.goto_first, list));
-                });
-                widget.getAction('goto_next', 'bottom', function (action) {
-                    action.on('click', _.bind(list.goto_next, list));
-                });
                 widget.getAction('goto_previous', 'bottom', function (action) {
                     action.on('click', _.bind(list.goto_previous, list));
                 });
-                widget.getAction('goto_last', 'bottom', function (action) {
-                    action.on('click', _.bind(list.goto_last, list));
+                widget.getAction('goto_page', 'bottom', function (action) {
+                    action.on('change', _.bind(list.goto_page, {e: this, list: list}));
+                });
+                widget.getAction('goto_next', 'bottom', function (action) {
+                    action.on('click', _.bind(list.goto_next, list));
                 });
 
                 // render filters

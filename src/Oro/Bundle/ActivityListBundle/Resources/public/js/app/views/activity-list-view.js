@@ -83,19 +83,8 @@ define(function (require) {
         render: function () {
             ActivityListView.__super__.render.apply(this, arguments);
             this.$loadingMaskContainer = this.$('.loading-mask');
+            this._initActionMenus();
             return this;
-        },
-
-        expandAll: function () {
-            _.each(this.subviews, function (itemView) {
-                itemView.toggle(false);
-            });
-        },
-
-        collapseAll: function () {
-            _.each(this.subviews, function (itemView) {
-                itemView.toggle(true);
-            });
         },
 
         refresh: function () {
@@ -108,37 +97,23 @@ define(function (require) {
             this._filter();
         },
 
+        _initActionMenus: function () {
+            jQuery('.activity-list a.dropdown-toggle').mouseover(function () {
+                jQuery(this).trigger('click');
+            });
+            jQuery('.activity-list .dropdown-menu').mouseleave(function () {
+                jQuery('a.dropdown-toggle', jQuery(this).parent()).trigger('click');
+            });
+        },
+
         _initPager: function () {
             if (this.collection.getPageSize() < this.collection.getCount()) {
                 this._toggleNext(true);
-                jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             }
+            jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
+            jQuery('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
         },
 
-        goto_first: function () {
-            this.collection.setPage(1);
-
-            this._toggleNext(true);
-            this._togglePrevious();
-
-            this._setPageNumber();
-            this._reload();
-        },
-        goto_next: function () {
-            var currentPage = this.collection.getPage();
-            if (currentPage < this.collection.pager.total) {
-                var nextPage = currentPage + 1;
-                this.collection.setPage(nextPage);
-                if (nextPage == this.collection.pager.total) {
-                    this._toggleNext();
-                }
-
-                this._togglePrevious(true);
-
-                this._setPageNumber(nextPage);
-                this._reload();
-            }
-        },
         goto_previous: function () {
             var currentPage = this.collection.getPage();
             if (currentPage > 1) {
@@ -158,43 +133,70 @@ define(function (require) {
                 this._reload();
             }
         },
-        goto_last: function () {
-            var nextPage = this.collection.pager.total;
-            this.collection.setPage(nextPage);
 
-            this._togglePrevious(true);
-            this._toggleNext();
+        goto_page: function (e) {
+            var that = this.list,
+                currentPage = that.collection.getPage(),
+                maxPage = that.collection.pager.total,
+                nextPage = parseInt($(e.target).val());
 
-            this._setPageNumber(nextPage);
-            this._reload();
+            if (_.isNaN(nextPage) || nextPage <= 0 || nextPage > maxPage || nextPage == currentPage) {
+                $(e.target).val(currentPage);
+                return;
+            }
+
+            that._togglePrevious(true);
+            that._toggleNext(true);
+
+            if (nextPage == 1) {
+                that._togglePrevious();
+            }
+            if (nextPage == maxPage) {
+                that._toggleNext();
+            }
+
+            that.collection.setPage(nextPage);
+            that._setPageNumber(nextPage);
+            that._reload();
+        },
+
+        goto_next: function () {
+            var currentPage = this.collection.getPage();
+            if (currentPage < this.collection.pager.total) {
+                var nextPage = currentPage + 1;
+                this.collection.setPage(nextPage);
+                if (nextPage == this.collection.pager.total) {
+                    this._toggleNext();
+                } else {
+                    this._toggleNext(true);
+                }
+                this._togglePrevious(true);
+
+                this._setPageNumber(nextPage);
+                this._reload();
+            }
         },
 
         _setPageNumber: function (pageNumber) {
             if (_.isUndefined(pageNumber)) {
                 pageNumber = 1;
             }
-            jQuery('.activity-list-widget .pagination-current').html(pageNumber);
+            jQuery('.activity-list-widget .pagination-current').val(pageNumber);
         },
+
         _togglePrevious: function (enable) {
             if (_.isUndefined(enable)) {
-                //disable "first" & "previous"
-                jQuery('.activity-list-widget .pagination-first').addClass('disabled');
                 jQuery('.activity-list-widget .pagination-previous').addClass('disabled');
             } else {
-                //enable "first" & "previous"
-                jQuery('.activity-list-widget .pagination-first').removeClass('disabled');
                 jQuery('.activity-list-widget .pagination-previous').removeClass('disabled');
             }
         },
+
         _toggleNext: function (enable) {
             if (_.isUndefined(enable)) {
-                //disable "next" & "last"
                 jQuery('.activity-list-widget .pagination-next').addClass('disabled');
-                jQuery('.activity-list-widget .pagination-last').addClass('disabled');
             } else {
-                //enable "next" & "last"
                 jQuery('.activity-list-widget .pagination-next').removeClass('disabled');
-                jQuery('.activity-list-widget .pagination-last').removeClass('disabled');
             }
         },
 
@@ -205,6 +207,7 @@ define(function (require) {
                     reset: true,
                     success: _.bind(function () {
                         this._hideLoading();
+                        this._initActionMenus();
                     }, this),
                     error: _.bind(function (collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});

@@ -1,17 +1,15 @@
 @import "../../../oroui/css/less/mixins";
 .activity-list-widget {
-  //border: 1px solid #ddd;
   position: relative;
-  .actions-bottom{
+  .actions-bottom {
     border-top: 1px solid #ddd;
-    padding:10px;
   }
   .title {
     border-bottom: 1px solid #ddd;
   }
   .activity-list {
     position: relative;
-    .no-data{
+    .no-data {
       margin: 20px;
     }
     .list-box {
@@ -90,6 +88,9 @@
             content: '\f116';
           }
         }
+        .accordion-heading.collapse {
+          overflow: visible;
+        }
         .accordion-heading.in .message {
           display: none;
         }
@@ -101,7 +102,7 @@
           .message, .subject {
             display: none;
           }
-          .message .responsive-block{
+          .message .responsive-block {
             width: auto;
             float: none;
           }
@@ -131,12 +132,24 @@
       background: none;
       border: none;
       box-shadow: none;
-      right: 45px;
       top: -36px;
     }
     .filter-item {
       margin-bottom: 0px;
       margin-right: 2px;
+    }
+    .dropdown-menu{
+      padding: 1px 2px;
+      right: 30px;
+    }
+  }
+  .grid-toolbar {
+    padding: 0;
+    .pagination > ul > li a{
+      width:24px;
+      i {
+        margin: 0 3px;
+      }
     }
   }
 }

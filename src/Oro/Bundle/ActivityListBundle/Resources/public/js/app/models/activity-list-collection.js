@@ -37,21 +37,21 @@ define([
         },
 
         getPage: function () {
-            return this.pager.current;
+            return parseInt(this.pager.current);
         },
         setPage: function (page) {
             this.pager.current = page;
         },
 
         getPageSize: function () {
-            return this.pager.pagesize;
+            return parseInt(this.pager.pagesize);
         },
         setPageSize: function (pagesize) {
             this.pager.pagesize = pagesize;
         },
 
         getCount: function () {
-            return this.pager.count;
+            return parseInt(this.pager.count);
         },
         setCount: function (count) {
             this.pager.count = count;
@@ -61,7 +61,7 @@ define([
         },
 
         parse: function(response) {
-            this.setCount(response.count);
+            this.setCount(parseInt(response.count));
 
             return response.data;
         }
