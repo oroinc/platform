@@ -14,7 +14,7 @@ class ActivityListController extends SoapController
      * @Soap\Method("getActivityLists")
      * @Soap\Param("entityClass", phpType="string")
      * @Soap\Param("entityId", phpType="int")
-     * @Soap\Param("activityClasses", phpType="string")
+     * @Soap\Param("activityClasses", phpType="string[]")
      * @Soap\Param("dateFrom", phpType="string")
      * @Soap\Param("dateTo", phpType="string")
      * @Soap\Param("page", phpType="int")
@@ -45,7 +45,6 @@ class ActivityListController extends SoapController
         }
 
         if ($activityClasses) {
-            $activityClasses = explode(',', $activityClasses);
             foreach ($activityClasses as $activityClass) {
                 array_push($filterActivityClasses, $routingHelper->decodeClassName($activityClass));
             }
