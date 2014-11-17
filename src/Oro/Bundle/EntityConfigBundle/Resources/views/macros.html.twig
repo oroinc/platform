@@ -62,7 +62,7 @@
         {% endif %}
         {{ oro_image_view(entity, value, entityInfo, field_name) }}
     {% elseif item.value.raw is defined %}
-        {{ value }}
+        {{ value.title }}
     {% else %}
         {{ value|escape }}
     {% endif %}
