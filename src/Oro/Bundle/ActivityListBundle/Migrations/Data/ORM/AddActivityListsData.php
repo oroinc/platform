@@ -92,10 +92,13 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $accessor = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
             if ($ownerField && $organizationField) {
-                $this->setSecurityContext(
-                    $accessor->getValue($entity, $ownerField),
-                    $accessor->getValue($entity, $organizationField)
-                );
+                $owner = $accessor->getValue($entity, $ownerField);
+                if ($owner instanceof User) {
+                    $this->setSecurityContext(
+                        $owner,
+                        $accessor->getValue($entity, $organizationField)
+                    );
+                }
             }
             $manager->persist($provider->getActivityListEntitiesByActivityEntity($entity));
         }

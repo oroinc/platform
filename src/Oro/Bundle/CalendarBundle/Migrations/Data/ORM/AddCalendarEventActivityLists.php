@@ -1,35 +1,32 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
-
+namespace Oro\Bundle\CalendarBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
+
 use Oro\Bundle\ActivityListBundle\Migrations\Data\ORM\AddActivityListsData;
 
-class AddEmailActivityLists extends AddActivityListsData implements DependentFixtureInterface
+class AddCalendarEventActivityLists extends AddActivityListsData implements DependentFixtureInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getDependencies()
     {
-        return [
-            'Oro\Bundle\EmailBundle\Migrations\Data\ORM\LoadDashboardData'
-        ];
+        return ['Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'];
     }
 
-
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
         $this->addActivityListsForActivityClass(
             $manager,
-            'OroEmailBundle:Email',
-            'fromEmailAddress.owner',
-            'fromEmailAddress.owner.organization'
+            'OroCalendarBundle:CalendarEvent',
+            'calendar.owner',
+            'calendar.organization'
         );
     }
-}
+} 
