@@ -38,7 +38,6 @@
 }
 
 .calendars .media-body .user-calendar {
-    color:         #444 !important;
     display:       inline-block;
     font-size:     13px;
     font-weight:   bold;
@@ -48,6 +47,13 @@
     text-overflow: ellipsis;
     white-space:   nowrap;
     width:         80%;
+}
+
+.calendars .connection-item .user-calendar {
+    color: #999;
+}
+.calendars .connection-item.active .user-calendar {
+    color: #444;
 }
 
 .calendars .icons-holder .icons-holder-text [class^="icon-"] {
@@ -201,7 +207,7 @@
 
 .calendar-connections .context-menu-button {
     display: none;
-    color: #000;
+    color: #444;
 }
 
 .calendar-connections .connection-item:hover .context-menu-button {

@@ -50,7 +50,7 @@ define(['jquery', 'underscore', 'oroform/js/app/components/base-simple-color-pic
          * @inheritDoc
          */
         _addPickerHandlers: function () {
-            this.$parent.on('click' + '.' + this.cid, 'span.color', _.bind(function (e) {
+            this.$parent.on('click.' + this.cid, 'span.color', _.bind(function (e) {
                 e.preventDefault();
                 if (!this.$element.is(':disabled')) {
                     this.$current = $(e.currentTarget);
