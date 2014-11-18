@@ -4,6 +4,7 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\Common\Collections\Criteria;
@@ -27,32 +28,36 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     public function handleGetListRequest($page = 1, $limit = self::ITEMS_PER_PAGE, $filters = [])
     {
         $manager = $this->getManager();
-        $items = $manager->getList($limit, $page, $filters);
+        $qb      = $manager->getListQueryBuilder($limit, $page, $filters);
+        $items   = $qb->getQuery()->getResult(Query::HYDRATE_SIMPLEOBJECT);
 
-        $result = array();
+        $result = [];
         foreach ($items as $item) {
             $result[] = $this->getPreparedItem($item);
         }
         unset($items);
 
-        return $this->handleView($this->view($result, Codes::HTTP_OK));
+        return $this->buildResponse($result, ['result' => $result, 'query' => false, 'action' => self::ACTION_LIST]);
     }
 
     /**
      * GET single item
      *
-     * @param  mixed    $id
+     * @param  mixed $id
+     *
      * @return Response
      */
     public function handleGetRequest($id)
     {
-        $item = $this->getManager()->find($id);
+        $result = $this->getManager()->find($id);
 
-        if ($item) {
-            $item = $this->getPreparedItem($item);
+        $code = Codes::HTTP_NOT_FOUND;
+        if ($result) {
+            $result = $this->getPreparedItem($result);
+            $code   = Codes::HTTP_OK;
         }
 
-        return $this->handleView($this->view($item ?: null, $item ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND));
+        return $this->buildResponse($result, ['result' => $result, 'action' => self::ACTION_READ], $code);
     }
 
     /**
@@ -77,7 +82,8 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      * Prepare list of entities for serialization
      *
      * @param array $entities
-     * @param  array $resultFields If not empty, result item will contain only given fields.
+     * @param array $resultFields If not empty, result item will contain only given fields.
+     *
      * @return array
      */
     protected function getPreparedItems($entities, $resultFields = [])
@@ -86,6 +92,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         foreach ($entities as $entity) {
             $result[] = $this->getPreparedItem($entity, $resultFields);
         }
+
         return $result;
     }
 
@@ -230,33 +237,47 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function transformEntityField($field, &$value)
     {
         if ($value instanceof Proxy && method_exists($value, '__toString')) {
-            $value = (string) $value;
+            $value = (string)$value;
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
         }
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed|View $data
+     * @param array      $context
+     * @param int        $status Used only if data was given in raw format
+     *
+     * @return Response
      */
-    protected function handleView(View $view)
+    protected function buildResponse($data, $context = [], $status = Codes::HTTP_OK)
     {
-        // TODO BAP-6122 remove this code when FOSRestBundle version >= 1.4.2
-        $context = $view->getSerializationContext() ?: new SerializationContext();
+        if (!$data instanceof View) {
+            $headers = isset($context['headers']) ? $context['headers'] : [];
+            unset($context['headers']);
 
-        $groups = $this->container->getParameter('fos_rest.serializer.exclusion_strategy.groups');
-        if ($groups) {
-            $context->setGroups($groups);
+            $data = $this->view($data, $status, $headers);
         }
 
+        // TODO BAP-6122 remove this code when FOSRestBundle version >= 1.4.2
+        $serializationContext = $data->getSerializationContext() ?: new SerializationContext();
+        $groups               = $this->container->getParameter('fos_rest.serializer.exclusion_strategy.groups');
+        if ($groups) {
+            $serializationContext->setGroups($groups);
+        }
         $version = $this->container->getParameter('fos_rest.serializer.exclusion_strategy.version');
         if ($version) {
-            $context->setVersion($version);
+            $serializationContext->setVersion($version);
         }
 
-        $context->setSerializeNull(true);
-        $view->setSerializationContext($context);
+        $serializationContext->setSerializeNull(true);
+        $data->setSerializationContext($serializationContext);
 
-        return parent::handleView($view);
+        $response       = parent::handleView($data);
+        $includeHandler = $this->get('oro_soap.handler.include');
+
+        $includeHandler->handle($this, $context, $this->get('request'), $response);
+
+        return $response;
     }
 }

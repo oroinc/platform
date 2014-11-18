@@ -14,19 +14,21 @@ interface IncludeHandlerInterface
      * Is handler object supports "include request"
      *
      * @param object|EntityManagerAwareInterface|FormAwareInterface $object
+     * @param array                                                 $context
      *
      * @return bool
      */
-    public function supports($object);
+    public function supports($object, array $context);
 
     /**
      * Process "include request" and modify response object
      *
      * @param object|EntityManagerAwareInterface|FormAwareInterface $object
+     * @param array                                                 $context
      * @param Request                                               $request
      * @param Response                                              $response
      *
      * @return void
      */
-    public function handle($object, Request $request, Response $response);
+    public function handle($object, array $context, Request $request, Response $response);
 }

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\SoapBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass;
+use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\InlcudeHandlersPass;
 
 class OroSoapBundle extends Bundle
 {
@@ -17,5 +18,6 @@ class OroSoapBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new LoadPass());
+        $container->addCompilerPass(new InlcudeHandlersPass());
     }
 }

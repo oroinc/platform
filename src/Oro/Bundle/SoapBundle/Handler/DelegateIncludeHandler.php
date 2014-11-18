@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\SoapBundle\Handler;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DelegateHandler implements IncludeHandlerInterface
+class DelegateIncludeHandler implements IncludeHandlerInterface
 {
     const HEADER_INCLUDE     = 'X-Include';
     const HEADER_UNSUPPORTED = 'X-Include-Unsupported';
@@ -19,12 +19,17 @@ class DelegateHandler implements IncludeHandlerInterface
     /** @var ContainerInterface */
     protected $container;
 
+    /**
+     * @param ContainerInterface $container
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
 
     /**
+     * Collecting handlers that registered with oro_soap.include_handler tag
+     *
      * @param string $name
      * @param string $serviceId
      */
@@ -36,7 +41,7 @@ class DelegateHandler implements IncludeHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($object)
+    public function supports($object, array $context)
     {
         return true;
     }
@@ -44,7 +49,7 @@ class DelegateHandler implements IncludeHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle($object, Request $request, Response $response)
+    public function handle($object, array $context, Request $request, Response $response)
     {
         $processed        = [];
         $includeRequested = explode(self::DELIMITER, $response->headers->get(self::HEADER_INCLUDE));
@@ -54,8 +59,8 @@ class DelegateHandler implements IncludeHandlerInterface
         foreach ($known as $name) {
             $serviceId = $this->handlers[$name];
             $handler   = $this->container->get($serviceId);
-            if ($handler instanceof IncludeHandlerInterface && $handler->supports($object)) {
-                $handler->handle($object, $request, $response);
+            if ($handler instanceof IncludeHandlerInterface && $handler->supports($object, $context)) {
+                $handler->handle($object, $context, $request, $response);
                 $processed[] = $name;
             }
         }
