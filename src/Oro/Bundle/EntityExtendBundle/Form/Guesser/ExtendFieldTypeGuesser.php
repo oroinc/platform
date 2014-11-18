@@ -77,7 +77,7 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
         $isTypeNotExists = empty($this->typeMap[$fieldConfigId->getFieldType()]);
         $options         = $this->getOptions($extendConfig, $fieldConfigId);
 
-        if (!$this->isApplicableField($extendConfig) || $isTypeNotExists || empty($options)) {
+        if (!$this->isApplicableField($extendConfig) || $isTypeNotExists) {
             return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
         }
 
