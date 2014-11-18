@@ -86,4 +86,4 @@ class ActivityListFilterHelper
             $this->choiceFilter->apply($dataSourceAdapter, $typeForm->getData());
         }
     }
-} 
+}

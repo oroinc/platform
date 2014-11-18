@@ -97,4 +97,4 @@ class ActivityListFilterHelperTest extends \PHPUnit_Framework_TestCase
 
         $filter->addFiltersToQuery($qb, $filterData);
     }
-} 
+}

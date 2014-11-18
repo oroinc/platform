@@ -164,4 +164,4 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedDQL, $qb->getDQL());
         $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }
-} 
+}
