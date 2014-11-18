@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NoteBundle\Provider;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -41,6 +43,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     public function getRoutes()
     {
         return [
+            'itemView'   => 'oro_note_widget_info',
             'itemEdit'   => 'oro_note_update',
             'itemDelete' => 'oro_api_delete_note'
         ];
@@ -65,12 +68,18 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getData($entity)
+    public function getData(ActivityList $activityListEntity)
     {
-        /** @var Note $entity */
-        return [
-            'message' => $entity->getMessage()
-        ];
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganization($activityEntity)
+    {
+        /** @var $activityEntity Note */
+        return $activityEntity->getOrganization();
     }
 
     /**

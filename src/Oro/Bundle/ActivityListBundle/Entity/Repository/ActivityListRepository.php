@@ -24,22 +24,13 @@ class ActivityListRepository extends EntityRepository
     public function getActivityListQueryBuilder(
         $entityClass,
         $entityId,
-        $activityClasses = array(),
+        $activityClasses = [],
         $dateFrom = null,
         $dateTo = null,
         $orderField = 'updatedAt',
         $orderDirection = 'DESC'
     ) {
-        $associationName = ExtendHelper::buildAssociationName(
-            $entityClass,
-            ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
-        );
-
-        $qb = $this->createQueryBuilder('activity')
-            ->join('activity.' . $associationName, 'r')
-            ->where('r.id = :entityId')
-            ->setParameter('entityId', $entityId)
-            ->orderBy('activity.' . $orderField, $orderDirection);
+        $qb = $this->getBaseActivityListQueryBuilder($entityClass, $entityId, $orderField, $orderDirection);
 
         if ($activityClasses) {
             $qb->andWhere($qb->expr()->in('activity.relatedActivityClass', ':activityClasses'))
@@ -57,5 +48,30 @@ class ActivityListRepository extends EntityRepository
         }
 
         return $qb;
+    }
+
+    /**
+     * @param string  $entityClass
+     * @param integer $entityId
+     * @param string  $orderField
+     * @param string  $orderDirection
+     * @return QueryBuilder
+     */
+    public function getBaseActivityListQueryBuilder(
+        $entityClass,
+        $entityId,
+        $orderField = 'updatedAt',
+        $orderDirection = 'DESC'
+    ) {
+        $associationName = ExtendHelper::buildAssociationName(
+            $entityClass,
+            ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
+        );
+
+        return $this->createQueryBuilder('activity')
+            ->join('activity.' . $associationName, 'r')
+            ->where('r.id = :entityId')
+            ->setParameter('entityId', $entityId)
+            ->orderBy('activity.' . $orderField, $orderDirection);
     }
 }

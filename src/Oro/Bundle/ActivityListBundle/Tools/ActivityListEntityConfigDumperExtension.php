@@ -48,7 +48,8 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
         if ($actionType === ExtendConfigDumper::ACTION_PRE_UPDATE) {
             $targetEntityConfigs = $this->getTargetEntityConfigs();
 
-            return !empty($targetEntityConfigs);
+            return !empty($targetEntityConfigs)
+                && $this->configManager->getProvider('extend')->hasConfig(self::ENTITY_CLASS);
         }
 
         return false;

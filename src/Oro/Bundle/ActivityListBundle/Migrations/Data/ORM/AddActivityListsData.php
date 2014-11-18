@@ -7,8 +7,12 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 /**
@@ -37,30 +41,36 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
      *
      * @param ObjectManager $manager
      * @param string        $activityClass Activity class we need to add activity list data
+     * @param string        $ownerField
+     * @param string        $organizationField
      */
-    public function addActivityListsForActivityClass(ObjectManager $manager, $activityClass)
-    {
+    public function addActivityListsForActivityClass(
+        ObjectManager $manager,
+        $activityClass,
+        $ownerField = '',
+        $organizationField = ''
+    ) {
         if ($this->container->hasParameter('installed') && $this->container->getParameter('installed')) {
-            $provider = $this->container->get('oro_activity_list.provider.chain');
+            $provider     = $this->container->get('oro_activity_list.provider.chain');
             $queryBuilder = $manager->getRepository($activityClass)->createQueryBuilder('entity');
-            $iterator = new BufferedQueryResultIterator($queryBuilder);
+            $iterator     = new BufferedQueryResultIterator($queryBuilder);
             $iterator->setBufferSize(self::BATCH_SIZE);
 
             $itemsCount = 0;
-            $entities = [];
+            $entities   = [];
 
             foreach ($iterator as $entity) {
                 $entities[] = $entity;
                 $itemsCount++;
 
                 if (0 == $itemsCount % self::BATCH_SIZE) {
-                    $this->saveActivityLists($manager, $provider, $entities);
+                    $this->saveActivityLists($manager, $provider, $entities, $ownerField, $organizationField);
                     $entities = [];
                 }
             }
 
             if ($itemsCount % static::BATCH_SIZE > 0) {
-                $this->saveActivityLists($manager, $provider, $entities);
+                $this->saveActivityLists($manager, $provider, $entities, $ownerField, $organizationField);
             }
         }
     }
@@ -69,12 +79,40 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
      * @param ObjectManager             $manager
      * @param ActivityListChainProvider $provider
      * @param array                     $entities
+     * @param string                    $ownerField
+     * @param string                    $organizationField
      */
-    protected function saveActivityLists(ObjectManager $manager, ActivityListChainProvider $provider, $entities)
-    {
+    protected function saveActivityLists(
+        ObjectManager $manager,
+        ActivityListChainProvider $provider,
+        $entities,
+        $ownerField = '',
+        $organizationField = ''
+    ) {
+        $accessor = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
+            if ($ownerField && $organizationField) {
+                $owner = $accessor->getValue($entity, $ownerField);
+                if ($owner instanceof User) {
+                    $this->setSecurityContext(
+                        $owner,
+                        $accessor->getValue($entity, $organizationField)
+                    );
+                }
+            }
             $manager->persist($provider->getActivityListEntitiesByActivityEntity($entity));
         }
         $manager->flush();
+    }
+
+    /**
+     * @param User         $user
+     * @param Organization $organization
+     */
+    protected function setSecurityContext(User $user, Organization $organization)
+    {
+        $securityContext = $this->container->get('security.context');
+        $token           = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+        $securityContext->setToken($token);
     }
 }

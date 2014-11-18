@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActivityListBundle\EventListener;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\PersistentCollection;
 
@@ -37,7 +36,7 @@ class ActivityListListener
         DoctrineHelper $doctrineHelper
     ) {
         $this->activityListManager = $activityListManager;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrineHelper      = $doctrineHelper;
     }
 
     /**
@@ -48,7 +47,7 @@ class ActivityListListener
     public function onFlush(OnFlushEventArgs $args)
     {
         $entityManager = $args->getEntityManager();
-        $unitOfWork = $entityManager->getUnitOfWork();
+        $unitOfWork    = $entityManager->getUnitOfWork();
 
         $this->collectInsertedEntities($unitOfWork->getScheduledEntityInsertions());
         $this->collectUpdates($unitOfWork);
@@ -117,7 +116,7 @@ class ActivityListListener
         foreach ($updatedCollections as $hash => $collection) {
             /** @var $collection PersistentCollection */
             $ownerEntity = $collection->getOwner();
-            $entityHash = spl_object_hash($ownerEntity);
+            $entityHash  = spl_object_hash($ownerEntity);
             if ($this->activityListManager->isSupportedEntity($ownerEntity)
                 && $this->doctrineHelper->getSingleEntityIdentifier($ownerEntity) !== null
                 && empty($this->updatedEntities[$entityHash])

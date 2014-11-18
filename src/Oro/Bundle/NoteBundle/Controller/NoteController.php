@@ -65,6 +65,16 @@ class NoteController extends Controller
     }
 
     /**
+     * @Route("/widget/info/{id}", name="oro_note_widget_info", requirements={"id"="\d+"})
+     * @Template
+     * @AclAncestor("oro_note_view")
+     */
+    public function infoAction(Note $entity)
+    {
+        return array('entity' => $entity);
+    }
+
+    /**
      * @Route("/create/{entityClass}/{entityId}", name="oro_note_create")
      *
      * @Template("OroNoteBundle:Note:update.html.twig")
