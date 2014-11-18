@@ -129,8 +129,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
             }, this));
             this.$picker.on('click.' + this.cid, _.bind(function (e) {
                 if (!this.$element.is(':disabled')) {
-                    e.preventDefault();
-                    e.stopPropagation();
                     this.$picker.parent().find('.minicolors-panel').css(this._getPickerPos(this.$picker));
                     this.$picker.minicolors('show');
                 }
