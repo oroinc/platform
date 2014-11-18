@@ -12,21 +12,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
             '</div>'
         },
 
-        /** @property */
-        pickerActionsTemplate: null,
-
-        /** @property {jQuery} */
-        $element: null,
-
-        /** @property {jQuery} */
-        $parent: null,
-
-        /** @property {jQuery} */
-        $picker: null,
-
-        /** @property {jQuery} */
-        $current: null,
-
         /**
          * @constructor
          * @param {Object} options
@@ -58,10 +43,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          * @inheritDoc
          */
         dispose: function () {
-            if (!this.disposed && this.$element) {
-                this.$current = null;
-                this.$parent.off();
-                this.$picker.off();
+            if (!this.disposed) {
+                if (this.$element) {
+                    this.$element.simplecolorpicker('destroy');
+                }
+                if (this.$parent) {
+                    this.$parent.off('.' + this.cid);
+                }
+                if (this.$picker) {
+                    this.$picker.minicolors('destroy');
+                    this.$picker.off('.' + this.cid);
+                }
             }
             BaseSimpleColorPicker.__super__.dispose.call(this);
         },
@@ -93,7 +85,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
                     }
                 }, this),
                 hide: _.bind(function () {
-                    this.$current = null;
+                    if (this.$current) {
+                        delete this.$current;
+                    }
                 }, this)
             });
         },
@@ -120,7 +114,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          */
         _addPickerActions: function () {
             this.$picker.parent().find('.minicolors-panel').append(this.pickerActionsTemplate({__: __}));
-            this.$parent.on('click', 'button[data-action=cancel]', _.bind(function (e) {
+            this.$parent.on('click' + '.' + this.cid, 'button[data-action=cancel]', _.bind(function (e) {
                 e.preventDefault();
                 this.$picker.minicolors('hide');
             }, this));
@@ -130,12 +124,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/co
          * @private
          */
         _addPickerHandlers: function () {
-            this.$parent.on('click', 'span.color', _.bind(function (e) {
+            this.$parent.on('click' + '.' + this.cid, 'span.color', _.bind(function (e) {
                 if (!this.$element.is(':disabled')) {
                     this.$current = $(e.currentTarget);
                 }
             }, this));
-            this.$picker.on('click', _.bind(function (e) {
+            this.$picker.on('click' + '.' + this.cid, _.bind(function (e) {
                 if (!this.$element.is(':disabled')) {
                     this.$picker.parent().find('.minicolors-panel').css(this._getPickerPos(this.$picker));
                     this.$picker.minicolors('show');

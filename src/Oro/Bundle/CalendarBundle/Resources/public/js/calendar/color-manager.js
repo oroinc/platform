@@ -28,7 +28,7 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
 
         setCalendarColors: function (calendarId, backgroundColor) {
             this.calendarColors[calendarId] = {
-                color: colorUtil.getContrastColor(backgroundColor),
+                color: this.getContrastColor(backgroundColor),
                 backgroundColor: backgroundColor
             };
         },
@@ -46,12 +46,22 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
         applyColors: function (obj, getLastBackgroundColor) {
             if (_.isEmpty(obj.color) && _.isEmpty(obj.backgroundColor)) {
                 obj.backgroundColor = this._findNextColor(getLastBackgroundColor());
-                obj.color = colorUtil.getContrastColor(obj.backgroundColor);
+                obj.color = this.getContrastColor(obj.backgroundColor);
             } else if (_.isEmpty(obj.color)) {
-                obj.color = colorUtil.getContrastColor(this.defaultColor);
+                obj.color = this.getContrastColor(this.defaultColor);
             } else if (_.isEmpty(obj.backgroundColor)) {
                 obj.backgroundColor = this.defaultColor;
             }
+        },
+
+        /**
+         * Calculates contrast color
+         *
+         * @param {string} hex A color in six-digit hexadecimal form.
+         * @returns {string}
+         */
+        getContrastColor: function (hex) {
+            return colorUtil.getContrastColor(hex);
         },
 
         _findColor: function (color) {

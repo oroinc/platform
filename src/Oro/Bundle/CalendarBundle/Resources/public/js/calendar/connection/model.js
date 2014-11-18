@@ -13,6 +13,15 @@ define(['underscore', 'backbone', 'routing'
         route: 'oro_api_post_calendar_connection',
         urlRoot: null,
 
+        /**
+         * This property can be used to indicate whether calendar events
+         * should be reloaded or not after a calendar connection is changed.
+         * To force events reloading set this property to true.
+         * To prohibit events reloading set this property to false.
+         * @property
+         */
+        reloadEventsRequest: null,
+
         defaults: {
             id: null,
             targetCalendar: null,

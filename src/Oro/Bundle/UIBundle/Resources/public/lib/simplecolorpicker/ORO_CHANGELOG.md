@@ -9,3 +9,4 @@ Changes in BAP 1.5.0
 * Allow to apply the picker to INPUT element.
 * Add `table` option to allow using this control to edit any color in the list.
 * Add contrast color for Ok/check mark.
+* Modify `selectColor` method to allow to remove selection.
