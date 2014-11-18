@@ -1,8 +1,9 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
-], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field', 'oroui/js/mediator'
+], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter,
+        mediator) {
     'use strict';
 
     var $ = Backbone.$;
@@ -101,6 +102,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 defaultOptions
             ));
             this.eventDialog.render();
+            if (this.model.isNew()) {
+                mediator.execute('layout:init', this.eventDialog.widget);
+            }
 
             // subscribe to 'delete event' event
             this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
