@@ -74,4 +74,21 @@ class ActivityListRepository extends EntityRepository
             ->setParameter('entityId', $entityId)
             ->orderBy('activity.' . $orderField, $orderDirection);
     }
+
+    /**
+     * Delete activity lists by related activity data
+     * @param $class
+     * @param $id
+     */
+    public function deleteActivityListsByRelatedActivityData($class, $id)
+    {
+        $this->createQueryBuilder('list')
+            ->delete()
+            ->where('list.relatedActivityClass = :relatedActivityClass')
+            ->andWhere('list.relatedActivityId = :relatedActivityId')
+            ->setParameter('relatedActivityClass', $class)
+            ->setParameter('relatedActivityId', $id)
+            ->getQuery()
+            ->execute();
+    }
 }

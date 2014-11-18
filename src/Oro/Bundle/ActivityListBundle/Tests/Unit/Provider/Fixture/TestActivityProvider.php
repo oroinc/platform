@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -10,11 +11,18 @@ class TestActivityProvider implements ActivityListProviderInterface
 {
     const ACTIVITY_CLASS_NAME = 'Test\Entity';
 
+    protected $targets;
+
     /**
      * {@inheritdoc}
      */
     public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
     {
+        if ($configId->getClassName() === 'Acme\\DemoBundle\\Entity\\CorrectEntity') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -23,13 +31,6 @@ class TestActivityProvider implements ActivityListProviderInterface
     public function getSubject($entity)
     {
         return $entity->subject;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getData($entity)
-    {
     }
 
     /**
@@ -73,6 +74,26 @@ class TestActivityProvider implements ActivityListProviderInterface
      * {@inheritdoc}
      */
     public function getTargetEntities($entity)
+    {
+        return $this->targets;
+    }
+
+    public function setTargets($targets)
+    {
+        $this->targets = $targets;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData(ActivityList $activityListEntity)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganization($activityEntity)
     {
     }
 }

@@ -5,7 +5,8 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class ActivityListTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,6 +54,8 @@ class ActivityListTest extends \PHPUnit_Framework_TestCase
             ['relatedActivityId', 123],
             ['updatedAt', new \DateTime('now')],
             ['createdAt', new \DateTime('now')],
+            ['owner', new User()],
+            ['editor', new User()],
             ['organization', new Organization()]
         ];
     }

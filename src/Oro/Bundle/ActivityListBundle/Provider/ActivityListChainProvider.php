@@ -52,6 +52,8 @@ class ActivityListChainProvider
     }
 
     /**
+     * Add activity list provider
+     *
      * @param ActivityListProviderInterface $provider
      */
     public function addProvider(ActivityListProviderInterface $provider)
@@ -60,6 +62,8 @@ class ActivityListChainProvider
     }
 
     /**
+     * Get array with all target classes (entities where activity can be assigned to)
+     *
      * @return array
      */
     public function getTargetEntityClasses()
@@ -104,6 +108,8 @@ class ActivityListChainProvider
     }
 
     /**
+     * Returns new activity list entity for given activity
+     *
      * @param object $activityEntity
      *
      * @return ActivityList
@@ -116,6 +122,8 @@ class ActivityListChainProvider
     }
 
     /**
+     * Returns updated activity list entity for given activity
+     *
      * @param object        $entity
      * @param EntityManager $entityManager
      *
@@ -227,7 +235,7 @@ class ActivityListChainProvider
 
         $targets = $provider->getTargetEntities($entity);
         foreach ($targets as $target) {
-            if ($list->supportActivityListTarget(get_class($target))) {
+            if ($list->supportActivityListTarget($this->doctrineHelper->getEntityClass($target))) {
                 $list->addActivityListTarget($target);
             }
         }
