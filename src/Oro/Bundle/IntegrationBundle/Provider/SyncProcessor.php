@@ -200,61 +200,60 @@ class SyncProcessor
         /** @var ContextInterface $contexts */
         $context = $jobResult->getContext();
 
-        $counts = [];
+        $counts = array_fill_keys(['process', 'read', 'update', 'delete', 'add'], 0);
+        $connectorData = [];
         if ($context) {
-            $counts['process'] = $counts['warnings'] = 0;
-            $counts['read']    = $context->getReadCount();
+            $counts['read'] = $context->getReadCount();
             $counts['process'] += $counts['add'] = $context->getAddCount();
             $counts['process'] += $counts['update'] = $context->getUpdateCount();
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
+            $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
         }
 
-        $exceptions    = $jobResult->getFailureExceptions();
-        $isSuccess     = $jobResult->isSuccessful() && empty($exceptions);
-        $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
-        $status        = new Status();
+        $exceptions = $jobResult->getFailureExceptions();
+        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
+
+        $status = new Status();
         $status->setConnector($connector);
+        $status->setData(is_array($connectorData) ? $connectorData : []);
 
-        if (is_array($connectorData)) {
-            $status->setData($connectorData);
-        }
+        $message = sprintf(
+            "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
+            $counts['read'],
+            $counts['process'],
+            $counts['update'],
+            $counts['add'],
+            $counts['delete'],
+            $context->getErrorEntriesCount()
+        );
+        $this->logger->info($message);
 
         if (!$isSuccess) {
             $this->logger->error('Errors were occurred:');
             $exceptions = implode(PHP_EOL, $exceptions);
-            $this->logger->error(
-                $exceptions,
-                ['exceptions' => $jobResult->getFailureExceptions()]
-            );
+
+            $this->logger->error($exceptions);
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         } else {
-            $message = '';
+            $warningsText = PHP_EOL;
+
             if ($context->getErrors()) {
-                $message = 'Some entities were skipped due to warnings:';
+                $warningsText .= 'Some entities were skipped due to warnings:' . PHP_EOL;
                 foreach ($context->getErrors() as $error) {
-                    $message .= $error . PHP_EOL;
+                    $warningsText .= $error . PHP_EOL;
                 }
 
-                $this->logger->warning($message);
+                $this->logger->warning($warningsText);
             }
 
-            $message .= sprintf(
-                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
-                $counts['read'],
-                $counts['process'],
-                $counts['update'],
-                $counts['add'],
-                $counts['delete'],
-                $context->getErrorEntriesCount()
-            );
-            $this->logger->info($message);
-
-            $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
+            $status->setCode(Status::STATUS_COMPLETED)->setMessage($message . $warningsText);
         }
+
         if ($saveStatus) {
             $this->doctrineRegistry
                 ->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($integration, $status);
+
             if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
                 $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
             }

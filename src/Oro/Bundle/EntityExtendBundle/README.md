@@ -317,7 +317,46 @@ To reload all cached data just run this command without `--no-warmup` option.
 
 Custom form type and options
 ---------------------
+
 To configure custom form type and options for extended field, read [Custom form type and options](Resources/doc/custom_form_type.md)
+
+Validation for extended fields
+---------------------
+By default all extended fields are not validated. In general extended fields rendered as usual forms, same way as not extended,
+but there's a way to define validation constraints for all extended fields by their type.
+This is done through the configuration of oro_entity_extend.validation_loader:
+
+```yaml
+    oro_entity_extend.validation_loader:
+        class: %oro_entity_extend.validation_loader.class%
+        public: false
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.form
+        calls:
+            -
+                - addConstraints
+                -
+                    - integer
+                    -
+                        - NotNull: ~
+                        - Regex:
+                            pattern: "/^[\d+]*$/"
+                            message: "This value should contain only numbers."
+
+            - [addConstraints, ["boolean", [{ NotBlank: ~ }]]]
+```
+
+To pass constraints there are two ways:
+- use compiler pass to add 'addConstraints' call with necessary constraint configuration
+- directly call service
+
+Pay attention to the fact that all constraints defined here applied to all extended fields with corresponding type.
+
+Another point to keep in mind - integer fields should be rendered as text. Because html5 validation works only in case 
+when form submitted directly by user, and platform use javascript to submit forms. 
+Platform relates on jQuery validation, but due to the nature of input[type=number] - it's not possible to get it's raw value when it's not number.
+
 
 Extend Fields View
 ---------------------
@@ -356,3 +395,4 @@ In this code we:
 - calculate field view value and set it using `$event->setFieldViewValue($viewData);` 
 
 In variable `$viewData` can be simple string or array `[ 'link' => 'example.com', 'title' => 'some text representation']`. In case of string it will be formatted in twig template automatically based on field type. In case of array we show field with text equal to `'title'`. Also title will be escaped. If `'link'` option exists we show field as link with href equal to `'link'` option value.
+

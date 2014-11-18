@@ -17,7 +17,8 @@ define([
     PinComponent = BaseBookmarkComponent.extend({
         listen: {
             'add collection': 'onAdd',
-            'remove collection': 'onRemove'
+            'remove collection': 'onRemove',
+            'pagestate:change mediator': 'onPageStateChange'
         },
 
         _createSubViews: function () {
@@ -123,6 +124,18 @@ define([
             if (mediator.execute('compareUrl', model.get('url'))) {
                 // remove 'restore' param from URL, if pin was removed for current page
                 mediator.execute('changeUrlParam', 'restore', null);
+            }
+        },
+
+        onPageStateChange: function () {
+            var model, url;
+            model = this.collection.getCurrentModel();
+            if (model) {
+                url = mediator.execute('currentUrl');
+                if (model.get('url') !== url) {
+                    model.set('url', url);
+                    model.save();
+                }
             }
         }
     });
