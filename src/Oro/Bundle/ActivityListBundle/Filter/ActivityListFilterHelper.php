@@ -83,8 +83,7 @@ class ActivityListFilterHelper
             if (!$typeForm->isSubmitted()) {
                 $typeForm->submit($filterData['activityType']);
             }
-            $data = $typeForm->getData();
-            $this->choiceFilter->apply($dataSourceAdapter, $data);
+            $this->choiceFilter->apply($dataSourceAdapter, $typeForm->getData());
         }
     }
 } 
