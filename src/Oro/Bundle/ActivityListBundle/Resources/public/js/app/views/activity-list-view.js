@@ -55,6 +55,13 @@ define(function (require) {
             this.template = _.template($(this.options.template).html());
 
             /**
+             * on adding activity item listen to "widget:doRefresh:activity-list-widget"
+             */
+            mediator.on('widget:doRefresh:activity-list-widget', _.bind(function () {
+                this._reload();
+            }, this));
+
+            /**
              * on editing activity item listen to "widget_success:activity_list:item:update"
              */
             mediator.on('widget_success:activity_list:item:update', _.bind(function () {
@@ -93,16 +100,14 @@ define(function (require) {
             this._reload();
         },
 
-        filter: function () {
-            this._filter();
-        },
-
         _initActionMenus: function () {
-            jQuery('.activity-list a.dropdown-toggle').mouseover(function () {
+            jQuery('.activity-list .dropdown-toggle').unbind('mouseover');
+            jQuery('.activity-list .dropdown-toggle').bind('mouseover', function () {
                 jQuery(this).trigger('click');
             });
-            jQuery('.activity-list .dropdown-menu').mouseleave(function () {
-                jQuery('a.dropdown-toggle', jQuery(this).parent()).trigger('click');
+            jQuery('.activity-list .dropdown-menu').unbind('mouseleave');
+            jQuery('.activity-list .dropdown-menu').bind('mouseleave', function () {
+                jQuery('.dropdown-toggle', jQuery(this).parent()).trigger('click');
             });
         },
 
@@ -207,8 +212,8 @@ define(function (require) {
                     reset: true,
                     success: _.bind(function () {
                         this._hideLoading();
-                        this._initPager();
                         this._initActionMenus();
+                        this._initPager();
                     }, this),
                     error: _.bind(function (collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
