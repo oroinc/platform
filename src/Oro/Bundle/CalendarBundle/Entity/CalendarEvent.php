@@ -60,12 +60,32 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  */
 class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
 {
+    const NOT_RESPONDED        = 'not responded';
+    const TENTATIVELY_ACCEPTED = 'tentatively accepted';
+    const ACCEPTED             = 'accepted';
+    const DECLINED             = 'declined';
+
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent")
+     **/
+    protected $children;
+
+    /**
+     * @var CalendarEvent
+     *
+     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="children")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     **/
+    protected $parent;
 
     /**
      * @var Calendar
@@ -185,11 +205,26 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     protected $updatedAt;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="invitation", type="string")
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $invitation;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->reminders = new ArrayCollection();
+        $this->children  = new ArrayCollection();
     }
 
     /**
@@ -381,6 +416,103 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
         $result->setRecipient($this->getCalendar()->getOwner());
 
         return $result;
+    }
+
+    /**
+     * Get children calendar events
+     *
+     * @return Collection|CalendarEvent[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+    /**
+     * Set children calendar events.
+     *
+     * @param Collection|CalendarEvent[] $calendarEvents
+     *
+     * @return CalendarEvent
+     */
+    public function resetChildren($calendarEvents)
+    {
+        $this->children->clear();
+
+        foreach ($calendarEvents as $calendarEvent) {
+            $this->addChildCalendarEvent($calendarEvent);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add child calendar event
+     *
+     * @param CalendarEvent $calendarEvent
+     *
+     * @return CalendarEvent
+     */
+    public function addChildCalendarEvent(CalendarEvent $calendarEvent)
+    {
+        if (!$this->children->contains($calendarEvent)) {
+            $this->children->add($calendarEvent);
+            $calendarEvent->setParent($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove child calendar event
+     *
+     * @param CalendarEvent $calendarEvent
+     *
+     * @return CalendarEvent
+     */
+    public function removeChildCalendarEvent(CalendarEvent $calendarEvent)
+    {
+        if ($this->children->contains($calendarEvent)) {
+            $this->children->removeElement($calendarEvent);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set parent calendar event.
+     *
+     * @param CalendarEvent $parent
+     */
+    public function setParent(CalendarEvent $parent = null)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * Get parent calendar event.
+     *
+     * @return CalendarEvent
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInvitation()
+    {
+        return $this->invitation;
+    }
+
+    /**
+     * @param string $invitation
+     */
+    public function setInvitation($invitation)
+    {
+        $this->invitation = $invitation;
     }
 
     /**
