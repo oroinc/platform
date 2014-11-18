@@ -21,58 +21,68 @@
     {% set fieldValue = item.value %}
     {% if fieldValue is iterable %}
         {% if fieldValue.values is defined %}
+
             {% for value in fieldValue.values %}
-                {{ _self.renderLinkIfDefined(value) }}
+                {{ _self.renderField(value) }}
                 {% if not loop.last %}
                     ,&nbsp;
                 {% endif %}
+            {% else %}
+                {{ 'N/A'|trans }}
             {% endfor %}
         {% else %}
-            {{ _self.renderLinkIfDefined(fieldValue) }}
+            {{ _self.renderField(fieldValue) }}
         {% endif %}
     {% else %}
-        {{ _self.resolveSimpleTypes(entity, entity_class, field_name, item) }}
+        {{ _self.renderFormatted(entity, entity_class, field_name, item) }}
     {% endif %}
-
 {% endmacro %}
 
-{% macro resolveSimpleTypes(entity, entity_class, field_name, item) %}
+{% macro renderFormatted(entity, entity_class, field_name, item) %}
     {% set value = item.value %}
     {% set type  = item.type %}
 
     {% if type == 'text' %}
-        {{ value|escape|nl2br }}
+        {% set value = value|escape|nl2br %}
     {% elseif type == 'boolean' %}
-        {{ value ? 'Yes'|trans : 'No'|trans }}
+        {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}
-        {{ value ? value | oro_format_currency : null }}
+        {% set value = value ? value | oro_format_currency : null %}
     {% elseif type == 'percent' %}
-        {{ value ? value | oro_format_percent : null }}
+        {% set value = value ? value | oro_format_percent : null %}
     {% elseif type == 'date' %}
-        {{ value ? value | oro_format_date : null }}
+        {% set value = value ? value | oro_format_date : null %}
     {% elseif type == 'datetime' %}
-        {{ value ? value | oro_format_datetime : null }}
+        {% set value = value ? value | oro_format_datetime : null %}
     {% elseif type == 'file' %}
-        {{ oro_file_view(entity, field_name, value) }}
+        {% set value %}
+            {{ oro_file_view(entity, field_name, value) }}
+        {% endset %}
     {% elseif type == 'image' %}
         {% if entity_class is null %}
             {% set entityInfo = entity %}
         {% else %}
             {% set entityInfo = entity_class %}
         {% endif %}
-        {{ oro_image_view(entity, value, entityInfo, field_name) }}
-    {% elseif item.value.raw is defined %}
-        {{ value.title }}
+        {% set value %}
+            {{ oro_image_view(entity, value, entityInfo, field_name) }}
+        {% endset %}
     {% else %}
-        {{ value|escape }}
+        {% set value = value|escape %}
     {% endif %}
+
+    {{ value|default('N/A'|trans) }}
 {% endmacro %}
 
-{% macro renderLinkIfDefined(value) %}
+{% macro renderField(value) %}
     {% import 'OroUIBundle::macros.html.twig' as ui %}
 
-    {% if value.link is defined and value.link != false  %}
+    {% if value.template is defined %}
+        {{ include(value.template, { data: value}) }}
+    {% elseif value.link is defined and value.link != false  %}
         {{ ui.renderUrl(value.link, value.title) }}
+    {% elseif value.raw is defined %}
+        {{ value.title|raw }}
     {% else %}
         {{ value.title|escape }}
     {% endif %}
