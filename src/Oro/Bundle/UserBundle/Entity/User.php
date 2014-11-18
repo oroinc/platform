@@ -452,6 +452,13 @@ class User extends ExtendUser implements
      * @ORM\OneToMany(targetEntity="Email", mappedBy="user", orphanRemoval=true, cascade={"persist"})
      */
     protected $emails;
+    
+    /**
+     * @var Phone[]|ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Phone", mappedBy="user", orphanRemoval=true, cascade={"persist"})
+     */
+    protected $phones;
 
     /**
      * @var Tag[]
@@ -552,6 +559,7 @@ class User extends ExtendUser implements
         $this->groups        = new ArrayCollection();
         $this->statuses      = new ArrayCollection();
         $this->emails        = new ArrayCollection();
+        $this->phones        = new ArrayCollection();
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins  = new ArrayCollection();
         $this->organizations = new ArrayCollection();
@@ -621,6 +629,17 @@ class User extends ExtendUser implements
     public function getEmailFields()
     {
         return ['email'];
+    }
+
+    /**
+     * Get names of fields contain phone numbers
+     *
+     * @return string[]|null
+     */
+    
+    public function getPhoneFields()
+    {
+        return ['phone'];
     }
 
     /**
@@ -1442,6 +1461,46 @@ class User extends ExtendUser implements
     public function removeEmail(Email $email)
     {
         $this->emails->removeElement($email);
+
+        return $this;
+    }
+    
+    /**
+     * Get User Phones
+     *
+     * @return Phone[]
+     */
+    public function getPhones()
+    {
+        return $this->phones;
+    }
+
+    /**
+     * Add Phone to User
+     *
+     * @param  Phone $phone
+     *
+     * @return User
+     */
+    public function addPhone(Phone $phone)
+    {
+        $this->phone[] = $phone;
+
+        $phone->setUser($this);
+
+        return $this;
+    }
+
+    /**
+     * Delete Phone from User
+     *
+     * @param  Phone $phone
+     *
+     * @return User
+     */
+    public function removePhone(Phone $phone)
+    {
+        $this->phones->removeElement($phone);
 
         return $this;
     }
