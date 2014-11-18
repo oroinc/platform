@@ -208,7 +208,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="invitation", type="string")
+     * @ORM\Column(name="invitation_status", type="string")
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -217,7 +217,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *      }
      * )
      */
-    protected $invitation;
+    protected $invitationStatus;
 
     public function __construct()
     {
@@ -502,17 +502,17 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @return string
      */
-    public function getInvitation()
+    public function getInvitationStatus()
     {
-        return $this->invitation;
+        return $this->invitationStatus;
     }
 
     /**
-     * @param string $invitation
+     * @param string $invitationStatus
      */
-    public function setInvitation($invitation)
+    public function setInvitationStatus($invitationStatus)
     {
-        $this->invitation = $invitation;
+        $this->invitationStatus = $invitationStatus;
     }
 
     /**
