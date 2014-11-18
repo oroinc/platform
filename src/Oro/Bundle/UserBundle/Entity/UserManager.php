@@ -146,6 +146,17 @@ class UserManager implements UserProviderInterface
     }
 
     /**
+     * Finds a user by phone
+     *
+     * @param  string $phone
+     * @return User
+     */
+    public function findUserByPhone($phone)
+    {
+        return $this->findUserBy(array('phone' => $phone));
+    }
+
+    /**
      * Finds a user by username
      *
      * @param  string $username
