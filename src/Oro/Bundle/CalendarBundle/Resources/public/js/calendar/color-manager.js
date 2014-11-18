@@ -64,36 +64,42 @@ define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
             return colorUtil.getContrastColor(hex);
         },
 
-        _findColor: function (color) {
-            if (_.isEmpty(color)) {
-                return this._findColor(this.defaultColor);
-            }
-            color = color.toUpperCase();
-            var result = _.find(this.colors, function (clr) { return clr === color; });
-            if (_.isUndefined(result)) {
-                result = this._findColor(this.defaultColor);
-            }
-            return result;
-        },
-
-        _findNextColor: function (color) {
-            if (_.isEmpty(color)) {
-                return this._findColor(this.defaultColor);
-            }
-            color = color.toUpperCase();
+        _findColorIndex: function (color) {
             var i = -1;
             _.each(this.colors, function (clr, index) {
                 if (clr === color) {
                     i = index;
                 }
             });
+            return i;
+        },
+
+        _findNextColor: function (color) {
+            if (_.isEmpty(color)) {
+                return this.defaultColor;
+            }
+            color = color.toUpperCase();
+            var i = this._findColorIndex(color);
             if (i === -1) {
-                return this._findColor(this.defaultColor);
+                i = this._findColorIndex(this.defaultColor);
             }
-            if ((i + 1) === _.size(this.colors)) {
-                return _.first(this.colors);
+            var unusedColors = _.difference(this.colors, _.pluck(this.calendarColors, 'backgroundColor'));
+            if (unusedColors.length > 0) {
+                //find unused color to end of color list
+                for (var j=i+1; j < this.colors.length; j++) {
+                    if (_.indexOf(unusedColors, this.colors[j]) !== -1) {
+                        return this.colors[j];
+                    }
+                }
+                //find unused color from start of color list to current color
+                for (j=0; j < i+1; j++) {
+                    if (_.indexOf(unusedColors, this.colors[j]) !== -1) {
+                        return this.colors[j];
+                    }
+                }
             }
-            return this.colors[i + 1];
+            //get next color from list because all colors was used
+            return this.colors[i+1];
         }
     };
 
