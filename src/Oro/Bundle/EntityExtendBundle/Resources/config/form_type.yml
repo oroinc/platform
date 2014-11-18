@@ -241,7 +241,7 @@ services:
             - @oro_entity_config.provider.enum
         calls:
             - [addExtendTypeMapping, ["string", "text"]]
-            - [addExtendTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addExtendTypeMapping, ["integer", "text"]] # integers should be text to make validation work
             - [addExtendTypeMapping, ["smallint", "integer", { precision: 0 }]]
             - [addExtendTypeMapping, ["bigint", "integer", { precision: 0 }]]
             - [addExtendTypeMapping, ["decimal", "number"]]
