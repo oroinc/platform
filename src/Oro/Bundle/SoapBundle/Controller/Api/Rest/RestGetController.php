@@ -15,6 +15,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
+use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
@@ -36,7 +37,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
         unset($items);
 
-        return $this->buildResponse($result, ['result' => $result, 'query' => $qb, 'action' => self::ACTION_LIST]);
+        return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
     }
 
     /**
@@ -56,7 +57,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
             $code   = Codes::HTTP_OK;
         }
 
-        return $this->buildResponse($result, ['result' => $result, 'action' => self::ACTION_READ], $code);
+        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], $code);
     }
 
     /**
@@ -244,24 +245,25 @@ abstract class RestGetController extends FOSRestController implements EntityMana
 
     /**
      * @param mixed|View $data
-     * @param array      $context
+     * @param string     $action
+     * @param array      $contextValues
      * @param int        $status Used only if data was given in raw format
      *
      * @return Response
      */
-    protected function buildResponse($data, $context = [], $status = Codes::HTTP_OK)
+    protected function buildResponse($data, $action, $contextValues = [], $status = Codes::HTTP_OK)
     {
         if ($data instanceof View) {
             $response = parent::handleView($data);
         } else {
-            $headers = isset($context['headers']) ? $context['headers'] : [];
-            unset($context['headers']);
+            $headers = isset($contextValues['headers']) ? $contextValues['headers'] : [];
+            unset($contextValues['headers']);
 
             $response = new JsonResponse($data, $status, $headers);
         }
 
         $includeHandler = $this->get('oro_soap.handler.include');
-        $includeHandler->handle($this, $context, $this->get('request'), $response);
+        $includeHandler->handle(new Context($this, $this->get('request'), $response, $action, $contextValues));
 
         return $response;
     }

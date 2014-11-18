@@ -40,7 +40,7 @@ abstract class RestController extends RestGetController implements
             $view = $this->view(null, Codes::HTTP_NOT_FOUND);
         }
 
-        return $this->buildResponse($view, ['id' => $id, 'entity' => $entity, 'action' => self::ACTION_UPDATE]);
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
     }
 
     /**
@@ -61,10 +61,7 @@ abstract class RestController extends RestGetController implements
             $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
         }
 
-        return $this->buildResponse(
-            $view,
-            ['success' => $isProcessed, 'entity' => $entity, 'action' => self::ACTION_CREATE]
-        );
+        return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
     }
 
     /**
@@ -88,17 +85,20 @@ abstract class RestController extends RestGetController implements
      */
     public function handleDeleteRequest($id)
     {
+        $isProcessed = false;
+
         try {
             $this->getDeleteHandler()->handleDelete($id, $this->getManager());
 
-            $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+            $isProcessed = true;
+            $view        = $this->view(null, Codes::HTTP_NO_CONTENT);
         } catch (EntityNotFoundException $notFoundEx) {
             $view = $this->view(null, Codes::HTTP_NOT_FOUND);
         } catch (ForbiddenException $forbiddenEx) {
             $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
         }
 
-        return $this->buildResponse($view, ['id' => $id]);
+        return $this->buildResponse($view, self::ACTION_DELETE, ['id' => $id, 'success' => $isProcessed]);
     }
 
     /**

@@ -5,9 +5,6 @@ namespace Oro\Bundle\SoapBundle\Handler;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestApiReadInterface;
@@ -31,19 +28,21 @@ class TotalHeaderHandler implements IncludeHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($object, array $context)
+    public function supports(Context $context)
     {
-        return $object instanceof RestApiReadInterface && $object instanceof EntityManagerAwareInterface;
+        $controller = $context->getController();
+
+        return ($controller instanceof EntityManagerAwareInterface || $context->has('query'))
+            && $context->isAction(RestApiReadInterface::ACTION_LIST);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function handle($object, array $context, Request $request, Response $response)
+    public function handle(Context $context)
     {
-        /** @var RestApiReadInterface|EntityManagerAwareInterface $object */
-        if (isset($context['query'])) {
-            $value = $context['query'];
+        if ($context->has('query')) {
+            $value = $context->get('query');
 
             if ($value instanceof QueryBuilder) {
                 $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($value);
@@ -60,11 +59,11 @@ class TotalHeaderHandler implements IncludeHandlerInterface
                 );
             }
         } else {
-            $qb    = $object->getManager()->getRepository()->createQueryBuilder('e');
+            $qb    = $context->getController()->getManager()->getRepository()->createQueryBuilder('e');
             $query = $qb->getQuery();
         }
 
         $totalCount = QueryCountCalculator::calculateCount($query);
-        $response->headers->set(self::HEADER_NAME, $totalCount);
+        $context->getResponse()->headers->set(self::HEADER_NAME, $totalCount);
     }
 }

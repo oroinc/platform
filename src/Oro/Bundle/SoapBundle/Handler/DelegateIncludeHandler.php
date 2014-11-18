@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SoapBundle\Handler;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DelegateIncludeHandler implements IncludeHandlerInterface
@@ -41,7 +39,7 @@ class DelegateIncludeHandler implements IncludeHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function supports($object, array $context)
+    public function supports(Context $context)
     {
         return true;
     }
@@ -49,30 +47,30 @@ class DelegateIncludeHandler implements IncludeHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle($object, array $context, Request $request, Response $response)
+    public function handle(Context $context)
     {
         $processed        = [];
-        $includeRequested = explode(self::DELIMITER, $request->headers->get(self::HEADER_INCLUDE));
+        $includeRequested = explode(self::DELIMITER, $context->getRequest()->headers->get(self::HEADER_INCLUDE));
         $includeRequested = array_filter(array_map('trim', $includeRequested));
         $known            = array_intersect($includeRequested, array_keys($this->handlers));
-        $unknown          = array_diff($includeRequested, $known);
 
         foreach ($known as $name) {
             $serviceId = $this->handlers[$name];
             $handler   = $this->container->get($serviceId);
-            if ($handler instanceof IncludeHandlerInterface && $handler->supports($object, $context)) {
-                $handler->handle($object, $context, $request, $response);
+            if ($handler instanceof IncludeHandlerInterface && $handler->supports($context)) {
+                $handler->handle($context);
                 $processed[] = $name;
             }
         }
 
+        $unknown = array_diff($includeRequested, $known);
         if (!empty($unknown)) {
-            $response->headers->set(self::HEADER_UNKNOWN, implode(self::DELIMITER, $unknown));
+            $context->getResponse()->headers->set(self::HEADER_UNKNOWN, implode(self::DELIMITER, $unknown));
         }
 
         $unsupported = array_diff($known, $processed);
         if (!empty($unsupported)) {
-            $response->headers->set(self::HEADER_UNSUPPORTED, implode(self::DELIMITER, $unsupported));
+            $context->getResponse()->headers->set(self::HEADER_UNSUPPORTED, implode(self::DELIMITER, $unsupported));
         }
     }
 }
