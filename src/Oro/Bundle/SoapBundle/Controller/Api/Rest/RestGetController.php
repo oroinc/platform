@@ -67,7 +67,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     public function optionsAction()
     {
-        $metadata = $this->get('oro_soap.provider.metadata.chain')->getMetadataFor($this);
+        $metadata = $this->get('oro_soap.provider.metadata')->getMetadataFor($this);
 
         return $this->handleView(
             $this->view($metadata, Codes::HTTP_OK)

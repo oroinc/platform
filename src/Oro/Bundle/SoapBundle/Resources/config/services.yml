@@ -39,3 +39,6 @@ services:
             - @translator
         tags:
             - { name: oro_soap.metadata_provider }
+
+    oro_soap.provider.metadata:
+        alias: oro_soap.provider.metadata.chain
