@@ -138,18 +138,14 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                         error: _.bind(function (model, response) {
                             savingMsg.close();
                             this._showError(__('Sorry, the calendar updating was failed'), response.responseJSON || {});
-                            if (this.model.get('visible')) {
-                                this.connectionsView.setItemVisibility($connection, this.model.get('backgroundColor'));
-                            }
+                            this.connectionsView.setItemVisibility($connection, this.model.get('visible') ? this.model.get('backgroundColor') : '');
                             this.connectionsView._actionSyncObject.reject();
                         }, this)
                     });
                 } catch (err) {
                     savingMsg.close();
                     this._showError(__('Sorry, unexpected error was occurred'), err);
-                    if (this.model.get('visible')) {
-                        this.connectionsView.setItemVisibility($connection, this.model.get('backgroundColor'));
-                    }
+                    this.connectionsView.setItemVisibility($connection, this.model.get('visible') ? this.model.get('backgroundColor') : '');
                     this.connectionsView._actionSyncObject.reject();
                 }
             } else {

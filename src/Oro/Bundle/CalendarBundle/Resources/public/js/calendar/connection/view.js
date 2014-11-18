@@ -81,12 +81,26 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             return this.$el.find(this.selectors.findItemByCalendar(model.get('calendarUid')));
         },
 
-        setItemVisibility: function ($item, backgroundColor) {
-            var $visibilityButton = $item.find(this.selectors.visibilityButton);
+        setItemVisibility: function ($item, backgroundColor, skipActive) {
+            var $visibilityButton = $item.find(this.selectors.visibilityButton),
+                colors;
             if (backgroundColor) {
+                if (skipActive !== true) {
+                    $item.addClass('active');
+                    $item.attr(this.attrs.visible, 'true');
+                    $item.attr(this.attrs.backgroundColor, backgroundColor);
+                    $item.attr(this.attrs.color, this.options.colorManager.getContrastColor(backgroundColor));
+                }
                 $visibilityButton.removeClass('un-color');
                 $visibilityButton.css({backgroundColor: backgroundColor, borderColor: backgroundColor});
             } else {
+                if (skipActive !== true) {
+                    $item.removeClass('active');
+                    $item.attr(this.attrs.visible, 'false');
+                    colors = this.options.colorManager.getCalendarColors($item.attr(this.attrs.calendarUid));
+                    $item.attr(this.attrs.backgroundColor, colors.backgroundColor);
+                    $item.attr(this.attrs.color, colors.color);
+                }
                 $visibilityButton.css({backgroundColor: '', borderColor: ''});
                 $visibilityButton.addClass('un-color');
             }
@@ -140,16 +154,16 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
         },
 
         onOverCalendarItem: function (e) {
-            var $connection = $(e.currentTarget);
-            if (!$connection.data('visible')) {
-                this.setItemVisibility($connection, $connection.data('bg-color'));
+            var $item = $(e.currentTarget);
+            if ($item.attr(this.attrs.visible) === 'false') {
+                this.setItemVisibility($item, $item.attr(this.attrs.backgroundColor), true);
             }
         },
 
         onOutCalendarItem: function (e) {
-            var $connection = $(e.currentTarget);
-            if (!$connection.data('visible')) {
-                this.setItemVisibility($connection, '');
+            var $item = $(e.currentTarget);
+            if ($item.attr(this.attrs.visible) === 'false') {
+                this.setItemVisibility($item, '', true);
             }
         },
 

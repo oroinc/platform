@@ -730,7 +730,7 @@
 
 {% block oro_color_table_widget %}
     {% set attr = attr|merge({
-        'data-page-component-module': 'oroform/js/app/components/color-table',
+        'data-page-component-module': module|default('oroform/js/app/components/color-table'),
         'data-page-component-options': configs|json_encode
     }) %}
     {% set type = 'hidden' %}
