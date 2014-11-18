@@ -6,13 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DelegateIncludeHandler implements IncludeHandlerInterface
 {
-    const HEADER_INCLUDE     = 'X-Include';
-    const HEADER_UNSUPPORTED = 'X-Include-Unsupported';
-    const HEADER_UNKNOWN     = 'X-Include-Unknown';
-    const DELIMITER          = ';';
-
     /** @var array */
-    protected $handlers;
+    protected $handlers = [];
 
     /** @var ContainerInterface */
     protected $container;

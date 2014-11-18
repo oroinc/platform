@@ -63,7 +63,17 @@ class TotalHeaderHandler implements IncludeHandlerInterface
             $query = $qb->getQuery();
         }
 
-        $totalCount = QueryCountCalculator::calculateCount($query);
+        $totalCount = $this->calculateCount($query);
         $context->getResponse()->headers->set(self::HEADER_NAME, $totalCount);
+    }
+
+    /**
+     * @param Query $query
+     *
+     * @return int
+     */
+    protected function calculateCount(Query $query)
+    {
+        return QueryCountCalculator::calculateCount($query);
     }
 }
