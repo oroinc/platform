@@ -134,7 +134,7 @@ class ApiEntityManager
     }
 
     /**
-     * Returns Paginator to paginate throw items.
+     * Returns array of item matching filtering criteria
      *
      * In case when limit and offset set to null QueryBuilder instance will be returned.
      *
@@ -148,27 +148,7 @@ class ApiEntityManager
      */
     public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null)
     {
-        $page = $page > 0 ? $page : 1;
-        $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
-
-        if (is_array($criteria)) {
-            $newCriteria = new Criteria();
-            foreach ($criteria as $fieldName => $value) {
-                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
-            }
-
-            $criteria = $newCriteria;
-        }
-
-        // dispatch oro_api.request.get_list.before event
-        $event = new GetListBefore($criteria, $this->class);
-        $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
-        $criteria = $event->getCriteria();
-
-        $criteria
-            ->setMaxResults($limit)
-            ->orderBy($this->getOrderBy($orderBy))
-            ->setFirstResult($this->getOffset($page, $limit));
+        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
 
         return $this->getRepository()
             ->matching($criteria)
@@ -176,6 +156,8 @@ class ApiEntityManager
     }
 
     /**
+     * Returns query builder that could be used for fetching data based on given filtering criteria
+     *
      * @param int   $limit
      * @param int   $page
      * @param array $criteria
@@ -185,7 +167,25 @@ class ApiEntityManager
      */
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null)
     {
-        $page = $page > 0 ? $page : 1;
+        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
+
+        $qb = $this->getRepository()->createQueryBuilder('e');
+        $qb->addCriteria($criteria);
+
+        return $qb;
+    }
+
+    /**
+     * @param int   $limit
+     * @param int   $page
+     * @param array $criteria
+     * @param null  $orderBy
+     *
+     * @return array|Criteria
+     */
+    protected function prepareQueryCriteria($limit = 10, $page = 1, $criteria = [], $orderBy = null)
+    {
+        $page    = $page > 0 ? $page : 1;
         $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
 
         if (is_array($criteria)) {
@@ -207,10 +207,7 @@ class ApiEntityManager
             ->orderBy($this->getOrderBy($orderBy))
             ->setFirstResult($this->getOffset($page, $limit));
 
-        $qb = $this->getRepository()->createQueryBuilder('e');
-        $qb->addCriteria($criteria);
-
-        return $qb;
+        return $criteria;
     }
 
     /**
