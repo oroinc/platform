@@ -3,13 +3,12 @@
 namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\Common\Collections\Criteria;
-
-use JMS\Serializer\SerializationContext;
 
 use FOS\Rest\Util\Codes;
 use FOS\RestBundle\View\View;
@@ -29,7 +28,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     {
         $manager = $this->getManager();
         $qb      = $manager->getListQueryBuilder($limit, $page, $filters);
-        $items   = $qb->getQuery()->getResult(Query::HYDRATE_SIMPLEOBJECT);
+        $items   = $qb->getQuery()->getResult();
 
         $result = [];
         foreach ($items as $item) {
@@ -37,7 +36,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
         unset($items);
 
-        return $this->buildResponse($result, ['result' => $result, 'query' => false, 'action' => self::ACTION_LIST]);
+        return $this->buildResponse($result, ['result' => $result, 'query' => $qb, 'action' => self::ACTION_LIST]);
     }
 
     /**
@@ -252,30 +251,16 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function buildResponse($data, $context = [], $status = Codes::HTTP_OK)
     {
-        if (!$data instanceof View) {
+        if ($data instanceof View) {
+            $response = parent::handleView($data);
+        } else {
             $headers = isset($context['headers']) ? $context['headers'] : [];
             unset($context['headers']);
 
-            $data = $this->view($data, $status, $headers);
+            $response = new JsonResponse($data, $status, $headers);
         }
 
-        // TODO BAP-6122 remove this code when FOSRestBundle version >= 1.4.2
-        $serializationContext = $data->getSerializationContext() ?: new SerializationContext();
-        $groups               = $this->container->getParameter('fos_rest.serializer.exclusion_strategy.groups');
-        if ($groups) {
-            $serializationContext->setGroups($groups);
-        }
-        $version = $this->container->getParameter('fos_rest.serializer.exclusion_strategy.version');
-        if ($version) {
-            $serializationContext->setVersion($version);
-        }
-
-        $serializationContext->setSerializeNull(true);
-        $data->setSerializationContext($serializationContext);
-
-        $response       = parent::handleView($data);
         $includeHandler = $this->get('oro_soap.handler.include');
-
         $includeHandler->handle($this, $context, $this->get('request'), $response);
 
         return $response;

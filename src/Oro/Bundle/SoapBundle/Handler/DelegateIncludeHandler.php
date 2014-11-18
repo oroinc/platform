@@ -11,7 +11,7 @@ class DelegateIncludeHandler implements IncludeHandlerInterface
     const HEADER_INCLUDE     = 'X-Include';
     const HEADER_UNSUPPORTED = 'X-Include-Unsupported';
     const HEADER_UNKNOWN     = 'X-Include-Unknown';
-    const DELIMITER          = '; ';
+    const DELIMITER          = ';';
 
     /** @var array */
     protected $handlers;
@@ -52,7 +52,8 @@ class DelegateIncludeHandler implements IncludeHandlerInterface
     public function handle($object, array $context, Request $request, Response $response)
     {
         $processed        = [];
-        $includeRequested = explode(self::DELIMITER, $response->headers->get(self::HEADER_INCLUDE));
+        $includeRequested = explode(self::DELIMITER, $request->headers->get(self::HEADER_INCLUDE));
+        $includeRequested = array_filter(array_map('trim', $includeRequested));
         $known            = array_intersect($includeRequested, array_keys($this->handlers));
         $unknown          = array_diff($includeRequested, $known);
 
