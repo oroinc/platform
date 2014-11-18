@@ -18,9 +18,19 @@ define(['underscore', 'oroform/js/app/components/color-table'
             // set initial state of a color picker
             this._enable(!this.$useDefault.is(":checked"));
             // monitor changing of 'Use Default' checkbox to set appropriate state of a color picker
-            this.$useDefault.on('change', _.bind(function (e) {
+            this.$useDefault.on('change' + '.' + this.cid, _.bind(function (e) {
                 this._enable(!this.$useDefault.is(":checked"));
             }, this));
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (!this.disposed && this.$useDefault) {
+                this.$useDefault.off('.' + this.cid);
+            }
+            ColorTable.__super__.dispose.call(this);
         },
 
         _enable: function (enabled) {
