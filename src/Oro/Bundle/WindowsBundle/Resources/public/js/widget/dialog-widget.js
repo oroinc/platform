@@ -252,6 +252,7 @@ define(function (require) {
             }, this));
 
             this.widget.on("dialogresizestop", _.bind(this._fixBorderShifting, this));
+            layout.init(this.loadingElement);
         },
 
         _initAdjustHeight: function(content) {
