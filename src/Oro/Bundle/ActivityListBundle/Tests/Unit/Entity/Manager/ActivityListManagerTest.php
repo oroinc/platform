@@ -111,7 +111,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->pager->expects($this->once())->method('init');
         $this->pager->expects($this->once())->method('getResults')->willReturn([]);
 
-        $this->activityListManager->getList($testClass, $testId, $page, $filter);
+        $this->activityListManager->getList($testClass, $testId, $filter, $page);
 
         $expectedDQL = 'SELECT activity FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
             . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId ORDER BY activity.createdBy ASC';
