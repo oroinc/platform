@@ -72,6 +72,7 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All day event
+            invitation.label:     Guests
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty
