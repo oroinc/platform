@@ -22,15 +22,16 @@ class ActivityListMigrationTest extends \PHPUnit_Framework_TestCase
         $nameGenerator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator')
             ->disableOriginalConstructor()
             ->getMock();
-
         $schema = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema')
             ->disableOriginalConstructor()
             ->getMock();
-        $queries = new QueryBag();
 
+        $queries   = new QueryBag();
         $migration = new ActivityListMigration($provider, $activityListExtension, $metadataHelper, $nameGenerator);
+
         $migration->up($schema, $queries);
         $postQuery = $queries->getPostQueries()[0];
+
         $this->assertInstanceOf('Oro\Bundle\ActivityListBundle\Migration\ActivityListMigrationQuery', $postQuery);
     }
 }

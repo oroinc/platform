@@ -19,6 +19,7 @@ parameters:
     oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
 
     oro_activity_list.filter.helper.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
+
 services:
     oro_activity_list.manager:
         class: %oro_activity_list.manager.class%

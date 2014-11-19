@@ -30,6 +30,9 @@ class EmailActivityListProvider implements ActivityListProviderInterface
 
     /**
      * @param DoctrineHelper $doctrineHelper
+     * @param ServiceLink    $doctrineRegistryLink
+     * @param ServiceLink    $nameFormatterLink
+     * @param Router         $router
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -102,8 +105,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
 
         // TODO: we need EntityConfig to get view url for an entities
         $classParts = explode('\\', $owner->getClass());
-        $routeName = strtolower(array_shift($classParts)) . '_' . strtolower(array_pop($classParts)) . '_view';
-
+        $routeName  = strtolower(array_shift($classParts)) . '_' . strtolower(array_pop($classParts)) . '_view';
 
         return [
             'owner_name'  => $this->nameFormatterLink->getService()->format($owner),

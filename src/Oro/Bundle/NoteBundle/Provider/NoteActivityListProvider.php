@@ -3,12 +3,11 @@
 namespace Oro\Bundle\NoteBundle\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
-use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\NoteBundle\Entity\Note;
 
 class NoteActivityListProvider implements ActivityListProviderInterface
 {

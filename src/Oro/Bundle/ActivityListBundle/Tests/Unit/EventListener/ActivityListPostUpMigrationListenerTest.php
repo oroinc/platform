@@ -9,12 +9,6 @@ class ActivityListPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCas
 {
     public function testOnPostUp()
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $event = new PostMigrationEvent($connection);
-
         $provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -28,15 +22,20 @@ class ActivityListPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCas
         $nameGenerator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator')
             ->disableOriginalConstructor()
             ->getMock();
-
         $listener = new ActivityListPostUpMigrationListener(
             $provider,
             $activityListExtension,
             $metadataHelper,
             $nameGenerator
         );
+        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event = new PostMigrationEvent($connection);
         $listener->onPostUp($event);
         $migration = $event->getMigrations()[0];
+
         $this->assertInstanceOf('Oro\Bundle\ActivityListBundle\Migration\ActivityListMigration', $migration);
     }
 }

@@ -9,16 +9,10 @@ use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 
 class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY_NAME = 'ActivityListEntityName';
-
-    /**
-     * @var ActivityListRepository
-     */
+    /** @var ActivityListRepository */
     protected $repository;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
     protected function setUp()
