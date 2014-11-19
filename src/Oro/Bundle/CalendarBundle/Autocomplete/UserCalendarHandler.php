@@ -8,58 +8,15 @@ use Oro\Bundle\UserBundle\Autocomplete\UserAclHandler;
 class UserCalendarHandler extends UserAclHandler
 {
     /**
-     * {@inheritdoc}
+     * @param string $query
      *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @return object|null
      */
-    public function search($query, $page, $perPage, $searchById = false)
+    protected function searchById($query)
     {
-        list ($search, $entityClass, $permission, $entityId, $excludeCurrentUser) = explode(';', $query);
-        $entityClass = $this->decodeClassName($entityClass);
+        list ($id, $entityClass) = explode(';', $query);
 
-        $hasMore  = false;
-        $object   = $entityId
-            ? $this->em->getRepository($entityClass)->find((int)$entityId)
-            : 'entity:' . $entityClass;
-        $observer = new OneShotIsGrantedObserver();
-        $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        if ($this->getSecurityContext()->isGranted($permission, $object)) {
-            $results = [];
-            if ($searchById) {
-                $results[] = $this->em->getRepository($entityClass)->find((int)$query);
-            } else {
-                $page        = (int)$page > 0 ? (int)$page : 1;
-                $perPage     = (int)$perPage > 0 ? (int)$perPage : 10;
-                $firstResult = ($page - 1) * $perPage;
-                $perPage += 1;
-
-                $user         = $this->getSecurityContext()->getToken()->getUser();
-                $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
-                $queryBuilder = $this->getSearchQueryBuilder($search);
-                if ((boolean)$excludeCurrentUser) {
-                    $this->excludeUser($queryBuilder, $user);
-                }
-                $queryBuilder
-                    ->setFirstResult($firstResult)
-                    ->setMaxResults($perPage);
-                $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user, $organization);
-                $results = $queryBuilder->getQuery()->getResult();
-
-                $hasMore = count($results) == $perPage;
-            }
-
-            $resultsData = [];
-            foreach ($results as $user) {
-                $resultsData[] = $this->convertItem($user);
-            }
-        } else {
-            $resultsData = [];
-        }
-
-        return [
-            'results' => $resultsData,
-            'more'    => $hasMore
-        ];
+        return $this->em->getRepository($entityClass)->find((int)$id);
     }
 
     /**
