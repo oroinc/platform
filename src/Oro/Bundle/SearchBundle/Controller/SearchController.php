@@ -72,6 +72,7 @@ class SearchController extends Controller
             'from'           => $from,
             'searchString'   => $string,
             'groupedResults' => $resultProvider->getGroupedResults($string),
+            'entities'     => $this->get('oro_search.index')->getAllowedEntitiesListAliases(),
         );
     }
 }
