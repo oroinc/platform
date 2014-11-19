@@ -13,14 +13,9 @@ Fundamentals
 ------------
 
 Examples of activities that can be added to other entities are:
-
-- in platform
--- Emails
--- Calendar events
--- Notes
-- in crm
--- Calls
--- Tasks
+- Emails
+- Calendar events
+- Notes
 
 Visualization of Activity list defined as widget block. It shows activities related to the entity record, currently being viewed, in a single list with ability to filter by activity type (multiselect) and date (daterange filter).
 
