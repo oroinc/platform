@@ -36,7 +36,6 @@ class OroColorTableType extends AbstractType
         $resolver
             ->setDefaults(
                 [
-                    'module'         => null,
                     'picker_control' => null // hue, brightness, saturation, or wheel. defaults wheel
                 ]
             );
@@ -58,8 +57,6 @@ class OroColorTableType extends AbstractType
             }
             $view->vars['value'] = $value;
         }
-
-        $view->vars['module'] = $options['module'];
 
         $view->vars['configs']['table']  = true;
         $view->vars['configs']['picker'] = [];

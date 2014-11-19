@@ -136,13 +136,32 @@ label, input, button, select, textarea { font-size:13px;}
   }
 }
 .simplecolorpicker {
-  span.color[data-color=''],
-  span.color[data-color='#FFFFFF'],
-  span.color[data-color='#ffffff'] {
-    border: 1px solid rgba(0,0,0,0.2);
+  &.icon {
+    &[data-color=''],
+    &[data-color='#FFFFFF'],
+    &[data-color='#ffffff'] {
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    &[data-color='']:hover,
+    &[data-color='#FFFFFF']:hover,
+    &[data-color='#ffffff']:hover {
+      border: 1px solid rgba(0,0,0,0.2) !important;
+    }
   }
-  span.color[data-selected]:after {
-    color: inherit !important;
+  span.color {
+    &[data-color=''],
+    &[data-color='#FFFFFF'],
+    &[data-color='#ffffff'] {
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+    &[data-color='']:hover,
+    &[data-color='#FFFFFF']:hover,
+    &[data-color='#ffffff']:hover {
+      border: 1px solid rgba(0,0,0,0.2) !important;
+    }
+    &[data-selected]:after {
+      color: inherit !important;
+    }
   }
 }
 i.color {

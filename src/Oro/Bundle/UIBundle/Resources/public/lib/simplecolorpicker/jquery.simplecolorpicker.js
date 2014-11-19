@@ -35,15 +35,40 @@
 
       self.$colorList = null;
 
-      var selectedVal = self.$select.val();
+      var selectedVal = self.$select.val(),
+          isDisabledVal = self.$select.is(':disabled');
+
+      if (!self.$select.is('select') && !self.options.table) {
+        var selIdx = null, selId = null, matchIdx = null;
+        $.each(self.options.data, function(index, value) {
+          if (selIdx === null && value.selected) {
+            selIdx = index;
+            selId = value.id;
+          }
+          if (matchIdx === null && (
+            (!value.id && !selectedVal) ||
+            (value.id && selectedVal && value.id.toLowerCase() === selectedVal.toLowerCase())
+          )) {
+            matchIdx = index;
+          }
+        });
+        $.each(self.options.data, function(index, value) {
+          if (value.selected && selIdx !== null && matchIdx !== null && matchIdx !== selIdx) {
+            value.selected = false;
+          } else if (!value.selected && matchIdx !== null && matchIdx === index) {
+            value.selected = true;
+          }
+        });
+      }
 
       if (self.options.picker === true) {
         var selectText = self.$select.is('select') ? self.$select.find('> option:selected').text() : this.getSelectedText(self.options.data);
         self.$icon = $('<span class="simplecolorpicker icon"'
                      + ' title="' + selectText + '"'
-                     + ' style="background-color: ' + selectedVal + ';"'
-                     + ' role="button" tabindex="0">'
-                     + '</span>').insertAfter(self.$select);
+                     + ' style="background-color: ' + (!selectedVal && self.options.emptyColor ? self.options.emptyColor : selectedVal) + ';"'
+                     + ' data-color="' + selectedVal + '"'
+                     + (isDisabledVal === false ? ' role="button" tabindex="0"' : ' data-disabled')
+                     + '></span>').insertAfter(self.$select);
         self.$icon.on('click.' + self.type, $.proxy(self.showPicker, self));
 
         self.$picker = $('<span class="simplecolorpicker picker ' + self.options.theme + '"></span>').appendTo(document.body);
@@ -70,7 +95,7 @@
         var bgColor = !color && self.options.emptyColor ? self.options.emptyColor : color;
 
         var isSelected = isSelect ? $option.is(':selected') : ($option.selected ? true : false);
-        var isDisabled = isSelect ? $option.is(':disabled') : ($option.disabled ? true : false);
+        var isDisabled = isDisabledVal || (isSelect ? $option.is(':disabled') : ($option.disabled ? true : false));
 
         var selected = '';
         if (isSelected === true) {
@@ -122,25 +147,7 @@
               buildItemFunc($(this), true);
           });
       } else if (!self.options.table) {
-          var selected = null, selectedId = null, matched = null;
           $.each(self.options.data, function(index, value) {
-              if (selected === null && value.selected) {
-                  selected = index;
-                  selectedId = value.id;
-              }
-              if (matched === null && (
-                  (!value.id && !selectedVal) ||
-                  (value.id && selectedVal && value.id.toLowerCase() === selectedVal.toLowerCase())
-              )) {
-                  matched = index;
-              }
-          });
-          $.each(self.options.data, function(index, value) {
-              if (value.selected && selected !== null && matched !== null && matched !== selected) {
-                  value.selected = false;
-              } else if (!value.selected && matched !== null && matched === index) {
-                  value.selected = true;
-              }
               buildItemFunc(value, false);
           });
       } else {
@@ -236,7 +243,29 @@
       }
     },
 
+    /**
+     * @param {bool=} enabled
+     */
+    enable: function (enabled) {
+      var $el = (this.options.picker === true) ? this.$icon : this.$colorList.find('> span.color');
+      if (enabled === undefined) {
+        enabled = true;
+      }
+      this.$select.prop('disabled', !enabled);
+      if (enabled) {
+        $el.removeAttr('data-disabled');
+        $el.attr('tabindex', '0');
+      } else {
+        $el.attr('data-disabled', '');
+        $el.removeAttr('tabindex');
+      }
+    },
+
     showPicker: function() {
+      // When an icon is clicked, show a picker (unless disabled)
+      if (this.$icon.is('[data-disabled]') !== false) {
+        return;
+      }
       var pos = this.$icon.offset();
       this.$picker.css({
         // Remove some pixels to align the picker icon with the icons inside the dropdown

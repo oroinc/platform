@@ -67,6 +67,7 @@
   content: '\00a0\00a0\00a0\00a0'; /* Spaces */
 }
 
+.simplecolorpicker.icon[data-disabled]:hover,
 .simplecolorpicker span.color[data-disabled]:hover {
   cursor: not-allowed;
   border: 1px solid transparent;
