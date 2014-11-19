@@ -1,9 +1,8 @@
 /*jslint nomen:true*/
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field', 'oroui/js/mediator'
-], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter,
-        mediator) {
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
+    ], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -58,6 +57,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     title: this.model.isNew() ? __('Add New Event') : __('View Event'),
                     stateEnabled: false,
                     incrementalPosition: false,
+                    initLayout: true,
                     dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
                         modal: true,
                         resizable: false,
@@ -102,9 +102,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 defaultOptions
             ));
             this.eventDialog.render();
-            if (this.model.isNew()) {
-                mediator.execute('layout:init', this.eventDialog.widget);
-            }
 
             // subscribe to 'delete event' event
             this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
@@ -247,7 +244,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             var modelData = this.model.toJSON(),
                 form = this.fillForm(this.template(modelData), modelData),
                 calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
-            form.find('[name]').uniform('update');
             form.find('[name*="backgroundColor"]')
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
             return form;
