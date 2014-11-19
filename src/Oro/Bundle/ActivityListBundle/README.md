@@ -11,19 +11,22 @@ Table of content
 
 Fundamentals
 ------------
-Activity is a combination of a common and ubiquitous activity and an entity that encompasses this activity.
 
-Examples of activities are:
+Examples of activities that can be added to other entities are:
 
-- Emails
-- Calendar events
+- in platform
+-- Emails
+-- Calendar events
+-- Notes
+- in crm
+-- Calls
+-- Tasks
 
-Activity list is an entity.  
-Visualization of Activity list defined as widget - a block that performs a certain function. In our case is displaying activities related to the entity record in a single list with ability to filter by activity type (multiselect) and by date (daterange filter).
+Visualization of Activity list defined as widget block. It shows activities related to the entity record, currently being viewed, in a single list with ability to filter by activity type (multiselect) and date (daterange filter).
 
-The most important details of the activity is shown by default, but you have access to the full activity record. Only a limited number of records displayed by default, sorted by update date in descending order. The limitation and sorting can be changed in [UI](#configuration) .
+Each activity row shows base information about itself: type of activity, who and when have created and update it, also you have access to the full activity record via "expand" action. By default is displayed 25 records, sorted by update date in descending order. The limitation and sorting can be changed in [UI](#configuration) .
 
-The widget currently displayed in "Record activities" placeholder at view pages of entities witch was configured as receiver of activities.
+The widget currently displayed in "Record activities" placeholder block on an entities view page.
 
 **Example UI within contact page**
 ![An example of widget](./Resources/doc/example.png)
