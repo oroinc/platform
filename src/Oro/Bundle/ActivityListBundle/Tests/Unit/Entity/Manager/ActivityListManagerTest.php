@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
-
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;

@@ -4,7 +4,9 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
@@ -32,13 +34,13 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->routeHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
+        $this->routeHelper    = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
+        $this->translator     = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
 
         $this->testActivityProvider = new TestActivityProvider();
@@ -82,14 +84,20 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSubject()
     {
-        $testEntity = new \stdClass();
+        $testEntity          = new \stdClass();
         $testEntity->subject = 'test';
         $this->assertEquals('test', $this->provider->getSubject($testEntity));
     }
 
+    public function testGetEmptySubject()
+    {
+        $testEntity = new TestTarget();
+        $this->assertNull($this->provider->getSubject($testEntity));
+    }
+
     public function testGetTargetEntityClasses()
     {
-        $correctTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
+        $correctTarget    = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\CorrectEntity');
         $notCorrectTarget = new EntityConfigId('entity', 'Acme\\DemoBundle\\Entity\\NotCorrectEntity');
         $this->configManager->expects($this->once())
             ->method('getIds')
@@ -105,20 +113,44 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['Acme\\DemoBundle\\Entity\\CorrectEntity'], $this->provider->getTargetEntityClasses());
     }
 
-    /*public function testGetActivityListEntitiesByActivityEntity()
+    public function testGetProviderForEntity()
     {
-        $testActivity = new \stdClass();
-        $testActivity->subject = 'test subject';
-        $testActivity->id = 150;
-
-        $this->testActivityProvider->setTargets([]);
-
-        $this->doctrineHelper->expects($this->any())
+        $testEntity = new \stdClass();
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityClass')
-            ->will($this->returnValue(get_class($testActivity)));
+            ->with($testEntity)
+            ->willReturn('Test\Entity');
+        $this->assertEquals($this->testActivityProvider, $this->provider->getProviderForEntity($testEntity));
+    }
 
-        $resultActivityList = $this->provider->getActivityListEntitiesByActivityEntity($testActivity);
+    public function testGetActivityListOption()
+    {
+        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()->getMock();
+        $configId     = new EntityConfigId('entity', 'Test\Entity');
+        $entityConfig = new Config($configId);
 
-        $a = 1;
-    }*/
+        $entityConfig->set('icon', 'test_icon');
+        $entityConfig->set('label', 'test_label');
+        $entityConfigProvider->expects($this->once())->method('getConfig')->willReturn($entityConfig);
+        $this->translator->expects($this->once())->method('trans')->with('test_label')->willReturn('test_label');
+        $this->routeHelper->expects($this->once())->method('encodeClassName')
+            ->willReturn('Test_Entity');
+        $this->configManager->expects($this->once())->method('getProvider')->willReturn($entityConfigProvider);
+
+        $result = $this->provider->getActivityListOption();
+        $this->assertEquals(
+            [
+                'Test_Entity' => [
+                    'icon'     => 'test_icon',
+                    'label'    => 'test_label',
+                    'template' => 'test_template.js.twig',
+                    'routes'   => [
+                        'delete' => 'test_delete_route'
+                    ]
+                ]
+            ],
+            $result
+        );
+    }
 }
