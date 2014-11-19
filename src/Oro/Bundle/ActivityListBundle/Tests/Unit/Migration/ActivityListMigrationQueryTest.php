@@ -57,8 +57,13 @@ class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->migrationQuery = new ActivityListMigrationQuery($this->schema, $this->provider,
-            $this->activityListExtension, $this->metadataHelper, $this->nameGenerator);
+        $this->migrationQuery = new ActivityListMigrationQuery(
+            $this->schema,
+            $this->provider,
+            $this->activityListExtension,
+            $this->metadataHelper,
+            $this->nameGenerator
+        );
     }
 
     public function testRunActivityLists()
@@ -84,7 +89,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
         $entityMetadataHelper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $extendExtension = new ExtendExtension($extendOptionsManager, $entityMetadataHelper);
+        $extendExtension      = new ExtendExtension($extendOptionsManager, $entityMetadataHelper);
         $extendExtension->setNameGenerator($this->nameGenerator);
         $this->activityListExtension->setExtendExtension($extendExtension);
 
@@ -118,7 +123,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             'ALTER TABLE oro_rel_c3990ba6784dd132527c89 ADD CONSTRAINT FK_53682E3596EB1108 '
-            .'FOREIGN KEY (activitylist_id) REFERENCES oro_activity_list (id) ON DELETE CASCADE',
+            . 'FOREIGN KEY (activitylist_id) REFERENCES oro_activity_list (id) ON DELETE CASCADE',
             $log[1]
         );
         $this->assertEquals(

@@ -10,6 +10,9 @@ class ActivityListEntityGeneratorExtension extends AbstractAssociationEntityGene
     /** @var ActivityListChainProvider */
     protected $listProvider;
 
+    /**
+     * @param ActivityListChainProvider $listProvider
+     */
     public function __construct(ActivityListChainProvider $listProvider)
     {
         $this->listProvider = $listProvider;

@@ -15,9 +15,8 @@ class CollectListManager
     /**
      * @param ActivityListChainProvider $chainProvider
      */
-    public function __construct(
-        ActivityListChainProvider $chainProvider
-    ) {
+    public function __construct(ActivityListChainProvider $chainProvider)
+    {
         $this->chainProvider = $chainProvider;
     }
 
@@ -40,7 +39,7 @@ class CollectListManager
     {
         if (!empty($deletedEntities)) {
             foreach ($deletedEntities as $entity) {
-                $entityManager->getRepository('OroActivityListBundle:ActivityList')
+                $entityManager->getRepository(ActivityList::ENTITY_NAME)
                     ->deleteActivityListsByRelatedActivityData($entity['class'], $entity['id']);
             }
         }

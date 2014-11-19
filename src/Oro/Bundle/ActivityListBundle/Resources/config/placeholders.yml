@@ -7,4 +7,3 @@ items:
     oro_activity_list:
         applicable: @oro_activity_list.placeholder.filter->isApplicable($entity$)
         template: OroActivityListBundle:ActivityList:activities.html.twig
-        #acl: oro_activity_list_view
