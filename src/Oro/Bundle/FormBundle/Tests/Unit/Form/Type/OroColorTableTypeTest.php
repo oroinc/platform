@@ -77,13 +77,11 @@ class OroColorTableTypeTest extends FormIntegrationTestCase
         return [
             [
                 'options'       => [
-                    'module'            => null,
-                    'picker_control'    => true,
+                    'picker_control' => true,
                 ],
                 'expectedVars'  => [
                     'value'     => json_encode(['#FFFFFF','#000000']),
                     'attr'      => [],
-                    'module'    => null,
                     'configs'   => [
                         'table'     => true,
                         'picker'    => [
