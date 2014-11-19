@@ -29,7 +29,12 @@ class ActivityListPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCas
             ->disableOriginalConstructor()
             ->getMock();
 
-        $listener = new ActivityListPostUpMigrationListener($provider, $activityListExtension, $metadataHelper, $nameGenerator);
+        $listener = new ActivityListPostUpMigrationListener(
+            $provider,
+            $activityListExtension,
+            $metadataHelper,
+            $nameGenerator
+        );
         $listener->onPostUp($event);
         $migration = $event->getMigrations()[0];
         $this->assertInstanceOf('Oro\Bundle\ActivityListBundle\Migration\ActivityListMigration', $migration);
