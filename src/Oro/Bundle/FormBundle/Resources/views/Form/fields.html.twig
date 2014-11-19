@@ -690,21 +690,23 @@
 {% endblock %}
 
 {% block oro_simple_color_picker_widget %}
-    {% set attr = attr|merge({
-        'data-page-component-module': 'oroform/js/app/components/simple-color-picker',
-        'data-page-component-options': configs|json_encode
-    }) %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-picker-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
     {% set type = 'hidden' %}
     {{ block('form_widget_simple') }}
 {% endblock %}
 
 {% block oro_simple_color_choice_widget %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-choice-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
     {% if required and empty_value is none and not empty_value_in_choices and not multiple -%}
         {% set required = false %}
     {%- endif -%}
-    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}
-        data-page-component-module="oroform/js/app/components/simple-color-choice"
-        data-page-component-options="{{ configs|json_encode }}">
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
         {% if allow_empty_color -%}
             <option value="" class="empty-color"{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
             <optgroup label="---"></optgroup>
@@ -729,10 +731,10 @@
 {% endblock %}
 
 {% block oro_color_table_widget %}
-    {% set attr = attr|merge({
-        'data-page-component-module': module|default('oroform/js/app/components/color-table'),
-        'data-page-component-options': configs|json_encode
-    }) %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/color-table-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
     {% set type = 'hidden' %}
     {{ block('form_widget_simple') }}
 {% endblock %}
