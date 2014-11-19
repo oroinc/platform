@@ -22,9 +22,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
 {
     const BATCH_SIZE = 300;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     /**

@@ -47,11 +47,11 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
         EntityMetadataHelper $metadataHelper,
         ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
-        $this->schema = $schema;
-        $this->provider = $provider;
+        $this->schema                = $schema;
+        $this->provider              = $provider;
         $this->activityListExtension = $activityListExtension;
-        $this->metadataHelper = $metadataHelper;
-        $this->nameGenerator = $nameGenerator;
+        $this->metadataHelper        = $metadataHelper;
+        $this->nameGenerator         = $nameGenerator;
     }
 
     /**
@@ -79,11 +79,11 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
      */
     protected function runActivityLists(LoggerInterface $logger, $dryRun = false)
     {
-        $targetEntities = $this->provider->getTargetEntityClasses();
-        $toSchema = clone $this->schema;
+        $targetEntities   = $this->provider->getTargetEntityClasses();
+        $toSchema         = clone $this->schema;
         $hasSchemaChanges = false;
         foreach ($targetEntities as $targetEntity) {
-            $associationName = ExtendHelper::buildAssociationName(
+            $associationName   = ExtendHelper::buildAssociationName(
                 $targetEntity,
                 ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
             );
@@ -103,9 +103,9 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
 
         if ($hasSchemaChanges) {
             $comparator = new Comparator();
-            $platform = $this->connection->getDatabasePlatform();
+            $platform   = $this->connection->getDatabasePlatform();
             $schemaDiff = $comparator->compare($this->schema, $toSchema);
-            $queries = $schemaDiff->toSql($platform);
+            $queries    = $schemaDiff->toSql($platform);
             foreach ($queries as $query) {
                 $this->logQuery($logger, $query);
                 if (!$dryRun) {

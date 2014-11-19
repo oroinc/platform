@@ -7,8 +7,7 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
@@ -67,10 +66,11 @@ class ActivityListChangesListener
     /**
      * @param EntityManager $entityManager
      *
-     * @return UserInterface|null
+     * @return User|null
      */
     protected function getUser(EntityManager $entityManager)
     {
+        /** @var User $user */
         $user = $this->securityFacadeLink->getService()->getLoggedUser();
         if ($user && $entityManager->getUnitOfWork()->getEntityState($user) == UnitOfWork::STATE_DETACHED) {
             $user = $entityManager->find('OroUserBundle:User', $user->getId());

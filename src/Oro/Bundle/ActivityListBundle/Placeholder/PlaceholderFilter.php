@@ -19,20 +19,15 @@ class PlaceholderFilter
     /**
      * Checks if the entity can have activities
      *
-     * @param object $entity
+     * @param object|null $entity
      * @return bool
      */
-    public function isApplicable($entity)
+    public function isApplicable($entity = null)
     {
         if (null === $entity || !is_object($entity)) {
             return false;
         }
 
-        $className = ClassUtils::getClass($entity);
-
-        return in_array(
-            $className,
-            $this->activityListProvider->getTargetEntityClasses()
-        );
+        return in_array(ClassUtils::getClass($entity), $this->activityListProvider->getTargetEntityClasses());
     }
 }

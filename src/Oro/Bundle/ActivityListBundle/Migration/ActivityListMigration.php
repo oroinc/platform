@@ -38,10 +38,10 @@ class ActivityListMigration implements Migration
         EntityMetadataHelper $metadataHelper,
         ExtendDbIdentifierNameGenerator $nameGenerator
     ) {
-        $this->provider = $provider;
+        $this->provider              = $provider;
         $this->activityListExtension = $activityListExtension;
-        $this->metadataHelper = $metadataHelper;
-        $this->nameGenerator = $nameGenerator;
+        $this->metadataHelper        = $metadataHelper;
+        $this->nameGenerator         = $nameGenerator;
     }
 
     /**

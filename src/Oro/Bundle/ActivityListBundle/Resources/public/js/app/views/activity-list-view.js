@@ -112,6 +112,8 @@ define(function (require) {
         _initPager: function () {
             if (this.collection.getPageSize() < this.collection.getCount()) {
                 this._toggleNext(true);
+            } else {
+                this._toggleNext();
             }
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());

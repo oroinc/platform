@@ -13,7 +13,7 @@
             {{ UI.clientLink({
                 'aCss': 'btn refresh-button icons-holder-text',
                 'iCss': 'icon-refresh',
-                'title' : 'Refresh'|trans,
+                'title': 'Refresh'|trans,
                 'dataAttributes': {'action-name': 'refresh'}
             }) }}
         </div>
@@ -28,9 +28,8 @@
             {% set options = {
                 widgetId: app.request.get('_wid'),
                 activityListData: render(path(
-                    'oro_activity_list_api_get_filtered',
+                    'oro_activity_list_api_get_list',
                     {
-                        version: 'latest',
                         entityClass: oro_class_name(entity, true),
                         entityId: entity.id
                     }
@@ -40,9 +39,8 @@
                     template: '#template-activity-list',
                     itemTemplate: '#template-activity-item',
                     urls: {
-                        route: 'oro_activity_list_api_get_filtered',
+                        route: 'oro_activity_list_api_get_list',
                         parameters: {
-                            version: 'latest',
                             entityClass: oro_class_name(entity, true),
                             entityId: entity.id
                         }
