@@ -78,7 +78,7 @@ services:
         calls:
             # default types
             - [addDoctrineTypeMapping, ["string", "text"]]
-            - [addDoctrineTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["integer", "text"]] # to be able validate numbers properly, we need text input
             - [addDoctrineTypeMapping, ["smallint", "integer", { precision: 0 }]]
             - [addDoctrineTypeMapping, ["bigint", "integer", { precision: 0 }]]
             - [addDoctrineTypeMapping, ["boolean", "checkbox"]]

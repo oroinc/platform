@@ -134,6 +134,7 @@ services:
             - @doctrine
             - @event_dispatcher
             - @oro_importexport.context_registry
+            - @oro_integration.logger.strategy
 
     oro_integration.reader.entity.by_id:
         class: %oro_integration.reader.entity.by_id.class%
