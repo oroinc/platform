@@ -59,6 +59,7 @@ class ActivityList extends ExtendActivityList
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $owner;
 
@@ -67,6 +68,7 @@ class ActivityList extends ExtendActivityList
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $editor;
 
