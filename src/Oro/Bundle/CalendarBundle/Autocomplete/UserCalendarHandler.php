@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Autocomplete;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
 use Oro\Bundle\UserBundle\Autocomplete\UserAclHandler;
 
 class UserCalendarHandler extends UserAclHandler
@@ -24,7 +26,12 @@ class UserCalendarHandler extends UserAclHandler
      */
     public function convertItem($calendar)
     {
-        $result = parent::convertItem($calendar->getOwner());
+        if ($calendar instanceof UserInterface) {
+            $result = parent::convertItem($calendar);
+        } else {
+            $result = parent::convertItem($calendar->getOwner());
+        }
+
         $result['id'] = $calendar->getId();
 
         return $result;
