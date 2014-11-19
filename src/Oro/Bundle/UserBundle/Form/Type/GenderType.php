@@ -51,7 +51,7 @@ class GenderType extends AbstractType
                 'multiple'    => false,
                 'expanded'    => false,
                 'empty_value' => 'oro.user.form.choose_gender',
-                'is_translated_choices' => true
+                'translatable_options' => false
             )
         );
     }

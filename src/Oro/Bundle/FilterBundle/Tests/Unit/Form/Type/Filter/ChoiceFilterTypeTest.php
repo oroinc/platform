@@ -52,8 +52,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
                     ),
                     'populate_default' => false,
                     'default_value' => null,
-                    'null_value' => null,
-                    'is_translated_choices' => false
+                    'null_value' => null
                 )
             )
         );

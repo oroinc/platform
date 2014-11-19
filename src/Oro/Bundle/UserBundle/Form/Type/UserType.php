@@ -78,7 +78,7 @@ class UserType extends AbstractType
                     'required'      => !$this->isMyProfilePage,
                     'read_only'     => $this->isMyProfilePage,
                     'disabled'      => $this->isMyProfilePage,
-                    'is_translated_choices' => true
+                    'translatable_options' => false
                 )
             );
         }
@@ -96,7 +96,7 @@ class UserType extends AbstractType
                     'required'  => false,
                     'read_only' => $this->isMyProfilePage,
                     'disabled'  => $this->isMyProfilePage,
-                    'is_translated_choices' => true
+                    'translatable_options' => false
                 )
             );
         }

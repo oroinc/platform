@@ -66,7 +66,7 @@ class BusinessUnitType extends AbstractType
                         null,
                         $this->securityFacade->getOrganizationId()
                     ),
-                    'is_translated_choices' => true
+                    'translatable_options' => false
                 ]
             )
             ->add(
@@ -153,7 +153,7 @@ class BusinessUnitType extends AbstractType
                             $data->getId(),
                             $this->securityFacade->getOrganizationId()
                         ),
-                        'is_translated_choices' => true
+                        'translatable_options' => false
                     ]
                 );
             }

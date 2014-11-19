@@ -55,7 +55,7 @@ class EntityChoiceType extends AbstractType
                 'empty_value' => '',
                 'show_plural' => false,
                 'configs'     => $defaultConfigs,
-                'is_translated_choices' => true
+                'translatable_options' => false
             )
         );
         $resolver->setNormalizers(

@@ -115,16 +115,16 @@ datagrid:
                     type: choice
                     data_name: ownerName
                     options:
-                          field_options:
-                              choices: @oro_organization.provider.business_units_grid->getOwnerChoices
-                          is_translated_choices: true
+                        field_options:
+                            choices: @oro_organization.provider.business_units_grid->getOwnerChoices
+                            translatable_options: false
                 organizationName:
                     type: choice
                     data_name: organizationName
                     options:
-                          field_options:
-                              choices: @oro_organization.provider.business_units_grid->getOrganizationChoices
-                          is_translated_choices: true
+                        field_options:
+                            choices: @oro_organization.provider.business_units_grid->getOrganizationChoices
+                            translatable_options: false
                 createdAt:
                     type: datetime
                     data_name: u.createdAt

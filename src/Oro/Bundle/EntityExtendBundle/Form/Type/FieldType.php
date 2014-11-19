@@ -113,8 +113,8 @@ class FieldType extends AbstractType
                 'configs'     => [
                     'placeholder'          => self::TYPE_LABEL_PREFIX . 'choose_value',
                 ],
-                'is_translated_groups'  => true,
-                'is_translated_choices' => true,
+                'translatable_groups'  => false,
+                'translatable_options' => false
             ]
         );
     }

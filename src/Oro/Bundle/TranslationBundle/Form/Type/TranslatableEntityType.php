@@ -117,7 +117,7 @@ class TranslatableEntityType extends AbstractType
                 'query_builder' => null,
                 'choices'       => null,
                 'choice_list'   => $choiceList,
-                'is_translated_choices' => true
+                'translatable_options' => false
             )
         );
         $resolver->setRequired(array('class'));

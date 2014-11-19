@@ -32,8 +32,10 @@ abstract class AbstractChoiceType extends AbstractType
     {
         if (!empty($view->children['value'])) {
             /** @var FormView $valueFormView */
-            $valueFormView   = $view->children['value'];
-            if (!isset($options['is_translated_choices']) || !$options['is_translated_choices']) {
+            $valueFormView = $view->children['value'];
+            if (!isset($options['field_options']['translatable_options'])
+                || $options['field_options']['translatable_options']
+            ) {
                 $this->translateChoices($view, $valueFormView, $options);
             }
         }

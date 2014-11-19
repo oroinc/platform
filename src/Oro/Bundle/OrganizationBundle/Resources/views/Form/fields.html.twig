@@ -168,7 +168,7 @@
                 <option {{ disable }} value="{{ choice.value }}"
                 {% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
                     {%- spaceless -%}
-                        {% set label = is_translated_choices is defined and is_translated_choices ? choice.label : choice.label|trans({}, translation_domain) %}
+                        {% set label = translatable_options is defined and not translatable_options ? choice.label : choice.label|trans({}, translation_domain) %}
                         {# output is not escaped because it's done form in type "oro_business_unit_tree" #}
                         {{ label|raw }}
                     {%- endspaceless -%}

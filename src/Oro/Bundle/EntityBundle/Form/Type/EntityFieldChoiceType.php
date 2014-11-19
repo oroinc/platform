@@ -88,7 +88,7 @@ class EntityFieldChoiceType extends AbstractType
                 'skip_load_entities'  => false,
                 'skip_load_data'      => false,
                 'configs'             => $defaultConfigs,
-                'is_translated_choices' => true
+                'translatable_options' => false
             )
         );
         $resolver->setNormalizers(
