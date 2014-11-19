@@ -18,6 +18,9 @@ class OroColorTableType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // TODO: ConditionalReverseTransformer is a workaround
+        // due to Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
+        // should be fixed in https://magecore.atlassian.net/browse/BAP-6156
         $builder->addModelTransformer(
             new ConditionalReverseTransformer(
                 new ArrayToJsonTransformer(),
@@ -46,7 +49,9 @@ class OroColorTableType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        // make sure a value is processed by transformers; a problem happens after submitting disabled form
+        // TODO: make sure a value is processed by transformers; a problem happens after submitting disabled form
+        // this is a workaround due to Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber
+        // should be fixed in https://magecore.atlassian.net/browse/BAP-6156
         if (is_array($view->vars['value'])) {
             $value = $view->vars['value'];
             foreach ($form->getConfig()->getModelTransformers() as $transformer) {
