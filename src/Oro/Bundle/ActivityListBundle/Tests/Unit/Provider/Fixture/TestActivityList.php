@@ -22,4 +22,4 @@ class TestActivityList extends ActivityList
     {
         return true;
     }
-} 
+}
