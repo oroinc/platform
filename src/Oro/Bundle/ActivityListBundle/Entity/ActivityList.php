@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Entity;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -48,6 +50,7 @@ class ActivityList extends ExtendActivityList
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $id;
 
@@ -56,6 +59,7 @@ class ActivityList extends ExtendActivityList
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $owner;
 
@@ -64,6 +68,7 @@ class ActivityList extends ExtendActivityList
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $editor;
 
@@ -71,6 +76,7 @@ class ActivityList extends ExtendActivityList
      * @var string
      *
      * @ORM\Column(name="verb", type="string", length=32)
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $verb;
 
@@ -78,6 +84,7 @@ class ActivityList extends ExtendActivityList
      * @var string
      *
      * @ORM\Column(name="subject", type="string", length=255)
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $subject;
 
@@ -85,6 +92,7 @@ class ActivityList extends ExtendActivityList
      * @var string
      *
      * @ORM\Column(name="related_activity_class", type="string", length=255, nullable=false)
+     * @Soap\ComplexType("string", nillable=true)
      */
     protected $relatedActivityClass;
 
@@ -92,6 +100,7 @@ class ActivityList extends ExtendActivityList
      * @var integer
      *
      * @ORM\Column(name="related_activity_id", type="integer", nullable=false)
+     * @Soap\ComplexType("int", nillable=true)
      */
     protected $relatedActivityId;
 
@@ -106,6 +115,7 @@ class ActivityList extends ExtendActivityList
      *          }
      *      }
      * )
+     * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $createdAt;
 
@@ -120,6 +130,7 @@ class ActivityList extends ExtendActivityList
      *          }
      *      }
      * )
+     * @Soap\ComplexType("dateTime", nillable=true)
      */
     protected $updatedAt;
 
