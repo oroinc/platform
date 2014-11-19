@@ -49,10 +49,13 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
 
         $entityConfigProvider   = $this->configManager->getProvider('entity');
         $extendConfigProvider   = $this->configManager->getProvider('extend');
+        $viewConfigProvider     = $this->configManager->getProvider('view');
         $datagridConfigProvider = $this->configManager->getProvider('datagrid');
 
-        $fields   = [];
+        $fields = [];
+        $priorities = [];
         $fieldIds = $entityConfigProvider->getIds($entityClassName);
+        /** @var FieldConfigId $fieldId */
         foreach ($fieldIds as $fieldId) {
             $extendConfig = $extendConfigProvider->getConfigById($fieldId);
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
@@ -61,8 +64,13 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
                 && !$extendConfig->is('is_deleted')
             ) {
                 $fields[] = $fieldId;
+                $priorities[] = $viewConfigProvider
+                    ->getConfig($entityClassName, $fieldId->getFieldName())
+                    ->get('priority', false, 0);
             }
         }
+
+        array_multisort($priorities, SORT_DESC, $fields);
 
         return $fields;
     }
