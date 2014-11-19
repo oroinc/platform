@@ -44,7 +44,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->supports($context));
     }
 
-    public function testNotSupportsWithAnotherThenListActions()
+    public function testDoesNotSupportWithAnotherThenListActions()
     {
         $context = $this->createContext(null, null, null, RestApiReadInterface::ACTION_READ);
         $context->set('query', $this->getMockForAbstractClass('Doctrine\ORM\AbstractQuery', [], '', false));

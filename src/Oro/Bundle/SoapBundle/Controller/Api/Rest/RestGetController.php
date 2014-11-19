@@ -60,7 +60,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
             $code   = Codes::HTTP_OK;
         }
 
-        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], $code);
+        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
     }
 
     /**
