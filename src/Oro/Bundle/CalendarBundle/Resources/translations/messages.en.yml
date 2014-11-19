@@ -10,14 +10,30 @@ oro:
             view_calendar: My Calendar
 
     calendar:
+        my_calendar:                My Calendar
+        add_event:                  Add Event
+        add_event.title:            Add an event to this record
+        assign_event:               Assign Event
+        assign_event.title:         Assign an event to this user
+        assign_event.widget_title:  Assign Event to %username%
+        view_events:                Events
+
+        controller:
+            event.saved.message:  Calendar event saved
+
         form:
             choose_user_to_add_calendar: "Choose a user to add..."
-            exclude_calendar:            "Exclude this calendar"
 
         my_calendar_widget_descriptions: This widget displays a calendar for today.
+        print: Print
 
         menu:
             view_default: My Calendar
+
+        context:
+            remove: Remove calendar
+            hide: Hide calendar
+            show: Show calendar
 
         control:
             all_day: ""
@@ -25,6 +41,9 @@ oro:
             month:   month
             week:    week
             day:     day
+
+        reminder_template:
+            due_message: is starting at
 
         #
         # Oro/Bundle/CalendarBundle/Entity/Calendar
@@ -39,8 +58,6 @@ oro:
         owner.label:         Owner
         organization.label:  Organization
 
-        my_calendar:         My Calendar
-
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
         #
@@ -48,25 +65,26 @@ oro:
             entity_label:         Calendar event
             entity_plural_label:  Calendar events
             entity_description:   Represent calendar event
-            id.label:        Id
-            title.label:     Title
-            start.label:     Start
-            end.label:       End
-            calendar.label:  Calendar
-            all_day.label:   All day event
+            id.label:             Id
+            title.label:          Title
+            description.label:    Description
+            start.label:          Start
+            end.label:            End
+            calendar.label:       Calendar
+            all_day.label:        All day event
 
         #
-        # Oro/Bundle/CalendarBundle/Entity/CalendarConnection.php
+        # Oro/Bundle/CalendarBundle/Entity/CalendarProperty
         #
-        calendarconnection:
-            entity_label:             Calendar of other users
-            entity_plural_label:      Calendars of other users
-            entity_description:       Represent calendar connection
-            id.label:                 Id
-            connected_calendar.label: Connected calendar
-            color.label:              Color
-            calendar.label:           Calendar
-            background_color.label:   Background
-
-        reminder_template:
-            due_message: is starting at
+        calendarproperty:
+            entity_label:           Calendar property
+            entity_plural_label:    Calendar properties
+            entity_description:     Represent different kind of user's properties for a calendar
+            id.label:               Id
+            target_calendar.label:  Target Calendar
+            calendar_alias.label:   Calendar Alias
+            calendar.label:         Calendar Id
+            position.label:         Position
+            visible.label:          Visible
+            color.label:            Color
+            background_color.label: Background

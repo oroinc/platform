@@ -321,16 +321,16 @@ class User extends AbstractPageEntity
         )->click();
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ".
-            "ui-front ui-draggable ui-resizable ui-dialog-normal ui-dialog-buttons']"
+            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
+            "ui-dialog-normal']"
         );
         $this->test->byXpath(
             "//div[@class='ui-dialog-titlebar-buttonpane']/button[@title='close']"
         )->click();
         $this->waitForAjax();
         $this->assertElementNotPresent(
-            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all " .
-            "ui-front ui-draggable ui-resizable ui-dialog-normal ui-dialog-buttons']"
+            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
+            "ui-dialog-normal']"
         );
 
         return $this;

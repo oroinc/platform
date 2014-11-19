@@ -31,7 +31,7 @@ RequireJS services
  - **oro/block-widget** - Block widget
  - **oro/buttons-widget** - Buttons widget
  - **oro/dialog-widget** - Dialog widget
- - **oroui/js/widget/abstract** - Abstract widget, can not be used standalone
+ - **oroui/js/widget/abstract-widget** - Abstract widget, can not be used standalone
 
 Widgets
 =======
@@ -343,7 +343,7 @@ Parameters:
 
 Name |  Type |  Description
 -----|-------|-------------
-widget | oro.AbstractWidget | widget instance
+widget | oroui.widget.AbstractWidget | widget instance
 
 #### getWidgetInstance(wid, callback)
 

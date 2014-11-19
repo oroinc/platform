@@ -57,10 +57,9 @@ class JobExecutor
         ManagerRegistry $managerRegistry
     ) {
         $this->batchJobRegistry = $jobRegistry;
-        $this->batchJobManager = $batchJobRepository->getJobManager();
-        $this->contextRegistry = $contextRegistry;
-        $this->entityManager = $managerRegistry->getManager();
-        $this->managerRegistry = $managerRegistry;
+        $this->batchJobManager  = $batchJobRepository->getJobManager();
+        $this->contextRegistry  = $contextRegistry;
+        $this->managerRegistry  = $managerRegistry;
     }
 
     /**
@@ -71,6 +70,8 @@ class JobExecutor
      */
     public function executeJob($jobType, $jobName, array $configuration = array())
     {
+        $this->initialize();
+
         // create and persist job instance and job execution
         $jobInstance = new JobInstance(self::CONNECTOR_NAME, $jobType, $jobName);
         $jobInstance->setCode($this->generateJobCode($jobName));
@@ -85,14 +86,6 @@ class JobExecutor
 
         // do job
         $jobResult = $this->doJob($jobInstance, $jobExecution);
-
-        // EntityManager can be closed when there was an exception in flush method called inside some jobs execution
-        // Can't be implemented right now due to OroEntityManager external dependencies
-        // on ExtendManager and FilterCollection
-        if (!$this->entityManager->isOpen()) {
-            $this->managerRegistry->resetManager();
-            $this->entityManager = $this->managerRegistry->getManager();
-        }
 
         // flush batch entities
         $this->batchJobManager->flush($jobInstance);
@@ -201,7 +194,7 @@ class JobExecutor
      */
     protected function getJobInstanceRepository()
     {
-        return $this->entityManager->getRepository('AkeneoBatchBundle:JobInstance');
+        return $this->managerRegistry->getRepository('AkeneoBatchBundle:JobInstance');
     }
 
     /**
@@ -250,5 +243,13 @@ class JobExecutor
         $prefix .= date('Y_m_d_H_i_s') . '_';
 
         return preg_replace('~\W~', '_', uniqid($prefix, true));
+    }
+
+    /**
+     * Initialize environment
+     */
+    protected function initialize()
+    {
+        $this->entityManager = $this->managerRegistry->getManager();
     }
 }

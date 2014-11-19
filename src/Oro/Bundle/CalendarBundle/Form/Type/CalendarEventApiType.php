@@ -35,6 +35,14 @@ class CalendarEventApiType extends CalendarEventType
                 )
             )
             ->add(
+                'description',
+                'text',
+                array(
+                    'required' => false,
+                    'label'    => 'oro.calendar.calendarevent.description.label'
+                )
+            )
+            ->add(
                 'start',
                 'datetime',
                 array(
@@ -88,6 +96,7 @@ class CalendarEventApiType extends CalendarEventType
                 'data_class'      => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
                 'intention'       => 'calendar_event',
                 'csrf_protection' => false,
+                'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
             )
         );
     }

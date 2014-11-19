@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
+use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Common\Util\ClassUtils;
@@ -130,6 +131,20 @@ class IndexListener implements OptionalListenerInterface
         if ($this->hasEntitiesToIndex()) {
             $this->indexEntities();
         }
+    }
+
+    /**
+     * Clear object storage when error was occurred during UOW#Commit
+     *
+     * @param OnClearEventArgs $args
+     */
+    public function onClear(OnClearEventArgs $args)
+    {
+        if (!($this->enabled && $this->hasEntitiesToIndex())) {
+            return;
+        }
+
+        $this->savedEntities = $this->deletedEntities = [];
     }
 
     /**

@@ -6,6 +6,7 @@
 "Requires update": "Requires update"
 "Active": "Active"
 "Deleted": "Deleted"
+"Field successfully deleted": "Field successfully deleted"
 
 oro:
     entity_extend:

@@ -3,31 +3,20 @@
 namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 
 class CalendarRepository extends EntityRepository
 {
     /**
-     * Gets user's calendar
+     * Gets user's default calendar
      *
      * @param int $userId
+     * @param int $organizationId
      *
-     * @return Calendar
+     * @return Calendar|null
      */
-    public function findByUser($userId)
-    {
-        return $this->findOneBy(array('owner' => $userId));
-    }
-
-    /**
-     * Gets user's calendar in scope of organization
-     *
-     * @param $userId
-     * @param $organizationId
-     *
-     * @return null|object
-     */
-    public function findByUserAndOrganization($userId, $organizationId)
+    public function findDefaultCalendar($userId, $organizationId)
     {
         return $this->findOneBy(
             array(

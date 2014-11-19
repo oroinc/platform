@@ -17,6 +17,7 @@
 
 .form-horizontal .control-group {
   max-width: auto;
+  margin: 0 0 7px;
 }
 
 .form-horizontal .control-group label.control-label {
@@ -28,8 +29,22 @@
   margin-left: 0px;
 }
 
-.pin-bar, #pin-button-div, .breadcrumb-pin {
+.pin-bar, #pin-button-div, #breadcrumb {
   display: none !important;
+}
+#flash-messages {
+  .flash-messages-frame {
+    left: 50%;
+    min-width: 300px;
+  }
+  .flash-messages-holder {
+    position: absolute;
+    left: -50%;
+    width: 100%;
+  }
+  .alert .close {
+    font-size: 25px;
+  }
 }
 
 .scrollspy-nav, .scrollspy-nav-target {

@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -20,7 +18,6 @@ use Oro\Bundle\ReminderBundle\Form\Type\ReminderCollectionType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderInterval\UnitType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderType;
-use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
 
@@ -79,12 +76,13 @@ class CalendarEventApiTypeTest extends TypeTestCase
     public function testSubmitValidData()
     {
         $formData = array(
-            'calendar'  => 1,
-            'title'     => 'testTitle',
-            'start'     => '2013-10-05T13:00:00Z',
-            'end'       => '2013-10-05T13:30:00+00:00',
-            'allDay'    => true,
-            'reminders' => new ArrayCollection()
+            'calendar'    => 1,
+            'title'       => 'testTitle',
+            'description' => 'testDescription',
+            'start'       => '2013-10-05T13:00:00Z',
+            'end'         => '2013-10-05T13:30:00+00:00',
+            'allDay'      => true,
+            'reminders'   => new ArrayCollection()
         );
 
         $type = new CalendarEventApiType(array());
@@ -100,6 +98,7 @@ class CalendarEventApiTypeTest extends TypeTestCase
         ReflectionUtil::setId($calendar, 1);
         $this->assertEquals($calendar, $result->getCalendar());
         $this->assertEquals('testTitle', $result->getTitle());
+        $this->assertEquals('testDescription', $result->getDescription());
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:00:00Z'), $result->getStart());
         $this->assertDateTimeEquals(new \DateTime('2013-10-05T13:30:00Z'), $result->getEnd());
         $this->assertTrue($result->getAllDay());
@@ -119,9 +118,10 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->method('setDefaults')
             ->with(
                 array(
-                    'data_class'      => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                    'intention'       => 'calendar_event',
-                    'csrf_protection' => false,
+                    'data_class'           => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                    'intention'            => 'calendar_event',
+                    'csrf_protection'      => false,
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 )
             );
 

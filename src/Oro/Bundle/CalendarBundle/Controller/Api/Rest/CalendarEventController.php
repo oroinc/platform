@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Controller\Api\Rest;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -16,12 +17,11 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
-use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 
 /**
  * @RouteResource("calendarevent")
@@ -33,101 +33,102 @@ class CalendarEventController extends RestController implements ClassResourceInt
      * Get calendar events.
      *
      * @QueryParam(
-     *      name="calendar", requirements="\d+", nullable=false, strict=true,
-     *      description="Calendar id.")
+     *      name="calendar", requirements="\d+",
+     *      nullable=false,
+     *      strict=true,
+     *      description="Calendar id."
+     * )
+     * @QueryParam(
+     *      name="page",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Page number, starting from 1. Defaults to 1."
+     * )
+     * @QueryParam(
+     *      name="limit",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Number of items per page. defaults to 10."
+     * )
      * @QueryParam(
      *      name="start",
      *      requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
-     *      nullable=false, strict=true,
-     *      description="Start date in RFC 3339. For example: 2009-11-05T13:15:30Z.")
+     *      nullable=true,
+     *      strict=true,
+     *      description="Start date in RFC 3339. For example: 2009-11-05T13:15:30Z."
+     * )
      * @QueryParam(
      *      name="end",
      *      requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
-     *      nullable=false, strict=true,
-     *      description="End date in RFC 3339. For example: 2009-11-05T13:15:30Z.")
+     *      nullable=true,
+     *      strict=true,
+     *      description="End date in RFC 3339. For example: 2009-11-05T13:15:30Z."
+     * )
      * @QueryParam(
-     *      name="subordinate", requirements="(true)|(false)", nullable=true, strict=true, default="false",
-     *      description="Determine whether events from connected calendars should be included or not.")
+     *      name="subordinate",
+     *      requirements="(true)|(false)",
+     *      nullable=true,
+     *      strict=true,
+     *      default="false",
+     *      description="Determines whether events from connected calendars should be included or not."
+     * )
+     * @QueryParam(
+     *     name="createdAt",
+     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
+     *     nullable=true,
+     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
+     * )
+     * @QueryParam(
+     *     name="updatedAt",
+     *     requirements="\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?",
+     *     nullable=true,
+     *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
+     * )
      * @ApiDoc(
      *      description="Get calendar events",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_calendar_event_view",
-     *      type="entity",
-     *      class="OroCalendarBundle:CalendarEvent",
-     *      permission="VIEW",
-     *      group_name=""
-     * )
+     * @AclAncestor("oro_calendar_event_view")
      *
      * @return Response
-     * @throws \InvalidArgumentException
      */
     public function cgetAction()
     {
         $calendarId  = (int)$this->getRequest()->get('calendar');
-        $start       = new \DateTime($this->getRequest()->get('start'));
-        $end         = new \DateTime($this->getRequest()->get('end'));
         $subordinate = (true == $this->getRequest()->get('subordinate'));
 
-        /** @var SecurityFacade $securityFacade */
-        $securityFacade = $this->get('oro_security.security_facade');
-        if (!$securityFacade->isGranted('oro_calendar_connection_view')) {
-            $subordinate = false;
-        }
+        $qb = null;
+        if ($this->getRequest()->get('start') && $this->getRequest()->get('end')) {
+            $result = $this->get('oro_calendar.calendar_manager')->getCalendarEvents(
+                $this->getUser()->getId(),
+                $calendarId,
+                new \DateTime($this->getRequest()->get('start')),
+                new \DateTime($this->getRequest()->get('end')),
+                $subordinate
+            );
+        } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
+            $dateParamFilter  = new HttpDateTimeParameterFilter();
+            $filterParameters = ['createdAt' => $dateParamFilter, 'updatedAt' => $dateParamFilter];
+            $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
 
-        $manager = $this->getManager();
-        /** @var CalendarEventRepository $repo */
-        $repo = $manager->getRepository();
-        $qb = $repo->getEventListQueryBuilder($calendarId, $start, $end, $subordinate);
+            /** @var CalendarEventRepository $repo */
+            $repo  = $this->getManager()->getRepository();
+            $qb    = $repo->getEventListQueryBuilder($calendarId, $subordinate, $filterCriteria);
+            $page  = (int)$this->getRequest()->get('page', 1);
+            $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+            $qb->setMaxResults($limit)
+                ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
 
-        $result = array();
-
-        $items = $qb->getQuery()->getArrayResult();
-        $itemIds = array_map(
-            function ($item) {
-                return $item['id'];
-            },
-            $items
-        );
-        $reminders = $manager
-            ->getObjectManager()
-            ->getRepository('OroReminderBundle:Reminder')
-            ->findRemindersByEntities($itemIds, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
-
-        foreach ($items as $item) {
-            $resultItem = array();
-            foreach ($item as $field => $value) {
-                $this->transformEntityField($field, $value);
-                $resultItem[$field] = $value;
-            }
-            $resultItem['editable'] =
-                ($resultItem['calendar'] === $calendarId)
-                && $securityFacade->isGranted('oro_calendar_event_update');
-            $resultItem['removable'] =
-                ($resultItem['calendar'] === $calendarId)
-                && $securityFacade->isGranted('oro_calendar_event_delete');
-            $resultReminders = array_filter(
-                $reminders,
-                function ($reminder) use ($resultItem) {
-                    /* @var Reminder $reminder */
-                    return $reminder->getRelatedEntityId() == $resultItem['id'];
-                }
+            $result = $this->get('oro_calendar.calendar_event.normalizer')->getCalendarEvents(
+                $calendarId,
+                $qb
             );
 
-            $resultItem['reminders'] = [];
-            foreach ($resultReminders as $resultReminder) {
-                /* @var Reminder $resultReminder */
-                $resultItem['reminders'][] = [
-                    'method' => $resultReminder->getMethod(),
-                    'interval' => [
-                        'number' => $resultReminder->getInterval()->getNumber(),
-                        'unit' => $resultReminder->getInterval()->getUnit()
-                    ]
-                ];
-            }
-
-            $result[] = $resultItem;
+            return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
+        } else {
+            throw new BadRequestHttpException(
+                'Time interval ("start" and "end") or paging ("page" and "limit") parameters should be specified.'
+            );
         }
 
         return new Response(json_encode($result), Codes::HTTP_OK);
@@ -142,13 +143,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *      description="Update calendar event",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_calendar_event_update",
-     *      type="entity",
-     *      class="OroCalendarBundle:CalendarEvent",
-     *      permission="EDIT",
-     *      group_name=""
-     * )
+     * @AclAncestor("oro_calendar_event_update")
      *
      * @return Response
      */
@@ -165,13 +160,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *      description="Create new calendar event",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_calendar_event_create",
-     *      type="entity",
-     *      class="OroCalendarBundle:CalendarEvent",
-     *      permission="CREATE",
-     *      group_name=""
-     * )
+     * @AclAncestor("oro_calendar_event_create")
      *
      * @return Response
      */
@@ -235,7 +224,14 @@ class CalendarEventController extends RestController implements ClassResourceInt
     {
         parent::fixFormData($data, $entity);
 
+        if (isset($data['allDay']) && ($data['allDay'] === 'false' || $data['allDay'] === '0')) {
+            $data['allDay'] = false;
+        }
+
         // remove auxiliary attributes if any
+        unset($data['createdAt']);
+        unset($data['updatedAt']);
+        unset($data['calendarAlias']);
         unset($data['editable']);
         unset($data['removable']);
 

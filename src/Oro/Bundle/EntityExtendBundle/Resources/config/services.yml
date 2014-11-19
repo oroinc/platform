@@ -33,6 +33,9 @@ parameters:
     oro_entity_extend.twig.extension.dynamic_fields.class:    Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension
     oro_entity_extend.twig.extension.enum.class:              Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
     oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
+    oro_entity_extend.datagrid.action.type.ajaxdeletefield.class:  Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction
+    oro_entity_extend.validation_loader.class:                Oro\Bundle\EntityExtendBundle\Validator\ExtendFieldValidationLoader
+    oro_entity_extend.listener.extend_field_value_render.class:  Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -261,8 +264,7 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_entity_extend.extend.field_type_helper
-            - @oro_locale.formatter.date_time
-            - @router
+            - @event_dispatcher
         tags:
             - { name: twig.extension }
 
@@ -279,3 +281,35 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: oro_datagrid.column_options_guesser }
+
+    oro_entity_extend.datagrid.action.type.ajaxdeletefield:
+        class: %oro_entity_extend.datagrid.action.type.ajaxdeletefield.class%
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
+
+    oro_entity_extend.validation_loader:
+        class: %oro_entity_extend.validation_loader.class%
+        public: false
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.form
+        calls:
+            -
+                - addConstraints
+                -
+                    - integer
+                    -
+                        - Regex:
+                            pattern: "/^[\d+]*$/"
+                            message: "This value should contain only numbers."
+
+    oro_entity_extend.listener.extend_field_value_render:
+        class: %oro_entity_extend.listener.extend_field_value_render.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @router
+            - @oro_entity_extend.extend.field_type_helper
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }

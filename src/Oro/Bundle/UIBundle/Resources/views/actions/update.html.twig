@@ -6,6 +6,10 @@
 
 {% set entity = entity is defined ? entity : null %}
 
+{% block before_content_addition %}
+    {% placeholder update_before_content_addition with {entity: entity} %}
+{% endblock before_content_addition %}
+
 {% block content %}
     {% if isWidgetContext and savedId is defined and savedId %}
         <script type="text/javascript">
@@ -20,7 +24,7 @@
             });
         </script>
     {% else %}
-    <form id="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
+    <form id="{{ form.vars.name }}" action="{{ oro_url_add_query(formAction) }}" {{ form_enctype(form) }}
           method="post" data-collect="true">
         {% if isWidgetContext %}
             <div class="widget-actions">
@@ -43,11 +47,11 @@
                                     <div class="clearfix">
                                         {% block breadcrumbs %}
                                             <div class="pull-left">
-                                                <div class="sub-title"><a href="{{ breadcrumbs.indexPath }}">{{ breadcrumbs.indexLabel }}</a></div>
+                                                <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a></div>
                                                 <span class="separator">/</span>
                                                 {% if breadcrumbs.additional is defined %}
                                                     {% for breadcrumb in breadcrumbs.additional %}
-                                                    <div class="sub-title"><a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a></div>
+                                                    <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
                                                     <span class="separator">/</span>
                                                     {% endfor %}
                                                 {% endif %}
@@ -93,17 +97,23 @@
                         <div class="pull-right user-info-state">
                             <div class="inline-decorate-container">
                                 <ul class="inline-decorate">
-                                    {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : form.vars.value.id|default %}
-                                    {% if audit_entity_id %}
-                                        {% placeholder change_history_block with {
-                                            'entity': entity|default(form.vars.value),
-                                            'entity_class': audit_entity_class|default(null),
-                                            'id': audit_entity_id,
-                                            'title': audit_title|default(form.vars.value),
-                                            'audit_path': audit_path|default('oro_dataaudit_history'),
-                                            'audit_show_change_history': audit_show_change_history|default(false)
-                                        } %}
-                                    {% endif %}
+                                    {% block pageActions %}
+                                        {% placeholder update_pageActions_before with {entity: entity} %}
+
+                                        {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : form.vars.value.id|default %}
+                                        {% if audit_entity_id %}
+                                            {% placeholder change_history_block with {
+                                                'entity': entity|default(form.vars.value),
+                                                'entity_class': audit_entity_class|default(null),
+                                                'id': audit_entity_id,
+                                                'title': audit_title|default(form.vars.value),
+                                                'audit_path': audit_path|default('oro_dataaudit_history'),
+                                                'audit_show_change_history': audit_show_change_history|default(false)
+                                            } %}
+                                        {% endif %}
+
+                                        {% placeholder update_pageActions_after with {entity: entity} %}
+                                    {% endblock pageActions %}
                                 </ul>
                             </div>
                         </div>

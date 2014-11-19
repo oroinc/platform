@@ -11,16 +11,20 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\WorkflowBundle\Cache\ProcessTriggerCache;
 use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Bundle\WorkflowBundle\Model\ProcessLogger;
+use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ProcessCollectorListener implements OptionalListenerInterface
 {
     /**
@@ -47,6 +51,11 @@ class ProcessCollectorListener implements OptionalListenerInterface
      * @var ProcessTriggerCache
      */
     protected $triggerCache;
+
+    /**
+     * @var ProcessSchedulePolicy
+     */
+    protected $schedulePolicy;
 
     /**
      * @var array
@@ -79,24 +88,27 @@ class ProcessCollectorListener implements OptionalListenerInterface
     protected $enabled = true;
 
     /**
-     * @param ManagerRegistry     $registry
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ProcessHandler      $handler
-     * @param ProcessLogger       $logger
-     * @param ProcessTriggerCache $triggerCache
+     * @param ManagerRegistry           $registry
+     * @param DoctrineHelper            $doctrineHelper
+     * @param ProcessHandler            $handler
+     * @param ProcessLogger             $logger
+     * @param ProcessTriggerCache       $triggerCache
+     * @param ProcessSchedulePolicy     $schedulePolicy
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
         ProcessHandler $handler,
         ProcessLogger $logger,
-        ProcessTriggerCache $triggerCache
+        ProcessTriggerCache $triggerCache,
+        ProcessSchedulePolicy $schedulePolicy
     ) {
         $this->registry       = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->handler        = $handler;
         $this->logger         = $logger;
         $this->triggerCache   = $triggerCache;
+        $this->schedulePolicy = $schedulePolicy;
     }
 
     /**
@@ -203,12 +215,16 @@ class ProcessCollectorListener implements OptionalListenerInterface
             return;
         }
 
+        $changeSet = $args->getEntityChangeSet();
+        foreach (array_keys($changeSet) as $field) {
+            $changeSet[$field] = ['old' => $args->getOldValue($field), 'new' => $args->getNewValue($field)];
+        }
         $entityTriggers = $this->getTriggers($entityClass, $event);
         foreach ($entityTriggers as $trigger) {
-            $this->scheduleProcess($trigger, $entity);
+            $this->scheduleProcess($trigger, $entity, $changeSet);
         }
 
-        foreach (array_keys($args->getEntityChangeSet()) as $field) {
+        foreach (array_keys($changeSet) as $field) {
             $fieldTriggers = $this->getTriggers($entityClass, $event, $field);
 
             foreach ($fieldTriggers as $trigger) {
@@ -216,7 +232,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 $newValue = $args->getNewValue($field);
 
                 if ($newValue != $oldValue) {
-                    $this->scheduleProcess($trigger, $entity, $oldValue, $newValue);
+                    $this->scheduleProcess($trigger, $entity, $changeSet, $oldValue, $newValue);
                 }
             }
         }
@@ -277,7 +293,8 @@ class ProcessCollectorListener implements OptionalListenerInterface
         $entityManager = $args->getEntityManager();
 
         // handle processes
-        $hasHandledProcesses = false;
+        $hasQueuedOrHandledProcesses = false;
+        $handledProcesses = [];
         foreach ($this->scheduledProcesses as &$entityProcesses) {
             while ($entityProcess = array_shift($entityProcesses)) {
                 /** @var ProcessTrigger $trigger */
@@ -292,15 +309,25 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 } else {
                     $this->logger->debug('Process handled', $trigger, $data);
                     $this->handler->handleTrigger($trigger, $data);
+                    $handledProcesses[] = $entityProcess;
                 }
 
-                $hasHandledProcesses = true;
+                $hasQueuedOrHandledProcesses = true;
             }
         }
 
         // save both handled entities and queued process jobs
-        if ($hasHandledProcesses) {
+        if ($hasQueuedOrHandledProcesses) {
             $entityManager->flush();
+
+            foreach ($handledProcesses as $entityProcess) {
+                /** @var ProcessTrigger $trigger */
+                $trigger = $entityProcess['trigger'];
+                /** @var ProcessData $data */
+                $data = $entityProcess['data'];
+
+                $this->handler->finishTrigger($trigger, $data);
+            }
         }
 
         // delete unused processes
@@ -369,18 +396,32 @@ class ProcessCollectorListener implements OptionalListenerInterface
     /**
      * @param ProcessTrigger $trigger
      * @param object $entity
+     * @param array|null $changeSet
      * @param mixed|null $old
      * @param mixed|null $new
      */
-    protected function scheduleProcess(ProcessTrigger $trigger, $entity, $old = null, $new = null)
-    {
+    protected function scheduleProcess(
+        ProcessTrigger $trigger,
+        $entity,
+        array $changeSet = null,
+        $old = null,
+        $new = null
+    ) {
         $entityClass = ClassUtils::getClass($entity);
 
         // important to set modified flag to true
         $data = new ProcessData();
         $data->set('data', $entity);
+        if ($changeSet) {
+            $data->set('changeSet', $changeSet);
+        }
         if ($old || $new) {
             $data->set('old', $old)->set('new', $new);
+        }
+
+        if (!$this->schedulePolicy->isScheduleAllowed($trigger, $data)) {
+            $this->logger->debug('Policy declined process scheduling', $trigger, $data);
+            return;
         }
 
         $this->scheduledProcesses[$entityClass][] = array('trigger' => $trigger, 'data' => $data);

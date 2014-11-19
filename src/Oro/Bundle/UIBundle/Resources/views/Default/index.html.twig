@@ -95,6 +95,9 @@
                             {% endblock breadcrumb %}
                         </div>
                         {% placeholder pin_button %}
+                        <div id="before-content-addition">
+                            {% block before_content_addition %}{% endblock before_content_addition %}
+                        </div>
                         <div id="flash-messages">
                             {% block messages %}
                                 <div class="flash-messages-frame">
@@ -209,7 +212,8 @@
             'data': {
                 'scripts': block('head_script'),
                 'content': block('page_container'),
-                'breadcrumb': block('breadcrumb')|trim
+                'breadcrumb': block('breadcrumb')|trim,
+                'beforeContentAddition': block('before_content_addition')
             }
         }
     %}

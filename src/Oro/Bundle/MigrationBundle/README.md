@@ -264,7 +264,7 @@ Also if you need to use other extension in your extension the extension class sh
 Data fixtures
 -------------
 
-Syfony allows to load data using data fixtures. But these fixtures are run each time when `doctrine:fixtures:load` command is executed.
+Symfony allows to load data using data fixtures. But these fixtures are run each time when `doctrine:fixtures:load` command is executed.
 
 To avoid loading the same fixture several time, **oro:migration:data:load** command was created. This command guarantees that each data fixture will be loaded only once.
 

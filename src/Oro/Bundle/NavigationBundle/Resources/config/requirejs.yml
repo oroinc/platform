@@ -15,8 +15,8 @@ config:
         'oronavigation/js/shortcuts/view': 'bundles/oronavigation/js/shortcuts/view.js'
         'oronavigation/js/app/components/favorite-component': 'bundles/oronavigation/js/app/components/favorite-component.js'
         'oronavigation/js/app/components/pin-component': 'bundles/oronavigation/js/app/components/pin-component.js'
-        'oronavigation/js/app/modules/views': 'bundles/oronavigation/js/app/modules/views.js'
-        'oronavigation/js/app/modules/content-manager': 'bundles/oronavigation/js/app/modules/content-manager.js'
+        'oronavigation/js/app/modules/views-module': 'bundles/oronavigation/js/app/modules/views-module.js'
+        'oronavigation/js/app/modules/content-manager-module': 'bundles/oronavigation/js/app/modules/content-manager-module.js'
         'oronavigation/js/app/models/base/collection': 'bundles/oronavigation/js/app/models/base/collection.js'
         'oronavigation/js/app/models/base/model': 'bundles/oronavigation/js/app/models/base/model.js'
         'oronavigation/js/app/models/page-state-model': 'bundles/oronavigation/js/app/models/page-state-model.js'
@@ -24,5 +24,5 @@ config:
         'oronavigation/js/app/views/history-view': 'bundles/oronavigation/js/app/views/history-view.js'
         'oronavigation/js/app/views/most-viewed-view': 'bundles/oronavigation/js/app/views/most-viewed-view.js'
     appmodules:
-        - oronavigation/js/app/modules/views
-        - oronavigation/js/app/modules/content-manager
+        - oronavigation/js/app/modules/views-module
+        - oronavigation/js/app/modules/content-manager-module

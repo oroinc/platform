@@ -24,6 +24,14 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
     /**
      * {@inheritdoc}
      */
+    public function getPriority()
+    {
+        return 300;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getEntityName(DatagridConfiguration $config)
     {
         return $config->offsetGetByPath(self::EXTEND_ENTITY_CONFIG_PATH);

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -22,9 +24,6 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
     /** @var RegistryInterface */
     protected $registry;
 
-    /** @var EntityManager */
-    protected $em;
-
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
@@ -34,20 +33,25 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
     /** @var ContextRegistry */
     protected $contextRegistry;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param RegistryInterface        $registry
      * @param EventDispatcherInterface $eventDispatcher
      * @param ContextRegistry          $contextRegistry
+     * @param LoggerInterface          $logger
      */
     public function __construct(
         RegistryInterface $registry,
         EventDispatcherInterface $eventDispatcher,
-        ContextRegistry $contextRegistry
+        ContextRegistry $contextRegistry,
+        LoggerInterface $logger
     ) {
         $this->registry        = $registry;
         $this->eventDispatcher = $eventDispatcher;
         $this->contextRegistry = $contextRegistry;
-        $this->ensureEntityManagerReady();
+        $this->logger          = $logger;
     }
 
     /**
@@ -55,26 +59,31 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
      */
     public function write(array $items)
     {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
+
         try {
-            $this->em->beginTransaction();
+            $em->beginTransaction();
 
             foreach ($items as $item) {
-                $this->em->persist($item);
+                $em->persist($item);
             }
 
-            $this->em->flush();
-            $this->em->commit();
+            $em->flush();
+            $em->commit();
 
             $configuration = $this->contextRegistry
                 ->getByStepExecution($this->stepExecution)
                 ->getConfiguration();
 
             if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
-                $this->em->clear();
+                $em->clear();
             }
         } catch (\Exception $exception) {
-            $this->em->rollback();
-            $this->ensureEntityManagerReady();
+            $em->rollback();
+            if (!$em->isOpen()) {
+                $this->registry->resetManager();
+            }
 
             $jobName = $this->stepExecution->getJobExecution()->getJobInstance()->getAlias();
 
@@ -87,7 +96,8 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
                     'error_entries_count',
                     (int)$importContext->getValue('error_entries_count') + count($items)
                 );
-                $importContext->addError($event->getWarning());
+
+                $this->logger->warning($event->getWarning());
 
                 if ($event->getException() === $exception) {
                     // exception are already handled and job can move forward
@@ -101,7 +111,7 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
             }
         }
 
-        $this->eventDispatcher->dispatch(WriterAfterFlushEvent::NAME, new WriterAfterFlushEvent($this->em));
+        $this->eventDispatcher->dispatch(WriterAfterFlushEvent::NAME, new WriterAfterFlushEvent($em));
     }
 
     /**
@@ -110,18 +120,5 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
-    }
-
-    /**
-     * Prepares EntityManager, reset it if closed with error
-     */
-    protected function ensureEntityManagerReady()
-    {
-        $this->em = $this->registry->getManager();
-
-        if (!$this->em->isOpen()) {
-            $this->registry->resetManager();
-            $this->ensureEntityManagerReady();
-        }
     }
 }

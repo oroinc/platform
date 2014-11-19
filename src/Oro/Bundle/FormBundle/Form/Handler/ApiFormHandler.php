@@ -7,8 +7,6 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-use OroCRM\Bundle\TaskBundle\Entity\Task;
-
 class ApiFormHandler
 {
     /**

@@ -1,0 +1,2 @@
+oro.entity_pagination.system_configuration.fields.enabled.tooltip: 'Navigate to previous or next grid entity from a view page'
+oro.entity_pagination.system_configuration.fields.limit.tooltip: 'Maximum number of records that will be supported by Record Pagination'

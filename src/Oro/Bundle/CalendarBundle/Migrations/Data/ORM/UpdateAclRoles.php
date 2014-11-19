@@ -62,11 +62,6 @@ class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterfac
     {
         $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_USER));
 
-        // deny to view other user's calendar
-        $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarConnection');
-        $maskBuilder = $manager->getMaskBuilder($oid);
-        $manager->setPermission($sid, $oid, $maskBuilder->get());
-
         // grant to manage own calendar events
         $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
         $maskBuilder = $manager->getMaskBuilder($oid)
@@ -85,14 +80,6 @@ class UpdateAclRoles extends AbstractFixture implements DependentFixtureInterfac
     protected function updateManagerRole(AclManager $manager)
     {
         $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_MANAGER));
-
-        // grant to view other user's calendar for the same business unit
-        $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarConnection');
-        $maskBuilder = $manager->getMaskBuilder($oid)
-        //    ->add('VIEW_LOCAL');
-        // @todo now only SYSTEM level is supported
-            ->add('VIEW_SYSTEM');
-        $manager->setPermission($sid, $oid, $maskBuilder->get());
 
         // grant to manage own calendar events
         $oid = $manager->getOid('entity:Oro\Bundle\CalendarBundle\Entity\CalendarEvent');

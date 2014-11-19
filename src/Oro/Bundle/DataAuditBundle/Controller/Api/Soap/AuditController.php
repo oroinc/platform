@@ -2,22 +2,30 @@
 
 namespace Oro\Bundle\DataAuditBundle\Controller\Api\Soap;
 
-use Symfony\Component\DependencyInjection\ContainerAware;
-use Doctrine\Common\Persistence\ObjectManager;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\DataAuditBundle\Entity\Audit;
 
-class AuditController extends ContainerAware
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapGetController;
+
+class AuditController extends SoapGetController
 {
     /**
      * @Soap\Method("getAudits")
+     * @Soap\Param("page", phpType="int")
+     * @Soap\Param("limit", phpType="int")
      * @Soap\Result(phpType = "Oro\Bundle\DataAuditBundle\Entity\Audit[]")
      * @AclAncestor("oro_dataaudit_history")
+     *
+     * @param int $page
+     * @param int $limit
+     *
+     * @return Audit[]
      */
-    public function cgetAction()
+    public function cgetAction($page = 1, $limit = 10)
     {
-        return $this->getManager()->getRepository('OroDataAuditBundle:Audit')->findAll();
+        return $this->handleGetListRequest($page, $limit);
     }
 
     /**
@@ -25,36 +33,23 @@ class AuditController extends ContainerAware
      * @Soap\Param("id", phpType = "int")
      * @Soap\Result(phpType = "Oro\Bundle\DataAuditBundle\Entity\Audit")
      * @AclAncestor("oro_dataaudit_history")
+     *
+     * @param int $id
+     *
+     * @return Audit
      */
     public function getAction($id)
     {
-        return $this->getEntity('OroDataAuditBundle:Audit', (int) $id);
+        return $this->handleGetRequest($id);
     }
 
     /**
-     * Shortcut to get entity
+     * Get entity Manager
      *
-     * @param  string     $repo
-     * @param  int|string $id
-     * @throws \SoapFault
-     * @return Audit
+     * @return ApiEntityManager
      */
-    protected function getEntity($repo, $id)
+    public function getManager()
     {
-        $entity = $this->getManager()->find($repo, $id);
-
-        if (!$entity) {
-            throw new \SoapFault('NOT_FOUND', sprintf('Record #%u can not be found', $id));
-        }
-
-        return $entity;
-    }
-
-    /**
-     * @return ObjectManager
-     */
-    protected function getManager()
-    {
-        return $this->container->get('doctrine.orm.entity_manager');
+        return $this->container->get('oro_dataaudit.audit.manager.api');
     }
 }
