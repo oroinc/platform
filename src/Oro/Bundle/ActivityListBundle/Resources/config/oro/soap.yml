@@ -1,2 +1,2 @@
 classes:
-  - Oro\Bundle\ActivityListBundle\Controller\Api\Soap\ActivityListController
+    - Oro\Bundle\ActivityListBundle\Controller\Api\Soap\ActivityListController
