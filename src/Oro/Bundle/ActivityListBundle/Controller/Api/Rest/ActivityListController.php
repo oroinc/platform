@@ -96,9 +96,7 @@ class ActivityListController extends RestController
 
         $qb = $this->getManager()
             ->getRepository()
-            ->getActivityListQueryBuilder(
-                $entityClass, $entityId, $activityClasses, $dateFrom, $dateTo
-            );
+            ->getActivityListQueryBuilder($entityClass, $entityId, $activityClasses, $dateFrom, $dateTo);
 
         $pager = $this->container->get('oro_datagrid.extension.pager.orm.pager');
         $pager->setQueryBuilder($qb);
