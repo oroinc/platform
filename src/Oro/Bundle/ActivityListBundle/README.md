@@ -6,7 +6,7 @@ Table of content
 ----------------
 - [Fundamentals](#fundamentals)
 - [Add widget into a page](#add-widget-into-a-page)
-- [Register an new entity](#register-an-new-entity)
+- [Register a new entity](#register-a-new-entity)
 - [Configuration](#configuration)
 
 Fundamentals
@@ -28,7 +28,7 @@ The widget currently displayed in "Record activities" placeholder block on an en
 
 Add widget into a page
 ----------------------
-Place widget into your page using placeholders, passing an entity object into template.
+Generally widget will be rendered in placeholder "view_content_data_activities". But in case of extending or using view template different from 'OroUIBundle:actions:view.html.twig' you will have to define placeholder in it, e.g.: 
 
 ```
   {%- set activitiesData -%}
@@ -43,9 +43,9 @@ Place widget into your page using placeholders, passing an entity object into te
   }]) %}
 ```
 
-Register an new entity
+Register a new entity
 ----------------------
-To add an new entity to be displayed within widget you need to register a service that implements **ActivityListProviderInterface** and tagged as **oro_activity_list.provider**. Working example can be found in EmailBundle or CalendarBundle:
+To add a new entity to be displayed within widget you need to register a service that implements **ActivityListProviderInterface** and tagged as **oro_activity_list.provider**. Working example can be found in EmailBundle or CalendarBundle:
 ```
     oro_calendar.activity_list.provider:
         class: %oro_calendar.activity_list.provider.class%
