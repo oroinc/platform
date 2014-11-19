@@ -19,6 +19,9 @@ UPGRADE FROM 1.4 to 1.5
 - Added `oro_simple_color_choice` Symfony2 form type based on `choice` and using [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added `oro_color_table` Symfony2 form type intended to edit any color in a list and using [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff and [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
 
+####NavigationBundle
+- Added ability to use service functions into menu attributes to get data
+
 ####UIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
