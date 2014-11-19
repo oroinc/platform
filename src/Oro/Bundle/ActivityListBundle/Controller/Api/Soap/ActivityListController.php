@@ -10,7 +10,8 @@ use Oro\Bundle\SoapBundle\Controller\Api\Soap\SoapController;
 class ActivityListController extends SoapController
 {
     /**
-     * @Soap\Method("getActivityLists")
+     * @Soap\Method("getActivitiesList")
+     *
      * @Soap\Param("entityClass", phpType="string")
      * @Soap\Param("entityId", phpType="int")
      * @Soap\Param("activityClasses", phpType="string[]")
@@ -18,6 +19,7 @@ class ActivityListController extends SoapController
      * @Soap\Param("dateTo", phpType="dateTime")
      * @Soap\Param("page", phpType="int")
      * @Soap\Param("limit", phpType="int")
+     *
      * @Soap\Result(phpType = "Oro\Bundle\ActivityListBundle\Entity\ActivityList[]")
      */
     public function cgetAction(
@@ -29,7 +31,7 @@ class ActivityListController extends SoapController
         $page = 1,
         $limit = null
     ) {
-        $limit = $limit ? $limit : $this->container->get('oro_config.user')->get('oro_activity_list.per_page');
+        $limit = $limit ?: $this->container->get('oro_config.user')->get('oro_activity_list.per_page');
 
         /** @var ActivityListRepository $repo */
         $repo = $this->getManager()->getRepository();
@@ -40,9 +42,8 @@ class ActivityListController extends SoapController
         $pager->setPage($page);
         $pager->setMaxPerPage($limit);
         $pager->init();
-        $result = $pager->getResults();
 
-        return $this->transformToSoapEntities($result);
+        return $this->transformToSoapEntities($pager->getResults());
     }
 
     /**
