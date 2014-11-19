@@ -19,7 +19,6 @@ define(function (require) {
             configuration: {},
             template: null,
             itemTemplate: null,
-            itemAddEvent: 'activity:add',
             itemViewIdPrefix: 'activity-',
             listSelector: '.items.list-box',
             fallbackSelector: '.no-data',
@@ -55,10 +54,23 @@ define(function (require) {
 
             this.template = _.template($(this.options.template).html());
 
-            // create communication in scope of active controller
-            mediator.on(this.options.itemAddEvent, this._addItem, this);
+            /**
+             * on adding activity item listen to "widget:doRefresh:activity-list-widget"
+             */
+            mediator.on('widget:doRefresh:activity-list-widget', _.bind(function () {
+                this._reload();
+            }, this));
+
+            /**
+             * on editing activity item listen to "widget_success:activity_list:item:update"
+             */
+            mediator.on('widget_success:activity_list:item:update', _.bind(function () {
+                this._reload();
+            }, this));
 
             ActivityListView.__super__.initialize.call(this, options);
+
+            this._initPager();
         },
 
         /**
@@ -68,59 +80,138 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
+
             delete this.itemEditDialog;
             delete this.$loadingMaskContainer;
+
             ActivityListView.__super__.dispose.call(this);
         },
 
         render: function () {
             ActivityListView.__super__.render.apply(this, arguments);
             this.$loadingMaskContainer = this.$('.loading-mask');
+            this._initActionMenus();
             return this;
         },
 
-        expandAll: function () {
-            _.each(this.subviews, function (itemView) {
-                itemView.toggle(false);
-            });
-        },
-
-        collapseAll: function () {
-            _.each(this.subviews, function (itemView) {
-                itemView.toggle(true);
-            });
-        },
-
         refresh: function () {
+            this.collection.setPage(1);
+            this._setPageNumber();
             this._reload();
         },
 
-        filter: function () {
-            this._filter();
+        _initActionMenus: function () {
+            $('.activity-list .dropdown-toggle').unbind('mouseover').bind('mouseover', function () {
+                $(this).trigger('click');
+            });
+            $('.activity-list .dropdown-menu').unbind('mouseleave').bind('mouseleave', function () {
+                $(this).parent().find('a.dropdown-toggle').trigger('click');
+            });
         },
 
-        more: function () {
-            this._more();
-        },
-
-        _reload: function (sorting) {
-            //var state = {};
-            if (!_.isUndefined(sorting)) {
-                this.collection.setSorting(sorting);
+        _initPager: function () {
+            if (this.collection.getPageSize() < this.collection.getCount()) {
+                this._toggleNext(true);
             }
+            $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
+            $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+        },
+
+        goto_previous: function () {
+            var currentPage = this.collection.getPage();
+            if (currentPage > 1) {
+                var nextPage = currentPage - 1;
+                this.collection.setPage(nextPage);
+                if (nextPage == 1) {
+                    this._togglePrevious();
+                }
+
+                if (this.collection.pager.total > 1) {
+                    this._toggleNext(true);
+                } else {
+                    this._toggleNext();
+                }
+
+                this._setPageNumber(nextPage);
+                this._reload();
+            }
+        },
+
+        goto_page: function (e) {
+            var that = this.list,
+                currentPage = that.collection.getPage(),
+                maxPage = that.collection.pager.total,
+                nextPage = parseInt($(e.target).val());
+
+            if (_.isNaN(nextPage) || nextPage <= 0 || nextPage > maxPage || nextPage == currentPage) {
+                $(e.target).val(currentPage);
+                return;
+            }
+
+            that._togglePrevious(true);
+            that._toggleNext(true);
+
+            if (nextPage == 1) {
+                that._togglePrevious();
+            }
+            if (nextPage == maxPage) {
+                that._toggleNext();
+            }
+
+            that.collection.setPage(nextPage);
+            that._setPageNumber(nextPage);
+            that._reload();
+        },
+
+        goto_next: function () {
+            var currentPage = this.collection.getPage();
+            if (currentPage < this.collection.pager.total) {
+                var nextPage = currentPage + 1;
+                this.collection.setPage(nextPage);
+                if (nextPage == this.collection.pager.total) {
+                    this._toggleNext();
+                } else {
+                    this._toggleNext(true);
+                }
+                this._togglePrevious(true);
+
+                this._setPageNumber(nextPage);
+                this._reload();
+            }
+        },
+
+        _setPageNumber: function (pageNumber) {
+            if (_.isUndefined(pageNumber)) {
+                pageNumber = 1;
+            }
+            $('.activity-list-widget .pagination-current').val(pageNumber);
+        },
+
+        _togglePrevious: function (enable) {
+            if (_.isUndefined(enable)) {
+                $('.activity-list-widget .pagination-previous').addClass('disabled');
+            } else {
+                $('.activity-list-widget .pagination-previous').removeClass('disabled');
+            }
+        },
+
+        _toggleNext: function (enable) {
+            if (_.isUndefined(enable)) {
+                $('.activity-list-widget .pagination-next').addClass('disabled');
+            } else {
+                $('.activity-list-widget .pagination-next').removeClass('disabled');
+            }
+        },
+
+        _reload: function () {
             this._showLoading();
             try {
-                //_.each(this.subviews, function (itemView) {
-                //    state[itemView.model.get('id')] = itemView.isCollapsed();
-                //    state[itemView.model.get('id')] = true;
-                //});
                 this.collection.fetch({
                     reset: true,
                     success: _.bind(function () {
-                        //_.each(this.subviews, function (itemView) {
-                        //    itemView.toggle(state[itemView.model.get('id')]);
-                        //});
                         this._hideLoading();
+                        this._initActionMenus();
+                        this._initPager();
                     }, this),
                     error: _.bind(function (collection, response) {
                         this._showLoadItemsError(response.responseJSON || {});
@@ -129,14 +220,6 @@ define(function (require) {
             } catch (err) {
                 this._showLoadItemsError(err);
             }
-        },
-
-        _filter: function () {
-            alert('filter');
-        },
-
-        _more: function () {
-            alert('more');
         },
 
         _viewItem: function (model, modelView) {
@@ -148,18 +231,22 @@ define(function (require) {
                     type: 'get',
                     dataType: 'html',
                     data: {
-                        _widgetContainer: 'block'
+                        _widgetContainer: 'dialog'
                     }
                 };
 
             if (currentModel.get('is_loaded') !== true) {
                 this._showLoading();
                 Backbone.$.ajax(options)
-                    .done(function (response) {
+                    .done(function (data) {
+                        var response = $('<html />').html(data);
                         currentModel.set('is_loaded', true);
-                        currentModel.set('contentHTML', jQuery(response).find('.control-group'));
+                        currentModel.set('contentHTML', $(response).find('.widget-content').html());
+
                         that._hideLoading();
+
                         currentModelView.toggle();
+                        that._initActionMenus();
                     })
                     .fail(_.bind(this._showLoadItemsError, this));
             } else {
@@ -174,6 +261,7 @@ define(function (require) {
                     'title': model.get('subject'),
                     'regionEnabled': false,
                     'incrementalPosition': false,
+                    'alias': 'activity_list:item:update',
                     'dialogOptions': {
                         'modal': true,
                         'resizable': false,
@@ -181,32 +269,11 @@ define(function (require) {
                         'autoResize': true,
                         'close': _.bind(function () {
                             delete this.itemEditDialog;
-                            this.refresh();
                         }, this)
                     }
                 });
+
                 this.itemEditDialog.render();
-
-                //mediator.once('page:request', _.bind(function () {
-                //    if (this.itemEditDialog) {
-                //        this.itemEditDialog.remove();
-                //    }
-                //}, this));
-
-                //this.itemEditDialog.on('formSave', _.bind(function (response) {
-                //    var model, insertPosition;
-                //    this.itemEditDialog.remove();
-                //    delete this.itemEditDialog;
-                //    mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
-                //
-                //    model = this.collection.get(response.id);
-                //    if (model) {
-                //        model.set(response);
-                //    } else {
-                //        insertPosition = this.collection.sorting === 'DESC' ? 0 : this.collection.length;
-                //        this.collection.add(response, {at: insertPosition});
-                //    }
-                //}, this));
             }
         },
 
@@ -239,8 +306,8 @@ define(function (require) {
                     }, this)
                 });
 
-                this._hideLoading();
-                mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
+                this.refresh();
+
             } catch (err) {
                 this._showDeleteItemError(err);
             }
@@ -255,7 +322,8 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            var route = this.options.configuration[model.get('relatedActivityClass')].routes[actionKey];
+            var className = model.get('relatedActivityClass').replace(/\\/g, '_');
+            var route = this.options.configuration[className].routes[actionKey];
             return routing.generate(route, {'id': model.get('relatedActivityId')});
         },
 

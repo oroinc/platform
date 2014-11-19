@@ -2,39 +2,69 @@
 /*global define*/
 define([
     'oroui/js/app/models/base/collection',
-    './activity-list-model'
-], function (BaseCollection, ActivityModel) {
+    './activity-list-model',
+    'underscore',
+    'routing',
+], function (BaseCollection, ActivityModel, _, routing) {
     'use strict';
 
     var ActivityCollection;
 
     ActivityCollection = BaseCollection.extend({
         model:    ActivityModel,
-        baseUrl:  '',
-        sorting:  'DESC',
-        fromDate: '',
-        toDate:   '',
-        filter:   '',
+        route: '',
+        routeParameters: {},
+        filter:   {},
+        pager: {
+            count:    1, //total activities count
+            current:  1, //current page
+            pagesize: 1, //items per page
+            total:    1  //total pages
+        },
 
         url: function () {
-            return this.baseUrl + '?sorting=' + this.sorting;
+            return routing.generate(
+                this.route,
+                _.extend(
+                    _.extend([], this.routeParameters),
+                    _.extend({page: this.getPage()}, {filter: this.filter})
+                )
+            );
         },
 
-        getSorting: function () {
-            return this.sorting;
-        },
-        setSorting: function (mode) {
-            this.sorting = mode;
+        setFilter: function (filter) {
+            this.filter = filter;
         },
 
-        getFromDate: function () {},
-        setFromDate: function () {},
+        getPage: function () {
+            return parseInt(this.pager.current);
+        },
+        setPage: function (page) {
+            this.pager.current = page;
+        },
 
-        getToDate: function () {},
-        setToDate: function () {},
+        getPageSize: function () {
+            return parseInt(this.pager.pagesize);
+        },
+        setPageSize: function (pagesize) {
+            this.pager.pagesize = pagesize;
+        },
 
-        getFilter: function () {},
-        setFilter: function () {}
+        getCount: function () {
+            return parseInt(this.pager.count);
+        },
+        setCount: function (count) {
+            this.pager.count = count;
+            this.pager.total = count == 0 ? 1 : Math.ceil(count/this.pager.pagesize);
+
+            this.count = count;
+        },
+
+        parse: function(response) {
+            this.setCount(parseInt(response.count));
+
+            return response.data;
+        }
     });
 
     return ActivityCollection;

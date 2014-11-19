@@ -19,7 +19,9 @@
                             template,
                             {
                                 user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
-                                date: '<i class="date">' + updatedAt + '</i>'
+                                date: '<i class="date">' + createdAt + '</i>',
+                                editor: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
+                                editor_date: '<i class="date">' + updatedAt + '</i>'
                             },
                             { interpolate: /\{\{(.+?)\}\}/g }
                         ) %>
@@ -29,15 +31,24 @@
                     </span>
                 </span>
             </div>
-            <div class="actions">
-                <button class="btn item-edit-button<% if (!editable) { %> disabled<% } %>" <% if (!editable) { %> disabled="disabled"<% } %>
-                    title="{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|e('html_attr')|raw }}">
-                    <i class="icon-edit hide-text">{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|e('html')|raw }}</i>
-                </button>
-                <button class="btn item-remove-button<% if (!removable) { %> disabled<% } %>" <% if (!removable) { %> disabled="disabled"<% } %>
-                    title="{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|e('html_attr')|raw }}">
-                    <i class="icon-trash hide-text">{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|e('html')|raw }}</i>
-                </button>
+            <div class="actions action-cell">
+                <div class="more-bar-holder">
+                    <div class="dropdown">
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>
+                        <ul class="dropdown-menu pull-right launchers-dropdown-menu nav nav-pills icons-holder launchers-list">
+                            <li class="launcher-item">
+                                <a href="javascript:void(0);" class="action no-hash item-edit-button" title="{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}">
+                                    <i class="icon-edit hide-text">{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}</i>
+                                </a>
+                            </li>
+                            <li class="launcher-item">
+                                <a href="javascript:void(0);" class="action no-hash item-remove-button" title="{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}">
+                                    <i class="icon-trash hide-text">{{ 'oro.calendar.calendarevent.delete_event'|trans({'{{ entity }}': entityName})|raw }}</i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
@@ -45,38 +56,7 @@
                 <a href="#" class="no-hash accordion-toggle"><%= subject %></a>
             </div>
             <div class="message">
-                <% if (data != null) {
-                    var dateTimeFormatter = require('orolocale/js/formatter/datetime');
-                    var templateCalendarEvent = '<div class="control-group">' +
-                        '<label class="control-label">[[ label ]]</label>' +
-                        '<div class="controls">' +
-                            '<div class="control-label">[[ value ]]</div>' +
-                            '</div>' +
-                        '</div>';
-                    %>
-
-                    <%= _.template(templateCalendarEvent,
-                        {label: '{{ 'oro.calendar.calendarevent.description.label'|trans|raw }}', value: data['description']},
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
-
-                    <%= _.template(templateCalendarEvent,
-                        {
-                            label: '{{ 'oro.calendar.calendarevent.start.label'|trans|raw }}',
-                            value: dateTimeFormatter.formatDateTime(data['start_date'])
-                        },
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
-
-                    <%= _.template(templateCalendarEvent,
-                        {
-                            label: '{{ 'oro.calendar.calendarevent.end.label'|trans|raw }}',
-                            value: dateTimeFormatter.formatDateTime(data['end_date'])
-                        },
-                        {interpolate: /\[\[(.+?)\]\]/g}
-                    ) %>
-
-                <% } %>
+                <!-- Do NOT remove. Placeholder for activity view -->
             </div>
         </div>
     </div>

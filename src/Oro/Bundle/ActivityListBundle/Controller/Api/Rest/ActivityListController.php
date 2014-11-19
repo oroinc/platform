@@ -24,8 +24,6 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
  */
 class ActivityListController extends RestController
 {
-    const ITEMS_PER_PAGE = 25;
-
     /**
      * Get activity lists for given entity
      *
@@ -34,6 +32,12 @@ class ActivityListController extends RestController
      *
      * @QueryParam(
      *      name="page", requirements="\d+", nullable=true, description="Page number, starting from 1. Default is 1."
+     * )
+     * @QueryParam(
+     *      name="limit",
+     *      requirements="\d+",
+     *      nullable=true,
+     *      description="Number of records in result. Default value takes from system config"
      * )
      * @QueryParam(
      *      name="activityClasses", requirements="\s+", nullable=true,
@@ -69,9 +73,11 @@ class ActivityListController extends RestController
      */
     public function cgetAction($entityClass, $entityId)
     {
-        $activityСlasses = $this->getRequest()->get('activityClasses', []);
+        $entityClass     = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
+        $activityClasses = $this->getRequest()->get('activityClasses', []);
         $dateFrom        = strtotime($this->getRequest()->get('dateFrom', null));
         $dateTo          = strtotime($this->getRequest()->get('dateTo', null));
+        $routingHelper   = $this->get('oro_entity.routing_helper');
 
         if ($dateFrom) {
             $dateFrom = new \DateTime($dateFrom, new \DateTimeZone('UTC'));
@@ -79,18 +85,74 @@ class ActivityListController extends RestController
         if ($dateTo) {
             $dateTo = new \DateTime($dateTo, new \DateTimeZone('UTC'));
         }
-        if (!is_array($activityСlasses)) {
-            $activityСlasses = explode(',', $activityСlasses);
+        if (!is_array($activityClasses) && $activityClasses !== '') {
+            $activityClasses = array_map(
+                function ($activityСlass) use ($routingHelper) {
+                    return $routingHelper->decodeClassName($activityСlass);
+                },
+                explode(',', $activityClasses)
+            );
         }
 
-        $results = $this->getManager()->getList(
-            $this->get('oro_entity.routing_helper')->decodeClassName($entityClass),
-            $entityId,
-            $activityСlasses,
-            $dateFrom,
-            $dateTo,
-            $this->getRequest()->get('page', 1)
+        $qb = $this->getManager()
+            ->getRepository()
+            ->getActivityListQueryBuilder($entityClass, $entityId, $activityClasses, $dateFrom, $dateTo);
+
+        $pager = $this->container->get('oro_datagrid.extension.pager.orm.pager');
+        $pager->setQueryBuilder($qb);
+        $pager->setPage($this->getRequest()->get('page', 1));
+        $pager->setMaxPerPage(
+            $this->getRequest()->get(
+                'limit',
+                $this->get('oro_config.user')->get('oro_activity_list.per_page')
+            )
         );
+        $pager->init();
+
+        return new JsonResponse($pager->getResults());
+    }
+
+    /**
+     * Get filtered activity lists for given entity
+     *
+     * @param string  $entityClass Entity class name
+     * @param integer $entityId    Entity id
+     *
+     * @QueryParam(
+     *      name="page", requirements="\d+", nullable=true, description="Page number, starting from 1. Default is 1."
+     * )
+     * @QueryParam(
+     *      name="filter", nullable=true,
+     *      description="Array with Activity type and Date range filters values"
+     * )
+     *
+     * @ApiDoc(
+     *      description="Returns an array with collection of ActivityList objects and count of all records",
+     *      resource=true,
+     *      statusCodes={
+     *          200="Returned when successful",
+     *      }
+     * )
+     * @return JsonResponse
+     */
+    public function getFilteredActivityListAction($entityClass, $entityId)
+    {
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
+        $filter      = $this->getRequest()->get('filter');
+
+        $results = [
+            'count' => $this->getManager()->getListCount(
+                $entityClass,
+                $entityId,
+                $filter
+            ),
+            'data'  => $this->getManager()->getList(
+                $entityClass,
+                $entityId,
+                $filter,
+                $this->getRequest()->get('page', 1)
+            )
+        ];
 
         return new JsonResponse($results);
     }

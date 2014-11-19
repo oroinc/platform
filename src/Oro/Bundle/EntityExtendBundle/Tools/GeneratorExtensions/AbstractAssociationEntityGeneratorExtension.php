@@ -106,6 +106,8 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
     /**
      * @param array    $schema
      * @param PhpClass $class
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function generateManyToOneAssociationMethods(array $schema, PhpClass $class)
     {

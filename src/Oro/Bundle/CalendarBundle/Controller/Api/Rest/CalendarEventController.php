@@ -21,6 +21,7 @@ use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 
 /**
  * @RouteResource("calendarevent")
@@ -106,22 +107,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
                 $subordinate
             );
         } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
-            $dateClosure      = function ($value) {
-                // datetime value hack due to the fact that some clients pass + encoded as %20 and not %2B,
-                // so it becomes space on symfony side due to parse_str php function in HttpFoundation\Request
-                $value = str_replace(' ', '+', $value);
-
-                // The timezone is ignored when DateTime value specifies a timezone (e.g. 2010-01-28T15:00:00+02:00)
-                return new \DateTime($value, new \DateTimeZone('UTC'));
-            };
-            $filterParameters = [
-                'createdAt' => [
-                    'closure' => $dateClosure,
-                ],
-                'updatedAt' => [
-                    'closure' => $dateClosure,
-                ],
-            ];
+            $dateParamFilter  = new HttpDateTimeParameterFilter();
+            $filterParameters = ['createdAt' => $dateParamFilter, 'updatedAt' => $dateParamFilter];
             $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
 
             /** @var CalendarEventRepository $repo */
@@ -136,6 +123,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
                 $calendarId,
                 $qb
             );
+
+            return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
         } else {
             throw new BadRequestHttpException(
                 'Time interval ("start" and "end") or paging ("page" and "limit") parameters should be specified.'

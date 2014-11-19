@@ -3,9 +3,10 @@
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
@@ -15,9 +16,6 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ActivityListManager
 {
-    const STATE_CREATE = 'create';
-    const STATE_UPDATE = 'update';
-
     /** @var EntityManager */
     protected $em;
 
@@ -33,24 +31,37 @@ class ActivityListManager
     /** @var UserConfigManager */
     protected $config;
 
+    /** @var ActivityListChainProvider */
+    protected $chainProvider;
+
+    /** @var ActivityListFilterHelper */
+    protected $activityListFilterHelper;
+
     /**
-     * @param Registry       $doctrine
-     * @param SecurityFacade $securityFacade
-     * @param NameFormatter  $nameFormatter
-     * @param Pager          $pager
+     * @param Registry                  $doctrine
+     * @param SecurityFacade            $securityFacade
+     * @param NameFormatter             $nameFormatter
+     * @param Pager                     $pager
+     * @param UserConfigManager         $config
+     * @param ActivityListChainProvider $provider
+     * @param ActivityListFilterHelper  $activityListFilterHelper
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config
+        UserConfigManager $config,
+        ActivityListChainProvider $provider,
+        ActivityListFilterHelper $activityListFilterHelper
     ) {
-        $this->em             = $doctrine->getManager();
-        $this->securityFacade = $securityFacade;
-        $this->nameFormatter  = $nameFormatter;
-        $this->pager          = $pager;
-        $this->config         = $config;
+        $this->em                       = $doctrine->getManager();
+        $this->securityFacade           = $securityFacade;
+        $this->nameFormatter            = $nameFormatter;
+        $this->pager                    = $pager;
+        $this->config                   = $config;
+        $this->chainProvider            = $provider;
+        $this->activityListFilterHelper = $activityListFilterHelper;
     }
 
     /**
@@ -62,33 +73,23 @@ class ActivityListManager
     }
 
     /**
-     * @param string         $entityClass
-     * @param integer        $entityId
-     * @param array          $activityEntityСlasses
-     * @param \DateTime|bool $dateFrom
-     * @param \DateTime|bool $dateTo
-     * @param integer        $page
+     * @param string  $entityClass
+     * @param integer $entityId
+     * @param array   $filter
+     * @param integer $page
      *
      * @return ActivityList[]
      */
-    public function getList(
-        $entityClass,
-        $entityId,
-        $activityEntityСlasses,
-        $dateFrom,
-        $dateTo,
-        $page
-    ) {
-        /** @var QueryBuilder $qb */
-        $qb = $this->getRepository()->getActivityListQueryBuilder(
+    public function getList($entityClass, $entityId, $filter, $page)
+    {
+        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
             $entityId,
-            $activityEntityСlasses,
-            $dateFrom,
-            $dateTo,
             $this->config->get('oro_activity_list.sorting_field'),
             $this->config->get('oro_activity_list.sorting_direction')
         );
+
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
@@ -96,12 +97,30 @@ class ActivityListManager
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
         $pager->init();
 
-        /** @var ActivityList[] $result */
-        $results = $pager->getResults();
+        return $this->getEntityViewModels($pager->getResults());
+    }
 
-        $results = $this->getEntityViewModels($results);
+    /**
+     * @param string  $entityClass
+     * @param integer $entityId
+     * @param array   $filter
+     *
+     * @return ActivityList[]
+     */
+    public function getListCount($entityClass, $entityId, $filter)
+    {
+        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
+            $entityClass,
+            $entityId,
+            $this->config->get('oro_activity_list.sorting_field'),
+            $this->config->get('oro_activity_list.sorting_direction')
+        );
 
-        return $results;
+        $qb->select('COUNT(activity.id)');
+
+        $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -128,6 +147,7 @@ class ActivityListManager
         foreach ($entities as $entity) {
             $result[] = $this->getEntityViewModel($entity);
         }
+
         return $result;
     }
 
@@ -138,14 +158,31 @@ class ActivityListManager
      */
     public function getEntityViewModel(ActivityList $entity)
     {
+        $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
+
+        $ownerName = '';
+        $ownerId   = '';
+        if ($entity->getOwner()) {
+            $ownerName = $this->nameFormatter->format($entity->getOwner());
+            $ownerId   = $entity->getOwner()->getId();
+        }
+
+        $editorName = '';
+        $editorId   = '';
+        if ($entity->getEditor()) {
+            $editorName = $this->nameFormatter->format($entity->getEditor());
+            $editorId   = $entity->getEditor()->getId();
+        }
+
         $result = [
             'id'                   => $entity->getId(),
-            'owner'                => $this->nameFormatter->format($entity->getOwner()),
-            'owner_id'             => $entity->getOwner()->getId(),
-            'owner_route'          => '',
+            'owner'                => $ownerName,
+            'owner_id'             => $ownerId,
+            'editor'               => $editorName,
+            'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
-            'data'                 => $entity->getData(),
+            'data'                 => $entityProvider->getData($entity),
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),

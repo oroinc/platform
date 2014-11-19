@@ -72,7 +72,7 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All day event
-            updated_by:           updated by {{ user }} at {{ date }}
+            updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}
             added_by:             added by {{ user }} at {{ date }}
             update_event:         Update {{ entity }}
             delete_event:         Delete {{ entity }}
