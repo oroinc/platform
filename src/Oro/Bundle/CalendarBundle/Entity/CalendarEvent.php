@@ -75,7 +75,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent", cascade={"remove"})
      **/
     protected $children;
 
@@ -208,7 +208,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="invitation_status", type="string")
+     * @ORM\Column(name="invitation_status", type="string", length=32)
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
