@@ -133,7 +133,11 @@ class ActivityListManager
         /** @var ActivityList $activityListItem */
         $activityListItem = $this->getRepository()->find($activityListItemId);
 
-        return $this->getEntityViewModel($activityListItem);
+        if ($activityListItem) {
+            return $this->getEntityViewModel($activityListItem);
+        }
+
+        return null;
     }
 
     /**

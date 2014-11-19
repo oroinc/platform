@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder\Fixture\TestTarget;
@@ -152,5 +153,36 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
             ],
             $result
         );
+    }
+
+    public function testGetUpdatedActivityList()
+    {
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
+        $repo = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository')
+            ->disableOriginalConstructor()->getMock();
+
+        $activityEntity = new ActivityList();
+        $repo->expects($this->once())->method('findOneBy')->willReturn($activityEntity);
+        $em->expects($this->once())->method('getRepository')->willReturn($repo);
+
+        $testEntity = new \stdClass();
+        $testEntity->subject = 'testSubject';
+
+        $this->testActivityProvider->setTargets([new \stdClass()]);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(
+                function ($entity) use ($testEntity) {
+                    if ($entity === $testEntity) {
+                        return 'Test\Entity';
+                    }
+
+                    return get_class($entity);
+                }
+            );
+
+        $result = $this->provider->getUpdatedActivityList($testEntity, $em);
+        $this->assertEquals('update', $result->getVerb());
+        $this->assertEquals('testSubject', $result->getSubject());
     }
 }
