@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 
@@ -88,7 +89,9 @@ class ExtendFieldValidationLoader extends AbstractLoader
     {
         $extendConfig = $this->extendConfigProvider->getConfig($className, $fieldName);
 
-        return !$extendConfig->is('is_deleted') && $extendConfig->is('is_extend');
+        return !$extendConfig->is('is_deleted') &&
+            !$extendConfig->is('state', ExtendScope::STATE_NEW) &&
+            $extendConfig->is('is_extend');
     }
 
     /**
