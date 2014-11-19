@@ -13,7 +13,7 @@
             {% if isMobileVersion() %}
                 <select name="from">
                     <option value="">
-                        {% trans %}All{% endtrans %}
+                        {% trans %}All{% endtrans %} ({{ groupedResults[''].count }})
                     </option>
                     {% set searchEntities = [] %}
                     {% for className, alias in entities %}
