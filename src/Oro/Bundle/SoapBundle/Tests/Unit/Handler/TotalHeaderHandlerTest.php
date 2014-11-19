@@ -64,7 +64,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->handler->supports($context));
     }
 
-    public function testNotSupportsWithAnotherThenListActionsEvenControllerIsEntityManagerAwareController()
+    public function testDoesNotSupportWithAnotherThenListActionsEvenControllerIsEntityManagerAwareController()
     {
         $context = $this->createContext(
             $this->getMock('Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface'),
@@ -115,7 +115,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($testCount, $response->headers->get(TotalHeaderHandler::HEADER_NAME));
     }
 
-    public function testWithJustManagerAwareController()
+    public function testHandleWithJustManagerAwareController()
     {
         $testCount = 22;
 
@@ -146,7 +146,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
         $query = new Query($this->getMock('Doctrine\ORM\EntityManager', [], [], '', false));
         $qb->expects($this->once())->method('getQuery')
             ->willReturn($query);
-        
+
         $this->handler->expects($this->once())->method('calculateCount')->with($query)
             ->willReturn($testCount);
 
@@ -159,7 +159,7 @@ class TotalHeaderHandlerTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testInvalidQueryValue()
+    public function testHandleWithInvalidQueryValueThrowException()
     {
         $context = $this->createContext();
         $context->set('query', false);
