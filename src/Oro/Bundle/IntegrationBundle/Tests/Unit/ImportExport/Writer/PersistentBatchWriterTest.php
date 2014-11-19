@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Writer;
 
+use Psr\Log\LoggerInterface;
+
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 
@@ -27,11 +29,15 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
     /** @var PersistentBatchWriter */
     protected $writer;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     protected function setUp()
     {
         $this->registry        = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+        $this->logger          = $this->getMock('Psr\Log\LoggerInterface');
         $this->entityManager   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
 
@@ -198,6 +204,11 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
             ->method('isOpen')
             ->will($this->returnValue($isManagerOpen));
 
-        return new PersistentBatchWriter($this->registry, $this->eventDispatcher, $this->contextRegistry);
+        return new PersistentBatchWriter(
+            $this->registry,
+            $this->eventDispatcher,
+            $this->contextRegistry,
+            $this->logger
+        );
     }
 }
