@@ -51,7 +51,7 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
         $this->registry        = $registry;
         $this->eventDispatcher = $eventDispatcher;
         $this->contextRegistry = $contextRegistry;
-        $this->logger = $logger;
+        $this->logger          = $logger;
     }
 
     /**
@@ -96,8 +96,6 @@ class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareIn
                     'error_entries_count',
                     (int)$importContext->getValue('error_entries_count') + count($items)
                 );
-
-                $importContext->incrementErrorEntriesCount();
 
                 $this->logger->warning($event->getWarning());
 
