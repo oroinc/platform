@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Handler;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\Container;
 
 use Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler;
@@ -38,13 +36,13 @@ class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
     public function testUnknownIncludes()
     {
         $testUnsupported = implode(IncludeHandlerInterface::DELIMITER, ['include1', 'include2']);
-        $request         = new Request();
-        $response        = new Response();
 
-        $request->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $testUnsupported);
+        $context = $this->createContext();
+        $context->getRequest()->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $testUnsupported);
 
-        $this->handler->handle($this->createContext(null, $request, $response));
+        $this->handler->handle($context);
 
+        $response = $context->getResponse();
         $this->assertTrue($response->headers->has(IncludeHandlerInterface::HEADER_UNKNOWN));
         $this->assertFalse($response->headers->has(IncludeHandlerInterface::HEADER_UNSUPPORTED));
 
@@ -54,9 +52,8 @@ class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
     public function testUnsupportedIncludes()
     {
         $includeName = 'lastModified';
-        $request     = new Request();
-        $response    = new Response();
-        $request->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $includeName);
+        $context     = $this->createContext();
+        $context->getRequest()->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $includeName);
 
         $serviceId = 'acme.demo.last-modified.handler';
         $handler   = $this->getMock('Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface');
@@ -67,8 +64,9 @@ class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Handler\Context'))
             ->willReturn(false);
 
-        $this->handler->handle($this->createContext(null, $request, $response));
+        $this->handler->handle($context);
 
+        $response = $context->getResponse();
         $this->assertFalse($response->headers->has(IncludeHandlerInterface::HEADER_UNKNOWN));
         $this->assertTrue($response->headers->has(IncludeHandlerInterface::HEADER_UNSUPPORTED));
 
@@ -78,9 +76,8 @@ class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
     public function testSupportedIncludes()
     {
         $includeName = 'lastModified';
-        $request     = new Request();
-        $response    = new Response();
-        $request->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $includeName);
+        $context     = $this->createContext();
+        $context->getRequest()->headers->set(IncludeHandlerInterface::HEADER_INCLUDE, $includeName);
 
         $serviceId = 'acme.demo.last-modified.handler';
         $handler   = $this->getMock('Oro\Bundle\SoapBundle\Handler\IncludeHandlerInterface');
@@ -93,8 +90,9 @@ class DelegateIncludeHandlerTest extends \PHPUnit_Framework_TestCase
         $handler->expects($this->once())->method('handle')
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Handler\Context'));
 
-        $this->handler->handle($this->createContext(null, $request, $response));
+        $this->handler->handle($context);
 
+        $response = $context->getResponse();
         $this->assertFalse($response->headers->has(IncludeHandlerInterface::HEADER_UNKNOWN));
         $this->assertFalse($response->headers->has(IncludeHandlerInterface::HEADER_UNSUPPORTED));
     }
