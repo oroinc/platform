@@ -206,7 +206,6 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-
         if ($reloadUser) {
             $result->expects($this->once())->method('find')
                 ->with('OroUserBundle:User')
