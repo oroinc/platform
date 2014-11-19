@@ -38,6 +38,7 @@ class TestActivityProvider implements ActivityListProviderInterface
      */
     public function getTemplate()
     {
+        return 'test_template.js.twig';
     }
 
     /**
@@ -45,6 +46,7 @@ class TestActivityProvider implements ActivityListProviderInterface
      */
     public function getRoutes()
     {
+        return ['delete' => 'test_delete_route'];
     }
 
     /**

@@ -9,7 +9,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
-class ActivityListExtension  implements ExtendExtensionAwareInterface
+class ActivityListExtension implements ExtendExtensionAwareInterface
 {
     /** @var ExtendExtension */
     protected $extendExtension;

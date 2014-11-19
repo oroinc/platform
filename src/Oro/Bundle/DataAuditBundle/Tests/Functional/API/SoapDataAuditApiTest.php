@@ -21,20 +21,20 @@ class SoapDataAuditApiTest extends WebTestCase
      */
     public function testPreconditions()
     {
-        //create users
-        $request = array(
-            "username" => 'user_' . mt_rand(),
-            "email" => 'test_'  . mt_rand() . '@test.com',
-            "enabled" => '1',
-            "plainPassword" => '1231231q',
-            "namePrefix" => "Mr",
-            "firstName" => "firstName",
-            "middleName" => "middleName",
-            "lastName" => "lastName",
-            "nameSuffix" => "Sn.",
-            "roles" => array("2"),
-            "owner" => "1"
-        );
+        // create users
+        $request = [
+            'username'      => 'user_' . mt_rand(),
+            'email'         => 'test_' . mt_rand() . '@test.com',
+            'enabled'       => '1',
+            'plainPassword' => '1231231q',
+            'namePrefix'    => 'Mr',
+            'firstName'     => 'firstName',
+            'middleName'    => 'middleName',
+            'lastName'      => 'lastName',
+            'nameSuffix'    => 'Sn.',
+            'roles'         => ['2'],
+            'owner'         => '1'
+        ];
 
         $this->client->setServerParameters($this->generateWsseAuthHeader());
         $id = $this->soapClient->createUser($request);

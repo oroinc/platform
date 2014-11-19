@@ -9,7 +9,8 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {
     public function testSsApplicable()
     {
-        $activityListProvider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
+        $activityListProvider = $this
+            ->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()
             ->getMock();
         $filter = new PlaceholderFilter($activityListProvider);
