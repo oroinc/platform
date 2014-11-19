@@ -6,8 +6,8 @@ UPGRADE FROM 1.4 to 1.5
 
 ####CalendarBundle:
 - Added calendar providers. Calendar Provider gives developers a way to add a different kind of items on a calendar. As example developer can use calendar provider to show emails as "Calendar Events" into Calendar.
-- Changed REST API for CalendarConnections. Developer should send "CalendarProperty" ID into PUT and DELETE REST methods.
-- Added "context menu" for calendar that perform any action with calendar, based on menu from NavigationBundle. "Context menu" can be extend in any other bundle
+- Changed REST API for CalendarConnections. Before Developer send Calendar ID of logged user and Calendar ID that connected with calendar of logged user. In current version he should send "CalendarProperty" ID into PUT and DELETE REST methods.
+- Added "context menu" for calendar, based on menu from NavigationBundle. "Context menu" can be extend in any other bundle
 
 ####EntityExtendBundle:
 - `Tools\ExtendConfigDumper` constant `ENTITY` has been deprecated
@@ -20,7 +20,7 @@ UPGRADE FROM 1.4 to 1.5
 - Added `oro_color_table` Symfony2 form type intended to edit any color in a list and using [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff and [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
 
 ####NavigationBundle
-- Added ability to use service functions into menu attributes to get data
+- Added support of [System Aware Resolver](/src/Oro/Component/Config/Resources/doc/system_aware_resolver.md) in navigation.yml
 
 ####UIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
