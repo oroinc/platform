@@ -90,6 +90,7 @@ class TestActivityProvider implements ActivityListProviderInterface
      */
     public function getData(ActivityList $activityListEntity)
     {
+        return ['test_data'];
     }
 
     /**
