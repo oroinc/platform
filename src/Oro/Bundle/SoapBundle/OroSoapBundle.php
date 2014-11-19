@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\LoadPass;
 use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\InlcudeHandlersPass;
+use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\MetadataProvidersPass;
 
 class OroSoapBundle extends Bundle
 {
@@ -19,5 +20,6 @@ class OroSoapBundle extends Bundle
 
         $container->addCompilerPass(new LoadPass());
         $container->addCompilerPass(new InlcudeHandlersPass());
+        $container->addCompilerPass(new MetadataProvidersPass());
     }
 }
