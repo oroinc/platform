@@ -123,6 +123,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
                 $calendarId,
                 $qb
             );
+
+            return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
         } else {
             throw new BadRequestHttpException(
                 'Time interval ("start" and "end") or paging ("page" and "limit") parameters should be specified.'

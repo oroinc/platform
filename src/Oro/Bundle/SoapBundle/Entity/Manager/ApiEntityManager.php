@@ -59,6 +59,8 @@ class ApiEntityManager
     }
 
     /**
+     * Get entity metadata
+     *
      * @return ClassMetadata|ClassMetadataInfo
      */
     public function getMetadata()
@@ -105,8 +107,7 @@ class ApiEntityManager
             throw new \InvalidArgumentException('Expected instance of ' . $this->class);
         }
 
-        $idFields = $this->metadata->getIdentifierFieldNames();
-        $idField = current($idFields);
+        $idField   = $this->metadata->getSingleIdentifierFieldName();
         $entityIds = $this->metadata->getIdentifierValues($entity);
 
         return $entityIds[$idField];
@@ -133,10 +134,11 @@ class ApiEntityManager
     }
 
     /**
-     * Returns Paginator to paginate throw items.
+     * Returns array of item matching filtering criteria
      *
      * In case when limit and offset set to null QueryBuilder instance will be returned.
      *
+     * @deprecated since 1.4.1 use getListQueryBuilder instead
      * @param int        $limit
      * @param int        $page
      * @param array      $criteria
@@ -146,7 +148,44 @@ class ApiEntityManager
      */
     public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null)
     {
-        $page = $page > 0 ? $page : 1;
+        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
+
+        return $this->getRepository()
+            ->matching($criteria)
+            ->toArray();
+    }
+
+    /**
+     * Returns query builder that could be used for fetching data based on given filtering criteria
+     *
+     * @param int   $limit
+     * @param int   $page
+     * @param array $criteria
+     * @param null  $orderBy
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null)
+    {
+        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
+
+        $qb = $this->getRepository()->createQueryBuilder('e');
+        $qb->addCriteria($criteria);
+
+        return $qb;
+    }
+
+    /**
+     * @param int   $limit
+     * @param int   $page
+     * @param array $criteria
+     * @param null  $orderBy
+     *
+     * @return array|Criteria
+     */
+    protected function prepareQueryCriteria($limit = 10, $page = 1, $criteria = [], $orderBy = null)
+    {
+        $page    = $page > 0 ? $page : 1;
         $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
 
         if (is_array($criteria)) {
@@ -168,9 +207,7 @@ class ApiEntityManager
             ->orderBy($this->getOrderBy($orderBy))
             ->setFirstResult($this->getOffset($page, $limit));
 
-        return $this->getRepository()
-            ->matching($criteria)
-            ->toArray();
+        return $criteria;
     }
 
     /**
