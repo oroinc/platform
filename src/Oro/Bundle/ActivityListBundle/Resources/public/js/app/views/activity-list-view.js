@@ -101,13 +101,11 @@ define(function (require) {
         },
 
         _initActionMenus: function () {
-            jQuery('.activity-list .dropdown-toggle').unbind('mouseover');
-            jQuery('.activity-list .dropdown-toggle').bind('mouseover', function () {
-                jQuery(this).trigger('click');
+            $('.activity-list .dropdown-toggle').unbind('mouseover').bind('mouseover', function () {
+                $(this).trigger('click');
             });
-            jQuery('.activity-list .dropdown-menu').unbind('mouseleave');
-            jQuery('.activity-list .dropdown-menu').bind('mouseleave', function () {
-                jQuery('.dropdown-toggle', jQuery(this).parent()).trigger('click');
+            $('.activity-list .dropdown-menu').unbind('mouseleave').bind('mouseleave', function () {
+                $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
         },
 
@@ -115,8 +113,8 @@ define(function (require) {
             if (this.collection.getPageSize() < this.collection.getCount()) {
                 this._toggleNext(true);
             }
-            jQuery('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
-            jQuery('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+            $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
+            $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
         },
 
         goto_previous: function () {
@@ -186,22 +184,22 @@ define(function (require) {
             if (_.isUndefined(pageNumber)) {
                 pageNumber = 1;
             }
-            jQuery('.activity-list-widget .pagination-current').val(pageNumber);
+            $('.activity-list-widget .pagination-current').val(pageNumber);
         },
 
         _togglePrevious: function (enable) {
             if (_.isUndefined(enable)) {
-                jQuery('.activity-list-widget .pagination-previous').addClass('disabled');
+                $('.activity-list-widget .pagination-previous').addClass('disabled');
             } else {
-                jQuery('.activity-list-widget .pagination-previous').removeClass('disabled');
+                $('.activity-list-widget .pagination-previous').removeClass('disabled');
             }
         },
 
         _toggleNext: function (enable) {
             if (_.isUndefined(enable)) {
-                jQuery('.activity-list-widget .pagination-next').addClass('disabled');
+                $('.activity-list-widget .pagination-next').addClass('disabled');
             } else {
-                jQuery('.activity-list-widget .pagination-next').removeClass('disabled');
+                $('.activity-list-widget .pagination-next').removeClass('disabled');
             }
         },
 
@@ -241,9 +239,9 @@ define(function (require) {
                 this._showLoading();
                 Backbone.$.ajax(options)
                     .done(function (data) {
-                        var response = jQuery('<html />').html(data);
+                        var response = $('<html />').html(data);
                         currentModel.set('is_loaded', true);
-                        currentModel.set('contentHTML', jQuery(response).find('.widget-content').html());
+                        currentModel.set('contentHTML', $(response).find('.widget-content').html());
 
                         that._hideLoading();
 
