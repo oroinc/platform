@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActivityListBundle\Tests\Entity\Repository;
+namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;

@@ -224,7 +224,7 @@ class ActivityList extends ExtendActivityList
      *
      * @return self
      */
-    public function setOwner(User $owningUser)
+    public function setOwner(User $owningUser = null)
     {
         $this->owner = $owningUser;
 
@@ -252,7 +252,7 @@ class ActivityList extends ExtendActivityList
      *
      * @return self
      */
-    public function setEditor(User $editor)
+    public function setEditor(User $editor = null)
     {
         $this->editor = $editor;
 
