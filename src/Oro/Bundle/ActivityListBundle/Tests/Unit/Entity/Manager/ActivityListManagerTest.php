@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivityList;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
@@ -176,7 +177,6 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->em->expects($this->once())->method('getRepository')->willReturn($repo);
         $repo->expects($this->once())->method('find')->with(12)->willReturn(null);
         $this->assertNull($this->activityListManager->getItem(12));
-
     }
 
     public function testGetItem()

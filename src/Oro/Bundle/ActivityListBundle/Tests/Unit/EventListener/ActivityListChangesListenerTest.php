@@ -42,7 +42,7 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->securityFacade);
-        unset($this->subscriber);
+        unset($this->listener);
     }
 
     /**

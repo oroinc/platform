@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture;
 
-
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
 class TestActivityList extends ActivityList
