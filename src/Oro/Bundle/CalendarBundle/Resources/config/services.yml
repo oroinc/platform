@@ -123,4 +123,4 @@ services:
            - @oro_entity.doctrine_helper
            - @doctrine
         tags:
-           - {name: oro_activity_list.provider, priority: 50}        
+           - {name: oro_activity_list.provider, priority: 50}

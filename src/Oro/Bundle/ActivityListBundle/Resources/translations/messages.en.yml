@@ -27,7 +27,7 @@ oro:
                         createdAt: Created date
                         updatedAt: Updated date
                 sorting_direction:
-                    label: Sorting direction
+                    label: Sort direction
                     choices:
                         DESC: Descending
                         ASC:  Ascending
