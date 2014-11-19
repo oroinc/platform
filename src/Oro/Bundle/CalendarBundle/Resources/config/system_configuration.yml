@@ -9,13 +9,11 @@ oro_system_configuration:
             type: oro_color_table
             options:
                 label: oro.calendar.system_configuration.fields.calendar_colors.label
-                module: oroconfig/js/app/components/color-table
         oro_calendar.event_colors:
             data_type: array
             type: oro_color_table
             options:
                 label: oro.calendar.system_configuration.fields.event_colors.label
-                module: oroconfig/js/app/components/color-table
 
     tree:
         system_configuration:

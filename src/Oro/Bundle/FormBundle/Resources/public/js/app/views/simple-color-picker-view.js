@@ -1,27 +1,27 @@
 /*jslint nomen: true*/
 /*global define*/
-define(['underscore', 'oroform/js/app/components/base-simple-color-picker'
-    ], function (_, BaseSimpleColorPicker) {
+define(['underscore', 'oroform/js/app/views/base-simple-color-picker-view'
+    ], function (_, BaseSimpleColorPickerView) {
     'use strict';
 
-    var SimpleColorPicker = BaseSimpleColorPicker.extend({
+    var SimpleColorPickerView = BaseSimpleColorPickerView.extend({
         /**
          * @constructor
          * @param {object} options
          */
         initialize: function (options) {
-            SimpleColorPicker.__super__.initialize.call(this, options);
+            SimpleColorPickerView.__super__.initialize.call(this, options);
         },
 
         /**
          * @inheritDoc
          */
         _processOptions: function (options) {
-            var selectedVal = options._sourceElement.val(),
+            var selectedVal = this.$el.val(),
                 selectedIndex = null,
                 customIndex = null;
 
-            SimpleColorPicker.__super__._processOptions.call(this, options);
+            SimpleColorPickerView.__super__._processOptions.call(this, options);
 
             // set custom color
             _.each(options.data, function (value, index) {
@@ -42,7 +42,7 @@ define(['underscore', 'oroform/js/app/components/base-simple-color-picker'
          * @inheritDoc
          */
         _getSimpleColorPickerOptions: function (options) {
-            options = SimpleColorPicker.__super__._getSimpleColorPickerOptions.call(this, options);
+            options = SimpleColorPickerView.__super__._getSimpleColorPickerOptions.call(this, options);
             return _.defaults(_.omit(options, ['custom_color']), {
                 emptyColor: '#FFFFFF'
             });
@@ -52,7 +52,7 @@ define(['underscore', 'oroform/js/app/components/base-simple-color-picker'
          * @inheritDoc
          */
         _getPickerOptions: function (options) {
-            return SimpleColorPicker.__super__._getPickerOptions.call(this, options.custom_color);
+            return SimpleColorPickerView.__super__._getPickerOptions.call(this, options.custom_color);
         },
 
         /**
@@ -63,5 +63,5 @@ define(['underscore', 'oroform/js/app/components/base-simple-color-picker'
         }
     });
 
-    return SimpleColorPicker;
+    return SimpleColorPickerView;
 });
