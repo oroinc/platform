@@ -132,7 +132,7 @@ class ActivityListChainProvider
     public function getUpdatedActivityList($entity, EntityManager $entityManager)
     {
         $provider        = $this->getProviderForEntity($entity);
-        $existListEntity = $entityManager->getRepository('OroActivityListBundle:ActivityList')->findOneBy(
+        $existListEntity = $entityManager->getRepository(ActivityList::ENTITY_NAME)->findOneBy(
             [
                 'relatedActivityClass' => $this->doctrineHelper->getEntityClass($entity),
                 'relatedActivityId'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)

@@ -17,12 +17,7 @@ use Oro\Bundle\FilterBundle\Filter\DateTimeRangeFilter;
 class ActivityListController extends Controller
 {
     /**
-     * @Route(
-     *      "/view/widget/{entityClass}/{entityId}",
-     *      name="oro_activity_list_widget_activities"
-     * )
-     *
-     * @ AclAncestor("oro_activity_list_view")
+     * @Route("/view/widget/{entityClass}/{entityId}", name="oro_activity_list_widget_activities")
      * @Template("OroActivityListBundle:ActivityList:activities.html.twig")
      *
      * @param string  $entityClass The entity class which activities should be rendered

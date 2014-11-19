@@ -1,5 +1,0 @@
-oro:
-    activitylist:
-        system_configuration:
-            fields:
-                per_page.tooltip: Number of activities that wiil be loaded by default and every time on "load more" action
