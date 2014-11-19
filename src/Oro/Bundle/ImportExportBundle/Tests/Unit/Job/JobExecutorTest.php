@@ -273,7 +273,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $repository->expects($this->once())
             ->method('findOneBy')
             ->with(array('code' => $code));
-        $this->entityManager->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getRepository')
             ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));
@@ -302,7 +302,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('findOneBy')
             ->with(array('code' => $code))
             ->will($this->returnValue($jobInstance));
-        $this->entityManager->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getRepository')
             ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));
@@ -339,7 +339,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('findOneBy')
             ->with(array('code' => $code))
             ->will($this->returnValue($jobInstance));
-        $this->entityManager->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getRepository')
             ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));
@@ -382,7 +382,7 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('findOneBy')
             ->with(array('code' => $code))
             ->will($this->returnValue($jobInstance));
-        $this->entityManager->expects($this->once())
+        $this->managerRegistry->expects($this->once())
             ->method('getRepository')
             ->with('AkeneoBatchBundle:JobInstance')
             ->will($this->returnValue($repository));

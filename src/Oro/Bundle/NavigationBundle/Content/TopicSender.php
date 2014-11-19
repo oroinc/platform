@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Content;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
@@ -20,14 +22,19 @@ class TopicSender
     /** @var ServiceLink */
     protected $securityContextLink;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     public function __construct(
         TopicPublisher $publisher,
         ServiceLink $generatorLink,
-        ServiceLink $securityContextLink
+        ServiceLink $securityContextLink,
+        LoggerInterface $logger
     ) {
         $this->publisher           = $publisher;
         $this->generatorLink       = $generatorLink;
         $this->securityContextLink = $securityContextLink;
+        $this->logger              = $logger;
     }
 
     /**
@@ -49,7 +56,11 @@ class TopicSender
                 },
                 $tags
             );
-            $this->publisher->send(self::UPDATE_TOPIC, json_encode($tags));
+            try {
+                $this->publisher->send(self::UPDATE_TOPIC, json_encode($tags));
+            } catch (\Exception $e) {
+                $this->logger->error($e->getMessage());
+            }
         }
     }
 
