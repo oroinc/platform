@@ -41,8 +41,8 @@ Place widget into your page using placeholders, passing an entity object into te
         {% set dataBlocks = dataBlocks|merge([{
             'title': 'Title',
             'subblocks': [{
-	            'spanClass': 'empty',
-    	        'data': [activitiesData]
+                'spanClass': 'empty',
+                'data': [activitiesData]
             }]
        	}]) %}
 ```
