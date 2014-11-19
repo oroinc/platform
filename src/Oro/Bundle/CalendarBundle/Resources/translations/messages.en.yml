@@ -80,7 +80,7 @@ oro:
             start.label:          Start
             end.label:            End
             calendar.label:       Calendar
-            all_day.label:        All day event
+            all_day.label:        All-day event
             backgroundColor.label: Color
 
         #
