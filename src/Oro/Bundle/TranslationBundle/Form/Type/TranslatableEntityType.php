@@ -111,24 +111,13 @@ class TranslatableEntityType extends AbstractType
             return new ObjectChoiceList($entities, $options['property'], array(), null, $idField);
         };
 
-        $defaultConfigs = array(
-            'is_translated_option'    => true
-        );
-
         $resolver->setDefaults(
             array(
                 'property'      => null,
                 'query_builder' => null,
                 'choices'       => null,
                 'choice_list'   => $choiceList,
-                'translation'   => $defaultConfigs
-            )
-        );
-        $resolver->setNormalizers(
-            array(
-                'translation' => function (Options $options, $configs) use ($defaultConfigs) {
-                    return array_merge($defaultConfigs, $configs);
-                }
+                'is_translated_choices' => true
             )
         );
         $resolver->setRequired(array('class'));

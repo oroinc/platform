@@ -92,9 +92,7 @@ class UserTypeTest extends \PHPUnit_Framework_TestCase
                 'required'  => false,
                 'read_only' => $isMyProfile,
                 'disabled'  => $isMyProfile,
-                'translation' => array(
-                    'is_translated_option' => true
-                )
+                'is_translated_choices' => true
             );
             $builder->expects($this->at(++$order))
                 ->method('add')

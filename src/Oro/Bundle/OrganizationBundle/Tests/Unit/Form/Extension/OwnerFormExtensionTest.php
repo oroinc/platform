@@ -215,9 +215,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'configs'     => array(
                     'is_safe'              => true
                 ),
-                'translation'     => array(
-                    'is_translated_option' => true
-                ),
+                'is_translated_choices' => true,
                 'choices' => null,
                 'constraints' => array(new NotBlank()),
                 'required' => true,
@@ -243,9 +241,7 @@ class OwnerFormExtensionTest extends \PHPUnit_Framework_TestCase
                 'required' => true,
                 'constraints' => array(new NotBlank()),
                 'label' => 'oro.user.owner.label',
-                'translation' => array(
-                    'is_translated_option' => true
-                )
+                'is_translated_choices' => true
             )
         );
         $this->extension->buildForm($this->builder, array('ownership_disabled' => false));

@@ -19,7 +19,7 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\TranslationBundle\Form\Extension\TranslatedChoiceTypeExtension;
+use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 
 class FieldTypeTest extends TypeTestCase
 {
@@ -119,7 +119,7 @@ class FieldTypeTest extends TypeTestCase
                         new FormTypeValidatorExtension($validator)
                     ],
                     'choice' => [
-                        new TranslatedChoiceTypeExtension()
+                        new TranslatableChoiceTypeExtension()
                     ]
                 ]
             )
