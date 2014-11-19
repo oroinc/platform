@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Autocomplete;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\UserBundle\Autocomplete\UserAclHandler;
 
 class UserCalendarHandler extends UserAclHandler
