@@ -9,9 +9,6 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 
 class CollectListManager
 {
-    const STATE_CREATE = 'create';
-    const STATE_UPDATE = 'update';
-
     /** @var ActivityListChainProvider */
     protected $chainProvider;
 
@@ -43,14 +40,8 @@ class CollectListManager
     {
         if (!empty($deletedEntities)) {
             foreach ($deletedEntities as $entity) {
-                $entityManager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('list')
-                    ->delete()
-                    ->where('list.relatedActivityClass = :relatedActivityClass')
-                    ->andWhere('list.relatedActivityId = :relatedActivityId')
-                    ->setParameter('relatedActivityClass', $entity['class'])
-                    ->setParameter('relatedActivityId', $entity['id'])
-                    ->getQuery()
-                    ->execute();
+                $entityManager->getRepository('OroActivityListBundle:ActivityList')
+                    ->deleteActivityListsByRelatedActivityData($entity['class'], $entity['id']);
             }
         }
     }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -38,8 +40,9 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getRoutes()
     {
         return [
+            'itemView'   => 'oro_calendar_event_widget_info',
             'itemEdit'   => 'oro_calendar_event_update',
-            'itemDelete' => 'oro_api_delete_calendar_event'
+            'itemDelete' => 'oro_api_delete_calendarevent'
         ];
     }
 
@@ -63,14 +66,18 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getData($entity)
+    public function getData(ActivityList $activityListEntity)
     {
-        /** @var CalendarEvent $entity */
-        return [
-            'description'  => $entity->getDescription(),
-            'start_date'   => $entity->getStart(),
-            'end_date'     => $entity->getEnd(),
-        ];
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrganization($activityEntity)
+    {
+        /** @var $activityEntity CalendarEvent */
+        return $activityEntity->getCalendar()->getOrganization();
     }
 
     /**

@@ -78,7 +78,7 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
      */
     protected function createTypeGuess($formType, array $formOptions = array())
     {
-        return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+        return new TypeGuess($formType, $formOptions, TypeGuess::HIGH_CONFIDENCE);
     }
 
     /**

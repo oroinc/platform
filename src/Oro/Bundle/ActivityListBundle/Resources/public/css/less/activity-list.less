@@ -1,17 +1,15 @@
 @import "../../../oroui/css/less/mixins";
 .activity-list-widget {
-  border: 1px solid #ddd;
   position: relative;
-  .actions-bottom{
+  .actions-bottom {
     border-top: 1px solid #ddd;
-    padding:10px;
   }
   .title {
     border-bottom: 1px solid #ddd;
   }
   .activity-list {
     position: relative;
-    .no-data{
+    .no-data {
       margin: 20px;
     }
     .list-box {
@@ -30,7 +28,6 @@
           font-size: smaller;
         }
         .title-item {
-          //float: left;
           white-space: nowrap;
           .icon {
             display: inline-block;
@@ -58,7 +55,6 @@
       padding: 0;
       margin: 0;
       .accordion-group {
-        //overflow: hidden;
         border: 0;
         margin: 0;
         .accordion-heading {
@@ -66,6 +62,10 @@
           width: 100%;
           & > div {
             display: table-cell;
+          }
+          .dropdown-menu{
+            padding: 1px 2px;
+            right: 30px;
           }
           .message {
             .accordion-toggle {
@@ -75,9 +75,6 @@
             }
             .accordion-toggle.collapsed:before {
               content: '';
-            }
-            .control-group{
-              max-width: none;
             }
           }
           .accordion-toggle {
@@ -95,6 +92,9 @@
             content: '\f116';
           }
         }
+        .accordion-heading.collapse {
+          overflow: visible;
+        }
         .accordion-heading.in .message {
           display: none;
         }
@@ -105,7 +105,13 @@
         .accordion-body {
           .message, .subject {
             display: none;
-            overflow-x: auto;
+          }
+          .message .responsive-block {
+            width: auto;
+            float: none;
+          }
+          .control-group{
+            max-width: none;
           }
         }
         .accordion-body.in {
@@ -130,12 +136,20 @@
       background: none;
       border: none;
       box-shadow: none;
-      right: 115px;
       top: -36px;
     }
     .filter-item {
       margin-bottom: 0px;
       margin-right: 2px;
+    }
+  }
+  .grid-toolbar {
+    padding: 0;
+    .pagination > ul > li a{
+      width:24px;
+      i {
+        margin: 0 3px;
+      }
     }
   }
 }

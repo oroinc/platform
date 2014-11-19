@@ -52,7 +52,16 @@ define([
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
             data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
             data.relatedActivityClass = _.escape(data.relatedActivityClass);
-            data.owner_url = routing.generate('oro_user_view', {'id': data.owner_id});
+            if (data.owner_id) {
+                data.owner_url = routing.generate('oro_user_view', {'id': data.owner_id});
+            } else {
+                data.owner_url = '';
+            }
+            if (data.editor_id) {
+                data.editor_url = routing.generate('oro_user_view', {'id': data.editor_id});
+            }else {
+                data.editor_url = '';
+            }
 
             return data;
         },
@@ -71,10 +80,9 @@ define([
         },
 
         /**
-         * Collapses/expands view elements
-         *
-         * @param {boolean=} collapse
-         */
+        * Collapses/expands view elements
+        * @param {boolean=} collapse
+        */
         toggle: function (collapse) {
             if (_.isUndefined(collapse)) {
                 collapse = !this.isCollapsed();

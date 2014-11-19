@@ -14,7 +14,7 @@ class FormConfigGuesser extends AbstractFormGuesser
     protected $formConfigProvider;
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry         $managerRegistry
      * @param ConfigProviderInterface $entityConfigProvider
      * @param ConfigProviderInterface $formConfigProvider
      */
@@ -51,7 +51,7 @@ class FormConfigGuesser extends AbstractFormGuesser
             return $this->createDefaultTypeGuess();
         }
 
-        $formType = $formConfig->get('form_type');
+        $formType    = $formConfig->get('form_type');
         $formOptions = $formConfig->has('form_options') ? $formConfig->get('form_options') : array();
         $formOptions = $this->addLabelOption($formOptions, $class, $property);
 

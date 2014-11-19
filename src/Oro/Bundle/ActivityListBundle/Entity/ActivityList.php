@@ -19,7 +19,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
- * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -42,6 +41,9 @@ class ActivityList extends ExtendActivityList
     const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
     const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
 
+    const VERB_CREATE = 'create';
+    const VERB_UPDATE = 'update';
+
     /**
      * @var integer
      *
@@ -61,6 +63,14 @@ class ActivityList extends ExtendActivityList
     protected $owner;
 
     /**
+     * @var User
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="user_editor_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $editor;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="verb", type="string", length=32)
@@ -75,14 +85,6 @@ class ActivityList extends ExtendActivityList
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $subject;
-
-    /**
-     * @var array
-     *
-     * @ORM\Column(name="data", type="array", nullable=true)
-     * @Soap\ComplexType("BeSimple\SoapCommon\Type\KeyValue\String[]", nillable=true)
-     */
-    protected $data;
 
     /**
      * @var string
@@ -203,30 +205,6 @@ class ActivityList extends ExtendActivityList
     }
 
     /**
-     * Get an additional data of the related record
-     *
-     * @return array|null
-     */
-    public function getData()
-    {
-        return $this->data;
-    }
-
-    /**
-     * Set an additional data of the related record
-     *
-     * @param array|null $data
-     *
-     * @return self
-     */
-    public function setData($data)
-    {
-        $this->data = $data;
-
-        return $this;
-    }
-
-    /**
      * Get owning organization
      *
      * @return Organization
@@ -276,6 +254,26 @@ class ActivityList extends ExtendActivityList
     public function getRelatedActivityClass()
     {
         return $this->relatedActivityClass;
+    }
+
+    /**
+     * @param User $editor
+     *
+     * @return self
+     */
+    public function setEditor(User $editor)
+    {
+        $this->editor = $editor;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getEditor()
+    {
+        return $this->editor;
     }
 
     /**
@@ -364,26 +362,5 @@ class ActivityList extends ExtendActivityList
     public function __toString()
     {
         return (string)$this->subject;
-    }
-
-    /**
-     * Pre persist event handler
-     *
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = clone $this->createdAt;
-    }
-
-    /**
-     * Pre update event handler
-     *
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

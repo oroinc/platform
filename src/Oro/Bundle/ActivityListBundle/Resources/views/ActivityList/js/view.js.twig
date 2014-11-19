@@ -3,18 +3,22 @@
         <div class="accordion-heading collapse<% if (!collapsed) { %> in<% } %>">
             <div class="title-item">
                 <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
+                <span class="icon">
+                    <i class="icon-check-empty"></i>
+                </span>
                 <span class="visual">
-                    <span><%= relatedActivityClass %></span>
-                </span>
-                <span class="details">
-                    <i class="date"><%= createdAt %></i>
-                    <i class="date"><%= updatedAt %></i>
+                    <span class="details">
+                        <i class="date"><%= createdAt %></i>
+                        <i class="date"><%= updatedAt %></i>
+                    </span>
+                    <span class="message-item message">
+                        <a href="#" class="no-hash accordion-toggle"><%= subject %></a>
+                    </span>
                 </span>
             </div>
-            <div class="message-item">
-                <div class="message"><%= subject %></div>
+            <div class="actions">
+                <!-- Activity type action buttons -->
             </div>
-            <div class="actions"></div>
         </div>
         <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
             <div class="message">
