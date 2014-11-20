@@ -49,7 +49,7 @@ Developer may define attributes:
 </li>
 ```
 In a template developer should provide ```<li{{ oro_menu.attributes(itemAttributes) }}>``` tag. Also he can do
- not provide own template and uses standard template.
+ not provide own template and use [standard template](../views/Calendar/Menu/contextMenu.html.twig).
 
 **Module** received next values from **options** into **initialize**:
 - **el** - context menu item
