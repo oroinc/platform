@@ -11,11 +11,13 @@ class PhoneType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'phone',
-            'phone',
+            'phones',
+            'oro_phone_collection',
             array(
-                'label' => 'oro.user.phone.label',
-                'required' => false,
+                'label'    => 'oro.user.phones.label',
+                'type'     => 'oro_phone',
+                'required' => false/*, hmm. need to look at this file to see wht to do here
+                'options'  => array('data_class' => 'OroCRM\Bundle\ContactBundle\Entity\ContactPhone'*/)
             )
         );
     }
