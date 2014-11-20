@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
+use Doctrine\ORM\Query;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -110,15 +111,16 @@ class UserAclHandler implements SearchHandlerInterface
 
                 $user         = $this->getSecurityContext()->getToken()->getUser();
                 $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
-                $queryBuilder = $this->getSearchQueryBuilder($search);
+                $queryBuilder = $this->createQueryBuilder();
+                $this->addSearchCriteria($queryBuilder, $search);
                 if ((boolean)$excludeCurrentUser) {
                     $this->excludeUser($queryBuilder, $user);
                 }
                 $queryBuilder
                     ->setFirstResult($firstResult)
                     ->setMaxResults($perPage);
-                $this->addAcl($queryBuilder, $observer->getAccessLevel(), $user, $organization);
-                $results = $queryBuilder->getQuery()->getResult();
+                $query = $this->applyAcl($queryBuilder, $observer->getAccessLevel(), $user, $organization);
+                $results = $query->getResult();
 
                 $hasMore = count($results) == $perPage;
             }
@@ -232,64 +234,71 @@ class UserAclHandler implements SearchHandlerInterface
     }
 
     /**
-     * Get search users query builder
-     *
-     * @param $search
+     * Gets a query builder can be used to retrieve users
      *
      * @return QueryBuilder
      */
-    protected function getSearchQueryBuilder($search)
+    protected function createQueryBuilder()
     {
-        /** @var \Doctrine\ORM\QueryBuilder $queryBuilder */
-        $queryBuilder = $this->em->createQueryBuilder();
+        return $this->em->createQueryBuilder()
+            ->select('user')
+            ->from('Oro\Bundle\UserBundle\Entity\User', 'user');
+    }
+
+    /**
+     * Adds a search criteria to the given query builder based on the given query string
+     *
+     * @param QueryBuilder $queryBuilder The query builder
+     * @param string       $search       The search string
+     */
+    protected function addSearchCriteria(QueryBuilder $queryBuilder, $search)
+    {
         $queryBuilder
-            ->select(['users'])
-            ->from('Oro\Bundle\UserBundle\Entity\User', 'users')
             ->add(
                 'where',
                 $queryBuilder->expr()->orX(
                     $queryBuilder->expr()->like(
                         $queryBuilder->expr()->concat(
-                            'users.firstName',
+                            'user.firstName',
                             $queryBuilder->expr()->concat(
                                 $queryBuilder->expr()->literal(' '),
-                                'users.lastName'
+                                'user.lastName'
                             )
                         ),
                         '?1'
                     ),
                     $queryBuilder->expr()->like(
                         $queryBuilder->expr()->concat(
-                            'users.lastName',
+                            'user.lastName',
                             $queryBuilder->expr()->concat(
                                 $queryBuilder->expr()->literal(' '),
-                                'users.firstName'
+                                'user.firstName'
                             )
                         ),
                         '?1'
                     ),
-                    $queryBuilder->expr()->like('users.username', '?1')
+                    $queryBuilder->expr()->like('user.username', '?1')
                 )
             )
             ->setParameter(1, '%' . str_replace(' ', '%', $search) . '%');
-
-        return $queryBuilder;
     }
 
     /**
-     * Add ACL Check condition to the Query Builder
+     * Returns ACL protected query built based on the given query builder
      *
      * @param QueryBuilder $queryBuilder
      * @param string       $accessLevel
      * @param User         $user
      * @param Organization $organization
+     *
+     * @return Query
      */
-    protected function addAcl(QueryBuilder $queryBuilder, $accessLevel, User $user, Organization $organization)
+    protected function applyAcl(QueryBuilder $queryBuilder, $accessLevel, User $user, Organization $organization)
     {
         if ($accessLevel == AccessLevel::BASIC_LEVEL) {
-            $queryBuilder->andWhere($queryBuilder->expr()->in('users.id', [$user->getId()]));
+            $queryBuilder->andWhere($queryBuilder->expr()->in('user.id', [$user->getId()]));
         } elseif ($accessLevel == AccessLevel::GLOBAL_LEVEL) {
-            $queryBuilder->join('users.organizations', 'org')
+            $queryBuilder->join('user.organizations', 'org')
                 ->andWhere($queryBuilder->expr()->in('org.id', [$organization->getId()]));
         } elseif ($accessLevel !== AccessLevel::SYSTEM_LEVEL) {
             if ($accessLevel == AccessLevel::LOCAL_LEVEL) {
@@ -297,15 +306,17 @@ class UserAclHandler implements SearchHandlerInterface
                     $user->getId(),
                     $organization->getId()
                 );
-            } elseif ($accessLevel == AccessLevel::DEEP_LEVEL) {
+            } else { // AccessLevel::DEEP_LEVEL
                 $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()
                 );
             }
-            $queryBuilder->join('users.businessUnits', 'bu')
+            $queryBuilder->join('user.businessUnits', 'bu')
                 ->andWhere($queryBuilder->expr()->in('bu.id', $resultBuIds));
         }
+
+        return $queryBuilder->getQuery();
     }
 
     /**
@@ -324,7 +335,7 @@ class UserAclHandler implements SearchHandlerInterface
      */
     protected function excludeUser(QueryBuilder $queryBuilder, UserInterface $user)
     {
-        $queryBuilder->andWhere('users.id != :userId');
+        $queryBuilder->andWhere('user.id != :userId');
         $queryBuilder->setParameter('userId', $user->getId());
     }
 

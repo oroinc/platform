@@ -36,30 +36,26 @@ class UserCalendarHandler extends UserAclHandler
     ) {
         parent::__construct($em, $attachmentManager, $className, $securityContextLink, $treeProvider, $aclVoter);
 
-        $this->aclHelper           = $aclHelper;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function getSearchQueryBuilder($search)
+    protected function createQueryBuilder()
     {
-        $qb = parent::getSearchQueryBuilder($search);
-
-        $qb
-            ->select('calendar')
-            ->innerJoin('OroCalendarBundle:Calendar', 'calendar', 'WITH', 'calendar.owner = users');
-
-        return $qb;
+        return $this->em->createQueryBuilder()
+            ->select('calendar, user')
+            ->from('OroCalendarBundle:Calendar', 'calendar')
+            ->innerJoin('calendar.owner', 'user');
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addAcl(QueryBuilder $queryBuilder, $accessLevel, User $user, Organization $organization)
+    protected function applyAcl(QueryBuilder $queryBuilder, $accessLevel, User $user, Organization $organization)
     {
-        $queryBuilder->andWhere($queryBuilder->expr()->eq('calendar.organization', $organization->getId()));
-        $this->aclHelper->apply($queryBuilder);
+        return $this->aclHelper->apply($queryBuilder);
     }
 
     /**
