@@ -59,6 +59,18 @@ oro:
         organization.label:  Organization
 
         #
+        # Oro/Bundle/CalendarBundle/Entity/SystemCalendar
+        #
+        systemcalendar:
+            entity_label:        System Calendar
+            entity_plural_label: System Calendars
+            id.label:            Id
+            name.label:          Name
+            events.label:        System Event
+            connections.label:   Connection
+            organization.label:  Organization
+
+        #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
         #
         calendarevent:
