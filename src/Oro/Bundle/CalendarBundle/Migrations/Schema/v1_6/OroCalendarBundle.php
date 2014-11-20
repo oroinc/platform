@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_4;
+namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_6;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -17,7 +17,6 @@ class OroCalendarBundle implements Migration
         $table = $schema->getTable('oro_calendar_event');
         $table->addColumn('invitation_status', 'string', ['default' => null, 'notnull' => false, 'length' => 32]);
         $table->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
-        $table->addIndex(['parent_id'], 'oro_calendar_event_parent_idx', []);
         $table->addForeignKeyConstraint(
             $table,
             ['parent_id'],
