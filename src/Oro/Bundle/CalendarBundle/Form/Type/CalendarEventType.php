@@ -4,11 +4,19 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class CalendarEventType extends AbstractType
 {
+    /**
+     * @var CalendarEvent
+     */
+    protected $parentEvent;
+
     /**
      * {@inheritdoc}
      */
@@ -62,7 +70,73 @@ class CalendarEventType extends AbstractType
                     'required' => false,
                     'label'    => 'oro.reminder.entity_plural_label'
                 ]
+            )->add(
+                'childEvents',
+                'oro_calendar_event_invitees',
+                [
+                    'required' => false,
+                    'label'    => 'oro.calendar.calendarevent.invitation.label'
+                ]
             );
+
+        // extract master event
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
+
+        // get existing events
+        $builder->get('childEvents')->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onChildPostSubmit']);
+
+        // synchronize child events
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit']);
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function onPreSubmit(FormEvent $event)
+    {
+        $data = $event->getForm()->getData();
+        if ($data) {
+            $this->parentEvent = $data;
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function onChildPostSubmit(FormEvent $event)
+    {
+        /** @var CalendarEvent[] $data */
+        $data = $event->getForm()->getData();
+        if ($data && $this->parentEvent) {
+            foreach ($data as $key => $calendarEvent) {
+                $existingEvent = $this->parentEvent->getChildEventByCalendar($calendarEvent->getCalendar());
+                if ($existingEvent) {
+                    $data[$key] = $existingEvent;
+                }
+            }
+        }
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function onPostSubmit(FormEvent $event)
+    {
+        /** @var CalendarEvent $parentEvent */
+        $parentEvent = $event->getForm()->getData();
+        if ($parentEvent) {
+            foreach ($parentEvent->getChildEvents() as $calendarEvent) {
+                $calendarEvent->setTitle($parentEvent->getTitle())
+                    ->setDescription($parentEvent->getDescription())
+                    ->setStart($parentEvent->getStart())
+                    ->setEnd($parentEvent->getEnd())
+                    ->setAllDay($parentEvent->getAllDay());
+
+                if (!$calendarEvent->getInvitationStatus()) {
+                    $calendarEvent->setInvitationStatus(CalendarEvent::NOT_RESPONDED);
+                }
+            }
+        }
     }
 
     /**

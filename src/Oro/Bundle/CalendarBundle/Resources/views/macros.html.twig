@@ -36,7 +36,7 @@
     <div class="row-fluid">
         <div class="responsive-block">
             {{ _self.build_invitation_link(parentEvent) }}
-            {% for event in parentEvent.children %}
+            {% for event in parentEvent.childEvents %}
                 {{ _self.build_invitation_link(event) }}
             {% endfor %}
         </div>
@@ -82,7 +82,8 @@
             form_row(form.start),
             form_row(form.end),
             form_row(form.allDay),
-            form_row(form.reminders)
+            form_row(form.reminders),
+            form_row(form.childEvents)
         ]
     %}
     <div class="widget-content">

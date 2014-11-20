@@ -61,7 +61,7 @@
                 {{ UI.renderProperty('oro.calendar.calendarevent.start.label'|trans, entity.start|oro_format_datetime) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.end.label'|trans, entity.end|oro_format_datetime) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, entity.allDay ? 'Yes'|trans : 'No'|trans) }}
-                {% if entity.children is not empty %}
+                {% if entity.childEvents is not empty %}
                     {% set parentEvent = entity  %}
                 {% elseif entity.parent %}
                     {% set parentEvent = entity.parent %}
