@@ -5,7 +5,7 @@
     <a class="no-hash"
        href="{{ path(audit_path, {entity:entity_class, id:id}) }}"
        id="view-activity-btn"
-       title="{{ title }} - {{ 'Change History'|trans }}">
-        {{ 'Change History'|trans }}
+       title="{{ 'oro.dataaudit.change_history.title'|trans({'%item%': title}) }}">
+        {{ 'oro.dataaudit.change_history'|trans }}
     </a>
 </li>
