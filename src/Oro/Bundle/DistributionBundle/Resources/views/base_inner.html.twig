@@ -16,7 +16,7 @@
 
                 $(document).ajaxError(function (e) {
                     loader.displayOriginalElement();
-                    util.error('Ajax error');
+                    util.error({{ 'oro.distribution.messages.ajax_error'|trans }});
                 });
 
                 var Urls = {
@@ -70,7 +70,7 @@
                 {% if errors is defined and errors|length > 0 %}
                     <div class="alert fade in alert-error">
                         <i class="icon icon-error"></i>
-                        Following unexpected error(s) occurred:
+                        {{ 'oro.distribution.messages.unexpected_error'|trans }}:
                         <ul>
                             {% for error in errors %}
                                 <li>{{ error }}</li>
@@ -81,7 +81,7 @@
                 {% if notWritableSystemPaths|length > 0 %}
                     <div class="alert fade in alert-notice">
                         <i class="icon icon-info-sign"></i>
-                        Following directories/files have to be writable by web user:
+                        {{ 'oro.distribution.messages.not_writable'|trans }}:
                         <ul>
                             {% for path in notWritableSystemPaths %}
                                 <li>{{ path }}</li>

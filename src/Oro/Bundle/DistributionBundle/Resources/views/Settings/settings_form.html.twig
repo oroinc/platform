@@ -37,18 +37,18 @@
     {{ form_errors(form.oauth) }}
 
     <fieldset class="repos" data-prototype="{% filter escape %}{% include 'OroDistributionBundle:Settings:repo_prototype.html.twig' with { 'repo': form.repositories.vars.prototype } %}{% endfilter %}">
-        <legend>Repositories</legend>
+        <legend>{{ 'oro.distribution.settings.repositories'|trans }}</legend>
         {% for repo in form.repositories %}
             {% include 'OroDistributionBundle:Settings:repo_prototype.html.twig' with { 'repo': repo } %}
         {% endfor %}
-        <a href="javascript:void(0);" id="add_repo_link">Add a repository</a>
+        <a href="javascript:void(0);" id="add_repo_link">{{ 'oro.distribution.settings.add_repository'|trans }}</a>
     </fieldset>
 
 
     <div class="actions">
         <a class="btn btn-primary btn-large" id="install-new-package" href="javascript:submit();">
             <i class="icon-settings"></i>
-            Save
+            {{ 'oro.distribution.action.save'|trans }}
         </a>
     </div>
     {{ form_widget(form._token) }}
