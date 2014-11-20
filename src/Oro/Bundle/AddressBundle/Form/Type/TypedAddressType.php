@@ -30,7 +30,7 @@ class TypedAddressType extends AbstractType
                     'property' => 'label',
                     'required' => false,
                     'multiple' => true,
-                    'expanded' => true,
+                    'expanded' => true
                 )
             )
             ->add(
