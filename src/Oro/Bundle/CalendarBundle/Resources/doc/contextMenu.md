@@ -12,9 +12,8 @@ Each item is calendar in left sidebar on page "My Calendar". Each of them can ha
  calendar", "Remove calendar" (from calendar items list) and "Choose calendar color".
 
 ##Extendability
-Developer can extend calendar item context menu. He can add his own action to menu. He can add new action into
- any bundle. Context Menu based on knplabs/knp-menu. First of all developer should add menu item into navigation.yml, for
- example:
+Calendar Context Menu is based on knplabs/knp-menu. The menu can be extended with new action items from any bundle.
+ To add a new action to the menu, the action configuration must be added to the navigation.ym, for example:
 ``` yaml
 oro_menu_config:
     items:
@@ -32,11 +31,11 @@ oro_menu_config:
                 oro_calendar_remove_action: ~
 ```
 
-Developer can define attributes:
+Developer may define attributes:
 - **Label** shows action name into menu (required).
 - **Position** define place of action in context menu.
-- **Module** consists js module that performs action into browser. If developer does not provide module parameter then
- context menu don't have this action (required).
+- **Module** consists js module that performs action into browser. If the developer does not provide the "module"
+ attribute, the context menu will not contain this action.
 - **Template** provides twig template that replace standard item template, for example:
 ``` twig
 <li{{ oro_menu.attributes(itemAttributes) }}>
