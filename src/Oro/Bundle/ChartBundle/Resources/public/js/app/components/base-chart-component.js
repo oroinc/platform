@@ -21,6 +21,7 @@ define(function(require) {
          * @param {Object} options
          */
         initialize: function(options) {
+            var updateHandler;
             this.data = options.data;
             this.options = options.options;
             this.config = options.config;
@@ -30,11 +31,14 @@ define(function(require) {
 
             this.renderBaseLayout();
 
-            this.$chart.bind('update.' + this.cid, $.proxy(this.update, this));
-            // updates the chart on resize once per frame (1000/25)
-            $(window).bind('resize.' + this.cid, _.throttle($.proxy(this.update, this), 40, {leading: false}));
+            updateHandler = _.bind(this.update, this);
 
-            _.defer(_.bind(this.update, this));
+            this.$chart.bind('update.' + this.cid, updateHandler);
+            // updates the chart on resize once per frame (1000/25)
+            $(window).bind('resize.' + this.cid, _.throttle(updateHandler, 40, {leading: false}));
+            $(window).bind('responsive-reflow.' + this.cid, updateHandler);
+
+            _.defer(updateHandler);
         },
 
         /**
@@ -63,14 +67,12 @@ define(function(require) {
          * Update chart size and redraw
          */
         update: function() {
-            if(this.setChartSize()) {
+            var isChanged = this.setChartSize();
+
+            if(isChanged) {
                 this.draw();
                 this.fixSize();
             }
-        },
-
-        delayUpdate: function() {
-
         },
 
         /**
