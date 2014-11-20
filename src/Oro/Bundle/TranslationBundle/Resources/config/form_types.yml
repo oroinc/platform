@@ -1,6 +1,7 @@
 parameters:
     oro_translation.form.type.translatable_entity.class:     Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType
     oro_translation.form.type.available_translations.class: Oro\Bundle\TranslationBundle\Form\Type\AvailableTranslationsConfigurationType
+    oro_translation.form.extension.translatable_choice.class: Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension
 
 services:
     oro_translation.form.type.translatable_entity:
@@ -19,3 +20,8 @@ services:
         arguments: ["translatable_entity"]
         tags:
             - { name: form.type, alias: genemu_jqueryselect2_translatable_entity }
+
+    oro_translation.form.extension.translatable_choice:
+        class: %oro_translation.form.extension.translatable_choice.class%
+        tags:
+            - { name: form.type_extension, alias: choice }

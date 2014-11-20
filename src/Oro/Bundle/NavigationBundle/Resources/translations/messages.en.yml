@@ -11,3 +11,14 @@ oro:
             mostviewed.label: Most Viewed
         messages:
             no_items: No items
+        shortcuts:
+            title: Shortcuts
+            example: "Example: Create user, Users list"
+            see_all: See full list
+            most_used: Most Used Actions
+        favorites:
+            button: Favorites
+            button.title: Mark/unmark the page as favorite
+        pins:
+            button: Minimize
+            button.title: Pin/unpin the page

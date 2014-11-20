@@ -17,9 +17,7 @@
 
 {% block content %}
     <div class="container-fluid search-header clearfix">
-        <h2 style="width: auto">
-            {% trans with {'%name%': tag.name|escape} %}Records tagged as "%name%"{% endtrans %}
-        </h2>
+        <h2 style="width: auto">{{ 'oro.tag.datagrid.search_result'|trans({'%name%': tag.name|escape}) }}</h2>
     </div>
 
     {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
