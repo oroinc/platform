@@ -65,7 +65,8 @@ class BusinessUnitType extends AbstractType
                     'business_unit_ids' => $this->businessUnitManager->getBusinessUnitIds(
                         null,
                         $this->securityFacade->getOrganizationId()
-                    )
+                    ),
+                    'translatable_options' => false
                 ]
             )
             ->add(
@@ -151,7 +152,8 @@ class BusinessUnitType extends AbstractType
                         'forbidden_business_unit_ids' => $this->businessUnitManager->getChildBusinessUnitIds(
                             $data->getId(),
                             $this->securityFacade->getOrganizationId()
-                        )
+                        ),
+                        'translatable_options' => false
                     ]
                 );
             }

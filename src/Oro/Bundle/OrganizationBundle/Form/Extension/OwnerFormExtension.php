@@ -391,9 +391,9 @@ class OwnerFormExtension extends AbstractTypeExtension
                         'label'             => $this->fieldLabel,
                         'business_unit_ids' => $this->getBusinessUnitIds(),
                         'configs'           => array(
-                            'is_translated_option' => true,
                             'is_safe' => true,
                         ),
+                        'translatable_options' => false,
                         'choices' => $this->businessUnitManager->getTreeOptions(
                             $this->businessUnitManager->getBusinessUnitsTree(
                                 null,
@@ -417,6 +417,7 @@ class OwnerFormExtension extends AbstractTypeExtension
                             'choices' => $businessUnits,
                             'mapped' => true,
                             'label' => $this->fieldLabel,
+                            'translatable_options' => false
                         ),
                         $validation
                     )
