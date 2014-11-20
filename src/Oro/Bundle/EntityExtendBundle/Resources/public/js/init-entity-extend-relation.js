@@ -1,7 +1,7 @@
 /* jshint browser:true */
 /* global require */
-require(['jquery', 'routing'],
-function($, routing) {
+require(['jquery', 'orotranslation/js/translator', 'routing'],
+function($, __, routing) {
     'use strict';
     $(function() {
         $(document).on('change', '#oro_entity_config_type_extend_relation_target_entity', function (e) {
@@ -13,9 +13,9 @@ function($, routing) {
             $(fields).each(function(index, el){
                 var is_multiple = typeof $(el).attr('multiple') !== 'undefined' && $(el).attr('multiple') !== false;
                 if (is_multiple) {
-                    $(el).empty().append('<option value="">Loading...</option>');
+                    $(el).empty().append('<option value="">' + __('Loading...') + '</option>');
                 } else {
-                    $(el).prev('span').text('loading...');
+                    $(el).prev('span').text(__('Loading...'));
                 }
             });
 
@@ -28,7 +28,7 @@ function($, routing) {
                     });
 
                     $(el).empty().append(items.join(''));
-                    $(el).prev('span').text('Please choice target field...');
+                    $(el).prev('span').text(__('oro.entity.form.choose_entity_field'));
                 });
             });
 

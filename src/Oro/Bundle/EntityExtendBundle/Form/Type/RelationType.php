@@ -12,20 +12,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class RelationType extends AbstractType
 {
     /**
-     * @var ConfigProvider
+     * @var ConfigManager
      */
-    protected $configProvider;
-
-    /**
-     * @var Entity Config Provider
-     */
-    protected $entityProvider;
+    protected $configManager;
 
     /**
      * @var Config
@@ -37,20 +32,21 @@ class RelationType extends AbstractType
      */
     protected $formFactory;
 
-    public function __construct(ConfigProvider $configProvider, ConfigProvider $entityProvider)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->configProvider = $configProvider;
-        $this->entityProvider = $entityProvider;
+        $this->configManager = $configManager;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->config      = $this->configProvider->getConfigById($options['config_id']);
+        $this->config      = $this->configManager
+            ->getProvider('extend')
+            ->getConfigById($options['config_id']);
         $this->formFactory = $builder->getFormFactory();
 
         $builder->add(
             'target_entity',
-            new TargetType($this->configProvider, $this->entityProvider, $options['config_id']),
+            new TargetType($this->configManager, $options['config_id']),
             [
                 'constraints' => [new Assert\NotBlank()]
             ]
@@ -155,7 +151,7 @@ class RelationType extends AbstractType
         $form->add(
             $this->formFactory->createNamed(
                 $name,
-                new TargetFieldType($this->configProvider, $targetEntityClass),
+                new TargetFieldType($this->configManager, $targetEntityClass),
                 $data,
                 $options
             )

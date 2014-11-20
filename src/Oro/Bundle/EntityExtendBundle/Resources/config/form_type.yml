@@ -54,8 +54,7 @@ services:
     oro_entity_extend.type.relation:
         class:                                                  %oro_entity_extend.type.relation.class%
         arguments:
-            - @oro_entity_config.provider.extend
-            - @oro_entity_config.provider.entity
+            - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_relation_type }
 
