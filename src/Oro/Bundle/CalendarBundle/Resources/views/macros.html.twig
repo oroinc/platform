@@ -59,7 +59,10 @@
         {% else %}
             {% set invitationClass = '' %}
         {% endif %}
-        <i class="{{ invitationClass }}"></i>
+        {% if invitationClass is not empty %}
+            {% set status = 'oro.calendar.calendarevent.statuses.' ~ invitationStatus %}
+            <i class="{{ invitationClass }}" title="{{ status|trans }}"></i>
+        {% endif %}
         <span>
             {% if (resource_granted('oro_user_user_view') and calendarEvent.calendar.owner) %}
                 {{ UI.link({
