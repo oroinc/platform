@@ -61,8 +61,8 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $calendarEvent->setTitle('Parent calendar event');
 
         // reset children calendar events
-        $this->assertSame($calendarEvent, $calendarEvent->resetChildren($children));
-        $actual = $calendarEvent->getChildren();
+        $this->assertSame($calendarEvent, $calendarEvent->resetChildEvents($children));
+        $actual = $calendarEvent->getChildEvents();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals($children, $actual->toArray());
         /** @var CalendarEvent $child */
@@ -71,13 +71,13 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         }
 
         // add children calendar events
-        $this->assertSame($calendarEvent, $calendarEvent->addChildCalendarEvent($calendarEventTwo));
-        $actual = $calendarEvent->getChildren();
+        $this->assertSame($calendarEvent, $calendarEvent->addChildEvent($calendarEventTwo));
+        $actual = $calendarEvent->getChildEvents();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals($children, $actual->toArray());
 
-        $this->assertSame($calendarEvent, $calendarEvent->addChildCalendarEvent($calendarEventThree));
-        $actual = $calendarEvent->getChildren();
+        $this->assertSame($calendarEvent, $calendarEvent->addChildEvent($calendarEventThree));
+        $actual = $calendarEvent->getChildEvents();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals(array($calendarEventOne, $calendarEventTwo, $calendarEventThree), $actual->toArray());
         /** @var CalendarEvent $child */
@@ -86,8 +86,8 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         }
 
         // remove child calender event
-        $this->assertSame($calendarEvent, $calendarEvent->removeChildCalendarEvent($calendarEventOne));
-        $actual = $calendarEvent->getChildren();
+        $this->assertSame($calendarEvent, $calendarEvent->removeChildEvent($calendarEventOne));
+        $actual = $calendarEvent->getChildEvents();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals(array(1 => $calendarEventTwo, 2 => $calendarEventThree), $actual->toArray());
     }
