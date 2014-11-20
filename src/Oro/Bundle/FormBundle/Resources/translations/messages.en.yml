@@ -10,7 +10,7 @@ oro:
         click_here_to_select: Click here to select...
         tooltip.read_more: Read more
         icon_select:
-            adjust:	adjust
+            adjust: adjust
             anchor: anchor
             archive: archive
             asterisk: asterisk
@@ -76,7 +76,7 @@ oro:
             expand: expand
             expand-alt: expand alt
             external-link: external link
-            external-link: external link sign
+            external-link-sign: external link sign
             eye-close: eye close
             eye-open: eye open
             facetime-video: facetime video
@@ -90,9 +90,9 @@ oro:
             flag-alt: flag alt
             flag-checkered: flag checkered
             folder-close: folder close
-            folder-close: folder close alt
+            folder-close-alt: folder close alt
             folder-open: folder open
-            folder-open: folder open alt
+            folder-open-alt: folder open alt
             food: food
             frown: frown
             gamepad: gamepad
@@ -126,7 +126,7 @@ oro:
             magnet: magnet
             mail-forward: mail forward
             mail-reply: mail reply
-            mail-reply: mail reply all
+            mail-reply-all: mail reply all
             male: male
             map-marker: map marker
             meh: meh
@@ -134,7 +134,7 @@ oro:
             microphone-off: microphone off
             minus: minus
             minus-sign: minus sign
-            minus-sign: minus sign alt
+            minus-sign-alt: minus sign alt
             mobile-phone: mobile phone
             money: money
             moon: moon
@@ -151,7 +151,7 @@ oro:
             plane: plane
             plus: plus
             plus-sign: plus sign
-            plus-sign: plus sign alt
+            plus-sign-alt: plus sign alt
             power-off: power off
             print: print
             pushpin: pushpin
@@ -190,20 +190,20 @@ oro:
             sitemap: sitemap
             smile: smile
             sort: sort
-            sort-by: sort by alphabet
-            sort-by: sort by alphabet alt
-            sort-by: sort by attributes
-            sort-by: sort by attributes alt
-            sort-by: sort by order
-            sort-by: sort by order alt
+            sort-by-alphabet: sort by alphabet
+            sort-by-alphabet-alt: sort by alphabet alt
+            sort-by-attributes: sort by attributes
+            sort-by-attributes-alt: sort by attributes alt
+            sort-by-order: sort by order
+            sort-by-order-alt: sort by order alt
             sort-down: sort down
             sort-up: sort up
             spinner: spinner
             star: star
             star-empty: star empty
             star-half: star half
-            star-half: star half empty
-            star-half: star half full
+            star-half-empty: star half empty
+            star-half-full: star half full
             subscript: subscript
             suitcase: suitcase
             sun: sun
@@ -214,9 +214,9 @@ oro:
             tasks: tasks
             terminal: terminal
             thumbs-down: thumbs down
-            thumbs-down: thumbs down alt
+            thumbs-down-alt: thumbs down alt
             thumbs-up: thumbs up
-            thumbs-up: thumbs up alt
+            thumbs-up-alt: thumbs up alt
             ticket: ticket
             time: time
             tint: tint

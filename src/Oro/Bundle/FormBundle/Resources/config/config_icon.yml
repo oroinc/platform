@@ -79,9 +79,9 @@ oro_icon_select:
     flag-alt:               icon-flag-alt
     flag-checkered:         icon-flag-checkered
     folder-close:           icon-folder-close
-    folder-close alt:       icon-folder-close-alt
+    folder-close-alt:       icon-folder-close-alt
     folder-open:            icon-folder-open
-    folder-open alt:        icon-folder-open-alt
+    folder-open-alt:        icon-folder-open-alt
     food:                   icon-food
     frown:                  icon-frown
     gamepad:                icon-gamepad
@@ -115,7 +115,7 @@ oro_icon_select:
     magnet:                 icon-magnet
     mail-forward:           icon-mail-forward
     mail-reply:             icon-mail-reply
-    mail-reply all:         icon-mail-reply-all
+    mail-reply-all:         icon-mail-reply-all
     male:                   icon-male
     map-marker:             icon-map-marker
     meh:                    icon-meh
@@ -180,11 +180,11 @@ oro_icon_select:
     smile:                  icon-smile
     sort:                   icon-sort
     sort-by-alphabet:       icon-sort-by-alphabet
-    sort-by-alphabet alt:   icon-sort-by-alphabet-alt
+    sort-by-alphabet-alt:   icon-sort-by-alphabet-alt
     sort-by-attributes:     icon-sort-by-attributes
-    sort-by-attributes alt: icon-sort-by-attributes-alt
+    sort-by-attributes-alt: icon-sort-by-attributes-alt
     sort-by-order:          icon-sort-by-order
-    sort-by-order alt:      icon-sort-by-order-alt
+    sort-by-order-alt:      icon-sort-by-order-alt
     sort-down:              icon-sort-down
     sort-up:                icon-sort-up
     spinner:                icon-spinner
