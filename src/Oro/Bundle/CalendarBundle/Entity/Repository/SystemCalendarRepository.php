@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
+use Doctrine\ORM\AbstractQuery;
 
 class SystemCalendarRepository extends EntityRepository
 {
@@ -13,7 +13,7 @@ class SystemCalendarRepository extends EntityRepository
      * @param int[] $calendarIds
      * @param bool  $public
      *
-     * @return Query
+     * @return AbstractQuery
      */
     public function getCalendarsByIdsQuery($calendarIds, $public = false)
     {
