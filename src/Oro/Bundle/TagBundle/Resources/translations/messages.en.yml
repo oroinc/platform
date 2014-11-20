@@ -15,6 +15,7 @@ oro:
         datagrid:
             usage_count: Usage Count
             search:      Search by tag
+            search_result: Records tagged as "%name%"
 
         created_by.label:    Created By
         entity_description:  Show records tagged by this tag
