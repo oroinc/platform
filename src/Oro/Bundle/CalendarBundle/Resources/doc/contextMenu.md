@@ -32,12 +32,12 @@ oro_menu_config:
                 oro_calendar_remove_action: ~
 ```
 
-Developer can define parameters:
-- Label shows action name into menu (required).
-- Position define place of action in context menu.
-- Module consists js module that to perform action into browser. If developer don't provide module parameter then
+Developer can define attributes:
+- **Label** shows action name into menu (required).
+- **Position** define place of action in context menu.
+- **Module** consists js module that performs action into browser. If developer does not provide module parameter then
  context menu don't have this action (required).
-- Template parameter provide twig template that replace standard item template? for example:
+- **Template** provides twig template that replace standard item template, for example:
 ``` twig
 <li{{ oro_menu.attributes(itemAttributes) }}>
     <a href="javascript:void(0);" class="action">
@@ -52,16 +52,16 @@ Developer can define parameters:
 In a template developer should provide ```<li{{ oro_menu.attributes(itemAttributes) }}>``` tag. Also he can do
  not provide own template and uses standard template.
 
-Module received next values from "options" into "initialize":
-- el - context menu item
-- model - a Backbone model represents [a calendar connection](../public/js/calendar/connection/model.js)
-- collection - [a Backbone collection of a calendar item models](../public/js/calendar/connection/collection.js)
-- colorManager - [js manager](../public/js/calendar/color-manager.js) that consist methods and list of predefined and
+**Module** received next values from **options** into **initialize**:
+- **el** - context menu item
+- **model** - a Backbone model represents [a calendar connection](../public/js/calendar/connection/model.js)
+- **collection** - a Backbone [collection](../public/js/calendar/connection/collection.js) of calendar item models
+- **colorManager** - [manager](../public/js/calendar/color-manager.js) that consist functions and list of predefined and
  used colors for calendar
-- connectionsView - a Backbone view of [a calendar items list](../public/js/calendar/connection/view.js)
-- closeContextMenu - a function that closes context menu
+- **connectionsView** - a Backbone view represents [a calendar items list](../public/js/calendar/connection/view.js)
+- **closeContextMenu** - a function that closes context menu
 
-In js module developer can use default method "execute". This method will call when user click on your item menu, for
+In js module developer can use default method **execute**. This method will call when user click on your item menu, for
  example:
 ``` js
 ...
@@ -93,16 +93,16 @@ execute: function (model, actionSyncObject) {
 },
 ...
 ```
-Execute function must receive two parameters:
-- model is [a Backbone model](../public/js/calendar/connection/model.js) that consist property of calendar item.
-- actionSyncObject is jQuery deferred object that synchronize context menu action and rendering calendar. If custom
- action done successfully then promise object should perform resolve() method. In other case should perform reject()
- method.
+**Execute()** function must receive two parameters:
+- **model** is [a Backbone model](../public/js/calendar/connection/model.js) that consist property of calendar item.
+- **actionSyncObject** is jQuery deferred object that synchronize context menu action and rendering calendar. If custom
+ action done successfully then promise object should perform **resolve()** function. In other case should perform
+ **reject()** method.
 
-Another case developer can use any other js events or methods to start context menu action in module. In this case module
- should execute method "_initActionSyncObject" of object "connectionsView" before start action, that user can't run
- another menu actions. After action was done module should execute "resolve" or "reject" methods of object
- "connectionsView._actionSyncObject".
+Another case developer can use any other js events or functions to start context menu action in module. In this case module
+ should execute method **_initActionSyncObject()** of object **connectionsView** before start action, that user can't run
+ another menu actions. After action was done module should execute **resolve()** or **reject()** functions of object
+ **connectionsView._actionSyncObject**.
 
 Don't forgot to execute cache:clear after update navigation.yml, and assets:install and assetic:dump for dev environment
  and oro:requirejs:build for production environment.
