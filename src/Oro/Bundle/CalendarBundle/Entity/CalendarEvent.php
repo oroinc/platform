@@ -77,7 +77,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent", cascade={"remove"})
      **/
-    protected $children;
+    protected $childEvents;
 
     /**
      * @var CalendarEvent
@@ -224,7 +224,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
         parent::__construct();
 
         $this->reminders = new ArrayCollection();
-        $this->children  = new ArrayCollection();
+        $this->childEvents = new ArrayCollection();
     }
 
     /**
@@ -419,13 +419,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * Get children calendar events
+     * Get child calendar events
      *
      * @return Collection|CalendarEvent[]
      */
-    public function getChildren()
+    public function getChildEvents()
     {
-        return $this->children;
+        return $this->childEvents;
     }
 
     /**
@@ -435,12 +435,12 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @return CalendarEvent
      */
-    public function resetChildren($calendarEvents)
+    public function resetChildEvents($calendarEvents)
     {
-        $this->children->clear();
+        $this->childEvents->clear();
 
         foreach ($calendarEvents as $calendarEvent) {
-            $this->addChildCalendarEvent($calendarEvent);
+            $this->addChildEvent($calendarEvent);
         }
 
         return $this;
@@ -453,10 +453,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @return CalendarEvent
      */
-    public function addChildCalendarEvent(CalendarEvent $calendarEvent)
+    public function addChildEvent(CalendarEvent $calendarEvent)
     {
-        if (!$this->children->contains($calendarEvent)) {
-            $this->children->add($calendarEvent);
+        if (!$this->childEvents->contains($calendarEvent)) {
+            $this->childEvents->add($calendarEvent);
             $calendarEvent->setParent($this);
         }
 
@@ -470,10 +470,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @return CalendarEvent
      */
-    public function removeChildCalendarEvent(CalendarEvent $calendarEvent)
+    public function removeChildEvent(CalendarEvent $calendarEvent)
     {
-        if ($this->children->contains($calendarEvent)) {
-            $this->children->removeElement($calendarEvent);
+        if ($this->childEvents->contains($calendarEvent)) {
+            $this->childEvents->removeElement($calendarEvent);
         }
 
         return $this;

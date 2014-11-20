@@ -1,0 +1,3 @@
+config:
+    paths:
+        'oroactivitylist/js/app/components/activity-list-component': 'bundles/oroactivitylist/js/app/components/activity-list-component.js'
