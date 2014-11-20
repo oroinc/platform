@@ -284,7 +284,7 @@
                 ) }}
             {%- endif -%}
 
-            {%- if is_translated_label is defined and is_translated_label -%}
+            {%- if translatable_label is defined and not translatable_label -%}
                 {{ label }}
             {%- elseif raw_label is defined and raw_label -%}
                 {{ label|raw }}
@@ -298,7 +298,7 @@
 
 {% block oro_money_row %}
     {% set label = label|trans({}, translation_domain) ~ ' (' ~ currency_symbol ~')' %}
-    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
+    {{ form_row(form, {'type': 'text', 'label': label, 'translatable_label': false}) }}
 {% endblock %}
 
 {% block oro_money_widget %}
@@ -308,7 +308,7 @@
 
 {% block percent_row %}
     {% set label = label|trans({}, translation_domain) ~ ' (%)' %}
-    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
+    {{ form_row(form, {'type': 'text', 'label': label, 'translatable_label': false}) }}
 {% endblock %}
 
 {% block percent_widget %}

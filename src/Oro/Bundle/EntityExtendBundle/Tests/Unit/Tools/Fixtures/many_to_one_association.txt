@@ -33,6 +33,25 @@ class Entity
     }
 
     /**
+     * Returns array with all associated entities
+     *
+     * @return array
+     */
+    public function getTestTargetEntities()
+    {
+        $associationEntities = [];
+        $entity = $this->target_entity1_2ce134a6;
+        if ($entity) {
+            $associationEntities[] = $entity;
+        }
+        $entity = $this->target_entity2_b5e8651c;
+        if ($entity) {
+            $associationEntities[] = $entity;
+        }
+        return $associationEntities;
+    }
+
+    /**
      * Gets the entity this entity is associated with
      *
      * @return object|null Any configurable entity

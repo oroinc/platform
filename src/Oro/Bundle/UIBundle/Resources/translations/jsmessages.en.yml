@@ -35,8 +35,15 @@ Microsecond: Microsecond
 "Error! Incorrect server response.": "Error! Incorrect server response."
 "Sorry, unexpected error was occurred": "Sorry, unexpected error was occurred"
 "Please select a file...": "Please select a file..."
+"Choose File": "Choose File"
+"Searching...": "Searching..."
+"No matches found": "No matches found"
 Ok: Ok
 "N/A": "N/A"
+maximize: maximize
+restore: restore
+minimize: minimize
+close: close
 
 oro:
     ui:
