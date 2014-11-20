@@ -7,12 +7,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Controller\Annotations\Get;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -73,7 +71,7 @@ class NoteController extends RestController implements ClassResourceInterface
         }
         unset($result);
 
-        return new Response(json_encode($items), Codes::HTTP_OK);
+        return $this->buildResponse($items, self::ACTION_LIST, ['result' => $items, 'query' => $qb]);
     }
 
     /**

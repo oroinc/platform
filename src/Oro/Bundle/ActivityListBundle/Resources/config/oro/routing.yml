@@ -1,0 +1,29 @@
+oro_activity_list_bundle:
+    resource:     "@OroActivityListBundle/Controller"
+    type:         annotation
+    prefix:       /
+
+oro_activity_list_bundle_api:
+    resource: "@OroActivityListBundle/Controller/Api/Rest/ActivityListController.php"
+    type:     rest
+    prefix:   api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version: latest
+
+#
+# REST actions
+#
+oro_activity_list_api_get_list:
+    pattern: api/rest/{version}/activitylist/{entityClass}/{entityId}.{_format}
+    defaults: {_controller: OroActivityListBundle:Api/Rest/ActivityList:cget, _format: json, version: latest}
+    requirements:
+         _method: GET
+
+oro_activity_list_api_get_item:
+    pattern: api/rest/{version}/activitylist/{entityId}.{_format}
+    defaults: {_controller: OroActivityListBundle:Api/Rest/ActivityList:getActivityListItem, _format: json, version: latest}
+    requirements:
+         _method: GET
