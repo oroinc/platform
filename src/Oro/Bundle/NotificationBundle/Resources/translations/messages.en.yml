@@ -14,7 +14,6 @@ oro:
 
         form:
             choose_event:     'Choose an event...'
-            choose_entity:    'Choose an entity...'
             choose_template:  'Choose a template...'
 
         datagrid:
