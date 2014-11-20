@@ -15,7 +15,7 @@ class AddNoteActivityLists extends AddActivityListsData implements DependentFixt
     public function getDependencies()
     {
         return [
-            'Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'
+            'Oro\Bundle\NoteBundle\Migrations\Data\ORM\UpdateNotesWithOrganization'
         ];
     }
 
