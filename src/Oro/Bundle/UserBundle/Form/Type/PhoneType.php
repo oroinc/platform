@@ -16,7 +16,7 @@ class PhoneType extends AbstractType
             array(
                 'label'    => 'oro.user.phones.label',
                 'type'     => 'oro_phone',
-                'required' => false/*, hmm. need to look at this file to see wht to do here
+                'required' => false/*, can I just remove this since phones are defined in the UserEntity?
                 'options'  => array('data_class' => 'OroCRM\Bundle\ContactBundle\Entity\ContactPhone'*/)
             )
         );
