@@ -64,9 +64,9 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
                 && !$extendConfig->is('is_deleted')
             ) {
                 $fields[] = $fieldId;
-                $priorities[] = $viewConfigProvider
-                    ->getConfig($entityClassName, $fieldId->getFieldName())
-                    ->get('priority', false, 0);
+
+                $viewConfig = $viewConfigProvider->getConfig($entityClassName, $fieldId->getFieldName());
+                $priorities[] = $viewConfig->get('priority', false, 0);
             }
         }
 
