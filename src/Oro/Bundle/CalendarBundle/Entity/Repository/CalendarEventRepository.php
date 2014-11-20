@@ -17,6 +17,7 @@ class CalendarEventRepository extends EntityRepository
      * @param bool           $subordinate If true events from connected calendars will be returned as well
      * @param array|Criteria $filters     Additional filtering criteria, e.g. ['allDay' => true, ...]
      *                                    or \Doctrine\Common\Collections\Criteria
+     * @param string         $kind        user|system|null by default user
      *
      * @return QueryBuilder
      */
@@ -25,11 +26,12 @@ class CalendarEventRepository extends EntityRepository
         $startDate,
         $endDate,
         $subordinate = false,
-        $filters = []
+        $filters = [],
+        $kind = 'user'
     ) {
-        $qb = $this->getEventListQueryBuilder($calendarId, $subordinate, $filters);
-
         /** @var QueryBuilder $qb */
+        $qb = $this->getEventListQueryBuilder($calendarId, $subordinate, $filters, $kind);
+
         $qb
             ->andWhere(
                 '(e.start < :start AND e.end >= :start) OR '
@@ -50,20 +52,30 @@ class CalendarEventRepository extends EntityRepository
      * @param bool           $subordinate If true events from connected calendars will be returned as well
      * @param array|Criteria $filters     Additional filtering criteria, e.g. ['allDay' => true, ...]
      *                                    or \Doctrine\Common\Collections\Criteria
+     * @param string         $kind        user|system|null by default user
      *
      * @return QueryBuilder
      */
     public function getEventListQueryBuilder(
         $calendarId,
         $subordinate = false,
-        $filters = []
+        $filters = [],
+        $kind = 'user'
     ) {
         /** @var QueryBuilder $qb */
         $qb = $this->createQueryBuilder('e')
             ->select(
                 'c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay, e.createdAt, e.updatedAt'
-            )
-            ->innerJoin('e.calendar', 'c');
+            );
+        switch ($kind) {
+            case 'system':
+                $qb->innerJoin('e.systemCalendar', 'c');
+                break;
+            default:
+                $qb->innerJoin('e.calendar', 'c');
+                break;
+        }
+
         if (is_array($filters)) {
             $newCriteria = new Criteria();
             foreach ($filters as $fieldName => $value) {

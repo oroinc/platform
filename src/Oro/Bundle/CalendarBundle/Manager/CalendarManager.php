@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Manager;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider;
 use Oro\Bundle\CalendarBundle\Provider\CalendarProviderInterface;
 use Oro\Bundle\UIBundle\Tools\ArrayUtils;
