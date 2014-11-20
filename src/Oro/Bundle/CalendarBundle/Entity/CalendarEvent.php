@@ -64,6 +64,14 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
     const ACCEPTED             = 'accepted';
     const DECLINED             = 'declined';
+    const WITHOUT_STATUS       = null;
+
+    protected $availableStatuses = [
+        CalendarEvent::DECLINED,
+        CalendarEvent::ACCEPTED,
+        CalendarEvent::TENTATIVELY_ACCEPTED,
+        CalendarEvent::NOT_RESPONDED,
+    ];
 
     /**
      * @ORM\Id
@@ -512,7 +520,20 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function setInvitationStatus($invitationStatus)
     {
-        $this->invitationStatus = $invitationStatus;
+        if ($this->isvalid($invitationStatus)) {
+            $this->invitationStatus = $invitationStatus;
+        } else {
+            throw new \LogicException(sprintf('Investigation status "%s" is not supported', $invitationStatus));
+        }
+    }
+
+    /**
+     * @param string|null $invitationStatus
+     * @return bool
+     */
+    protected function isValid($invitationStatus)
+    {
+        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->availableStatuses);
     }
 
     /**

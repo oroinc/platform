@@ -47,6 +47,17 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @expectedException \LogicException
+     */
+    public function testNotValidInvitationStatusSetter()
+    {
+        $obj = new CalendarEvent();
+
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $accessor->setValue($obj, 'invitationStatus', 'wrong');
+    }
+
     public function testChildren()
     {
         $calendarEventOne = new CalendarEvent();
