@@ -78,6 +78,12 @@ oro:
             update_event:         Update {{ entity }}
             delete_event:         Delete {{ entity }}
 
+            statuses:
+                not_responded:        Not responded
+                tentatively_accepted: Tentatively accepted
+                accepted:             Accepted
+                declined:             Declined
+
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty
         #

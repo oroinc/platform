@@ -36,7 +36,7 @@
     <div class="row-fluid">
         <div class="responsive-block">
             {{ _self.build_invitation_link(parentEvent) }}
-            {% for event in parentEvent.children %}
+            {% for event in parentEvent.childEvents %}
                 {{ _self.build_invitation_link(event) }}
             {% endfor %}
         </div>
