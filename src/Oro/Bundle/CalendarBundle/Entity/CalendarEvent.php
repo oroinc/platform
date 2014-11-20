@@ -75,7 +75,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent", cascade={"remove"}, onDelete="CASCADE")
+     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent", cascade={"remove"})
      **/
     protected $childEvents;
 
@@ -83,7 +83,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var CalendarEvent
      *
      * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="children")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      **/
     protected $parent;
 
