@@ -18,6 +18,7 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *      name="oro_calendar_event",
  *      indexes={
  *          @ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"}),
+ *          @ORM\Index(name="oro_system_calendar_event_idx", columns={"system_calendar_id", "start_at", "end_at"}),
  *          @ORM\Index(name="oro_calendar_event_updated_at_idx", columns={"updated_at"})
  *      }
  * )
@@ -71,7 +72,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var Calendar
      *
      * @ORM\ManyToOne(targetEntity="Calendar", inversedBy="events")
-     * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -81,6 +82,21 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * )
      */
     protected $calendar;
+
+    /**
+     * @var SystemCalendar
+     *
+     * @ORM\ManyToOne(targetEntity="SystemCalendar", inversedBy="events")
+     * @ORM\JoinColumn(name="system_calendar_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $systemCalendar;
 
     /**
      * @var string
@@ -222,6 +238,30 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     public function setCalendar(Calendar $calendar)
     {
         $this->calendar = $calendar;
+
+        return $this;
+    }
+
+    /**
+     * Gets owning system calendar
+     *
+     * @return SystemCalendar
+     */
+    public function getSystemCalendar()
+    {
+        return $this->systemCalendar;
+    }
+
+    /**
+     * Sets owning system calendar
+     *
+     * @param SystemCalendar $systemCalendar
+     *
+     * @return CalendarEvent
+     */
+    public function setSystemCalendar(SystemCalendar $systemCalendar)
+    {
+        $this->systemCalendar = $systemCalendar;
 
         return $this;
     }
@@ -378,7 +418,9 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
 
         $result->setSubject($this->getTitle());
         $result->setExpireAt($this->getStart());
-        $result->setRecipient($this->getCalendar()->getOwner());
+        if ($this->getCalendar()) {
+            $result->setRecipient($this->getCalendar()->getOwner());
+        }
 
         return $result;
     }
