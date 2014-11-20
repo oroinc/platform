@@ -13,6 +13,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
@@ -361,7 +362,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
         array $options = [],
-        $fieldType = 'oneToMany'
+        $fieldType = RelationType::ONE_TO_MANY
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -444,7 +445,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
         array $options = [],
-        $fieldType = 'manyToMany'
+        $fieldType = RelationType::MANY_TO_MANY
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -540,7 +541,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $targetTable,
         $targetColumnName,
         array $options = [],
-        $fieldType = 'manyToOne'
+        $fieldType = RelationType::MANY_TO_ONE
     ) {
         $this->ensureExtendFieldSet($options);
 

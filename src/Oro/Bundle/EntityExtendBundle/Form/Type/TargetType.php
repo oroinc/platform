@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
 class TargetType extends AbstractType
@@ -80,7 +81,7 @@ class TargetType extends AbstractType
             ? array($extendEntityConfig->getId($this->targetEntity))
             : $extendEntityConfig->getIds();
 
-        if (in_array($relationType, array('oneToMany', 'manyToMany'))) {
+        if (in_array($relationType, array(RelationTypeBase::ONE_TO_MANY, RelationTypeBase::MANY_TO_MANY))) {
             $entityIds = array_filter(
                 $entityIds,
                 function (EntityConfigId $configId) {

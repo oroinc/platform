@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
@@ -105,7 +106,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     protected function isIndexRequired($className, $fieldName, $fieldType)
     {
         $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-        if (in_array($underlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
+        if (in_array($underlyingType, RelationType::$anyToAnyRelations)) {
             // relation fields already have an index
             return false;
         }

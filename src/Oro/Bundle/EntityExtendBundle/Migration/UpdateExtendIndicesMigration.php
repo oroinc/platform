@@ -6,6 +6,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
@@ -117,7 +118,7 @@ class UpdateExtendIndicesMigration implements
         if (!isset($options[ExtendOptionsManager::NEW_NAME_OPTION])) {
             if (isset($options[ExtendOptionsManager::TYPE_OPTION])) {
                 $columnType = $options[ExtendOptionsManager::TYPE_OPTION];
-                if (!in_array($columnType, ['oneToMane', 'manyToMany', 'manyToOne', 'optionSet'])) {
+                if (!in_array($columnType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']))) {
                     $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
                         $className,
                         $columnName
