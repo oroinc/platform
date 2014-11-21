@@ -14,7 +14,8 @@ define(['jquery', 'underscore'], function ($, _) {
                 valueEls.each(function (i, el) {
                     $(el)
                         .prop('disabled', value)
-                        .data('disabled', value);
+                        .data('disabled', value)
+                        .trigger(value ? 'disable' : 'enable');
 
                     if (!_.isUndefined($.uniform) && _.contains($.uniform.elements, el)) {
                         $(el).uniform('update');

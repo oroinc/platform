@@ -31,6 +31,11 @@ define(function (require) {
             loadingMaskEnabled: true,
             loadingElement: null,
             container: null,
+            // set to true if 'layout:init' should be executed after a widget is shown
+            // e.g. if HTML content passed to a widget is rendered from JS template
+            // this option is ignored when content is retrieved by AJAX, in this case 'layout:init'
+            // is executed anyway
+            initLayout: false,
             submitHandler: function () {
                 this.trigger('adoptedFormSubmit', this.form, this);
             }
@@ -599,6 +604,9 @@ define(function (require) {
                 this.loadContent();
             } else {
                 this._show();
+                if (this.options.initLayout) {
+                    mediator.execute('layout:init', this.widget);
+                }
             }
             this.firstRun = false;
         },
@@ -607,15 +615,16 @@ define(function (require) {
          * Updates content of a widget.
          *
          * @param {String} content
+         * @param {bool=}  initLayout
          */
-        setContent: function (content) {
+        setContent: function (content, initLayout) {
             this.actionsEl = null;
             this.actions = {};
             this.setElement($(content).filter('.widget-content:first'));
             this._show();
-            mediator.execute('layout:init', this.widget);
-            mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
+            if (initLayout || (initLayout === undefined && this.options.initLayout)) {
+                mediator.execute('layout:init', this.widget);
+            }
         },
 
         /**
@@ -678,7 +687,9 @@ define(function (require) {
         _onContentLoad: function(content) {
             this.loading = false;
             this.trigger('contentLoad', content, this);
-            this.setContent(content);
+            this.setContent(content, true);
+            mediator.trigger('widget:contentLoad', this.widget);
+            mediator.trigger('layout:adjustHeight');
         },
 
         /**

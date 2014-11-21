@@ -96,15 +96,7 @@ class CalendarProperty extends ExtendCalendarProperty
     /**
      * @var string|null
      *
-     * @ORM\Column(name="color", type="string", length=6, nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
-     */
-    protected $color;
-
-    /**
-     * @var string|null
-     *
-     * @ORM\Column(name="background_color", type="string", length=6, nullable=true)
+     * @ORM\Column(name="background_color", type="string", length=7, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $backgroundColor;
@@ -235,32 +227,6 @@ class CalendarProperty extends ExtendCalendarProperty
     public function setVisible($visible)
     {
         $this->visible = (bool)$visible;
-
-        return $this;
-    }
-
-    /**
-     * Gets a text color of the connected calendar events.
-     * If this method returns null the text color should be calculated automatically on UI.
-     *
-     * @return string|null The color in hex format, for example F00 or FF0000 for a red color.
-     */
-    public function getColor()
-    {
-        return $this->color;
-    }
-
-    /**
-     * Sets a text color of the connected calendar events.
-     *
-     * @param string|null $color The color in hex format, for example F00 or FF0000 for a red color.
-     *                           Set it to null to allow UI to calculate the text color automatically.
-     *
-     * @return self
-     */
-    public function setColor($color)
-    {
-        $this->color = $color;
 
         return $this;
     }

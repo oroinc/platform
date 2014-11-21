@@ -143,7 +143,7 @@ define(function (require) {
             var $elements;
             if ($.isPlainObject($.uniform)) {
                 // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)');
                 $elements.uniform();
                 if ($elements.is('.error:not([multiple])')) {
                     $elements.removeClass('error').closest('.selector').addClass('error');
@@ -171,7 +171,7 @@ define(function (require) {
 
             // removes uniform plugin from elements
             if ($.isPlainObject($.uniform)) {
-                $elements = $container.find('select:not(.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)');
                 $.uniform.restore($elements);
             }
 
