@@ -32,6 +32,53 @@
 </script>
 {% endmacro %}
 
+{% macro calendar_event_invitation(parentEvent) %}
+    <div class="row-fluid">
+        <div class="responsive-block">
+            {{ _self.build_invitation_link(parentEvent) }}
+            {% for event in parentEvent.childEvents %}
+                {{ _self.build_invitation_link(event) }}
+            {% endfor %}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro build_invitation_link(calendarEvent) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div>
+        <i class="icon-user"></i>
+        {% set invitationStatus = calendarEvent.invitationStatus %}
+        {% if invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::NOT_RESPONDED') %}
+            {% set invitationClass = 'icon-reply' %}
+        {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::TENTATIVELY_ACCEPTED') %}
+            {% set invitationClass = 'icon-question' %}
+        {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::ACCEPTED') %}
+            {% set invitationClass = 'icon-ok' %}
+        {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::DECLINED') %}
+            {% set invitationClass = 'icon-remove' %}
+        {% else %}
+            {% set invitationClass = '' %}
+        {% endif %}
+        {% if invitationClass is not empty %}
+            <i class="{{ invitationClass }}" title="{{ _self.calendar_event_invitation_status(invitationStatus) }}"></i>
+        {% endif %}
+        <span>
+            {% if (resource_granted('oro_user_user_view') and calendarEvent.calendar.owner) %}
+                {{ UI.link({
+                    'label' : calendarEvent.calendar.owner|oro_format_name,
+                    'path'  : path('oro_user_view', {'id': calendarEvent.calendar.owner.id})
+                }) }}
+            {% else %}
+                {{ calendarEvent.calendar.owner ? calendarEvent.calendar.owner|oro_format_name : '' }}
+            {% endif %}
+        </span>
+    </div>
+{% endmacro %}
+
+{%- macro calendar_event_invitation_status(statusCode) -%}
+    {{ ('oro.calendar.calendarevent.statuses.' ~ statusCode)|trans }}
+{%- endmacro -%}
+
 {% macro calendar_event_form_template(id, form) %}
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
