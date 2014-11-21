@@ -87,15 +87,72 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $that = $this;
 
+        $query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
+            ->setMethods(['setParameter', 'getResult', 'execute'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $expr = $this->getMock('Doctrine\ORM\Query\Expr', ['in']);
+        $expr
+            ->expects($this->once())
+            ->method('in');
+
+        $queryBuilder = $this->getMock(
+            'Doctrine\ORM\QueryBilder',
+            ['select', 'from', 'andWhere', 'setParameter', 'setMaxResults', 'expr', 'getQuery']
+        );
+        $queryBuilder
+            ->expects($this->once())
+            ->method('expr')
+            ->will($this->returnValue($expr));
+        $queryBuilder
+            ->expects($this->once())
+            ->method('select');
+        $queryBuilder
+            ->expects($this->once())
+            ->method('from');
+        $queryBuilder
+            ->expects($this->exactly(3))
+            ->method('andWhere');
+        $queryBuilder
+            ->expects($this->exactly(2))
+            ->method('setParameter');
+        $queryBuilder
+            ->expects($this->once())
+            ->method('setMaxResults');
+        $queryBuilder
+            ->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+
+        $this->em
+            ->expects($this->any())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($queryBuilder));
+
         $uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()->getMock();
-        $this->em->expects($this->once())->method('getUnitOfWork')->will($this->returnValue($uow));
+
+        $this->em
+            ->expects($this->once())
+            ->method('getUnitOfWork')
+            ->will($this->returnValue($uow));
+
         $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
             ->disableOriginalConstructor()->getMock();
-        $metadataFactory->expects($this->once())->method('getMetadataFor')
+
+        $metadataFactory
+            ->expects($this->once())
+            ->method('getMetadataFor')
             ->will($this->returnValue(new ClassMetadata('testEntity')));
-        $this->em->expects($this->once())->method('getMetadataFactory')->will($this->returnValue($metadataFactory));
-        $uow->expects($this->once())->method('persist')
+
+        $this->em
+            ->expects($this->once())
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($metadataFactory));
+
+        $uow->expects($this->once())
+            ->method('persist')
             ->with($this->isInstanceOf('JMS\JobQueueBundle\Entity\Job'))
             ->will(
                 $this->returnCallback(

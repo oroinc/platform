@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Types\Type;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -63,16 +64,54 @@ class SyncScheduler
             '--connector=' . $connectorType,
             '--params=' . serialize($params)
         ];
-        $job  = new Job(self::JOB_NAME, $args);
 
-        if ($useFlush) {
+        if ($this->hasNoSameJobs($args)) {
+            $this->addJob($args, $useFlush);
+        }
+    }
+
+    /**
+     * @param array $args
+     *
+     * @return bool
+     */
+    protected function hasNoSameJobs(array $args)
+    {
+        $qb = $this->em->createQueryBuilder();
+
+        $qb->select('j');
+        $qb->from('JMSJobQueueBundle:Job', 'j');
+        $qb->andWhere('j.command = :command');
+        $qb->andWhere('j.args = :args');
+        $qb->andWhere($qb->expr()->in('j.state', [Job::STATE_PENDING, Job::STATE_NEW]));
+        $qb->setParameter('command', self::JOB_NAME);
+        $qb->setParameter('args', $args, Type::JSON_ARRAY);
+        $qb->setMaxResults(1);
+        $result = $qb->getQuery()->getArrayResult();
+
+        return empty($result);
+    }
+
+    /**
+     * @param array $args
+     * @param bool  $useFlush
+     */
+    protected function addJob(array $args, $useFlush)
+    {
+        $job = new Job(self::JOB_NAME, $args);
+
+        if (true === $useFlush) {
             $this->em->persist($job);
             $this->em->flush();
-        } else {
-            $uow = $this->em->getUnitOfWork();
-            $uow->persist($job);
-            $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
-            $uow->computeChangeSet($jobMeta, $job);
+
+            return;
         }
+
+        $uow = $this->em->getUnitOfWork();
+        $uow->persist($job);
+        $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
+        $uow->computeChangeSet($jobMeta, $job);
+
+        return;
     }
 }
