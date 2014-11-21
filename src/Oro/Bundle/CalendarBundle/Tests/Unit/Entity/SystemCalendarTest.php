@@ -55,6 +55,7 @@ class SystemCalendarTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['name', 'testName'],
+            ['backgroundColor', '#FFFFFF'],
             ['public', true],
             ['organization', new Organization()],
         ];
