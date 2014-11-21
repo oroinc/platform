@@ -66,7 +66,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     const DECLINED             = 'declined';
     const WITHOUT_STATUS       = null;
 
-    protected $investigationStatuses = [
+    protected $invitationStatuses = [
         CalendarEvent::DECLINED,
         CalendarEvent::ACCEPTED,
         CalendarEvent::TENTATIVELY_ACCEPTED,
@@ -556,7 +556,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     protected function isValid($invitationStatus)
     {
-        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->investigationStatuses);
+        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->invitationStatuses);
     }
 
     /**
