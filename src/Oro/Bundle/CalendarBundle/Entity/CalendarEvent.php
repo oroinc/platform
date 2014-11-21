@@ -219,7 +219,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * Gets owning calendar
+     * Gets owning user's calendar
      *
      * @return Calendar
      */
@@ -229,11 +229,11 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * Sets owning calendar
+     * Sets owning user's calendar
      *
      * @param Calendar $calendar
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setCalendar(Calendar $calendar = null)
     {
@@ -257,7 +257,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param SystemCalendar $systemCalendar
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setSystemCalendar(SystemCalendar $systemCalendar = null)
     {
@@ -281,7 +281,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param string $title
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setTitle($title)
     {
@@ -305,7 +305,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param  string $description
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setDescription($description)
     {
@@ -329,7 +329,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param \DateTime $start
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setStart($start)
     {
@@ -360,7 +360,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param \DateTime $end
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setEnd($end)
     {
@@ -384,7 +384,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param bool $allDay
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setAllDay($allDay)
     {
@@ -414,15 +414,15 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function getReminderData()
     {
-        $result = new ReminderData();
-
-        $result->setSubject($this->getTitle());
-        $result->setExpireAt($this->getStart());
         if (!$this->getCalendar()) {
             throw new \LogicException(
-                sprinnf('Only user\'s calendar events can have reminders. Event Id: %d.', $this->id)
+                sprintf('Only user\'s calendar events can have reminders. Event Id: %d.', $this->id)
             );
         }
+
+        $result = new ReminderData();
+        $result->setSubject($this->getTitle());
+        $result->setExpireAt($this->getStart());
         $result->setRecipient($this->getCalendar()->getOwner());
 
         return $result;

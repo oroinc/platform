@@ -126,8 +126,9 @@ class Calendar
     /**
      * Sets calendar name.
      *
-     * @param  string|null $name
-     * @return Calendar
+     * @param string|null $name
+     *
+     * @return self
      */
     public function setName($name)
     {
@@ -150,7 +151,8 @@ class Calendar
      * Sets owning user for this calendar
      *
      * @param User $owningUser
-     * @return Calendar
+     *
+     * @return self
      */
     public function setOwner($owningUser)
     {
@@ -173,7 +175,8 @@ class Calendar
      * Adds an event to this calendar.
      *
      * @param  CalendarEvent $event
-     * @return Calendar
+     *
+     * @return self
      */
     public function addEvent(CalendarEvent $event)
     {
@@ -185,10 +188,11 @@ class Calendar
     }
 
     /**
-     * Set organization
+     * Sets owning organization
      *
      * @param Organization $organization
-     * @return Calendar
+     *
+     * @return self
      */
     public function setOrganization(Organization $organization = null)
     {
@@ -198,7 +202,7 @@ class Calendar
     }
 
     /**
-     * Get organization
+     * Gets owning organization
      *
      * @return Organization
      */

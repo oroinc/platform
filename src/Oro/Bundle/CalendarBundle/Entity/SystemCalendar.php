@@ -16,6 +16,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          "entity"={
  *              "icon"="icon-calendar"
  *          },
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
+ *          },
  *          "security"={
  *              "type"="ACL",
  *              "permissions"="VIEW;CREATE;EDIT;DELETE",
@@ -43,7 +48,7 @@ class SystemCalendar
     protected $id;
 
     /**
-     * @var string|null
+     * @var string
      *
      * @ORM\Column(type="string", length=255)
      */
@@ -54,7 +59,7 @@ class SystemCalendar
      *
      * @ORM\Column(name="is_public", type="boolean")
      */
-    protected $public;
+    protected $public = false;
 
     /**
      * @var ArrayCollection|CalendarEvent[]
@@ -77,7 +82,6 @@ class SystemCalendar
     public function __construct()
     {
         $this->events = new ArrayCollection();
-        $this->public = false;
     }
 
     /**
@@ -89,7 +93,7 @@ class SystemCalendar
     }
 
     /**
-     * Gets the system calendar id.
+     * Gets the calendar id.
      *
      * @return int
      */
@@ -99,9 +103,9 @@ class SystemCalendar
     }
 
     /**
-     * Gets system calendar name.
+     * Gets the calendar name.
      *
-     * @return string|null
+     * @return string
      */
     public function getName()
     {
@@ -109,10 +113,11 @@ class SystemCalendar
     }
 
     /**
-     * Sets system calendar name.
+     * Sets the calendar name.
      *
-     * @param  string|null $name
-     * @return SystemCalendar
+     * @param string $name
+     *
+     * @return self
      */
     public function setName($name)
     {
@@ -122,8 +127,10 @@ class SystemCalendar
     }
 
     /**
-     * Gets is_public flag.
-     * If flag is true VIEW ACL will not be used for such system calendars
+     * Gets a flag indicates that the calendar is available for all
+     * users regardless of which organization they belong to.
+     * Public calendars are available to all organizations.
+     * Private calendars are available only to users inside one organization.
      *
      * @return bool
      */
@@ -133,8 +140,11 @@ class SystemCalendar
     }
 
     /**
+     * Sets a flag indicates whether the calendar is public or not.
+     *
      * @param  bool $public
-     * @return SystemCalendar
+     *
+     * @return self
      */
     public function setPublic($public)
     {
@@ -144,7 +154,7 @@ class SystemCalendar
     }
 
     /**
-     * Gets all events of this system calendar.
+     * Gets all events of the calendar.
      *
      * @return CalendarEvent[]
      */
@@ -154,10 +164,11 @@ class SystemCalendar
     }
 
     /**
-     * Adds an event to this system calendar.
+     * Adds an event to the calendar.
      *
      * @param  CalendarEvent $event
-     * @return SystemCalendar
+     *
+     * @return self
      */
     public function addEvent(CalendarEvent $event)
     {
@@ -169,10 +180,11 @@ class SystemCalendar
     }
 
     /**
-     * Set organization
+     * Sets owning organization
      *
      * @param Organization $organization
-     * @return SystemCalendar
+     *
+     * @return self
      */
     public function setOrganization(Organization $organization = null)
     {
@@ -182,7 +194,7 @@ class SystemCalendar
     }
 
     /**
-     * Get organization
+     * Gets owning organization
      *
      * @return Organization
      */
