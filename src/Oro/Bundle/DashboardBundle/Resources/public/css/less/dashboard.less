@@ -72,17 +72,15 @@
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+    position: relative;
 
-    .actions-container.collapse-expand-action-container {
-      position: relative;
-      top: 1px;
-      padding: 10px 5px;
-      border-bottom: 1px solid #ddd;
+    .actions-container .collapse-expand-action-container {
+      margin-top: -1px;
     }
     
     .actions-container {
-      position: relative;
-      top: -32px;
+      position: absolute;
+      top: 10px;
       height: 0px;
       .collapse-action{
         color: #727272;
@@ -111,11 +109,11 @@
     }
 
     .actions-container.pull-left {
-      top: 10px;
+      left: 0;
     }
 
     .actions-container.pull-right {
-      top: -32px;
+      right: 0;
     }
 
     .default-actions-container {
@@ -147,7 +145,7 @@
 
     .title {
       padding-left: 28px;
-      padding-right: 0;
+      padding-right: 90px;
     }
 
     .row-fluid {
@@ -503,15 +501,5 @@
 .navigation {
   .dashboard-widgets-add {
     margin: 0 0 0 11px;
-  }
-}
-
-.mobile-version .dashboard-widget {
-  .title {
-    height: 70px;
-  }
-
-  .action-wrapper.sortable {
-    display: none;
   }
 }
