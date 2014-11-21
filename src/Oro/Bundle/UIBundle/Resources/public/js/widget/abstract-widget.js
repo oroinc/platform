@@ -45,6 +45,10 @@ define(function (require) {
         loadingMask: null,
         loading: false,
 
+        listen: {
+            renderComplete: '_initSectionActions'
+        },
+
         initialize: function(options) {
             options = options || {};
             this.options = _.defaults(options, this.options);
@@ -209,6 +213,33 @@ define(function (require) {
                     v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
+        },
+
+        /**
+         * Register other action elements
+         *
+         * @private
+         */
+        _initSectionActions: function() {
+            var widget = this,
+                sections = this.widget.find('[data-section]');
+            sections.each(function (i, sectionEl) {
+                var $sectionEl = $(sectionEl),
+                    sectionName = $sectionEl.attr('data-section'),
+                    actions = $sectionEl.find('[action-name], [data-action-name]');
+                if ($sectionEl.attr('action-name') || $sectionEl.attr('data-action-name')) {
+                    actions.push($sectionEl);
+                }
+                if (!widget.actions[sectionName]) {
+                    widget.actions[sectionName] = {};
+                }
+                actions.each(function (i, actionEl) {
+                    var $actionEl = $(actionEl),
+                        actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
+                    widget.actions[sectionName][actionName] = $actionEl;
+                    widget.trigger('widget:add:action:' + sectionName + ':' + actionName, $actionEl);
+                });
+            })
         },
 
         /**

@@ -15,20 +15,20 @@
             });
         </script>
             <div class="dropdown header-dropdown-shortcut header-utility-dropdown">
-                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{% trans %}Shortcuts{% endtrans %}"><i class="icon-share-sign"></i></a>
+                <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" title="{{ 'oro.navigation.shortcuts.title'|trans }}"><i class="icon-share-sign"></i></a>
                 <ul class="dropdown-menu">
-                    <li class="nav-header nav-header-title">{% trans %}Shortcuts{% endtrans %}</li>
+                    <li class="nav-header nav-header-title">{{ 'oro.navigation.shortcuts.title'|trans }}</li>
                     <li class="dark">
                         <form>
                             <input type="text" placeholder="Enter shortcut action" class="input">
                             <div class="clearfix">
-                                <div class="extra-small">{% trans %}Example: Create user, Users list{% endtrans %}
-                                    <a href="{{ options.details }}">{% trans %}See full list{% endtrans %}</a>
+                                <div class="extra-small">{{ 'oro.navigation.shortcuts.example'|trans }}
+                                    <a href="{{ options.details }}">{{ 'oro.navigation.shortcuts.see_all'|trans }}</a>
                                 </div>
                             </div>
                         </form>
                     </li>
-                    <div class="nav-header">{% trans %}Most Used Actions{% endtrans %}</div>
+                    <div class="nav-header">{{ 'oro.navigation.shortcuts.most_used'|trans }}</div>
                     {{ block('children') }}
                 </ul>
             </div>

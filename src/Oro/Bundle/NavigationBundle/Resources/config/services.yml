@@ -221,6 +221,7 @@ services:
             - @oro_wamp.publisher
             - @oro_navigation.content.tag_generator_chain.link
             - @oro_navigation.content.security.context.linksss
+            - @logger
 
     oro_navigation.content.tag_generator_chain.link:
         tags:

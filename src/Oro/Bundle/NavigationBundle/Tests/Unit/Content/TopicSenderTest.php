@@ -10,6 +10,8 @@ use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 use Oro\Bundle\NavigationBundle\Content\TopicSender;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
+use Psr\Log\LoggerInterface;
+
 class TopicSenderTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_USERNAME = 'usernameTeST';
@@ -28,10 +30,14 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
     /** @var TopicSender */
     protected $sender;
 
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $logger;
+
     protected function setUp()
     {
         $this->publisher       = $this->getMock('Oro\Bundle\SyncBundle\Wamp\TopicPublisher');
         $this->securityContext = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->logger          = $this->getMock('Psr\Log\LoggerInterface');
         $this->generator       = new TagGeneratorChain();
         $container             = new Container();
         $container->set('generator', $this->generator);
@@ -40,7 +46,8 @@ class TopicSenderTest extends \PHPUnit_Framework_TestCase
         $this->sender = new TopicSender(
             $this->publisher,
             new ServiceLink($container, 'generator'),
-            new ServiceLink($container, 'security')
+            new ServiceLink($container, 'security'),
+            $this->logger
         );
     }
 

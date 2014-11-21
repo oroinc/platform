@@ -83,6 +83,11 @@ oro:
             all_day.label:        All-day event
             backgroundColor.label: Color
 
+            updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}
+            added_by:             added by {{ user }} at {{ date }}
+            update_event:         Update {{ entity }}
+            delete_event:         Delete {{ entity }}
+
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty
         #
