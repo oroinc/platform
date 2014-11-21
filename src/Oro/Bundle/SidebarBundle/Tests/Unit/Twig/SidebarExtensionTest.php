@@ -3,19 +3,29 @@
 namespace Oro\Bundle\SidebarBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Templating\Asset\PackageInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 use Oro\Bundle\SidebarBundle\Twig\SidebarExtension;
 
 class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|WidgetDefinitionRegistry
      */
     protected $widgetDefinitionsRegistry;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
      */
-    protected $container;
+    protected $translator;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|PackageInterface
+     */
+    protected $assetHelper;
 
     /**
      * @var SidebarExtension
@@ -28,14 +38,23 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerInterface')
+
+        $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new SidebarExtension($this->widgetDefinitionsRegistry, $this->container);
+
+        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Asset\PackageInterface')->getMock();
+
+        $this->extension = new SidebarExtension(
+            $this->widgetDefinitionsRegistry,
+            $this->assetHelper,
+            $this->translator
+        );
     }
 
     public function testGetFunctions()
     {
+        /** @var \Twig_SimpleFunction[] $functions */
         $functions = $this->extension->getFunctions();
         $this->assertCount(1, $functions);
 
@@ -52,33 +71,37 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetWidgetDefinitions()
     {
         $placement = 'left';
+        $title = 'Foo';
         $definitions = new ArrayCollection();
         $definitions->set(
             'test',
             array(
-                'title' => 'Foo',
+                'title' => $title,
                 'icon' => 'test.ico',
                 'module' => 'widget/foo',
                 'placement' => 'left'
             )
         );
-        $assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Asset\PackageInterface')
-            ->getMock();
-        $assetHelper->expects($this->once())
+
+        $this->assetHelper
+            ->expects($this->once())
             ->method('getUrl')
             ->with('test.ico')
             ->will($this->returnValue('/asserts/test.ico'));
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with('templating.helper.assets')
-            ->will($this->returnValue($assetHelper));
+
         $this->widgetDefinitionsRegistry->expects($this->once())
             ->method('getWidgetDefinitionsByPlacement')
             ->with($placement)
             ->will($this->returnValue($definitions));
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with($title)
+            ->will($this->returnValue('trans' . $title));
+
         $expected = array(
             'test' => array(
-                'title' => 'Foo',
+                'title' => 'transFoo',
                 'icon' => '/asserts/test.ico',
                 'module' => 'widget/foo',
                 'placement' => 'left'
