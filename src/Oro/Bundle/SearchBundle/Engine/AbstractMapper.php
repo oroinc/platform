@@ -156,11 +156,6 @@ abstract class AbstractMapper
                 $clearedValue = Query::clearString($value);
                 $textAllDataField .= sprintf(' %s %s ', $value, $clearedValue);
 
-                $clearedValue = str_replace(Query::DELIMITER, '', $clearedValue);
-                if (filter_var($clearedValue, FILTER_VALIDATE_INT)) {
-                    $textAllDataField .= $clearedValue;
-                }
-
                 $objectData[$fieldConfig['target_type']][Indexer::TEXT_ALL_DATA_FIELD] = implode(
                     Query::DELIMITER,
                     array_unique(

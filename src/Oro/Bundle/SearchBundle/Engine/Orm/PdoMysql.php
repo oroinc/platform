@@ -104,6 +104,10 @@ class PdoMysql extends BaseDriver
         $words = array_filter(
             $words,
             function ($value) use ($length) {
+                if (filter_var($value, FILTER_VALIDATE_INT)) {
+                    return true;
+                }
+
                 return mb_strlen($value) < $length;
             }
         );

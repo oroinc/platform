@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SearchBundle\Entity\IndexText;
 
 class Query
 {
@@ -394,13 +393,20 @@ class Query
      */
     public static function clearString($inputString)
     {
-        return trim(
+        $string = trim(
             preg_replace(
                 '/ +/',
                 self::DELIMITER,
                 preg_replace('/[^\w:*]/u', self::DELIMITER, $inputString)
             )
         );
+
+        $fullString = str_replace(self::DELIMITER, '', $string);
+        if (filter_var($fullString, FILTER_VALIDATE_INT)) {
+            return $fullString;
+        }
+
+        return $string;
     }
 
     /**
