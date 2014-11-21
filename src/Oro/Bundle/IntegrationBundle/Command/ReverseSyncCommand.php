@@ -71,6 +71,8 @@ class ReverseSyncCommand extends ContainerAwareCommand
             ->getConfiguration()
             ->setSQLLogger(null);
 
+        $logger->notice('inter='.$integrationId . '; conn=' . $connectorType . '; param=' . $params);
+
         if ($this->isJobRunning($integrationId, $connectorType, $params)) {
             $logger->warning('Job already running. Terminating....');
 
