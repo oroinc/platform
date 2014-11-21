@@ -33,3 +33,20 @@
         return {more: false, results: $field.data('entity-field-util')._getData() };
     }
 {% endblock %}
+
+{% block _oro_entity_config_type_view_priority_widget %}
+    {{ form_widget(form) }}
+
+    <script type="text/javascript">
+        require(['jquery', 'underscore'], function ($, _) {
+            $(function () {
+                var displayable = $('#{{ id|replace({(name): 'is_displayable'}) }}');
+                displayable
+                    .on('change', _.bind(function () {
+                        $('#{{ id }}').attr('disabled', displayable.val() == 0);
+                    }))
+                    .trigger('change');
+            });
+        });
+    </script>
+{% endblock %}

@@ -117,6 +117,7 @@ class ActivityListManager
         );
 
         $qb->select('COUNT(activity.id)');
+        $qb->resetDQLPart('orderBy');
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
 
