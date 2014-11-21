@@ -4,7 +4,6 @@ namespace Oro\Bundle\SidebarBundle\Tests\Unit\Twig;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Symfony\Component\Templating\Asset\PackageInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
@@ -23,11 +22,6 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|PackageInterface
-     */
-    protected $assetHelper;
-
-    /**
      * @var SidebarExtension
      */
     protected $extension;
@@ -43,11 +37,8 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Asset\PackageInterface')->getMock();
-
         $this->extension = new SidebarExtension(
             $this->widgetDefinitionsRegistry,
-            $this->assetHelper,
             $this->translator
         );
     }
@@ -83,11 +74,11 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assetHelper
-            ->expects($this->once())
-            ->method('getUrl')
-            ->with('test.ico')
-            ->will($this->returnValue('/asserts/test.ico'));
+//        $this->assetHelper
+//            ->expects($this->once())
+//            ->method('getUrl')
+//            ->with('test.ico')
+//            ->will($this->returnValue('/asserts/test.ico'));
 
         $this->widgetDefinitionsRegistry->expects($this->once())
             ->method('getWidgetDefinitionsByPlacement')
@@ -102,7 +93,7 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             'test' => array(
                 'title' => 'transFoo',
-                'icon' => '/asserts/test.ico',
+                'icon' => 'test.ico',
                 'module' => 'widget/foo',
                 'placement' => 'left'
             )

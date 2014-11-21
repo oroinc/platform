@@ -1,6 +1,7 @@
 parameters:
     oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
     oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
+    oro_sidebar.request.handler.class: Oro\Bundle\SidebarBundle\EventListener\RequestHandler
 
 services:
     oro_sidebar.widget_definition.registry:
@@ -12,7 +13,14 @@ services:
         class: %oro_sidebar.twig.extension.class%
         arguments:
             - @oro_sidebar.widget_definition.registry
-            - @templating.helper.assets=
             - @translator
         tags:
             - { name: twig.extension }
+
+    oro_sidebar.request.handler:
+        class: %oro_sidebar.request.handler.class%
+        arguments:
+            - @oro_sidebar.widget_definition.registry
+            - @templating.helper.assets=
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
