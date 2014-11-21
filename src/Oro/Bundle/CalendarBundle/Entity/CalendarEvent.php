@@ -543,7 +543,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function setInvitationStatus($invitationStatus)
     {
-        if ($this->isvalid($invitationStatus)) {
+        if ($this->isValid($invitationStatus)) {
             $this->invitationStatus = $invitationStatus;
         } else {
             throw new \LogicException(sprintf('Investigation status "%s" is not supported', $invitationStatus));

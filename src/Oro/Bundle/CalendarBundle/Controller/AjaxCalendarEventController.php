@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
- * @Route("/ajax")
+ * @Route("/event/ajax")
  */
 class AjaxCalendarEventController extends Controller
 {
@@ -20,10 +20,10 @@ class AjaxCalendarEventController extends Controller
      */
     public function changeStatus(CalendarEvent $entity, $status)
     {
-            $em = $this->getDoctrine()->getManager();
-            $entity->setInvitationStatus($status);
-            $em->flush();
+        $em = $this->getDoctrine()->getManager();
+        $entity->setInvitationStatus($status);
+        $em->flush($entity);
 
-            return new JsonResponse(["success" => true]);
+        return new JsonResponse(["success" => true]);
     }
 }
