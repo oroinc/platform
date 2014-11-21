@@ -47,8 +47,10 @@
     {% endif %}
     <div class="pull-left">
         {% if (invitationStatus and invitationClass) %}
-            {% set status = 'oro.calendar.calendarevent.statuses.' ~ invitationStatus %}
-            <div class="badge badge-{{ invitationClass }} status-{{ invitationClass }}"><i class="icon-status-{{ invitationClass }} icon-circle"></i>{{ status|trans }}</div>
+            <div class="badge badge-{{ invitationClass }} status-{{ invitationClass }}">
+                <i class="icon-status-{{ invitationClass }} icon-circle"></i>
+                {{ calendarMacros.calendar_event_invitation_status(invitationStatus) }}
+            </div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
