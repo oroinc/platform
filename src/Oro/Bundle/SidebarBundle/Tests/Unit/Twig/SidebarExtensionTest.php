@@ -74,12 +74,6 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-//        $this->assetHelper
-//            ->expects($this->once())
-//            ->method('getUrl')
-//            ->with('test.ico')
-//            ->will($this->returnValue('/asserts/test.ico'));
-
         $this->widgetDefinitionsRegistry->expects($this->once())
             ->method('getWidgetDefinitionsByPlacement')
             ->with($placement)
