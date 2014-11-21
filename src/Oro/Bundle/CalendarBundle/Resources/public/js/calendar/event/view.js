@@ -78,10 +78,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     confirm.open();
                 }, this),
                 onEdit = _.bind(function (e) {
-                    this.eventDialog.setTitle(__('Edit Event'));
-                    this.eventDialog.setContent(this.getEventForm());
                     this._showMask(__('Loading...'));
                     this.listenTo(this, 'formLoaded', _.bind(this._hideMask, this));
+
+                    this.eventDialog.setTitle(__('Edit Event'));
+                    this.eventDialog.setContent(this.getEventForm());
 
                     // subscribe to 'delete event' event
                     this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
@@ -212,9 +213,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 }
 
                 if (name.indexOf('[childEvents]') != -1) {
-                    input.on('select2-data-loaded', function(e) {
+                    if (input.val()) {
+                        input.on('select2-data-loaded', function(e) {
+                            self.trigger('formLoaded');
+                        });
+                    } else {
                         self.trigger('formLoaded');
-                    });
+                    }
                 }
             });
 
