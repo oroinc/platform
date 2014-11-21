@@ -92,11 +92,17 @@
             form_row(form.childEvents)
         ]
     %}
+    {% set templateReplacement = {
+        '<script': '<% print("<sc" + "ript") %>',
+        '</script>': '<% print("</sc" + "ript>") %>',
+        '<%': '<% print("<" + "%") %>',
+        '%>': '<% print("%" + ">") %>',
+    } %}
     <div class="widget-content">
         <div class="alert alert-error" style="display: none;"></div>
         <form id="{{ form.vars.name }}" action="#">
             <fieldset class="form-horizontal">
-                {{ UI.scrollSubblock(null, data, true, false)|replace({'<script': '<% print("<sc" + "ript") %>', '</script>': '<% print("</sc" + "ript>") %>'})|raw }}
+                {{ UI.scrollSubblock(null, data, true, false)|replace(templateReplacement)|raw }}
                 <div class="widget-actions form-actions" style="display: none;">
                     <% if (id != null && removable) { %>
                     {{
@@ -117,7 +123,7 @@
                 </div>
             </fieldset>
         </form>
-        {{ oro_form_js_validation(form)|replace({'<script': '<% print("<sc" + "ript") %>', '</script>': '<% print("</sc" + "ript>") %>'})|raw }}
+        {{ oro_form_js_validation(form)|replace(templateReplacement)|raw }}
     </div>
 </script>
 {% endmacro %}

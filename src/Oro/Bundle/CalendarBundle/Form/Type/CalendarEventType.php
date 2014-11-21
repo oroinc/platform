@@ -79,6 +79,14 @@ class CalendarEventType extends AbstractType
                 ]
             );
 
+        $this->subscribeOnChildEvents($builder);
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    protected function subscribeOnChildEvents(FormBuilderInterface $builder)
+    {
         // extract master event
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
 
@@ -125,6 +133,8 @@ class CalendarEventType extends AbstractType
         /** @var CalendarEvent $parentEvent */
         $parentEvent = $event->getForm()->getData();
         if ($parentEvent) {
+            $this->checkEventStatus($parentEvent);
+
             foreach ($parentEvent->getChildEvents() as $calendarEvent) {
                 $calendarEvent->setTitle($parentEvent->getTitle())
                     ->setDescription($parentEvent->getDescription())
@@ -132,10 +142,18 @@ class CalendarEventType extends AbstractType
                     ->setEnd($parentEvent->getEnd())
                     ->setAllDay($parentEvent->getAllDay());
 
-                if (!$calendarEvent->getInvitationStatus()) {
-                    $calendarEvent->setInvitationStatus(CalendarEvent::NOT_RESPONDED);
-                }
+                $this->checkEventStatus($calendarEvent);
             }
+        }
+    }
+
+    /**
+     * @param CalendarEvent $calendarEvent
+     */
+    protected function checkEventStatus(CalendarEvent $calendarEvent)
+    {
+        if (!$calendarEvent->getInvitationStatus()) {
+            $calendarEvent->setInvitationStatus(CalendarEvent::NOT_RESPONDED);
         }
     }
 

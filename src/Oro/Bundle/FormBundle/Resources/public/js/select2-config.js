@@ -151,6 +151,7 @@ define(['jquery', 'underscore'
                         if (typeof response.results != 'undefined') {
                             handleResults(response.results);
                         }
+                        element.trigger('select2-data-loaded');
                     }
                 });
             };

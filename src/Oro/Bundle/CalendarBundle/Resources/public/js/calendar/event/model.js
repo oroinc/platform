@@ -61,7 +61,10 @@ define(['underscore', 'backbone', 'routing'
             options.contentType = 'application/json';
             options.data = JSON.stringify(_.extend(
                 {id: this.originalId},
-                _.omit(this.toJSON(), ['id', 'editable', 'removable', 'calendarUid']),
+                _.omit(
+                    this.toJSON(),
+                    ['id', 'editable', 'removable', 'calendarUid', 'invitedUsers', 'parentEventId', 'invitationStatus']
+                ),
                 attrs || {}
             ));
 
@@ -78,6 +81,14 @@ define(['underscore', 'backbone', 'routing'
             if (!this.originalId && this.id && calendarUid) {
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
+            }
+
+            // UI component for child events uin fact uses IDs of invited users
+            if (_.isArray(this.get('childEvents'))) {
+                this.set('childEvents', '');
+                if (this.get('invitedUsers')) {
+                    this.set('childEvents', this.get('invitedUsers').join(','));
+                }
             }
         }
     });

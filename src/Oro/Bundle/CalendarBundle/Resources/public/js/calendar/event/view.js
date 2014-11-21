@@ -80,6 +80,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 onEdit = _.bind(function (e) {
                     this.eventDialog.setTitle(__('Edit Event'));
                     this.eventDialog.setContent(this.getEventForm());
+                    this._showMask(__('Loading...'));
+                    this.listenTo(this, 'formLoaded', _.bind(this._hideMask, this));
+
                     // subscribe to 'delete event' event
                     this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
                         deleteAction.on('click', onDelete);
@@ -206,6 +209,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         input.val(value);
                     }
                     input.change();
+                }
+
+                if (name.indexOf('[childEvents]') != -1) {
+                    input.on('select2-data-loaded', function(e) {
+                        self.trigger('formLoaded');
+                    });
                 }
             });
 

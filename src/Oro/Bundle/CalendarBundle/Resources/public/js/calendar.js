@@ -159,7 +159,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
             // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent, false);
-            this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+            // this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+            this.getCalendarElement().fullCalendar('refetchEvents');
 
             // make sure that a calendar is visible when a new event is added to it
             if (!model.get('visible')) {
@@ -172,11 +173,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, _.pick(eventModel.toJSON(), _.keys(_.omit(fcEvent, ['id']))));
             this.prepareViewModel(fcEvent);
-            this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+            // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+            this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
         onEventDeleted: function (eventModel) {
-            this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            // this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
         onConnectionAddedOrDeleted: function () {
