@@ -50,9 +50,6 @@ class SystemCalendar
     protected $name;
 
     /**
-     * Gets is_public flag.
-     * If flag is true VIEW ACL will not be used for such system calendars
-     *
      * @var boolean
      *
      * @ORM\Column(name="is_public", type="boolean")
@@ -125,6 +122,9 @@ class SystemCalendar
     }
 
     /**
+     * Gets is_public flag.
+     * If flag is true VIEW ACL will not be used for such system calendars
+     *
      * @return bool
      */
     public function isPublic()
