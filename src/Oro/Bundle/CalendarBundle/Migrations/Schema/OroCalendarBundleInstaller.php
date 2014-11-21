@@ -14,7 +14,7 @@ class OroCalendarBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_6';
     }
 
     /**
@@ -67,6 +67,8 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('all_day', 'boolean', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('invitation_status', 'string', ['default' => null, 'notnull' => false, 'length' => 32]);
+        $table->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
         $table->addIndex(['updated_at'], 'oro_calendar_event_updated_at_idx', []);
@@ -108,6 +110,12 @@ class OroCalendarBundleInstaller implements Installation
             ['calendar_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $table,
+            ['parent_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
         );
     }
 
