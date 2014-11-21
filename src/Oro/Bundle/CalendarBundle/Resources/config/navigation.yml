@@ -44,7 +44,7 @@ oro_menu_config:
             label: 'oro.calendar.systemcalendar.entity_plural_label'
             route: 'oro_system_calendar_index'
             extras:
-                position: 125
+                position: 95
 
     tree:
         application_menu:
@@ -74,4 +74,4 @@ oro_titles:
     oro_calendar_event_view: '%%entity.title%%'
     oro_calendar_event_create: oro.ui.create_entity
     oro_calendar_event_update: '%%entity.title%% - Edit'
-    oro_system_calendar_list: ~
+    oro_system_calendar_index:  ~
