@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_6;
+namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_7;
 
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
