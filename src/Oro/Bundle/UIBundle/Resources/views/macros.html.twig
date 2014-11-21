@@ -121,6 +121,19 @@
 {% endmacro %}
 
 {#
+    Render color property block
+    Parameters:
+        title - property title
+        data  - property data
+#}
+{% macro renderColorProperty(title, data) %}
+    {% if data is not none %}
+       {% set data = '<i class="color hide-text" title="' ~ data ~ '" style="background-color: ' ~ data ~ ';">' ~ data ~ '</i>' %}
+    {% endif %}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+{% endmacro %}
+
+{#
     Create the link
     Parameters - array:
         [

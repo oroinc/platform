@@ -21,6 +21,7 @@ define(['underscore', 'backbone', 'routing'
             start: null,
             end: null,
             allDay: false,
+            backgroundColor: null,
             reminders: {},
             editable: false,
             removable: false,

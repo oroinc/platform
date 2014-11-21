@@ -81,7 +81,7 @@
 
 {% block content_data %}
     <div class="row-fluid" id="calendar">
-        <div class="span2">
+        <div class="span2 scrollable-container">
             <div class="calendars">
                 <div class="calendar-connections"></div>
                 <form action="#">
@@ -102,25 +102,19 @@
     </script>
 
     <script type="text/html" id="template-calendar-connection-item">
-        <li class="media connection-item" >
+        <li class="media connection-item<% if (visible) { %> active<% } %>" >
             <span
                 <% if (visible) { %>
                 class="calendar-color"
                     <% if (!_.isEmpty(backgroundColor)) { %>
-                    style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
+                    style="background-color: <%- backgroundColor %>; border-color: <%- backgroundColor %>"
                     <% } %>
                 <% } else { %>
                     class="calendar-color un-color"
                 <% } %>
             ></span>
             <div class="media-body">
-                <div
-                    <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
-                    class="user-calendar"
-                    title="<%- calendarName %>"
-                >
-                    <%- calendarName %>
-                </div>
+                <div class="user-calendar" title="<%- calendarName %>"><%- calendarName %></div>
                 <div class="pull-right icons-holder">
                     <a href="javascript: void(0);" class="icons-holder-text no-hash context-menu-button">
                         <i class="icon-ellipsis-horizontal"></i>
