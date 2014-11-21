@@ -40,7 +40,7 @@ class RelatedEntityTest extends Selenium2TestCase
             ->setFieldName($entityData['relationField'])
             ->setType('One to many')
             ->proceed()
-            ->setTargetEntity('OroUserBundle:User')
+            ->setTargetEntity('User')
             ->setRelation('Related entity data fields', array('First name', 'Last name'))
             ->setRelation('Related entity info title', array('First name', 'Last name'))
             ->setRelation('Related entity detailed', array('First name', 'Last name'))

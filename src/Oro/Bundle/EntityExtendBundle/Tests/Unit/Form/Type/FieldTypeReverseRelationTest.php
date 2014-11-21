@@ -21,6 +21,7 @@ use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 
 class FieldTypeReverseRelationTest extends TypeTestCase
 {
@@ -118,6 +119,9 @@ class FieldTypeReverseRelationTest extends TypeTestCase
                     'form' => [
                         new DataBlockExtension(),
                         new FormTypeValidatorExtension($validator)
+                    ],
+                    'choice' => [
+                        new TranslatableChoiceTypeExtension()
                     ]
                 ]
             )

@@ -29,4 +29,7 @@ UPGRADE FROM 1.4 to 1.5
   by `oro_soap.provider.metadata`.
 - Added possibility to add own metadata provider into chain using tag `oro_soap.metadata_provider`
 - Added `Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider` - collect metadata from **OroEntityConfigBundle** about entity. It exposes entity FQCN, label, description.
-
+- Added possibility for client to ask server to include additional info into response in REST API. `X-Include` header should be used for this purposes.
+- Added possibility to develop handlers that will provide additional info for client based on `X-Include` header. Handler should implement 
+  `Oro\Bundle\SoapBundle\Request\Handler\IncludeHandlerInterface` and registered as service with tag `oro_soap.include_handler` with `alias` option that should correspond
+  to requested info that it handles

@@ -93,6 +93,7 @@ class DynamicFieldsExtension extends \Twig_Extension
         }
 
         $fields = $this->extendProvider->filter(array($this, 'filterFields'), $entityClass);
+        $priorities = [];
 
         foreach ($fields as $field) {
             /** @var FieldConfigId $fieldConfigId */
@@ -119,7 +120,11 @@ class DynamicFieldsExtension extends \Twig_Extension
                 'label' => $label,
                 'value' => $event->getFieldViewValue(),
             );
+
+            $priorities[] = $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0);
         }
+
+        array_multisort($priorities, SORT_DESC, $dynamicRow);
 
         return $dynamicRow;
     }
