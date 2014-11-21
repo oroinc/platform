@@ -60,8 +60,8 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  */
 class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
 {
-    const NOT_RESPONDED        = 'not responded';
-    const TENTATIVELY_ACCEPTED = 'tentatively accepted';
+    const NOT_RESPONDED        = 'not_responded';
+    const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
     const ACCEPTED             = 'accepted';
     const DECLINED             = 'declined';
 
@@ -83,7 +83,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var CalendarEvent
      *
      * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="childEvents")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      **/
     protected $parent;
 
@@ -208,7 +208,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="invitation_status", type="string", length=32)
+     * @ORM\Column(name="invitation_status", type="string", length=32, nullable=true)
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -509,7 +509,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * Get parent calendar event.
      *
-     * @return CalendarEvent
+     * @return CalendarEvent|null
      */
     public function getParent()
     {
@@ -517,7 +517,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getInvitationStatus()
     {
@@ -525,7 +525,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * @param string $invitationStatus
+     * @param string|null $invitationStatus
      */
     public function setInvitationStatus($invitationStatus)
     {

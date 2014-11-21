@@ -59,12 +59,14 @@
         {% else %}
             {% set invitationClass = '' %}
         {% endif %}
-        <i class="{{ invitationClass }}"></i>
+        {% if invitationClass is not empty %}
+            <i class="{{ invitationClass }}" title="{{ _self.calendar_event_invitation_status(invitationStatus) }}"></i>
+        {% endif %}
         <span>
             {% if (resource_granted('oro_user_user_view') and calendarEvent.calendar.owner) %}
                 {{ UI.link({
-                'label' : calendarEvent.calendar.owner|oro_format_name,
-                'path'  : path('oro_user_view', {'id': calendarEvent.calendar.owner.id})
+                    'label' : calendarEvent.calendar.owner|oro_format_name,
+                    'path'  : path('oro_user_view', {'id': calendarEvent.calendar.owner.id})
                 }) }}
             {% else %}
                 {{ calendarEvent.calendar.owner ? calendarEvent.calendar.owner|oro_format_name : '' }}
@@ -72,6 +74,10 @@
         </span>
     </div>
 {% endmacro %}
+
+{%- macro calendar_event_invitation_status(statusCode) -%}
+    {{ ('oro.calendar.calendarevent.statuses.' ~ statusCode)|trans }}
+{%- endmacro -%}
 
 {% macro calendar_event_form_template(id, form) %}
 <script type="text/html" id="{{ id }}">

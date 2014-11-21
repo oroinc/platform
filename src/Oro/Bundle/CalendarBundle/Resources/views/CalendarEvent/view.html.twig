@@ -1,6 +1,6 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroCalendarBundle::macros.html.twig' as C %}
+{% import 'OroCalendarBundle::macros.html.twig' as calendarMacros %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 {% oro_title_set({params : {"%entity.title%": entity.title|default('N/A') }}) %}
@@ -47,7 +47,10 @@
     {% endif %}
     <div class="pull-left">
         {% if (invitationStatus and invitationClass) %}
-            <div class="badge badge-{{ invitationClass }} status-{{ invitationClass }}"><i class="icon-status-{{ invitationClass }} icon-circle"></i>{{ entity.invitationStatus|trans }}</div>
+            <div class="badge badge-{{ invitationClass }} status-{{ invitationClass }}">
+                <i class="icon-status-{{ invitationClass }} icon-circle"></i>
+                {{ calendarMacros.calendar_event_invitation_status(invitationStatus) }}
+            </div>
         {% endif %}
     </div>
 {% endblock breadcrumbs %}
@@ -62,12 +65,12 @@
                 {{ UI.renderProperty('oro.calendar.calendarevent.end.label'|trans, entity.end|oro_format_datetime) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, entity.allDay ? 'Yes'|trans : 'No'|trans) }}
                 {% if entity.childEvents is not empty %}
-                    {% set parentEvent = entity  %}
+                    {% set invitationEvent = entity  %}
                 {% elseif entity.parent %}
-                    {% set parentEvent = entity.parent %}
+                    {% set invitationEvent = entity.parent %}
                 {% endif %}
-                {% if parentEvent is defined %}
-                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.invitation.label'|trans, C.calendar_event_invitation(parentEvent)) }}
+                {% if invitationEvent is defined %}
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.invitation.label'|trans, calendarMacros.calendar_event_invitation(invitationEvent)) }}
                 {% endif %}
             </div>
             <div class="responsive-block">
