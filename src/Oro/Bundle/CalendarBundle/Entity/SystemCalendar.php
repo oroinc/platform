@@ -55,6 +55,13 @@ class SystemCalendar
     protected $name;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="background_color", type="string", length=7, nullable=true)
+     */
+    protected $backgroundColor;
+
+    /**
      * @var boolean
      *
      * @ORM\Column(name="is_public", type="boolean")
@@ -122,6 +129,32 @@ class SystemCalendar
     public function setName($name)
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Gets a background color of this calendar.
+     * If this method returns null the background color should be calculated automatically on UI.
+     *
+     * @return string|null The color in hex format, e.g. #FF0000.
+     */
+    public function getBackgroundColor()
+    {
+        return $this->backgroundColor;
+    }
+
+    /**
+     * Sets a background color of this calendar.
+     *
+     * @param string|null $backgroundColor The color in hex format, e.g. #FF0000.
+     *                                     Set it to null to allow UI to calculate the background color automatically.
+     *
+     * @return self
+     */
+    public function setBackgroundColor($backgroundColor)
+    {
+        $this->backgroundColor = $backgroundColor;
 
         return $this;
     }
