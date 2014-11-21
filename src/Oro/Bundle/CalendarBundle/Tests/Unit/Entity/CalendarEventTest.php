@@ -2,11 +2,17 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\ReminderBundle\Model\ReminderData;
+use Oro\Bundle\ReminderBundle\Entity\Reminder;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CalendarEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,20 +38,6 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($value, $accessor->getValue($obj, $property));
     }
 
-    public function propertiesDataProvider()
-    {
-        return array(
-            array('calendar', new Calendar()),
-            array('title', 'testTitle'),
-            array('description', 'testdDescription'),
-            array('start', new \DateTime()),
-            array('end', new \DateTime()),
-            array('allDay', true),
-            array('createdAt', new \DateTime()),
-            array('updatedAt', new \DateTime()),
-        );
-    }
-
     public function testPrePersist()
     {
         $obj = new CalendarEvent();
@@ -66,5 +58,56 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
         $obj->preUpdate();
         $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
+    }
+
+    public function testGetReminderData()
+    {
+        $obj = new CalendarEvent();
+        ReflectionUtil::setId($obj, 1);
+        $obj->setTitle('testTitle');
+        $calendar = new Calendar();
+        $calendar->setOwner(new User());
+        $obj->setCalendar($calendar);
+        /** @var ReminderData $reminderData */
+        $reminderData = $obj->getReminderData();
+
+        $this->assertEquals($reminderData->getSubject(), $obj->getTitle());
+        $this->assertEquals($reminderData->getExpireAt(), $obj->getStart());
+        $this->assertTrue($reminderData->getRecipient() === $calendar->getOwner());
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Only user's calendar events can have reminders. Event Id: 1.
+     */
+    public function testGetReminderDataWithLogicException()
+    {
+        $obj = new CalendarEvent();
+        ReflectionUtil::setId($obj, 1);
+        $obj->getReminderData();
+    }
+
+    public function testToString()
+    {
+        $obj = new CalendarEvent();
+        $obj->setTitle('testTitle');
+        $this->assertEquals($obj->getTitle(), (string)$obj);
+    }
+
+    public function propertiesDataProvider()
+    {
+        return [
+            ['calendar', new Calendar()],
+            ['systemCalendar', new SystemCalendar()],
+            ['reminders', new ArrayCollection([new Reminder()])],
+            ['title', 'testTitle'],
+            ['description', 'testDescription'],
+            ['start', new \DateTime()],
+            ['end', new \DateTime()],
+            ['allDay', true],
+            ['backgroundColor', '#FFFFFF'],
+            ['createdAt', new \DateTime()],
+            ['updatedAt', new \DateTime()],
+        ];
     }
 }

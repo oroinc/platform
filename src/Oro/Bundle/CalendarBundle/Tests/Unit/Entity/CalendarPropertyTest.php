@@ -53,8 +53,7 @@ class CalendarPropertyTest extends \PHPUnit_Framework_TestCase
             array('calendar', 123),
             array('position', 100),
             array('visible', false),
-            array('color', 'FFFFFF'),
-            array('backgroundColor', 'FFFFFF'),
+            array('backgroundColor', '#FFFFFF'),
         );
     }
 }

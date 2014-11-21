@@ -18,6 +18,12 @@ config:
         'jquery.select2':
             deps:
                 - 'jquery'
+        'jquery.simplecolorpicker':
+            deps:
+                - 'jquery'
+        'jquery.minicolors':
+            deps:
+                - 'jquery'
         'jquery.jstree':
             deps:
                 - 'jquery'
@@ -77,6 +83,8 @@ config:
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
+        'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
+        'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
         'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
@@ -115,6 +123,7 @@ config:
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
         'oroui/js/app/components/hidden-redirect-component': 'bundles/oroui/js/app/components/hidden-redirect-component.js'
+        'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'

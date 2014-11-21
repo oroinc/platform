@@ -14,7 +14,7 @@ class AddCalendarEventActivityLists extends AddActivityListsData implements Depe
      */
     public function getDependencies()
     {
-        return ['Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData'];
+        return ['Oro\Bundle\CalendarBundle\Migrations\Data\ORM\UpdateCalendarWithOrganization'];
     }
 
     /**

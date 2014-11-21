@@ -59,8 +59,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension
         }
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
+        $viewConfigProvider   = $this->configManager->getProvider('view');
         $formConfigs          = $this->configManager->getProvider('form')->getConfigs($className);
 
+        $priorities = [];
+        $fields = [];
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
@@ -75,7 +78,14 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 continue;
             }
 
-            $builder->add($fieldName);
+            $fields[] = $fieldName;
+            $priorities[] = $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0);
+        }
+
+        array_multisort($priorities, SORT_DESC, $fields);
+
+        foreach ($fields as $field) {
+            $builder->add($field);
         }
     }
 
