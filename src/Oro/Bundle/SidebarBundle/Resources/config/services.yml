@@ -12,6 +12,7 @@ services:
         class: %oro_sidebar.twig.extension.class%
         arguments:
             - @oro_sidebar.widget_definition.registry
-            - @service_container
+            - @templating.helper.assets=
+            - @translator
         tags:
             - { name: twig.extension }
