@@ -16,6 +16,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class UserCalendarHandler extends UserAclHandler
 {
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /**
      * @param EntityManager     $em
      * @param AttachmentManager $attachmentManager
