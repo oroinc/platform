@@ -7,6 +7,18 @@ use Oro\Bundle\UserBundle\Autocomplete\UserAclHandler;
 class UserCalendarHandler extends UserAclHandler
 {
     /**
+     * @param string $query
+     *
+     * @return object|null
+     */
+    protected function searchById($query)
+    {
+        list ($id, $entityClass) = explode(';', $query);
+
+        return $this->em->getRepository($entityClass)->find((int)$id);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getSearchQueryBuilder($search)

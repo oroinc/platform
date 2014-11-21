@@ -1,0 +1,42 @@
+/*jslint nomen: true*/
+/*global define*/
+define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
+    ], function (_, BaseView) {
+    'use strict';
+
+    var SimpleColorChoiceView = BaseView.extend({
+        events: {
+            'enable': 'enable',
+            'disable': 'disable'
+        },
+
+        /**
+         * @constructor
+         * @param {Object} options
+         */
+        initialize: function (options) {
+            this.$el.simplecolorpicker(_.defaults(_.omit(options, ['el']), {
+                emptyColor: '#FFFFFF'
+            }));
+        },
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (!this.disposed && this.$el) {
+                this.$el.simplecolorpicker('destroy');
+            }
+            SimpleColorChoiceView.__super__.dispose.call(this);
+        },
+
+        enable: function () {
+            this.$el.simplecolorpicker('enable');
+        },
+
+        disable: function () {
+            this.$el.simplecolorpicker('enable', false);
+        }
+    });
+
+    return SimpleColorChoiceView;
+});

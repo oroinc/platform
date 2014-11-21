@@ -9,6 +9,19 @@ oro:
         choose_value: Choose a value...
         click_here_to_select: Click here to select...
         tooltip.read_more: Read more
+        color:
+            custom:         Custom color...
+            bold_blue:      Bold blue
+            blue:           Blue
+            turquoise:      Turquoise
+            green:          Green
+            bold_green:     Bold green
+            yellow:         Yellow
+            orange:         Orange
+            red:            Red
+            bold_red:       Bold red
+            purple:         Purple
+            gray:           Gray
         icon_select:
             adjust: adjust
             anchor: anchor

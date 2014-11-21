@@ -101,7 +101,7 @@ class UserAclHandler implements SearchHandlerInterface
         if ($this->getSecurityContext()->isGranted($permission, $object)) {
             $results = [];
             if ($searchById) {
-                $results[] = $this->em->getRepository('OroUserBundle:User')->find((int)$query);
+                $results[] = $this->searchById($query);
             } else {
                 $page        = (int)$page > 0 ? (int)$page : 1;
                 $perPage     = (int)$perPage > 0 ? (int)$perPage : 10;
@@ -135,6 +135,16 @@ class UserAclHandler implements SearchHandlerInterface
             'results' => $resultsData,
             'more'    => $hasMore
         ];
+    }
+
+    /**
+     * @param string $query
+     *
+     * @return User
+     */
+    protected function searchById($query)
+    {
+        return $this->em->getRepository('OroUserBundle:User')->find((int)$query);
     }
 
     /**
