@@ -53,8 +53,10 @@ class SidebarExtension extends \Twig_Extension
         $definitions = $this->widgetDefinitionsRegistry
             ->getWidgetDefinitionsByPlacement($placement)
             ->toArray();
+        $translator = $this->container->get('translator');
         foreach ($definitions as &$definition) {
             $definition['icon'] = $assetHelper->getUrl($definition['icon']);
+            $definition['title'] = $translator->trans($definition['title']);
         }
         return $definitions;
     }
