@@ -62,7 +62,7 @@ class OroCalendarBundleInstaller implements Installation
         $table = $schema->createTable('oro_system_calendar');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name', 'string', ['length' => 255]);
         $table->addcolumn('is_public', 'boolean', ['default' => false]);
         $table->addIndex(['organization_id'], 'IDX_1DE3E2F032C8A3DE', []);
         $table->setPrimaryKey(['id']);
@@ -88,9 +88,9 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('updated_at', 'datetime', []);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
-        $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_system_calendar_event_idx', []);
+        $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_sys_calendar_event_idx', []);
         $table->addIndex(['system_calendar_id'], 'IDX_2DDC40DD55F0F9D0', []);
-        $table->addIndex(['updated_at'], 'oro_calendar_event_updated_at_idx', []);
+        $table->addIndex(['updated_at'], 'oro_calendar_event_up_idx', []);
         $table->setPrimaryKey(['id']);
     }
 

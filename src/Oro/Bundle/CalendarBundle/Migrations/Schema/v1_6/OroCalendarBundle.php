@@ -16,7 +16,7 @@ class OroCalendarBundle implements Migration
         $table = $schema->createTable('oro_system_calendar');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('name', 'string', ['length' => 255]);
         $table->addcolumn('is_public', 'boolean', ['default' => false]);
 
         $table->addIndex(['organization_id'], 'IDX_1DE3E2F032C8A3DE', []);
@@ -31,7 +31,7 @@ class OroCalendarBundle implements Migration
         $table = $schema->getTable('oro_calendar_event');
         $table->changeColumn('calendar_id', ['integer', 'notnull' => false]);
         $table->addColumn('system_calendar_id', 'integer', ['notnull' => false]);
-        $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_system_calendar_event_idx', []);
+        $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_sys_calendar_event_idx', []);
         $table->addIndex(['system_calendar_id'], 'IDX_2DDC40DD55F0F9D0', []);
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_system_calendar'),

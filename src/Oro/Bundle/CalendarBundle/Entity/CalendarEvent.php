@@ -18,8 +18,8 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *      name="oro_calendar_event",
  *      indexes={
  *          @ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"}),
- *          @ORM\Index(name="oro_system_calendar_event_idx", columns={"system_calendar_id", "start_at", "end_at"}),
- *          @ORM\Index(name="oro_calendar_event_updated_at_idx", columns={"updated_at"})
+ *          @ORM\Index(name="oro_sys_calendar_event_idx", columns={"system_calendar_id", "start_at", "end_at"}),
+ *          @ORM\Index(name="oro_calendar_event_up_idx", columns={"updated_at"})
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
@@ -235,7 +235,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @return CalendarEvent
      */
-    public function setCalendar(Calendar $calendar)
+    public function setCalendar(Calendar $calendar = null)
     {
         $this->calendar = $calendar;
 
@@ -259,7 +259,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @return CalendarEvent
      */
-    public function setSystemCalendar(SystemCalendar $systemCalendar)
+    public function setSystemCalendar(SystemCalendar $systemCalendar = null)
     {
         $this->systemCalendar = $systemCalendar;
 
@@ -418,9 +418,12 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
 
         $result->setSubject($this->getTitle());
         $result->setExpireAt($this->getStart());
-        if ($this->getCalendar()) {
-            $result->setRecipient($this->getCalendar()->getOwner());
+        if (!$this->getCalendar()) {
+            throw new \LogicException(
+                sprinnf('Only user\'s calendar events can have reminders. Event Id: %d.', $this->id)
+            );
         }
+        $result->setRecipient($this->getCalendar()->getOwner());
 
         return $result;
     }

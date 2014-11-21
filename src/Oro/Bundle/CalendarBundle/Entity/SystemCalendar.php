@@ -45,14 +45,17 @@ class SystemCalendar
     /**
      * @var string|null
      *
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     protected $name;
 
     /**
+     * Gets is_public flag.
+     * If flag is true VIEW ACL will not be used for such system calendars
+     *
      * @var boolean
      *
-     * @ORM\Column(name="is_public", type="boolean", nullable=true)
+     * @ORM\Column(name="is_public", type="boolean")
      */
     protected $public;
 
