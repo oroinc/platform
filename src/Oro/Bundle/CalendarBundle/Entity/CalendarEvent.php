@@ -66,12 +66,35 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     const DECLINED             = 'declined';
     const WITHOUT_STATUS       = null;
 
-    protected $availableStatuses = [
+    protected $investigationStatuses = [
         CalendarEvent::DECLINED,
         CalendarEvent::ACCEPTED,
         CalendarEvent::TENTATIVELY_ACCEPTED,
         CalendarEvent::NOT_RESPONDED,
     ];
+
+    protected $availableStatuses = [
+        CalendarEvent::DECLINED,
+        CalendarEvent::ACCEPTED,
+        CalendarEvent::TENTATIVELY_ACCEPTED,
+    ];
+
+    /**
+     * @return array
+     */
+    public function getAvailableInvitationStatuses()
+    {
+        $currentStatus = $this->getInvitationStatus();
+        $availableStatuses = [];
+        if ($currentStatus) {
+            $availableStatuses = $this->availableStatuses;
+            if (($key = array_search($currentStatus, $availableStatuses)) !== false) {
+                unset($availableStatuses[$key]);
+            }
+        }
+
+        return $availableStatuses;
+    }
 
     /**
      * @ORM\Id
@@ -533,7 +556,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     protected function isValid($invitationStatus)
     {
-        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->availableStatuses);
+        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->investigationStatuses);
     }
 
     /**

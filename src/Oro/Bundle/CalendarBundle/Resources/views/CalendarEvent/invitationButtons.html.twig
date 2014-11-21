@@ -1,0 +1,12 @@
+<div class="btn-group" role="group">
+    {% set statuses = entity.availableInvitationStatuses %}
+    {% for status in statuses  %}
+        {% set statusName = 'oro.calendar.calendarevent.statuses.' ~ status %}
+        {{ UI.link({
+        'aCss': 'btn btn-default',
+        'path':  path('oro_calendar_event_change_status', {'id': entity.id, 'status': status}),
+        'label': statusName|trans,
+        'title': statusName|trans,
+        }) }}
+    {% endfor %}
+</div>
