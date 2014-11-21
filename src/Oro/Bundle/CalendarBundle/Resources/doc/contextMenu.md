@@ -1,4 +1,4 @@
-Context Calendar Menu
+Calendar Context Menu
 =====================
 
 Table of content
@@ -7,13 +7,16 @@ Table of content
 - [Extendability](#extendability)
 
 ##Overview
-Each item is calendar in left sidebar on page "My Calendar". Each of them can have context menu. You can see it if click
- on three dots icon in right side of calendar item. Context menu have actions. By default we have actions "Show/Hide
- calendar", "Remove calendar" (from calendar items list) and "Choose calendar color".
+To manage calendars are displayed on "My Calendar" page a context menu can be used. The context menu is open by clicking
+ three dots icon beside a calendar. For now there are the following actions there:
+- Show/Hide calendar
+- Remove calendar
+- Change calendar color
 
 ##Extendability
-Calendar Context Menu is based on knplabs/knp-menu. The menu can be extended with new action items from any bundle.
- To add a new action to the menu, the action configuration must be added to the navigation.ym, for example:
+Calendar Context Menu is based on [knplabs/knp-menu](https://github.com/KnpLabs/KnpMenuBundle). The menu can be extended
+ with new action items from any bundle. To add a new action to the menu, the action configuration must be added to the
+ navigation.yml, for example:
 ``` yaml
 oro_menu_config:
     items:
@@ -32,11 +35,10 @@ oro_menu_config:
 ```
 
 Developer may define attributes:
-- **Label** shows action name into menu (required).
-- **Position** define place of action in context menu.
-- **Module** consists js module that performs action into browser. If the developer does not provide the "module"
- attribute, the context menu will not contain this action.
-- **Template** provides twig template that replace standard item template, for example:
+- **Label** - it is name of action.
+- **Position** - specifies an order in context menu.
+- **Module** - it is path to JavaScript module. It to handle item action.
+- **Template** - it is name of item template. Example of item template:
 ``` twig
 <li{{ oro_menu.attributes(itemAttributes) }}>
     <a href="javascript:void(0);" class="action">
@@ -48,8 +50,9 @@ Developer may define attributes:
     </a>
 </li>
 ```
-In a template developer should provide ```<li{{ oro_menu.attributes(itemAttributes) }}>``` tag. Also he can do
- not provide own template and use [standard template](../views/Calendar/Menu/contextMenu.html.twig).
+In a template developer should provide ```<li{{ oro_menu.attributes(itemAttributes) }}>``` tag. If template was not
+ defined, item will be displayed as it is presented into [context menu template]
+(../views/Calendar/Menu/contextMenu.html.twig).
 
 **Module** received next values from **options** into **initialize**:
 - **el** - context menu item
@@ -60,7 +63,7 @@ In a template developer should provide ```<li{{ oro_menu.attributes(itemAttribut
 - **connectionsView** - a Backbone view represents [a calendar items list](../public/js/calendar/connection/view.js)
 - **closeContextMenu** - a function that closes context menu
 
-In js module developer can use default method **execute**. This method will call when user click on your item menu, for
+In JavaScript module developer can use default method **execute**. This method will call when user click on your item menu, for
  example:
 ``` js
 ...
@@ -98,10 +101,9 @@ execute: function (model, actionSyncObject) {
  action done successfully then promise object should perform **resolve()** function. In other case should perform
  **reject()** method.
 
-Another case developer can use any other js events or functions to start context menu action in module. In this case module
- should execute method **_initActionSyncObject()** of object **connectionsView** before start action, that user can't run
+Another case a developer can use any other  events or functions to execute context menu action in module. In this case module
+ should call method **_initActionSyncObject()** of object **connectionsView** before start action, that user can't run
  another menu actions. After action was done module should execute **resolve()** or **reject()** functions of object
  **connectionsView._actionSyncObject**.
 
-Don't forgot to execute cache:clear after update navigation.yml, and assets:install and assetic:dump for dev environment
- and oro:requirejs:build for production environment.
+Don't forgot to execute cache:clear after update navigation.yml.
