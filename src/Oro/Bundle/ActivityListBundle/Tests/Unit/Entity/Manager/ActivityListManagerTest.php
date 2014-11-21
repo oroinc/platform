@@ -166,7 +166,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityListManager->getListCount($testClass, $testId, $filter);
 
         $expectedDQL = 'SELECT COUNT(activity.id) FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
-            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId ORDER BY activity.createdBy DESC';
+            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId';
         $this->assertEquals($expectedDQL, $qb->getDQL());
         $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }

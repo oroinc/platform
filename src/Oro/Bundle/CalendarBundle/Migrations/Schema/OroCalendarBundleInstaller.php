@@ -111,6 +111,12 @@ class OroCalendarBundleInstaller implements Installation
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
+        $table->addForeignKeyConstraint(
+            $table,
+            ['parent_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
     }
 
     /**
