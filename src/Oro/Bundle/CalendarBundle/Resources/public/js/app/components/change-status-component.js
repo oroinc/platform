@@ -31,7 +31,7 @@ define(function (require) {
             this.$element.on('click.' + this.cid, function (e) {
                 e.preventDefault();
                 $.ajax({
-                    url: self.element.attr('href'),
+                    url: self.$element.attr('href'),
                     type: 'GET',
                     success: function() {
                         mediator.execute('refreshPage');
