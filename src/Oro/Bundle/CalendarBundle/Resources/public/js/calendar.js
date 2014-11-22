@@ -49,6 +49,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             connectionsOptions: {
                 collection: null,
                 containerTemplateSelector: null
+            },
+            colorManagerOptions: {
+                colors: null
             }
         },
 
@@ -61,6 +64,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         eventView: null,
         loadingMask: null,
         colorManager: null,
+
+        /**
+         * This property can be used to prevent unnecessary reloading of calendar events.
+         * key = calendarUid
+         * @property
+         */
+        eventsLoaded: {},
 
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
@@ -77,8 +87,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             this.listenTo(this.collection, 'add', this.onEventAdded);
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
-
-            this.colorManager = new ColorManager();
+            this.colorManager = new ColorManager(this.options.colorManagerOptions);
         },
 
         /**
@@ -104,7 +113,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 this.eventView = new EventView(_.extend({}, options, {
                     model: eventModel,
                     viewTemplateSelector: this.options.eventsOptions.itemViewTemplateSelector,
-                    formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector
+                    formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector,
+                    colorManager: this.colorManager
                 }));
                 // subscribe to event view collection events
                 this.listenTo(this.eventView, 'addEvent', this.handleEventViewAdd);
@@ -131,7 +141,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         getCollection: function () {
-            return this.options.collection;
+            return this.collection;
         },
 
         getConnectionCollection: function () {
@@ -153,17 +163,28 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         },
 
-        onEventAdded: function (eventModel) {
-            var fcEvent = eventModel.toJSON(),
-                model = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
+        addEventToCalendar: function (eventModel) {
+            var fcEvent = eventModel.toJSON();
 
             // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+        },
+
+        getCalendarEvents: function (calendarUid) {
+            return this.getCalendarElement().fullCalendar('clientEvents', function (fcEvent) {
+                return fcEvent.calendarUid === calendarUid;
+            });
+        },
+
+        onEventAdded: function (eventModel) {
+            var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
+
+            this.addEventToCalendar(eventModel);
 
             // make sure that a calendar is visible when a new event is added to it
-            if (!model.get('visible')) {
-                this.connectionsView.showCalendar(model);
+            if (!connectionModel.get('visible')) {
+                this.connectionsView.showCalendar(connectionModel);
             }
         },
 
@@ -179,12 +200,45 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
         },
 
-        onConnectionAddedOrDeleted: function () {
+        onConnectionAdded: function () {
             this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
-        onConnectionChanged: function () {
+        onConnectionChanged: function (connectionModel) {
+            if (connectionModel.reloadEventsRequest !== null) {
+                if (connectionModel.reloadEventsRequest === true) {
+                    this.getCalendarElement().fullCalendar('refetchEvents');
+                }
+                connectionModel.reloadEventsRequest = null;
+                return;
+            }
 
+            var changes = connectionModel.changedAttributes(),
+                calendarUid = connectionModel.get('calendarUid');
+            if (_.has(changes, 'visible')) {
+                if (changes.visible) {
+                    if (this.eventsLoaded[calendarUid]) {
+                        _.each(this.collection.where({calendarUid: calendarUid}), function (eventModel) {
+                            this.addEventToCalendar(eventModel);
+                        }, this);
+                    } else {
+                        this.getCalendarElement().fullCalendar('refetchEvents');
+                    }
+                } else {
+                    this.getCalendarElement().fullCalendar('removeEvents', function (fcEvent) {
+                        return fcEvent.calendarUid === calendarUid;
+                    });
+                }
+            } else if (_.has(changes, 'backgroundColor') && connectionModel.get('visible')) {
+                _.each(this.getCalendarEvents(calendarUid), function (fcEvent) {
+                    this.prepareViewModel(fcEvent, false);
+                    this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+                }, this);
+            }
+        },
+
+        onConnectionDeleted: function () {
+            this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
         select: function (start, end) {
@@ -245,6 +299,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 var fcEvents = this.collection.toJSON();
                 _.each(fcEvents, function (fcEvent) {
                     this.prepareViewModel(fcEvent, false);
+                }, this);
+                this.eventsLoaded = {};
+                this.options.connectionsOptions.collection.each(function (connectionModel) {
+                    if (connectionModel.get('visible')) {
+                        this.eventsLoaded[connectionModel.get('calendarUid')] = true;
+                    }
                 }, this);
                 this._hideMask();
                 callback(fcEvents);
@@ -438,9 +498,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 colorManager: this.colorManager
             });
 
-            this.listenTo(this.connectionsView, 'connectionAdd', this.onConnectionAddedOrDeleted);
+            this.listenTo(this.connectionsView, 'connectionAdd', this.onConnectionAdded);
             this.listenTo(this.connectionsView, 'connectionChange', this.onConnectionChanged);
-            this.listenTo(this.connectionsView, 'connectionRemove', this.onConnectionAddedOrDeleted);
+            this.listenTo(this.connectionsView, 'connectionRemove', this.onConnectionDeleted);
         },
 
         loadConnectionColors: function () {
@@ -450,7 +510,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 this.colorManager.applyColors(obj, function () {
                     return lastBackgroundColor;
                 });
-                this.colorManager.setCalendarColors(obj.calendarUid, obj.color, obj.backgroundColor);
+                this.colorManager.setCalendarColors(obj.calendarUid, obj.backgroundColor);
                 if (obj.calendarAlias === 'user') {
                     lastBackgroundColor = obj.backgroundColor;
                 }
