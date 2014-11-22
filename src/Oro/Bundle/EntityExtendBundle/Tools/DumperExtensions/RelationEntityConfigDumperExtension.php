@@ -109,8 +109,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
     /**
      * @param ConfigInterface $fieldConfig
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function createSelfRelation(ConfigInterface $fieldConfig)
     {

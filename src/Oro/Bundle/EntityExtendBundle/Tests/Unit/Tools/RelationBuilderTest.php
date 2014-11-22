@@ -119,7 +119,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             $targetFieldName,
             [
                 'extend' => [
-                    'owner' => ExtendScope::OWNER_CUSTOM,
+                    'owner' => ExtendScope::OWNER_CUSTOM
                 ],
                 'test'   => [
                     'test_attr' => 123
