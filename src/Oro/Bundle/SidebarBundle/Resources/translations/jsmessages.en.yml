@@ -1,1 +1,10 @@
-"The widget will be removed": "The widget will be removed"
+oro.sidebar:
+  widget:
+    add:
+      dialog:
+        title: "Select widget to add"
+      content:
+        section_title: "Add widget"
+    remove:
+      confirm:
+        message: "The widget will be removed"

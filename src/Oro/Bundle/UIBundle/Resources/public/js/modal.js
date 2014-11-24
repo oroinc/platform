@@ -2,8 +2,9 @@
 define([
     'underscore',
     'backbone',
+    'orotranslation/js/translator',
     'backbone-bootstrap-modal'
-], function (_, Backbone) {
+], function (_, Backbone, __) {
     'use strict';
 
     var Modal, $;
@@ -18,8 +19,19 @@ define([
      * @extends Backbone.BootstrapModal
      */
     Modal = Backbone.BootstrapModal.extend({
+        defaults: {
+            okText: __('OK'),
+            cancelText: __('Cancel')
+        },
+
         /** @property {String} */
         className: 'modal',
+
+        initialize: function (options) {
+            options = options || {};
+            _.defaults(options, this.defaults);
+            Modal.__super__.initialize.call(this, options);
+        },
 
         /**
          * Renders and shows the modal
