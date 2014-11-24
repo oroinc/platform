@@ -76,6 +76,18 @@ class JobResult
     }
 
     /**
+     * @param string $failureException
+     */
+    public function removeFailureException($failureException)
+    {
+        $key = array_search($failureException, $this->failureExceptions, true);
+
+        if (false !== $key) {
+            unset($this->failureExceptions[$key]);
+        }
+    }
+
+    /**
      * @param ContextInterface $context
      * @return JobResult
      */
