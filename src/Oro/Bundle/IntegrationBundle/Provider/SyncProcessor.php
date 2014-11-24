@@ -278,7 +278,6 @@ class SyncProcessor
         /** @var TransportInterface $transport */
         $transport     = $connectorType->getTransport();
 
-
         return $transport->processExceptionMessages($exceptions);
     }
 }
