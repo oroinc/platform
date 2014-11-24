@@ -22,12 +22,29 @@ oro_menu_config:
                 position: 10
                 module: 'orocalendar/js/calendar/menu/toggle-calendar'
                 template: 'OroCalendarBundle:Calendar:Menu/toggleCalendar.html.twig'
+        oro_calendar_menu_divider:
+            label: ''
+            extras:
+                position: 95
+            attributes:
+                class: 'divider'
+        oro_calendar_color_action:
+            uri: '#'
+            extras:
+                position: 100
+                module: 'orocalendar/js/calendar/menu/change-calendar-color'
+                template: 'OroCalendarBundle:Calendar:Menu/changeCalendarColor.html.twig'
         calendar_event_list:
             label: 'oro.calendar.calendarevent.entity_plural_label'
             route: 'oro_calendar_event_index'
             extras:
                 position: 50
                 routes: ['oro_calendar_event_*']
+        oro_system_calendar_list:
+            label: 'oro.calendar.systemcalendar.entity_plural_label'
+            route: 'oro_system_calendar_index'
+            extras:
+                position: 95
 
     tree:
         application_menu:
@@ -35,6 +52,9 @@ oro_menu_config:
                 activities_tab:
                     children:
                         calendar_event_list: ~
+                system_tab:
+                    children:
+                        oro_system_calendar_list: ~
         usermenu:
             children:
                 oro_calendar_view_default: ~
@@ -44,6 +64,8 @@ oro_menu_config:
             children:
                 oro_calendar_remove_action: ~
                 oro_calendar_toggle_action: ~
+                oro_calendar_menu_divider: ~
+                oro_calendar_color_action: ~
 
 oro_titles:
     oro_calendar_view_default: "My Calendar - %%username%%"
@@ -52,3 +74,4 @@ oro_titles:
     oro_calendar_event_view: '%%entity.title%%'
     oro_calendar_event_create: oro.ui.create_entity
     oro_calendar_event_update: '%%entity.title%% - Edit'
+    oro_system_calendar_index:  ~

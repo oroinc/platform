@@ -5,12 +5,14 @@ oro:
         entity_description:   Represent activities list
 
         id.label:             Id
+        owner.label:          Created by
+        editor.label:         Updated by
         verb.label:           Verb
         subject.label:        Subject
         data.label:           Data
         organization.label:   Organization
-        related_entity_class.label: Related entity class
-        related_entity_id.label:    Related entity id
+        related_activity_class.label: Related activity class
+        related_activity_id.label:    Related activity id
         created_at.label: Created at
         updated_at.label: Updated at
 

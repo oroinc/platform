@@ -136,7 +136,8 @@ class CalendarManager
     protected function applyCalendarDefaultValues(array &$calendar, array $defaultValues)
     {
         foreach ($defaultValues as $fieldName => $val) {
-            if (!isset($calendar[$fieldName]) && !array_key_exists($fieldName, $calendar)) {
+            // set default value for a field if the field does not exists or it's value is null
+            if (!isset($calendar[$fieldName])) {
                 $calendar[$fieldName] = is_callable($val)
                     ? call_user_func($val, $fieldName)
                     : $val;

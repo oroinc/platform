@@ -144,10 +144,18 @@ services:
             - @oro_reminder.entity.manager
 
     oro_calendar.autocomplete.user_calendar_handler:
-        parent: oro_user.autocomplete.user.search_acl_handler.abstract
         class: %oro_calendar.autocomplete.user_calendar_handler.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_attachment.manager
+            - %oro_user.entity.class%
+            - @oro_entity_config.link.security_context
+            - @oro_security.ownership_tree_provider
+            - @oro_security.acl_helper
+            - @?security.acl.voter.basic_permissions
         calls:
             - [ setProperties, [["namePrefix", "firstName", "middleName", "lastName", "nameSuffix"]] ]
+            - [ setNameFormatter, [@oro_locale.formatter.name] ]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: user_calendars, acl_resource: oro_user_user_view }
         lazy: true

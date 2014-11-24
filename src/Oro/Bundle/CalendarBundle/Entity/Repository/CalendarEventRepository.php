@@ -141,7 +141,9 @@ class CalendarEventRepository extends EntityRepository
         /** @var QueryBuilder $qb */
         $qb = $this->createQueryBuilder('e')
             ->select(
+
                 'c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay, e.createdAt, e.updatedAt'
+                . ' e.backgroundColor, e.createdAt, e.updatedAt'
             );
 
         switch ($calendarAlias) {

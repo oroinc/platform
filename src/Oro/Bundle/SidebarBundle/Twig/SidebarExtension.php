@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\SidebarBundle\Twig;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Templating\Asset\PackageInterface;
 
 class SidebarExtension extends \Twig_Extension
 {
@@ -16,18 +16,20 @@ class SidebarExtension extends \Twig_Extension
     protected $widgetDefinitionsRegistry;
 
     /**
-     * @var ContainerInterface
+     * @var TranslatorInterface
      */
-    protected $container;
+    protected $translator;
 
     /**
      * @param WidgetDefinitionRegistry $widgetDefinitionsRegistry
-     * @param ContainerInterface $container
+     * @param TranslatorInterface $translator
      */
-    public function __construct(WidgetDefinitionRegistry $widgetDefinitionsRegistry, ContainerInterface $container)
-    {
+    public function __construct(
+        WidgetDefinitionRegistry $widgetDefinitionsRegistry,
+        TranslatorInterface $translator
+    ) {
         $this->widgetDefinitionsRegistry = $widgetDefinitionsRegistry;
-        $this->container = $container;
+        $this->translator = $translator;
     }
 
     /**
@@ -48,14 +50,14 @@ class SidebarExtension extends \Twig_Extension
      */
     public function getWidgetDefinitions($placement)
     {
-        /** @var PackageInterface $assetHelper */
-        $assetHelper =$this->container->get('templating.helper.assets');
         $definitions = $this->widgetDefinitionsRegistry
             ->getWidgetDefinitionsByPlacement($placement)
             ->toArray();
+
         foreach ($definitions as &$definition) {
-            $definition['icon'] = $assetHelper->getUrl($definition['icon']);
+            $definition['title'] = $this->translator->trans($definition['title']);
         }
+
         return $definitions;
     }
 
