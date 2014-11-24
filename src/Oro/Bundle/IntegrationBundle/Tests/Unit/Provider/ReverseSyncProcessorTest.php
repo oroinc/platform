@@ -95,7 +95,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($realConnector));
 
         $this->integration->expects($this->once())
-            ->method('getEnabled')
+            ->method('isEnabled')
             ->will($this->returnValue(true));
 
         $jobResult = new JobResult();
