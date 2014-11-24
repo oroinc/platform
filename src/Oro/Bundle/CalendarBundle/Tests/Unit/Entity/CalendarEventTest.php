@@ -125,4 +125,27 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $obj->preUpdate();
         $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
     }
+
+    public function testGetChildEventByCalendar()
+    {
+        $firstCalendar = new Calendar();
+        $firstCalendar->setName('1');
+        $secondCalendar = new Calendar();
+        $secondCalendar->setName('2');
+
+        $firstEvent = new CalendarEvent();
+        $firstEvent->setTitle('1')
+            ->setCalendar($firstCalendar);
+        $secondEvent = new CalendarEvent();
+        $secondEvent->setTitle('2')
+            ->setCalendar($secondCalendar);
+
+        $masterEvent = new CalendarEvent();
+        $masterEvent->addChildEvent($firstEvent)
+            ->addChildEvent($secondEvent);
+
+        $this->assertEquals($firstEvent, $masterEvent->getChildEventByCalendar($firstCalendar));
+        $this->assertEquals($secondEvent, $masterEvent->getChildEventByCalendar($secondCalendar));
+        $this->assertNull($masterEvent->getChildEventByCalendar(new Calendar));
+    }
 }
