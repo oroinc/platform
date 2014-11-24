@@ -52,7 +52,7 @@ class ReverseSyncProcessor
      */
     public function process(Integration $integration, $connector, array $parameters)
     {
-        if (!$integration->getEnabled()) {
+        if (!$integration->isEnabled()) {
             return $this;
         }
 

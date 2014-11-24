@@ -397,9 +397,19 @@ class Channel
     }
 
     /**
+     *
+     * @deprecated in favor of isEnabled since 1.4.1 will be removed in 1.6
      * @return boolean
      */
     public function getEnabled()
+    {
+        return $this->isEnabled();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
     {
         return $this->enabled;
     }

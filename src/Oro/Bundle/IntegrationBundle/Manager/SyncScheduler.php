@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -12,29 +13,25 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 
 /**
- * Class SyncScheduler
- *
- * @package Oro\Bundle\IntegrationBundle\Manager
- *
  * This class is responsible for job scheduling needed for two way data sync.
  */
 class SyncScheduler
 {
     const JOB_NAME = 'oro:integration:reverse:sync';
 
-    /** @var EntityManager */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $registry;
 
     /** @var TypesRegistry */
     protected $typesRegistry;
 
     /**
-     * @param EntityManager $em
-     * @param TypesRegistry $typesRegistry
+     * @param ManagerRegistry $registry
+     * @param TypesRegistry   $typesRegistry
      */
-    public function __construct(EntityManager $em, TypesRegistry $typesRegistry)
+    public function __construct(ManagerRegistry $registry, TypesRegistry $typesRegistry)
     {
-        $this->em            = $em;
+        $this->registry      = $registry;
         $this->typesRegistry = $typesRegistry;
     }
 
@@ -50,7 +47,7 @@ class SyncScheduler
      */
     public function schedule(Integration $integration, $connectorType, $params = [], $useFlush = true)
     {
-        if (!$integration->getEnabled()) {
+        if (!$integration->isEnabled()) {
             return;
         }
 
@@ -65,53 +62,39 @@ class SyncScheduler
             '--params=' . serialize($params)
         ];
 
-        if ($this->hasNoSameJobs($args)) {
-            $this->addJob($args, $useFlush);
+        if (!$this->isScheduled($args)) {
+            $job = new Job(self::JOB_NAME, $args);
+
+            /** @var EntityManager $em */
+            $em = $this->registry->getManagerForClass('JMSJobQueueBundle:Job');
+            $em->persist($job);
+
+            if (true === $useFlush) {
+                $em->flush();
+            } else {
+                $jobMeta = $em->getClassMetadata('JMSJobQueueBundle:Job');
+                $em->getUnitOfWork()->computeChangeSet($jobMeta, $job);
+            }
         }
     }
 
     /**
+     * Check whether job for export is already scheduled and waiting to be processed
+     *
      * @param array $args
      *
      * @return bool
      */
-    protected function hasNoSameJobs(array $args)
+    protected function isScheduled(array $args)
     {
-        $qb = $this->em->createQueryBuilder();
-
-        $qb->select('j');
-        $qb->from('JMSJobQueueBundle:Job', 'j');
+        $qb = $this->registry->getRepository('JMSJobQueueBundle:Job')->createQueryBuilder('j');
+        $qb->select('count(j.id)');
         $qb->andWhere('j.command = :command');
         $qb->andWhere('j.args = :args');
         $qb->andWhere($qb->expr()->in('j.state', [Job::STATE_PENDING, Job::STATE_NEW]));
         $qb->setParameter('command', self::JOB_NAME);
         $qb->setParameter('args', $args, Type::JSON_ARRAY);
-        $qb->setMaxResults(1);
-        $result = $qb->getQuery()->getArrayResult();
 
-        return empty($result);
-    }
-
-    /**
-     * @param array $args
-     * @param bool  $useFlush
-     */
-    protected function addJob(array $args, $useFlush)
-    {
-        $job = new Job(self::JOB_NAME, $args);
-
-        if (true === $useFlush) {
-            $this->em->persist($job);
-            $this->em->flush();
-
-            return;
-        }
-
-        $uow = $this->em->getUnitOfWork();
-        $uow->persist($job);
-        $jobMeta = $this->em->getMetadataFactory()->getMetadataFor('JMS\JobQueueBundle\Entity\Job');
-        $uow->computeChangeSet($jobMeta, $job);
-
-        return;
+        return $qb->getQuery()->getSingleScalarResult();
     }
 }
