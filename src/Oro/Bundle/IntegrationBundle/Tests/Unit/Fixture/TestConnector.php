@@ -43,6 +43,6 @@ class TestConnector implements ConnectorInterface
      */
     public function getTransport()
     {
-        return 'test Type';
+        return new TestTransport();
     }
 }
