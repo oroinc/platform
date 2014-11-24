@@ -45,6 +45,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Calendar
 {
+    const CALENDAR_ALIAS = 'user';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")

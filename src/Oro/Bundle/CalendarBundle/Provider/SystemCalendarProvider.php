@@ -64,14 +64,11 @@ class SystemCalendarProvider implements CalendarProviderInterface
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getEventListByTimeIntervalQueryBuilder(
+        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
             $calendarId,
             $start,
             $end,
-            true,
-            [],
-            SystemCalendar::CALENDAR_ALIAS,
-            ['public' => false]
+            []
         );
 
         return $this->calendarEventNormalizer->getCalendarEvents(
