@@ -11,7 +11,7 @@ use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 class CalendarEventRepository extends EntityRepository
 {
     /**
-     * Returns a query builder with time condition for all calendar types
+     * Adds time condition to a query builder for all calendar types
      *
      * @param QueryBuilder  $qb
      * @param \DateTime     $startDate
@@ -35,7 +35,7 @@ class CalendarEventRepository extends EntityRepository
     }
 
     /**
-     * Returns a query builder with filters for all calendar types
+     * Adds filters to a query builder for all calendar types
      *
      * @param QueryBuilder   $qb
      * @param array|Criteria $filters       Additional filtering criteria, e.g. ['allDay' => true, ...]
@@ -64,6 +64,8 @@ class CalendarEventRepository extends EntityRepository
     }
 
     /**
+     * Adds connected calendars to a query builder
+     *
      * @param QueryBuilder  $qb
      * @param int           $calendarId
      * @param string        $calendarAlias
@@ -90,6 +92,8 @@ class CalendarEventRepository extends EntityRepository
     }
 
     /**
+     * Returns a base query builder which can be used to get a list of calendar events
+     *
      * @return QueryBuilder
      */
     public function getBaseEventListQueryBuilder()
