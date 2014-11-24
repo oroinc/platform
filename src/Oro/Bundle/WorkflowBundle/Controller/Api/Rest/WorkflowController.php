@@ -206,7 +206,7 @@ class WorkflowController extends FOSRestController
         $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
 
         if (!$workflowItem) {
-            return $this->handleError($this->get('translator')->trans('Entity not found'), Codes::HTTP_NOT_FOUND);
+            return $this->handleError($this->get('translator')->trans('oro.workflow.transition.entity_not_found'), Codes::HTTP_NOT_FOUND);
         }
 
         return $this->transitAction($workflowItem, $transitionName);

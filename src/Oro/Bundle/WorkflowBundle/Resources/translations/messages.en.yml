@@ -70,7 +70,6 @@ Workflow activated: Workflow activated
 Workflow deactivated: Workflow deactivated
 There are no transitions yet.: There are no transitions yet.
 Reset workflow data: Reset workflow data
-"Entity not found": "Entity not found"
 
 oro:
     workflow:
@@ -144,6 +143,7 @@ oro:
 
         transition:
             start: "Start %workflow%"
+            entity_not_found: Entity not found
 
         workflowdefinition:
             entity_label:                 Workflow
