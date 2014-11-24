@@ -86,6 +86,7 @@ class CalendarEventNormalizer
             'start' => $event->getStart(),
             'end' => $event->getEnd(),
             'allDay' => $event->getAllDay(),
+            'backgroundColor' => $event->getBackgroundColor(),
             'createdAt' => $event->getCreatedAt(),
             'updatedAt' => $event->getUpdatedAt(),
             'calendar' => $event->getCalendar() ? $event->getCalendar()->getId() : null,

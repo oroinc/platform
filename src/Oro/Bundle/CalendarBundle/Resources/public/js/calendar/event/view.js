@@ -1,9 +1,9 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oroui/js/mediator',
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing',
     'oro/dialog-widget', 'oroui/js/loading-mask', 'orocalendar/js/form-validation',
     'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
-], function (_, Backbone, __, routing, mediator,
+], function (_, Backbone, __, routing,
      DialogWidget, LoadingMask, FormValidation,
      DeleteConfirmation, fieldFormatter
 ) {
@@ -200,7 +200,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
             // show loading mask if child events users should be updated
             if (modelData.childEvents) {
-                mediator.once('widget:contentLoad', function () {
+                this.eventDialog.once('renderComplete', function() {
                     self.showLoadingMask();
                 });
             }

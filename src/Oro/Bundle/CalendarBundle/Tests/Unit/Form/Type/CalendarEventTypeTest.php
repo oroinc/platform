@@ -79,7 +79,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->will($this->returnSelf());
-        $builder->expects($this->at(5))
+        $builder->expects($this->at(6))
             ->method('add')
             ->with(
                 'reminders',
@@ -87,7 +87,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 array('required' => false, 'label' => 'oro.reminder.entity_plural_label')
             )
             ->will($this->returnSelf());
-        $builder->expects($this->at(6))
+        $builder->expects($this->at(7))
             ->method('add')
             ->with(
                 'childEvents',
@@ -96,7 +96,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->returnSelf());
 
-        $builder->expects($this->at(7))
+        $builder->expects($this->at(8))
             ->method('addEventListener')
             ->with(FormEvents::PRE_SUBMIT, [$this->type, 'onPreSubmit']);
 
@@ -105,12 +105,12 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->method('addEventListener')
             ->with(FormEvents::POST_SUBMIT, [$this->type, 'onChildPostSubmit']);
 
-        $builder->expects($this->at(8))
+        $builder->expects($this->at(9))
             ->method('get')
             ->with('childEvents')
             ->will($this->returnValue($childBuilder));
 
-        $builder->expects($this->at(9))
+        $builder->expects($this->at(10))
             ->method('addEventListener')
             ->with(FormEvents::POST_SUBMIT, [$this->type, 'onPostSubmit']);
 
