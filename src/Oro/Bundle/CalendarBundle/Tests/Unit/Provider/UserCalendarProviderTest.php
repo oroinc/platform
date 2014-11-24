@@ -4,7 +4,6 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -32,7 +31,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->calendarEventNormalizer =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\CalendarEventNormalizer')
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
 
@@ -146,13 +145,19 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->with('OroCalendarBundle:CalendarEvent')
             ->will($this->returnValue($repo));
         $repo->expects($this->once())
-            ->method('getEventListByTimeIntervalQueryBuilder')
+            ->method('getUserEventListByTimeIntervalQueryBuilder')
             ->with($calendarId, $this->identicalTo($start), $this->identicalTo($end), $subordinate)
             ->will($this->returnValue($qb));
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
 
         $this->calendarEventNormalizer->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($calendarId, $this->identicalTo($qb))
+            ->with($calendarId, $this->identicalTo($query))
             ->will($this->returnValue($events));
 
         $result = $this->provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);

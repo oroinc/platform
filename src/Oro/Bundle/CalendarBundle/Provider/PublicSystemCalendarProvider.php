@@ -34,7 +34,8 @@ class PublicSystemCalendarProvider implements CalendarProviderInterface
     {
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
-        $qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds, true);
+        $qb = $repo->getPublicCalendarsQueryBuilder();
+        /** @var SystemCalendar $calendars */
         $calendars = $qb->getQuery()->getResult();
 
         $result = [];

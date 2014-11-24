@@ -6,7 +6,6 @@ use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class SystemCalendarProvider implements CalendarProviderInterface
 {
@@ -16,22 +15,16 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
-    /** @var AclHelper */
-    protected $aclHelper;
-
     /**
      * @param DoctrineHelper                    $doctrineHelper
      * @param AbstractCalendarEventNormalizer   $calendarEventNormalizer
-     * @param AclHelper                         $aclHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        AbstractCalendarEventNormalizer $calendarEventNormalizer,
-        AclHelper $aclHelper
+        AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
         $this->doctrineHelper          = $doctrineHelper;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
-        $this->aclHelper               = $aclHelper;
     }
 
     /**
@@ -41,8 +34,10 @@ class SystemCalendarProvider implements CalendarProviderInterface
     {
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
-        $qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds, false);
-        $calendars = $this->aclHelper->apply($qb, 'VIEW', false)->getResult();
+        $qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds);
+        //@TODO: Fix ACL for calendars providers
+        /** @var SystemCalendar $calendars */
+        $calendars = $qb->getQuery()->getResult();
 
         $result = [];
 
@@ -73,7 +68,8 @@ class SystemCalendarProvider implements CalendarProviderInterface
 
         return $this->calendarEventNormalizer->getCalendarEvents(
             $calendarId,
-            $this->aclHelper->apply($qb, 'VIEW', true)
+            //@TODO: Fix ACL for calendars providers
+            $qb->getQuery()
         );
     }
 }

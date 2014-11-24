@@ -2,36 +2,22 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\AbstractQuery;
 
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 abstract class AbstractCalendarEventNormalizer
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /** @var ReminderManager */
     protected $reminderManager;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param SecurityFacade  $securityFacade
      * @param ReminderManager $reminderManager
      */
     public function __construct(
-        ManagerRegistry $doctrine,
-        SecurityFacade $securityFacade,
         ReminderManager $reminderManager
     ) {
-        $this->doctrine        = $doctrine;
-        $this->securityFacade  = $securityFacade;
         $this->reminderManager = $reminderManager;
     }
 

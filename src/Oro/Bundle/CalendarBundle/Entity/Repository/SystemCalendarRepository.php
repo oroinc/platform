@@ -8,28 +8,38 @@ use Doctrine\ORM\QueryBuilder;
 class SystemCalendarRepository extends EntityRepository
 {
     /**
-     * Gets QueryBuilder
+     * Returns a query builder which can be used to get list of system calendars by list of calendar IDs
      *
      * @param int[] $calendarIds
-     * @param bool  $public
      *
      * @return QueryBuilder
      */
-    public function getSystemCalendarsByIdsQueryBuilder($calendarIds, $public = false)
+    public function getSystemCalendarsByIdsQueryBuilder($calendarIds)
     {
         $qb = $this->createQueryBuilder('sc')
             ->select('sc')
             ->where('sc.public = :public')
-            ->setParameter('public', $public);
+            ->setParameter('public', false);
 
-        if (!empty($calendarIds) && !$public) {
-            $qb
-                ->andWhere($qb->expr()->in('sc.id', $calendarIds));
-        } elseif (!$public) {
-            $qb
-                ->andWhere('1 = 0');
+        if ($calendarIds) {
+            $qb->andWhere($qb->expr()->in('sc.id', $calendarIds));
+        } else {
+            $qb->andWhere('1 = 0');
         }
 
         return $qb;
+    }
+
+    /**
+     * Returns a query builder which can be used to get list of public calendars
+     *
+     * @return QueryBuilder
+     */
+    public function getPublicCalendarsQueryBuilder()
+    {
+        return $this->createQueryBuilder('sc')
+            ->select('sc')
+            ->where('sc.public = :public')
+            ->setParameter('public', true);
     }
 }

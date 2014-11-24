@@ -14,4 +14,3 @@ class SystemCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         $resultItem['removable'] = false;
     }
 }
-

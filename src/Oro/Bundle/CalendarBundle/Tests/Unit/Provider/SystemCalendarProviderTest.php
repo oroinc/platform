@@ -28,7 +28,7 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->calendarEventNormalizer =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\CalendarEventNormalizer')
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
         $this->aclHelper               = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
@@ -44,34 +44,39 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCalendarDefaultValues()
     {
-        $userId      = 123;
-        $calendarId  = 2;
+        $userId      = 1;
+        $calendarId  = 1;
         $calendarIds = [1, 2];
 
         $calendar1 = new SystemCalendar();
         ReflectionUtil::setId($calendar1, 1);
         $organization1 = new Organization();
-        $organization1->setName('Envlights');
-        $calendar1->setOwner($organization1);
+        $calendar1->setOrganization($organization1);
+        $calendar1->setName('Main OroCRM');
 
         $calendar2 = new SystemCalendar();
         ReflectionUtil::setId($calendar2, 2);
-        $organization2 = new Organization();
-        $organization2->setName('OroCRM');
-        $calendar2->setOwner($organization2);
+        $calendar2->setOrganization($organization1);
+        $calendar2->setName('Second OroCRM');
 
         $calendars = [$calendar1, $calendar2];
 
-
-        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+        $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
             ->setMethods(['getResult'])
             ->getMockForAbstractClass();
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
         $repo->expects($this->once())
-            ->method('getCalendarsByIdsQuery')
+            ->method('getSystemCalendarsByIdsQueryBuilder')
+            ->with($calendarIds)
+            ->will($this->returnValue($qb));
+        $qb->expects($this->once())
+            ->method('getQuery')
             ->will($this->returnValue($query));
         $query->expects($this->once())
             ->method('getResult')
@@ -81,18 +86,18 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getEntityRepository')
             ->with('OroCalendarBundle:SystemCalendar')
             ->will($this->returnValue($repo));
-        $this->aclHelper->expects($this->once())
-            ->method('apply')
-            ->will($this->returnValue($query));
 
         $result = $this->provider->getCalendarDefaultValues($userId, $calendarId, $calendarIds);
+
         $this->assertEquals(
             [
                 1 => [
-                    'calendarName' => 'Envlights'
+                    'calendarName'  => 'Main OroCRM',
+                    'position'      => -60,
                 ],
                 2 => [
-                    'calendarName' => 'OroCRM',
+                    'calendarName' => 'Second OroCRM',
+                    'position'      => -60,
                 ]
             ],
             $result
@@ -106,8 +111,7 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $start       = new \DateTime();
         $end         = new \DateTime();
         $subordinate = true;
-        $filters     = ['public' => false];
-        $kind        = 'system';
+        $filters     = [];
 
         $events      = [['id' => 1]];
 
@@ -122,13 +126,19 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->with('OroCalendarBundle:CalendarEvent')
             ->will($this->returnValue($repo));
         $repo->expects($this->once())
-            ->method('getEventListByTimeIntervalQueryBuilder')
-            ->with($calendarId, $this->identicalTo($start), $this->identicalTo($end), $subordinate, $filters, $kind)
+            ->method('getSystemEventListByTimeIntervalQueryBuilder')
+            ->with($calendarId, $this->identicalTo($start), $this->identicalTo($end), $filters)
             ->will($this->returnValue($qb));
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
 
         $this->calendarEventNormalizer->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($calendarId, $this->identicalTo($qb))
+            ->with($calendarId, $this->identicalTo($query))
             ->will($this->returnValue($events));
 
         $result = $this->provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
