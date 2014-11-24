@@ -19,6 +19,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
     return Backbone.View.extend({
         /** @property {Object} */
         options: {
+            colorManager: null,
             widgetRoute: null,
             widgetOptions: null
         },
@@ -60,6 +61,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     title: this.model.isNew() ? __('Add New Event') : __('View Event'),
                     stateEnabled: false,
                     incrementalPosition: false,
+                    initLayout: true,
                     dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
                         modal: true,
                         resizable: false,
@@ -84,7 +86,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 onEdit = _.bind(function (e) {
                     this.eventDialog.setTitle(__('Edit Event'));
                     this.eventDialog.setContent(this.getEventForm());
-
                     // subscribe to 'delete event' event
                     this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
                         deleteAction.on('click', onDelete);
@@ -263,8 +264,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         getEventForm: function () {
             var modelData = this.model.toJSON(),
-                form = this.fillForm(this.template(modelData), modelData);
-            form.find('[name]').uniform('update');
+                form = this.fillForm(this.template(modelData), modelData),
+                calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
+            form.find('[name*="backgroundColor"]')
+                .data('page-component-options').emptyColor = calendarColors.backgroundColor;
             return form;
         },
 

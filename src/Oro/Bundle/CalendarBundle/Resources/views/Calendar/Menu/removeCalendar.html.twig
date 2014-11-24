@@ -1,6 +1,15 @@
 <% if (removable) { %>
-    {% if item.extras.module is defined %}
-        {% set itemAttributes = itemAttributes|merge({'data-module': item.extras.module })%}
-    {% endif %}
-    <a href="javascript:void(0);"{{ oro_menu.attributes(itemAttributes) }}>{{ label }}</a>
+    {% set Label %}
+        {%- if item.getExtra('icon') %}
+            <i class="{{- item.getExtra('icon') -}}"></i>
+        {% endif -%}
+        {% if options.allow_safe_labels and item.getExtra('safe_label', false) %}
+            {{- item.label|trans|raw -}}
+        {% else %}
+            {{- item.label|trans(item.getExtra('translateParams', {}), item.getExtra('translateDomain', 'messages')) -}}
+        {% endif %}
+    {% endset %}
+    <li{{ oro_menu.attributes(itemAttributes) }}>
+        <a href="javascript:void(0);" class="action">{{ Label }}</a>
+    </li>
 <% } %>

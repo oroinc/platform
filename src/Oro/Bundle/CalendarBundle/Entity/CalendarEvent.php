@@ -181,6 +181,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     protected $allDay;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="background_color", type="string", length=7, nullable=true)
+     */
+    protected $backgroundColor;
+
+    /**
      * @var Collection
      */
     protected $reminders;
@@ -392,6 +399,32 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     public function setAllDay($allDay)
     {
         $this->allDay = $allDay;
+
+        return $this;
+    }
+
+    /**
+     * Gets a background color of this events.
+     * If this method returns null the background color should be calculated automatically on UI.
+     *
+     * @return string|null The color in hex format, e.g. #FF0000.
+     */
+    public function getBackgroundColor()
+    {
+        return $this->backgroundColor;
+    }
+
+    /**
+     * Sets a background color of this events.
+     *
+     * @param string|null $backgroundColor The color in hex format, e.g. #FF0000.
+     *                                     Set it to null to allow UI to calculate the background color automatically.
+     *
+     * @return self
+     */
+    public function setBackgroundColor($backgroundColor)
+    {
+        $this->backgroundColor = $backgroundColor;
 
         return $this;
     }

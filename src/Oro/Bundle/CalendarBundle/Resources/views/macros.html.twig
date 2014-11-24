@@ -88,6 +88,7 @@
             form_row(form.start),
             form_row(form.end),
             form_row(form.allDay),
+            form_row(form.backgroundColor),
             form_row(form.reminders),
             form_row(form.childEvents)
         ]
@@ -207,6 +208,9 @@
                 itemTemplateSelector: {{ connectionsOptions.itemTemplateSelector|json_encode|raw }},
                 {% endif %}
                 collection: connections
+            },
+            colorManagerOptions: {
+                colors: {{ oro_config_value('oro_calendar.calendar_colors')|json_encode|raw }}
             }
         };
         _.extend(options.eventsOptions, {{ calendar|json_encode|raw }});

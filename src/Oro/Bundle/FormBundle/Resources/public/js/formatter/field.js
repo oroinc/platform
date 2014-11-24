@@ -87,6 +87,15 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/nu
          */
         dateTime: function (val) {
             return _.isNull(val) || _.isUndefined(val) ? __('N/A') : dateTimeFormatter.formatDateTime(val);
+        },
+
+        /**
+         * @param {*} val
+         * @returns {string}
+         */
+        color: function (val) {
+            return !val ? __('N/A') : '<i class="color hide-text" title="' +
+                val + '" style="background-color: ' + val + ';">' + val + '</i>';
         }
     }
 });

@@ -75,6 +75,14 @@ class CalendarEventApiType extends CalendarEventType
                 )
             )
             ->add(
+                'backgroundColor',
+                'text',
+                array(
+                    'required' => false,
+                    'label'    => 'oro.calendar.calendarevent.backgroundColor.label'
+                )
+            )
+            ->add(
                 'reminders',
                 'oro_reminder_collection',
                 [
