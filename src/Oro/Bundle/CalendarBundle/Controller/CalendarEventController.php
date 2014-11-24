@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -32,6 +33,26 @@ class CalendarEventController extends Controller
         return array(
             'entity_class' => $this->container->getParameter('oro_calendar.calendar_event.entity.class')
         );
+    }
+
+    /**
+     * @Route("/system/{id}", name="oro_calendar_system_event_index", requirements={"id"="\d+"})
+     * @Template
+     * @Acl(
+     *      id="oro_calendar_system_event_view",
+     *      type="entity",
+     *      class="OroCalendarBundle:SystemCalendar",
+     *      permission="VIEW",
+     *      group_name=""
+     * )
+     */
+    public function indexSystemAction(SystemCalendar $entity)
+    {
+        return [
+            'params'        => ['id' => $entity->getId()],
+            'grid_name'     => $entity->isPublic() ? 'public-calendar-event-grid' : 'system-calendar-event-grid',
+            'entity_class'  => $this->container->getParameter('oro_calendar.calendar_event.entity.class')
+        ];
     }
 
     /**
