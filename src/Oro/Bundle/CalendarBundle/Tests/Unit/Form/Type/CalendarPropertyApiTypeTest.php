@@ -92,8 +92,7 @@ class CalendarPropertyApiTypeTest extends TypeTestCase
             'calendar'        => 2,
             'position'        => 100,
             'visible'         => true,
-            'color'           => 'FF0000',
-            'backgroundColor' => '00FF00',
+            'backgroundColor' => '#00FF00',
         ];
 
         $type = new CalendarPropertyApiType([]);
@@ -112,8 +111,7 @@ class CalendarPropertyApiTypeTest extends TypeTestCase
         $this->assertEquals(2, $result->getCalendar());
         $this->assertEquals(100, $result->getPosition());
         $this->assertTrue($result->getVisible());
-        $this->assertEquals('FF0000', $result->getColor());
-        $this->assertEquals('00FF00', $result->getBackgroundColor());
+        $this->assertEquals('#00FF00', $result->getBackgroundColor());
 
         $view     = $form->createView();
         $children = $view->children;

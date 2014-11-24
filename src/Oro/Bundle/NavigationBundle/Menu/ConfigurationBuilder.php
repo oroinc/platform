@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\NavigationBundle\Menu;
 
+use Oro\Component\Config\Resolver\ResolverInterface;
+
 use Knp\Menu\ItemInterface;
 
 class ConfigurationBuilder implements BuilderInterface
@@ -10,6 +12,17 @@ class ConfigurationBuilder implements BuilderInterface
      * @var array $container
      */
     protected $configuration;
+
+    /** @var ResolverInterface */
+    protected $resolver;
+
+    /**
+     * @param ResolverInterface $resolver
+     */
+    public function __construct(ResolverInterface $resolver)
+    {
+        $this->resolver = $resolver;
+    }
 
     /**
      * @param array $configuration
@@ -60,6 +73,7 @@ class ConfigurationBuilder implements BuilderInterface
     {
         $isAllowed = false;
         foreach ($data as $itemCode => $itemData) {
+            $itemData = $this->resolver->resolve($itemData);
             if (!empty($itemList[$itemCode])) {
 
                 $itemOptions = $itemList[$itemCode];

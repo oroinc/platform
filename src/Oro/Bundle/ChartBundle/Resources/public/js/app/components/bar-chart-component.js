@@ -1,30 +1,17 @@
 define(function(require) {
+    'use strict';
 
-//    var $ = require('jquery');
-    var Flotr = require('flotr2');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    var BarChartComponent;
-
+    var BarChartComponent,
+        Flotr = require('flotr2'),
+        numberFormatter = require('orolocale/js/formatter/number'),
+        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
-     *
-     * @class orochart.app.components.BarCharComponent
-     * @extends orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BarCharComponent
+     * @class orochart.app.components.BarChartComponent
+     * @extends orochart.app.components.BaseChartComponent
+     * @exports orochart/app/components/bar-char-component
      */
     BarChartComponent = BaseChartComponent.extend({
-        /**
-         *
-         * @overrides
-         * @param {object} options
-         */
-        initialize: function(options) {
-            BaseChartComponent.prototype.initialize.call(this, options);
-
-            this.update();
-        },
-
         /**
          * Draw chart
          *

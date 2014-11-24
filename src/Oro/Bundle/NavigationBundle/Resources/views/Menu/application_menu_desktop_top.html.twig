@@ -8,6 +8,8 @@
     {% if item.hasChildren and item.displayChildren %}
         {%- set classes = classes|merge(['dropdown']) %}
         {%- set childrenClasses = childrenClasses|merge(['dropdown-menu']) %}
+    {% else %}
+        {%- set classes = classes|merge(['single']) %}
     {% endif %}
     {% if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined %}
         {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}

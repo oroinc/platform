@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Manager\CalendarManager;
 
 class CalendarManagerTest extends \PHPUnit_Framework_TestCase
@@ -164,7 +163,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                     'calendar'       => 1,
                     'visible'        => true,
                     'position'       => 2,
-                    'extra_field'    => null,
+                    'extra_field'    => 'def_opt',
                     'calendarName'   => 'calendar1',
                     'removable'      => true
                 ],

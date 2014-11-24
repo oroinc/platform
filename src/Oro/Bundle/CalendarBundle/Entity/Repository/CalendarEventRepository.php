@@ -61,7 +61,8 @@ class CalendarEventRepository extends EntityRepository
         /** @var QueryBuilder $qb */
         $qb = $this->createQueryBuilder('e')
             ->select(
-                'c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay, e.createdAt, e.updatedAt'
+                'c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
+                . ' e.backgroundColor, e.createdAt, e.updatedAt'
             )
             ->innerJoin('e.calendar', 'c');
         if (is_array($filters)) {
