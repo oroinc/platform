@@ -15,22 +15,20 @@ class OroCalendarBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $eventTable = $schema->getTable('oro_calendar_event');
-        $eventTable->addColumn('invitation_status', 'string', ['default' => null, 'notnull' => false, 'length' => 32]);
-        $eventTable->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
-        $eventTable->addForeignKeyConstraint(
-            $eventTable,
-            ['parent_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE']
-        );
-        
         $table = $schema->getTable('oro_calendar_property');
         $table->getColumn('background_color')->setOptions(['length' => 7]);
         $table->dropColumn('color');
 
         $table = $schema->getTable('oro_calendar_event');
         $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 7]);
+        $table->addColumn('invitation_status', 'string', ['default' => null, 'notnull' => false, 'length' => 32]);
+        $table->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
+        $table->addForeignKeyConstraint(
+            $table,
+            ['parent_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
 
         $queries->addPostQuery($this->getUpdateBackgroundColorValuesQuery());
         $queries->addPostQuery(

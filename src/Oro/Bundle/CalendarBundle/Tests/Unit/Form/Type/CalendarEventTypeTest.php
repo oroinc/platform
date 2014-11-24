@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormEvents;
+
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType;
 
 class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
@@ -77,6 +79,40 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->will($this->returnSelf());
+        $builder->expects($this->at(6))
+            ->method('add')
+            ->with(
+                'reminders',
+                'oro_reminder_collection',
+                array('required' => false, 'label' => 'oro.reminder.entity_plural_label')
+            )
+            ->will($this->returnSelf());
+        $builder->expects($this->at(7))
+            ->method('add')
+            ->with(
+                'childEvents',
+                'oro_calendar_event_invitees',
+                array('required' => false, 'label' => 'oro.calendar.calendarevent.invitation.label')
+            )
+            ->will($this->returnSelf());
+
+        $builder->expects($this->at(8))
+            ->method('addEventListener')
+            ->with(FormEvents::PRE_SUBMIT, [$this->type, 'onPreSubmit']);
+
+        $childBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+        $childBuilder->expects($this->once())
+            ->method('addEventListener')
+            ->with(FormEvents::POST_SUBMIT, [$this->type, 'onChildPostSubmit']);
+
+        $builder->expects($this->at(9))
+            ->method('get')
+            ->with('childEvents')
+            ->will($this->returnValue($childBuilder));
+
+        $builder->expects($this->at(10))
+            ->method('addEventListener')
+            ->with(FormEvents::POST_SUBMIT, [$this->type, 'onPostSubmit']);
 
         $this->type->buildForm($builder, array());
     }

@@ -43,10 +43,11 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getEventListByTimeIntervalQueryBuilder(1, new \DateTime(), new \DateTime(), true);
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            'SELECT e FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.childEvents ce'
+            . ' LEFT JOIN ce.calendar cec'
+            . ' LEFT JOIN cec.owner ceco'
             . ' WHERE (c.id IN(SELECT connection.calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarProperty connection'
             . ' WHERE connection.targetCalendar = :id'
@@ -69,10 +70,11 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getEventListByTimeIntervalQueryBuilder(1, new \DateTime(), new \DateTime(), false);
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            'SELECT e FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.childEvents ce'
+            . ' LEFT JOIN ce.calendar cec'
+            . ' LEFT JOIN cec.owner ceco'
             . ' WHERE c.id = :id'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -97,10 +99,11 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            'SELECT e FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.childEvents ce'
+            . ' LEFT JOIN ce.calendar cec'
+            . ' LEFT JOIN cec.owner ceco'
             . ' WHERE e.allDay = :allDay AND c.id = :id'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -127,10 +130,11 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            'SELECT e FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.childEvents ce'
+            . ' LEFT JOIN ce.calendar cec'
+            . ' LEFT JOIN cec.owner ceco'
             . ' WHERE e.allDay = :allDay AND c.id = :id'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
