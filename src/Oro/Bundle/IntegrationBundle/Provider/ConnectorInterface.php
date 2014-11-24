@@ -33,4 +33,9 @@ interface ConnectorInterface
      * @return string
      */
     public function getType();
+
+    /**
+     * @return TransportInterface
+     */
+    public function getTransport();
 }

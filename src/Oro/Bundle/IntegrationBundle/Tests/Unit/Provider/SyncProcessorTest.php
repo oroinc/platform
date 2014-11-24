@@ -133,7 +133,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 
         $realConnector = new TestConnector();
         $this->registry
-            ->expects($this->once())
+            ->expects($this->exactly(2))
             ->method('getConnectorType')
             ->will($this->returnValue($realConnector));
 

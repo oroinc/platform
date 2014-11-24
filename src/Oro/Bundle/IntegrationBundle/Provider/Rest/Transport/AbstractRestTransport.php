@@ -44,6 +44,14 @@ abstract class AbstractRestTransport implements TransportInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function processExceptionMessages(array $exceptions)
+    {
+        return $exceptions;
+    }
+
+    /**
      * Create REST client
      *
      * @param Transport $transportEntity
