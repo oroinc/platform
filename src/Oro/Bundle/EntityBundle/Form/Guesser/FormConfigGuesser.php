@@ -72,8 +72,8 @@ class FormConfigGuesser extends AbstractFormGuesser
         $formOptions = $this->addLabelOption($formOptions, $class, $property);
 
         // fallback guess from recursive call must be with low confidence
-        $confidence = is_null($property) ? TypeGuess::LOW_CONFIDENCE : null;
-
-        return $this->createTypeGuess($formType, $formOptions, $confidence);
+        return is_null($property) ?
+            $this->createTypeGuess($formType, $formOptions, TypeGuess::LOW_CONFIDENCE) :
+            $this->createTypeGuess($formType, $formOptions);
     }
 }
