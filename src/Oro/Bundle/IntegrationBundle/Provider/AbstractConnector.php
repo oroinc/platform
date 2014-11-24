@@ -48,6 +48,9 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
         $this->contextMediator = $contextMediator;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTransport()
     {
         return $this->transport;
