@@ -6,6 +6,7 @@ use Symfony\Bridge\Doctrine\RegistryInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
@@ -210,7 +211,7 @@ class SyncProcessor
             $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
         }
 
-        $exceptions = $jobResult->getFailureExceptions();
+        $exceptions = $this->getExceptions($jobResult);
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
         $status = new Status();
@@ -260,5 +261,22 @@ class SyncProcessor
         }
 
         return $isSuccess;
+    }
+
+    /**
+     * @param JobResult $jobResult
+     *
+     * @return array
+     */
+    protected function getExceptions(JobResult $jobResult)
+    {
+        $exceptions = $jobResult->getFailureExceptions();
+        $result     = [];
+
+        foreach ($exceptions as $exception) {
+            $result[] = preg_replace("/<apiKey.*?>(.*)<\/apiKey>/i", "", $exception);
+        }
+
+        return $result;
     }
 }
