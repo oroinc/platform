@@ -211,7 +211,7 @@ class SyncProcessor
             $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
         }
 
-        $exceptions = $this->getExceptions($jobResult);
+        $exceptions = $this->getJobResultExceptions($jobResult);
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
         $status = new Status();
@@ -268,7 +268,7 @@ class SyncProcessor
      *
      * @return array
      */
-    protected function getExceptions(JobResult $jobResult)
+    protected function getJobResultExceptions(JobResult $jobResult)
     {
         $exceptions = $jobResult->getFailureExceptions();
         $result     = [];
