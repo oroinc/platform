@@ -35,14 +35,14 @@ class PublicSystemCalendarProvider implements CalendarProviderInterface
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
         $qb = $repo->getPublicCalendarsQueryBuilder();
-        /** @var SystemCalendar $calendars */
+        /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
 
         $result = [];
 
         foreach ($calendars as $calendar) {
             $resultItem = [
-                'calendarName'  => $name = $calendar->getName(),
+                'calendarName'  => $calendar->getName(),
                 'removable'     => false,
                 'position'      => -80,
             ];

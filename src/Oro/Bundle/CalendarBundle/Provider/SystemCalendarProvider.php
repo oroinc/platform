@@ -36,7 +36,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
         $qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds);
         //@TODO: Fix ACL for calendars providers
-        /** @var SystemCalendar $calendars */
+        /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
 
         $result = [];
