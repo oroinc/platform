@@ -1,8 +1,12 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
-], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oroui/js/mediator',
+    'oro/dialog-widget', 'oroui/js/loading-mask', 'orocalendar/js/form-validation',
+    'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
+], function (_, Backbone, __, routing, mediator,
+     DialogWidget, LoadingMask, FormValidation,
+     DeleteConfirmation, fieldFormatter
+) {
     'use strict';
 
     var $ = Backbone.$;
@@ -78,9 +82,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     confirm.open();
                 }, this),
                 onEdit = _.bind(function (e) {
-                    this._showMask(__('Loading...'));
-                    this.listenTo(this, 'formLoaded', _.bind(this._hideMask, this));
-
                     this.eventDialog.setTitle(__('Edit Event'));
                     this.eventDialog.setContent(this.getEventForm());
 
@@ -157,6 +158,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             this._showMask(__('Deleting...'));
         },
 
+        showLoadingMask: function () {
+            this._showMask(__('Loading...'));
+        },
+
         _showMask: function (message) {
             if (this.loadingMask) {
                 this.loadingMask.$el
@@ -192,6 +197,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             var inputs = form.find('[name]');
             var fieldNameRegex = /\[(\w+)\]/g;
 
+            // show loading mask if child events users should be updated
+            if (modelData.childEvents) {
+                mediator.once('widget:contentLoad', function () {
+                    self.showLoadingMask();
+                });
+            }
+
             _.each(inputs, function (input) {
                 input = $(input);
                 var name = input.attr('name'),
@@ -212,14 +224,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     input.change();
                 }
 
-                if (name.indexOf('[childEvents]') != -1) {
-                    if (input.val()) {
-                        input.on('select2-data-loaded', function(e) {
-                            self.trigger('formLoaded');
-                        });
-                    } else {
-                        self.trigger('formLoaded');
-                    }
+                // hide loading mask if child events users should be updated
+                if (name.indexOf('[childEvents]') != -1 && modelData.childEvents) {
+                    input.on('select2-data-loaded', function() {
+                        self._hideMask();
+                    });
                 }
             });
 
