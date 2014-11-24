@@ -210,8 +210,7 @@ class SyncProcessor
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
             $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
         }
-
-        $exceptions = $this->getJobResultExceptions($jobResult);
+        $exceptions = $this->getJobResultExceptions($jobResult, $integration, $connector);
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
         $status = new Status();
@@ -264,19 +263,22 @@ class SyncProcessor
     }
 
     /**
-     * @param JobResult $jobResult
+     * @param JobResult   $jobResult
+     * @param Integration $integration
+     * @param string      $connector
      *
      * @return array
      */
-    protected function getJobResultExceptions(JobResult $jobResult)
+    protected function getJobResultExceptions(JobResult $jobResult, Integration $integration, $connector)
     {
-        $exceptions = $jobResult->getFailureExceptions();
-        $result     = [];
+        /** @var array $exceptions */
+        $exceptions    = $jobResult->getFailureExceptions();
+        /** @var ConnectorInterface $connectorType */
+        $connectorType = $this->registry->getConnectorType($integration->getType(), $connector);
+        /** @var TransportInterface $transport */
+        $transport     = $connectorType->getTransport();
 
-        foreach ($exceptions as $exception) {
-            $result[] = preg_replace("/<apiKey.*?>(.*)<\/apiKey>/i", "", $exception);
-        }
 
-        return $result;
+        return $transport->processExceptionMessages($exceptions);
     }
 }
