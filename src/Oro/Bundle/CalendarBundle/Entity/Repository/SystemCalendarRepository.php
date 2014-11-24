@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
 
 class SystemCalendarRepository extends EntityRepository
 {
@@ -13,17 +13,23 @@ class SystemCalendarRepository extends EntityRepository
      * @param int[] $calendarIds
      * @param bool  $public
      *
-     * @return AbstractQuery
+     * @return QueryBuilder
      */
-    public function getCalendarsByIdsQuery($calendarIds, $public = false)
+    public function getSystemCalendarsByIdsQueryBuilder($calendarIds, $public = false)
     {
         $qb = $this->createQueryBuilder('sc')
-            ->select('sc');
-        $qb
-            ->where($qb->expr()->in('sc.id', $calendarIds))
-            ->andWhere('sc.public = :public')
+            ->select('sc')
+            ->where('sc.public = :public')
             ->setParameter('public', $public);
 
-        return $qb->getQuery();
+        if (!empty($calendarIds) && !$public) {
+            $qb
+                ->andWhere($qb->expr()->in('sc.id', $calendarIds));
+        } elseif (!$public) {
+            $qb
+                ->andWhere('1 = 0');
+        }
+
+        return $qb;
     }
 }

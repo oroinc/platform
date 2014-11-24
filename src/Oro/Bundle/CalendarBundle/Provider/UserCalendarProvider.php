@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
@@ -14,18 +15,18 @@ class UserCalendarProvider implements CalendarProviderInterface
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var CalendarEventNormalizer */
+    /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
     /**
-     * @param DoctrineHelper          $doctrineHelper
-     * @param NameFormatter           $nameFormatter
-     * @param CalendarEventNormalizer $calendarEventNormalizer
+     * @param DoctrineHelper                    $doctrineHelper
+     * @param NameFormatter                     $nameFormatter
+     * @param AbstractCalendarEventNormalizer   $calendarEventNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         NameFormatter $nameFormatter,
-        CalendarEventNormalizer $calendarEventNormalizer
+        AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
         $this->doctrineHelper          = $doctrineHelper;
         $this->nameFormatter           = $nameFormatter;
@@ -66,10 +67,11 @@ class UserCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
     {
-        $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent')
-            ->getEventListByTimeIntervalQueryBuilder($calendarId, $start, $end, $subordinate);
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $qb   = $repo->getEventListByTimeIntervalQueryBuilder($calendarId, $start, $end, $subordinate);
 
-        return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb);
+        return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
     }
 
     /**

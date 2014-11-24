@@ -9,29 +9,16 @@ use Doctrine\ORM\QueryBuilder;
 class CalendarEventRepository extends EntityRepository
 {
     /**
-     * Returns a query builder which can be used to get a list of calendar events filtered by start and end dates
+     * Returns a query builder with time condition for all calendar types
      *
-     * @param int            $calendarId
-     * @param \DateTime      $startDate
-     * @param \DateTime      $endDate
-     * @param bool           $subordinate If true events from connected calendars will be returned as well
-     * @param array|Criteria $filters     Additional filtering criteria, e.g. ['allDay' => true, ...]
-     *                                    or \Doctrine\Common\Collections\Criteria
-     * @param string         $kind        user|system|null by default user
+     * @param QueryBuilder  $qb
+     * @param \DateTime     $startDate
+     * @param \DateTime     $endDate
      *
      * @return QueryBuilder
      */
-    public function getEventListByTimeIntervalQueryBuilder(
-        $calendarId,
-        $startDate,
-        $endDate,
-        $subordinate = false,
-        $filters = [],
-        $kind = 'user'
-    ) {
-        /** @var QueryBuilder $qb */
-        $qb = $this->getEventListQueryBuilder($calendarId, $subordinate, $filters, $kind);
-
+    protected function addTimeIntervalQueryBuilder(QueryBuilder $qb, $startDate, $endDate)
+    {
         $qb
             ->andWhere(
                 '(e.start < :start AND e.end >= :start) OR '
@@ -46,13 +33,101 @@ class CalendarEventRepository extends EntityRepository
     }
 
     /**
+     * Returns a query builder with filters for all calendar types
+     *
+     * @param QueryBuilder   $qb
+     * @param array|Criteria $filters       Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                      or \Doctrine\Common\Collections\Criteria
+     *
+     * @return QueryBuilder
+     */
+    protected function addFiltersQueryBuilder(QueryBuilder $qb, $filters)
+    {
+        if ($filters) {
+            if (is_array($filters)) {
+                $newCriteria = new Criteria();
+                foreach ($filters as $fieldName => $value) {
+                    $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+                }
+
+                $filters = $newCriteria;
+            }
+
+            if ($filters instanceof Criteria) {
+                $qb->addCriteria($filters);
+            }
+        }
+
+        return $qb;
+    }
+
+    /**
+     * Returns a query builder which can be used to get a list of calendar events filtered by start and end dates
+     * This method apply to User and System Calendars
+     *
+     * @param int            $calendarId
+     * @param \DateTime      $startDate
+     * @param \DateTime      $endDate
+     * @param bool           $subordinate   If true events from connected calendars will be returned as well
+     * @param array|Criteria $filters       Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                      or \Doctrine\Common\Collections\Criteria
+     * @param string         $calendarAlias user|system|null by default user
+     * @param array          $options       Array of additional options
+     *
+     * @return QueryBuilder
+     */
+    public function getEventListByTimeIntervalQueryBuilder(
+        $calendarId,
+        $startDate,
+        $endDate,
+        $subordinate = false,
+        $filters = [],
+        $calendarAlias = 'user',
+        $options = []
+    ) {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getEventListQueryBuilder($calendarId, $subordinate, $filters, $calendarAlias, $options);
+
+        return $this->addTimeIntervalQueryBuilder($qb, $startDate, $endDate);
+    }
+
+    /**
+     * Returns a query builder which can be used to get a list of calendar events filtered by start and end dates
+     * This method apply to Public Calendar
+     *
+     * @param \DateTime      $startDate
+     * @param \DateTime      $endDate
+     * @param array|Criteria $filters       Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                      or \Doctrine\Common\Collections\Criteria
+     *
+     * @return QueryBuilder
+     */
+    public function getPublicEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->createQueryBuilder('e')
+            ->select(
+                'c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay, e.createdAt, e.updatedAt'
+            );
+
+        $qb->innerJoin('e.systemCalendar', 'c')
+            ->andWhere('c.public = :public')
+            ->setParameter('public', true);
+
+        $qb = $this->addFiltersQueryBuilder($qb, $filters);
+
+        return $this->addTimeIntervalQueryBuilder($qb, $startDate, $endDate);
+    }
+
+    /**
      * Returns a query builder which can be used to get a list of calendar events
      *
      * @param int            $calendarId
-     * @param bool           $subordinate If true events from connected calendars will be returned as well
-     * @param array|Criteria $filters     Additional filtering criteria, e.g. ['allDay' => true, ...]
-     *                                    or \Doctrine\Common\Collections\Criteria
-     * @param string         $kind        user|system|null by default user
+     * @param bool           $subordinate   If true events from connected calendars will be returned as well
+     * @param array|Criteria $filters       Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                      or \Doctrine\Common\Collections\Criteria
+     * @param string         $calendarAlias user|system|null by default user
+     * @param array          $options       Array of additional options
      *
      * @return QueryBuilder
      */
@@ -60,33 +135,27 @@ class CalendarEventRepository extends EntityRepository
         $calendarId,
         $subordinate = false,
         $filters = [],
-        $kind = 'user'
+        $calendarAlias = 'user',
+        $options = []
     ) {
         /** @var QueryBuilder $qb */
         $qb = $this->createQueryBuilder('e')
             ->select(
                 'c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay, e.createdAt, e.updatedAt'
             );
-        switch ($kind) {
+
+        switch ($calendarAlias) {
             case 'system':
-                $qb->innerJoin('e.systemCalendar', 'c');
+                $qb->innerJoin('e.systemCalendar', 'c')
+                    ->andWhere('c.public = :public')
+                    ->setParameter('public', $options['public']);
                 break;
             default:
                 $qb->innerJoin('e.calendar', 'c');
-                break;
         }
 
-        if (is_array($filters)) {
-            $newCriteria = new Criteria();
-            foreach ($filters as $fieldName => $value) {
-                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
-            }
+        $qb = $this->addFiltersQueryBuilder($qb, $filters);
 
-            $filters = $newCriteria;
-        }
-        if ($filters) {
-            $qb->addCriteria($filters);
-        }
         if ($subordinate) {
             $connectionRepo = $this->getEntityManager()->getRepository('OroCalendarBundle:CalendarProperty');
             $qbConnections  = $connectionRepo->createQueryBuilder('connection')
@@ -100,7 +169,7 @@ class CalendarEventRepository extends EntityRepository
             $qb
                 ->andWhere($qb->expr()->in('c.id', $qbConnections->getDQL()))
                 ->setParameter('id', $calendarId)
-                ->setParameter('calendarAlias', 'user');
+                ->setParameter('calendarAlias', $calendarAlias);
         } else {
             $qb
                 ->andWhere('c.id = :id')

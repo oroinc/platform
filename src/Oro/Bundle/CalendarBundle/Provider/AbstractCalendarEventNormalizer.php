@@ -4,12 +4,12 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Proxy\Proxy;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\AbstractQuery;
 
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-class CalendarEventNormalizer
+abstract class AbstractCalendarEventNormalizer
 {
     /** @var ManagerRegistry */
     protected $doctrine;
@@ -38,28 +38,23 @@ class CalendarEventNormalizer
     /**
      * Converts calendar events returned by the given query to form that can be used in API
      *
-     * @param int          $calendarId The target calendar id
-     * @param QueryBuilder $qb         The query builder that should be used to get events
+     * @param int               $calendarId The target calendar id
+     * @param AbstractQuery     $query      The query that should be used to get events
      *
      * @return array
      */
-    public function getCalendarEvents($calendarId, QueryBuilder $qb)
+    public function getCalendarEvents($calendarId, AbstractQuery $query)
     {
         $result = [];
 
-        $items = $qb->getQuery()->getArrayResult();
+        $items = $query->getArrayResult();
         foreach ($items as $item) {
             $resultItem = array();
             foreach ($item as $field => $value) {
                 $this->transformEntityField($value);
                 $resultItem[$field] = $value;
             }
-            $resultItem['editable']  =
-                ($resultItem['calendar'] === $calendarId)
-                && $this->securityFacade->isGranted('oro_calendar_event_update');
-            $resultItem['removable'] =
-                ($resultItem['calendar'] === $calendarId)
-                && $this->securityFacade->isGranted('oro_calendar_event_delete');
+            $this->applyPermission($resultItem, $calendarId);
 
             $result[] = $resultItem;
         }
@@ -82,4 +77,13 @@ class CalendarEventNormalizer
             $value = $value->format('c');
         }
     }
+
+    /**
+     * Method applies permission to edit or to delete event on the calendar page
+     * It must be implemented into real class for different types of calendars
+     *
+     * @param array     &$resultItem
+     * @param int       $calendarId
+     */
+    abstract protected function applyPermission(&$resultItem, $calendarId);
 }

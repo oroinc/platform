@@ -2,33 +2,31 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Doctrine\ORM\QueryBuilder;
-
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class SystemCalendarProvider implements CalendarProviderInterface
 {
-    const CALENDAR_KIND = 'system';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var CalendarEventNormalizer */
+    /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
     /** @var AclHelper */
     protected $aclHelper;
 
     /**
-     * @param DoctrineHelper          $doctrineHelper
-     * @param CalendarEventNormalizer $calendarEventNormalizer
-     * @param AclHelper               $aclHelper
+     * @param DoctrineHelper                    $doctrineHelper
+     * @param AbstractCalendarEventNormalizer   $calendarEventNormalizer
+     * @param AclHelper                         $aclHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        CalendarEventNormalizer $calendarEventNormalizer,
+        AbstractCalendarEventNormalizer $calendarEventNormalizer,
         AclHelper $aclHelper
     ) {
         $this->doctrineHelper          = $doctrineHelper;
@@ -41,15 +39,17 @@ class SystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds)
     {
-        $query = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar')
-            ->getCalendarsByIdsQuery($calendarIds, false);
-        $calendars = $this->aclHelper->apply($query, 'VIEW', false)->getResult();
+        /** @var SystemCalendarRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
+        $qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds, false);
+        $calendars = $this->aclHelper->apply($qb, 'VIEW', false)->getResult();
 
         $result = [];
 
         foreach ($calendars as $calendar) {
             $resultItem = [
-                'calendarName' => $this->buildCalendarName($calendar)
+                'calendarName'  => $calendar->getName(),
+                'position'      => -60,
             ];
             $result[$calendar->getId()] = $resultItem;
         }
@@ -62,32 +62,21 @@ class SystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
     {
-        /** @var QueryBuilder $qb */
-        $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent')
-            ->getEventListByTimeIntervalQueryBuilder(
-                $calendarId,
-                $start,
-                $end,
-                $subordinate,
-                ['public' => false],
-                self::CALENDAR_KIND
-            );
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $qb = $repo->getEventListByTimeIntervalQueryBuilder(
+            $calendarId,
+            $start,
+            $end,
+            true,
+            [],
+            SystemCalendar::CALENDAR_ALIAS,
+            ['public' => false]
+        );
 
-        return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb);
-    }
-
-    /**
-     * @param SystemCalendar $calendar
-     *
-     * @return string
-     */
-    protected function buildCalendarName(SystemCalendar $calendar)
-    {
-        $name = $calendar->getName();
-        if (!$name) {
-            $name = $calendar->getOwner()->getName();
-        }
-
-        return $name;
+        return $this->calendarEventNormalizer->getCalendarEvents(
+            $calendarId,
+            $this->aclHelper->apply($qb, 'VIEW', true)
+        );
     }
 }

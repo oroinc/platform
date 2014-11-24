@@ -2,28 +2,26 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Doctrine\ORM\QueryBuilder;
-
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class PublicSystemCalendarProvider implements CalendarProviderInterface
 {
-    const CALENDAR_KIND = 'system';
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var CalendarEventNormalizer */
+    /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
     /**
-     * @param DoctrineHelper          $doctrineHelper
-     * @param CalendarEventNormalizer $calendarEventNormalizer
+     * @param DoctrineHelper                    $doctrineHelper
+     * @param AbstractCalendarEventNormalizer   $calendarEventNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        CalendarEventNormalizer $calendarEventNormalizer
+        AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
         $this->doctrineHelper          = $doctrineHelper;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
@@ -34,15 +32,18 @@ class PublicSystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds)
     {
-        $query = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar')
-            ->getCalendarsByIdsQuery($calendarIds, true);
-        $calendars = $query->getResult();
+        /** @var SystemCalendarRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
+        $qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds, true);
+        $calendars = $qb->getQuery()->getResult();
 
         $result = [];
 
         foreach ($calendars as $calendar) {
             $resultItem = [
-                'calendarName' => $this->buildCalendarName($calendar)
+                'calendarName'  => $name = $calendar->getName(),
+                'removable'     => false,
+                'position'      => -80,
             ];
             $result[$calendar->getId()] = $resultItem;
         }
@@ -55,32 +56,10 @@ class PublicSystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
     {
-        /** @var QueryBuilder $qb */
-        $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent')
-            ->getEventListByTimeIntervalQueryBuilder(
-                $calendarId,
-                $start,
-                $end,
-                $subordinate,
-                ['public' => true],
-                self::CALENDAR_KIND
-            );
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder($start, $end, []);
 
-        return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb);
-    }
-
-    /**
-     * @param SystemCalendar $calendar
-     *
-     * @return string
-     */
-    protected function buildCalendarName(SystemCalendar $calendar)
-    {
-        $name = $calendar->getName();
-        if (!$name) {
-            $name = $calendar->getOwner()->getName();
-        }
-
-        return $name;
+        return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
     }
 }
