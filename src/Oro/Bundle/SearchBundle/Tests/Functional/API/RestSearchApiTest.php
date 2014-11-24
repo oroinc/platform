@@ -30,7 +30,7 @@ class RestSearchApiTest extends WebTestCase
         if (array_key_exists('supported_engines', $request)) {
             $engine = $this->getContainer()->getParameter('oro_search.engine');
             if (!in_array($engine, $request['supported_engines'])) {
-                $this->markTestIncomplete('Test should not be executed on this engine');
+                $this->markTestIncomplete(sprintf('Test should not be executed on "%s" engine', $engine));
             }
             unset($request['supported_engines']);
         }

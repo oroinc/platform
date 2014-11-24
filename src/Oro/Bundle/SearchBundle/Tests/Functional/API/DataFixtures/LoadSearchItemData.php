@@ -86,7 +86,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             //object
             $item->objectValue = new \stdClass();
             //phone
-            $item->phone = sprintf($ind % 2 ? '123-456-%s-00' : '%s00987654', $ind);
+            $item->phone = sprintf($ind % 2 ? '123-456-%s00' : '%s00987654', $ind);
 
             $manager->persist($item);
         }
