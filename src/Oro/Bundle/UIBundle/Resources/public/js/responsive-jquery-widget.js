@@ -35,9 +35,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             sectionNoBlocksModifier: 'responsive-section-no-blocks',
             cellNoBlocksModifier: 'responsive-cell-no-blocks',
 
-            sectionHasBlocksModifier: 'responsive-section-has-blocks',
-            cellHasBlocksModifier: 'responsive-cell-has-blocks',
-
             sizes: [{
                 modifierClassName: 'responsive-small',
                 width: {
@@ -65,6 +62,8 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             }]
         },
 
+        widgetEventPrefix: 'responsive-',
+
         /**
          *
          * @protected
@@ -82,16 +81,24 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
         _update: function() {
             var context = this;
             var $sections = this.$sections;
+            var isChanged = false;
 
-            $sections.each(function(index, element) {
-                context._updateSection($(element));
+            $sections.each(function () {
+                if (context._updateSection($(this))) {
+                    isChanged = true;
+                }
             });
+
+            if (isChanged) {
+                this._trigger('reflow');
+            }
         },
 
         /**
          * Update section modificators
          *
          * @param {jQuery} $section
+         * @return {boolean} true if section was updated
          * @protected
          */
         _updateSection: function($section) {
@@ -101,32 +108,37 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             var sectionWidth = $section.outerWidth();
             var size = this._getSize(sectionWidth);
             var classNames = [size.modifierClassName];
-            var hasNoBlocks = true;
+            var hasBlocks = true;
+            var isChanged = false;
 
-            this._updateClasses($section, classNames);
-
-            $cells.each(function(index, cell) {
-                var $cell = $(cell);
-                context._updateCell($cell);
-                if(!$cell.hasClass(options.cellNoBlocksModifier)) {
-                    hasNoBlocks = false;
+            $cells.each(function () {
+                var $cell = $(this);
+                if (context._updateCell($cell)) {
+                    isChanged = true;
                 }
+                hasBlocks = !$cell.hasClass(options.cellNoBlocksModifier);
             });
 
-            if(hasNoBlocks) {
-                $section.addClass(options.sectionNoBlocksModifier);
-            } else {
-                $section.addClass(options.sectionHasBlocksModifier);
+            if (!hasBlocks) {
+                classNames.push(options.sectionNoBlocksModifier);
             }
+
+            if (this._updateClasses($section, classNames)) {
+                isChanged = true;
+            }
+
+            return isChanged;
         },
 
         /**
          * Update cell modifiers
          *
          * @param {jQuery} $cell
+         * @return {boolean} true if cell was updated
          * @protected
          */
         _updateCell: function($cell) {
+            var isChanged;
             var options = this.options;
             var $blocks = this._getBlocksFromCell($cell);
             var classNames = [];
@@ -135,7 +147,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
                 classNames.push(options.cellNoBlocksModifier);
             }
 
-            this._updateClasses($cell, classNames);
+            isChanged = this._updateClasses($cell, classNames);
+
+            return isChanged;
         },
 
         /**
@@ -186,7 +200,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
          * Get size object from options.sizes by width
          *
          * @param {number} sectionWidth
-         * @returns {object}
+         * @returns {Object}
          * @potected
          */
         _getSize: function(sectionWidth) {
@@ -198,46 +212,25 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
         },
 
         /**
-         * Remove all added classes then add new
+         * Updates classes for the target if they are different from already added
          *
          * @param {jQuery} $target
          * @param {string[]} classNames
+         * @return {boolean} if classes are changed
          * @protected
          */
         _updateClasses: function($target, classNames) {
-            this._clearClasses($target);
-            this._addClasses($target, classNames);
-        },
+            var isChanged, addedClasses;
+            addedClasses = $target.data(this.options.addedClassesDataName) || [];
+            isChanged = !_.isEqual(addedClasses, classNames);
 
-        /**
-         * Remove all added classes
-         *
-         * @param {jQuery} $target
-         * @protected
-         */
-        _clearClasses: function($target) {
-            var classNames = $target.data(this.options.addedClassesDataName);
+            if (isChanged) {
+                $target.removeClass(addedClasses.join(' '));
+                $target.addClass(classNames.join(' '));
+                $target.data(this.options.addedClassesDataName, classNames);
+            }
 
-            _.forEach(classNames, function(className) {
-                $target.removeClass(className);
-            }, this);
-
-            $target.data(this.options.addedClassesDataName, null);
-        },
-
-        /**
-         * Add classes from set to element
-         *
-         * @param {jQuery} $target
-         * @param {string[]} classNames
-         * @protected
-         */
-        _addClasses: function($target, classNames) {
-            _.forEach(classNames, function(className) {
-                $target.addClass(className);
-            }, this);
-
-            $target.data(this.options.addedClassesDataName, classNames);
+            return isChanged;
         }
     });
 

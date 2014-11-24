@@ -78,12 +78,35 @@
   }
 }
 .chart-container {
-  >.clearfix {
-    width: auto !important;
-    .chart {
-      margin: 0 auto;
-      float: none;
-    }
+  &>.clearfix {
+    max-width: 100%;
   }
 }
 
+.dashboard-selector-container {
+  label {
+    display: none;
+  }
+  div.selector{
+    height: 34px;
+    border-color:#ccc #ccc #b3b3b3;
+    select, span {
+      height: 32px;
+      line-height: 32px;
+    }
+    span:after {
+      top: 3px;
+    }
+  }
+}
+.dashboard-container-wrapper{
+  .dashboard-widget {
+    .title {
+      padding-right: 45px;
+    }
+
+    .action-wrapper.sortable {
+      display: none;
+    }
+  }
+}

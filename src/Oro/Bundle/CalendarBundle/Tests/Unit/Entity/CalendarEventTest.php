@@ -41,6 +41,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             array('start', new \DateTime()),
             array('end', new \DateTime()),
             array('allDay', true),
+            array('backgroundColor', '#FF0000'),
             array('createdAt', new \DateTime()),
             array('updatedAt', new \DateTime()),
             array('invitationStatus', CalendarEvent::NOT_RESPONDED)
