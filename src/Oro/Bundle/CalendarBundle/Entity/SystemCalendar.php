@@ -9,7 +9,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository")
  * @ORM\Table(name="oro_system_calendar")
  * @Config(
  *      defaultValues={
@@ -40,6 +40,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class SystemCalendar
 {
+    const CALENDAR_ALIAS = 'system';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
