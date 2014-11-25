@@ -328,6 +328,17 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # the names of persistence operations to cascade on the relation.
+                # the set of possible values are: 'persist', 'remove', 'detach', 'merge', 'refresh', 'all'
+                # for example: ['persist', 'remove']
+                # see Doctrine's documentation for more details
+                # note that for many-to-one and one-to-many relations the 'detach' operation is applied by default
+                # and this cannot be changed through the config
+                # this attribute is applicable to any type of relations
+                cascade: # array of strings
+                    options:
+                        auditable:          false
+
                 # OptionSet form type fields
                 # @deprecated since 1.4, will be removed in 2.0
                 set_expanded:
