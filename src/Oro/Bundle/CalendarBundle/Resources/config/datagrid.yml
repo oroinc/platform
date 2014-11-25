@@ -294,7 +294,7 @@ datagrid:
     system-calendar-event-grid:
         extends: base-system-calendar-event-grid
         source:
-            acl_resource: oro_calendar_system_event_view
+            acl_resource: oro_system_calendar_view
             query:
                 where:
                     and:

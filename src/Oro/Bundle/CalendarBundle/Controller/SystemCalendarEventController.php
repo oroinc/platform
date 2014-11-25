@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -20,8 +20,9 @@ class SystemCalendarEventController extends Controller
     /**
      * @Route("/{id}/event", name="oro_calendar_system_event_index", requirements={"id"="\d+"})
      * @Template
+     * @TODO: Replace to AclAncestor after implemented BAP-5989
      * @Acl(
-     *      id="oro_calendar_system_event_view",
+     *      id="oro_system_calendar_view",
      *      type="entity",
      *      class="OroCalendarBundle:SystemCalendar",
      *      permission="VIEW",
@@ -30,9 +31,8 @@ class SystemCalendarEventController extends Controller
      */
     public function indexAction(SystemCalendar $entity)
     {
-        if (!$entity->isPublic() && $entity->getOrganization()
-            && $entity->getOrganization()->getId() != $this->get('oro_security.security_facade')->getOrganizationId()) {
-            throw new AccessDeniedHttpException('Access denied to foreign system calendar events');
+        if (!$entity->isPublic() && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
+            throw new AccessDeniedException('Access denied to foreign system calendar events');
         }
 
         return [
