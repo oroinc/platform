@@ -295,8 +295,8 @@ define(function (require) {
                     wait: true,
                     url: this._getUrl('itemDelete', model),
                     success: _.bind(function () {
-                        this._hideLoading();
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
+                        this._reload();
                     }, this),
                     error: _.bind(function (model, response) {
                         if (!_.isUndefined(response.status) && response.status === 403) {
@@ -304,13 +304,12 @@ define(function (require) {
                         } else {
                             this._showDeleteItemError(response.responseJSON || {});
                         }
+                        this._hideLoading();
                     }, this)
                 });
-
-                this.refresh();
-
             } catch (err) {
                 this._showDeleteItemError(err);
+                this._hideLoading();
             }
         },
 
