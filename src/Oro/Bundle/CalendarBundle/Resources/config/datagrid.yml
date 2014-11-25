@@ -246,7 +246,9 @@ datagrid:
                         - { join: event.systemCalendar, alias: calendar }
                 where:
                     and:
-                        - calendar.id = :id
+                        - calendar.id = :calendarId
+            bind_parameters:
+                - calendarId
         columns:
             title:
                 label: oro.calendar.calendarevent.title.label
@@ -292,13 +294,16 @@ datagrid:
     system-calendar-event-grid:
         extends: base-system-calendar-event-grid
         source:
+            acl_resource: oro_calendar_system_event_view
             query:
                 where:
                     and:
                         - calendar.public = false
 
-    public-calendar-event-grid:
+    public-system-calendar-event-grid:
         extends: base-system-calendar-event-grid
+        options:
+            skip_acl_check: true
         source:
             query:
                 where:
