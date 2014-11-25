@@ -68,9 +68,11 @@ class EventsToUsersTransformerTest extends \PHPUnit_Framework_TestCase
         $organizationId = 42;
 
         $firstUser = new User();
-        $firstUser->setUsername('1');
+        $firstUser->setId(1)
+            ->setUsername('1');
         $secondUser = new User();
-        $secondUser->setUsername('2');
+        $secondUser->setId(2)
+            ->setUsername('2');
 
         $firstCalendar = new Calendar();
 
@@ -81,14 +83,10 @@ class EventsToUsersTransformerTest extends \PHPUnit_Framework_TestCase
         $calendarRepository = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $calendarRepository->expects($this->at(0))
-            ->method('findDefaultCalendar')
-            ->with(null, $organizationId)
-            ->will($this->returnValue($firstCalendar));
-        $calendarRepository->expects($this->at(1))
-            ->method('findDefaultCalendar')
-            ->with(null, $organizationId)
-            ->will($this->returnValue(null));
+        $calendarRepository->expects($this->once())
+            ->method('findDefaultCalendars')
+            ->with([1, 2], $organizationId)
+            ->will($this->returnValue([$firstCalendar]));
 
         $this->registry->expects($this->any())
             ->method('getRepository')

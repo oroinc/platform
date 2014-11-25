@@ -25,4 +25,21 @@ class CalendarRepository extends EntityRepository
             )
         );
     }
+
+    /**
+     * @param array $userIds
+     * @param int   $organizationId
+     *
+     * @return Calendar[]
+     */
+    public function findDefaultCalendars(array $userIds, $organizationId)
+    {
+        $queryBuilder = $this->createQueryBuilder('c');
+
+        return $queryBuilder
+            ->andWhere('c.organization = :organization')->setParameter('organization', $organizationId)
+            ->andWhere($queryBuilder->expr()->in('c.owner', $userIds))
+            ->getQuery()
+            ->getResult();
+    }
 }
