@@ -203,7 +203,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 if (matches.length) {
                     var value = self.getValueByPath(modelData, matches);
                     if (input.is(':checkbox')) {
-                        input.prop('checked', value);
+                        if (value === false || value === true) {
+                            input.prop('checked', value);
+                        } else {
+                            input.prop('checked', input.val() == value);
+                        }
                     } else {
                         input.val(value);
                     }
@@ -267,6 +271,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     this.setValueByPath(data, dataItem.value, matches);
                 }
             }, this);
+
+            if (data.hasOwnProperty('calendarUid')) {
+                if (data.calendarUid) {
+                    data.calendarAlias = data.calendarUid.substr(0, data.calendarUid.lastIndexOf('_'));
+                    data.calendar = parseInt(data.calendarUid.substr(data.calendarUid.lastIndexOf('_') + 1));
+                }
+                delete data.calendarUid;
+            }
 
             return data;
         },

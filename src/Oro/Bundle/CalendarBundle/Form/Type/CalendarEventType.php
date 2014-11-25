@@ -4,7 +4,10 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class CalendarEventType extends AbstractType
@@ -75,6 +78,8 @@ class CalendarEventType extends AbstractType
                     'label'    => 'oro.reminder.entity_plural_label'
                 ]
             );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
     }
 
     /**
@@ -84,8 +89,34 @@ class CalendarEventType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                'intention'  => 'calendar_event',
+                'allow_change_calendar' => false,
+                'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                'intention'             => 'calendar_event'
+            ]
+        );
+    }
+
+    /**
+     * PRE_SET_DATA event handler
+     *
+     * @param FormEvent $event
+     */
+    public function preSetData(FormEvent $event)
+    {
+        $form   = $event->getForm();
+        $config = $form->getConfig();
+
+        if (!$config->getOption('allow_change_calendar')) {
+            return;
+        }
+
+        $form->add(
+            'calendarUid',
+            'oro_calendar_choice',
+            [
+                'required' => false,
+                'mapped'   => false,
+                'label'    => 'oro.calendar.calendarevent.calendar.label'
             ]
         );
     }

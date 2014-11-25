@@ -2,13 +2,29 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class CalendarEventApiType extends CalendarEventType
 {
+    /** @var CalendarChoiceManager */
+    protected $calendarChoiceManager;
+
+    /**
+     * @param CalendarChoiceManager $calendarChoiceManager
+     */
+    public function __construct(CalendarChoiceManager $calendarChoiceManager)
+    {
+        $this->calendarChoiceManager = $calendarChoiceManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -17,81 +33,81 @@ class CalendarEventApiType extends CalendarEventType
         $builder
             ->add('id', 'hidden', array('mapped' => false))
             ->add(
-                'calendar',
-                'oro_entity_identifier',
-                array(
-                    'label'    => 'oro.calendar.entity_label',
-                    'required' => true,
-                    'class'    => 'OroCalendarBundle:Calendar',
-                    'multiple' => false
-                )
-            )
-            ->add(
                 'title',
                 'text',
-                array(
-                    'required' => true,
-                    'label'    => 'oro.calendar.calendarevent.title.label'
-                )
+                [
+                    'required' => true
+                ]
             )
             ->add(
                 'description',
                 'text',
-                array(
-                    'required' => false,
-                    'label'    => 'oro.calendar.calendarevent.description.label'
-                )
+                [
+                    'required' => false
+                ]
             )
             ->add(
                 'start',
                 'datetime',
-                array(
-                    'label'          => 'oro.calendar.calendarevent.start.label',
+                [
                     'required'       => true,
                     'with_seconds'   => true,
                     'widget'         => 'single_text',
                     'format'         => DateTimeType::HTML5_FORMAT,
-                    'model_timezone' => 'UTC',
-                )
+                    'model_timezone' => 'UTC'
+                ]
             )
             ->add(
                 'end',
                 'datetime',
-                array(
-                    'label'          => 'oro.calendar.calendarevent.end.label',
+                [
                     'required'       => true,
                     'with_seconds'   => true,
                     'widget'         => 'single_text',
                     'format'         => DateTimeType::HTML5_FORMAT,
-                    'model_timezone' => 'UTC',
-                )
+                    'model_timezone' => 'UTC'
+                ]
             )
             ->add(
                 'allDay',
                 'checkbox',
-                array(
-                    'required' => false,
-                    'label'    => 'oro.calendar.calendarevent.all_day.label'
-                )
+                [
+                    'required' => false
+                ]
             )
             ->add(
                 'backgroundColor',
                 'text',
-                array(
+                [
+                    'required' => false
+                ]
+            )
+            ->add(
+                'calendarAlias',
+                'text',
+                [
                     'required' => false,
-                    'label'    => 'oro.calendar.calendarevent.backgroundColor.label'
-                )
+                    'mapped'   => false
+                ]
+            )
+            ->add(
+                'calendar',
+                'integer',
+                [
+                    'required' => false,
+                    'mapped'   => false
+                ]
             )
             ->add(
                 'reminders',
                 'oro_reminder_collection',
                 [
                     'required' => false,
-                    'label'    => 'oro.reminder.entity_plural_label'
                 ]
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
     }
 
     /**
@@ -107,6 +123,33 @@ class CalendarEventApiType extends CalendarEventType
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
             )
         );
+    }
+
+    /**
+     * POST_SUBMIT event handler
+     *
+     * @param FormEvent $event
+     */
+    public function postSubmitData(FormEvent $event)
+    {
+        $form = $event->getForm();
+
+        /** @var CalendarEvent $data */
+        $data = $form->getData();
+        if (empty($data)) {
+            return;
+        }
+
+        $calendarId = $form->get('calendar')->getData();
+        if (empty($calendarId)) {
+            return;
+        }
+        $calendarAlias = $form->get('calendarAlias')->getData();
+        if (empty($calendarAlias)) {
+            $calendarAlias = 'user';
+        }
+
+        $this->calendarChoiceManager->setCalendar($data, $calendarAlias, (int)$calendarId);
     }
 
     /**
