@@ -36,7 +36,7 @@ class UserCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds)
+    public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
         $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
             ->createQueryBuilder('o')
@@ -65,11 +65,25 @@ class UserCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($calendarId, $start, $end, $subordinate);
+        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end);
+        $visibleIds = [];
+        foreach ($connections as $id => $visible) {
+            if ($visible) {
+                $visibleIds[] = $id;
+            }
+        }
+        if (!empty($visibleIds)) {
+            $qb
+                ->andWhere('c.id IN (:visibleIds)')
+                ->setParameter('visibleIds', $visibleIds);
+        } else {
+            $qb
+                ->andWhere('1 = 0');
+        }
 
         return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
     }

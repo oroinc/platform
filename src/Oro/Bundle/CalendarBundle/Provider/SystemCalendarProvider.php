@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Doctrine\Common\Collections\Criteria;
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarPropertyRepository;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
@@ -30,11 +32,15 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds)
+    public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
-        $qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds);
+
+        //@TODO: temporary return all system calendars until BAP-6566 implemented
+        //$qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds);
+        $qb = $repo->getSystemCalendarsQueryBuilder($organizationId);
+
         //@TODO: Fix ACL for calendars providers
         /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
@@ -44,6 +50,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
         foreach ($calendars as $calendar) {
             $resultItem = [
                 'calendarName'  => $calendar->getName(),
+                'removable'     => false,
                 'position'      => -60,
             ];
             $result[$calendar->getId()] = $resultItem;
@@ -55,16 +62,32 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
     {
+        //@TODO: temporary return all system calendars until BAP-6566 implemented
+        ///** @var CalendarEventRepository $repo */
+        //$repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        //$qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
+        //    $calendarId,
+        //    $start,
+        //    $end,
+        //    []
+        //);
+
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
-            $calendarId,
-            $start,
-            $end,
-            []
-        );
+        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder($start, $end);
+        $invisibleIds = [];
+        foreach ($connections as $id => $visible) {
+            if (!$visible) {
+                $invisibleIds[] = $id;
+            }
+        }
+        if (!empty($invisibleIds)) {
+            $qb
+                ->andWhere('c.id NOT IN (:invisibleIds)')
+                ->setParameter('invisibleIds', $invisibleIds);
+        }
 
         return $this->calendarEventNormalizer->getCalendarEvents(
             $calendarId,

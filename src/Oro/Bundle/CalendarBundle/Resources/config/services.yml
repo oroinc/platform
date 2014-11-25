@@ -15,7 +15,7 @@ parameters:
     oro_calendar.calendar_property_provider.class:               Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
     oro_calendar.calendar_provider.system.class:                 Oro\Bundle\CalendarBundle\Provider\SystemCalendarProvider
-    oro_calendar.calendar_provider.public_system.class:          Oro\Bundle\CalendarBundle\Provider\PublicSystemCalendarProvider
+    oro_calendar.calendar_provider.public.class:                 Oro\Bundle\CalendarBundle\Provider\PublicCalendarProvider
     oro_calendar.calendar_event.user_normalizer.class:           Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer
     oro_calendar.calendar_event.system_normalizer.class:         Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer
     oro_calendar.calendar_event.public_normalizer.class:         Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer
@@ -113,13 +113,13 @@ services:
         tags:
             - { name: oro_calendar.calendar_provider, alias: system }
 
-    oro_calendar.calendar_provider.public_system:
-        class: %oro_calendar.calendar_provider.public_system.class%
+    oro_calendar.calendar_provider.public:
+        class: %oro_calendar.calendar_provider.public.class%
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_calendar.calendar_event.public_normalizer
         tags:
-            - { name: oro_calendar.calendar_provider, alias: publicSystem }
+            - { name: oro_calendar.calendar_provider, alias: public }
 
     oro_calendar.calendar_event.user_normalizer:
         class: %oro_calendar.calendar_event.user_normalizer.class%

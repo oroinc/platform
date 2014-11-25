@@ -4,10 +4,10 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Query\Expr;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
-use Oro\Bundle\CalendarBundle\Provider\PublicSystemCalendarProvider;
+use Oro\Bundle\CalendarBundle\Provider\PublicCalendarProvider;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 
-class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
+class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -15,7 +15,7 @@ class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarEventNormalizer;
 
-    /** @var UserCalendarProvider */
+    /** @var PublicCalendarProvider */
     protected $provider;
 
     protected function setUp()
@@ -28,7 +28,7 @@ class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
-        $this->provider = new PublicSystemCalendarProvider(
+        $this->provider = new PublicCalendarProvider(
             $this->doctrineHelper,
             $this->calendarEventNormalizer
         );
@@ -36,16 +36,16 @@ class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCalendarDefaultValues()
     {
-        $userId      = 123;
-        $calendarId  = 1;
-        $calendarIds = [1];
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 10;
+        $calendarIds    = [10];
 
         $calendar1 = new SystemCalendar();
         ReflectionUtil::setId($calendar1, 1);
         $calendar1->setName('Master');
 
         $calendars = [$calendar1];
-
 
         $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
             ->disableOriginalConstructor()
@@ -72,7 +72,7 @@ class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->with('OroCalendarBundle:SystemCalendar')
             ->will($this->returnValue($repo));
 
-        $result = $this->provider->getCalendarDefaultValues($userId, $calendarId, $calendarIds);
+        $result = $this->provider->getCalendarDefaultValues($organizationId, $userId, $calendarId, $calendarIds);
         $this->assertEquals(
             [
                 1 => [
@@ -87,14 +87,13 @@ class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCalendarEvents()
     {
-        $calendarId  = 123;
-        $userId      = 123;
-        $start       = new \DateTime();
-        $end         = new \DateTime();
-        $subordinate = true;
-        $filters     = [];
-
-        $events      = [['id' => 1]];
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 10;
+        $start          = new \DateTime();
+        $end            = new \DateTime();
+        $connections    = [10 => true, 20 => false];
+        $events         = [['id' => 1]];
 
         $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -108,11 +107,19 @@ class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repo));
         $repo->expects($this->once())
             ->method('getPublicEventListByTimeIntervalQueryBuilder')
-            ->with($this->identicalTo($start), $this->identicalTo($end), $filters)
+            ->with($this->identicalTo($start), $this->identicalTo($end))
             ->will($this->returnValue($qb));
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
+        $qb->expects($this->once())
+            ->method('andWhere')
+            ->with('c.id NOT IN (:invisibleIds)')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('setParameter')
+            ->with('invisibleIds', [20])
+            ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
@@ -122,7 +129,7 @@ class PublicSystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->with($calendarId, $this->identicalTo($query))
             ->will($this->returnValue($events));
 
-        $result = $this->provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
+        $result = $this->provider->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
         $this->assertEquals($events, $result);
     }
 }

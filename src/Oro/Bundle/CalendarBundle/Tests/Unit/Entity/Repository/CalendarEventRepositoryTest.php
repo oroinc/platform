@@ -35,12 +35,12 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
     }
 
-    public function testGetBaseEventListQueryBuilder()
+    public function testGetEventListQueryBuilder()
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
 
-        $qb = $repo->getBaseEventListQueryBuilder();
+        $qb = $repo->getEventListQueryBuilder();
 
         $this->assertEquals(
             'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
@@ -55,44 +55,17 @@ class CalendarEventRepositoryTest extends OrmTestCase
         /** @var CalendarEventRepository $repo */
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
 
-        $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(1, new \DateTime(), new \DateTime(), true);
+        $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(new \DateTime(), new \DateTime());
 
         $this->assertEquals(
             'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
-            . ' WHERE (c.id IN(SELECT connection.calendar'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarProperty connection'
-            . ' WHERE connection.targetCalendar = :id'
-            . ' AND connection.calendarAlias = :calendarAlias'
-            . ' AND connection.visible = true))'
-            . ' AND ('
+            . ' WHERE '
             . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
-            . '(e.start >= :start AND e.end < :end))'
-            . ' ORDER BY c.id, e.start ASC',
-            $qb->getQuery()->getDQL()
-        );
-    }
-
-    public function testGetUserEventListByTimeIntervalQueryBuilderForOwnEventsOnly()
-    {
-        /** @var CalendarEventRepository $repo */
-        $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
-
-        $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(1, new \DateTime(), new \DateTime(), false);
-
-        $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
-            . ' INNER JOIN e.calendar c'
-            . ' WHERE c.id = :id'
-            . ' AND ('
-            . '(e.start < :start AND e.end >= :start) OR '
-            . '(e.start <= :end AND e.end > :end) OR'
-            . '(e.start >= :start AND e.end < :end))'
+            . '(e.start >= :start AND e.end < :end)'
             . ' ORDER BY c.id, e.start ASC',
             $qb->getQuery()->getDQL()
         );
@@ -104,10 +77,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
 
         $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(
-            1,
             new \DateTime(),
             new \DateTime(),
-            false,
             new Criteria(Criteria::expr()->eq('allDay', true))
         );
 
@@ -116,7 +87,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
-            . ' WHERE e.allDay = :allDay AND c.id = :id'
+            . ' WHERE e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
@@ -134,10 +105,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
 
         $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(
-            1,
             new \DateTime(),
             new \DateTime(),
-            false,
             ['allDay' => true]
         );
 
@@ -146,7 +115,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
-            . ' WHERE e.allDay = :allDay AND c.id = :id'
+            . ' WHERE e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
@@ -163,18 +132,14 @@ class CalendarEventRepositoryTest extends OrmTestCase
         /** @var CalendarEventRepository $repo */
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
 
-        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(1, new \DateTime(), new \DateTime());
+        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(new \DateTime(), new \DateTime());
 
         $this->assertEquals(
             'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
-            . ' WHERE c.public = :public AND (c.id IN(SELECT connection.calendar'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarProperty connection'
-            . ' WHERE connection.targetCalendar = :id'
-            . ' AND connection.calendarAlias = :calendarAlias'
-            . ' AND connection.visible = true))'
+            . ' WHERE c.public = :public'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
@@ -190,7 +155,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
 
         $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
-            1,
             new \DateTime(),
             new \DateTime(),
             new Criteria(Criteria::expr()->eq('allDay', true))
@@ -201,11 +165,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
-            . ' WHERE c.public = :public AND e.allDay = :allDay AND (c.id IN(SELECT connection.calendar'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarProperty connection'
-            . ' WHERE connection.targetCalendar = :id'
-            . ' AND connection.calendarAlias = :calendarAlias'
-            . ' AND connection.visible = true))'
+            . ' WHERE c.public = :public AND e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
@@ -223,7 +183,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
 
         $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
-            1,
             new \DateTime(),
             new \DateTime(),
             ['allDay' => true]
@@ -234,11 +193,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
-            . ' WHERE c.public = :public AND e.allDay = :allDay AND (c.id IN(SELECT connection.calendar'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarProperty connection'
-            . ' WHERE connection.targetCalendar = :id'
-            . ' AND connection.calendarAlias = :calendarAlias'
-            . ' AND connection.visible = true))'
+            . ' WHERE c.public = :public AND e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
