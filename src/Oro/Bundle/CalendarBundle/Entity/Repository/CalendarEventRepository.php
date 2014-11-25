@@ -133,32 +133,4 @@ class CalendarEventRepository extends EntityRepository
             }
         }
     }
-
-    /**
-     * Adds connected calendars to a query builder
-     *
-     * @param QueryBuilder  $qb
-     * @param int           $calendarId
-     * @param string        $calendarAlias
-     *
-     * @return QueryBuilder
-     */
-    protected function addCalendarConnectionsQueryBuilder(QueryBuilder $qb, $calendarId, $calendarAlias)
-    {
-        $connectionRepo = $this->getEntityManager()->getRepository('OroCalendarBundle:CalendarProperty');
-        $qbConnections  = $connectionRepo->createQueryBuilder('connection')
-            ->select('connection.calendar')
-            ->where(
-                'connection.targetCalendar = :id'
-                . ' AND connection.calendarAlias = :calendarAlias'
-                . ' AND connection.visible = true'
-            );
-
-        $qb
-            ->andWhere($qb->expr()->in('c.id', $qbConnections->getDQL()))
-            ->setParameter('id', $calendarId)
-            ->setParameter('calendarAlias', $calendarAlias);
-
-        return $qb;
-    }
 }
