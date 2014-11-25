@@ -234,6 +234,11 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     protected $invitationStatus;
 
+    /**
+     * @var boolean
+     */
+    protected $notifyInvitedUsers;
+
     public function __construct()
     {
         parent::__construct();
@@ -584,6 +589,22 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     protected function isValid($invitationStatus)
     {
         return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->availableStatuses);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isNotifyInvitedUsers()
+    {
+        return $this->notifyInvitedUsers;
+    }
+
+    /**
+     * @param boolean $notifyInvitedUsers
+     */
+    public function setNotifyInvitedUsers($notifyInvitedUsers)
+    {
+        $this->notifyInvitedUsers = $notifyInvitedUsers;
     }
 
     /**

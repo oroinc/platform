@@ -44,7 +44,8 @@
                     form_row(form.allDay),
                     form_row(form.backgroundColor),
                     form_row(form.reminders),
-                    form_row(form.childEvents)
+                    form_row(form.childEvents),
+                    form_row(form.notifyInvitedUsers)
                 ]
             }
         ]
@@ -70,4 +71,49 @@
         'dataBlocks': dataBlocks
     } %}
     {{ parent() }}
+
+    {% if entity.invitationStatus and entity.parent is null and entity.childEvents %}
+    <script type="text/javascript">
+        /* jshint browser:true, devel:true */
+        /* global require */
+        require(['jquery', 'orotranslation/js/translator', 'oroui/js/modal'],
+                function ($, __, Modal) {
+                'use strict';
+
+                var isModalShown = false;
+
+                $('#{{ form.vars.name }}').submit(function (e) {
+                    if (!isModalShown) {
+                        var $form = $(this).closest('form'),
+                        $notifyInvitedUsers = $form.find('input[name="{{ form.vars.name }}[notifyInvitedUsers]"]'),
+                        confirm = new Modal({
+                            title: __('Notify invited users'),
+                            okText: __('Notify'),
+                            cancelText: __("Don't notify"),
+                            content: __('All invited users will be notified of changes.'),
+                            className: 'modal modal-primary',
+                            okButtonClass: 'btn-primary btn-large',
+                            handleClose: true
+                        });
+
+                        confirm.on('ok', function () {
+                            $notifyInvitedUsers.val(true);
+                            $form.submit();
+                            isModalShown = false;
+                        });
+                        confirm.on('cancel', function () {
+                            $form.submit();
+                            isModalShown = false;
+                        });
+                        confirm.on('close', function () {
+                            isModalShown = false;
+                        });
+                        confirm.open();
+                        isModalShown = true;
+                        e.preventDefault();
+                    }
+                });
+            });
+    </script>
+    {% endif %}
 {% endblock content_data %}
