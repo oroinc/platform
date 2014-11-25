@@ -16,9 +16,9 @@ parameters:
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
     oro_calendar.calendar_provider.system.class:                 Oro\Bundle\CalendarBundle\Provider\SystemCalendarProvider
     oro_calendar.calendar_provider.public.class:                 Oro\Bundle\CalendarBundle\Provider\PublicCalendarProvider
-    oro_calendar.calendar_event.user_normalizer.class:           Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer
-    oro_calendar.calendar_event.system_normalizer.class:         Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer
-    oro_calendar.calendar_event.public_normalizer.class:         Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer
+    oro_calendar.calendar_event_normalizer.user.class:           Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer
+    oro_calendar.calendar_event_normalizer.system.class:         Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer
+    oro_calendar.calendar_event_normalizer.public.class:         Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer
     oro_calendar.autocomplete.user_calendar_handler.class:       Oro\Bundle\CalendarBundle\Autocomplete\UserCalendarHandler
 
 services:
@@ -101,7 +101,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_locale.formatter.name
-            - @oro_calendar.calendar_event.user_normalizer
+            - @oro_calendar.calendar_event_normalizer.user
         tags:
             - { name: oro_calendar.calendar_provider, alias: user }
 
@@ -109,7 +109,7 @@ services:
         class: %oro_calendar.calendar_provider.system.class%
         arguments:
             - @oro_entity.doctrine_helper
-            - @oro_calendar.calendar_event.system_normalizer
+            - @oro_calendar.calendar_event_normalizer.system
         tags:
             - { name: oro_calendar.calendar_provider, alias: system }
 
@@ -117,23 +117,23 @@ services:
         class: %oro_calendar.calendar_provider.public.class%
         arguments:
             - @oro_entity.doctrine_helper
-            - @oro_calendar.calendar_event.public_normalizer
+            - @oro_calendar.calendar_event_normalizer.public
         tags:
             - { name: oro_calendar.calendar_provider, alias: public }
 
-    oro_calendar.calendar_event.user_normalizer:
-        class: %oro_calendar.calendar_event.user_normalizer.class%
+    oro_calendar.calendar_event_normalizer.user:
+        class: %oro_calendar.calendar_event_normalizer.user.class%
         arguments:
             - @oro_security.security_facade
             - @oro_reminder.entity.manager
 
-    oro_calendar.calendar_event.system_normalizer:
-        class: %oro_calendar.calendar_event.system_normalizer.class%
+    oro_calendar.calendar_event_normalizer.system:
+        class: %oro_calendar.calendar_event_normalizer.system.class%
         arguments:
             - @oro_reminder.entity.manager
 
-    oro_calendar.calendar_event.public_normalizer:
-        class: %oro_calendar.calendar_event.public_normalizer.class%
+    oro_calendar.calendar_event_normalizer.public:
+        class: %oro_calendar.calendar_event_normalizer.public.class%
         arguments:
             - @oro_reminder.entity.manager
 
