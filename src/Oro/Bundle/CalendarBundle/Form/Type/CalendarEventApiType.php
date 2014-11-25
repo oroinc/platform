@@ -34,6 +34,22 @@ class CalendarEventApiType extends CalendarEventType
         $builder
             ->add('id', 'hidden', array('mapped' => false))
             ->add(
+                'calendar',
+                'integer',
+                [
+                    'required' => false,
+                    'mapped'   => false
+                ]
+            )
+            ->add(
+                'calendarAlias',
+                'text',
+                [
+                    'required' => false,
+                    'mapped'   => false
+                ]
+            )
+            ->add(
                 'title',
                 'text',
                 [
@@ -81,22 +97,6 @@ class CalendarEventApiType extends CalendarEventType
                 'text',
                 [
                     'required' => false
-                ]
-            )
-            ->add(
-                'calendarAlias',
-                'text',
-                [
-                    'required' => false,
-                    'mapped'   => false
-                ]
-            )
-            ->add(
-                'calendar',
-                'integer',
-                [
-                    'required' => false,
-                    'mapped'   => false
                 ]
             )
             ->add(
