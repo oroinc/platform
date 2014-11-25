@@ -8,6 +8,7 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Oro\Bundle\ReminderBundle\Form\Type\MethodType;
@@ -64,7 +65,7 @@ class CalendarEventApiTypeTest extends TypeTestCase
             ->method('setCalendar')
             ->with(
                 $this->isInstanceOf('Oro\Bundle\CalendarBundle\Entity\CalendarEvent'),
-                'user',
+                Calendar::CALENDAR_ALIAS,
                 1
             );
 

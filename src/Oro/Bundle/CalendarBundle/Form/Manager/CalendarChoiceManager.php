@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Manager;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -82,7 +82,7 @@ class CalendarChoiceManager
                 if (empty($userCalendar['name'])) {
                     $userCalendar['name'] = $this->nameFormatter->format($this->securityFacade->getLoggedUser());
                 }
-                $userCalendar['alias'] = 'user';
+                $userCalendar['alias'] = Calendar::CALENDAR_ALIAS;
                 array_unshift($calendars, $userCalendar);
             }
         }
@@ -106,7 +106,7 @@ class CalendarChoiceManager
     public function setCalendar(CalendarEvent $event, $calendarAlias, $calendarId)
     {
         $calendar = $event->getCalendar();
-        if ($calendarAlias === 'user') {
+        if ($calendarAlias === Calendar::CALENDAR_ALIAS) {
             if (!$calendar || $calendar->getId() !== $calendarId) {
                 $event->setCalendar($this->findCalendar($calendarId));
             }

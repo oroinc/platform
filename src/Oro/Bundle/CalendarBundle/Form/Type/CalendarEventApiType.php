@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
@@ -146,7 +147,7 @@ class CalendarEventApiType extends CalendarEventType
         }
         $calendarAlias = $form->get('calendarAlias')->getData();
         if (empty($calendarAlias)) {
-            $calendarAlias = 'user';
+            $calendarAlias = Calendar::CALENDAR_ALIAS;
         }
 
         $this->calendarChoiceManager->setCalendar($data, $calendarAlias, (int)$calendarId);

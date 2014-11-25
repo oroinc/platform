@@ -64,7 +64,7 @@ class EntityListener
                 $calendarProperty = new CalendarProperty();
                 $calendarProperty
                     ->setTargetCalendar($calendar)
-                    ->setCalendarAlias('user')
+                    ->setCalendarAlias(Calendar::CALENDAR_ALIAS)
                     ->setCalendar($calendar->getId());
                 $em->persist($calendarProperty);
             }
