@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Symfony\Component\Form\FormView;
+
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventInviteesType;
-use Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CalendarEventInviteesTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EventsToUsersTransformer
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $transformer;
 
@@ -45,6 +49,60 @@ class CalendarEventInviteesTypeTest extends \PHPUnit_Framework_TestCase
             ->with(['autocomplete_alias' => 'users_without_current']);
 
         $this->type->setDefaultOptions($resolver);
+    }
+
+    public function testBuildView()
+    {
+        $firstUser = new User();
+        $firstUser->setUsername('1');
+        $secondUser = new User();
+        $secondUser->setUsername('2');
+
+        $firstCalendar = new Calendar();
+        $firstCalendar->setOwner($firstUser);
+        $secondCalendar = new Calendar();
+        $secondCalendar->setOwner($secondUser);
+
+        $firstEvent = new CalendarEvent();
+        $firstEvent->setCalendar($firstCalendar);
+        $secondEvent = new CalendarEvent();
+        $secondEvent->setCalendar($secondCalendar);
+
+        $formData = [$firstEvent, $secondEvent];
+        $transformedData = [$firstUser, $secondUser];
+
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($formData));
+
+        $this->transformer->expects($this->once())
+            ->method('transform')
+            ->with($formData)
+            ->will($this->returnValue($transformedData));
+
+        $converter = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\ConverterInterface');
+        $converter->expects($this->any())
+            ->method('convertItem')
+            ->will($this->returnCallback([$this, 'convertEvent']));
+
+        $formView = new FormView();
+        $expectedSelectedData = json_encode([$this->convertEvent($firstUser), $this->convertEvent($secondUser)]);
+
+        $this->type->buildView($formView, $form, ['converter' => $converter]);
+
+        $this->assertArrayHasKey('attr', $formView->vars);
+        $this->assertEquals(['data-selected-data' => $expectedSelectedData], $formView->vars['attr']);
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return string
+     */
+    public function convertEvent(User $user)
+    {
+        return $user->getUsername();
     }
 
     public function testGetName()
