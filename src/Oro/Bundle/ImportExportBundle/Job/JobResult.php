@@ -57,6 +57,7 @@ class JobResult
 
     /**
      * @param boolean $successful
+     *
      * @return JobResult
      */
     public function setSuccessful($successful)
@@ -67,6 +68,7 @@ class JobResult
 
     /**
      * @param string $failureException
+     *
      * @return JobResult
      */
     public function addFailureException($failureException)
@@ -76,19 +78,19 @@ class JobResult
     }
 
     /**
-     * @param string $failureException
+     * @param array $failureException
+     *
+     * @return $this
      */
-    public function removeFailureException($failureException)
+    public function setFailureException(array $failureException)
     {
-        $key = array_search($failureException, $this->failureExceptions, true);
-
-        if (false !== $key) {
-            unset($this->failureExceptions[$key]);
-        }
+        $this->failureExceptions = $failureException;
+        return $this;
     }
 
     /**
      * @param ContextInterface $context
+     *
      * @return JobResult
      */
     public function setContext(ContextInterface $context)
@@ -99,6 +101,7 @@ class JobResult
 
     /**
      * @param int $jobId
+     *
      * @return JobResult
      */
     public function setJobId($jobId)
@@ -117,6 +120,7 @@ class JobResult
 
     /**
      * @param string $jobCode
+     *
      * @return JobResult
      */
     public function setJobCode($jobCode)
