@@ -3,15 +3,16 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
+use Oro\Bundle\IntegrationBundle\Event\AfterJobExecutionEvent;
 
 class SyncProcessor
 {
@@ -30,25 +31,31 @@ class SyncProcessor
     /** @var LoggerStrategy */
     protected $logger;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     * @param RegistryInterface $doctrineRegistry
-     * @param ProcessorRegistry $processorRegistry
-     * @param Executor          $jobExecutor
-     * @param TypesRegistry     $registry
-     * @param LoggerStrategy    $logger
+     * @param RegistryInterface        $doctrineRegistry
+     * @param ProcessorRegistry        $processorRegistry
+     * @param Executor                 $jobExecutor
+     * @param TypesRegistry            $registry
+     * @param LoggerStrategy           $logger
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         RegistryInterface $doctrineRegistry,
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
         TypesRegistry $registry,
-        LoggerStrategy $logger
+        LoggerStrategy $logger,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->doctrineRegistry  = $doctrineRegistry;
         $this->processorRegistry = $processorRegistry;
         $this->jobExecutor       = $jobExecutor;
         $this->registry          = $registry;
         $this->logger            = $logger;
+        $this->eventDispatcher   = $eventDispatcher;
     }
 
     /**
@@ -210,7 +217,10 @@ class SyncProcessor
             $counts['process'] += $counts['delete'] = $context->getDeleteCount();
             $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
         }
-        $exceptions = $this->getJobResultExceptions($jobResult, $integration, $connector);
+
+        $this->eventDispatcher->dispatch(AfterJobExecutionEvent::NAME, new AfterJobExecutionEvent($jobResult));
+
+        $exceptions = $jobResult->getFailureExceptions();
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
         $status = new Status();
@@ -260,24 +270,5 @@ class SyncProcessor
         }
 
         return $isSuccess;
-    }
-
-    /**
-     * @param JobResult   $jobResult
-     * @param Integration $integration
-     * @param string      $connector
-     *
-     * @return array
-     */
-    protected function getJobResultExceptions(JobResult $jobResult, Integration $integration, $connector)
-    {
-        /** @var array $exceptions */
-        $exceptions    = $jobResult->getFailureExceptions();
-        /** @var ConnectorInterface $connectorType */
-        $connectorType = $this->registry->getConnectorType($integration->getType(), $connector);
-        /** @var TransportInterface $transport */
-        $transport     = $connectorType->getTransport();
-
-        return $transport->processExceptionMessages($exceptions);
     }
 }

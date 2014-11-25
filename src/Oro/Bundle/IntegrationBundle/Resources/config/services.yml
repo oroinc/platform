@@ -160,6 +160,7 @@ services:
           - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
           - @oro_integration.logger.strategy
+          - @event_dispatcher
         lazy: true
 
     oro_integration.provider.connector_context_mediator:
