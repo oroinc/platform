@@ -98,11 +98,11 @@ abstract class AbstractSyncProcessor implements LoggerAwareInterface
     {
         $counts = array_fill_keys(['process', 'processed', 'updated', 'deleted', 'added', 'invalid'], 0);
         if ($context) {
-            $counts['read'] = $context->getReadCount();
-            $counts['processed'] += $counts['added'] = $context->getAddCount();
-            $counts['processed'] += $counts['updated'] = $context->getUpdateCount();
-            $counts['processed'] += $counts['deleted'] = $context->getDeleteCount();
-            $counts['invalid'] = $context->getErrorEntriesCount();
+            $counts['read'] = (int)$context->getReadCount();
+            $counts['processed'] += $counts['added'] = (int)$context->getAddCount();
+            $counts['processed'] += $counts['updated'] = (int)$context->getUpdateCount();
+            $counts['processed'] += $counts['deleted'] = (int)$context->getDeleteCount();
+            $counts['invalid'] = (int)$context->getErrorEntriesCount();
         }
 
         return $counts;
