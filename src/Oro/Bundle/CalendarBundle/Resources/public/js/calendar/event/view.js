@@ -1,12 +1,8 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing',
-    'oro/dialog-widget', 'oroui/js/loading-mask', 'orocalendar/js/form-validation',
-    'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
-], function (_, Backbone, __, routing,
-     DialogWidget, LoadingMask, FormValidation,
-     DeleteConfirmation, fieldFormatter
-) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
+], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
     var $ = Backbone.$;

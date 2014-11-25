@@ -89,7 +89,8 @@ class CalendarEventApiType extends CalendarEventType
                     'required' => false,
                     'label'    => 'oro.reminder.entity_plural_label'
                 ]
-            )->add(
+            )
+            ->add(
                 'childEvents',
                 'oro_calendar_event_invitees',
                 [

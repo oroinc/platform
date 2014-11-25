@@ -74,13 +74,16 @@ class EventsToUsersTransformer implements DataTransformerInterface
         $events = new ArrayCollection();
 
         /** @var User $user */
+        $userIds = [];
         foreach ($value as $user) {
-            $calendar = $calendarRepository->findDefaultCalendar($user->getId(), $organizationId);
-            if ($calendar) {
-                $event = new CalendarEvent();
-                $event->setCalendar($calendar);
-                $events->add($event);
-            }
+            $userIds[] = $user->getId();
+        }
+
+        $calendars = $calendarRepository->findDefaultCalendars($userIds, $organizationId);
+        foreach ($calendars as $calendar) {
+            $event = new CalendarEvent();
+            $event->setCalendar($calendar);
+            $events->add($event);
         }
 
         return $events;
