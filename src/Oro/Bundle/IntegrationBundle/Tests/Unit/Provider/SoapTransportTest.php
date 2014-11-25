@@ -171,19 +171,4 @@ class SoapTransportTest extends \PHPUnit_Framework_TestCase
         $this->transport->init($this->transportEntity);
         $this->transport->call('test');
     }
-
-    public function testProcessExceptionMessages()
-    {
-        $message = '<?xml version="1.0" encoding="UTF-8"?>' .
-            '<SOAP-ENV:Body><ns1:login><username xsi:type="xsd:string">abc</username>' .
-            '<apiKey xsi:type="xsd:string">abcabc1</apiKey></ns1:login></SOAP-ENV:Body></SOAP-ENV:Envelope>';
-
-        $validMessage = '<?xml version="1.0" encoding="UTF-8"?>' .
-            '<SOAP-ENV:Body><ns1:login><username xsi:type="xsd:string">abc</username>' .
-            '</ns1:login></SOAP-ENV:Body></SOAP-ENV:Envelope>';
-
-        $result = $this->transport->processExceptionMessages([$message]);
-
-        $this->assertEquals([$validMessage], $result);
-    }
 }

@@ -2,41 +2,26 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Oro\Bundle\IntegrationBundle\Event\AfterJobExecutionEvent;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\ImportExportBundle\Job\JobResult;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
 
-class SyncProcessor
+class SyncProcessor extends AbstractSyncProcessor
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $doctrineRegistry;
 
-    /** @var ProcessorRegistry */
-    protected $processorRegistry;
-
-    /** @var Executor */
-    protected $jobExecutor;
-
-    /** @var TypesRegistry */
-    protected $registry;
-
-    /** @var LoggerStrategy */
-    protected $logger;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
     /**
-     * @param RegistryInterface        $doctrineRegistry
+     * @param ManagerRegistry          $doctrineRegistry
      * @param ProcessorRegistry        $processorRegistry
      * @param Executor                 $jobExecutor
      * @param TypesRegistry            $registry
@@ -44,19 +29,16 @@ class SyncProcessor
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        RegistryInterface $doctrineRegistry,
+        ManagerRegistry $doctrineRegistry,
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
         TypesRegistry $registry,
-        LoggerStrategy $logger,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        LoggerStrategy $logger = null
     ) {
-        $this->doctrineRegistry  = $doctrineRegistry;
-        $this->processorRegistry = $processorRegistry;
-        $this->jobExecutor       = $jobExecutor;
-        $this->registry          = $registry;
-        $this->logger            = $logger;
-        $this->eventDispatcher   = $eventDispatcher;
+        $this->doctrineRegistry = $doctrineRegistry;
+
+        parent::__construct($processorRegistry, $jobExecutor, $registry, $eventDispatcher, $logger);
     }
 
     /**
@@ -119,16 +101,6 @@ class SyncProcessor
         }
 
         return $isSuccess;
-    }
-
-    /**
-     * Get logger strategy
-     *
-     * @return LoggerStrategy
-     */
-    public function getLoggerStrategy()
-    {
-        return $this->logger;
     }
 
     /**
@@ -204,23 +176,22 @@ class SyncProcessor
      */
     protected function processImport($connector, $jobName, $configuration, Integration $integration, $saveStatus)
     {
+        $event = new SyncEvent($jobName, $configuration);
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
+        $configuration = $event->getConfiguration();
+
         $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
+
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_AFTER, new SyncEvent($jobName, $configuration, $jobResult));
 
         /** @var ContextInterface $contexts */
         $context = $jobResult->getContext();
 
-        $counts = array_fill_keys(['process', 'read', 'update', 'delete', 'add'], 0);
-        $connectorData = [];
+        $connectorData = $errors = [];
         if ($context) {
-            $counts['read'] = $context->getReadCount();
-            $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['update'] = $context->getUpdateCount();
-            $counts['process'] += $counts['delete'] = $context->getDeleteCount();
             $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
+            $errors        = $context->getErrors();
         }
-
-        $this->eventDispatcher->dispatch(AfterJobExecutionEvent::NAME, new AfterJobExecutionEvent($jobResult));
-
         $exceptions = $jobResult->getFailureExceptions();
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
@@ -228,36 +199,25 @@ class SyncProcessor
         $status->setConnector($connector);
         $status->setData(is_array($connectorData) ? $connectorData : []);
 
-        $message = sprintf(
-            "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
-            $counts['read'],
-            $counts['process'],
-            $counts['update'],
-            $counts['add'],
-            $counts['delete'],
-            $context->getErrorEntriesCount()
-        );
+        $message = $this->formatResultMessage($context);
         $this->logger->info($message);
 
-        if (!$isSuccess) {
+        if ($isSuccess) {
+            if ($errors) {
+                $warningsText = 'Some entities were skipped due to warnings:' . PHP_EOL;
+                $warningsText .= implode($errors, PHP_EOL);
+                $this->logger->warning($warningsText);
+
+                $message .= PHP_EOL . $warningsText;
+            }
+
+            $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
+        } else {
             $this->logger->error('Errors were occurred:');
             $exceptions = implode(PHP_EOL, $exceptions);
 
             $this->logger->error($exceptions);
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
-        } else {
-            $warningsText = PHP_EOL;
-
-            if ($context->getErrors()) {
-                $warningsText .= 'Some entities were skipped due to warnings:' . PHP_EOL;
-                foreach ($context->getErrors() as $error) {
-                    $warningsText .= $error . PHP_EOL;
-                }
-
-                $this->logger->warning($warningsText);
-            }
-
-            $status->setCode(Status::STATUS_COMPLETED)->setMessage($message . $warningsText);
         }
 
         if ($saveStatus) {

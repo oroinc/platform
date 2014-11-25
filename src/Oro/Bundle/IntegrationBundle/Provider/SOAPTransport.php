@@ -129,20 +129,6 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function processExceptionMessages(array $exceptions)
-    {
-        $result = [];
-
-        foreach ($exceptions as $exception) {
-            $result[] = preg_replace("/<apiKey.*?>(.*)<\/apiKey>/i", "", $exception);
-        }
-
-        return $result;
-    }
-
-    /**
      * @param string $wsdlUrl
      *
      * @return \SoapClient

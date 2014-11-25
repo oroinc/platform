@@ -28,6 +28,9 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $log;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
     /**
      * Setup test obj and mock
      */
@@ -44,17 +47,23 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->registry    = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $this->integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $this->log         = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+        $this->registry                = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
+        $this->integration             = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->log                     = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+        $this->eventDispatcher         = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     }
 
-    /**
-     * Tear down
-     */
     protected function tearDown()
     {
-        unset($this->em, $this->processorRegistry, $this->registry, $this->jobExecutor, $this->processor, $this->log);
+        unset(
+            $this->em,
+            $this->eventDispatcher,
+            $this->processorRegistry,
+            $this->registry,
+            $this->jobExecutor,
+            $this->processor,
+            $this->log
+        );
     }
 
     /**
@@ -85,6 +94,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
                 $this->processorRegistry,
                 $this->jobExecutor,
                 $this->registry,
+                $this->eventDispatcher,
                 $this->log
             ]
         );
@@ -133,7 +143,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 
         $realConnector = new TestConnector();
         $this->registry
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('getConnectorType')
             ->will($this->returnValue($realConnector));
 

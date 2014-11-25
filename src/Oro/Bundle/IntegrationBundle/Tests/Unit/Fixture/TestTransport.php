@@ -38,12 +38,4 @@ class TestTransport implements TransportInterface
     {
         return 'FQCN';
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function processExceptionMessages(array $exceptions)
-    {
-        return $exceptions;
-    }
 }

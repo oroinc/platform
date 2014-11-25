@@ -31,11 +31,4 @@ interface TransportInterface
      * @return string
      */
     public function getSettingsEntityFQCN();
-
-    /**
-     * @param array $messages
-     *
-     * @return array
-     */
-    public function processExceptionMessages(array $messages);
 }

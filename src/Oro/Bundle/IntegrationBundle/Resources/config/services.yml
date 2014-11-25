@@ -157,8 +157,8 @@ services:
           - @oro_importexport.processor.registry
           - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
-          - @oro_integration.logger.strategy
           - @event_dispatcher
+          - @oro_integration.logger.strategy
         lazy: true
 
     oro_integration.provider.connector_context_mediator:
@@ -186,6 +186,7 @@ services:
             - @oro_importexport.processor.registry
             - @oro_integration.job_executor
             - @oro_integration.manager.types_registry
+            - @event_dispatcher
             - @oro_integration.logger.strategy
         lazy: true
 

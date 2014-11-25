@@ -76,15 +76,14 @@ class JobResult
     }
 
     /**
-     * @param string $failureException
+     * @param array $failureException
+     *
+     * @return $this
      */
-    public function removeFailureException($failureException)
+    public function setFailureExceptions(array $failureException)
     {
-        $key = array_search($failureException, $this->failureExceptions, true);
-
-        if (false !== $key) {
-            unset($this->failureExceptions[$key]);
-        }
+        $this->failureExceptions = $failureException;
+        return $this;
     }
 
     /**
