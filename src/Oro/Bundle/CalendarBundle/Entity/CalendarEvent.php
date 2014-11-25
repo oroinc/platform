@@ -106,14 +106,14 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent", orphanRemoval=true, cascade={"all"})
      **/
     protected $childEvents;
 
     /**
      * @var CalendarEvent
      *
-     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="childEvents")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      **/
     protected $parent;
@@ -538,9 +538,26 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     {
         if ($this->childEvents->contains($calendarEvent)) {
             $this->childEvents->removeElement($calendarEvent);
+            $calendarEvent->setParent(null);
         }
 
         return $this;
+    }
+
+    /**
+     * @param Calendar $calendar
+     *
+     * @return CalendarEvent|null
+     */
+    public function getChildEventByCalendar(Calendar $calendar)
+    {
+        $result = $this->childEvents->filter(
+            function (CalendarEvent $item) use ($calendar) {
+                return $item->getCalendar() == $calendar;
+            }
+        );
+
+        return $result->count() ? $result->first() : null;
     }
 
     /**

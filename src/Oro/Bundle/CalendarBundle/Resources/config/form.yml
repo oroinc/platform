@@ -1,10 +1,12 @@
 parameters:
-    oro_calendar.calendar_event.form.type.class:              Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType
-    oro_calendar.calendar_event.form.type.api.class:          Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType
-    oro_calendar.calendar_event.form.handler.class:           Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler
-    oro_calendar.calendar_event.form.handler.api.class:       Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler
-    oro_calendar.calendar_property.form.type.api.class:       Oro\Bundle\CalendarBundle\Form\Type\CalendarPropertyApiType
-    oro_calendar.calendar_property.form.handler.api.class:    Oro\Bundle\CalendarBundle\Form\Handler\CalendarPropertyApiHandler
+    oro_calendar.calendar_event.form.type.class:                   Oro\Bundle\CalendarBundle\Form\Type\CalendarEventType
+    oro_calendar.calendar_event.form.type.api.class:               Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType
+    oro_calendar.calendar_event.form.handler.class:                Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler
+    oro_calendar.calendar_event.form.handler.api.class:            Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler
+    oro_calendar.calendar_event_invitees.form.type.class:          Oro\Bundle\CalendarBundle\Form\Type\CalendarEventInviteesType
+    oro_calendar.calendar_event.transformer.events_to_users.class: Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer
+    oro_calendar.calendar_property.form.type.api.class:            Oro\Bundle\CalendarBundle\Form\Type\CalendarPropertyApiType
+    oro_calendar.calendar_property.form.handler.api.class:         Oro\Bundle\CalendarBundle\Form\Handler\CalendarPropertyApiHandler
 
 services:
     oro_calendar.calendar_event.form.type:
@@ -51,6 +53,19 @@ services:
             - @oro_calendar.calendar_event.form.api
             - @request
             - @doctrine.orm.entity_manager
+
+    oro_calendar.calendar_event_invitees.form.type:
+        class: %oro_calendar.calendar_event_invitees.form.type.class%
+        arguments:
+            - @oro_calendar.calendar_event.transformer.events_to_users
+        tags:
+            - { name: form.type, alias: oro_calendar_event_invitees }
+
+    oro_calendar.calendar_event.transformer.events_to_users:
+        class: %oro_calendar.calendar_event.transformer.events_to_users.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
 
     oro_calendar.calendar_property.form.type.api:
         class: %oro_calendar.calendar_property.form.type.api.class%

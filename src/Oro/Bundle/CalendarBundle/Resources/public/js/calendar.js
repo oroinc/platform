@@ -193,11 +193,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, _.pick(eventModel.toJSON(), _.keys(_.omit(fcEvent, ['id']))));
             this.prepareViewModel(fcEvent);
-            this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+            // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+            this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
         onEventDeleted: function (eventModel) {
-            this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            // this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
         onConnectionAdded: function () {

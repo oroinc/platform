@@ -2,7 +2,7 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
     'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
-    ], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
+], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -155,6 +155,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             this._showMask(__('Deleting...'));
         },
 
+        showLoadingMask: function () {
+            this._showMask(__('Loading...'));
+        },
+
         _showMask: function (message) {
             if (this.loadingMask) {
                 this.loadingMask.$el
@@ -190,6 +194,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             var inputs = form.find('[name]');
             var fieldNameRegex = /\[(\w+)\]/g;
 
+            // show loading mask if child events users should be updated
+            if (modelData.childEvents) {
+                this.eventDialog.once('renderComplete', function() {
+                    self.showLoadingMask();
+                });
+            }
+
             _.each(inputs, function (input) {
                 input = $(input);
                 var name = input.attr('name'),
@@ -208,6 +219,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         input.val(value);
                     }
                     input.change();
+                }
+
+                // hide loading mask if child events users should be updated
+                if (name.indexOf('[childEvents]') != -1 && modelData.childEvents) {
+                    input.on('select2-data-loaded', function() {
+                        self._hideMask();
+                    });
                 }
             });
 
