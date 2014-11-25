@@ -139,7 +139,7 @@ class SyncProcessor
         array $parameters = [],
         $saveStatus = true
     ) {
-        if (!$integration->getEnabled()) {
+        if (!$integration->isEnabled()) {
             return false;
         }
 

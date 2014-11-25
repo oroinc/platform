@@ -128,7 +128,7 @@ class SyncProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->integration
             ->expects($this->once())
-            ->method('getEnabled')
+            ->method('isEnabled')
             ->will($this->returnValue(true));
 
         $realConnector = new TestConnector();

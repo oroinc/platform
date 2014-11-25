@@ -129,7 +129,7 @@ class IntegrationController extends Controller
      */
     public function toggleAction(Integration $integration)
     {
-        if ($integration->getEnabled()) {
+        if ($integration->isEnabled()) {
             $integration->setEnabled(false);
             $this->get('session')->getFlashBag()->add(
                 'success',
