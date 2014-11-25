@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer;
 
@@ -30,6 +31,14 @@ class CalendarEventInviteesType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer($this->eventsToUsersTransformer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(['autocomplete_alias' => 'users_without_current']);
     }
 
     /**

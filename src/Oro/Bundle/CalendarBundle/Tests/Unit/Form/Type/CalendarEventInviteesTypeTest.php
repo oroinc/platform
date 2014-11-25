@@ -37,6 +37,16 @@ class CalendarEventInviteesTypeTest extends \PHPUnit_Framework_TestCase
         $this->type->buildForm($builder, []);
     }
 
+    public function testSetDefaultOptions()
+    {
+        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver->expects($this->once())
+            ->method('setDefaults')
+            ->with(['autocomplete_alias' => 'users_without_current']);
+
+        $this->type->setDefaultOptions($resolver);
+    }
+
     public function testGetName()
     {
         $this->assertEquals(CalendarEventInviteesType::NAME, $this->type->getName());
