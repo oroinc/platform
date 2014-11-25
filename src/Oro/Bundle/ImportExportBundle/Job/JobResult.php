@@ -82,7 +82,7 @@ class JobResult
      *
      * @return $this
      */
-    public function setFailureException(array $failureException)
+    public function setFailureExceptions(array $failureException)
     {
         $this->failureExceptions = $failureException;
         return $this;

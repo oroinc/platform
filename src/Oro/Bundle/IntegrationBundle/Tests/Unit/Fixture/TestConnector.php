@@ -37,12 +37,4 @@ class TestConnector implements ConnectorInterface
     {
         return 'test Type';
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTransport()
-    {
-        return new TestTransport();
-    }
 }
