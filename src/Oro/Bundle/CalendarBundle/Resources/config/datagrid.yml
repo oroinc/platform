@@ -294,7 +294,7 @@ datagrid:
     system-calendar-event-grid:
         extends: base-system-calendar-event-grid
         source:
-            acl_resource: oro_system_calendar_view
+            # @TODO: Add acl_resource: oro_system_calendar_view after BAP-5989 was implemented
             query:
                 where:
                     and:

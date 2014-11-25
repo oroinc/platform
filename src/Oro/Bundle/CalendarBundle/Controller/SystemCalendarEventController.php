@@ -20,14 +20,6 @@ class SystemCalendarEventController extends Controller
     /**
      * @Route("/{id}/event", name="oro_calendar_system_event_index", requirements={"id"="\d+"})
      * @Template
-     * @TODO: Replace to AclAncestor after implemented BAP-5989
-     * @Acl(
-     *      id="oro_system_calendar_view",
-     *      type="entity",
-     *      class="OroCalendarBundle:SystemCalendar",
-     *      permission="VIEW",
-     *      group_name=""
-     * )
      */
     public function indexAction(SystemCalendar $entity)
     {
