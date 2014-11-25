@@ -1,7 +1,7 @@
 <div class="btn-group" role="group">
     {% set statuses = entity.availableInvitationStatuses %}
     {% for status in statuses  %}
-        {% set statusName = calendarMacros.calendar_event_invitation_status(status) %}
+        {% set statusName = calendarMacros.calendar_event_invitation_actions(status) %}
         {{ UI.link({
             'aCss': 'btn btn-default',
             'data':  {'page-component-module': 'orocalendar/js/app/components/change-status-component'},

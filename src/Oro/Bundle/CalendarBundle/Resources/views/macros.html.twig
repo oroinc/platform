@@ -79,6 +79,10 @@
     {{ ('oro.calendar.calendarevent.statuses.' ~ statusCode)|trans }}
 {%- endmacro -%}
 
+{%- macro calendar_event_invitation_actions(statusCode) -%}
+    {{ ('oro.calendar.calendarevent.actions.' ~ statusCode)|trans }}
+{%- endmacro -%}
+
 {% macro calendar_event_form_template(id, form) %}
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
