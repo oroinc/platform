@@ -89,6 +89,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 array(
                     'allow_change_calendar' => false,
+                    'layout_template'       => false,
                     'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
                     'intention'             => 'calendar_event',
                 )

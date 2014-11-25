@@ -10,7 +10,7 @@ class SystemCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     protected function applyPermission(&$resultItem, $calendarId)
     {
         //@TODO: it must be override in BAP-5998
-        $resultItem['editable']  = true;
-        $resultItem['removable'] = true;
+        $resultItem['editable']  = false;
+        $resultItem['removable'] = false;
     }
 }
