@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -10,6 +9,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager;
 
 class CalendarChoiceType extends AbstractType
@@ -41,8 +41,9 @@ class CalendarChoiceType extends AbstractType
         $resolver->setDefaults(
             array(
                 'choices'              => function (Options $options) {
-                    return $this->calendarChoiceManager->getChoices();
+                    return $this->calendarChoiceManager->getChoices($options['is_new']);
                 },
+                'is_new'               => false,
                 'translatable_options' => false
             )
         );

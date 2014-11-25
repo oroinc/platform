@@ -41,6 +41,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 class SystemCalendar
 {
     const CALENDAR_ALIAS = 'system';
+    const PUBLIC_CALENDAR_ALIAS = 'public';
 
     /**
      * @ORM\Id

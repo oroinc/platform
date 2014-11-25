@@ -15,6 +15,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
     return Backbone.View.extend({
         /** @property {Object} */
         options: {
+            calendar: null,
+            connections: null,
             colorManager: null,
             widgetRoute: null,
             widgetOptions: null
@@ -246,10 +248,20 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         getEventForm: function () {
             var modelData = this.model.toJSON(),
-                form = this.fillForm(this.template(modelData), modelData),
+                templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData),
+                form = this.fillForm(this.template(templateData), modelData),
                 calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
             form.find('[name*="backgroundColor"]')
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
+            form.find('[name*="calendarUid"]')
+                .on('change', _.bind(function (e) {
+                    var $emptyColor = form.find('.empty-color'),
+                        $selector = $(e.currentTarget),
+                        tagName = $selector.prop('tagName').toUpperCase(),
+                        calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
+                        colors = this.options.colorManager.getCalendarColors(calendarUid);
+                    $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
+                }, this));
             return form;
         },
 
@@ -307,6 +319,50 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
 
             return current;
+        },
+
+        getEventFormTemplateData: function (isNew) {
+            var templateType = '',
+                calendars = [],
+                ownCalendar = null,
+                isOwnCalendar = function (item) {
+                    return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
+                },
+                isApplicable = function (item) {
+                    // TODO: add ACL check
+                    if (isOwnCalendar(item)) {
+                        return true;
+                    }
+                    return (item.get('calendarAlias') === 'system' || item.get('calendarAlias') === 'public');
+                };
+
+            this.options.connections.each(function (item) {
+                var calendar;
+                if (isApplicable(item)) {
+                    calendar = {uid: item.get('calendarUid'), name: item.get('calendarName')};
+                    if (!ownCalendar && isOwnCalendar(item)) {
+                        ownCalendar = calendar;
+                    } else {
+                        calendars.push(calendar);
+                    }
+                }
+            }, this);
+
+            if (calendars.length) {
+                if (isNew && calendars.length === 1) {
+                    templateType = 'single';
+                } else {
+                    if (ownCalendar) {
+                        calendars.unshift(ownCalendar);
+                    }
+                    templateType = 'multiple';
+                }
+            }
+
+            return {
+                calendarUidTemplateType: templateType,
+                calendars: calendars
+            };
         }
     });
 });

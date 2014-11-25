@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -90,6 +92,7 @@ class CalendarEventType extends AbstractType
         $resolver->setDefaults(
             [
                 'allow_change_calendar' => false,
+                'layout_template'       => false,
                 'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
                 'intention'             => 'calendar_event'
             ]
@@ -110,15 +113,34 @@ class CalendarEventType extends AbstractType
             return;
         }
 
-        $form->add(
-            'calendarUid',
-            'oro_calendar_choice',
-            [
-                'required' => false,
-                'mapped'   => false,
-                'label'    => 'oro.calendar.calendarevent.calendar.label'
-            ]
-        );
+        if ($config->getOption('layout_template')) {
+            $form->add(
+                'calendarUid',
+                'oro_calendar_choice_template',
+                [
+                    'required' => false,
+                    'mapped'   => false,
+                    'label'    => 'oro.calendar.calendarevent.calendar.label'
+                ]
+            );
+        } else {
+            /** @var CalendarEvent $data */
+            $data = $event->getData();
+            $form->add(
+                $form->getConfig()->getFormFactory()->createNamed(
+                    'calendarUid',
+                    'oro_calendar_choice',
+                    $this->getCalendarUid($data),
+                    [
+                        'required'        => false,
+                        'mapped'          => false,
+                        'auto_initialize' => false,
+                        'is_new'          => !$data || !$data->getId(),
+                        'label'           => 'oro.calendar.calendarevent.calendar.label'
+                    ]
+                )
+            );
+        }
     }
 
     /**
@@ -127,5 +149,28 @@ class CalendarEventType extends AbstractType
     public function getName()
     {
         return 'oro_calendar_event';
+    }
+
+    /**
+     * @param CalendarEvent $data
+     *
+     * @return string
+     */
+    protected function getCalendarUid(CalendarEvent $data = null)
+    {
+        if ($data) {
+            if ($data->getCalendar()) {
+                return sprintf('%s_%d', Calendar::CALENDAR_ALIAS, $data->getCalendar()->getId());
+            }
+            if ($data->getSystemCalendar()) {
+                $alias = $data->getSystemCalendar()->isPublic()
+                    ? SystemCalendar::PUBLIC_CALENDAR_ALIAS
+                    : SystemCalendar::CALENDAR_ALIAS;
+
+                return sprintf('%s_%d', $alias, $data->getSystemCalendar()->getId());
+            }
+        }
+
+        return null;
     }
 }

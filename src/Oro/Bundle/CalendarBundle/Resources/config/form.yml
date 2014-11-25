@@ -7,6 +7,7 @@ parameters:
     oro_calendar.calendar_property.form.handler.api.class:    Oro\Bundle\CalendarBundle\Form\Handler\CalendarPropertyApiHandler
     oro_calendar.calendar_choice.manager.class:               Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager
     oro_calendar.calendar_choice.form.type.class:             Oro\Bundle\CalendarBundle\Form\Type\CalendarChoiceType
+    oro_calendar.calendar_choice_template.form.type.class:    Oro\Bundle\CalendarBundle\Form\Type\CalendarChoiceTemplateType
 
 services:
     oro_calendar.calendar_event.form.type:
@@ -28,8 +29,16 @@ services:
         arguments:
             - "oro_calendar_event_form"
             - "oro_calendar_event"
+
+    oro_calendar.calendar_event.form.template:
+        class:           Symfony\Component\Form\Form
+        factory_method:  createNamed
+        factory_service: form.factory
+        arguments:
+            - "oro_calendar_event_form"
+            - "oro_calendar_event"
             - ~
-            - {allow_change_calendar: true}
+            - {allow_change_calendar: true, layout_template: true}
 
     oro_calendar.calendar_event.form.api:
         class:           Symfony\Component\Form\Form
@@ -109,3 +118,8 @@ services:
             - @oro_calendar.calendar_choice.manager
         tags:
             - { name: form.type, alias: oro_calendar_choice }
+
+    oro_calendar.calendar_choice_template.form.type:
+        class: %oro_calendar.calendar_choice_template.form.type.class%
+        tags:
+            - { name: form.type, alias: oro_calendar_choice_template }

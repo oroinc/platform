@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Manager;
 
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
+use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
@@ -44,38 +46,39 @@ class CalendarChoiceManager
     }
 
     /**
-     * @return array
+     * @param bool $isNew
+     *
+     * @return array key = calendarUid, value = calendar name
      */
-    public function getChoices()
+    public function getChoices($isNew)
     {
-        $calendars = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar')
-            ->createQueryBuilder('c')
-            ->select('c.id, c.name, c.public')
-            ->where('c.public = :public OR c.organization = :organizationId')
-            ->setParameter('public', true)
-            ->setParameter('organizationId', $this->securityFacade->getOrganizationId())
+        /** @var SystemCalendarRepository $systemCalendarRepo */
+        $systemCalendarRepo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
+        $calendars          = $systemCalendarRepo->getCalendarsQueryBuilder($this->securityFacade->getOrganizationId())
+            ->select('sc.id, sc.name, sc.public')
             ->getQuery()
             ->getArrayResult();
         // @todo: check ACL here. will be done in BAP-6575
 
-        if (count($calendars) === 1) {
+        if ($isNew && count($calendars) === 1) {
             $calendars[0]['name'] = $this->translator->trans(
                 'oro.calendar.add_to_calendar',
                 ['%name%' => $calendars[0]['name']]
             );
-        } elseif (count($calendars) > 1) {
+        } elseif (!$isNew || count($calendars) !== 0) {
             usort(
                 $calendars,
                 function ($a, $b) {
                     return strcasecmp($a['name'], $b['name']);
                 }
             );
-            $userCalendars = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
-                ->createQueryBuilder('c')
+            /** @var CalendarRepository $calendarRepo */
+            $calendarRepo  = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar');
+            $userCalendars = $calendarRepo->getUserCalendarsQueryBuilder(
+                $this->securityFacade->getOrganizationId(),
+                $this->securityFacade->getLoggedUserId()
+            )
                 ->select('c.id, c.name')
-                ->where('c.owner = :userId AND c.organization = :organizationId')
-                ->setParameter('userId', $this->securityFacade->getLoggedUserId())
-                ->setParameter('organizationId', $this->securityFacade->getOrganizationId())
                 ->getQuery()
                 ->getArrayResult();
             foreach ($userCalendars as $userCalendar) {
@@ -89,9 +92,10 @@ class CalendarChoiceManager
 
         $choices = [];
         foreach ($calendars as $calendar) {
-            $alias                                                   = !empty($calendar['alias'])
+            $alias = !empty($calendar['alias'])
                 ? $calendar['alias']
-                : ($calendar['public'] ? 'public' : 'system');
+                : ($calendar['public'] ? SystemCalendar::PUBLIC_CALENDAR_ALIAS : SystemCalendar::CALENDAR_ALIAS);
+
             $choices[$this->getCalendarUid($alias, $calendar['id'])] = $calendar['name'];
         }
 
