@@ -44,7 +44,11 @@ class CalendarConnectionController extends RestController implements ClassResour
     public function cgetAction($id)
     {
         $items = $this->getManager()->getCalendarManager()
-            ->getCalendars($this->getUser()->getId(), $id);
+            ->getCalendars(
+                $this->get('oro_security.security_facade')->getOrganization()->getId(),
+                $this->getUser()->getId(),
+                $id
+            );
 
         return new Response(json_encode($items), Codes::HTTP_OK);
     }

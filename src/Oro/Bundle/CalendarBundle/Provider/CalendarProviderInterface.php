@@ -7,9 +7,10 @@ interface CalendarProviderInterface
     /**
      * Gets default properties for the given calendar
      *
-     * @param int   $userId      The id of an user requested this information
-     * @param int   $calendarId  The target calendar id
-     * @param int[] $calendarIds The list of ids of connected calendars
+     * @param int   $organizationId The id of an organization for which this information is requested
+     * @param int   $userId         The id of an user requested this information
+     * @param int   $calendarId     The target calendar id
+     * @param int[] $calendarIds    The list of ids of connected calendars
      *
      * @return array Each item of this array can contains any properties of a calendar you need to set as default.
      *               You can return any property defined in CalendarProperty class.
@@ -23,16 +24,19 @@ interface CalendarProviderInterface
      *                  widgetRoute   - route name of a widget can be used to view an event. defaults to empty
      *                  widgetOptions - options of a widget can be used to view an event. defaults to empty
      */
-    public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds);
+    public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds);
 
     /**
      * Gets the list of calendar events
      *
-     * @param int       $userId      The id of an user requested this information
-     * @param int       $calendarId  The target calendar id
-     * @param \DateTime $start       A date/time specifies the begin of a time interval
-     * @param \DateTime $end         A date/time specifies the end of a time interval
-     * @param bool      $subordinate Determines whether events from connected calendars should be included or not
+     * @param int       $organizationId The id of an organization for which this information is requested
+     * @param int       $userId         The id of an user requested this information
+     * @param int       $calendarId     The target calendar id
+     * @param \DateTime $start          A date/time specifies the begin of a time interval
+     * @param \DateTime $end            A date/time specifies the end of a time interval
+     * @param array     $connections    The list of connected calendars
+     *                                  key = connected calendar id
+     *                                  value = visibility flag (true/false)
      *
      * @return array Each item of this array should contains all properties of a calendar event.
      *               There are several additional properties you can return as well:
@@ -40,5 +44,5 @@ interface CalendarProviderInterface
      *                  removable - indicated whether an event can be deleted. defaults to true
      *                  reminders - the list of attached reminders. defaults to empty
      */
-    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
 }
