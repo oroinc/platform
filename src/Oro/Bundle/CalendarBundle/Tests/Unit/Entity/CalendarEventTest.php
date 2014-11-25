@@ -104,6 +104,58 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(1 => $calendarEventTwo, 2 => $calendarEventThree), $actual->toArray());
     }
 
+    /**
+     * @param $status
+     * @param $expected
+     *
+     * @dataProvider getAvailableDataProvider
+     */
+    public function testGetAvailableInvitationStatuses($status, $expected)
+    {
+        $event = new CalendarEvent();
+        $event->setInvitationStatus($status);
+        $actual = $event->getAvailableInvitationStatuses();
+        $this->assertEmpty(array_diff($expected, $actual));
+    }
+
+    /**
+     * @return array
+     */
+    public function getAvailableDataProvider()
+    {
+        return [
+            'not responded' => [
+                'status' => CalendarEvent::NOT_RESPONDED,
+                'expected' => [
+                    CalendarEvent::ACCEPTED,
+                    CalendarEvent::TENTATIVELY_ACCEPTED,
+                    CalendarEvent::DECLINED,
+                ]
+            ],
+            'declined' => [
+                'status' => CalendarEvent::DECLINED,
+                'expected' => [
+                    CalendarEvent::ACCEPTED,
+                    CalendarEvent::TENTATIVELY_ACCEPTED,
+                ]
+            ],
+            'accepted' => [
+                'status' => CalendarEvent::ACCEPTED,
+                'expected' => [
+                    CalendarEvent::TENTATIVELY_ACCEPTED,
+                    CalendarEvent::DECLINED,
+                ]
+            ],
+            'tentatively available ' => [
+                'status' => CalendarEvent::TENTATIVELY_ACCEPTED,
+                'expected' => [
+                    CalendarEvent::ACCEPTED,
+                    CalendarEvent::DECLINED,
+                ]
+            ]
+        ];
+    }
+
     public function testPrePersist()
     {
         $obj = new CalendarEvent();
