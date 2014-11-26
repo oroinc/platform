@@ -109,7 +109,7 @@
         <form id="{{ form.vars.name }}" action="#">
             <fieldset class="form-horizontal">
                 {{ UI.scrollSubblock(null, data, true, false)|replace(templateReplacement)|raw }}
-                <% if (notifiable) { %>
+                <% if (typeof notifiable !== 'undefined' && notifiable) { %>
                     {{ _self.notifyGuests(form)|replace(templateReplacement)|raw }}
                 <% } %>
                 <div class="widget-actions form-actions" style="display: none;">
