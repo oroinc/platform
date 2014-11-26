@@ -41,18 +41,11 @@
                     {% endif %}
 
                     <li class="entity-type{% if selected %} selected{% endif %}">
-                        {% if selected %}
-                            <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
-                                <i class="{{ iconClass }}"></i>
-                                {{ label }} ({{ type.count }})
-                                <div class="arrow"><i class="icon-chevron-right"></i></div>
-                            </a>
-                        {% else %}
-                            <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
-                                <i class="{{ iconClass }}"></i>
-                                {{ label }} ({{ type.count }})
-                            </a>
-                        {% endif %}
+                        <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
+                            <i class="{{ iconClass }}"></i>
+                            {{ label }} ({{ type.count }})
+                            {% if selected %}<div class="arrow"><i class="icon-chevron-right"></i></div>{% endif %}
+                        </a>
                     </li>
                 {% endfor %}
                 </ul>
