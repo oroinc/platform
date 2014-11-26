@@ -229,6 +229,87 @@ datagrid:
                                 false: Inactive
                                 true:  Active
 
+    base-system-calendar-event-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - event.id
+                    - calendar.name
+                    - event.title
+                    - event.start
+                    - event.end
+                from:
+                    - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
+                join:
+                    inner:
+                        - { join: event.systemCalendar, alias: calendar }
+                where:
+                    and:
+                        - calendar.id = :calendarId
+            bind_parameters:
+                - calendarId
+        columns:
+            title:
+                label: oro.calendar.calendarevent.title.label
+            name:
+                label: oro.calendar.calendarevent.calendar.label
+            start:
+                label: oro.calendar.calendarevent.start.label
+                frontend_type: datetime
+            end:
+                label: oro.calendar.calendarevent.end.label
+                frontend_type: datetime
+        sorters:
+            columns:
+                title:
+                    data_name: event.title
+                name:
+                    data_name: name
+                start:
+                    data_name: event.start
+                end:
+                    data_name: event.end
+            default:
+                start: ASC
+        filters:
+            columns:
+                title:
+                    type: string
+                    data_name: event.title
+                name:
+                    type: string
+                    data_name: name
+                start:
+                    type: datetime
+                    data_name: event.start
+                end:
+                    type: datetime
+                    data_name: event.end
+        properties:
+            id: ~
+        options:
+            entityHint: calendar_events
+
+    system-calendar-event-grid:
+        extends: base-system-calendar-event-grid
+        source:
+            # @TODO: Add acl_resource: oro_system_calendar_view after BAP-5989 was implemented
+            query:
+                where:
+                    and:
+                        - calendar.public = false
+
+    public-system-calendar-event-grid:
+        extends: base-system-calendar-event-grid
+        options:
+            skip_acl_check: true
+        source:
+            query:
+                where:
+                    and:
+                        - calendar.public = true
+
     system-calendar-grid:
         source:
             type: orm
