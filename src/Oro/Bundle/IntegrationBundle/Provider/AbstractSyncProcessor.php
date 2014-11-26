@@ -96,7 +96,7 @@ abstract class AbstractSyncProcessor implements LoggerAwareInterface
      */
     private function fetchStatistic(ContextInterface $context = null)
     {
-        $counts = array_fill_keys(['process', 'processed', 'updated', 'deleted', 'added', 'invalid'], 0);
+        $counts = array_fill_keys(['read', 'processed', 'updated', 'deleted', 'added', 'invalid'], 0);
         if ($context) {
             $counts['read'] = (int)$context->getReadCount();
             $counts['processed'] += $counts['added'] = (int)$context->getAddCount();

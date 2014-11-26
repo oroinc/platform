@@ -76,13 +76,13 @@ class JobResult
     }
 
     /**
-     * @param array $failureException
+     * @param array $exceptions
      *
      * @return $this
      */
-    public function setFailureExceptions(array $failureException)
+    public function setFailureExceptions(array $exceptions)
     {
-        $this->failureExceptions = $failureException;
+        $this->failureExceptions = $exceptions;
         return $this;
     }
 
