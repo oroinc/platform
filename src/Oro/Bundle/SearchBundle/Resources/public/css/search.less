@@ -59,6 +59,10 @@
   .customer-info {
     padding: 0 0 5px 60px;
     margin-top: -10px;
+    h1{
+      font-size: 18px;
+      line-height: 18px;
+    }
     .sub-title {
       font-size: 13px;
       line-height: 1em;
@@ -79,6 +83,9 @@
   border-top: 1px solid #cccccc;
   border-bottom: 1px solid #cccccc;
 }
+.search-form.before-grid{
+  display: none;
+}
 .mobile-version {
   .search-header .search-form input[type="text"] {
     width: 218px;
@@ -91,6 +98,14 @@
       .separator {
         display: none;
       }
+    }
+  }
+  @media only screen and (max-width : 565px) {
+    .search-form.before-grid {
+      display: block;
+    }
+    .search-entity-types-column {
+      display: none;
     }
   }
 }

@@ -10,26 +10,7 @@
             {% trans %}Search results{% endtrans %}
         </h2>
         <form method="get" action="{{ path('oro_search_results') }}" class="form-inline search-form">
-            {% if isMobileVersion() %}
-                <select name="from">
-                    <option value="">
-                        {% trans %}All{% endtrans %} ({{ groupedResults[''].count }})
-                    </option>
-                    {% set searchEntities = [] %}
-                    {% for className, alias in entities %}
-                        {% set entityType = oro_entity_config_value(className, 'label')|trans %}
-                        {% set searchEntities = searchEntities|merge({(alias) : entityType}) %}
-                    {% endfor %}
-
-                    {% for alias, name in searchEntities|sort %}
-                        <option value="{{ alias }}"{% if alias == from %} selected="selected"{% endif %}>
-                            {{ name }} {% if groupedResults[alias] is defined %}({{ groupedResults[alias].count }}){% endif %}
-                        </option>
-                    {% endfor %}
-                </select>
-            {% else %}
-                <input type="hidden" name="from" value="" />
-            {% endif %}
+            <input type="hidden" name="from" value="" />
             <input type="text" id="search" class="span2 search" name="search" value="{{ searchString }}" />
             <button type="submit" class="btn btn-search btn-primary">{{ 'Search'|trans }}</button>
         </form>
@@ -38,7 +19,6 @@
     {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
     <table width="100%" cellpadding="0" cellspacing="0">
         <tr>
-            {% if isDesktopVersion() %}
             <td class="search-entity-types-column">
                 {% for alias, type in groupedResults %}
                     {% set selected = alias == from %}
@@ -67,8 +47,19 @@
                     </div>
                 {% endfor %}
             </td>
-            {% endif %}
             <td class="search-results-column">
+                <form method="get" action="{{ path('oro_search_results') }}" class="form-inline search-form before-grid">
+                    <select name="from">
+                    {% for alias, type in groupedResults %}
+                        {% set selected = alias == from %}
+                        <option value="{{ alias }}"{% if selected %} selected="selected"{% endif %}>
+                            {% if type.class %}{{ type.label }}{% else %}{{ 'oro.search.result.all'|trans }}{% endif %}
+                            ({{ type.count }})
+                        </option>
+                    {% endfor %}
+                    </select>
+                    <input type="hidden" id="search" class="span2 search" name="search" value="{{ searchString }}" />
+                </form>
                 <div id="search-result-grid">
                     {{ dataGrid.renderGrid(gridName, {from: from, search: searchString}, { cssClass: 'search-grid grid-without-header' }) }}
                 </div>
