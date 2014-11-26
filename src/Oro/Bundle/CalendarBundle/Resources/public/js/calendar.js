@@ -186,6 +186,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             if (!connectionModel.get('visible')) {
                 this.connectionsView.showCalendar(connectionModel);
             }
+            this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
         onEventChanged: function (eventModel) {
