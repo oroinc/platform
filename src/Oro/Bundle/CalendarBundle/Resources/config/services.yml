@@ -10,6 +10,7 @@ parameters:
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
     oro_calendar.format_converter.date_time.full_calendar.class: Oro\Bundle\CalendarBundle\Converter\FullCalendarDateTimeFormatConverter
     oro_calendar.owner_assignment_checker.calendar.class:        Oro\Bundle\CalendarBundle\Ownership\CalendarOwnerAssignmentChecker
+    oro_calendar.activity_list.provider.class:                   Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
     oro_calendar.calendar_manager.class:                         Oro\Bundle\CalendarBundle\Manager\CalendarManager
     oro_calendar.calendar_property_provider.class:               Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
@@ -108,10 +109,26 @@ services:
             - @oro_reminder.entity.manager
 
     oro_calendar.autocomplete.user_calendar_handler:
-        parent: oro_user.autocomplete.user.search_acl_handler.abstract
         class: %oro_calendar.autocomplete.user_calendar_handler.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_attachment.manager
+            - %oro_user.entity.class%
+            - @oro_entity_config.link.security_context
+            - @oro_security.ownership_tree_provider
+            - @oro_security.acl_helper
+            - @?security.acl.voter.basic_permissions
         calls:
             - [ setProperties, [["namePrefix", "firstName", "middleName", "lastName", "nameSuffix"]] ]
+            - [ setNameFormatter, [@oro_locale.formatter.name] ]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: user_calendars, acl_resource: oro_user_user_view }
         lazy: true
+
+    oro_calendar.activity_list.provider:
+        class: %oro_calendar.activity_list.provider.class%
+        arguments:
+           - @oro_entity.doctrine_helper
+           - @doctrine
+        tags:
+           - {name: oro_activity_list.provider, priority: 50}

@@ -116,10 +116,10 @@ class TranslatableEntityType extends AbstractType
                 'property'      => null,
                 'query_builder' => null,
                 'choices'       => null,
-                'choice_list'   => $choiceList
+                'choice_list'   => $choiceList,
+                'translatable_options' => false
             )
         );
-
         $resolver->setRequired(array('class'));
     }
 }

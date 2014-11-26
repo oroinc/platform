@@ -456,7 +456,8 @@ class EntityFieldProvider
                 $this->getRelationType($fieldType),
                 $relatedClassName,
                 $withEntityDetails,
-                $translate
+                $translate,
+                false
             );
         }
     }
@@ -541,14 +542,15 @@ class EntityFieldProvider
     /**
      * Adds a relation to $result
      *
-     * @param array  $result
-     * @param string $name
-     * @param string $type
-     * @param string $label
-     * @param string $relationType
-     * @param string $relatedEntityName
-     * @param bool   $withEntityDetails
-     * @param bool   $translate
+     * @param array     $result
+     * @param string    $name
+     * @param string    $type
+     * @param string    $label
+     * @param string    $relationType
+     * @param string    $relatedEntityName
+     * @param bool      $withEntityDetails
+     * @param bool      $translate
+     * @param bool|null $translateLabel
      */
     protected function addRelation(
         array &$result,
@@ -558,9 +560,13 @@ class EntityFieldProvider
         $relationType,
         $relatedEntityName,
         $withEntityDetails,
-        $translate
+        $translate,
+        $translateLabel = null
     ) {
-        if ($translate) {
+        if ($translateLabel === null) {
+            $translateLabel = $translate;
+        }
+        if ($translateLabel) {
             $label = $this->translator->trans($label);
         }
 

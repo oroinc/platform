@@ -120,3 +120,6 @@ oro:
             has_role.label: Has role
         invite:
             label: Send an Email Invitation
+        privileges:
+            entity.label: Entity
+            action.label: Capabilities

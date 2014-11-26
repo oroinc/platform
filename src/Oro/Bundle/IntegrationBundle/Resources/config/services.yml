@@ -136,6 +136,7 @@ services:
             - @doctrine
             - @event_dispatcher
             - @oro_importexport.context_registry
+            - @oro_integration.logger.strategy
 
     oro_integration.reader.entity.by_id:
         class: %oro_integration.reader.entity.by_id.class%
@@ -176,7 +177,9 @@ services:
 
     oro_integration.sync_scheduler:
         class: %oro_integration.sync_scheduler.class%
-        arguments: [ @doctrine.orm.entity_manager, @oro_integration.manager.types_registry ]
+        arguments:
+            - @doctrine
+            - @oro_integration.manager.types_registry
 
     oro_integration.reverse_sync.processor:
         class: %oro_integration.reverse_sync.processor.class%

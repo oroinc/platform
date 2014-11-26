@@ -1,29 +1,51 @@
 define(function(require) {
-    var Flotr = require('flotr2');
-    var numberFormatter = require('orolocale/js/formatter/number');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    var BarChartComponent;
+    'use strict';
 
+    var FlowChartComponent,
+        _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
+        Flotr = require('flotr2'),
+        numberFormatter = require('orolocale/js/formatter/number'),
+        PieChartComponent = require('orochart/js/app/components/pie-chart-component');
     require('orochart/js/flotr2/funnel');
 
     /**
-     *
-     * @class orochart.app.components.BarCharComponent
-     * @extends orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BarCharComponent
+     * @class orochart.app.components.FlowChartComponent
+     * @extends orochart.app.components.PieChartComponent
+     * @exports orochart/app/components/flow-chart-component
      */
-    BarChartComponent = BaseChartComponent.extend({
+    FlowChartComponent = PieChartComponent.extend({
         /**
          *
          * @overrides
-         * @param {object} options
+         * @param {Object} options
          */
         initialize: function(options) {
-            BaseChartComponent.prototype.initialize.call(this, options);
+            FlowChartComponent.__super__.initialize.call(this, options);
 
             this.date = options.date;
+            this._prepareData();
+        },
 
-            this.update();
+        /**
+         * Prepares proper data structure
+         *
+         * @protected
+         */
+        _prepareData: function () {
+            var date = this.date;
+            _.each(this.data, function(item) {
+                var params, format;
+                params = {
+                    label: item.label,
+                    date: date,
+                    value: numberFormatter.formatCurrency(item.value)
+                };
+                format = 'oro.chart.flow_chart.label_fromatter.' + (item.isNozzle ? 'nozzle' : 'tick');
+                item.originalLabel = item.label;
+                item.label = __(format, params);
+                item.data = [item.value];
+            });
         },
 
         /**
@@ -32,44 +54,34 @@ define(function(require) {
          * @overrides
          */
         draw: function () {
-            var scope = this;
-            var $chart = this.$chart;
-            var options = this.options;
+            var labelsWidth,
+                $chart = this.$chart,
+                $legend = this.$legend,
+                options = this.options,
+                hasPlaceForLabels = !this.$container.hasClass('wrapped-chart-legend');
 
             if (!$chart.get(0).clientWidth) {
                 return;
             }
 
-            var data = this.data;
-            var chartData = {};
-            var nozzleSteps = [];
+            labelsWidth = 0;
+            $legend.html('');
 
-            _.each(data, function(value, key) {
-                if (value.value <= 0) {
-                    data[key].value = 0.0001;
-                }
-                chartData[value.label] = value.value;
-                if (value.isNozzle) {
-                    nozzleSteps.push(value.label);
-                }
-            });
+            if (hasPlaceForLabels) {
+                labelsWidth = 250;// width for embedded labels
+                $chart.width($chart.width() + labelsWidth);
+            }
+
             Flotr.draw(
                 $chart.get(0),
-                new Array(chartData),
+                this.data,
                 {
-                    funnel : {
-                        show : true,
+                    funnel: {
+                        show: true,
+                        showLabels: hasPlaceForLabels,
                         formatter: numberFormatter.formatCurrency,
-                        nozzleSteps: nozzleSteps,
                         colors: options.settings.chartColors,
-                        tickFormatter: function (label, value) {
-                            return label + ': ' + numberFormatter.formatCurrency(value);
-                        },
-                        nozzleFormatter: function (label, value) {
-                            return label
-                                    + ' (from ' + scope.date + '): '
-                                    + numberFormatter.formatCurrency(value);
-                        }
+                        marginX: labelsWidth
                     },
                     mouse: {
                         track: true,
@@ -77,11 +89,18 @@ define(function(require) {
                     },
                     grid: {
                         outlineWidth: 0
+                    },
+                    legend : {
+                        show: !hasPlaceForLabels,
+                        container: $legend.get(0),
+                        labelBoxWidth: 20,
+                        labelBoxHeight: 13,
+                        labelBoxMargin: 0
                     }
                 }
             );
         }
     });
 
-    return BarChartComponent;
+    return FlowChartComponent;
 });

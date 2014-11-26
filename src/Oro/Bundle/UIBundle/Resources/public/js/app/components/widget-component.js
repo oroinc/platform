@@ -133,9 +133,16 @@ define(function (require) {
         _bindEnvironmentEvent: function (widget) {
             var reloadEvent = this.options['reload-event'],
                 reloadGridName = this.options['reload-grid-name'],
+                refreshWidgetAlias = this.options['refresh-widget-alias'],
                 reloadWidgetAlias = this.options['reload-widget-alias'];
 
             reloadEvent = reloadEvent || 'widget_success:' + (widget.getAlias() || widget.getWid());
+
+            if (refreshWidgetAlias) {
+                widget.listenTo(mediator, reloadEvent, function () {
+                    mediator.trigger('widget:doRefresh:' + refreshWidgetAlias);
+                });
+            }
 
             if (reloadWidgetAlias) {
                 widget.listenTo(mediator, reloadEvent, function () {

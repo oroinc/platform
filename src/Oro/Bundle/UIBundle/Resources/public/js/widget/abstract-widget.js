@@ -31,6 +31,11 @@ define(function (require) {
             loadingMaskEnabled: true,
             loadingElement: null,
             container: null,
+            // set to true if 'layout:init' should be executed after a widget is shown
+            // e.g. if HTML content passed to a widget is rendered from JS template
+            // this option is ignored when content is retrieved by AJAX, in this case 'layout:init'
+            // is executed anyway
+            initLayout: false,
             submitHandler: function () {
                 this.trigger('adoptedFormSubmit', this.form, this);
             }
@@ -39,6 +44,10 @@ define(function (require) {
         loadingElement: null,
         loadingMask: null,
         loading: false,
+
+        listen: {
+            renderComplete: '_initSectionActions'
+        },
 
         initialize: function(options) {
             options = options || {};
@@ -204,6 +213,33 @@ define(function (require) {
                     v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
+        },
+
+        /**
+         * Register other action elements
+         *
+         * @private
+         */
+        _initSectionActions: function() {
+            var widget = this,
+                sections = this.widget.find('[data-section]');
+            sections.each(function (i, sectionEl) {
+                var $sectionEl = $(sectionEl),
+                    sectionName = $sectionEl.attr('data-section'),
+                    actions = $sectionEl.find('[action-name], [data-action-name]');
+                if ($sectionEl.attr('action-name') || $sectionEl.attr('data-action-name')) {
+                    actions.push($sectionEl);
+                }
+                if (!widget.actions[sectionName]) {
+                    widget.actions[sectionName] = {};
+                }
+                actions.each(function (i, actionEl) {
+                    var $actionEl = $(actionEl),
+                        actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
+                    widget.actions[sectionName][actionName] = $actionEl;
+                    widget.trigger('widget:add:action:' + sectionName + ':' + actionName, $actionEl);
+                });
+            })
         },
 
         /**
@@ -568,6 +604,9 @@ define(function (require) {
                 this.loadContent();
             } else {
                 this._show();
+                if (this.options.initLayout) {
+                    mediator.execute('layout:init', this.widget);
+                }
             }
             this.firstRun = false;
         },
@@ -576,15 +615,16 @@ define(function (require) {
          * Updates content of a widget.
          *
          * @param {String} content
+         * @param {bool=}  initLayout
          */
-        setContent: function (content) {
+        setContent: function (content, initLayout) {
             this.actionsEl = null;
             this.actions = {};
             this.setElement($(content).filter('.widget-content:first'));
             this._show();
-            mediator.execute('layout:init', this.widget);
-            mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
+            if (initLayout || (initLayout === undefined && this.options.initLayout)) {
+                mediator.execute('layout:init', this.widget);
+            }
         },
 
         /**
@@ -647,7 +687,9 @@ define(function (require) {
         _onContentLoad: function(content) {
             this.loading = false;
             this.trigger('contentLoad', content, this);
-            this.setContent(content);
+            this.setContent(content, true);
+            mediator.trigger('widget:contentLoad', this.widget);
+            mediator.trigger('layout:adjustHeight');
         },
 
         /**

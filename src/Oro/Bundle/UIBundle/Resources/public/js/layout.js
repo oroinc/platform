@@ -143,7 +143,7 @@ define(function (require) {
             var $elements;
             if ($.isPlainObject($.uniform)) {
                 // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)');
                 $elements.uniform();
                 if ($elements.is('.error:not([multiple])')) {
                     $elements.removeClass('error').closest('.selector').addClass('error');
@@ -151,7 +151,10 @@ define(function (require) {
 
                 // bind uniform plugin to input:file elements
                 $elements = $container.find('input:file');
-                $elements.uniform({fileDefaultHtml: __('Please select a file...')});
+                $elements.uniform({
+                    fileDefaultHtml: __('Please select a file...'),
+                    fileButtonHtml: __('Choose File')
+                });
                 if ($elements.is('.error')) {
                     $elements.removeClass('error').closest('.uploader').addClass('error');
                 }
@@ -168,7 +171,7 @@ define(function (require) {
 
             // removes uniform plugin from elements
             if ($.isPlainObject($.uniform)) {
-                $elements = $container.find('select:not(.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)');
                 $.uniform.restore($elements);
             }
 

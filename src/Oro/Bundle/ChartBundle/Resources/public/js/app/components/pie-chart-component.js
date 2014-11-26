@@ -1,73 +1,61 @@
 define(function(require) {
-    var Flotr = require('flotr2');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    var BarChartComponent;
+    'use strict';
 
+    var PieChartComponent,
+        Flotr = require('flotr2'),
+        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
-     *
-     * @class orochart.app.components.BarCharComponent
-     * @extends orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BarCharComponent
+     * @class orochart.app.components.PieChartComponent
+     * @extends orochart.app.components.BaseChartComponent
+     * @exports orochart/app/components/pie-chart-component
      */
-    BarChartComponent = BaseChartComponent.extend({
+    PieChartComponent = BaseChartComponent.extend({
         /**
          *
          * @overrides
-         * @param {object} options
+         * @param {Object} options
          */
         initialize: function(options) {
-            BaseChartComponent.prototype.initialize.call(this, options);
+            PieChartComponent.__super__.initialize.call(this, options);
 
-            this.$legend = this.$el.find('.chart-legend');
             this.options.settings.ratio = options.ratio;
-
-            this.update();
         },
 
-        setChartSize: function() {
+        setChartSize: function () {
+            var isChanged = false;
+            var $container = this.$container;
+            var isLegendWrapped = $container.hasClass('wrapped-chart-legend');
             var $chart = this.$chart;
-            var $widgetContent = $chart.parents('.chart-container').parent();
+            var $widgetContent = $container.parent();
             var $chartLegend = this.$legend;
             var chartWidth = Math.min(Math.round($widgetContent.width() * Number(this.options.settings.ratio)), 350);
 
-            if (chartWidth > 0 && chartWidth != $chart.width()) {
+            if (chartWidth > 0 && chartWidth !== $chart.width()) {
                 $chart.width(chartWidth);
                 $chart.height(chartWidth);
                 $chartLegend.height(chartWidth);
-                return true;
+                $chart.parent().width(chartWidth + $chartLegend.width());
+                isChanged = true;
             }
-            return false;
+
+            if ((isChanged || !isLegendWrapped) && this.$legend.position().top !== 0) {
+                // container is not in wrapped mode yet but the legend already has dropped under chart
+                $container.width(this.$chart.width());
+                $container.addClass('wrapped-chart-legend');
+                isChanged = true; // force changed ro redraw chart
+            } else if ((isChanged || isLegendWrapped) && $container.outerWidth(true) / $container.width() > 1.7) {
+                // container is in wrapped mode but there's already place for legend next to chart
+                $container.removeClass('wrapped-chart-legend');
+                $container.width('auto');
+                isChanged = true; // force changed ro redraw chart
+            }
+
+            return isChanged;
         },
 
-        setChartContainerSize: function() {
-            var $chart = this.$chart;
-            var $chartLegend = this.$legend;
-            var $chartLegendTable = $chartLegend.find('table');
-            var $td = $chartLegendTable.find('td');
-            var padding = parseInt($td.css('padding-bottom'));
-            if (padding > 0 && ($chartLegendTable.height() + 20) > $chartLegend.height()) {
-                while (($chartLegendTable.height() + 20) > $chartLegend.height()) {
-                    padding = padding - 1;
-                    $td.css('padding-bottom', padding + 'px');
-                    if (padding <= 0) {
-                        break;
-                    }
-                }
-            } else if (padding < 7 && ($chartLegendTable.height() + 20) < $chartLegend.height()) {
-                while (($chartLegendTable.height() + 20) < $chartLegend.height()) {
-                    padding = padding + 1;
-                    $td.css('padding-bottom', padding + 'px');
-                    if (padding >= 7) {
-                        break;
-                    }
-                }
-            }
-            $chart.closest('.clearfix').width(
-                $chart.width() +
-                    $chartLegendTable.outerWidth() +
-                    parseInt($chartLegendTable.css('margin-left'))
-            );
+        setChartContainerSize: function () {
+            // there's nothing to do with container
         },
 
         /**
@@ -77,7 +65,7 @@ define(function(require) {
          */
         draw: function() {
             var $chart = this.$chart;
-            var $chartLegend = this.$legend;
+            var $legend = this.$legend;
             var data = this.data;
             var settings = this.options.settings;
             var chartData = [];
@@ -124,7 +112,7 @@ define(function(require) {
                     },
                     legend : {
                         position : 'ne',
-                        container: $chartLegend.get(0),
+                        container: $legend.get(0),
                         labelBoxWidth: 20,
                         labelBoxHeight: 13,
                         labelBoxMargin: 0
@@ -134,5 +122,5 @@ define(function(require) {
         }
     });
 
-    return BarChartComponent;
+    return PieChartComponent;
 });
