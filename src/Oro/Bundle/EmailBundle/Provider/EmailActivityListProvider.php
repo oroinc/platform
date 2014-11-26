@@ -89,7 +89,11 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity Email */
-        return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
+        if ($activityEntity->getFromEmailAddress()->hasOwner()) {
+            return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
+        }
+
+        return null;
     }
 
     /**
@@ -134,11 +138,8 @@ class EmailActivityListProvider implements ActivityListProviderInterface
      */
     public function isApplicable($entity)
     {
-        if (is_object($entity)) {
-            $entity = $this->doctrineHelper->getEntityClass($entity);
-        }
-
-        return $entity == self::ACTIVITY_CLASS;
+        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
+            && $entity->getFromEmailAddress()->hasOwner();
     }
 
     /**
