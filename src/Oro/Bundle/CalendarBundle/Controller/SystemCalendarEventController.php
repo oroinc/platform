@@ -4,7 +4,6 @@ namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -24,7 +23,7 @@ class SystemCalendarEventController extends Controller
     public function indexAction(SystemCalendar $entity)
     {
         if (!$entity->isPublic() && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
-            throw new AccessDeniedException('Access denied to foreign system calendar events');
+            throw new AccessDeniedException('Access denied to system calendar events from another organization');
         }
 
         return [
@@ -41,15 +40,15 @@ class SystemCalendarEventController extends Controller
      */
     public function viewAction(CalendarEvent $entity)
     {
-        //Check: is event from system calendar
+        //is event from system calendar
         if (!$entity->getSystemCalendar()) {
-            throw new NotFoundHttpException();
+            throw $this->createNotFoundException(sprintf('Not found %d system calendar event', $entity->getId()));
         }
 
-        //Check: does user have permission to view system calendar
+        //does user have permission to view system calendar
         if (!$entity->getSystemCalendar()->isPublic()
             && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity->getSystemCalendar())) {
-            throw new AccessDeniedException('Access denied to foreign system calendar events');
+            throw new AccessDeniedException('Access denied to system calendar events from another organization');
         }
 
         return [
