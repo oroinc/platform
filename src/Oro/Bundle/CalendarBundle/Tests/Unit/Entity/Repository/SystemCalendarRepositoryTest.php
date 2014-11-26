@@ -56,6 +56,7 @@ class SystemCalendarRepositoryTest extends OrmTestCase
             . ' WHERE sc.public = :public AND sc.id IN(1, 2)',
             $qb->getQuery()->getDQL()
         );
+        $this->assertFalse($qb->getParameter('public')->getValue());
     }
 
     public function testGetPublicCalendarsQueryBuilder()
@@ -71,5 +72,26 @@ class SystemCalendarRepositoryTest extends OrmTestCase
             . ' WHERE sc.public = :public',
             $qb->getQuery()->getDQL()
         );
+        $this->assertTrue($qb->getParameter('public')->getValue());
+    }
+
+
+    public function testGetCalendarsQueryBuilder()
+    {
+        $organizationId = 1;
+
+        /** @var SystemCalendarRepository $repo */
+        $repo = $this->em->getRepository('OroCalendarBundle:SystemCalendar');
+
+        $qb = $repo->getCalendarsQueryBuilder($organizationId);
+
+        $this->assertEquals(
+            'SELECT sc'
+            . ' FROM Oro\Bundle\CalendarBundle\Entity\SystemCalendar sc'
+            . ' WHERE sc.organization = :organizationId OR sc.public = :public',
+            $qb->getQuery()->getDQL()
+        );
+        $this->assertEquals($organizationId, $qb->getParameter('organizationId')->getValue());
+        $this->assertTrue($qb->getParameter('public')->getValue());
     }
 }
