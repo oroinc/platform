@@ -3,10 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener\Datagrid;
 
 use Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener;
-use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\TestGridConfiguration;
-use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
 class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,109 +11,98 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
     protected $listener;
 
     /** @var PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContextLink;
-
-    /** @var PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
-
-    /** @var PHPUnit_Framework_MockObject_MockObject */
-    protected $aclVoter;
 
     protected function setUp()
     {
-        $organization = new Organization();
-        $organization->setId(1);
-
-        $token = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $token->expects($this->any())
-            ->method('getOrganizationContext')
-            ->will($this->returnValue($organization));
-
-        $securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityContext->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $this->securityContextLink = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityContextLink->expects($this->any())
-            ->method('getService')
-            ->will($this->returnValue($securityContext));
-
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganizationId')
+            ->will($this->returnValue(1));
 
-        $this->aclVoter = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->aclVoter->expects($this->any())
-            ->method('addOneShotIsGrantedObserver');
-
-        $this->listener = new SystemCalendarGridListener(
-            $this->securityContextLink,
-            $this->securityFacade,
-            $this->aclVoter
-        );
+        $this->listener = new SystemCalendarGridListener($this->securityFacade);
     }
 
-    public function testOnBuildBeforeViewGranted()
+    public function testOnBuildAfterViewGranted()
     {
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
+            ->with('oro_system_calendar_view')
             ->will($this->returnValue(true));
 
-        $parameters = new ParameterBag(['entityField' => 'testField']);
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($qb));
+
         $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $datagrid->expects($this->any())
-            ->method('getParameters')
-            ->will($this->returnValue($parameters));
+        $datagrid->expects($this->once())
+            ->method('getDatasource')
+            ->will($this->returnValue($datasource));
 
-        $gridConfig = new TestGridConfiguration();
+        $qb->expects($this->at(0))
+            ->method('andWhere')
+            ->with('sc.organization = :organizationId')
+            ->will($this->returnSelf());
 
-        $event = new BuildBefore($datagrid, $gridConfig);
-        $this->listener->onBuildBefore($event);
+        $qb->expects($this->at(1))
+            ->method('setParameter')
+            ->with('organizationId', 1);
 
-        $where = $gridConfig->offsetGetByPath(SystemCalendarGridListener::GRID_WHERE_PATH);
-        $this->assertEquals(
-            [
-                'o.id in (1)',
-            ],
-            $where
-        );
+        $event = new BuildAfter($datagrid);
+        $this->listener->onBuildAfter($event);
     }
 
-    public function testOnBuildBeforeViewNotGranted()
+    public function testOnBuildAfterViewNotGranted()
     {
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
+            ->with('oro_system_calendar_view')
             ->will($this->returnValue(false));
 
-        $parameters = new ParameterBag(['entityField' => 'testField']);
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $datasource = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource->expects($this->once())
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($qb));
+
         $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-        $datagrid->expects($this->any())
-            ->method('getParameters')
-            ->will($this->returnValue($parameters));
+        $datagrid->expects($this->once())
+            ->method('getDatasource')
+            ->will($this->returnValue($datasource));
 
-        $gridConfig = new TestGridConfiguration();
+        $qb->expects($this->at(0))
+            ->method('andWhere')
+            ->with('sc.organization = :organizationId')
+            ->will($this->returnSelf());
 
-        $event = new BuildBefore($datagrid, $gridConfig);
-        $this->listener->onBuildBefore($event);
+        $qb->expects($this->at(1))
+            ->method('setParameter')
+            ->with('organizationId', 1);
 
-        $where = $gridConfig->offsetGetByPath(SystemCalendarGridListener::GRID_WHERE_PATH);
-        $this->assertEquals(
-            [
-                'o.id in (1)',
-                'sc.public = 1',
-            ],
-            $where
-        );
+        $qb->expects($this->at(2))
+            ->method('andWhere')
+            ->with('sc.public = :public')
+            ->will($this->returnSelf());
+
+        $qb->expects($this->at(3))
+            ->method('setParameter')
+            ->with('public', true);
+
+        $event = new BuildAfter($datagrid);
+        $this->listener->onBuildAfter($event);
     }
 }

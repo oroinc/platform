@@ -318,23 +318,21 @@ datagrid:
                 select:
                     - sc.id
                     - sc.name as name
-                    - o.name as organization
+                    - sc.public
+                    - CASE WHEN sc.public = 1 THEN 'Organization' ELSE 'System' END as scope
                 from:
                     - { table: %oro_calendar.system_calendar.entity.class%, alias: sc }
-                join:
-                    inner:
-                        - { join: sc.organization, alias: o }
         columns:
             name:
                 label: oro.calendar.systemcalendar.name.label
-            organization:
-                label: oro.calendar.systemcalendar.organization.label
+            scope:
+                label: oro.calendar.systemcalendar.scope.label
         sorters:
             columns:
                 name:
                     data_name: name
-                organization:
-                    data_name: organization
+                scope:
+                    data_name: scope
             default:
                 name: ASC
         filters:
@@ -342,9 +340,9 @@ datagrid:
                 name:
                     type: string
                     data_name: name
-                organization:
+                scope:
                     type: string
-                    data_name: organization
+                    data_name: scope
         properties:
             id: ~
             view_link:
@@ -381,3 +379,4 @@ datagrid:
                 link:          delete_link
         options:
             skip_acl_check: true
+        action_configuration: @oro_calendar.system_calendar.datagrid_helper->getActionConfigurationClosure
