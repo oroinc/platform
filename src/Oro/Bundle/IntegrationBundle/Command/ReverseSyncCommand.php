@@ -48,6 +48,10 @@ class ReverseSyncCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($output->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
+            $output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
+        }
+
         $integrationId   = $input->getOption(self::INTEGRATION_ARG_NAME);
         $connectorType   = $input->getOption(self::CONNECTOR_ARG_NAME);
         $params          = $input->getOption(self::PARAMETERS_ARG_NAME);
