@@ -87,6 +87,8 @@ class CalendarEventManager
      * @param CalendarEvent $event
      * @param string        $calendarAlias
      * @param int           $calendarId
+     *
+     * @throws \LogicException
      */
     public function setCalendar(CalendarEvent $event, $calendarAlias, $calendarId)
     {

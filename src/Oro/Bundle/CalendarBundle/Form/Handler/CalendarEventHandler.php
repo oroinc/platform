@@ -123,6 +123,8 @@ class CalendarEventHandler
 
     /**
      * @param CalendarEvent $entity
+     *
+     * @throws \LogicException
      */
     protected function ensureCalendarSet(CalendarEvent $entity)
     {
