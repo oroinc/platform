@@ -159,6 +159,7 @@ services:
           - @oro_importexport.processor.registry
           - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
+          - @event_dispatcher
           - @oro_integration.logger.strategy
         lazy: true
 
@@ -187,6 +188,7 @@ services:
             - @oro_importexport.processor.registry
             - @oro_integration.job_executor
             - @oro_integration.manager.types_registry
+            - @event_dispatcher
             - @oro_integration.logger.strategy
         lazy: true
 
