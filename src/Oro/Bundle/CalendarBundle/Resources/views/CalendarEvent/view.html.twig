@@ -6,7 +6,9 @@
 {% oro_title_set({params : {"%entity.title%": entity.title|default('N/A') }}) %}
 
 {% block navButtons %}
-    {% include 'OroCalendarBundle:CalendarEvent:invitationButtons.html.twig' %}
+    {% if app.user and app.user.id == entity.calendar.owner.id %}
+        {% include 'OroCalendarBundle:CalendarEvent:invitationButtons.html.twig' with {'entity': entity} %}
+    {% endif %}
     {% if entity.parent is empty and resource_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path' : path('oro_calendar_event_update', { id: entity.id }),

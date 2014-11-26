@@ -95,6 +95,11 @@ oro:
                 accepted:             Accepted
                 declined:             Declined
 
+            actions:
+                tentatively_accepted: Tentatively
+                accepted:             Accept
+                declined:             Decline
+
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty
         #
