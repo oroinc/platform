@@ -108,6 +108,9 @@ class CalendarManager
                     if (!isset($event['removable'])) {
                         $event['removable'] = true;
                     }
+                    if (!isset($event['notifiable'])) {
+                        $event['notifiable'] = false;
+                    }
                 }
                 $result = array_merge($result, $events);
             }

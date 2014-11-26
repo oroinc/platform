@@ -21,7 +21,8 @@ define([
     Modal = Backbone.BootstrapModal.extend({
         defaults: {
             okText: __('OK'),
-            cancelText: __('Cancel')
+            cancelText: __('Cancel'),
+            handleClose: false
         },
 
         /** @property {String} */
@@ -30,7 +31,21 @@ define([
         initialize: function (options) {
             options = options || {};
             _.defaults(options, this.defaults);
+
+            if (options.handleClose) {
+                _.extend(this.events, {'click .close': _.bind(this.onClose, this)});
+            }
             Modal.__super__.initialize.call(this, options);
+        },
+
+        onClose: function(event) {
+            event.preventDefault();
+
+            this.trigger('close');
+
+            if (this.options.content && this.options.content.trigger) {
+                this.options.content.trigger('close', this);
+            }
         },
 
         /**
@@ -92,6 +107,10 @@ define([
             }
 
             this.once('cancel', function () {
+                self.close();
+            });
+
+            this.once('close', function () {
                 self.close();
             });
 

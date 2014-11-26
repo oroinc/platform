@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -47,19 +48,24 @@ class CalendarEventNormalizer
     {
         $result = [];
 
-        $items = $qb->getQuery()->getArrayResult();
+        $items = $qb->getQuery()->getResult();
+        /** @var CalendarEvent $item */
         foreach ($items as $item) {
+            $notifiable = $item->getInvitationStatus() && !$item->getParent() && !$item->getChildEvents()->isEmpty();
+            $item = $this->serializeCalendarEvent($item);
             $resultItem = array();
             foreach ($item as $field => $value) {
                 $this->transformEntityField($value);
                 $resultItem[$field] = $value;
             }
             $resultItem['editable']  =
-                ($resultItem['calendar'] === $calendarId)
+                $resultItem['calendar'] === $calendarId
+                && empty($resultItem['parentEventId'])
                 && $this->securityFacade->isGranted('oro_calendar_event_update');
             $resultItem['removable'] =
-                ($resultItem['calendar'] === $calendarId)
+                $resultItem['calendar'] === $calendarId
                 && $this->securityFacade->isGranted('oro_calendar_event_delete');
+            $resultItem['notifiable'] = $notifiable;
 
             $result[] = $resultItem;
         }
@@ -67,6 +73,38 @@ class CalendarEventNormalizer
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
         return $result;
+    }
+
+    /**
+     * @param CalendarEvent $event
+     *
+     * @return array
+     */
+    protected function serializeCalendarEvent(CalendarEvent $event)
+    {
+        $data = [
+            'id' => $event->getId(),
+            'title' => $event->getTitle(),
+            'description' => $event->getDescription(),
+            'start' => $event->getStart(),
+            'end' => $event->getEnd(),
+            'allDay' => $event->getAllDay(),
+            'backgroundColor' => $event->getBackgroundColor(),
+            'createdAt' => $event->getCreatedAt(),
+            'updatedAt' => $event->getUpdatedAt(),
+            'calendar' => $event->getCalendar() ? $event->getCalendar()->getId() : null,
+            'parentEventId' => $event->getParent() ? $event->getParent()->getId() : null,
+            'invitationStatus' => $event->getInvitationStatus(),
+            'childEvents' => [],
+            'invitedUsers' => [],
+        ];
+
+        foreach ($event->getChildEvents() as $childEvent) {
+            $data['childEvents'][] = $childEvent->getId();
+            $data['invitedUsers'][] = $childEvent->getCalendar()->getOwner()->getId();
+        }
+
+        return $data;
     }
 
     /**
