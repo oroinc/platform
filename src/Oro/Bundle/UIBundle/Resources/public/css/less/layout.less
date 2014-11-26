@@ -92,3 +92,40 @@
     padding-right: 0;
   }
 }
+
+.oro-page {
+  border-top: 1px solid @pageBorderColor;
+  .oro-page-sidebar {
+    width: 201px;
+    margin-right: -1px;
+    float: left;
+    border-right: 1px solid @pageBorderColor;
+    border-bottom: 1px solid @pageBorderColor;
+    background: @pageSidebarBackgroundColor;
+  }
+  .oro-page-body {
+    float: right;
+    width: calc(~"100% - 200px");
+    border-left: 1px solid @pageBorderColor;
+    border-bottom: 1px solid @pageBorderColor;
+    padding: 10px;
+    background-color: #ffffff;
+  }
+  &.collapsible-sidebar {
+    .oro-page-sidebar {
+      .dropdown-toggle {
+        display: none;
+      }
+      .dropdown-menu {
+        top: none;
+        left: none;
+        position: relative;
+        border: none;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+    }
+  }
+}

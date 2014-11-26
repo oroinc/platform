@@ -4,9 +4,8 @@ require([
     'underscore',
     'routing',
     'oroui/js/mediator',
-    'orotranslation/js/translator',
-    'oroui/js/tools'
-], function($, _, routing, mediator, __, tools) {
+    'orotranslation/js/translator'
+], function($, _, routing, mediator, __) {
   'use strict';
       $(function() {
           var _searchFlag = false,
@@ -24,13 +23,6 @@ require([
               $('#oroplatform-header .search-form .search').val('');
           });
 
-          if (tools.isMobile()) {
-              mediator.bind('page:afterChange', function () {
-                  $('#container .search-form select[name=from]').on('change', function () {
-                      $(this.form).trigger('submit');
-                  });
-              });
-          }
           mediator.bind('page:afterChange', searchByTagClose);
 
           $(document).on('click', '.search-view-more-link', function(evt) {

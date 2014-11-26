@@ -1,26 +1,25 @@
 .search-entity-types-column {
-  width: 200px;
-  vertical-align: top;
-  border: 1px solid #cccccc;
-  background-color: #f8f8f8;
   .entity-type {
     border-bottom: 1px solid #e6e6e6;
     width: 200px;
-    height: 30px;
-    font-size: 13px;
-    padding: 5px 0 5px 10px;
-    > img {
-      position: relative;
-      top: -2px;
+    a {
+      padding-top: 5px;
+      padding-bottom: 4px;
+    }
+    i[class^="icon-"] {
+      color: #444;
     }
   }
-  .entity-type.selected {
-    font-weight: bold;
+  .entity-type.selected, .entity-type.selected:hover {
     background-color: #e8e8e8;
-  }
-  .entity-type.selected .arrow {
-    float: right;
-    padding-right: 5px;
+    a{
+      font-weight: bold;
+      color: #444;
+    }
+    .arrow {
+      float: right;
+      margin-right: -7px;
+    }
   }
 }
 
@@ -38,24 +37,15 @@
     float: left;
     width: calc(~"100% - 180px");
     min-width: 260px;
-    margin: 16px 0 6px;
+    margin: 16px 0 18px;
     padding-left: 0px;
     input[type="text"] {
       width: 300px;
-    }
-    input[type="text"], .selector, .btn-search {
-      margin: 0 5px 10px 0;
-      display: block;
-      float: left;
     }
   }
 }
 
 .search-results-column {
-  vertical-align: top;
-  border: 1px solid #cccccc;
-  padding: 10px;
-  background-color: #ffffff;
   .customer-info {
     padding: 0 0 5px 60px;
     margin-top: -10px;
@@ -83,12 +73,26 @@
   border-top: 1px solid #cccccc;
   border-bottom: 1px solid #cccccc;
 }
-.search-form.before-grid{
-  display: none;
+.search-grid {
+  .table.grid{
+    margin-bottom: 20px;
+  }
 }
 .mobile-version {
-  .search-header .search-form input[type="text"] {
-    width: 218px;
+  .search-header .search-form {
+    input[type="text"] {
+      width: 218px;
+    }
+    @media only screen and (max-width : 512px) {
+      clear: both;
+      width: 100%;
+      .input-append {
+        width: 100%;
+      }
+      input[type="text"] {
+        width: calc(~"100% - 88px");
+      }
+    }
   }
   .search-grid {
     .pagination-container {
@@ -98,14 +102,6 @@
       .separator {
         display: none;
       }
-    }
-  }
-  @media only screen and (max-width : 565px) {
-    .search-form.before-grid {
-      display: block;
-    }
-    .search-entity-types-column {
-      display: none;
     }
   }
 }
