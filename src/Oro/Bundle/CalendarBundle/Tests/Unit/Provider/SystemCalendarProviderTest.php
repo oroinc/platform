@@ -134,11 +134,19 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $qb->expects($this->once())
+        $qb->expects($this->at(0))
+            ->method('andWhere')
+            ->with('c.organization = :organizationId')
+            ->will($this->returnSelf());
+        $qb->expects($this->at(1))
+            ->method('setParameter')
+            ->with('organizationId', $organizationId)
+            ->will($this->returnSelf());
+        $qb->expects($this->at(2))
             ->method('andWhere')
             ->with('c.id NOT IN (:invisibleIds)')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->at(3))
             ->method('setParameter')
             ->with('invisibleIds', [20])
             ->will($this->returnSelf());

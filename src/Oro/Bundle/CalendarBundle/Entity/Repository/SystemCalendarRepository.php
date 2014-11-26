@@ -58,4 +58,20 @@ class SystemCalendarRepository extends EntityRepository
             ->where('sc.public = :public')
             ->setParameter('public', true);
     }
+
+    /**
+     * Returns a query builder which can be used to get list of both system and public calendars
+     *
+     * @param int $organizationId
+     *
+     * @return QueryBuilder
+     */
+    public function getCalendarsQueryBuilder($organizationId)
+    {
+        return $this->createQueryBuilder('sc')
+            ->select('sc')
+            ->where('sc.organization = :organizationId OR sc.public = :public')
+            ->setParameter('organizationId', $organizationId)
+            ->setParameter('public', true);
+    }
 }

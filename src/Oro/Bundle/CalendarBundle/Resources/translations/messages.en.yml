@@ -17,6 +17,7 @@ oro:
         assign_event.title:         Assign an event to this user
         assign_event.widget_title:  Assign Event to %username%
         view_events:                Events
+        add_to_calendar:            Add to %name%
 
         system_configuration:
             groups:

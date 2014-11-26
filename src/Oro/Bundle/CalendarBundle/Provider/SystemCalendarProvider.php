@@ -76,7 +76,9 @@ class SystemCalendarProvider implements CalendarProviderInterface
 
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder($start, $end);
+        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder($start, $end)
+            ->andWhere('c.organization = :organizationId')
+            ->setParameter('organizationId', $organizationId);
         $invisibleIds = [];
         foreach ($connections as $id => $visible) {
             if (!$visible) {

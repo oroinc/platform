@@ -81,41 +81,6 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testProcessGetRequestWithoutCalendar()
-    {
-        $currentUser = new User();
-        ReflectionUtil::setId($currentUser, 123);
-        $organization = new Organization();
-        ReflectionUtil::setId($organization, 1);
-
-        $this->securityFacade->expects($this->exactly(2))
-            ->method('getLoggedUser')
-            ->will($this->returnValue($currentUser));
-        $this->securityFacade->expects($this->exactly(2))
-            ->method('getOrganization')
-            ->will($this->returnValue($organization));
-        $repository = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
-            ->disableOriginalConstructor()
-            ->setMethods(array('find', 'findAll', 'findBy', 'findOneBy', 'getClassName', 'findDefaultCalendar'))
-            ->getMock();
-        $calendar = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Calendar')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository ->expects($this->once())
-            ->method('findDefaultCalendar')
-            ->will($this->returnValue($calendar));
-        $this->om->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
-
-        $this->form->expects($this->never())
-            ->method('submit');
-
-        $this->assertFalse(
-            $this->handler->process($this->entity)
-        );
-    }
-
     /**
      * @dataProvider supportedMethods
      */
@@ -186,11 +151,18 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider supportedMethods
      *
      * @expectedException \LogicException
-     * @expectedExceptionMessage Current user did not define
+     * @expectedExceptionMessage Both logged in user and organization must be defined.
      */
     public function testProcessGetRequestWithoutCurrentUser($method)
     {
         $this->request->setMethod($method);
+
+        $this->form->expects($this->once())
+            ->method('submit')
+            ->with($this->identicalTo($this->request));
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->will($this->returnValue(true));
 
         $this->securityFacade->expects($this->once())
             ->method('getLoggedUser')

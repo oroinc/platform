@@ -226,9 +226,30 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
+     * Gets UID of a calendar this event belongs to
+     * The calendar UID is a string includes a calendar alias and id in the following format: {alias}_{id}
+     *
+     * @return string|null
+     */
+    public function getCalendarUid()
+    {
+        if ($this->calendar) {
+            return sprintf('%s_%d', Calendar::CALENDAR_ALIAS, $this->calendar->getId());
+        } elseif ($this->systemCalendar) {
+            $alias = $this->systemCalendar->isPublic()
+                ? SystemCalendar::PUBLIC_CALENDAR_ALIAS
+                : SystemCalendar::CALENDAR_ALIAS;
+
+            return sprintf('%s_%d', $alias, $this->systemCalendar->getId());
+        }
+
+        return null;
+    }
+
+    /**
      * Gets owning user's calendar
      *
-     * @return Calendar
+     * @return Calendar|null
      */
     public function getCalendar()
     {
@@ -245,6 +266,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     public function setCalendar(Calendar $calendar = null)
     {
         $this->calendar = $calendar;
+        // unlink an event from system calendar
+        if ($calendar && $this->getSystemCalendar()) {
+            $this->setSystemCalendar(null);
+        }
 
         return $this;
     }
@@ -252,7 +277,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     /**
      * Gets owning system calendar
      *
-     * @return SystemCalendar
+     * @return SystemCalendar|null
      */
     public function getSystemCalendar()
     {
@@ -269,6 +294,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     public function setSystemCalendar(SystemCalendar $systemCalendar = null)
     {
         $this->systemCalendar = $systemCalendar;
+        // unlink an event from user's calendar
+        if ($systemCalendar && $this->getCalendar()) {
+            $this->setCalendar(null);
+        }
 
         return $this;
     }
