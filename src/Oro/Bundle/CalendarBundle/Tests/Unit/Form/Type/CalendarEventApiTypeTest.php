@@ -25,15 +25,15 @@ class CalendarEventApiTypeTest extends TypeTestCase
     protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $calendarChoiceManager;
+    protected $calendarEventManager;
 
     protected function getExtensions()
     {
         $this->registry              = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calendarChoiceManager =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager')
+        $this->calendarEventManager =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\CalendarEventManager')
                 ->disableOriginalConstructor()
                 ->getMock();
 
@@ -58,10 +58,10 @@ class CalendarEventApiTypeTest extends TypeTestCase
             'reminders'       => new ArrayCollection()
         );
 
-        $type = new CalendarEventApiType($this->calendarChoiceManager);
+        $type = new CalendarEventApiType($this->calendarEventManager);
         $form = $this->factory->create($type);
 
-        $this->calendarChoiceManager->expects($this->once())
+        $this->calendarEventManager->expects($this->once())
             ->method('setCalendar')
             ->with(
                 $this->isInstanceOf('Oro\Bundle\CalendarBundle\Entity\CalendarEvent'),
@@ -104,10 +104,10 @@ class CalendarEventApiTypeTest extends TypeTestCase
             'reminders'       => new ArrayCollection()
         );
 
-        $type = new CalendarEventApiType($this->calendarChoiceManager);
+        $type = new CalendarEventApiType($this->calendarEventManager);
         $form = $this->factory->create($type);
 
-        $this->calendarChoiceManager->expects($this->once())
+        $this->calendarEventManager->expects($this->once())
             ->method('setCalendar')
             ->with(
                 $this->isInstanceOf('Oro\Bundle\CalendarBundle\Entity\CalendarEvent'),
@@ -150,13 +150,13 @@ class CalendarEventApiTypeTest extends TypeTestCase
                 )
             );
 
-        $type = new CalendarEventApiType($this->calendarChoiceManager);
+        $type = new CalendarEventApiType($this->calendarEventManager);
         $type->setDefaultOptions($resolver);
     }
 
     public function testGetName()
     {
-        $type = new CalendarEventApiType($this->calendarChoiceManager);
+        $type = new CalendarEventApiType($this->calendarEventManager);
         $this->assertEquals('oro_calendar_event_api', $type->getName());
     }
 

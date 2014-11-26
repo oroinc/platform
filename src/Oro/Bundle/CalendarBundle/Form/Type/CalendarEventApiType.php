@@ -10,20 +10,20 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager;
+use Oro\Bundle\CalendarBundle\Manager\CalendarEventManager;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class CalendarEventApiType extends CalendarEventType
 {
-    /** @var CalendarChoiceManager */
-    protected $calendarChoiceManager;
+    /** @var CalendarEventManager */
+    protected $calendarEventManager;
 
     /**
-     * @param CalendarChoiceManager $calendarChoiceManager
+     * @param CalendarEventManager $calendarEventManager
      */
-    public function __construct(CalendarChoiceManager $calendarChoiceManager)
+    public function __construct(CalendarEventManager $calendarEventManager)
     {
-        $this->calendarChoiceManager = $calendarChoiceManager;
+        $this->calendarEventManager = $calendarEventManager;
     }
 
     /**
@@ -150,7 +150,7 @@ class CalendarEventApiType extends CalendarEventType
             $calendarAlias = Calendar::CALENDAR_ALIAS;
         }
 
-        $this->calendarChoiceManager->setCalendar($data, $calendarAlias, (int)$calendarId);
+        $this->calendarEventManager->setCalendar($data, $calendarAlias, (int)$calendarId);
     }
 
     /**

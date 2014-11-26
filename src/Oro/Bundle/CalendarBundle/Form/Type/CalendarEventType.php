@@ -130,7 +130,7 @@ class CalendarEventType extends AbstractType
                 $form->getConfig()->getFormFactory()->createNamed(
                     'calendarUid',
                     'oro_calendar_choice',
-                    $this->getCalendarUid($data),
+                    $data ? $data->getCalendarUid() : null,
                     [
                         'required'        => false,
                         'mapped'          => false,
@@ -149,28 +149,5 @@ class CalendarEventType extends AbstractType
     public function getName()
     {
         return 'oro_calendar_event';
-    }
-
-    /**
-     * @param CalendarEvent $data
-     *
-     * @return string
-     */
-    protected function getCalendarUid(CalendarEvent $data = null)
-    {
-        if ($data) {
-            if ($data->getCalendar()) {
-                return sprintf('%s_%d', Calendar::CALENDAR_ALIAS, $data->getCalendar()->getId());
-            }
-            if ($data->getSystemCalendar()) {
-                $alias = $data->getSystemCalendar()->isPublic()
-                    ? SystemCalendar::PUBLIC_CALENDAR_ALIAS
-                    : SystemCalendar::CALENDAR_ALIAS;
-
-                return sprintf('%s_%d', $alias, $data->getSystemCalendar()->getId());
-            }
-        }
-
-        return null;
     }
 }

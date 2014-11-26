@@ -8,21 +8,29 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\CalendarBundle\Manager\CalendarEventManager;
 
 class CalendarChoiceType extends AbstractType
 {
-    /** @var CalendarChoiceManager */
-    protected $calendarChoiceManager;
+    /** @var CalendarEventManager */
+    protected $calendarEventManager;
+
+    /** @var TranslatorInterface */
+    protected $translator;
 
     /**
-     * @param CalendarChoiceManager $calendarChoiceManager
+     * @param CalendarEventManager $calendarEventManager
+     * @param TranslatorInterface  $translator
      */
-    public function __construct(CalendarChoiceManager $calendarChoiceManager)
+    public function __construct(CalendarEventManager $calendarEventManager, TranslatorInterface $translator)
     {
-        $this->calendarChoiceManager = $calendarChoiceManager;
+        $this->calendarEventManager = $calendarEventManager;
+        $this->translator           = $translator;
     }
 
     /**
@@ -41,7 +49,7 @@ class CalendarChoiceType extends AbstractType
         $resolver->setDefaults(
             array(
                 'choices'              => function (Options $options) {
-                    return $this->calendarChoiceManager->getChoices($options['is_new']);
+                    return $this->getChoices($options['is_new']);
                 },
                 'is_new'               => false,
                 'translatable_options' => false
@@ -85,8 +93,8 @@ class CalendarChoiceType extends AbstractType
             return;
         }
 
-        list($calendarAlias, $calendarId) = $this->calendarChoiceManager->parseCalendarUid($data);
-        $this->calendarChoiceManager->setCalendar($parentData, $calendarAlias, $calendarId);
+        list($calendarAlias, $calendarId) = $this->calendarEventManager->parseCalendarUid($data);
+        $this->calendarEventManager->setCalendar($parentData, $calendarAlias, $calendarId);
     }
 
     /**
@@ -103,5 +111,44 @@ class CalendarChoiceType extends AbstractType
     public function getParent()
     {
         return 'choice';
+    }
+
+    /**
+     * @param bool $isNew
+     *
+     * @return array key = calendarUid, value = calendar name
+     */
+    protected function getChoices($isNew)
+    {
+        $calendars = $this->calendarEventManager->getSystemCalendars();
+        if ($isNew && count($calendars) === 1) {
+            $calendars[0]['name'] = $this->translator->trans(
+                'oro.calendar.add_to_calendar',
+                ['%name%' => $calendars[0]['name']]
+            );
+        } elseif (!$isNew || count($calendars) !== 0) {
+            usort(
+                $calendars,
+                function ($a, $b) {
+                    return strcasecmp($a['name'], $b['name']);
+                }
+            );
+            $userCalendars = $this->calendarEventManager->getUserCalendars();
+            foreach ($userCalendars as $userCalendar) {
+                $userCalendar['alias'] = Calendar::CALENDAR_ALIAS;
+                array_unshift($calendars, $userCalendar);
+            }
+        }
+
+        $choices = [];
+        foreach ($calendars as $calendar) {
+            $alias                 = !empty($calendar['alias'])
+                ? $calendar['alias']
+                : ($calendar['public'] ? SystemCalendar::PUBLIC_CALENDAR_ALIAS : SystemCalendar::CALENDAR_ALIAS);
+            $calendarUid           = $this->calendarEventManager->getCalendarUid($alias, $calendar['id']);
+            $choices[$calendarUid] = $calendar['name'];
+        }
+
+        return $choices;
     }
 }

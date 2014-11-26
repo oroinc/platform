@@ -5,7 +5,6 @@ parameters:
     oro_calendar.calendar_event.form.handler.api.class:       Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler
     oro_calendar.calendar_property.form.type.api.class:       Oro\Bundle\CalendarBundle\Form\Type\CalendarPropertyApiType
     oro_calendar.calendar_property.form.handler.api.class:    Oro\Bundle\CalendarBundle\Form\Handler\CalendarPropertyApiHandler
-    oro_calendar.calendar_choice.manager.class:               Oro\Bundle\CalendarBundle\Form\Manager\CalendarChoiceManager
     oro_calendar.calendar_choice.form.type.class:             Oro\Bundle\CalendarBundle\Form\Type\CalendarChoiceType
     oro_calendar.calendar_choice_template.form.type.class:    Oro\Bundle\CalendarBundle\Form\Type\CalendarChoiceTemplateType
 
@@ -18,7 +17,7 @@ services:
     oro_calendar.calendar_event.form.type.api:
         class: %oro_calendar.calendar_event.form.type.api.class%
         arguments:
-            - @oro_calendar.calendar_choice.manager
+            - @oro_calendar.calendar_event_manager
         tags:
             - { name: form.type, alias: oro_calendar_event_api }
 
@@ -104,18 +103,11 @@ services:
             - @request
             - @doctrine.orm.entity_manager
 
-    oro_calendar.calendar_choice.manager:
-        class: %oro_calendar.calendar_choice.manager.class%
-        arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_security.security_facade
-            - @oro_locale.formatter.name
-            - @translator
-
     oro_calendar.calendar_choice.form.type:
         class: %oro_calendar.calendar_choice.form.type.class%
         arguments:
-            - @oro_calendar.calendar_choice.manager
+            - @oro_calendar.calendar_event_manager
+            - @translator
         tags:
             - { name: form.type, alias: oro_calendar_choice }
 
