@@ -234,6 +234,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
         unset($data['calendarAlias']);
         unset($data['editable']);
         unset($data['removable']);
+        unset($data['notifiable']);
 
         return true;
     }
