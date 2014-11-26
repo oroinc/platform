@@ -89,11 +89,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity Email */
-        if ($activityEntity->getFromEmailAddress()->hasOwner()) {
-            return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
-        }
-
-        return null;
+        return $activityEntity->getFromEmailAddress()->getOwner()->getOrganization();
     }
 
     /**
