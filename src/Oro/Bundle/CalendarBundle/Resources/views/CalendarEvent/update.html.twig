@@ -31,6 +31,15 @@
 {% block content_data %}
     {% set id = 'calendarevent-form' %}
 
+    {% if entity.invitationStatus and entity.parent is null and entity.childEvents is not empty %}
+        {% set componentDiv %}
+            {{ calendarMacros.notifyGuestsComponent() }}
+        {% endset %}
+    {% else %}
+        {% set componentDiv = '' %}
+    {% endif %}
+
+
     {% set dataBlocks = [{
         'title': 'General Information'|trans,
         'class': 'active',
@@ -46,7 +55,8 @@
                     form_row(form.backgroundColor),
                     form_row(form.reminders),
                     form_row(form.childEvents),
-                    form_row(form.notifyInvitedUsers)
+                    form_row(form.notifyInvitedUsers),
+                    componentDiv
                 ]
             }
         ]
@@ -72,8 +82,4 @@
         'dataBlocks': dataBlocks
     } %}
     {{ parent() }}
-
-    {% if entity.invitationStatus and entity.parent is null and entity.childEvents is not empty %}
-        {{ calendarMacros.notifyGuests(form) }}
-    {% endif %}
 {% endblock content_data %}
