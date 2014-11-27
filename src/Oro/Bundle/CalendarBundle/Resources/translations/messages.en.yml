@@ -75,12 +75,13 @@ oro:
             entity_plural_label:  System Calendars
             entity_description:   Represent system calendar
             id.label:             Id
-            name.label:           Name
+            name.label:           Calendar Name
             backgroundColor.label: Color
             public.label:         Make Public
             public.description:   Public calendars are available to all users regardless of which organization they belong to
             events.label:         Events
             organization.label:   Organization
+            scope.label:          Scope
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
