@@ -19,7 +19,7 @@
     </div>
 
     {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
-        <div class="oro-page collapsible-sidebar">
+        <div class="oro-page collapsible-sidebar clearfix">
             <div class="oro-page-sidebar search-entity-types-column dropdown">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
                     {% if selectedResult.class %}{{ selectedResult.label }}{% else %}{{ 'oro.search.result.all'|trans }}{% endif %}

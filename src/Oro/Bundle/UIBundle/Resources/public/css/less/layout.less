@@ -95,6 +95,8 @@
 
 .oro-page {
   border-top: 1px solid @pageBorderColor;
+  background: @pageSidebarBackgroundColor;
+  border-bottom: 1px solid @pageBorderColor;
   .oro-page-sidebar {
     width: 201px;
     margin-right: -1px;
@@ -107,11 +109,11 @@
     float: right;
     width: calc(~"100% - 200px");
     border-left: 1px solid @pageBorderColor;
-    border-bottom: 1px solid @pageBorderColor;
     padding: 10px;
     background-color: #ffffff;
   }
   &.collapsible-sidebar {
+
     .oro-page-sidebar {
       .dropdown-toggle {
         display: none;
