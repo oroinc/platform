@@ -24,6 +24,8 @@
         <div class="oro-page collapsible-sidebar clearfix">
             <div class="oro-page-sidebar search-entity-types-column dropdown">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                    {% if selectedResult.class %}{{ selectedResult.label }}{% else %}{{ 'oro.search.result.all'|trans }}{% endif %}
+                    ({{ selectedResult.count }}) <i class="icon-sort-down"></i>
                 </a>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                 {% for alias, type in groupedResults %}
