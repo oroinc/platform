@@ -10,11 +10,12 @@ use Zend\Mail\Storage\Exception as MailException;
 
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
+use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
+use Oro\Bundle\ImapBundle\Util\DateTimeParser;
 
 class ImapEmailManager
 {
@@ -197,10 +198,7 @@ class ImapEmailManager
     {
         $val = $headers->get($name);
         if ($val instanceof HeaderInterface) {
-            $dt = new \DateTime($val->getFieldValue());
-            $dt->setTimezone(new \DateTimeZone('UTC'));
-
-            return $dt;
+            return $this->convertToDateTime($val->getFieldValue());
         }
 
         return new \DateTime('0001-01-01', new \DateTimeZone('UTC'));
@@ -227,10 +225,8 @@ class ImapEmailManager
         $delim = strrpos($str, ';');
         if ($delim !== false) {
             $str = trim(preg_replace('@[\r\n]+@', '', substr($str, $delim + 1)));
-            $dt  = new \DateTime($str);
-            $dt->setTimezone(new \DateTimeZone('UTC'));
 
-            return $dt;
+            return $this->convertToDateTime($str);
         }
 
         return new \DateTime('0001-01-01', new \DateTimeZone('UTC'));
@@ -293,5 +289,19 @@ class ImapEmailManager
         }
 
         return 0;
+    }
+
+    /**
+     * Convert a string to DateTime
+     *
+     * @param string $value
+     *
+     * @return \DateTime
+     *
+     * @throws \Exception
+     */
+    protected function convertToDateTime($value)
+    {
+        return DateTimeParser::parse($value);
     }
 }
