@@ -98,6 +98,7 @@ datagrid:
                 link:          delete_link
         options:
             entityHint: calendar_events
+            entity_pagination: true
 
     widget-base-calendar-event-grid:
         source:
@@ -235,7 +236,6 @@ datagrid:
             query:
                 select:
                     - event.id
-                    - calendar.name
                     - event.title
                     - event.start
                     - event.end
@@ -252,8 +252,6 @@ datagrid:
         columns:
             title:
                 label: oro.calendar.calendarevent.title.label
-            name:
-                label: oro.calendar.calendarevent.calendar.label
             start:
                 label: oro.calendar.calendarevent.start.label
                 frontend_type: datetime
@@ -264,8 +262,6 @@ datagrid:
             columns:
                 title:
                     data_name: event.title
-                name:
-                    data_name: name
                 start:
                     data_name: event.start
                 end:
@@ -277,9 +273,6 @@ datagrid:
                 title:
                     type: string
                     data_name: event.title
-                name:
-                    type: string
-                    data_name: name
                 start:
                     type: datetime
                     data_name: event.start
@@ -292,6 +285,14 @@ datagrid:
                 type:       url
                 route:      oro_system_calendar_event_view
                 params:     [ id ]
+            update_link:
+                type:       url
+                route:      oro_system_calendar_event_update
+                params:     [ id ]
+            delete_link:
+                type:       url
+                route:      oro_api_delete_calendarevent
+                params:     [ id ]
         actions:
             view:
                 type:         navigate
@@ -300,8 +301,21 @@ datagrid:
                 icon:         eye-open
                 acl_recource: oro_calendar_event_view
                 rowAction:    true
+            update:
+                type:          navigate
+                acl_resource:  oro_calendar_event_create
+                label:         Update
+                icon:          edit
+                link:          update_link
+            delete:
+                type:          delete
+                acl_resource:  oro_calendar_event_delete
+                label:         Delete
+                icon:          trash
+                link:          delete_link
         options:
             entityHint: calendar_events
+            entity_pagination: true
 
     system-calendar-event-grid:
         extends: base-system-calendar-event-grid

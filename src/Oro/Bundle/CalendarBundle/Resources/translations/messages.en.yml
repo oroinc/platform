@@ -19,6 +19,10 @@ oro:
         view_events:                Events
         add_to_calendar:            Add to %name%
 
+        systemcalendarevent:
+            label:                  System Calendar Event
+            plural_label:           System Calendar Events
+
         system_configuration:
             groups:
                 calendar_settings.title:  Calendar settings
