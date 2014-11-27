@@ -27,7 +27,8 @@ oro:
                 event_colors.label:       Event colors
 
         controller:
-            event.saved.message:  Calendar event saved
+            event.saved.message:          Calendar event saved
+            systemcalendar.saved.message: Calendar saved
 
         form:
             choose_user_to_add_calendar: "Choose a user to add..."

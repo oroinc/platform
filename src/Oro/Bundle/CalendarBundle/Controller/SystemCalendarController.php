@@ -41,6 +41,7 @@ class SystemCalendarController extends Controller
 
     /**
      * @Route("/create", name="oro_system_calendar_create")
+     * @Template("OroCalendarBundle:SystemCalendar:update.html.twig")
      * @Acl(
      *      id="oro_system_calendar_create",
      *      type="entity",
@@ -51,11 +52,17 @@ class SystemCalendarController extends Controller
      */
     public function createAction()
     {
+        $entity = new SystemCalendar();
 
+        $formAction = $this->get('oro_entity.routing_helper')
+            ->generateUrlByRequest('oro_system_calendar_create', $this->getRequest());
+
+        return $this->update($entity, $formAction);
     }
 
     /**
      * @Route("/update/{id}", name="oro_system_calendar_update", requirements={"id"="\d+"})
+     * @Template("OroCalendarBundle:SystemCalendar:update.html.twig")
      * @Acl(
      *      id="oro_system_calendar_update",
      *      type="entity",
@@ -66,6 +73,41 @@ class SystemCalendarController extends Controller
      */
     public function updateAction(SystemCalendar $entity)
     {
+        $formAction = $this->get('router')->generate('oro_system_calendar_update', ['id' => $entity->getId()]);
 
+        return $this->update($entity, $formAction);
+    }
+
+    /**
+     * @param SystemCalendar $entity
+     * @param string        $formAction
+     *
+     * @return array
+     */
+    protected function update(SystemCalendar $entity, $formAction)
+    {
+        $saved = false;
+
+        if ($this->get('oro_calendar.system_calendar.form.handler')->process($entity)) {
+            if (!$this->getRequest()->get('_widgetContainer')) {
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.calendar.controller.systemcalendar.saved.message')
+                );
+
+                return $this->get('oro_ui.router')->redirectAfterSave(
+                    ['route' => 'oro_system_calendar_update', 'parameters' => ['id' => $entity->getId()]],
+                    ['route' => 'oro_system_calendar_view', 'parameters' => ['id' => $entity->getId()]]
+                );
+            }
+            $saved = true;
+        }
+
+        return array(
+            'entity'     => $entity,
+            'saved'      => $saved,
+            'form'       => $this->get('oro_calendar.system_calendar.form.handler')->getForm()->createView(),
+            'formAction' => $formAction
+        );
     }
 }
