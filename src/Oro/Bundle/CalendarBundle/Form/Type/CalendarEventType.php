@@ -145,7 +145,7 @@ class CalendarEventType extends AbstractType
         /** @var CalendarEvent $parentEvent */
         $parentEvent = $event->getForm()->getData();
         if ($parentEvent) {
-            $this->checkEventStatus($parentEvent);
+            $this->setDefaultEventStatus($parentEvent, CalendarEvent::ACCEPTED);
 
             foreach ($parentEvent->getChildEvents() as $calendarEvent) {
                 $calendarEvent->setTitle($parentEvent->getTitle())
@@ -154,18 +154,19 @@ class CalendarEventType extends AbstractType
                     ->setEnd($parentEvent->getEnd())
                     ->setAllDay($parentEvent->getAllDay());
 
-                $this->checkEventStatus($calendarEvent);
+                $this->setDefaultEventStatus($calendarEvent);
             }
         }
     }
 
     /**
      * @param CalendarEvent $calendarEvent
+     * @param string $status
      */
-    protected function checkEventStatus(CalendarEvent $calendarEvent)
+    protected function setDefaultEventStatus(CalendarEvent $calendarEvent, $status = CalendarEvent::NOT_RESPONDED)
     {
         if (!$calendarEvent->getInvitationStatus()) {
-            $calendarEvent->setInvitationStatus(CalendarEvent::NOT_RESPONDED);
+            $calendarEvent->setInvitationStatus($status);
         }
     }
 

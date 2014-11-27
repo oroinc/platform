@@ -223,7 +223,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
         // assert default data with default status
         $this->type->onPostSubmit(new FormEvent($form, []));
 
-        $this->assertEquals(CalendarEvent::NOT_RESPONDED, $parentEvent->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::ACCEPTED, $parentEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::NOT_RESPONDED, $firstEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::NOT_RESPONDED, $secondEvent->getInvitationStatus());
         $this->assertEventDataEquals($parentEvent, $firstEvent);
