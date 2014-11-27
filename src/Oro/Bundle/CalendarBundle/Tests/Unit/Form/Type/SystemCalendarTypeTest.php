@@ -49,8 +49,14 @@ class SystemCalendarTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'public',
-                'checkbox',
-                ['required' => false, 'label' => 'oro.calendar.systemcalendar.public.label']
+                'choice',
+                [
+                    'required' => false,
+                    'choices'  => [
+                        true  => 'oro.calendar.systemcalendar.scope.organization.label',
+                        false => 'oro.calendar.systemcalendar.scope.system.label',
+                    ]
+                ]
             )
             ->will($this->returnSelf());
 

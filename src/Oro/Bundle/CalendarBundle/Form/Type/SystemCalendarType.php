@@ -37,10 +37,13 @@ class SystemCalendarType extends AbstractType
             )
             ->add(
                 'public',
-                'checkbox',
+                'choice',
                 [
                     'required' => false,
-                    'label'    => 'oro.calendar.systemcalendar.public.label'
+                    'choices'  => [
+                        true  => 'oro.calendar.systemcalendar.scope.organization.label',
+                        false => 'oro.calendar.systemcalendar.scope.system.label',
+                    ]
                 ]
             );
     }

@@ -83,6 +83,8 @@ oro:
             events.label:         Events
             organization.label:   Organization
             scope.label:          Scope
+            scope.system.label:   System
+            scope.organization.label: Organization
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
