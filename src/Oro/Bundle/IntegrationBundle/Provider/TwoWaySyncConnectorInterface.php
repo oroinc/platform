@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-interface TwoWaySyncConnectorInterface
+interface TwoWaySyncConnectorInterface extends ConnectorInterface
 {
     const REMOTE_WINS = 'remote';
     const LOCAL_WINS  = 'local';
