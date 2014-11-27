@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener\Datagrid;
 
 use Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
 class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
@@ -104,5 +105,19 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
         $event = new BuildAfter($datagrid);
         $this->listener->onBuildAfter($event);
+    }
+
+    public function testGetActionConfigurationClosure()
+    {
+        $resultRecord = new ResultRecord(array('public' => true));
+
+        $closure = $this->listener->getActionConfigurationClosure();
+        $this->assertEquals(
+            [
+                'update' => false,
+                'delete' => false,
+            ],
+            $closure($resultRecord)
+        );
     }
 }
