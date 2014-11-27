@@ -134,11 +134,8 @@ class EmailActivityListProvider implements ActivityListProviderInterface
      */
     public function isApplicable($entity)
     {
-        if (is_object($entity)) {
-            $entity = $this->doctrineHelper->getEntityClass($entity);
-        }
-
-        return $entity == self::ACTIVITY_CLASS;
+        return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
+            && $entity->getFromEmailAddress()->hasOwner();
     }
 
     /**

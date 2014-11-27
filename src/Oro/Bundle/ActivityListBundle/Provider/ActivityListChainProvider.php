@@ -214,32 +214,36 @@ class ActivityListChainProvider
         $verb = ActivityList::VERB_CREATE,
         $list = null
     ) {
-        if (!$list) {
-            $list = new ActivityList();
-        }
-
-        $list->setSubject($provider->getSubject($entity));
-        $list->setVerb($verb);
-
-        if ($verb === ActivityList::VERB_UPDATE) {
-            $activityListTargets = $list->getActivityListTargetEntities();
-            foreach ($activityListTargets as $target) {
-                $list->removeActivityListTarget($target);
+        if ($provider->isApplicable($entity)) {
+            if (!$list) {
+                $list = new ActivityList();
             }
-        } else {
-            $className = $this->doctrineHelper->getEntityClass($entity);
-            $list->setRelatedActivityClass($className);
-            $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
-            $list->setOrganization($provider->getOrganization($entity));
-        }
 
-        $targets = $provider->getTargetEntities($entity);
-        foreach ($targets as $target) {
-            if ($list->supportActivityListTarget($this->doctrineHelper->getEntityClass($target))) {
-                $list->addActivityListTarget($target);
+            $list->setSubject($provider->getSubject($entity));
+            $list->setVerb($verb);
+
+            if ($verb === ActivityList::VERB_UPDATE) {
+                $activityListTargets = $list->getActivityListTargetEntities();
+                foreach ($activityListTargets as $target) {
+                    $list->removeActivityListTarget($target);
+                }
+            } else {
+                $className = $this->doctrineHelper->getEntityClass($entity);
+                $list->setRelatedActivityClass($className);
+                $list->setRelatedActivityId($this->doctrineHelper->getSingleEntityIdentifier($entity));
+                $list->setOrganization($provider->getOrganization($entity));
             }
+
+            $targets = $provider->getTargetEntities($entity);
+            foreach ($targets as $target) {
+                if ($list->supportActivityListTarget($this->doctrineHelper->getEntityClass($target))) {
+                    $list->addActivityListTarget($target);
+                }
+            }
+
+            return $list;
         }
 
-        return $list;
+        return null;
     }
 }
