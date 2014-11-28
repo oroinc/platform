@@ -3,10 +3,9 @@
     {% set statuses = entity.availableInvitationStatuses %}
     {% for status in statuses  %}
         {% set statusName = calendarMacros.calendar_event_invitation_action(status) %}
-        {% set invitationClass = calendarMacros.get_invitatition_status_class(status)|trim %}
         {{ UI.link({
             'aCss':  'btn btn-default',
-            'iCss':  invitationClass,
+            'iCss':  calendarMacros.get_invitatition_status_class(status),
             'data':  {'page-component-module': 'orocalendar/js/app/components/change-status-component'},
             'path':  path('oro_calendar_event_change_status', {'id': entity.id, 'status': status}),
             'label': statusName|trans,

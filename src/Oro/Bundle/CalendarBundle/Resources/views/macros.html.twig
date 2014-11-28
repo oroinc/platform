@@ -35,7 +35,7 @@
 {% macro calendar_event_invitation(parentEvent) %}
     <div class="row-fluid">
         <div class="responsive-block">
-            <ul class="guest-user-list list-group">
+            <ul class="user-status-list list-group">
                 {{ _self.build_invitation_link(parentEvent) }}
                 {% for event in parentEvent.childEvents %}
                     {{ _self.build_invitation_link(event) }}
@@ -48,7 +48,7 @@
 {% macro build_invitation_link(calendarEvent) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
         {% set invitationStatus = calendarEvent.invitationStatus %}
-        {% set invitationClass = _self.get_invitatition_status_class(invitationStatus)|trim %}
+        {% set invitationClass = _self.get_invitatition_status_class(invitationStatus) %}
         <li class="list-group-item">
             {% if invitationClass is not empty %}
                 <i class="{{ invitationClass }}" title="{{ _self.calendar_event_invitation_status(invitationStatus) }}"></i>
@@ -68,19 +68,17 @@
         </li>
 {% endmacro %}
 
-{%- macro get_invitatition_status_class(invitationStatus) -%}
+{% macro get_invitatition_status_class(invitationStatus) -%}
     {% if invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::NOT_RESPONDED') %}
-        {{ 'icon-reply' }}
+        {{- 'icon-reply' -}}
     {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::TENTATIVELY_ACCEPTED') %}
-        {{ 'icon-question' }}
+        {{- 'icon-question' -}}
     {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::ACCEPTED') %}
-        {{ 'icon-ok' }}
+        {{- 'icon-ok' -}}
     {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::DECLINED') %}
-        {{ 'icon-remove' }}
-    {% else %}
-        {{ '' }}
+        {{- 'icon-remove' -}}
     {% endif %}
-{%- endmacro -%}
+{%- endmacro %}
 
 {%- macro calendar_event_invitation_status(statusCode) -%}
     {{ ('oro.calendar.calendarevent.statuses.' ~ statusCode)|trans }}
