@@ -1,8 +1,3 @@
-"My Calendar": "My Calendar"
-"Today calendar": "Today's Calendar"
-"Delete event": "Delete event"
-"Are you sure you want to delete this event?": "Are you sure you want to delete this event?"
-
 oro:
     dashboard:
         calendar:
@@ -11,13 +6,23 @@ oro:
 
     calendar:
         my_calendar:                My Calendar
+        my_calendar_widget_title:   Today's Calendar
+        my_calendar_widget_description: This widget displays a calendar for today.
         add_event:                  Add Event
         add_event.title:            Add an event to this record
         assign_event:               Assign Event
         assign_event.title:         Assign an event to this user
         assign_event.widget_title:  Assign Event to %username%
+        delete_event.title:         Delete event
+        delete_event.confirmation:  Are you sure you want to delete this event?
+        print: Print
         view_events:                Events
         add_to_calendar:            Add to %name%
+
+        action:
+            public_calendar_management: Manage system calendars
+            public_calendar_event_management: Manage system calendar events
+            system_calendar_event_management: Manage organization calendar events
 
         system_configuration:
             groups:
@@ -32,9 +37,6 @@ oro:
         form:
             choose_user_to_add_calendar: "Choose a user to add..."
             no_color: Use calendar color
-
-        my_calendar_widget_descriptions: This widget displays a calendar for today.
-        print: Print
 
         menu:
             view_default: My Calendar
