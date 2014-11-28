@@ -96,7 +96,7 @@ oro:
                 declined:             Declined
 
             actions:
-                tentatively_accepted: Tentatively
+                tentatively_accepted: Tentative
                 accepted:             Accept
                 declined:             Decline
 

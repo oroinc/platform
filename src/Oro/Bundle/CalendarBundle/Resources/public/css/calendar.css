@@ -245,3 +245,11 @@
 .connection-item .custom-color-link:hover {
     color: #333;
 }
+
+table.guests td {
+    padding: 0 5px 10px 0;
+}
+
+table.guests td.icon {
+    text-align: center;
+}
