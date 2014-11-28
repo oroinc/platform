@@ -50,8 +50,6 @@ class SystemCalendarEventHandler
      *
      * @param  CalendarEvent $entity
      *
-     * @throws \LogicException
-     *
      * @return bool  True on successful processing, false otherwise
      */
     public function process(CalendarEvent $entity)

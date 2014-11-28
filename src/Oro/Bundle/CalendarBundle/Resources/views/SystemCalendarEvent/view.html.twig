@@ -8,8 +8,8 @@
     {# @TODO: Add check permission to update event from public system calendar #}
     {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
-        'path' : path('oro_system_calendar_event_update', { id: entity.id }),
-        'entity_label': 'oro.calendar.calendarevent.entity_label'|trans
+            'path' : path('oro_system_calendar_event_update', { id: entity.id }),
+            'entity_label': 'oro.calendar.calendarevent.entity_label'|trans
         })  }}
     {% endif %}
     {# @TODO: Add check permission to delete event from public system calendar #}
