@@ -33,7 +33,7 @@ define([
             _.defaults(options, this.defaults);
 
             if (options.handleClose) {
-                _.extend(this.events, {'click .close': _.bind(this.onClose, this)});
+                this.events = _.extend({}, this.events, {'click .close': _.bind(this.onClose, this)});
             }
             Modal.__super__.initialize.call(this, options);
         },
@@ -98,7 +98,11 @@ define([
                 });
 
                 $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function (e) {
-                    e.which === 27 && self.trigger('cancel');
+                    if (self.options.handleClose) {
+                        e.which === 27 && self.trigger('close');
+                    } else {
+                        e.which === 27 && self.trigger('cancel');
+                    }
 
                     if (self.options.content && self.options.content.trigger) {
                         e.which === 27 && self.options.content.trigger('shown', self);
