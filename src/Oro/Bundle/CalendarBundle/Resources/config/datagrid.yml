@@ -325,36 +325,43 @@ datagrid:
     system-calendar-grid:
         source:
             type: orm
-            acl_resource: ~
             query:
                 select:
                     - sc.id
-                    - sc.name as name
+                    - sc.name
                     - sc.public
-                    - CASE WHEN sc.public = 1 THEN 'Organization' ELSE 'System' END as scope
                 from:
                     - { table: %oro_calendar.system_calendar.entity.class%, alias: sc }
         columns:
             name:
                 label: oro.calendar.systemcalendar.name.label
-            scope:
-                label: oro.calendar.systemcalendar.scope.label
+            public:
+                label: oro.calendar.systemcalendar.public.label
+                frontend_type: select
+                choices:
+                    0: oro.calendar.systemcalendar.scope.organization
+                    1: oro.calendar.systemcalendar.scope.system
         sorters:
             columns:
                 name:
-                    data_name: name
-                scope:
-                    data_name: scope
+                    data_name: sc.name
+                public:
+                    data_name: sc.public
             default:
                 name: ASC
         filters:
             columns:
                 name:
-                    type: string
-                    data_name: name
-                scope:
-                    type: string
-                    data_name: scope
+                    type:       string
+                    data_name:  sc.name
+                public:
+                    type:       choice
+                    data_name:  sc.public
+                    options:
+                        field_options:
+                            choices:
+                                0: oro.calendar.systemcalendar.scope.organization
+                                1: oro.calendar.systemcalendar.scope.system
         properties:
             id: ~
             view_link:
@@ -375,20 +382,17 @@ datagrid:
                 label:        View
                 link:         view_link
                 icon:         eye-open
-                acl_recource: oro_system_calendar_view
                 rowAction:    true
             update:
                 type:          navigate
-                acl_resource:  oro_system_calendar_create
                 label:         Update
                 icon:          edit
                 link:          update_link
             delete:
                 type:          delete
-                acl_resource:  oro_system_calendar_delete
                 label:         Delete
                 icon:          trash
                 link:          delete_link
+        action_configuration: @oro_calendar.listener.datagrid.system_calendar->getActionConfigurationClosure
         options:
             skip_acl_check: true
-        action_configuration: @oro_calendar.system_calendar.datagrid_helper->getActionConfigurationClosure
