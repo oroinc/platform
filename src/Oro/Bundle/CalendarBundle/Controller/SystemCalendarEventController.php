@@ -8,7 +8,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
@@ -53,6 +52,77 @@ class SystemCalendarEventController extends Controller
 
         return [
             'entity' => $entity,
+        ];
+    }
+
+    /**
+     * @Route("/{id}/event/create", name="oro_system_calendar_event_create", requirements={"id"="\d+"})
+     * @Template("OroCalendarBundle:SystemCalendarEvent:update.html.twig")
+     * @AclAncestor("oro_calendar_event_create")
+     */
+    public function createAction(SystemCalendar $systemCalendar)
+    {
+        //@TODO: Add check permission to create system calendar event
+        $entity = new CalendarEvent();
+
+        $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $entity->setStart($startTime);
+        $entity->setEnd($startTime->add(new \DateInterval('PT1H')));
+        $entity->setSystemCalendar($systemCalendar);
+
+        $formAction = $this->get('oro_entity.routing_helper')
+            ->generateUrlByRequest(
+                'oro_system_calendar_event_create',
+                $this->getRequest(),
+                ['id' => $systemCalendar->getId()]
+            );
+
+        return $this->update($entity, $formAction);
+    }
+
+    /**
+     * @Route("/event/update/{id}", name="oro_system_calendar_event_update", requirements={"id"="\d+"})
+     * @Template
+     * @AclAncestor("oro_calendar_event_update")
+     */
+    public function updateAction(CalendarEvent $entity)
+    {
+        //@TODO: Add check permission to update system calendar event
+        $formAction = $this->get('router')->generate('oro_system_calendar_event_update', ['id' => $entity->getId()]);
+
+        return $this->update($entity, $formAction);
+    }
+
+    /**
+     * @param CalendarEvent $entity
+     * @param string        $formAction
+     *
+     * @return array
+     */
+    protected function update(CalendarEvent $entity, $formAction)
+    {
+        $saved = false;
+
+        if ($this->get('oro_calendar.system_calendar_event.form.handler')->process($entity)) {
+            if (!$this->getRequest()->get('_widgetContainer')) {
+                $this->get('session')->getFlashBag()->add(
+                    'success',
+                    $this->get('translator')->trans('oro.calendar.controller.event.saved.message')
+                );
+
+                return $this->get('oro_ui.router')->redirectAfterSave(
+                    ['route' => 'oro_system_calendar_event_update', 'parameters' => ['id' => $entity->getId()]],
+                    ['route' => 'oro_system_calendar_event_view', 'parameters' => ['id' => $entity->getId()]]
+                );
+            }
+            $saved = true;
+        }
+
+        return [
+            'entity'     => $entity,
+            'saved'      => $saved,
+            'form'       => $this->get('oro_calendar.calendar_event.form.handler')->getForm()->createView(),
+            'formAction' => $formAction
         ];
     }
 }
