@@ -62,7 +62,7 @@ class SystemCalendarHandler
      */
     public function process(SystemCalendar $entity)
     {
-        if (!$entity->getOrganization()) {
+        if (!$entity->isPublic() && !$entity->getOrganization()) {
             $entity->setOrganization($this->securityFacade->getOrganization());
         }
 
