@@ -1,0 +1,23 @@
+oro_system_calendar_view:
+    type: "entity"
+    class: "OroCalendarBundle:SystemCalendar"
+    permission: "VIEW"
+    group_name: ""
+
+oro_system_calendar_create:
+    type: "entity"
+    class: "OroCalendarBundle:SystemCalendar"
+    permission: "CREATE"
+    group_name: ""
+
+oro_system_calendar_create:
+    type: "entity"
+    class: "OroCalendarBundle:SystemCalendar"
+    permission: "UPDATE"
+    group_name: ""
+
+oro_system_calendar_delete:
+    type: "entity"
+    class: "OroCalendarBundle:SystemCalendar"
+    permission: "DELETE"
+    group_name: ""

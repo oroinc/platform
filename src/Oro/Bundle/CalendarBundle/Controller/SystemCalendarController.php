@@ -19,6 +19,10 @@ class SystemCalendarController extends Controller
      */
     public function indexAction()
     {
+        if (!$this->get('oro_calendar.system_calendar.config_helper')->isSomeSystemCalendarSupported()) {
+            throw $this->createNotFoundException('System and Public Calendars does not supported.');
+        }
+
         return [
             'entity_class' => $this->container->getParameter('oro_calendar.system_calendar.entity.class')
         ];
@@ -26,46 +30,45 @@ class SystemCalendarController extends Controller
 
     /**
      * @Route("/view/{id}", name="oro_system_calendar_view", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_system_calendar_view",
-     *      type="entity",
-     *      class="OroCalendarBundle:SystemCalendar",
-     *      permission="VIEW",
-     *      group_name=""
-     * )
      */
     public function viewAction(SystemCalendar $entity)
     {
+        if ($entity->isPublic()
+            && !$this->get('oro_calendar.system_calendar.config_helper')->isPublicCalendarSupported()) {
+            throw $this->createNotFoundException('Public Calendars does not supported.');
+        }
 
+        if (!$entity->isPublic()
+            && !$this->get('oro_calendar.system_calendar.config_helper')->isSystemCalendarSupported()) {
+            throw $this->createNotFoundException('System Calendars does not supported.');
+        }
     }
 
     /**
      * @Route("/create", name="oro_system_calendar_create")
-     * @Acl(
-     *      id="oro_system_calendar_create",
-     *      type="entity",
-     *      class="OroCalendarBundle:SystemCalendar",
-     *      permission="CREATE",
-     *      group_name=""
-     * )
      */
     public function createAction()
     {
-
+        if (!$this->get('oro_calendar.system_calendar.config_helper')->isSomeSystemCalendarSupported()) {
+            throw $this->createNotFoundException('System and Public Calendars does not supported.');
+        }
+        //@TODO: Added verification system and public calendars supported separately(after BAP-5991 will be implemented)
     }
 
     /**
      * @Route("/update/{id}", name="oro_system_calendar_update", requirements={"id"="\d+"})
-     * @Acl(
-     *      id="oro_system_calendar_update",
-     *      type="entity",
-     *      class="OroCalendarBundle:SystemCalendar",
-     *      permission="EDIT",
-     *      group_name=""
-     * )
      */
     public function updateAction(SystemCalendar $entity)
     {
+        if ($entity->isPublic()
+            && !$this->get('oro_calendar.system_calendar.config_helper')->isPublicCalendarSupported()) {
+            throw $this->createNotFoundException('Public Calendars does not supported.');
+        }
 
+        if (!$entity->isPublic()
+            && !$this->get('oro_calendar.system_calendar.config_helper')->isSystemCalendarSupported()) {
+            throw $this->createNotFoundException('System Calendars does not supported.');
+        }
+        //@TODO: Added verification system and public calendars supported separately(after BAP-5991 will be implemented)
     }
 }

@@ -25,6 +25,7 @@ parameters:
     oro_calendar.autocomplete.user_calendar_handler.class:       Oro\Bundle\CalendarBundle\Autocomplete\UserCalendarHandler
     oro_calendar.system_calendar.config_helper.class:            Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper
     oro_calendar.event_listener.navigation.class:                Oro\Bundle\CalendarBundle\EventListener\NavigationListener
+    oro_calendar.soap.handler.delete.class:                      Oro\Bundle\CalendarBundle\Handler\DeleteHandler
 
 services:
     oro_calendar.listener.entity_listener:
@@ -180,6 +181,7 @@ services:
         class: %oro_calendar.listener.datagrid.system_calendar.class%
         arguments:
             - @oro_security.security_facade
+            - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.system-calendar-grid, method: onBuildAfter }
 
@@ -194,3 +196,10 @@ services:
             - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_calendar.soap.handler.delete:
+        class: %oro_calendar.soap.handler.delete.class%
+        parent: oro_soap.handler.delete.abstract
+        calls:
+            - [setCalendarConfigHelper, [@oro_calendar.system_calendar.config_helper]]
+            - [setSecurityFacade, [@oro_security.security_facade]]

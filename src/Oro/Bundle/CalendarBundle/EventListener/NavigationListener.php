@@ -13,9 +13,8 @@ class NavigationListener
     /**
      * @param SystemCalendarConfigHelper $calendarConfigHelper
      */
-    public function __construct(
-        SystemCalendarConfigHelper $calendarConfigHelper
-    ) {
+    public function __construct(SystemCalendarConfigHelper $calendarConfigHelper)
+    {
         $this->calendarConfigHelper = $calendarConfigHelper;
     }
 
