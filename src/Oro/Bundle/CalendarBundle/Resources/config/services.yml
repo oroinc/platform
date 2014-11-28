@@ -24,6 +24,8 @@ parameters:
     oro_calendar.calendar_event_normalizer.system.class:         Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer
     oro_calendar.calendar_event_normalizer.public.class:         Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer
     oro_calendar.autocomplete.user_calendar_handler.class:       Oro\Bundle\CalendarBundle\Autocomplete\UserCalendarHandler
+    oro_calendar.system_calendar.config_helper.class:            Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper
+    oro_calendar.event_listener.navigation.class:                Oro\Bundle\CalendarBundle\EventListener\NavigationListener
 
 services:
     oro_calendar.listener.entity_listener:
@@ -121,6 +123,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_calendar.calendar_event_normalizer.system
+            - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: oro_calendar.calendar_provider, alias: system }
 
@@ -129,6 +132,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_calendar.calendar_event_normalizer.public
+            - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: oro_calendar.calendar_provider, alias: public }
 
@@ -184,3 +188,15 @@ services:
         class: %oro_calendar.system_calendar.datagrid_helper.class%
         arguments:
             - @oro_entity.entity_provider
+
+    oro_calendar.system_calendar.config_helper:
+        class: %oro_calendar.system_calendar.config_helper.class%
+        arguments:
+            - %oro_calendar.system_calendar_supported%
+
+    oro_calendar.event_listener.navigation:
+        class: %oro_calendar.event_listener.navigation.class%
+        arguments:
+            - @oro_calendar.system_calendar.config_helper
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
