@@ -7,10 +7,17 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository")
- * @ORM\Table(name="oro_system_calendar")
+ * @ORM\Table(
+ *      name="oro_system_calendar",
+ *      indexes={
+ *          @ORM\Index(name="oro_system_calendar_up_idx", columns={"updated_at"})
+ *      }
+ * )
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -40,7 +47,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class SystemCalendar
 {
-    const CALENDAR_ALIAS = 'system';
+    const CALENDAR_ALIAS        = 'system';
     const PUBLIC_CALENDAR_ALIAS = 'public';
 
     /**
@@ -85,6 +92,34 @@ class SystemCalendar
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $updatedAt;
 
     /**
      * Constructor
@@ -237,5 +272,74 @@ class SystemCalendar
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * Gets a creation date/time
+     *
+     * @return \DateTime
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * Sets a creation date/time
+     *
+     * @param \DateTime $createdAt
+     *
+     * @return self
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    /**
+     * Gets a modification date/time
+     *
+     * @return \DateTime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Sets a modification date/time
+     *
+     * @param \DateTime $updatedAt
+     *
+     * @return self
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * Pre persist event handler
+     *
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
+    }
+
+    /**
+     * Pre update event handler
+     *
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 }

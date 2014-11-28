@@ -63,11 +63,7 @@ class SystemCalendarHandler
     public function process(SystemCalendar $entity)
     {
         if (!$entity->getOrganization()) {
-            if ($this->securityFacade->getLoggedUser() && $this->securityFacade->getOrganization()) {
-                $entity->setOrganization($this->securityFacade->getOrganization());
-            } else {
-                throw new \LogicException('Current user did not define');
-            }
+            $entity->setOrganization($this->securityFacade->getOrganization());
         }
 
         $this->form->setData($entity);

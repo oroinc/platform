@@ -54,35 +54,13 @@ class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider supportedMethods
-     *
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Current user did not define
-     */
-    public function testProcessGetRequestWithoutCurrentUser($method)
-    {
-        $this->request->setMethod($method);
-
-        $this->securityFacade->expects($this->once())
-            ->method('getLoggedUser')
-            ->will($this->returnValue(null));
-
-        $this->handler->process($this->entity);
-    }
-
-    /**
-     * @dataProvider supportedMethods
      */
     public function testProcessInvalidData($method)
     {
-        $currentUser = new User();
-        ReflectionUtil::setId($currentUser, 123);
         $organization = new Organization();
         ReflectionUtil::setId($organization, 1);
 
         $this->securityFacade->expects($this->exactly(1))
-            ->method('getLoggedUser')
-            ->will($this->returnValue($currentUser));
-        $this->securityFacade->expects($this->exactly(2))
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 
@@ -112,15 +90,10 @@ class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessValidData($method)
     {
-        $currentUser = new User();
-        ReflectionUtil::setId($currentUser, 123);
         $organization = new Organization();
         ReflectionUtil::setId($organization, 1);
 
         $this->securityFacade->expects($this->exactly(1))
-            ->method('getLoggedUser')
-            ->will($this->returnValue($currentUser));
-        $this->securityFacade->expects($this->exactly(2))
             ->method('getOrganization')
             ->will($this->returnValue($organization));
 

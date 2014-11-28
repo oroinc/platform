@@ -84,6 +84,7 @@ oro:
 
             scope.system:         System
             scope.organization:   Organization
+            no_color.label:       No color
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
         #

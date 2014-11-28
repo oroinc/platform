@@ -38,8 +38,8 @@ class SystemCalendarTypeTest extends \PHPUnit_Framework_TestCase
                 [
                     'required'           => false,
                     'label'              => 'oro.calendar.systemcalendar.backgroundColor.label',
-                    'color_schema'       => 'oro_calendar.event_colors',
-                    'empty_value'        => 'oro.calendar.form.no_color',
+                    'color_schema'       => 'oro_calendar.calendar_colors',
+                    'empty_value'        => 'oro.calendar.systemcalendar.no_color.label',
                     'allow_empty_color'  => true,
                     'allow_custom_color' => true
                 ]
@@ -51,10 +51,11 @@ class SystemCalendarTypeTest extends \PHPUnit_Framework_TestCase
                 'public',
                 'choice',
                 [
-                    'required' => false,
-                    'choices'  => [
-                        true  => 'oro.calendar.systemcalendar.scope.organization.label',
-                        false => 'oro.calendar.systemcalendar.scope.system.label',
+                    'required'      => false,
+                    'empty_value'   => false,
+                    'choices'       => [
+                        true  => 'oro.calendar.systemcalendar.scope.organization',
+                        false => 'oro.calendar.systemcalendar.scope.system',
                     ]
                 ]
             )

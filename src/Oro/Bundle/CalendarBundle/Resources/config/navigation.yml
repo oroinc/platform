@@ -45,6 +45,7 @@ oro_menu_config:
             route: 'oro_system_calendar_index'
             extras:
                 position: 95
+                routes: ['oro_system_calendar_*']
 
     tree:
         application_menu:
