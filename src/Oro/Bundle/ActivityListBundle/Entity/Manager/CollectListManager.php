@@ -80,7 +80,10 @@ class CollectListManager
     {
         if (!empty($insertedEntities)) {
             foreach ($insertedEntities as $entity) {
-                $entityManager->persist($this->chainProvider->getActivityListEntitiesByActivityEntity($entity));
+                $activityList = $this->chainProvider->getActivityListEntitiesByActivityEntity($entity);
+                if ($activityList) {
+                    $entityManager->persist($activityList);
+                }
             }
 
             return true;
