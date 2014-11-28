@@ -283,7 +283,7 @@ class ExtendConfigDumper
         $defaultProperties  = [];
         $addRemoveMethods   = [];
 
-        $fieldConfigs = $extendProvider->getConfigs($className);
+        $fieldConfigs = $extendProvider->getConfigs($className, true);
         foreach ($fieldConfigs as $fieldConfig) {
             $this->checkFields(
                 $entityName,
