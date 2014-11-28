@@ -51,10 +51,15 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
         $qb->expects($this->at(0))
             ->method('andWhere')
-            ->with('sc.organization = :organizationId')
+            ->with('(sc.public = :public OR sc.organization = :organizationId)')
             ->will($this->returnSelf());
 
         $qb->expects($this->at(1))
+            ->method('setParameter')
+            ->with('public', true)
+            ->will($this->returnSelf());
+
+        $qb->expects($this->at(2))
             ->method('setParameter')
             ->with('organizationId', 1);
 
@@ -87,19 +92,10 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
         $qb->expects($this->at(0))
             ->method('andWhere')
-            ->with('sc.organization = :organizationId')
-            ->will($this->returnSelf());
-
-        $qb->expects($this->at(1))
-            ->method('setParameter')
-            ->with('organizationId', 1);
-
-        $qb->expects($this->at(2))
-            ->method('andWhere')
             ->with('sc.public = :public')
             ->will($this->returnSelf());
 
-        $qb->expects($this->at(3))
+        $qb->expects($this->at(1))
             ->method('setParameter')
             ->with('public', true);
 
