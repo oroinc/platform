@@ -83,7 +83,7 @@ class TagController extends Controller
         $selectedResult = null;
 
         foreach ($groupedResults as $alias => $type) {
-            if ($alias === $from) {
+            if ($alias == $from) {
                 $selectedResult = $type;
             }
         }

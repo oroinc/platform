@@ -145,6 +145,7 @@
       .oro-page-sidebar {
         .dropdown-menu {
           display: block !important;
+          z-index: inherit;
         }
       }
     }
@@ -164,6 +165,7 @@
           margin: 0 10px;
         }
         > .dropdown-menu {
+          z-index: 900;
           position: absolute;
           padding: 5px 0;
           margin: 2px 0 0;
@@ -178,6 +180,9 @@
           -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
           -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
           box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          .entity-type {
+            width: auto;
+          }
         }
       }
       .oro-page-body {

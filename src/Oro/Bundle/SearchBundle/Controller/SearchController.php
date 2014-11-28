@@ -71,7 +71,7 @@ class SearchController extends Controller
         $selectedResult = null;
 
         foreach ($groupedResults as $alias => $type) {
-            if ($alias === $from) {
+            if ($alias == $from) {
                 $selectedResult = $type;
             }
         }
