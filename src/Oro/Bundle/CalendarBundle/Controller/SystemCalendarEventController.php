@@ -81,7 +81,7 @@ class SystemCalendarEventController extends Controller
     }
 
     /**
-     * @Route("/update/{id}", name="oro_system_calendar_event_update", requirements={"id"="\d+"})
+     * @Route("/event/update/{id}", name="oro_system_calendar_event_update", requirements={"id"="\d+"})
      * @Template
      * @AclAncestor("oro_calendar_event_update")
      */
