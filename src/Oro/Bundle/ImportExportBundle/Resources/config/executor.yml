@@ -1,5 +1,6 @@
 parameters:
     oro_importexport.job_executor.class: Oro\Bundle\ImportExportBundle\Job\JobExecutor
+    akeneo_batch.job_repository.class:   Oro\Bundle\ImportExportBundle\Job\JobRepository
 
 services:
     oro_importexport.job_executor:

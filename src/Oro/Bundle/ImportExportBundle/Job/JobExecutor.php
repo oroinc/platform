@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
+use Doctrine\ORM\UnitOfWork;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Doctrine\ORM\EntityManager;
@@ -46,9 +47,9 @@ class JobExecutor
     protected $managerRegistry;
 
     /**
-     * @var EntityManager
+     * @var BatchJobRepository
      */
-    protected $batchJobManager;
+    protected $batchJobRepository;
 
     public function __construct(
         ConnectorRegistry $jobRegistry,
@@ -56,10 +57,10 @@ class JobExecutor
         ContextRegistry $contextRegistry,
         ManagerRegistry $managerRegistry
     ) {
-        $this->batchJobRegistry = $jobRegistry;
-        $this->batchJobManager  = $batchJobRepository->getJobManager();
-        $this->contextRegistry  = $contextRegistry;
-        $this->managerRegistry  = $managerRegistry;
+        $this->batchJobRegistry   = $jobRegistry;
+        $this->batchJobRepository = $batchJobRepository;
+        $this->contextRegistry    = $contextRegistry;
+        $this->managerRegistry    = $managerRegistry;
     }
 
     /**
@@ -77,19 +78,13 @@ class JobExecutor
         $jobInstance->setCode($this->generateJobCode($jobName));
         $jobInstance->setLabel(sprintf('%s.%s', $jobType, $jobName));
         $jobInstance->setRawConfiguration($configuration);
-        $jobExecution = new JobExecution();
-        $jobExecution->setJobInstance($jobInstance);
 
         // persist batch entities
-        $this->batchJobManager->persist($jobInstance);
-        $this->batchJobManager->persist($jobExecution);
+        $this->batchJobRepository->getJobManager()->persist($jobInstance);
+        $jobExecution = $this->batchJobRepository->createJobExecution($jobInstance);
 
         // do job
         $jobResult = $this->doJob($jobInstance, $jobExecution);
-
-        // flush batch entities
-        $this->batchJobManager->flush($jobInstance);
-        $this->batchJobManager->flush($jobExecution);
 
         // set data to JobResult
         $jobResult->setJobId($jobInstance->getId());
@@ -140,13 +135,37 @@ class JobExecutor
                     $jobResult->addFailureException($failureException);
                 }
             }
+
+            // trigger save of JobExecution and JobInstance
+            $this->batchJobRepository->getJobManager()->flush();
+            $this->batchJobRepository->getJobManager()->clear();
         } catch (\Exception $exception) {
             $this->entityManager->rollback();
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
+
+            $this->saveFailedJobExecution($jobExecution);
         }
 
         return $jobResult;
+    }
+
+    /**
+     * Try to save batch entities only in case when it's possible
+     *
+     * @param JobExecution $jobExecution
+     */
+    protected function saveFailedJobExecution(JobExecution $jobExecution)
+    {
+        $batchManager = $this->batchJobRepository->getJobManager();
+        $batchUow     = $batchManager->getUnitOfWork();
+        $couldBeSaved = $batchManager->isOpen()
+            && $batchUow->getEntityState($jobExecution) === UnitOfWork::STATE_MANAGED;
+
+        //
+        if ($couldBeSaved) {
+            $batchManager->flush();
+        }
     }
 
     /**
