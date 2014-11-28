@@ -1,0 +1,17 @@
+oro_public_calendar_management:
+    label: oro.calendar.action.public_calendar_management
+    type: action
+    group_name: ""
+    bindings: ~
+
+oro_public_calendar_event_management:
+    label: oro.calendar.action.public_calendar_event_management
+    type: action
+    group_name: ""
+    bindings: ~
+
+oro_system_calendar_event_management:
+    label: oro.calendar.action.system_calendar_event_management
+    type: action
+    group_name: ""
+    bindings: ~
