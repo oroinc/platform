@@ -51,7 +51,7 @@
                                                 <span class="separator">/</span>
                                                 {% if breadcrumbs.additional is defined %}
                                                     {% for breadcrumb in breadcrumbs.additional %}
-                                                    <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
+                                                    <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumb.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
                                                     <span class="separator">/</span>
                                                     {% endfor %}
                                                 {% endif %}
