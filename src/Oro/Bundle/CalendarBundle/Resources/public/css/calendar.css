@@ -246,10 +246,19 @@
     color: #333;
 }
 
-table.guests td {
-    padding: 0 5px 10px 0;
+.guest-user-list {
+    list-style: none;
+    display:table;
+    table-layout:fixed;
+    margin: 0 0 10px;
 }
-
-table.guests td.icon {
-    text-align: center;
+.guest-user-list li {
+    height: 25px
+}
+.guest-user-list .list-group-item {
+    width:100%;
+    display:table-row;
+}
+.guest-user-list .list-group-item-text {
+    display:table-cell;
 }

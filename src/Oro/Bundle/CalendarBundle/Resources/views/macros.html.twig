@@ -35,12 +35,12 @@
 {% macro calendar_event_invitation(parentEvent) %}
     <div class="row-fluid">
         <div class="responsive-block">
-            <table class="guests">
+            <ul class="guest-user-list list-group">
                 {{ _self.build_invitation_link(parentEvent) }}
                 {% for event in parentEvent.childEvents %}
                     {{ _self.build_invitation_link(event) }}
                 {% endfor %}
-            </table>
+            </ul>
         </div>
     </div>
 {% endmacro %}
@@ -49,14 +49,12 @@
     {% import 'OroUIBundle::macros.html.twig' as UI %}
         {% set invitationStatus = calendarEvent.invitationStatus %}
         {% set invitationClass = _self.get_invitatition_status_class(invitationStatus)|trim %}
-        <tr>
-            <td class="icon">
+        <li class="list-group-item">
             {% if invitationClass is not empty %}
                 <i class="{{ invitationClass }}" title="{{ _self.calendar_event_invitation_status(invitationStatus) }}"></i>
             {% endif %}
             {% set avatar = calendarEvent.calendar.owner.avatar %}
-            </td>
-            <td>
+            <span class="list-group-item-text">
                 <img src="{{ avatar ? filtered_image_url(avatar, 'avatar_xsmall') : asset('bundles/oroui/img/avatar-xsmall.png') }}" />
                 {% if (resource_granted('oro_user_user_view') and calendarEvent.calendar.owner) %}
                     {{ UI.link({
@@ -66,8 +64,8 @@
                 {% else %}
                     {{ calendarEvent.calendar.owner ? calendarEvent.calendar.owner|oro_format_name : '' }}
                 {% endif %}
-            </td>
-        </tr>
+            </span>
+        </li>
 {% endmacro %}
 
 {%- macro get_invitatition_status_class(invitationStatus) -%}
