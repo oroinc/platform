@@ -25,7 +25,7 @@ class DefaultOwnerSetEvent extends Event
      */
     public function __construct(Integration $integration)
     {
-        $this->integration= $integration;
+        $this->integration = $integration;
     }
 
     /**

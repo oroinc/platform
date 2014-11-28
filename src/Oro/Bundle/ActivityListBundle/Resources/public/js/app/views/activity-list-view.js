@@ -57,16 +57,12 @@ define(function (require) {
             /**
              * on adding activity item listen to "widget:doRefresh:activity-list-widget"
              */
-            mediator.on('widget:doRefresh:activity-list-widget', _.bind(function () {
-                this._reload();
-            }, this));
+            mediator.on('widget:doRefresh:activity-list-widget', this._reload, this );
 
             /**
              * on editing activity item listen to "widget_success:activity_list:item:update"
              */
-            mediator.on('widget_success:activity_list:item:update', _.bind(function () {
-                this._reload();
-            }, this));
+            mediator.on('widget_success:activity_list:item:update', this._reload, this);
 
             ActivityListView.__super__.initialize.call(this, options);
 
@@ -83,6 +79,9 @@ define(function (require) {
 
             delete this.itemEditDialog;
             delete this.$loadingMaskContainer;
+
+            mediator.off('widget:doRefresh:activity-list-widget', this._reload, this );
+            mediator.off('widget_success:activity_list:item:update', this._reload, this);
 
             ActivityListView.__super__.dispose.call(this);
         },
@@ -296,8 +295,8 @@ define(function (require) {
                     wait: true,
                     url: this._getUrl('itemDelete', model),
                     success: _.bind(function () {
-                        this._hideLoading();
                         mediator.execute('showFlashMessage', 'success', this._getMessage('itemRemoved'));
+                        this._reload();
                     }, this),
                     error: _.bind(function (model, response) {
                         if (!_.isUndefined(response.status) && response.status === 403) {
@@ -305,13 +304,12 @@ define(function (require) {
                         } else {
                             this._showDeleteItemError(response.responseJSON || {});
                         }
+                        this._hideLoading();
                     }, this)
                 });
-
-                this.refresh();
-
             } catch (err) {
                 this._showDeleteItemError(err);
+                this._hideLoading();
             }
         },
 
