@@ -9,7 +9,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @constructor
          */
         initialize: function () {
-            var $form = $(this.$el  ).closest('form'),
+            var $form = $(this.$el).closest('form'),
                 isModalShown = false,
                 getFormState = function($form) {
                     var $submit = $form.find('input[name="input_action"]');
@@ -19,9 +19,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
                     return result
                 },
-                formBaseState = getFormState($form),
+                formInitialState = getFormState($form),
                 isChanged = function($currentForm) {
-                    return getFormState($currentForm) != formBaseState;
+                    return getFormState($currentForm) != formInitialState;
                 };
 
             this.$parent = $form.parent();
@@ -34,7 +34,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                             title: __('Notify invited users'),
                             okText: __('Notify'),
                             cancelText: __("Don't notify"),
-                            content: __('All invited users will be notified of changes.'),
+                            content: __('All invited users will be notified of changes. Do you want to notify all invited users about changes?'),
                             className: 'modal modal-primary',
                             okButtonClass: 'btn-primary btn-large',
                             handleClose: true

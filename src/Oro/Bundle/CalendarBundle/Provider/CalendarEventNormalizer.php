@@ -48,8 +48,8 @@ class CalendarEventNormalizer
     {
         $result = [];
 
+        /** @var CalendarEvent[] $items */
         $items = $qb->getQuery()->getResult();
-        /** @var CalendarEvent $item */
         foreach ($items as $item) {
             $notifiable = $item->getInvitationStatus() && !$item->getParent() && !$item->getChildEvents()->isEmpty();
             $item = $this->serializeCalendarEvent($item);

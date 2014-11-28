@@ -138,10 +138,8 @@
 {% endmacro %}
 
 {% macro notifyGuestsComponent() %}
-    {% set componentName = 'oroui/js/app/components/view-component' %}
-    {% set componentOptions = {'view': 'orocalendar/js/app/views/guest-notifier-view'} %}
-    <div id = "component-element" style="display: none" data-page-component-module="{{ componentName }}"
-         data-page-component-options="{{ componentOptions|json_encode }}">
+    <div id = "component-element" style="display: none" data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ {'view': 'orocalendar/js/app/views/guest-notifier-view'}|json_encode }}">
     </div>
 {% endmacro %}
 
