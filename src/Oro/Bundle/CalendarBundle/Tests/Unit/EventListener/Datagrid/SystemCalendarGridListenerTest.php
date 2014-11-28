@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener\Datagrid;
 
 use Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
 class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
@@ -50,10 +51,15 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
         $qb->expects($this->at(0))
             ->method('andWhere')
-            ->with('sc.organization = :organizationId')
+            ->with('(sc.public = :public OR sc.organization = :organizationId)')
             ->will($this->returnSelf());
 
         $qb->expects($this->at(1))
+            ->method('setParameter')
+            ->with('public', true)
+            ->will($this->returnSelf());
+
+        $qb->expects($this->at(2))
             ->method('setParameter')
             ->with('organizationId', 1);
 
@@ -86,23 +92,28 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
         $qb->expects($this->at(0))
             ->method('andWhere')
-            ->with('sc.organization = :organizationId')
-            ->will($this->returnSelf());
-
-        $qb->expects($this->at(1))
-            ->method('setParameter')
-            ->with('organizationId', 1);
-
-        $qb->expects($this->at(2))
-            ->method('andWhere')
             ->with('sc.public = :public')
             ->will($this->returnSelf());
 
-        $qb->expects($this->at(3))
+        $qb->expects($this->at(1))
             ->method('setParameter')
             ->with('public', true);
 
         $event = new BuildAfter($datagrid);
         $this->listener->onBuildAfter($event);
+    }
+
+    public function testGetActionConfigurationClosure()
+    {
+        $resultRecord = new ResultRecord(array('public' => true));
+
+        $closure = $this->listener->getActionConfigurationClosure();
+        $this->assertEquals(
+            [
+                'update' => false,
+                'delete' => false,
+            ],
+            $closure($resultRecord)
+        );
     }
 }
