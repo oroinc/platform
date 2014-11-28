@@ -28,7 +28,7 @@
     {% set breadcrumbs = {
         'entity':      entity,
         'indexPath':   path('oro_system_calendar_index'),
-        'indexLabel':  'oro.calendar.systemcalendar.entity_label'|trans,
+        'indexLabel':  'oro.calendar.systemcalendar.entity_plural_label'|trans,
         'entityTitle': entity.title|default('N/A'),
         'additional': [{
             'indexPath':   path('oro_system_calendar_event_index', {'id': entity.systemCalendar.id}),
