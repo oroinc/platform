@@ -77,12 +77,12 @@ oro:
             id.label:             Id
             name.label:           Calendar Name
             backgroundColor.label: Color
-            public.label:         Make Public
-            public.description:   Public calendars are available to all users regardless of which organization they belong to
+            public.label:         Scope
             events.label:         Events
             organization.label:   Organization
-            scope.label:          Scope
 
+            scope.system:         System
+            scope.organization:   Organization
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
         #
