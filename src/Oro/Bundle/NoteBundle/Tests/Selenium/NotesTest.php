@@ -102,7 +102,7 @@ class NotesTest extends Selenium2TestCase
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->deleteNote($note)
-            ->assertMessage('Note deleted');
+            ->assertMessage('Activity item deleted');
     }
 
     /**

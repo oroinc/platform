@@ -108,8 +108,7 @@ class Notes extends AbstractPageEntity
     public function checkNote($note)
     {
         $this->assertElementPresent(
-            "//div[@class='title'][span[normalize-space(.)='Notes']]/following-sibling::div".
-            "//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]",
+            "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]",
             'Note not found'
         );
 
@@ -122,15 +121,19 @@ class Notes extends AbstractPageEntity
      */
     public function editNote($note)
     {
-        $this->test->byXPath(
-            "//div[@class='title'][span[normalize-space(.)='Notes']]/following-sibling::div".
-            "//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]".
-            "/preceding-sibling::div/div[@class='actions']/button[@title='Edit note']"
-        )->click();
+        $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
+            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions action-cell']//a[contains(., '...')]";
+        $editAction =
+            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu nav nav-pills icons-holder launchers-list']".
+            "//a[@title='Update Note']";
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($editAction)->click();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
-            "/span[normalize-space(.)='Update note']",
+            "/span[normalize-space(.)='{$note}']",
             'Update Note window is not opened'
         );
 
@@ -143,11 +146,15 @@ class Notes extends AbstractPageEntity
      */
     public function deleteNote($note)
     {
-        $this->test->byXPath(
-            "//div[@class='title'][span[normalize-space(.)='Notes']]/following-sibling::div".
-            "//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]".
-            "/preceding-sibling::div/div[@class='actions']/button[@title='Remove note']"
-        )->click();
+        $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
+            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions action-cell']//a[contains(., '...')]";
+        $deleteAction =
+            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu nav nav-pills icons-holder launchers-list']".
+            "//a[@title='Delete Note']";
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($deleteAction)->click();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitForAjax();
 
