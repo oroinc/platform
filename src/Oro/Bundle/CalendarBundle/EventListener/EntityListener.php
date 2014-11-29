@@ -7,21 +7,58 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
+use Symfony\Component\Security\Core\SecurityContextInterface;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityListener
 {
+    /** @var ServiceLink */
+    protected $securityContextLink;
+
     /** @var ClassMetadata[] */
     protected $metadataLocalCache = [];
 
     /** @var Calendar[] */
     protected $insertedCalendars = [];
+
+    /**
+     * @param ServiceLink $securityContextLink
+     */
+    public function __construct(ServiceLink $securityContextLink)
+    {
+        $this->securityContextLink = $securityContextLink;
+    }
+
+    /**
+     * @param PreUpdateEventArgs $args
+     */
+    public function preUpdate(PreUpdateEventArgs $args)
+    {
+        $entity = $args->getEntity();
+        if ($entity instanceof SystemCalendar) {
+            if ($entity->isPublic()) {
+                // make sure that public calendar doesn't belong to any organization
+                $entity->setOrganization(null);
+            } elseif (!$entity->getOrganization()) {
+                // make sure an organization is set for system calendar
+                $organization = $this->getOrganization();
+                if ($organization) {
+                    $entity->setOrganization($organization);
+                }
+            }
+        }
+    }
 
     /**
      * @param OnFlushEventArgs $event
@@ -71,6 +108,20 @@ class EntityListener
             $this->insertedCalendars = [];
             $em->flush();
         }
+    }
+
+    /**
+     * @return Organization|null
+     */
+    protected function getOrganization()
+    {
+        /** @var SecurityContextInterface $securityContext */
+        $securityContext = $this->securityContextLink->getService();
+        $token           = $securityContext->getToken();
+
+        return $token instanceof OrganizationContextTokenInterface
+            ? $token->getOrganizationContext()
+            : null;
     }
 
     /**

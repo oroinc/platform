@@ -36,8 +36,8 @@ class SystemCalendarGridListener
         if ($datasource instanceof OrmDatasource) {
             // @todo: add ACL check for public calendars here
             $isPublicGranted = $this->calendarConfigHelper->isPublicCalendarSupported();
-            $isSystemGranted = $this->securityFacade->isGranted('oro_system_calendar_view')
-                && $this->calendarConfigHelper->isSystemCalendarSupported();
+            $isSystemGranted = $this->calendarConfigHelper->isSystemCalendarSupported()
+                && $this->securityFacade->isGranted('oro_system_calendar_view');
             if ($isPublicGranted && $isSystemGranted) {
                 $datasource->getQueryBuilder()
                     ->andWhere('(sc.public = :public OR sc.organization = :organizationId)')

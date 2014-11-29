@@ -8,7 +8,6 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SystemCalendarHandler
 {
@@ -21,25 +20,19 @@ class SystemCalendarHandler
     /** @var ObjectManager */
     protected $manager;
 
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
     /**
      * @param FormInterface       $form
      * @param Request             $request
      * @param ObjectManager       $manager
-     * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         FormInterface $form,
         Request $request,
-        ObjectManager $manager,
-        SecurityFacade $securityFacade
+        ObjectManager $manager
     ) {
-        $this->form                = $form;
-        $this->request             = $request;
-        $this->manager             = $manager;
-        $this->securityFacade      = $securityFacade;
+        $this->form    = $form;
+        $this->request = $request;
+        $this->manager = $manager;
     }
 
     /**
@@ -55,20 +48,15 @@ class SystemCalendarHandler
     /**
      * Process form
      *
-     * @param  SystemCalendar $entity
-     * @throws \LogicException
+     * @param SystemCalendar $entity
      *
-     * @return bool  True on successful processing, false otherwise
+     * @return bool True on successful processing, false otherwise
      */
     public function process(SystemCalendar $entity)
     {
-        if (!$entity->isPublic() && !$entity->getOrganization()) {
-            $entity->setOrganization($this->securityFacade->getOrganization());
-        }
-
         $this->form->setData($entity);
 
-        if (in_array($this->request->getMethod(), array('POST'))) {
+        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {

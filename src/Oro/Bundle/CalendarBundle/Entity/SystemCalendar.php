@@ -252,6 +252,7 @@ class SystemCalendar
 
     /**
      * Sets owning organization
+     * Public calendars don't belong to any organization
      *
      * @param Organization $organization
      *
@@ -259,6 +260,10 @@ class SystemCalendar
      */
     public function setOrganization(Organization $organization = null)
     {
+        if ($organization && $this->isPublic()) {
+            return $this;
+        }
+
         $this->organization = $organization;
 
         return $this;
@@ -266,6 +271,7 @@ class SystemCalendar
 
     /**
      * Gets owning organization
+     * Public calendars don't belong to any organization
      *
      * @return Organization
      */

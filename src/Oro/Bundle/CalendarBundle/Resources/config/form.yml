@@ -147,4 +147,3 @@ services:
             - @oro_calendar.system_calendar.form
             - @request
             - @doctrine.orm.entity_manager
-            - @oro_security.security_facade

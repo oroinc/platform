@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 
 class SystemCalendarType extends AbstractType
@@ -30,7 +31,7 @@ class SystemCalendarType extends AbstractType
                     'required'           => false,
                     'label'              => 'oro.calendar.systemcalendar.backgroundColor.label',
                     'color_schema'       => 'oro_calendar.calendar_colors',
-                    'empty_value'        => 'oro.calendar.systemcalendar.no_color.label',
+                    'empty_value'        => 'oro.calendar.systemcalendar.no_color',
                     'allow_empty_color'  => true,
                     'allow_custom_color' => true
                 ]
@@ -40,10 +41,11 @@ class SystemCalendarType extends AbstractType
                 'choice',
                 [
                     'required'      => false,
+                    'label'         => 'oro.calendar.systemcalendar.public.label',
                     'empty_value'   => false,
                     'choices'       => [
-                        true  => 'oro.calendar.systemcalendar.scope.organization',
-                        false => 'oro.calendar.systemcalendar.scope.system',
+                        false => 'oro.calendar.systemcalendar.scope.organization',
+                        true  => 'oro.calendar.systemcalendar.scope.system',
                     ]
                 ]
             );

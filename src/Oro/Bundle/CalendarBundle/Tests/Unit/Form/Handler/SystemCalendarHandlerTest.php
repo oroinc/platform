@@ -4,11 +4,8 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Form\Handler\SystemCalendarHandler;
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,13 +54,6 @@ class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessInvalidData($method)
     {
-        $organization = new Organization();
-        ReflectionUtil::setId($organization, 1);
-
-        $this->securityFacade->expects($this->exactly(1))
-            ->method('getOrganization')
-            ->will($this->returnValue($organization));
-
         $this->request->setMethod($method);
 
         $this->form->expects($this->once())
@@ -90,13 +80,6 @@ class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessValidData($method)
     {
-        $organization = new Organization();
-        ReflectionUtil::setId($organization, 1);
-
-        $this->securityFacade->expects($this->exactly(1))
-            ->method('getOrganization')
-            ->will($this->returnValue($organization));
-
         $this->request->setMethod($method);
 
         $this->form->expects($this->once())
