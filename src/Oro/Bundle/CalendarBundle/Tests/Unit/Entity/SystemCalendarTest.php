@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class SystemCalendarTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,28 +20,38 @@ class SystemCalendarTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider propertiesDataProvider
+     *
      * @param string $property
      * @param mixed  $value
      */
     public function testSettersAndGetters($property, $value)
     {
-        $obj = new SystemCalendar();
+        $obj      = new SystemCalendar();
         $accessor = PropertyAccess::createPropertyAccessor();
         $accessor->setValue($obj, $property, $value);
 
         $this->assertEquals($value, $accessor->getValue($obj, $property));
     }
 
+    public function propertiesDataProvider()
+    {
+        return [
+            ['name', 'testName'],
+            ['backgroundColor', '#FFFFFF'],
+            ['public', true],
+        ];
+    }
+
     public function testEvents()
     {
-        $obj = new SystemCalendar();
+        $obj   = new SystemCalendar();
         $event = new CalendarEvent();
         $obj->addEvent($event);
         $this->assertCount(1, $obj->getEvents());
         $events = $obj->getEvents();
 
-        $this->assertTrue($event === $events[0]);
-        $this->assertTrue($obj === $events[0]->getSystemCalendar());
+        $this->assertSame($event, $events[0]);
+        $this->assertSame($obj, $events[0]->getSystemCalendar());
     }
 
     public function testToString()
@@ -51,13 +61,26 @@ class SystemCalendarTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($obj->getName(), (string)$obj);
     }
 
-    public function propertiesDataProvider()
+    public function testSetOrganizationForNonPublic()
     {
-        return [
-            ['name', 'testName'],
-            ['backgroundColor', '#FFFFFF'],
-            ['public', true],
-            ['organization', new Organization()],
-        ];
+        $organization = new Organization();
+
+        $obj = new SystemCalendar();
+
+        $this->assertFalse($obj->isPublic());
+        $this->assertNull($obj->getOrganization());
+        $obj->setOrganization($organization);
+        $this->assertSame($organization, $obj->getOrganization());
+    }
+
+    public function testSetOrganizationForPublic()
+    {
+        $obj = new SystemCalendar();
+        $obj->setPublic(true);
+
+        $this->assertTrue($obj->isPublic());
+        $this->assertNull($obj->getOrganization());
+        $obj->setOrganization(new Organization());
+        $this->assertNull($obj->getOrganization());
     }
 }

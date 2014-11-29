@@ -47,12 +47,8 @@ class DeleteHandler extends SoapDeleteHandler
             throw new ForbiddenException('System Calendars does not supported.');
         }
 
-        if (!$entity->isPublic() && $this->securityFacade->isGranted('oro_system_calendar_delete', $entity)) {
-            throw new ForbiddenException('Access denied to system calendar events from another organization');
+        if (!$entity->isPublic() && !$this->securityFacade->isGranted('oro_system_calendar_delete', $entity)) {
+            throw new ForbiddenException('Access denied to system calendars from another organization');
         }
-
-        if ($this->ownerDeletionManager->isOwner($entity) && $this->ownerDeletionManager->hasAssignments($entity)) {
-            throw new ForbiddenException('has assignments');
-        };
     }
 }

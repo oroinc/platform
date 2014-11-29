@@ -71,7 +71,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                     'required'           => false,
                     'label'              => 'oro.calendar.calendarevent.backgroundColor.label',
                     'color_schema'       => 'oro_calendar.event_colors',
-                    'empty_value'        => 'oro.calendar.form.no_color',
+                    'empty_value'        => 'oro.calendar.calendarevent.no_color',
                     'allow_empty_color'  => true,
                     'allow_custom_color' => true
                 )

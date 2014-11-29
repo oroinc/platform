@@ -8,6 +8,7 @@ parameters:
     oro_calendar.listener.datagrid.system_calendar.class:        Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_property.manager.api.class:            Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager
+    oro_calendar.system_calendar.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
     oro_calendar.format_converter.date_time.full_calendar.class: Oro\Bundle\CalendarBundle\Converter\FullCalendarDateTimeFormatConverter
@@ -30,7 +31,10 @@ parameters:
 services:
     oro_calendar.listener.entity_listener:
         class: %oro_calendar.listener.entity_listener.class%
+        arguments:
+            - @oro_organization.link.security_context
         tags:
+            - { name: doctrine.event_listener, event: preUpdate }
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
 
@@ -57,6 +61,13 @@ services:
             - %oro_calendar.calendar_property.entity.class%
             - @doctrine.orm.entity_manager
             - @oro_calendar.calendar_manager
+
+    oro_calendar.system_calendar.manager.api:
+        class: %oro_calendar.system_calendar.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_calendar.system_calendar.entity.class%
+            - @doctrine.orm.entity_manager
 
     oro_calendar.twig.dateformat:
         class: %oro_calendar.twig.dateformat.class%
