@@ -55,18 +55,19 @@ class SystemCalendarController extends RestController implements ClassResourceIn
      *      description="Remove system calendar",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_system_calendar_delete",
-     *      type="entity",
-     *      class="OroCalendarBundle:SystemCalendar",
-     *      permission="DELETE",
-     *      group_name=""
-     * )
      *
      * @return Response
      */
     public function deleteAction($id)
     {
+        return $this->handleDeleteRequest($id);
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->get('oro_calendar.soap.handler.delete');
     }
 }

@@ -6,18 +6,24 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
 
 class SystemCalendarGridListener
 {
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var SystemCalendarConfigHelper */
+    protected $calendarConfigHelper;
+
     /**
      * @param SecurityFacade $securityFacade
+     * @param SystemCalendarConfigHelper $calendarConfigHelper
      */
-    public function __construct(SecurityFacade $securityFacade)
+    public function __construct(SecurityFacade $securityFacade, SystemCalendarConfigHelper $calendarConfigHelper)
     {
-        $this->securityFacade = $securityFacade;
+        $this->securityFacade       = $securityFacade;
+        $this->calendarConfigHelper = $calendarConfigHelper;
     }
 
     /**
@@ -28,8 +34,10 @@ class SystemCalendarGridListener
         $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            $isPublicGranted = true; // @todo: add ACL check for public calendars here
-            $isSystemGranted = $this->securityFacade->isGranted('oro_system_calendar_view');
+            // @todo: add ACL check for public calendars here
+            $isPublicGranted = $this->calendarConfigHelper->isPublicCalendarSupported();
+            $isSystemGranted = $this->securityFacade->isGranted('oro_system_calendar_view')
+                && $this->calendarConfigHelper->isSystemCalendarSupported();
             if ($isPublicGranted && $isSystemGranted) {
                 $datasource->getQueryBuilder()
                     ->andWhere('(sc.public = :public OR sc.organization = :organizationId)')

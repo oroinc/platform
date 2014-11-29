@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Doctrine\Common\Collections\Criteria;
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarPropertyRepository;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
@@ -17,16 +15,22 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
+    /** @var SystemCalendarConfigHelper */
+    protected $calendarConfigHelper;
+
     /**
      * @param DoctrineHelper                    $doctrineHelper
      * @param AbstractCalendarEventNormalizer   $calendarEventNormalizer
+     * @param SystemCalendarConfigHelper        $calendarConfigHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        AbstractCalendarEventNormalizer $calendarEventNormalizer
+        AbstractCalendarEventNormalizer $calendarEventNormalizer,
+        SystemCalendarConfigHelper $calendarConfigHelper
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
-        $this->calendarEventNormalizer = $calendarEventNormalizer;
+        $this->doctrineHelper           = $doctrineHelper;
+        $this->calendarEventNormalizer  = $calendarEventNormalizer;
+        $this->calendarConfigHelper     = $calendarConfigHelper;
     }
 
     /**
@@ -34,6 +38,12 @@ class SystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
+        $result = [];
+
+        if (!$this->calendarConfigHelper->isSystemCalendarSupported()) {
+            return $result;
+        }
+
         /** @var SystemCalendarRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar');
 
@@ -44,8 +54,6 @@ class SystemCalendarProvider implements CalendarProviderInterface
         //@TODO: Fix ACL for calendars providers
         /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
-
-        $result = [];
 
         foreach ($calendars as $calendar) {
             $resultItem = [
@@ -64,6 +72,10 @@ class SystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
     {
+        if (!$this->calendarConfigHelper->isSystemCalendarSupported()) {
+            return [];
+        }
+
         //@TODO: temporary return all system calendars until BAP-6566 implemented
         ///** @var CalendarEventRepository $repo */
         //$repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
