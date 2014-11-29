@@ -8,6 +8,7 @@ parameters:
     oro_calendar.listener.datagrid.system_calendar.class:        Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_property.manager.api.class:            Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager
+    oro_calendar.system_calendar.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
     oro_calendar.format_converter.date_time.full_calendar.class: Oro\Bundle\CalendarBundle\Converter\FullCalendarDateTimeFormatConverter
@@ -23,6 +24,9 @@ parameters:
     oro_calendar.calendar_event_normalizer.system.class:         Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer
     oro_calendar.calendar_event_normalizer.public.class:         Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer
     oro_calendar.autocomplete.user_calendar_handler.class:       Oro\Bundle\CalendarBundle\Autocomplete\UserCalendarHandler
+    oro_calendar.system_calendar.config_helper.class:            Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper
+    oro_calendar.event_listener.navigation.class:                Oro\Bundle\CalendarBundle\EventListener\NavigationListener
+    oro_calendar.soap.handler.delete.class:                      Oro\Bundle\CalendarBundle\Handler\DeleteHandler
 
 services:
     oro_calendar.listener.entity_listener:
@@ -54,6 +58,13 @@ services:
             - %oro_calendar.calendar_property.entity.class%
             - @doctrine.orm.entity_manager
             - @oro_calendar.calendar_manager
+
+    oro_calendar.system_calendar.manager.api:
+        class: %oro_calendar.system_calendar.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_calendar.system_calendar.entity.class%
+            - @doctrine.orm.entity_manager
 
     oro_calendar.twig.dateformat:
         class: %oro_calendar.twig.dateformat.class%
@@ -120,6 +131,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_calendar.calendar_event_normalizer.system
+            - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: oro_calendar.calendar_provider, alias: system }
 
@@ -128,6 +140,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_calendar.calendar_event_normalizer.public
+            - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: oro_calendar.calendar_provider, alias: public }
 
@@ -176,5 +189,25 @@ services:
         class: %oro_calendar.listener.datagrid.system_calendar.class%
         arguments:
             - @oro_security.security_facade
+            - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.system-calendar-grid, method: onBuildAfter }
+
+    oro_calendar.system_calendar.config_helper:
+        class: %oro_calendar.system_calendar.config_helper.class%
+        arguments:
+            - %oro_calendar.system_calendar_supported%
+
+    oro_calendar.event_listener.navigation:
+        class: %oro_calendar.event_listener.navigation.class%
+        arguments:
+            - @oro_calendar.system_calendar.config_helper
+        tags:
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+
+    oro_calendar.soap.handler.delete:
+        class: %oro_calendar.soap.handler.delete.class%
+        parent: oro_soap.handler.delete.abstract
+        calls:
+            - [setCalendarConfigHelper, [@oro_calendar.system_calendar.config_helper]]
+            - [setSecurityFacade, [@oro_security.security_facade]]

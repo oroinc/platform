@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller\Api\Rest;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -11,10 +10,7 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 /**
  * @RouteResource("systemcalendar")
@@ -22,30 +18,6 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
  */
 class SystemCalendarController extends RestController implements ClassResourceInterface
 {
-    /**
-     * @return ApiEntityManager
-     */
-    public function getManager()
-    {
-        return $this->get('oro_calendar.system_calendar.manager.api');
-    }
-
-    /**
-     * @return Form
-     */
-    public function getForm()
-    {
-        return $this->get('oro_calendar.system_calendar.form.api');
-    }
-
-    /**
-     * @return ApiFormHandler
-     */
-    public function getFormHandler()
-    {
-        return $this->get('oro_calendar.system_calendar.form.handler.api');
-    }
-
     /**
      * Remove system calendar.
      *
@@ -55,18 +27,45 @@ class SystemCalendarController extends RestController implements ClassResourceIn
      *      description="Remove system calendar",
      *      resource=true
      * )
-     * @Acl(
-     *      id="oro_system_calendar_delete",
-     *      type="entity",
-     *      class="OroCalendarBundle:SystemCalendar",
-     *      permission="DELETE",
-     *      group_name=""
-     * )
      *
      * @return Response
      */
     public function deleteAction($id)
     {
+        return $this->handleDeleteRequest($id);
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager()
+    {
+        return $this->get('oro_calendar.system_calendar.manager.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        throw new \BadMethodCallException('Not implemented');
+        //return $this->get('oro_calendar.system_calendar.form.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormHandler()
+    {
+        throw new \BadMethodCallException('Not implemented');
+        //return $this->get('oro_calendar.system_calendar.form.handler.api');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->get('oro_calendar.soap.handler.delete');
     }
 }

@@ -17,6 +17,17 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_calendar');
 
+        $rootNode
+            ->children()
+                ->scalarNode('system_calendar_supported')
+                // please note that if you want to disable it on already working system
+                // you need to take care to create a migration to clean up redundant data
+                // in oro_calendar_property table
+                ->info('Indicates whether System and/or Public Calendars should be supported or not')
+                ->defaultFalse()
+            ->end()
+        ->end();
+
         SettingsBuilder::append(
             $rootNode,
             [
