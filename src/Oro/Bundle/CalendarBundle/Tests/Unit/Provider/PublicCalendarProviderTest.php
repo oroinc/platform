@@ -44,6 +44,7 @@ class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $calendar1 = new SystemCalendar();
         ReflectionUtil::setId($calendar1, 1);
         $calendar1->setName('Master');
+        $calendar1->setBackgroundColor('#FF0000');
 
         $calendars = [$calendar1];
 
@@ -75,10 +76,11 @@ class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $result = $this->provider->getCalendarDefaultValues($organizationId, $userId, $calendarId, $calendarIds);
         $this->assertEquals(
             [
-                1 => [
-                    'calendarName'  => 'Master',
-                    'removable'     => false,
-                    'position'      => -80,
+                $calendar1->getId() => [
+                    'calendarName'    => $calendar1->getName(),
+                    'backgroundColor' => $calendar1->getBackgroundColor(),
+                    'removable'       => false,
+                    'position'        => -80,
                 ]
             ],
             $result

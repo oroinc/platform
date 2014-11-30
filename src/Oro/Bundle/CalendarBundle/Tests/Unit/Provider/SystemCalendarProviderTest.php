@@ -54,6 +54,7 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $organization1 = new Organization();
         $calendar1->setOrganization($organization1);
         $calendar1->setName('Main OroCRM');
+        $calendar1->setBackgroundColor('#FF0000');
 
         $calendar2 = new SystemCalendar();
         ReflectionUtil::setId($calendar2, 2);
@@ -92,15 +93,17 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                1 => [
-                    'calendarName' => 'Main OroCRM',
-                    'removable'    => false,
-                    'position'     => -60,
+                $calendar1->getId() => [
+                    'calendarName'    => $calendar1->getName(),
+                    'backgroundColor' => $calendar1->getBackgroundColor(),
+                    'removable'       => false,
+                    'position'        => -60,
                 ],
-                2 => [
-                    'calendarName' => 'Second OroCRM',
-                    'removable'    => false,
-                    'position'     => -60,
+                $calendar2->getId() => [
+                    'calendarName'    => $calendar2->getName(),
+                    'backgroundColor' => $calendar2->getBackgroundColor(),
+                    'removable'       => false,
+                    'position'        => -60,
                 ]
             ],
             $result

@@ -57,9 +57,10 @@ class SystemCalendarProvider implements CalendarProviderInterface
 
         foreach ($calendars as $calendar) {
             $resultItem = [
-                'calendarName'  => $calendar->getName(),
-                'removable'     => false,
-                'position'      => -60,
+                'calendarName'    => $calendar->getName(),
+                'backgroundColor' => $calendar->getBackgroundColor(),
+                'removable'       => false,
+                'position'        => -60,
             ];
             $result[$calendar->getId()] = $resultItem;
         }
