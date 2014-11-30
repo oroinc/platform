@@ -194,6 +194,7 @@ services:
             - @oro_security.security_facade
             - @oro_calendar.system_calendar.config_helper
         tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.system-calendar-grid, method: onBuildBefore }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.system-calendar-grid, method: onBuildAfter }
 
     oro_calendar.system_calendar.config_helper:

@@ -5,14 +5,18 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener\Datagrid;
 use Oro\Bundle\CalendarBundle\EventListener\Datagrid\SystemCalendarGridListener;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
 class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var SystemCalendarGridListener */
     protected $listener;
 
-    /** @var PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $calendarConfigHelper;
 
     protected function setUp()
     {
@@ -22,12 +26,86 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade->expects($this->any())
             ->method('getOrganizationId')
             ->will($this->returnValue(1));
+        $this->calendarConfigHelper =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
 
-        $this->listener = new SystemCalendarGridListener($this->securityFacade);
+        $this->listener = new SystemCalendarGridListener(
+            $this->securityFacade,
+            $this->calendarConfigHelper
+        );
+    }
+
+    public function testOnBuildBeforeBothPublicAndSystemCalendarsEnabled()
+    {
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(true));
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
+
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $config   = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $config->expects($this->never())
+            ->method('offsetUnsetByPath');
+
+        $event = new BuildBefore($datagrid, $config);
+        $this->listener->onBuildBefore($event);
+    }
+
+    /**
+     * @dataProvider disableCalendarProvider
+     */
+    public function testOnBuildBeforeAnyPublicOrSystemCalendarDisabled($isPublicSupported, $isSystemSupported)
+    {
+        $this->calendarConfigHelper->expects($this->any())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue($isPublicSupported));
+        $this->calendarConfigHelper->expects($this->any())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue($isSystemSupported));
+
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+        $config   = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $config->expects($this->at(0))
+            ->method('offsetUnsetByPath')
+            ->with('[columns][public]');
+        $config->expects($this->at(1))
+            ->method('offsetUnsetByPath')
+            ->with('[filters][columns][public]');
+        $config->expects($this->at(2))
+            ->method('offsetUnsetByPath')
+            ->with('[sorters][columns][public]');
+
+        $event = new BuildBefore($datagrid, $config);
+        $this->listener->onBuildBefore($event);
+    }
+
+    public function disableCalendarProvider()
+    {
+        return [
+            [true, false],
+            [false, true],
+        ];
     }
 
     public function testOnBuildAfterViewGranted()
     {
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(true));
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
+
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
             ->with('oro_system_calendar_view')
@@ -69,6 +147,13 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildAfterViewNotGranted()
     {
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(true));
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
+
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
             ->with('oro_system_calendar_view')

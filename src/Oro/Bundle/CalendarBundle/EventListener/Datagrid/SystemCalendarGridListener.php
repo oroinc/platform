@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\EventListener\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
 
@@ -17,13 +19,27 @@ class SystemCalendarGridListener
     protected $calendarConfigHelper;
 
     /**
-     * @param SecurityFacade $securityFacade
+     * @param SecurityFacade             $securityFacade
      * @param SystemCalendarConfigHelper $calendarConfigHelper
      */
     public function __construct(SecurityFacade $securityFacade, SystemCalendarConfigHelper $calendarConfigHelper)
     {
         $this->securityFacade       = $securityFacade;
         $this->calendarConfigHelper = $calendarConfigHelper;
+    }
+
+    /**
+     * @param BuildBefore $event
+     */
+    public function onBuildBefore(BuildBefore $event)
+    {
+        // show 'public' column only if both public and system calendars are enabled
+        if (!$this->calendarConfigHelper->isPublicCalendarSupported()
+            || !$this->calendarConfigHelper->isSystemCalendarSupported()
+        ) {
+            $config = $event->getConfig();
+            $this->removeColumn($config, 'public');
+        }
     }
 
     /**
@@ -85,5 +101,17 @@ class SystemCalendarGridListener
 
             return $result;
         };
+    }
+
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param string                $fieldName
+     */
+    protected function removeColumn(DatagridConfiguration $config, $fieldName)
+    {
+        $config->offsetUnsetByPath(sprintf('[columns][%s]', $fieldName));
+        $config->offsetUnsetByPath(sprintf('[filters][columns][%s]', $fieldName));
+        $config->offsetUnsetByPath(sprintf('[sorters][columns][%s]', $fieldName));
     }
 }
