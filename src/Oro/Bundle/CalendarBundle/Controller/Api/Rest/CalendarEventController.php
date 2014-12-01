@@ -21,6 +21,7 @@ use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 
 /**
@@ -114,15 +115,18 @@ class CalendarEventController extends RestController implements ClassResourceInt
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
-            $qb    = $repo->getEventListQueryBuilder($calendarId, $subordinate, $filterCriteria);
+            $qb    = $repo->getUserEventListQueryBuilder($filterCriteria);
             $page  = (int)$this->getRequest()->get('page', 1);
             $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+            $qb
+                ->andWhere('c.id = :calendarId')
+                ->setParameter('calendarId', $calendarId);
             $qb->setMaxResults($limit)
                 ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
 
-            $result = $this->get('oro_calendar.calendar_event.normalizer')->getCalendarEvents(
+            $result = $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvents(
                 $calendarId,
-                $qb
+                $qb->getQuery()
             );
 
             return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
@@ -236,5 +240,59 @@ class CalendarEventController extends RestController implements ClassResourceInt
         unset($data['removable']);
 
         return true;
+    }
+
+    /**
+     * @return SystemCalendarConfigHelper
+     */
+    protected function getCalendarConfigHelper()
+    {
+        return $this->get('oro_calendar.system_calendar.config_helper');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleUpdateRequest($id)
+    {
+        /** @var CalendarEvent $entity */
+        $entity = $this->getManager()->find($id);
+
+        if ($entity) {
+            try {
+                if ($this->processForm($entity)) {
+                    $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+                } else {
+                    $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+                }
+            } catch (ForbiddenException $forbiddenEx) {
+                $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+            }
+        } else {
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+        }
+
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleCreateRequest($_ = null)
+    {
+        $entity      = call_user_func_array(array($this, 'createEntity'), func_get_args());
+        try {
+            $isProcessed = $this->processForm($entity);
+
+            if ($isProcessed) {
+                $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
+            } else {
+                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+            }
+        } catch (ForbiddenException $forbiddenEx) {
+            $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+        }
+
+        return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
     }
 }

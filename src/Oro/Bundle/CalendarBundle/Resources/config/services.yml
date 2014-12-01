@@ -107,6 +107,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_security.security_facade
             - @oro_locale.formatter.name
+            - @oro_calendar.system_calendar.config_helper
 
     oro_calendar.calendar_manager:
         class: %oro_calendar.calendar_manager.class%
