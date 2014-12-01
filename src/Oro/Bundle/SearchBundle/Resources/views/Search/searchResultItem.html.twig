@@ -21,6 +21,7 @@
                 {% block additional_info %}
                 {% endblock %}
             </div>
+            {% placeholder search_item_entity_info with {entity: entity} %}
             {% if entityInfo is defined and entityInfo|length %}
                 <div class="clearfix">
                     <ul class="inline">
