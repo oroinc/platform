@@ -1,6 +1,10 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
-{% oro_title_set({params : {"%entity.title%": entity.title, "%entityName%": 'oro.calendar.calendarevent.entity_label'|trans } }) %}
+{% oro_title_set({params : {
+    "%entity.title%": entity.title,
+    "%entityName%": 'oro.calendar.calendarevent.entity_label'|trans,
+    "%parent.name%": entity.systemCalendar.name
+} }) %}
 {% set entityId = entity.id %}
 
 {% block navButtons %}
@@ -10,7 +14,7 @@
         {% set html = html ~ UI.saveAndStayButton() %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
-    {{ UI.cancelButton(path('oro_system_calendar_event_index', {'id': entity.systemCalendar.id})) }}
+    {{ UI.cancelButton(path('oro_system_calendar_view', {'id': entity.systemCalendar.id})) }}
 {% endblock %}
 
 {% block pageHeader %}
@@ -21,7 +25,7 @@
             'indexLabel':  'oro.calendar.systemcalendar.entity_plural_label'|trans,
             'entityTitle': entity.title|default('N/A'),
             'additional': [{
-                'indexPath':   path('oro_system_calendar_event_index', {'id': entity.systemCalendar.id}),
+                'indexPath':   path('oro_system_calendar_view', {'id': entity.systemCalendar.id}),
                 'indexLabel':  entity.systemCalendar.name,
             }]
         } %}

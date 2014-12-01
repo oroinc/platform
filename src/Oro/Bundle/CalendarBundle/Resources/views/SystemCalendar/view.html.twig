@@ -5,6 +5,14 @@
 {% oro_title_set({params : {"%entity.title%": entity.name }}) %}
 
 {% block navButtons %}
+    {% if resource_granted('oro_calendar_event_create') %}
+        <div class="btn-group">
+            {{ UI.addButton({
+                'path' : path('oro_system_calendar_event_create', {'id': entity.id }),
+                'entity_label': 'oro.calendar.calendarevent.entity_label'|trans
+            }) }}
+        </div>
+    {% endif %}
     {% if resource_granted('EDIT', entity) %}
         {{ UI.editButton({
             'path' :        path('oro_system_calendar_update', { id: entity.id }),
