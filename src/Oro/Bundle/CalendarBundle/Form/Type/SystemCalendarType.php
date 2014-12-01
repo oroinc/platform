@@ -4,12 +4,32 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SystemCalendarType extends AbstractType
 {
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var SystemCalendarConfigHelper */
+    protected $calendarConfigHelper;
+
+    /**
+     * @param SecurityFacade             $securityFacade
+     * @param SystemCalendarConfigHelper $calendarConfigHelper
+     */
+    public function __construct(SecurityFacade $securityFacade, SystemCalendarConfigHelper $calendarConfigHelper)
+    {
+        $this->securityFacade       = $securityFacade;
+        $this->calendarConfigHelper = $calendarConfigHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -35,20 +55,9 @@ class SystemCalendarType extends AbstractType
                     'allow_empty_color'  => true,
                     'allow_custom_color' => true
                 ]
-            )
-            ->add(
-                'public',
-                'choice',
-                [
-                    'required'      => false,
-                    'label'         => 'oro.calendar.systemcalendar.public.label',
-                    'empty_value'   => false,
-                    'choices'       => [
-                        false => 'oro.calendar.systemcalendar.scope.organization',
-                        true  => 'oro.calendar.systemcalendar.scope.system',
-                    ]
-                ]
             );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
     }
 
     /**
@@ -62,6 +71,38 @@ class SystemCalendarType extends AbstractType
                 'intention'  => 'system_calendar',
             ]
         );
+    }
+
+    /**
+     * PRE_SET_DATA event handler
+     *
+     * @param FormEvent $event
+     */
+    public function preSetData(FormEvent $event)
+    {
+        $form = $event->getForm();
+
+        if ($this->calendarConfigHelper->isPublicCalendarSupported()
+            && $this->calendarConfigHelper->isSystemCalendarSupported()
+        ) {
+            $form->add(
+                'public',
+                'choice',
+                [
+                    'required'    => false,
+                    'label'       => 'oro.calendar.systemcalendar.public.label',
+                    'empty_value' => false,
+                    'choices'     => [
+                        false => 'oro.calendar.systemcalendar.scope.organization',
+                        true  => 'oro.calendar.systemcalendar.scope.system',
+                    ]
+                ]
+            );
+        } elseif ($this->calendarConfigHelper->isPublicCalendarSupported()) {
+            $form->add('public', 'hidden', ['data' => true]);
+        } elseif ($this->calendarConfigHelper->isSystemCalendarSupported()) {
+            $form->add('public', 'hidden', ['data' => false]);
+        }
     }
 
     /**

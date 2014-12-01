@@ -2,67 +2,157 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\TypeTestCase;
+
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Form\Type\SystemCalendarType;
+use Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType;
 
-class SystemCalendarTypeTest extends \PHPUnit_Framework_TestCase
+class SystemCalendarTypeTest extends TypeTestCase
 {
-    /**
-     * @var SystemCalendarType
-     */
-    protected $type;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
 
-    protected function setUp()
-    {
-        $this->type = new SystemCalendarType(array());
-    }
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $calendarConfigHelper;
 
-    public function testBuildForm()
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $translator;
+
+    protected function getExtensions()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
+        $this->securityFacade       = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->calendarConfigHelper =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
 
-        $builder->expects($this->at(0))
-            ->method('add')
-            ->with(
-                'name',
-                'text',
-                ['required' => true, 'label' => 'oro.calendar.systemcalendar.name.label']
-            )
-            ->will($this->returnSelf());
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with(
-                'backgroundColor',
-                'oro_simple_color_picker',
-                [
-                    'required'           => false,
-                    'label'              => 'oro.calendar.systemcalendar.backgroundColor.label',
-                    'color_schema'       => 'oro_calendar.calendar_colors',
-                    'empty_value'        => 'oro.calendar.systemcalendar.no_color',
-                    'allow_empty_color'  => true,
-                    'allow_custom_color' => true
-                ]
-            )
-            ->will($this->returnSelf());
-        $builder->expects($this->at(2))
-            ->method('add')
-            ->with(
-                'public',
-                'choice',
-                [
-                    'required'      => false,
-                    'label'         => 'oro.calendar.systemcalendar.public.label',
-                    'empty_value'   => false,
-                    'choices'       => [
-                        false => 'oro.calendar.systemcalendar.scope.organization',
-                        true  => 'oro.calendar.systemcalendar.scope.system',
-                    ]
-                ]
-            )
-            ->will($this->returnSelf());
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->translator    = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $this->configManager->expects($this->any())
+            ->method('get')
+            ->with('oro_calendar.calendar_colors')
+            ->will($this->returnValue(['#FF0000']));
 
-        $this->type->buildForm($builder, array());
+        return [
+            new PreloadedExtension(
+                $this->loadTypes(),
+                []
+            )
+        ];
+    }
+
+    /**
+     * @return AbstractType[]
+     */
+    protected function loadTypes()
+    {
+        $types = [
+            new OroSimpleColorPickerType($this->configManager, $this->translator),
+        ];
+
+        $keys = array_map(
+            function ($type) {
+                /* @var AbstractType $type */
+                return $type->getName();
+            },
+            $types
+        );
+
+        return array_combine($keys, $types);
+    }
+
+    public function testSubmitValidData()
+    {
+        $formData = [
+            'name'            => 'test',
+            'backgroundColor' => '#FF0000',
+            'public'          => '1'
+        ];
+
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(true));
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
+
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $form = $this->factory->create($type);
+        $form->submit($formData);
+
+        $this->assertTrue($form->isSynchronized());
+        /** @var SystemCalendar $result */
+        $result = $form->getData();
+        $this->assertInstanceOf('Oro\Bundle\CalendarBundle\Entity\SystemCalendar', $result);
+        $this->assertEquals('test', $result->getName());
+        $this->assertEquals('#FF0000', $result->getBackgroundColor());
+        $this->assertTrue($result->isPublic());
+    }
+
+    public function testSubmitValidDataPublicCalendarOnly()
+    {
+        $formData = [
+            'name'            => 'test',
+            'backgroundColor' => '#FF0000',
+            'public'          => '1'
+        ];
+
+        $this->calendarConfigHelper->expects($this->any())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(true));
+        $this->calendarConfigHelper->expects($this->any())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(false));
+
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $form = $this->factory->create($type);
+        $form->submit($formData);
+
+        $this->assertTrue($form->isSynchronized());
+        /** @var SystemCalendar $result */
+        $result = $form->getData();
+        $this->assertInstanceOf('Oro\Bundle\CalendarBundle\Entity\SystemCalendar', $result);
+        $this->assertEquals('test', $result->getName());
+        $this->assertEquals('#FF0000', $result->getBackgroundColor());
+        $this->assertTrue($result->isPublic());
+    }
+
+    public function testSubmitValidDataSystemCalendarOnly()
+    {
+        $formData = [
+            'name'            => 'test',
+            'backgroundColor' => '#FF0000',
+            'public'          => '0'
+        ];
+
+        $this->calendarConfigHelper->expects($this->any())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(false));
+        $this->calendarConfigHelper->expects($this->any())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
+
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $form = $this->factory->create($type);
+        $form->submit($formData);
+
+        $this->assertTrue($form->isSynchronized());
+        /** @var SystemCalendar $result */
+        $result = $form->getData();
+        $this->assertInstanceOf('Oro\Bundle\CalendarBundle\Entity\SystemCalendar', $result);
+        $this->assertEquals('test', $result->getName());
+        $this->assertEquals('#FF0000', $result->getBackgroundColor());
+        $this->assertFalse($result->isPublic());
     }
 
     public function testSetDefaultOptions()
@@ -77,11 +167,13 @@ class SystemCalendarTypeTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->type->setDefaultOptions($resolver);
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $type->setDefaultOptions($resolver);
     }
 
     public function testGetName()
     {
-        $this->assertEquals('oro_system_calendar', $this->type->getName());
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $this->assertEquals('oro_system_calendar', $type->getName());
     }
 }

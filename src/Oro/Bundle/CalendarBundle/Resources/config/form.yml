@@ -129,6 +129,9 @@ services:
 
     oro_calendar.system_calendar.form.type:
         class: %oro_calendar.system_calendar.form.type.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_calendar.system_calendar.config_helper
         tags:
             - { name: form.type, alias: oro_system_calendar }
 

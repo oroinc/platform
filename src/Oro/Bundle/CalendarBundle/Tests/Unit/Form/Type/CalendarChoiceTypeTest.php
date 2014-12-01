@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\Test\TypeTestCase;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarChoiceType;
-use Symfony\Component\Form\Test\TypeTestCase;
 
 class CalendarChoiceTypeTest extends TypeTestCase
 {
