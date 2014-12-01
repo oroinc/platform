@@ -3,11 +3,28 @@ config:
         'jquery.validate':
             deps:
                 - 'jquery'
+        'tinymce':
+            deps:
+                - 'jquery'
+        'tinymce.textcolor':
+            deps:
+                - 'tinymce'
+        'tinymce.code':
+            deps:
+                - 'tinymce'
+        'oroform/lib/tinymce-4.1.7/jquery.tinymce.min':
+            deps:
+                - 'jquery'
+                - 'tinymce'
+            exports: 'jQuery'
     map:
         '*':
             'jquery.validate': 'oroform/js/extend/validate'
+            'tinymce': 'oroform/lib/tinymce-4.1.7/jquery.tinymce.min'
         'oroform/js/extend/validate':
             'jquery.validate': 'jquery.validate'
+        'oroform/lib/tinymce-4.1.7/jquery.tinymce.min':
+            'tinymce': 'tinymce'
     paths:
         'jquery.validate': 'bundles/oroform/lib/jquery.validate/jquery.validate.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
@@ -39,3 +56,7 @@ config:
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
+
+        'tinymce': 'bundles/oroform/lib/tinymce-4.1.7/tinymce.min.js'
+        'tinymce.textcolor': 'bundles/oroform/lib/tinymce-4.1.7/plugins/textcolor/plugin.min.js'
+        'tinymce.code': 'bundles/oroform/lib/tinymce-4.1.7/plugins/code/plugin.min.js'
