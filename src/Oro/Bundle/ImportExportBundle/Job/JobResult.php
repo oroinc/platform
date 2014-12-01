@@ -76,6 +76,17 @@ class JobResult
     }
 
     /**
+     * @param array $exceptions
+     *
+     * @return $this
+     */
+    public function setFailureExceptions(array $exceptions)
+    {
+        $this->failureExceptions = $exceptions;
+        return $this;
+    }
+
+    /**
      * @param ContextInterface $context
      * @return JobResult
      */

@@ -349,7 +349,7 @@ define(function (require) {
             }
 
             var modal = new DeleteConfirmation({
-                content: __('The widget will be removed')
+                content: __('oro.sidebar.widget.remove.confirm.message')
             });
 
             modal.on('ok', function () {
