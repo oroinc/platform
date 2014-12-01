@@ -115,9 +115,13 @@ define([], function () {
 
             return {x:X, y:Y, z:Z};
         },
+
+        // Convert RGB to LAB
         rgb2lab: function (color) {
             return this.xyz2lab(this.rgb2xyz(color));
         },
+
+        // Convert HEX to LAB
         hex2lab: function (color) {
             return this.xyz2lab(this.rgb2xyz(this.hex2rgb(color)));
         },
