@@ -136,6 +136,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_calendar.calendar_event_normalizer.system
             - @oro_calendar.system_calendar.config_helper
+            - @oro_security.security_facade
         tags:
             - { name: oro_calendar.calendar_provider, alias: system }
 
@@ -145,6 +146,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_calendar.calendar_event_normalizer.public
             - @oro_calendar.system_calendar.config_helper
+            - @oro_security.security_facade
         tags:
             - { name: oro_calendar.calendar_provider, alias: public }
 

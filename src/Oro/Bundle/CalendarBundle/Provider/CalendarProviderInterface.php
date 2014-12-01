@@ -19,6 +19,8 @@ interface CalendarProviderInterface
      *                  calendarName - a name of a calendar. This property is mandatory.
      *                  removable - indicated whether a calendar can be disconnected from the target calendar
      *                              defaults to true
+     *                  canAddEvent - indicated whether events can be added to a calendar
+     *                              defaults to false
      *               Also there is special property names 'options' where you can return some additional options.
      *               For example:
      *                  widgetRoute   - route name of a widget can be used to view an event. defaults to empty

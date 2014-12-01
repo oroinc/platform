@@ -25,7 +25,7 @@
         </div>
         {% endspaceless -%}
         ';
-    } else {
+    } else if ({{ name }}TemplateType === 'multiple') {
         {{ name|raw }}Template = '
         {%- spaceless %}
         <div class="control-group">
@@ -41,5 +41,7 @@
         {% endspaceless -%}
         ';
     } %>
-    <%= _.template({{ name|raw }}Template.replace(/\< %/g, '<' + '%').replace(/% \>/g, '%' + '>'))({calendars: calendars}) %>
+    <% if ({{ name|raw }}Template) { %>
+        <%= _.template({{ name|raw }}Template.replace(/\< %/g, '<' + '%').replace(/% \>/g, '%' + '>'))({calendars: calendars}) %>
+    <% } %>
 {% endblock %}
