@@ -33,6 +33,7 @@ define(['underscore', 'backbone', 'routing'
             backgroundColor: null,
             calendarName: null,
             removable: true,
+            canAddEvent: false,
             options: null
         },
 

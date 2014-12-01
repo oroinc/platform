@@ -56,6 +56,9 @@ class UserCalendarProvider implements CalendarProviderInterface
             if ($calendar->getId() === $calendarId) {
                 $resultItem['removable'] = false;
             }
+            if ($calendarId === $calendar->getId()) {
+                $resultItem['canAddEvent'] = true;
+            }
             $result[$calendar->getId()] = $resultItem;
         }
 

@@ -327,18 +327,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 ownCalendar = null,
                 isOwnCalendar = function (item) {
                     return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
-                },
-                isApplicable = function (item) {
-                    // TODO: add ACL check
-                    if (isOwnCalendar(item)) {
-                        return true;
-                    }
-                    return (item.get('calendarAlias') === 'system' || item.get('calendarAlias') === 'public');
                 };
 
             this.options.connections.each(function (item) {
                 var calendar;
-                if (isApplicable(item)) {
+                if (item.get('canAddEvent')) {
                     calendar = {uid: item.get('calendarUid'), name: item.get('calendarName')};
                     if (!ownCalendar && isOwnCalendar(item)) {
                         ownCalendar = calendar;

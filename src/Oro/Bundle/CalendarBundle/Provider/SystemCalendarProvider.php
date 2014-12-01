@@ -6,6 +6,7 @@ use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SystemCalendarProvider implements CalendarProviderInterface
 {
@@ -18,19 +19,25 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /** @var SystemCalendarConfigHelper */
     protected $calendarConfigHelper;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
-     * @param DoctrineHelper                    $doctrineHelper
-     * @param AbstractCalendarEventNormalizer   $calendarEventNormalizer
-     * @param SystemCalendarConfigHelper        $calendarConfigHelper
+     * @param DoctrineHelper                  $doctrineHelper
+     * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
+     * @param SystemCalendarConfigHelper      $calendarConfigHelper
+     * @param SecurityFacade                  $securityFacade
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AbstractCalendarEventNormalizer $calendarEventNormalizer,
-        SystemCalendarConfigHelper $calendarConfigHelper
+        SystemCalendarConfigHelper $calendarConfigHelper,
+        SecurityFacade $securityFacade
     ) {
-        $this->doctrineHelper           = $doctrineHelper;
-        $this->calendarEventNormalizer  = $calendarEventNormalizer;
-        $this->calendarConfigHelper     = $calendarConfigHelper;
+        $this->doctrineHelper          = $doctrineHelper;
+        $this->calendarEventNormalizer = $calendarEventNormalizer;
+        $this->calendarConfigHelper    = $calendarConfigHelper;
+        $this->securityFacade          = $securityFacade;
     }
 
     /**
@@ -55,6 +62,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
         /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
 
+        $canAddEvent = $this->securityFacade->isGranted('oro_system_calendar_event_management');
         foreach ($calendars as $calendar) {
             $resultItem = [
                 'calendarName'    => $calendar->getName(),
@@ -62,6 +70,9 @@ class SystemCalendarProvider implements CalendarProviderInterface
                 'removable'       => false,
                 'position'        => -60,
             ];
+            if ($canAddEvent) {
+                $resultItem['canAddEvent'] = true;
+            }
             $result[$calendar->getId()] = $resultItem;
         }
 
