@@ -2,8 +2,8 @@ define(function (require) {
     'use strict';
 
     var WysiwygEditorView,
-        BaseView = require('oroui/js/app/views/base/view');
-    require('tinymce');
+        BaseView = require('oroui/js/app/views/base/view'),
+        $ = require('tinymce');
     require('tinymce.textcolor');
     require('tinymce.code');
 
@@ -16,8 +16,13 @@ define(function (require) {
             statusbar : false
         },
 
+        initialize: function (options) {
+            this.options = $.extend(true, {}, this.defaults, options);
+            WysiwygEditorView.__super__.initialize.apply(this, arguments);
+        },
+
         render: function () {
-            this.$el.tinymce(this.defaults);
+            this.$el.tinymce(this.options);
         },
 
         dispose: function () {
