@@ -4,12 +4,14 @@ namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
@@ -47,8 +49,11 @@ class SystemCalendarController extends Controller
         if (!$this->getCalendarConfigHelper()->isSomeSystemCalendarSupported()) {
             throw $this->createNotFoundException('System and Public Calendars does not supported.');
         }
-
-        //@TODO: Added verification system and public calendars supported separately(after BAP-5991 will be implemented)
+        if (!$this->getSecurityFacade()->isGranted('oro_public_calendar_management')
+            && !$this->getSecurityFacade()->isGranted('oro_system_calendar_create')
+        ) {
+            throw new AccessDeniedException();
+        }
 
         $entity = new SystemCalendar();
 
@@ -65,7 +70,13 @@ class SystemCalendarController extends Controller
     public function updateAction(SystemCalendar $entity)
     {
         $this->checkPermissionByConfig($entity);
-        //@TODO: Added verification system and public calendars supported separately(after BAP-5991 will be implemented)
+        if ($entity->isPublic()) {
+            if (!$this->getSecurityFacade()->isGranted('oro_public_calendar_management')) {
+                throw new AccessDeniedException();
+            }
+        } elseif (!$this->getSecurityFacade()->isGranted('oro_system_calendar_update')) {
+            throw new AccessDeniedException();
+        }
 
         $formAction = $this->get('router')->generate('oro_system_calendar_update', ['id' => $entity->getId()]);
 
@@ -131,5 +142,13 @@ class SystemCalendarController extends Controller
     protected function getCalendarConfigHelper()
     {
         return $this->get('oro_calendar.system_calendar.config_helper');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->get('oro_security.security_facade');
     }
 }

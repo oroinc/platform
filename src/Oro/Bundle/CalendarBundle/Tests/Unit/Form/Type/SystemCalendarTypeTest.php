@@ -79,12 +79,22 @@ class SystemCalendarTypeTest extends TypeTestCase
             'public'          => '1'
         ];
 
-        $this->calendarConfigHelper->expects($this->once())
+        $this->calendarConfigHelper->expects($this->any())
             ->method('isPublicCalendarSupported')
             ->will($this->returnValue(true));
-        $this->calendarConfigHelper->expects($this->once())
+        $this->calendarConfigHelper->expects($this->any())
             ->method('isSystemCalendarSupported')
             ->will($this->returnValue(true));
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['oro_public_calendar_management', null, true],
+                        ['oro_system_calendar_create', null, true],
+                    ]
+                )
+            );
 
         $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
         $form = $this->factory->create($type);
