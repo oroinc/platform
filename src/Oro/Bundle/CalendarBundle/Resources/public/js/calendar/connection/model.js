@@ -57,7 +57,10 @@ define(['underscore', 'backbone', 'routing'
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(
-                _.extend({}, _.omit(this.toJSON(), ['calendarUid', 'calendarName', 'removable']), attrs || {})
+                _.extend({}, _.omit(
+                    this.toJSON(),
+                    ['calendarUid', 'calendarName', 'removable', 'canAddEvent']
+                ), attrs || {})
             );
 
             Backbone.Model.prototype.save.call(this, attrs, options);
