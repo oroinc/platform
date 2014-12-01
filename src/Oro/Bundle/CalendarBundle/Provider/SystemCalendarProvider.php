@@ -8,6 +8,9 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * Represents organization calendars
+ */
 class SystemCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
