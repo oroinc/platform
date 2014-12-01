@@ -5,7 +5,7 @@
         {% set statusName = calendarMacros.calendar_event_invitation_action(status) %}
         {{ UI.link({
             'aCss': 'btn btn-default',
-            'data':  {'page-component-module': 'orocalendar/js/app/components/change-status-component'},
+            'data':  {'page-component-module': 'oroui/js/app/components/view-component', 'page-component-options': {'view':'orocalendar/js/app/views/change-status-view'}|json_encode},
             'path':  path('oro_calendar_event_change_status', {'id': entity.id, 'status': status}),
             'label': statusName|trans,
             'title': statusName|trans
