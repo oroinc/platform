@@ -8,24 +8,24 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 
 class SystemCalendarGridListener
 {
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var SystemCalendarConfigHelper */
-    protected $calendarConfigHelper;
+    /** @var SystemCalendarConfig */
+    protected $calendarConfig;
 
     /**
-     * @param SecurityFacade             $securityFacade
-     * @param SystemCalendarConfigHelper $calendarConfigHelper
+     * @param SecurityFacade       $securityFacade
+     * @param SystemCalendarConfig $calendarConfig
      */
-    public function __construct(SecurityFacade $securityFacade, SystemCalendarConfigHelper $calendarConfigHelper)
+    public function __construct(SecurityFacade $securityFacade, SystemCalendarConfig $calendarConfig)
     {
-        $this->securityFacade       = $securityFacade;
-        $this->calendarConfigHelper = $calendarConfigHelper;
+        $this->securityFacade = $securityFacade;
+        $this->calendarConfig = $calendarConfig;
     }
 
     /**
@@ -34,9 +34,7 @@ class SystemCalendarGridListener
     public function onBuildBefore(BuildBefore $event)
     {
         // show 'public' column only if both public and system calendars are enabled
-        if (!$this->calendarConfigHelper->isPublicCalendarSupported()
-            || !$this->calendarConfigHelper->isSystemCalendarSupported()
-        ) {
+        if (!$this->calendarConfig->isPublicCalendarEnabled() || !$this->calendarConfig->isSystemCalendarEnabled()) {
             $config = $event->getConfig();
             $this->removeColumn($config, 'public');
         }
@@ -50,8 +48,8 @@ class SystemCalendarGridListener
         $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            $isPublicGranted = $this->calendarConfigHelper->isPublicCalendarSupported();
-            $isSystemGranted = $this->calendarConfigHelper->isSystemCalendarSupported()
+            $isPublicGranted = $this->calendarConfig->isPublicCalendarEnabled();
+            $isSystemGranted = $this->calendarConfig->isSystemCalendarEnabled()
                 && $this->securityFacade->isGranted('oro_system_calendar_view');
             if ($isPublicGranted && $isSystemGranted) {
                 $datasource->getQueryBuilder()

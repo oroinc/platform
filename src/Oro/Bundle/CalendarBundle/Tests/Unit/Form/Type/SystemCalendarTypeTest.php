@@ -16,7 +16,7 @@ class SystemCalendarTypeTest extends TypeTestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $calendarConfigHelper;
+    protected $calendarConfig;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
@@ -29,8 +29,8 @@ class SystemCalendarTypeTest extends TypeTestCase
         $this->securityFacade       = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calendarConfigHelper =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+        $this->calendarConfig =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
                 ->disableOriginalConstructor()
                 ->getMock();
 
@@ -79,11 +79,11 @@ class SystemCalendarTypeTest extends TypeTestCase
             'public'          => '1'
         ];
 
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(true));
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->any())
             ->method('isGranted')
@@ -96,7 +96,7 @@ class SystemCalendarTypeTest extends TypeTestCase
                 )
             );
 
-        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfig);
         $form = $this->factory->create($type);
         $form->submit($formData);
 
@@ -117,14 +117,14 @@ class SystemCalendarTypeTest extends TypeTestCase
             'public'          => '1'
         ];
 
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(true));
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(false));
 
-        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfig);
         $form = $this->factory->create($type);
         $form->submit($formData);
 
@@ -145,14 +145,14 @@ class SystemCalendarTypeTest extends TypeTestCase
             'public'          => '0'
         ];
 
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(false));
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
 
-        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfig);
         $form = $this->factory->create($type);
         $form->submit($formData);
 
@@ -177,13 +177,13 @@ class SystemCalendarTypeTest extends TypeTestCase
                 )
             );
 
-        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfig);
         $type->setDefaultOptions($resolver);
     }
 
     public function testGetName()
     {
-        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfigHelper);
+        $type = new SystemCalendarType($this->securityFacade, $this->calendarConfig);
         $this->assertEquals('oro_system_calendar', $type->getName());
     }
 }

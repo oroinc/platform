@@ -16,8 +16,8 @@ class PublicCalendarProvider implements CalendarProviderInterface
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
-    /** @var SystemCalendarConfigHelper */
-    protected $calendarConfigHelper;
+    /** @var SystemCalendarConfig */
+    protected $calendarConfig;
 
     /** @var SecurityFacade */
     protected $securityFacade;
@@ -25,18 +25,18 @@ class PublicCalendarProvider implements CalendarProviderInterface
     /**
      * @param DoctrineHelper                  $doctrineHelper
      * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
-     * @param SystemCalendarConfigHelper      $calendarConfigHelper
+     * @param SystemCalendarConfig            $calendarConfig
      * @param SecurityFacade                  $securityFacade
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AbstractCalendarEventNormalizer $calendarEventNormalizer,
-        SystemCalendarConfigHelper $calendarConfigHelper,
+        SystemCalendarConfig $calendarConfig,
         SecurityFacade $securityFacade
     ) {
         $this->doctrineHelper          = $doctrineHelper;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
-        $this->calendarConfigHelper    = $calendarConfigHelper;
+        $this->calendarConfig          = $calendarConfig;
         $this->securityFacade          = $securityFacade;
     }
 
@@ -47,7 +47,7 @@ class PublicCalendarProvider implements CalendarProviderInterface
     {
         $result = [];
 
-        if (!$this->calendarConfigHelper->isPublicCalendarSupported()) {
+        if (!$this->calendarConfig->isPublicCalendarEnabled()) {
             foreach ($calendarIds as $id) {
                 $result[$id] = null;
             }
@@ -83,7 +83,7 @@ class PublicCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
     {
-        if (!$this->calendarConfigHelper->isPublicCalendarSupported()) {
+        if (!$this->calendarConfig->isPublicCalendarEnabled()) {
             return [];
         }
 

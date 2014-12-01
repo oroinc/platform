@@ -7,7 +7,7 @@ use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
-use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -24,25 +24,25 @@ class CalendarEventManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var SystemCalendarConfigHelper */
-    protected $calendarConfigHelper;
+    /** @var SystemCalendarConfig */
+    protected $calendarConfig;
 
     /**
-     * @param DoctrineHelper             $doctrineHelper
-     * @param SecurityFacade             $securityFacade
-     * @param NameFormatter              $nameFormatter
-     * @param SystemCalendarConfigHelper $calendarConfigHelper
+     * @param DoctrineHelper       $doctrineHelper
+     * @param SecurityFacade       $securityFacade
+     * @param NameFormatter        $nameFormatter
+     * @param SystemCalendarConfig $calendarConfig
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
-        SystemCalendarConfigHelper $calendarConfigHelper
+        SystemCalendarConfig $calendarConfig
     ) {
-        $this->doctrineHelper       = $doctrineHelper;
-        $this->securityFacade       = $securityFacade;
-        $this->nameFormatter        = $nameFormatter;
-        $this->calendarConfigHelper = $calendarConfigHelper;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->securityFacade = $securityFacade;
+        $this->nameFormatter  = $nameFormatter;
+        $this->calendarConfig = $calendarConfig;
     }
 
     /**
@@ -109,15 +109,10 @@ class CalendarEventManager
         } elseif (in_array($calendarAlias, [SystemCalendar::CALENDAR_ALIAS, SystemCalendar::PUBLIC_CALENDAR_ALIAS])) {
             $systemCalendar = $this->findSystemCalendar($calendarId);
             //@TODO: Added permission verification
-            if ($systemCalendar->isPublic()
-                && !$this->calendarConfigHelper->isPublicCalendarSupported()
-            ) {
+            if ($systemCalendar->isPublic() && !$this->calendarConfig->isPublicCalendarEnabled()) {
                 throw new ForbiddenException('Public Calendars does not supported.');
             }
-
-            if (!$systemCalendar->isPublic()
-                && !$this->calendarConfigHelper->isSystemCalendarSupported()
-            ) {
+            if (!$systemCalendar->isPublic() && !$this->calendarConfig->isSystemCalendarEnabled()) {
                 throw new ForbiddenException('System Calendars does not supported.');
             }
             $event->setSystemCalendar($systemCalendar);

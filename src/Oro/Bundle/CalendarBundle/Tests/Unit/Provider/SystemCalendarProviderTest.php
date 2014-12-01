@@ -17,7 +17,7 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
     protected $calendarEventNormalizer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $calendarConfigHelper;
+    protected $calendarConfig;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
@@ -34,8 +34,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->calendarConfigHelper    =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+        $this->calendarConfig    =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
                 ->disableOriginalConstructor()
                 ->getMock();
         $this->securityFacade          = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
@@ -45,7 +45,7 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new SystemCalendarProvider(
             $this->doctrineHelper,
             $this->calendarEventNormalizer,
-            $this->calendarConfigHelper,
+            $this->calendarConfig,
             $this->securityFacade
         );
     }
@@ -57,8 +57,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $calendarId     = 10;
         $calendarIds    = [10];
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(false));
 
         $result = $this->provider->getCalendarDefaultValues($organizationId, $userId, $calendarId, $calendarIds);
@@ -77,8 +77,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $calendarId     = 10;
         $calendarIds    = [10];
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
@@ -115,8 +115,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
         $calendars = [$calendar1, $calendar2];
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->exactly(2))
             ->method('isGranted')
@@ -192,8 +192,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
         $calendars = [$calendar1];
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->exactly(2))
             ->method('isGranted')
@@ -257,8 +257,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $end            = new \DateTime();
         $connections    = [10 => true, 20 => false];
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(false));
 
         $result = $this->provider->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
@@ -274,8 +274,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $end            = new \DateTime();
         $connections    = [10 => true, 20 => false];
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
@@ -296,8 +296,8 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $connections    = [10 => true, 20 => false];
         $events         = [['id' => 1]];
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')

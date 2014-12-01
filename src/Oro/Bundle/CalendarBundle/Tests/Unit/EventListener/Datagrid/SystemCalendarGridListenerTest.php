@@ -16,7 +16,7 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $calendarConfigHelper;
+    protected $calendarConfig;
 
     protected function setUp()
     {
@@ -26,24 +26,24 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade->expects($this->any())
             ->method('getOrganizationId')
             ->will($this->returnValue(1));
-        $this->calendarConfigHelper =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+        $this->calendarConfig =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
                 ->disableOriginalConstructor()
                 ->getMock();
 
         $this->listener = new SystemCalendarGridListener(
             $this->securityFacade,
-            $this->calendarConfigHelper
+            $this->calendarConfig
         );
     }
 
     public function testOnBuildBeforeBothPublicAndSystemCalendarsEnabled()
     {
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(true));
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
 
         $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
@@ -63,11 +63,11 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testOnBuildBeforeAnyPublicOrSystemCalendarDisabled($isPublicSupported, $isSystemSupported)
     {
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue($isPublicSupported));
-        $this->calendarConfigHelper->expects($this->any())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->any())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue($isSystemSupported));
 
         $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
@@ -99,11 +99,11 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildAfterViewGranted()
     {
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(true));
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
 
         $this->securityFacade->expects($this->once())
@@ -147,11 +147,11 @@ class SystemCalendarGridListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildAfterViewNotGranted()
     {
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(true));
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
 
         $this->securityFacade->expects($this->once())

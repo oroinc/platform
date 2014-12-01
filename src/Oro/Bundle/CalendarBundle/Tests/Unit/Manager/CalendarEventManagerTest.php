@@ -21,7 +21,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
     protected $nameFormatter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $calendarConfigHelper;
+    protected $calendarConfig;
 
     /** @var CalendarEventManager */
     protected $manager;
@@ -37,8 +37,8 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
         $this->nameFormatter  = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calendarConfigHelper    =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+        $this->calendarConfig    =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
                 ->disableOriginalConstructor()
                 ->getMock();
 
@@ -46,7 +46,7 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper,
             $this->securityFacade,
             $this->nameFormatter,
-            $this->calendarConfigHelper
+            $this->calendarConfig
         );
     }
 
@@ -220,8 +220,8 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
 
         $event = new CalendarEvent();
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isSystemCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
             ->disableOriginalConstructor()
@@ -249,8 +249,8 @@ class CalendarEventManagerTest extends \PHPUnit_Framework_TestCase
 
         $event = new CalendarEvent();
 
-        $this->calendarConfigHelper->expects($this->once())
-            ->method('isPublicCalendarSupported')
+        $this->calendarConfig->expects($this->once())
+            ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(true));
         $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
             ->disableOriginalConstructor()

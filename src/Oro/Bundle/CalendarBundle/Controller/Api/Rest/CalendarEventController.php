@@ -22,7 +22,9 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 /**
  * @RouteResource("calendarevent")
@@ -243,11 +245,11 @@ class CalendarEventController extends RestController implements ClassResourceInt
     }
 
     /**
-     * @return SystemCalendarConfigHelper
+     * @return SystemCalendarConfig
      */
-    protected function getCalendarConfigHelper()
+    protected function getCalendarConfig()
     {
-        return $this->get('oro_calendar.system_calendar.config_helper');
+        return $this->get('oro_calendar.system_calendar_config');
     }
 
     /**

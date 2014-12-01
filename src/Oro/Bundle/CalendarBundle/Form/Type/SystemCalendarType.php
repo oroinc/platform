@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
-use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SystemCalendarType extends AbstractType
@@ -17,17 +17,17 @@ class SystemCalendarType extends AbstractType
     /** @var SecurityFacade */
     protected $securityFacade;
 
-    /** @var SystemCalendarConfigHelper */
-    protected $calendarConfigHelper;
+    /** @var SystemCalendarConfig */
+    protected $calendarConfig;
 
     /**
-     * @param SecurityFacade             $securityFacade
-     * @param SystemCalendarConfigHelper $calendarConfigHelper
+     * @param SecurityFacade       $securityFacade
+     * @param SystemCalendarConfig $calendarConfig
      */
-    public function __construct(SecurityFacade $securityFacade, SystemCalendarConfigHelper $calendarConfigHelper)
+    public function __construct(SecurityFacade $securityFacade, SystemCalendarConfig $calendarConfig)
     {
-        $this->securityFacade       = $securityFacade;
-        $this->calendarConfigHelper = $calendarConfigHelper;
+        $this->securityFacade = $securityFacade;
+        $this->calendarConfig = $calendarConfig;
     }
 
     /**
@@ -82,9 +82,7 @@ class SystemCalendarType extends AbstractType
     {
         $form = $event->getForm();
 
-        if ($this->calendarConfigHelper->isPublicCalendarSupported()
-            && $this->calendarConfigHelper->isSystemCalendarSupported()
-        ) {
+        if ($this->calendarConfig->isPublicCalendarEnabled() && $this->calendarConfig->isSystemCalendarEnabled()) {
             $options = [
                 'required'    => false,
                 'label'       => 'oro.calendar.systemcalendar.public.label',
@@ -110,9 +108,9 @@ class SystemCalendarType extends AbstractType
                 }
             }
             $form->add('public', 'choice', $options);
-        } elseif ($this->calendarConfigHelper->isPublicCalendarSupported()) {
+        } elseif ($this->calendarConfig->isPublicCalendarEnabled()) {
             $form->add('public', 'hidden', ['data' => true]);
-        } elseif ($this->calendarConfigHelper->isSystemCalendarSupported()) {
+        } elseif ($this->calendarConfig->isSystemCalendarEnabled()) {
             $form->add('public', 'hidden', ['data' => false]);
         }
     }

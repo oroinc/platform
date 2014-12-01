@@ -13,6 +13,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 
 class SystemCalendarEventController extends Controller
 {
@@ -135,22 +136,20 @@ class SystemCalendarEventController extends Controller
      */
     protected function checkPermissionByConfig(SystemCalendar $entity)
     {
-        if ($entity->isPublic()
-            && !$this->getCalendarConfigHelper()->isPublicCalendarSupported()) {
+        if ($entity->isPublic() && !$this->getCalendarConfig()->isPublicCalendarEnabled()) {
             throw $this->createNotFoundException('Public Calendars does not supported.');
         }
 
-        if (!$entity->isPublic()
-            && !$this->getCalendarConfigHelper()->isSystemCalendarSupported()) {
+        if (!$entity->isPublic() && !$this->getCalendarConfig()->isSystemCalendarEnabled()) {
             throw $this->createNotFoundException('System Calendars does not supported.');
         }
     }
 
     /**
-     * @return SystemCalendarConfigHelper
+     * @return SystemCalendarConfig
      */
-    protected function getCalendarConfigHelper()
+    protected function getCalendarConfig()
     {
-        return $this->get('oro_calendar.system_calendar.config_helper');
+        return $this->get('oro_calendar.system_calendar_config');
     }
 }

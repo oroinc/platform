@@ -3,25 +3,26 @@
 namespace Oro\Bundle\CalendarBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
+
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler as SoapDeleteHandler;
-use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 
 class DeleteHandler extends SoapDeleteHandler
 {
-    /** @var SystemCalendarConfigHelper */
-    protected $calendarConfigHelper;
+    /** @var SystemCalendarConfig */
+    protected $calendarConfig;
 
     /** @var SecurityFacade */
     protected $securityFacade;
 
     /**
-     * @param SystemCalendarConfigHelper $calendarConfigHelper
+     * @param SystemCalendarConfig $calendarConfig
      */
-    public function setCalendarConfigHelper(SystemCalendarConfigHelper $calendarConfigHelper)
+    public function setCalendarConfig(SystemCalendarConfig $calendarConfig)
     {
-        $this->calendarConfigHelper = $calendarConfigHelper;
+        $this->calendarConfig = $calendarConfig;
     }
 
     /**
@@ -38,12 +39,12 @@ class DeleteHandler extends SoapDeleteHandler
     protected function checkPermissions($entity, ObjectManager $em)
     {
         if ($entity->isPublic()
-            && !$this->calendarConfigHelper->isPublicCalendarSupported()) {
+            && !$this->calendarConfig->isPublicCalendarEnabled()) {
             throw new ForbiddenException('Public Calendars does not supported.');
         }
 
         if (!$entity->isPublic()
-            && !$this->calendarConfigHelper->isSystemCalendarSupported()) {
+            && !$this->calendarConfig->isSystemCalendarEnabled()) {
             throw new ForbiddenException('System Calendars does not supported.');
         }
 

@@ -16,8 +16,8 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
-    /** @var SystemCalendarConfigHelper */
-    protected $calendarConfigHelper;
+    /** @var SystemCalendarConfig */
+    protected $calendarConfig;
 
     /** @var SecurityFacade */
     protected $securityFacade;
@@ -25,18 +25,18 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /**
      * @param DoctrineHelper                  $doctrineHelper
      * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
-     * @param SystemCalendarConfigHelper      $calendarConfigHelper
+     * @param SystemCalendarConfig            $calendarConfig
      * @param SecurityFacade                  $securityFacade
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         AbstractCalendarEventNormalizer $calendarEventNormalizer,
-        SystemCalendarConfigHelper $calendarConfigHelper,
+        SystemCalendarConfig $calendarConfig,
         SecurityFacade $securityFacade
     ) {
         $this->doctrineHelper          = $doctrineHelper;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
-        $this->calendarConfigHelper    = $calendarConfigHelper;
+        $this->calendarConfig          = $calendarConfig;
         $this->securityFacade          = $securityFacade;
     }
 
@@ -47,7 +47,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
     {
         $result = [];
 
-        if (!$this->calendarConfigHelper->isSystemCalendarSupported()
+        if (!$this->calendarConfig->isSystemCalendarEnabled()
             || !$this->securityFacade->isGranted('oro_system_calendar_view')
         ) {
             foreach ($calendarIds as $id) {
@@ -89,7 +89,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
     {
-        if (!$this->calendarConfigHelper->isSystemCalendarSupported()
+        if (!$this->calendarConfig->isSystemCalendarEnabled()
             || !$this->securityFacade->isGranted('oro_system_calendar_view')
         ) {
             return [];

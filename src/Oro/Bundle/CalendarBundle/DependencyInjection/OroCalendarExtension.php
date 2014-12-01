@@ -18,8 +18,8 @@ class OroCalendarExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $container->setParameter(
-            'oro_calendar.system_calendar_supported',
-            $config['system_calendar_supported']
+            'oro_calendar.enabled_system_calendar',
+            $config['enabled_system_calendar']
         );
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));

@@ -3,19 +3,19 @@
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
 use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
-use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 
 class NavigationListener
 {
-    /** @var SystemCalendarConfigHelper */
-    protected $calendarConfigHelper;
+    /** @var SystemCalendarConfig */
+    protected $calendarConfig;
 
     /**
-     * @param SystemCalendarConfigHelper $calendarConfigHelper
+     * @param SystemCalendarConfig $calendarConfig
      */
-    public function __construct(SystemCalendarConfigHelper $calendarConfigHelper)
+    public function __construct(SystemCalendarConfig $calendarConfig)
     {
-        $this->calendarConfigHelper = $calendarConfigHelper;
+        $this->calendarConfig = $calendarConfig;
     }
 
     /**
@@ -23,7 +23,9 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        if (!$this->calendarConfigHelper->isSomeSystemCalendarSupported()) {
+        if (!$this->calendarConfig->isPublicCalendarEnabled()
+            && !$this->calendarConfig->isSystemCalendarEnabled()
+        ) {
             $menu = $event->getMenu();
             $menu = $menu->getChild('system_tab')->getChild('oro_system_calendar_list');
             $menu->setDisplay(false);
