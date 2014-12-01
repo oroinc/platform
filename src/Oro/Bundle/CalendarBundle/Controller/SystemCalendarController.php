@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -10,8 +11,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper;
-
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 class SystemCalendarController extends Controller
 {
@@ -32,12 +31,16 @@ class SystemCalendarController extends Controller
 
     /**
      * @Route("/view/{id}", name="oro_system_calendar_view", requirements={"id"="\d+"})
+     * @Template
      */
     public function viewAction(SystemCalendar $entity)
     {
         $this->checkPermissionByConfig($entity);
+        
+        return [
+            'entity' => $entity,
+        ];
     }
-
     /**
      * @Route("/create", name="oro_system_calendar_create")
      * @Template("OroCalendarBundle:SystemCalendar:update.html.twig")
@@ -70,6 +73,23 @@ class SystemCalendarController extends Controller
         $formAction = $this->get('router')->generate('oro_system_calendar_update', ['id' => $entity->getId()]);
 
         return $this->update($entity, $formAction);
+    }
+
+    /**
+     * @Route("/widget/events/{id}", name="oro_system_calendar_widget_events", requirements={"id"="\d+"})
+     * @Template
+     */
+    public function eventsAction(SystemCalendar $entity)
+    {
+        $this->checkPermissionByConfig($entity);
+
+        if (!$entity->isPublic() && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
+            throw new AccessDeniedException('Access denied to system calendar events from another organization');
+        }
+
+        return [
+            'entity' => $entity
+        ];
     }
 
     /**
