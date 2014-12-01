@@ -20,11 +20,27 @@ class CalendarEventRepository extends EntityRepository
      */
     public function getUserEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
     {
+        $qb = $this->getUserEventListQueryBuilder($filters);
+        $this->addTimeIntervalFilter($qb, $startDate, $endDate);
+
+        return $qb;
+    }
+
+    /**
+     * Returns a query builder which can be used to get a list of user calendar events
+     *
+     * @param array|Criteria $filters   Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                  or \Doctrine\Common\Collections\Criteria
+     *
+     * @return QueryBuilder
+     */
+    public function getUserEventListQueryBuilder($filters = [])
+    {
         $qb = $this->getEventListQueryBuilder()
+            ->addSelect('c.id as calendar')
             ->innerJoin('e.calendar', 'c');
 
         $this->addFilters($qb, $filters);
-        $this->addTimeIntervalFilter($qb, $startDate, $endDate);
 
         return $qb;
     }
@@ -42,6 +58,7 @@ class CalendarEventRepository extends EntityRepository
     public function getSystemEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
     {
         $qb = $this->getEventListQueryBuilder()
+            ->addSelect('c.id as calendar')
             ->innerJoin('e.systemCalendar', 'c')
             ->andWhere('c.public = :public')
             ->setParameter('public', false);
@@ -65,6 +82,7 @@ class CalendarEventRepository extends EntityRepository
     public function getPublicEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
     {
         $qb = $this->getEventListQueryBuilder()
+            ->addSelect('c.id as calendar')
             ->innerJoin('e.systemCalendar', 'c')
             ->andWhere('c.public = :public')
             ->setParameter('public', true);
@@ -84,7 +102,7 @@ class CalendarEventRepository extends EntityRepository
     {
         return $this->createQueryBuilder('e')
             ->select(
-                'c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
+                'e.id, e.title, e.description, e.start, e.end, e.allDay,'
                 . ' e.backgroundColor, e.createdAt, e.updatedAt'
             );
     }
