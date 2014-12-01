@@ -10,6 +10,7 @@ parameters:
     oro_calendar.calendar_choice_template.form.type.class:    Oro\Bundle\CalendarBundle\Form\Type\CalendarChoiceTemplateType
     oro_calendar.system_calendar.form.handler.class:          Oro\Bundle\CalendarBundle\Form\Handler\SystemCalendarHandler
     oro_calendar.system_calendar.form.type.class:             Oro\Bundle\CalendarBundle\Form\Type\SystemCalendarType
+    oro_calendar.extension.acl_label.class:                   Oro\Bundle\CalendarBundle\Form\Extension\AclObjectLabelTypeExtension
 
 services:
     oro_calendar.calendar_event.form.type:
@@ -150,3 +151,8 @@ services:
             - @oro_calendar.system_calendar.form
             - @request
             - @doctrine.orm.entity_manager
+
+    oro_calendar.extension.acl_label:
+        class: %oro_calendar.extension.acl_label.class%
+        tags:
+            - { name: form.type_extension, alias: oro_acl_label }
