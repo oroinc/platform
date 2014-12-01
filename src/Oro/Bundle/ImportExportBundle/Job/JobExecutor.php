@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
-use Doctrine\ORM\UnitOfWork;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -13,6 +13,7 @@ use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -162,7 +163,6 @@ class JobExecutor
         $couldBeSaved = $batchManager->isOpen()
             && $batchUow->getEntityState($jobExecution) === UnitOfWork::STATE_MANAGED;
 
-        //
         if ($couldBeSaved) {
             $batchManager->flush();
         }
