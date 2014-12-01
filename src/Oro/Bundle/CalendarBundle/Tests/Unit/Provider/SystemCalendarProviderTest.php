@@ -19,6 +19,9 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarConfigHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
     /** @var SystemCalendarProvider */
     protected $provider;
 
@@ -35,15 +38,34 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $this->securityFacade          = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->provider = new SystemCalendarProvider(
             $this->doctrineHelper,
             $this->calendarEventNormalizer,
-            $this->calendarConfigHelper
+            $this->calendarConfigHelper,
+            $this->securityFacade
         );
     }
 
-    public function testGetCalendarDefaultValues()
+    public function testGetCalendarDefaultValuesDisabled()
+    {
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 10;
+        $calendarIds    = [10];
+
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(false));
+
+        $result = $this->provider->getCalendarDefaultValues($organizationId, $userId, $calendarId, $calendarIds);
+        $this->assertEquals([], $result);
+    }
+
+    public function testGetCalendarDefaultValuesCannotAddEvents()
     {
         $organizationId = 1;
         $userId         = 123;
@@ -67,14 +89,15 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $this->calendarConfigHelper->expects($this->once())
             ->method('isSystemCalendarSupported')
             ->will($this->returnValue(true));
-        $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
+
+        $repo  = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
             ->disableOriginalConstructor()
             ->getMock();
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
             ->setMethods(['getResult'])
             ->getMockForAbstractClass();
-        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+        $qb    = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
         $repo->expects($this->once())
@@ -109,6 +132,72 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
                     'removable'       => false,
                     'position'        => -60,
                 ]
+            ],
+            $result
+        );
+    }
+
+    public function testGetCalendarDefaultValuesCanAddEvents()
+    {
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 10;
+        $calendarIds    = [10];
+
+        $calendar1 = new SystemCalendar();
+        ReflectionUtil::setId($calendar1, 1);
+        $organization1 = new Organization();
+        $calendar1->setOrganization($organization1);
+        $calendar1->setName('Main OroCRM');
+        $calendar1->setBackgroundColor('#FF0000');
+
+        $calendars = [$calendar1];
+
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->with('oro_system_calendar_event_management')
+            ->will($this->returnValue(true));
+
+        $repo  = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+        $qb    = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo->expects($this->once())
+            ->method('getSystemCalendarsQueryBuilder')
+            ->with($organizationId)
+            ->will($this->returnValue($qb));
+        $qb->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $query->expects($this->once())
+            ->method('getResult')
+            ->will($this->returnValue($calendars));
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->with('OroCalendarBundle:SystemCalendar')
+            ->will($this->returnValue($repo));
+
+        $result = $this->provider->getCalendarDefaultValues($organizationId, $userId, $calendarId, $calendarIds);
+
+        $this->assertEquals(
+            [
+                $calendar1->getId() => [
+                    'calendarName'    => $calendar1->getName(),
+                    'backgroundColor' => $calendar1->getBackgroundColor(),
+                    'removable'       => false,
+                    'position'        => -60,
+                    'canAddEvent'     => true
+                ],
             ],
             $result
         );
