@@ -82,7 +82,7 @@ class ConfigExtension extends \Twig_Extension
      */
     public function getClassRoute($entityClass, $routeType = 'view')
     {
-        if (!in_array($routeType, ['view', 'name'])) {
+        if (!in_array($routeType, ['view', 'name', 'create'])) {
             return null;
         }
 
@@ -105,8 +105,9 @@ class ConfigExtension extends \Twig_Extension
     protected function getDefaultClassRoute($className, $routeType)
     {
         static $routeMap = [
-            'view' => 'view',
-            'name' => 'index',
+            'view'   => 'view',
+            'name'   => 'index',
+            'create' => 'create'
         ];
         $postfix = $routeMap[$routeType];
         $parts   = explode('\\', $className);
