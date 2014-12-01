@@ -47,7 +47,9 @@ class SystemCalendarProvider implements CalendarProviderInterface
     {
         $result = [];
 
-        if (!$this->calendarConfigHelper->isSystemCalendarSupported()) {
+        if (!$this->calendarConfigHelper->isSystemCalendarSupported()
+            || !$this->securityFacade->isGranted('oro_system_calendar_view')
+        ) {
             foreach ($calendarIds as $id) {
                 $result[$id] = null;
             }
@@ -87,7 +89,9 @@ class SystemCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
     {
-        if (!$this->calendarConfigHelper->isSystemCalendarSupported()) {
+        if (!$this->calendarConfigHelper->isSystemCalendarSupported()
+            || !$this->securityFacade->isGranted('oro_system_calendar_view')
+        ) {
             return [];
         }
 
