@@ -48,6 +48,10 @@ class PublicCalendarProvider implements CalendarProviderInterface
         $result = [];
 
         if (!$this->calendarConfigHelper->isPublicCalendarSupported()) {
+            foreach ($calendarIds as $id) {
+                $result[$id] = null;
+            }
+
             return $result;
         }
 

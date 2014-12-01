@@ -6,6 +6,7 @@ interface CalendarProviderInterface
 {
     /**
      * Gets default properties for the given calendar
+     * To remove already connected calendar just return NULL as a value for this calendar
      *
      * @param int   $organizationId The id of an organization for which this information is requested
      * @param int   $userId         The id of an user requested this information

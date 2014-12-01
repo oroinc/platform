@@ -57,7 +57,6 @@ class CalendarManager
 
         foreach ($this->providers as $alias => $provider) {
             $calendarIds           = isset($existing[$alias]) ? array_keys($existing[$alias]) : [];
-            //@TODO: Fix ACL for calendars providers
             $calendarDefaultValues = $provider->getCalendarDefaultValues(
                 $organizationId,
                 $userId,
@@ -66,10 +65,14 @@ class CalendarManager
             );
             foreach ($calendarDefaultValues as $id => $values) {
                 if (isset($existing[$alias][$id])) {
-                    $key      = $existing[$alias][$id];
-                    $calendar = $result[$key];
-                    $this->applyCalendarDefaultValues($calendar, $values);
-                    $result[$key] = $calendar;
+                    $key = $existing[$alias][$id];
+                    if ($values !== null) {
+                        $calendar = $result[$key];
+                        $this->applyCalendarDefaultValues($calendar, $values);
+                        $result[$key] = $calendar;
+                    } else {
+                        unset($result[$key]);
+                    }
                 } else {
                     $values['targetCalendar'] = $calendarId;
                     $values['calendarAlias']  = $alias;

@@ -48,6 +48,10 @@ class SystemCalendarProvider implements CalendarProviderInterface
         $result = [];
 
         if (!$this->calendarConfigHelper->isSystemCalendarSupported()) {
+            foreach ($calendarIds as $id) {
+                $result[$id] = null;
+            }
+
             return $result;
         }
 
@@ -58,7 +62,6 @@ class SystemCalendarProvider implements CalendarProviderInterface
         //$qb = $repo->getSystemCalendarsByIdsQueryBuilder($calendarIds);
         $qb = $repo->getSystemCalendarsQueryBuilder($organizationId);
 
-        //@TODO: Fix ACL for calendars providers
         /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
 

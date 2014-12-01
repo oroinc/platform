@@ -80,6 +80,15 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
             [
                 'id'             => 2,
                 'targetCalendar' => $calendarId,
+                'calendarAlias'  => 'provider1',
+                'calendar'       => 10,
+                'visible'        => true,
+                'position'       => 3,
+                'extra_field'    => null,
+            ],
+            [
+                'id'             => 2,
+                'targetCalendar' => $calendarId,
                 'calendarAlias'  => 'provider2',
                 'calendar'       => 2,
                 'visible'        => false,
@@ -107,13 +116,14 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->provider1->expects($this->once())
             ->method('getCalendarDefaultValues')
-            ->with($organizationId, $userId, $calendarId, [1])
+            ->with($organizationId, $userId, $calendarId, [1, 10])
             ->will(
                 $this->returnValue(
                     [
                         1 => [
                             'calendarName' => 'calendar1'
                         ],
+                        10 => null
                     ]
                 )
             );

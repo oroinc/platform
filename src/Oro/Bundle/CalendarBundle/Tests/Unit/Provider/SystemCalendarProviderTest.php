@@ -62,7 +62,12 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $result = $this->provider->getCalendarDefaultValues($organizationId, $userId, $calendarId, $calendarIds);
-        $this->assertEquals([], $result);
+        $this->assertEquals(
+            [
+                10 => null
+            ],
+            $result
+        );
     }
 
     public function testGetCalendarDefaultValuesCannotAddEvents()
