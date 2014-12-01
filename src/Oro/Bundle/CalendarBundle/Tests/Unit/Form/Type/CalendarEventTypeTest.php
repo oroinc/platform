@@ -23,6 +23,9 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new CalendarEventType(array());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testBuildForm()
     {
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
@@ -106,7 +109,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'notifyInvitedUsers',
                 'hidden',
-                array('required' => false, 'label' => '')
+                array('mapped' => false)
             )
             ->will($this->returnSelf());
 
