@@ -102,8 +102,7 @@ class CalendarEventApiType extends CalendarEventType
                 'notifyInvitedUsers',
                 'hidden',
                 [
-                    'required' => false,
-                    'label'=> ''
+                    'mapped' => false
                 ]
             );
 

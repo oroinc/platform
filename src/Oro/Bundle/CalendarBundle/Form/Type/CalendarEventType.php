@@ -95,8 +95,7 @@ class CalendarEventType extends AbstractType
                 'notifyInvitedUsers',
                 'hidden',
                 [
-                    'required' => false,
-                    'label'    => ''
+                    'mapped' => false
                 ]
             )
         ;
