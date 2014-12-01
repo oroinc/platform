@@ -15,6 +15,9 @@ class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarEventNormalizer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $calendarConfigHelper;
+
     /** @var PublicCalendarProvider */
     protected $provider;
 
@@ -27,11 +30,32 @@ class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\PublicCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $this->calendarConfigHelper    =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
+
 
         $this->provider = new PublicCalendarProvider(
             $this->doctrineHelper,
-            $this->calendarEventNormalizer
+            $this->calendarEventNormalizer,
+            $this->calendarConfigHelper
         );
+    }
+
+    public function testGetCalendarDefaultValuesPublicNotSupport()
+    {
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 10;
+        $calendarIds    = [10];
+
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(false));
+
+        $result = $this->provider->getCalendarDefaultValues($organizationId, $userId, $calendarId, $calendarIds);
+        $this->assertEquals([], $result);
     }
 
     public function testGetCalendarDefaultValues()
@@ -48,6 +72,9 @@ class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
         $calendars = [$calendar1];
 
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(true));
         $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -87,6 +114,23 @@ class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetCalendarEventsPublicNotSupport()
+    {
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 10;
+        $start          = new \DateTime();
+        $end            = new \DateTime();
+        $connections    = [10 => true, 20 => false];
+
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(false));
+
+        $result = $this->provider->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
+        $this->assertEquals([], $result);
+    }
+
     public function testGetCalendarEvents()
     {
         $organizationId = 1;
@@ -97,6 +141,9 @@ class PublicCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $connections    = [10 => true, 20 => false];
         $events         = [['id' => 1]];
 
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isPublicCalendarSupported')
+            ->will($this->returnValue(true));
         $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();
