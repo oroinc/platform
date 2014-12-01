@@ -19,10 +19,6 @@ oro:
         view_events:                Events
         add_to_calendar:            Add to %name%
 
-        systemcalendarevent:
-            label:                  System Calendar Event
-            plural_label:           System Calendar Events
-
         action:
             public_calendar_management: Manage system calendars
             public_calendar_event_management: Manage system calendar events

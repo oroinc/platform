@@ -80,5 +80,5 @@ oro_titles:
     oro_system_calendar_create: oro.ui.create_entity
     oro_system_calendar_update: '%%entity.title%% - Edit'
     oro_system_calendar_event_view: '%%entity.title%% - %%parent.name%%'
-    oro_system_calendar_event_create: oro.ui.create_entity
-    oro_system_calendar_event_update: '%%entity.title%% - %%parent.name%% - Edit'
+    oro_system_calendar_event_create: 'oro.ui.create_entity - %%parent.name%%'
+    oro_system_calendar_event_update: '%%entity.title%% - Edit - %%parent.name%%'

@@ -66,8 +66,7 @@
     {% set systemCalendarEventsWidget %}
     {{ oro_widget_render({
         'widgetType':   'block',
-        'url':          path('oro_system_calendar_widget_events', {id: entity.id}),
-        'title':        'oro.calendar.calendarevent.entity_plural_label'|trans
+        'url':          path('oro_system_calendar_widget_events', {id: entity.id})
     }) }}
     {% endset %}
 
