@@ -50,7 +50,6 @@ class SystemCalendarGridListener
         $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            // @todo: add ACL check for public calendars here
             $isPublicGranted = $this->calendarConfigHelper->isPublicCalendarSupported();
             $isSystemGranted = $this->calendarConfigHelper->isSystemCalendarSupported()
                 && $this->securityFacade->isGranted('oro_system_calendar_view');
@@ -84,11 +83,14 @@ class SystemCalendarGridListener
     {
         return function (ResultRecordInterface $record) {
             if ($record->getValue('public')) {
-                // @todo: add ACL check for public calendars here
-                return [
-                    'update' => false,
-                    'delete' => false,
-                ];
+                if ($this->securityFacade->isGranted('oro_public_calendar_management')) {
+                    return [];
+                } else {
+                    return [
+                        'update' => false,
+                        'delete' => false,
+                    ];
+                }
             }
 
             $result = [];

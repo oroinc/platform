@@ -43,7 +43,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getEventListQueryBuilder();
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e',
             $qb->getQuery()->getDQL()
@@ -58,8 +58,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(new \DateTime(), new \DateTime());
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE '
@@ -83,8 +83,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE e.allDay = :allDay'
@@ -111,8 +111,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE e.allDay = :allDay'
@@ -135,8 +135,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(new \DateTime(), new \DateTime());
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE c.public = :public'
@@ -161,8 +161,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE c.public = :public AND e.allDay = :allDay'
@@ -189,8 +189,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE c.public = :public AND e.allDay = :allDay'
@@ -213,8 +213,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder(new \DateTime(), new \DateTime());
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE c.public = :public'
@@ -239,8 +239,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE c.public = :public AND e.allDay = :allDay'
@@ -267,8 +267,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT c.id as calendar, e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt'
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE c.public = :public AND e.allDay = :allDay'

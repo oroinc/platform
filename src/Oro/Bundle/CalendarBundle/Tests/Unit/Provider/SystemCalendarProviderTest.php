@@ -17,7 +17,7 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
     protected $calendarEventNormalizer;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $aclHelper;
+    protected $calendarConfigHelper;
 
     /** @var SystemCalendarProvider */
     protected $provider;
@@ -31,14 +31,15 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->aclHelper               = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->calendarConfigHelper    =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfigHelper')
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $this->provider = new SystemCalendarProvider(
             $this->doctrineHelper,
             $this->calendarEventNormalizer,
-            $this->aclHelper
+            $this->calendarConfigHelper
         );
     }
 
@@ -63,6 +64,9 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
 
         $calendars = [$calendar1, $calendar2];
 
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
         $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -120,6 +124,9 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $connections    = [10 => true, 20 => false];
         $events         = [['id' => 1]];
 
+        $this->calendarConfigHelper->expects($this->once())
+            ->method('isSystemCalendarSupported')
+            ->will($this->returnValue(true));
         $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
             ->getMock();

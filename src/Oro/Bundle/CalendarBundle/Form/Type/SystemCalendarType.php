@@ -85,19 +85,31 @@ class SystemCalendarType extends AbstractType
         if ($this->calendarConfigHelper->isPublicCalendarSupported()
             && $this->calendarConfigHelper->isSystemCalendarSupported()
         ) {
-            $form->add(
-                'public',
-                'choice',
-                [
-                    'required'    => false,
-                    'label'       => 'oro.calendar.systemcalendar.public.label',
-                    'empty_value' => false,
-                    'choices'     => [
-                        false => 'oro.calendar.systemcalendar.scope.organization',
-                        true  => 'oro.calendar.systemcalendar.scope.system',
-                    ]
+            $options = [
+                'required'    => false,
+                'label'       => 'oro.calendar.systemcalendar.public.label',
+                'empty_value' => false,
+                'choices'     => [
+                    false => 'oro.calendar.systemcalendar.scope.organization',
+                    true  => 'oro.calendar.systemcalendar.scope.system'
                 ]
-            );
+            ];
+            /** @var SystemCalendar|null $data */
+            $data = $event->getData();
+            if ($data) {
+                $isPublicGranted = $this->securityFacade->isGranted('oro_public_calendar_management');
+                $isSystemGranted = $this->securityFacade->isGranted(
+                    $data->getId() ? 'oro_system_calendar_update' : 'oro_system_calendar_create'
+                );
+                if (!$isPublicGranted || !$isSystemGranted) {
+                    $options['read_only'] = true;
+                    if (!$data->getId() && !$isSystemGranted) {
+                        $options['data'] = true;
+                    }
+                    unset($options['choices'][$isSystemGranted]);
+                }
+            }
+            $form->add('public', 'choice', $options);
         } elseif ($this->calendarConfigHelper->isPublicCalendarSupported()) {
             $form->add('public', 'hidden', ['data' => true]);
         } elseif ($this->calendarConfigHelper->isSystemCalendarSupported()) {
