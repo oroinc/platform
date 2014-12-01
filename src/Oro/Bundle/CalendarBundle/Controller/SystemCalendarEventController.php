@@ -17,25 +17,6 @@ use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 class SystemCalendarEventController extends Controller
 {
     /**
-     * @Route("/{id}/event", name="oro_system_calendar_event_index", requirements={"id"="\d+"})
-     * @Template
-     */
-    public function indexAction(SystemCalendar $entity)
-    {
-        $this->checkPermissionByConfig($entity);
-
-        if (!$entity->isPublic() && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity)) {
-            throw new AccessDeniedException('Access denied to system calendar events from another organization');
-        }
-
-        return [
-            'params'        => ['calendarId' => $entity->getId()],
-            'gridName'      => $entity->isPublic() ? 'public-system-calendar-event-grid' : 'system-calendar-event-grid',
-            'entity_class'  => $this->container->getParameter('oro_calendar.calendar_event.entity.class')
-        ];
-    }
-
-    /**
      * @Route("/event/view/{id}", name="oro_system_calendar_event_view", requirements={"id"="\d+"})
      * @Template
      * @AclAncestor("oro_calendar_event_view")
@@ -130,7 +111,10 @@ class SystemCalendarEventController extends Controller
 
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     ['route' => 'oro_system_calendar_event_update', 'parameters' => ['id' => $entity->getId()]],
-                    ['route' => 'oro_system_calendar_event_view', 'parameters' => ['id' => $entity->getId()]]
+                    [
+                        'route'      => 'oro_system_calendar_view',
+                        'parameters' => ['id' => $entity->getSystemCalendar()->getId()]
+                    ]
                 );
             }
             $saved = true;
