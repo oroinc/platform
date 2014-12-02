@@ -67,11 +67,20 @@ class SearchController extends Controller
 
         /** @var $resultProvider ResultStatisticsProvider */
         $resultProvider = $this->get('oro_search.provider.result_statistics_provider');
+        $groupedResults = $resultProvider->getGroupedResults($string);
+        $selectedResult = null;
+
+        foreach ($groupedResults as $alias => $type) {
+            if ($alias == $from) {
+                $selectedResult = $type;
+            }
+        }
 
         return array(
             'from'           => $from,
             'searchString'   => $string,
-            'groupedResults' => $resultProvider->getGroupedResults($string),
+            'groupedResults' => $groupedResults,
+            'selectedResult' => $selectedResult
         );
     }
 }
