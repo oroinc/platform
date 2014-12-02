@@ -2,15 +2,37 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
+
 class PublicCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 {
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /**
+     * @param SecurityFacade    $securityFacade
+     * @param ReminderManager   $reminderManager
+     */
+    public function __construct(
+        SecurityFacade $securityFacade,
+        ReminderManager $reminderManager
+    ) {
+        parent::__construct($reminderManager);
+        $this->securityFacade = $securityFacade;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function applyPermission(&$resultItem, $calendarId)
     {
-        //@TODO: it must be override in BAP-5998
         $resultItem['editable']  = false;
         $resultItem['removable'] = false;
+
+        if ($this->securityFacade->isGranted('oro_public_calendar_event_management')) {
+            $resultItem['editable']  = true;
+            $resultItem['removable'] = true;
+        }
     }
 }
