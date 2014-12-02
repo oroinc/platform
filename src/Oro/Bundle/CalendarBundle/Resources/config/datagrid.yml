@@ -315,26 +315,26 @@ datagrid:
                 link:          delete_link
         options:
             entityHint: calendar_events
+            skip_acl_check: true
             entity_pagination: true
 
     system-calendar-event-grid:
         extends: base-system-calendar-event-grid
         source:
-            # @TODO: Add acl_resource: oro_system_calendar_view after BAP-5989 was implemented
             query:
                 where:
                     and:
                         - calendar.public = false
+        action_configuration: @oro_calendar.system_calendar_event.datagrid_helper->getSystemActionConfigurationClosure
 
     public-system-calendar-event-grid:
         extends: base-system-calendar-event-grid
-        options:
-            skip_acl_check: true
         source:
             query:
                 where:
                     and:
                         - calendar.public = true
+        action_configuration: @oro_calendar.system_calendar_event.datagrid_helper->getPublicActionConfigurationClosure
 
     system-calendar-grid:
         source:

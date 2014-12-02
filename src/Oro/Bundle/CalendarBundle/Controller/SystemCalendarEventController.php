@@ -9,8 +9,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
@@ -21,25 +19,31 @@ class SystemCalendarEventController extends Controller
     /**
      * @Route("/event/view/{id}", name="oro_system_calendar_event_view", requirements={"id"="\d+"})
      * @Template
-     * @AclAncestor("oro_calendar_event_view")
      */
     public function viewAction(CalendarEvent $entity)
     {
-        //is event from system calendar
-        if (!$entity->getSystemCalendar()) {
-            throw $this->createNotFoundException(sprintf('Not found %d system calendar event', $entity->getId()));
+        $calendar = $entity->getSystemCalendar();
+        if (!$calendar) {
+            // an event must belong to system calendar
+            throw $this->createNotFoundException('Not system calendar event.');
         }
 
-        $this->checkPermissionByConfig($entity->getSystemCalendar());
+        $this->checkPermissionByConfig($calendar);
 
-        //does user have permission to view system calendar
-        if (!$entity->getSystemCalendar()->isPublic()
-            && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity->getSystemCalendar())) {
-            throw new AccessDeniedException('Access denied to system calendar events from another organization');
+        $securityFacade = $this->getSecurityFacade();
+        if (!$calendar->isPublic() && !$securityFacade->isGranted('VIEW', $calendar)) {
+            // an user must have permissions to view system calendar
+            throw new AccessDeniedException();
         }
+
+        $isEventManagementGranted = $calendar->isPublic()
+            ? $securityFacade->isGranted('oro_public_calendar_event_management')
+            : $securityFacade->isGranted('oro_system_calendar_event_management');
 
         return [
-            'entity' => $entity,
+            'entity'    => $entity,
+            'editable'  => $isEventManagementGranted,
+            'removable' => $isEventManagementGranted
         ];
     }
 
@@ -47,11 +51,15 @@ class SystemCalendarEventController extends Controller
      * @Route("/{id}/event/create", name="oro_system_calendar_event_create", requirements={"id"="\d+"})
      * @Template("OroCalendarBundle:SystemCalendarEvent:update.html.twig")
      */
-    public function createAction(SystemCalendar $systemCalendar)
+    public function createAction(SystemCalendar $calendar)
     {
-        $this->checkPermissionByConfig($systemCalendar);
-        if (!$this->getSecurityFacade()->isGranted('oro_public_calendar_event_management')
-            && !$this->getSecurityFacade()->isGranted('oro_system_calendar_event_management')) {
+        $this->checkPermissionByConfig($calendar);
+
+        $securityFacade = $this->getSecurityFacade();
+        $isGranted = $calendar->isPublic()
+            ? $securityFacade->isGranted('oro_public_calendar_event_management')
+            : $securityFacade->isGranted('oro_system_calendar_event_management');
+        if (!$isGranted) {
             throw new AccessDeniedException();
         }
 
@@ -60,16 +68,12 @@ class SystemCalendarEventController extends Controller
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity->setStart($startTime);
         $entity->setEnd($startTime->add(new \DateInterval('PT1H')));
-        $entity->setSystemCalendar($systemCalendar);
+        $entity->setSystemCalendar($calendar);
 
-        $formAction = $this->get('oro_entity.routing_helper')
-            ->generateUrlByRequest(
-                'oro_system_calendar_event_create',
-                $this->getRequest(),
-                ['id' => $systemCalendar->getId()]
-            );
-
-        return $this->update($entity, $formAction);
+        return $this->update(
+            $entity,
+            $this->get('router')->generate('oro_system_calendar_event_create', ['id' => $calendar->getId()])
+        );
     }
 
     /**
@@ -78,28 +82,31 @@ class SystemCalendarEventController extends Controller
      */
     public function updateAction(CalendarEvent $entity)
     {
-        //is event from system calendar
-        if (!$entity->getSystemCalendar()) {
-            throw $this->createNotFoundException(sprintf('Not found %d system calendar event', $entity->getId()));
+        $calendar = $entity->getSystemCalendar();
+        if (!$calendar) {
+            // an event must belong to system calendar
+            throw $this->createNotFoundException('Not system calendar event.');
         }
 
-        $this->checkPermissionByConfig($entity->getSystemCalendar());
+        $this->checkPermissionByConfig($calendar);
 
-        //does user have permission to view system calendar
-        if (!$entity->getSystemCalendar()->isPublic()
-            && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity->getSystemCalendar())) {
-            throw new AccessDeniedException('Access denied to system calendar events from another organization');
-        }
-
-        if ($entity->getSystemCalendar()->isPublic()
-            && !$this->getSecurityFacade()->isGranted('oro_public_calendar_event_management')) {
-            throw new AccessDeniedException();
-        } elseif (!$this->getSecurityFacade()->isGranted('oro_system_calendar_event_management')) {
+        $securityFacade = $this->getSecurityFacade();
+        if (!$calendar->isPublic() && !$securityFacade->isGranted('VIEW', $calendar)) {
+            // an user must have permissions to view system calendar
             throw new AccessDeniedException();
         }
-        $formAction = $this->get('router')->generate('oro_system_calendar_event_update', ['id' => $entity->getId()]);
 
-        return $this->update($entity, $formAction);
+        $isGranted = $calendar->isPublic()
+            ? $securityFacade->isGranted('oro_public_calendar_event_management')
+            : $securityFacade->isGranted('oro_system_calendar_event_management');
+        if (!$isGranted) {
+            throw new AccessDeniedException();
+        }
+
+        return $this->update(
+            $entity,
+            $this->get('router')->generate('oro_system_calendar_event_update', ['id' => $entity->getId()])
+        );
     }
 
     /**
@@ -145,12 +152,14 @@ class SystemCalendarEventController extends Controller
      */
     protected function checkPermissionByConfig(SystemCalendar $entity)
     {
-        if ($entity->isPublic() && !$this->getCalendarConfig()->isPublicCalendarEnabled()) {
-            throw $this->createNotFoundException('Public Calendars does not supported.');
-        }
-
-        if (!$entity->isPublic() && !$this->getCalendarConfig()->isSystemCalendarEnabled()) {
-            throw $this->createNotFoundException('System Calendars does not supported.');
+        if ($entity->isPublic()) {
+            if (!$this->getCalendarConfig()->isPublicCalendarEnabled()) {
+                throw $this->createNotFoundException('Public calendars are disabled.');
+            }
+        } else {
+            if (!$this->getCalendarConfig()->isSystemCalendarEnabled()) {
+                throw $this->createNotFoundException('System calendars are disabled.');
+            }
         }
     }
 
