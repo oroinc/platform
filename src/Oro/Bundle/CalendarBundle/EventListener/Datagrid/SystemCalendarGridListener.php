@@ -103,7 +103,6 @@ class SystemCalendarGridListener
         };
     }
 
-
     /**
      * @param DatagridConfiguration $config
      * @param string                $fieldName
