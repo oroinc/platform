@@ -19,18 +19,26 @@ class EventDeleteHandler extends SoapDeleteHandler
 
     /**
      * @param SystemCalendarConfig $calendarConfig
+     *
+     * @return self
      */
     public function setCalendarConfig(SystemCalendarConfig $calendarConfig)
     {
         $this->calendarConfig = $calendarConfig;
+
+        return $this;
     }
 
     /**
      * @param SecurityFacade $securityFacade
+     *
+     * @return self
      */
     public function setSecurityFacade(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
+
+        return $this;
     }
 
     /**
@@ -51,9 +59,9 @@ class EventDeleteHandler extends SoapDeleteHandler
 
             if ($entity->getSystemCalendar()->isPublic()
                 && !$this->securityFacade->isGranted('oro_public_calendar_event_management')) {
-                throw new ForbiddenException('Access denied to public calendar events management');
+                throw new ForbiddenException('Access denied to public calendar events management.');
             } elseif (!$this->securityFacade->isGranted('oro_system_calendar_event_management')) {
-                throw new ForbiddenException('Access denied to system calendar events management');
+                throw new ForbiddenException('Access denied to system calendar events management.');
             }
         } else {
             parent::checkPermissions($entity, $em);

@@ -160,11 +160,13 @@ services:
     oro_calendar.calendar_event_normalizer.system:
         class: %oro_calendar.calendar_event_normalizer.system.class%
         arguments:
+            - @oro_security.security_facade
             - @oro_reminder.entity.manager
 
     oro_calendar.calendar_event_normalizer.public:
         class: %oro_calendar.calendar_event_normalizer.public.class%
         arguments:
+            - @oro_security.security_facade
             - @oro_reminder.entity.manager
 
     oro_calendar.autocomplete.user_calendar_handler:
