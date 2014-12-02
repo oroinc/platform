@@ -21,6 +21,7 @@ use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 
 /**
@@ -236,5 +237,15 @@ class CalendarEventController extends RestController implements ClassResourceInt
         unset($data['removable']);
 
         return true;
+    }
+
+    /**
+     * Gets an object responsible to delete an entity.
+     *
+     * @return DeleteHandler
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->get('oro_calendar.handler.delete');
     }
 }

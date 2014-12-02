@@ -24,6 +24,9 @@ class CalendarEventApiHandler
      */
     protected $manager;
 
+    /** @var CalendarEvent */
+    protected $dirtyEntity;
+
     /**
      * @param FormInterface $form
      * @param Request       $request
@@ -47,6 +50,8 @@ class CalendarEventApiHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+            $this->dirtyEntity = $entity;
+
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
@@ -65,7 +70,15 @@ class CalendarEventApiHandler
      */
     protected function onSuccess(CalendarEvent $entity)
     {
+        $new = $entity->getId() ? false : true;
+
         $this->manager->persist($entity);
         $this->manager->flush();
+
+        if ($new) {
+            $this->emailSendProcessor->sendInviteNotification($entity);
+        } else {
+            $this->emailSendProcessor->sendUpdateEventNotification($entity, $this->dirtyEntity);
+        }
     }
 }

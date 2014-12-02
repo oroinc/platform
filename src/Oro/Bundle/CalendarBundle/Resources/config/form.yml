@@ -45,6 +45,7 @@ services:
             - @oro_activity.manager
             - @oro_entity.routing_helper
             - @oro_security.security_facade
+            - @oro_calendar.send_processor.email
 
     oro_calendar.calendar_event.form.handler.api:
         class: %oro_calendar.calendar_event.form.handler.api.class%
@@ -53,6 +54,7 @@ services:
             - @oro_calendar.calendar_event.form.api
             - @request
             - @doctrine.orm.entity_manager
+            - @oro_calendar.send_processor.email
 
     oro_calendar.calendar_event_invitees.form.type:
         class: %oro_calendar.calendar_event_invitees.form.type.class%

@@ -11,6 +11,7 @@ use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -34,6 +35,12 @@ class CalendarEventHandler
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var EmailSendProcessor */
+    protected $emailSendProcessor;
+
+    /** @var CalendarEvent */
+    protected $dirtyEntity;
+
     /**
      * @param FormInterface       $form
      * @param Request             $request
@@ -41,6 +48,7 @@ class CalendarEventHandler
      * @param ActivityManager     $activityManager
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param SecurityFacade      $securityFacade
+     * @param EmailSendProcessor  $emailSendProcessor
      */
     public function __construct(
         FormInterface $form,
@@ -48,7 +56,8 @@ class CalendarEventHandler
         ObjectManager $manager,
         ActivityManager $activityManager,
         EntityRoutingHelper $entityRoutingHelper,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        EmailSendProcessor $emailSendProcessor
     ) {
         $this->form                = $form;
         $this->request             = $request;
@@ -56,6 +65,7 @@ class CalendarEventHandler
         $this->activityManager     = $activityManager;
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->securityFacade      = $securityFacade;
+        $this->emailSendProcessor  = $emailSendProcessor;
     }
 
     /**
@@ -96,6 +106,8 @@ class CalendarEventHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+            $this->dirtyEntity = $entity;
+
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
@@ -138,7 +150,15 @@ class CalendarEventHandler
      */
     protected function onSuccess(CalendarEvent $entity)
     {
+        $new = $entity->getId() ? false : true;
+
         $this->manager->persist($entity);
         $this->manager->flush();
+
+        if ($new) {
+            $this->emailSendProcessor->sendInviteNotification($entity);
+        } else {
+            $this->emailSendProcessor->sendUpdateEventNotification($entity, $this->dirtyEntity);
+        }
     }
 }

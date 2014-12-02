@@ -16,6 +16,9 @@ parameters:
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
     oro_calendar.calendar_event.normalizer.class:                Oro\Bundle\CalendarBundle\Provider\CalendarEventNormalizer
     oro_calendar.autocomplete.user_calendar_handler.class:       Oro\Bundle\CalendarBundle\Autocomplete\UserCalendarHandler
+    oro_calendar.model.email_notification.class:                 Oro\Bundle\CalendarBundle\Model\EmailNotification
+    oro_calendar.send_processor.email.class:                     Oro\Bundle\CalendarBundle\Model\EmailSendProcessor
+    oro_calendar.handler.delete.class:                           Oro\Bundle\CalendarBundle\Handler\DeleteHandler
 
 services:
     oro_calendar.listener.entity_listener:
@@ -132,3 +135,18 @@ services:
            - @doctrine
         tags:
            - {name: oro_activity_list.provider, priority: 50}
+
+    oro_calendar.model.email_notification:
+        class: %oro_calendar.model.email_notification.class%
+
+    oro_calendar.send_processor.email:
+        class: %oro_calendar.send_processor.email.class%
+        arguments:
+            - @oro_notification.email_processor
+            - @oro_calendar.model.email_notification
+
+    oro_calendar.handler.delete:
+        class: %oro_calendar.handler.delete.class%
+        parent: oro_soap.handler.delete.abstract
+        calls:
+            - [setEmailSendProcessor, [@oro_calendar.send_processor.email]]
