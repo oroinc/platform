@@ -2,14 +2,13 @@
 <div class="btn-group" role="group">
     {% set statuses = entity.availableInvitationStatuses %}
     {% for status in statuses  %}
-        {% set statusName = calendarMacros.calendar_event_invitation_action(status) %}
         {{ UI.link({
             'aCss':  'btn btn-default',
             'iCss':  calendarMacros.get_invitatition_status_class(status),
             'data':  {'page-component-module': 'orocalendar/js/app/components/change-status-component'},
             'path':  path('oro_calendar_event_change_status', {'id': entity.id, 'status': status}),
-            'label': statusName|trans,
-            'title': statusName|trans
+            'label': calendarMacros.calendar_event_invitation_action(status)|trans,
+            'title': calendarMacros.calendar_event_invitation_action(status)|trans
         }) }}
     {% endfor %}
 </div>
