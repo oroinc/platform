@@ -27,6 +27,7 @@ parameters:
     oro_calendar.system_calendar_config.class:                   Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig
     oro_calendar.event_listener.navigation.class:                Oro\Bundle\CalendarBundle\EventListener\NavigationListener
     oro_calendar.soap.handler.delete.class:                      Oro\Bundle\CalendarBundle\Handler\DeleteHandler
+    oro_calendar.soap.handler.event_delete.class:                Oro\Bundle\CalendarBundle\Handler\EventDeleteHandler
 
 services:
     oro_calendar.listener.entity_listener:
@@ -214,6 +215,13 @@ services:
 
     oro_calendar.soap.handler.delete:
         class: %oro_calendar.soap.handler.delete.class%
+        parent: oro_soap.handler.delete.abstract
+        calls:
+            - [setCalendarConfig, [@oro_calendar.system_calendar_config]]
+            - [setSecurityFacade, [@oro_security.security_facade]]
+
+    oro_calendar.soap.handler.event_delete:
+        class: %oro_calendar.soap.handler.event_delete.class%
         parent: oro_soap.handler.delete.abstract
         calls:
             - [setCalendarConfig, [@oro_calendar.system_calendar_config]]

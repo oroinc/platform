@@ -297,4 +297,12 @@ class CalendarEventController extends RestController implements ClassResourceInt
 
         return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->get('oro_calendar.soap.handler.event_delete');
+    }
 }

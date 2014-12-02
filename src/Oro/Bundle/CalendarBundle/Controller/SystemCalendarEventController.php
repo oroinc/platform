@@ -14,6 +14,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class SystemCalendarEventController extends Controller
 {
@@ -45,12 +46,15 @@ class SystemCalendarEventController extends Controller
     /**
      * @Route("/{id}/event/create", name="oro_system_calendar_event_create", requirements={"id"="\d+"})
      * @Template("OroCalendarBundle:SystemCalendarEvent:update.html.twig")
-     * @AclAncestor("oro_calendar_event_create")
      */
     public function createAction(SystemCalendar $systemCalendar)
     {
         $this->checkPermissionByConfig($systemCalendar);
-        //@TODO: Add check permission to create system calendar event
+        if (!$this->getSecurityFacade()->isGranted('oro_public_calendar_event_management')
+            && !$this->getSecurityFacade()->isGranted('oro_system_calendar_event_management')) {
+            throw new AccessDeniedException();
+        }
+
         $entity = new CalendarEvent();
 
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -71,7 +75,6 @@ class SystemCalendarEventController extends Controller
     /**
      * @Route("/event/update/{id}", name="oro_system_calendar_event_update", requirements={"id"="\d+"})
      * @Template
-     * @AclAncestor("oro_calendar_event_update")
      */
     public function updateAction(CalendarEvent $entity)
     {
@@ -87,7 +90,13 @@ class SystemCalendarEventController extends Controller
             && !$this->get('oro_security.security_facade')->isGranted('VIEW', $entity->getSystemCalendar())) {
             throw new AccessDeniedException('Access denied to system calendar events from another organization');
         }
-        //@TODO: Add check permission to update system calendar event
+
+        if ($entity->getSystemCalendar()->isPublic()
+            && !$this->getSecurityFacade()->isGranted('oro_public_calendar_event_management')) {
+            throw new AccessDeniedException();
+        } elseif (!$this->getSecurityFacade()->isGranted('oro_system_calendar_event_management')) {
+            throw new AccessDeniedException();
+        }
         $formAction = $this->get('router')->generate('oro_system_calendar_event_update', ['id' => $entity->getId()]);
 
         return $this->update($entity, $formAction);
@@ -151,5 +160,13 @@ class SystemCalendarEventController extends Controller
     protected function getCalendarConfig()
     {
         return $this->get('oro_calendar.system_calendar_config');
+    }
+
+    /**
+     * @return SecurityFacade
+     */
+    protected function getSecurityFacade()
+    {
+        return $this->get('oro_security.security_facade');
     }
 }
