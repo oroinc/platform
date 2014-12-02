@@ -4,7 +4,7 @@
     {% set scope = 'system-calendar-' ~ entity.id %}
     {{ dataGrid.renderGrid(
         oro_datagrid_build_fullname(
-            entity.public ? 'public-system-calendar-event-grid' : 'base-system-calendar-event-grid',
+            entity.public ? 'public-system-calendar-event-grid' : 'system-calendar-event-grid',
             scope
         ),
         {calendarId: entity.id}
