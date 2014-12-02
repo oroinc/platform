@@ -67,16 +67,16 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     const WITHOUT_STATUS       = null;
 
     protected $invitationStatuses = [
-        CalendarEvent::DECLINED,
+        CalendarEvent::NOT_RESPONDED,
         CalendarEvent::ACCEPTED,
         CalendarEvent::TENTATIVELY_ACCEPTED,
-        CalendarEvent::NOT_RESPONDED,
+        CalendarEvent::DECLINED
     ];
 
     protected $availableStatuses = [
-        CalendarEvent::DECLINED,
         CalendarEvent::ACCEPTED,
         CalendarEvent::TENTATIVELY_ACCEPTED,
+        CalendarEvent::DECLINED
     ];
 
     /**
