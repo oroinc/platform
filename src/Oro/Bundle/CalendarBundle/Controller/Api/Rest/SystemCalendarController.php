@@ -66,6 +66,6 @@ class SystemCalendarController extends RestController implements ClassResourceIn
      */
     protected function getDeleteHandler()
     {
-        return $this->get('oro_calendar.soap.handler.delete');
+        return $this->get('oro_calendar.system_calendar.handler.delete');
     }
 }

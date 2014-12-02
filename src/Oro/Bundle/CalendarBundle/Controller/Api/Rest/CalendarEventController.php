@@ -303,6 +303,6 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     protected function getDeleteHandler()
     {
-        return $this->get('oro_calendar.soap.handler.event_delete');
+        return $this->get('oro_calendar.calendar_event.handler.delete');
     }
 }

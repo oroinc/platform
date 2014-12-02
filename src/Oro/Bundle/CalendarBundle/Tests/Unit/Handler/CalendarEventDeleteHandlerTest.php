@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Handler;
 
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
-use Oro\Bundle\CalendarBundle\Handler\DeleteHandler;
+use Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler;
 
-class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
+class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
@@ -16,7 +17,7 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
 
-    /** @var  DeleteHandler */
+    /** @var CalendarEventDeleteHandler */
     protected $handler;
 
     protected function setUp()
@@ -40,10 +41,19 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->handler = new DeleteHandler();
+        $this->handler = new CalendarEventDeleteHandler();
         $this->handler->setCalendarConfig($this->calendarConfig);
         $this->handler->setSecurityFacade($this->securityFacade);
         $this->handler->setOwnerDeletionManager($ownerDeletionManager);
+    }
+
+    public function testHandleDelete()
+    {
+        $this->manager->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue(new CalendarEvent()));
+
+        $this->handler->handleDelete(1, $this->manager);
     }
 
     /**
@@ -54,10 +64,12 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
     {
         $calendar = new SystemCalendar();
         $calendar->setPublic(true);
+        $event = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
 
         $this->manager->expects($this->once())
             ->method('find')
-            ->will($this->returnValue($calendar));
+            ->will($this->returnValue($event));
         $this->calendarConfig->expects($this->once())
             ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(false));
@@ -69,20 +81,22 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
      * @expectedExceptionMessage Access denied.
      */
-    public function testHandleDeleteWhenPublicCalendarDeleteNotGranted()
+    public function testHandleDeleteWhenPublicCalendarEventManagementNotGranted()
     {
         $calendar = new SystemCalendar();
         $calendar->setPublic(true);
+        $event = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
 
         $this->manager->expects($this->once())
             ->method('find')
-            ->will($this->returnValue($calendar));
+            ->will($this->returnValue($event));
         $this->calendarConfig->expects($this->once())
             ->method('isPublicCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
-            ->with('oro_public_calendar_management')
+            ->with('oro_public_calendar_event_management')
             ->will($this->returnValue(false));
 
         $this->handler->handleDelete(1, $this->manager);
@@ -95,10 +109,12 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
     public function testHandleDeleteWhenSystemCalendarDisabled()
     {
         $calendar = new SystemCalendar();
+        $event    = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
 
         $this->manager->expects($this->once())
             ->method('find')
-            ->will($this->returnValue($calendar));
+            ->will($this->returnValue($event));
         $this->calendarConfig->expects($this->once())
             ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(false));
@@ -110,19 +126,21 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
      * @expectedExceptionMessage Access denied.
      */
-    public function testHandleDeleteWhenSystemCalendarDeleteNotGranted()
+    public function testHandleDeleteWhenSystemCalendarEventManagementNotGranted()
     {
         $calendar = new SystemCalendar();
+        $event    = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
 
         $this->manager->expects($this->once())
             ->method('find')
-            ->will($this->returnValue($calendar));
+            ->will($this->returnValue($event));
         $this->calendarConfig->expects($this->once())
             ->method('isSystemCalendarEnabled')
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
-            ->with('DELETE', $this->identicalTo($calendar))
+            ->with('oro_system_calendar_event_management')
             ->will($this->returnValue(false));
 
         $this->handler->handleDelete(1, $this->manager);

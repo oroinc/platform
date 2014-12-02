@@ -6,10 +6,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler as SoapDeleteHandler;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 
-class DeleteHandler extends SoapDeleteHandler
+class SystemCalendarDeleteHandler extends DeleteHandler
 {
     /** @var SystemCalendarConfig */
     protected $calendarConfig;
