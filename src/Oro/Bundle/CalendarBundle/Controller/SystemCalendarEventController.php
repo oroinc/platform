@@ -154,11 +154,11 @@ class SystemCalendarEventController extends Controller
     {
         if ($entity->isPublic()) {
             if (!$this->getCalendarConfig()->isPublicCalendarEnabled()) {
-                throw $this->createNotFoundException('Public Calendars does not supported.');
+                throw $this->createNotFoundException('Public calendars are disabled.');
             }
         } else {
             if (!$this->getCalendarConfig()->isSystemCalendarEnabled()) {
-                throw $this->createNotFoundException('System Calendars does not supported.');
+                throw $this->createNotFoundException('System calendars are disabled.');
             }
         }
     }

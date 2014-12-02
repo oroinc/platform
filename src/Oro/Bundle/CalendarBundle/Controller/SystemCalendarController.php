@@ -23,7 +23,7 @@ class SystemCalendarController extends Controller
     {
         $calendarConfig = $this->getCalendarConfig();
         if (!$calendarConfig->isPublicCalendarEnabled() && !$calendarConfig->isSystemCalendarEnabled()) {
-            throw $this->createNotFoundException('System and Public Calendars does not supported.');
+            throw $this->createNotFoundException('Both Public and System calendars are disabled.');
         }
 
         return [
@@ -63,7 +63,7 @@ class SystemCalendarController extends Controller
     {
         $calendarConfig = $this->getCalendarConfig();
         if (!$calendarConfig->isPublicCalendarEnabled() && !$calendarConfig->isSystemCalendarEnabled()) {
-            throw $this->createNotFoundException('System and Public Calendars does not supported.');
+            throw $this->createNotFoundException('Both Public and System calendars are disabled.');
         }
 
         $securityFacade = $this->getSecurityFacade();
@@ -160,11 +160,11 @@ class SystemCalendarController extends Controller
     {
         if ($entity->isPublic()) {
             if (!$this->getCalendarConfig()->isPublicCalendarEnabled()) {
-                throw $this->createNotFoundException('Public Calendars does not supported.');
+                throw $this->createNotFoundException('Public calendars are disabled.');
             }
         } else {
             if (!$this->getCalendarConfig()->isSystemCalendarEnabled()) {
-                throw $this->createNotFoundException('System Calendars does not supported.');
+                throw $this->createNotFoundException('System calendars are disabled.');
             }
         }
     }

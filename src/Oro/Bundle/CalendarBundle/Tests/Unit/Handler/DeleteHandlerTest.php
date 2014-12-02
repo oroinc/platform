@@ -27,10 +27,10 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
         $this->calendarConfig = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->manager = $this->getMockBuilder('Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager')
+        $this->manager        = $this->getMockBuilder('Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $objectManager        = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->manager->expects($this->any())
@@ -47,13 +47,13 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\SecurityBundle\Exception\ForbiddenException
-     * @expectedExceptionMessage Public Calendars does not supported.
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage Public calendars are disabled.
      */
     public function testHandleDeleteWhenPublicCalendarDisabled()
     {
-        $calendar = (new SystemCalendar())
-            ->setPublic(true);
+        $calendar = new SystemCalendar();
+        $calendar->setPublic(true);
 
         $this->manager->expects($this->once())
             ->method('find')
@@ -66,13 +66,35 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\SecurityBundle\Exception\ForbiddenException
-     * @expectedExceptionMessage System Calendars does not supported.
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage Access denied.
+     */
+    public function testHandleDeleteWhenPublicCalendarDeleteNotGranted()
+    {
+        $calendar = new SystemCalendar();
+        $calendar->setPublic(true);
+
+        $this->manager->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue($calendar));
+        $this->calendarConfig->expects($this->once())
+            ->method('isPublicCalendarEnabled')
+            ->will($this->returnValue(true));
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->with('oro_public_calendar_management')
+            ->will($this->returnValue(false));
+
+        $this->handler->handleDelete(1, $this->manager);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage System calendars are disabled.
      */
     public function testHandleDeleteWhenSystemCalendarDisabled()
     {
-        $calendar = (new SystemCalendar())
-            ->setPublic(false);
+        $calendar = new SystemCalendar();
 
         $this->manager->expects($this->once())
             ->method('find')
@@ -85,13 +107,12 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\SecurityBundle\Exception\ForbiddenException
-     * @expectedExceptionMessage Access denied to system calendars from another organization.
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage Access denied.
      */
     public function testHandleDeleteWhenSystemCalendarDeleteNotGranted()
     {
-        $calendar = (new SystemCalendar())
-            ->setPublic(false);
+        $calendar = new SystemCalendar();
 
         $this->manager->expects($this->once())
             ->method('find')
@@ -101,6 +122,7 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
+            ->with('DELETE', $this->identicalTo($calendar))
             ->will($this->returnValue(false));
 
         $this->handler->handleDelete(1, $this->manager);

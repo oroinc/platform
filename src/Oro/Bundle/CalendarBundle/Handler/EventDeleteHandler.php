@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler as SoapDeleteHandler;
@@ -46,22 +47,21 @@ class EventDeleteHandler extends SoapDeleteHandler
      */
     protected function checkPermissions($entity, ObjectManager $em)
     {
-        if ($entity->getSystemCalendar()) {
-            if ($entity->getSystemCalendar()->isPublic()
-                && !$this->calendarConfig->isPublicCalendarEnabled()) {
-                throw new ForbiddenException('Public Calendars does not supported.');
-            }
-
-            if (!$entity->getSystemCalendar()->isPublic()
-                && !$this->calendarConfig->isSystemCalendarEnabled()) {
-                throw new ForbiddenException('System Calendars does not supported.');
-            }
-
-            if ($entity->getSystemCalendar()->isPublic()
-                && !$this->securityFacade->isGranted('oro_public_calendar_event_management')) {
-                throw new ForbiddenException('Access denied to public calendar events management.');
-            } elseif (!$this->securityFacade->isGranted('oro_system_calendar_event_management')) {
-                throw new ForbiddenException('Access denied to system calendar events management.');
+        /** @var SystemCalendar|null $calendar */
+        $calendar = $entity->getSystemCalendar();
+        if ($calendar) {
+            if ($calendar->isPublic()) {
+                if (!$this->calendarConfig->isPublicCalendarEnabled()) {
+                    throw new ForbiddenException('Public calendars are disabled.');
+                } elseif (!$this->securityFacade->isGranted('oro_public_calendar_event_management')) {
+                    throw new ForbiddenException('Access denied.');
+                }
+            } else {
+                if (!$this->calendarConfig->isSystemCalendarEnabled()) {
+                    throw new ForbiddenException('System calendars are disabled.');
+                } elseif (!$this->securityFacade->isGranted('oro_system_calendar_event_management')) {
+                    throw new ForbiddenException('Access denied.');
+                }
             }
         } else {
             parent::checkPermissions($entity, $em);

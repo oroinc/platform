@@ -28,10 +28,10 @@ class EventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
         $this->calendarConfig = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->manager = $this->getMockBuilder('Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager')
+        $this->manager        = $this->getMockBuilder('Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $objectManager        = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->manager->expects($this->any())
@@ -41,9 +41,9 @@ class EventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->handler = (new EventDeleteHandler())
-            ->setCalendarConfig($this->calendarConfig)
-            ->setSecurityFacade($this->securityFacade);
+        $this->handler = new EventDeleteHandler();
+        $this->handler->setCalendarConfig($this->calendarConfig);
+        $this->handler->setSecurityFacade($this->securityFacade);
         $this->handler->setOwnerDeletionManager($ownerDeletionManager);
     }
 
@@ -57,15 +57,15 @@ class EventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\SecurityBundle\Exception\ForbiddenException
-     * @expectedExceptionMessage Public Calendars does not supported.
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage Public calendars are disabled.
      */
     public function testHandleDeleteWhenPublicCalendarDisabled()
     {
-        $calendar = (new SystemCalendar())
-            ->setPublic(true);
-        $event = (new CalendarEvent())
-            ->setSystemCalendar($calendar);
+        $calendar = new SystemCalendar();
+        $calendar->setPublic(true);
+        $event = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
 
         $this->manager->expects($this->once())
             ->method('find')
@@ -78,36 +78,15 @@ class EventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Oro\Bundle\SecurityBundle\Exception\ForbiddenException
-     * @expectedExceptionMessage System Calendars does not supported.
-     */
-    public function testHandleDeleteWhenSystemCalendarDisabled()
-    {
-        $calendar = (new SystemCalendar())
-            ->setPublic(false);
-        $event = (new CalendarEvent())
-            ->setSystemCalendar($calendar);
-
-        $this->manager->expects($this->once())
-            ->method('find')
-            ->will($this->returnValue($event));
-        $this->calendarConfig->expects($this->once())
-            ->method('isSystemCalendarEnabled')
-            ->will($this->returnValue(false));
-
-        $this->handler->handleDelete(1, $this->manager);
-    }
-
-    /**
-     * @expectedException Oro\Bundle\SecurityBundle\Exception\ForbiddenException
-     * @expectedExceptionMessage Access denied to public calendar events management.
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage Access denied.
      */
     public function testHandleDeleteWhenPublicCalendarEventManagementNotGranted()
     {
-        $calendar = (new SystemCalendar())
-            ->setPublic(true);
-        $event = (new CalendarEvent())
-            ->setSystemCalendar($calendar);
+        $calendar = new SystemCalendar();
+        $calendar->setPublic(true);
+        $event = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
 
         $this->manager->expects($this->once())
             ->method('find')
@@ -117,21 +96,41 @@ class EventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
+            ->with('oro_public_calendar_event_management')
             ->will($this->returnValue(false));
 
         $this->handler->handleDelete(1, $this->manager);
     }
 
     /**
-     * @expectedException Oro\Bundle\SecurityBundle\Exception\ForbiddenException
-     * @expectedExceptionMessage Access denied to system calendar events management.
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage System calendars are disabled.
+     */
+    public function testHandleDeleteWhenSystemCalendarDisabled()
+    {
+        $calendar = new SystemCalendar();
+        $event    = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
+
+        $this->manager->expects($this->once())
+            ->method('find')
+            ->will($this->returnValue($event));
+        $this->calendarConfig->expects($this->once())
+            ->method('isSystemCalendarEnabled')
+            ->will($this->returnValue(false));
+
+        $this->handler->handleDelete(1, $this->manager);
+    }
+
+    /**
+     * @expectedException \Oro\Bundle\SecurityBundle\Exception\ForbiddenException
+     * @expectedExceptionMessage Access denied.
      */
     public function testHandleDeleteWhenSystemCalendarEventManagementNotGranted()
     {
-        $calendar = (new SystemCalendar())
-            ->setPublic(false);
-        $event = (new CalendarEvent())
-            ->setSystemCalendar($calendar);
+        $calendar = new SystemCalendar();
+        $event    = new CalendarEvent();
+        $event->setSystemCalendar($calendar);
 
         $this->manager->expects($this->once())
             ->method('find')
@@ -141,6 +140,7 @@ class EventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(true));
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
+            ->with('oro_system_calendar_event_management')
             ->will($this->returnValue(false));
 
         $this->handler->handleDelete(1, $this->manager);
