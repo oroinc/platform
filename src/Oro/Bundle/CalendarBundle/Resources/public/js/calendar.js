@@ -184,6 +184,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
             this.addEventToCalendar(eventModel);
 
+            eventModel.set('editable', connectionModel.get('canEditEvent'));
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+
             // make sure that a calendar is visible when a new event is added to it
             if (!connectionModel.get('visible')) {
                 this.connectionsView.showCalendar(connectionModel);
@@ -191,11 +194,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         onEventChanged: function (eventModel) {
-            var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
+            var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
+                fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, _.pick(eventModel.toJSON(), _.keys(_.omit(fcEvent, ['id']))));
             this.prepareViewModel(fcEvent);
             this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+
+            eventModel.set('editable', connectionModel.get('canEditEvent'));
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
         },
 
         onEventDeleted: function (eventModel) {

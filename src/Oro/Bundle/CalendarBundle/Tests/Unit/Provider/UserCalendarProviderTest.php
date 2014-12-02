@@ -118,9 +118,11 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
                     'calendarName' => 'John Doo'
                 ],
                 $calendarIds[1] => [
-                    'calendarName' => 'John Smith',
-                    'removable'    => false,
-                    'canAddEvent'  => true
+                    'calendarName'   => 'John Smith',
+                    'removable'      => false,
+                    'canAddEvent'    => true,
+                    'canEditEvent'   => true,
+                    'canDeleteEvent' => true,
                 ]
             ],
             $result

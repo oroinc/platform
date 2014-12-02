@@ -22,6 +22,10 @@ interface CalendarProviderInterface
      *                              defaults to true
      *                  canAddEvent - indicated whether events can be added to a calendar
      *                              defaults to false
+     *                  canEditEvent - indicated whether calendar's events can be edited
+     *                              defaults to false
+     *                  canDeleteEvent - indicated whether calendar's events can be deleted
+     *                              defaults to false
      *               Also there is special property names 'options' where you can return some additional options.
      *               For example:
      *                  widgetRoute   - route name of a widget can be used to view an event. defaults to empty

@@ -70,7 +70,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
         /** @var SystemCalendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
 
-        $canAddEvent = $this->securityFacade->isGranted('oro_system_calendar_event_management');
+        $isEventManagementGranted = $this->securityFacade->isGranted('oro_system_calendar_event_management');
         foreach ($calendars as $calendar) {
             $resultItem = [
                 'calendarName'    => $calendar->getName(),
@@ -78,8 +78,10 @@ class SystemCalendarProvider implements CalendarProviderInterface
                 'removable'       => false,
                 'position'        => -60,
             ];
-            if ($canAddEvent) {
-                $resultItem['canAddEvent'] = true;
+            if ($isEventManagementGranted) {
+                $resultItem['canAddEvent']    = true;
+                $resultItem['canEditEvent']   = true;
+                $resultItem['canDeleteEvent'] = true;
             }
             $result[$calendar->getId()] = $resultItem;
         }

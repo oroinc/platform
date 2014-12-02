@@ -142,6 +142,8 @@ class CalendarConnectionController extends RestController implements ClassResour
         unset($data['calendarName']);
         unset($data['removable']);
         unset($data['canAddEvent']);
+        unset($data['canEditEvent']);
+        unset($data['canDeleteEvent']);
 
         return true;
     }

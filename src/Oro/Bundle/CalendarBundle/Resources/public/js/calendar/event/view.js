@@ -253,6 +253,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
             form.find('[name*="backgroundColor"]')
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
+            if (modelData.calendarAlias !== 'user') {
+                form.find('.reminders-collection').closest('.control-group').hide();
+            }
             form.find('[name*="calendarUid"]')
                 .on('change', _.bind(function (e) {
                     var $emptyColor = form.find('.empty-color'),

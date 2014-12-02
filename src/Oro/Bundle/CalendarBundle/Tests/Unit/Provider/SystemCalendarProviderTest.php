@@ -241,7 +241,9 @@ class SystemCalendarProviderTest extends \PHPUnit_Framework_TestCase
                     'backgroundColor' => $calendar1->getBackgroundColor(),
                     'removable'       => false,
                     'position'        => -60,
-                    'canAddEvent'     => true
+                    'canAddEvent'     => true,
+                    'canEditEvent'    => true,
+                    'canDeleteEvent'  => true,
                 ],
             ],
             $result
