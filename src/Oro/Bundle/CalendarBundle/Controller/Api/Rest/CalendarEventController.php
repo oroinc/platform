@@ -6,6 +6,8 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+use Doctrine\ORM\Proxy\Proxy;
+
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -132,6 +134,48 @@ class CalendarEventController extends RestController implements ClassResourceInt
         }
 
         return new Response(json_encode($result), Codes::HTTP_OK);
+    }
+
+    /**
+     * Get calendar event.
+     *
+     * @param string $id Calendar event id
+     *
+     * @QueryParam(
+     *      name="calendar", requirements="\d+",
+     *      nullable=true,
+     *      strict=true,
+     *      description="The id of calendar where an event is displayed."
+     * )
+     * @ApiDoc(
+     *      description="Get calendar event",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_calendar_event_view")
+     *
+     * @return Response
+     */
+    public function getAction($id)
+    {
+        $calendarId = $this->getRequest()->get('calendar');
+
+        $entity = $this->getManager()->find($id);
+
+        if ($entity instanceof Proxy && !$entity->__isInitialized()) {
+            $entity->__load();
+        }
+
+        $result = null;
+        $code = Codes::HTTP_NOT_FOUND;
+        if ($entity) {
+            $result = $this->get('oro_calendar.calendar_event.normalizer')->getCalendarEvent(
+                $entity,
+                $calendarId ? (int)$calendarId : null
+            );
+            $code   = Codes::HTTP_OK;
+        }
+
+        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
     }
 
     /**
