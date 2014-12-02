@@ -39,7 +39,31 @@ class SystemCalendarTest extends \PHPUnit_Framework_TestCase
             ['name', 'testName'],
             ['backgroundColor', '#FFFFFF'],
             ['public', true],
+            ['createdAt', new \DateTime('now')],
+            ['updatedAt', new \DateTime('now')],
         ];
+    }
+
+    public function testPrePersist()
+    {
+        $obj = new SystemCalendar();
+
+        $this->assertNull($obj->getCreatedAt());
+        $this->assertNull($obj->getUpdatedAt());
+
+        $obj->prePersist();
+        $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
+        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
+    }
+
+    public function testPreUpdate()
+    {
+        $obj = new SystemCalendar();
+
+        $this->assertNull($obj->getUpdatedAt());
+
+        $obj->preUpdate();
+        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
     }
 
     public function testEvents()

@@ -27,6 +27,8 @@ parameters:
     oro_calendar.system_calendar_config.class:                   Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig
     oro_calendar.event_listener.navigation.class:                Oro\Bundle\CalendarBundle\EventListener\NavigationListener
     oro_calendar.soap.handler.delete.class:                      Oro\Bundle\CalendarBundle\Handler\DeleteHandler
+    oro_calendar.soap.handler.event_delete.class:                Oro\Bundle\CalendarBundle\Handler\EventDeleteHandler
+    oro_calendar.system_calendar_event.datagrid_helper.class:    Oro\Bundle\CalendarBundle\Datagrid\SystemCalendarEventGridHelper
 
 services:
     oro_calendar.listener.entity_listener:
@@ -159,11 +161,13 @@ services:
     oro_calendar.calendar_event_normalizer.system:
         class: %oro_calendar.calendar_event_normalizer.system.class%
         arguments:
+            - @oro_security.security_facade
             - @oro_reminder.entity.manager
 
     oro_calendar.calendar_event_normalizer.public:
         class: %oro_calendar.calendar_event_normalizer.public.class%
         arguments:
+            - @oro_security.security_facade
             - @oro_reminder.entity.manager
 
     oro_calendar.autocomplete.user_calendar_handler:
@@ -218,3 +222,15 @@ services:
         calls:
             - [setCalendarConfig, [@oro_calendar.system_calendar_config]]
             - [setSecurityFacade, [@oro_security.security_facade]]
+
+    oro_calendar.soap.handler.event_delete:
+        class: %oro_calendar.soap.handler.event_delete.class%
+        parent: oro_soap.handler.delete.abstract
+        calls:
+            - [setCalendarConfig, [@oro_calendar.system_calendar_config]]
+            - [setSecurityFacade, [@oro_security.security_facade]]
+
+    oro_calendar.system_calendar_event.datagrid_helper:
+        class: %oro_calendar.system_calendar_event.datagrid_helper.class%
+        arguments:
+            - @oro_security.security_facade

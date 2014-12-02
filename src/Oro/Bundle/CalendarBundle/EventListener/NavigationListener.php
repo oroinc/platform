@@ -23,12 +23,11 @@ class NavigationListener
      */
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        if (!$this->calendarConfig->isPublicCalendarEnabled()
-            && !$this->calendarConfig->isSystemCalendarEnabled()
-        ) {
-            $menu = $event->getMenu();
-            $menu = $menu->getChild('system_tab')->getChild('oro_system_calendar_list');
-            $menu->setDisplay(false);
+        if (!$this->calendarConfig->isPublicCalendarEnabled() && !$this->calendarConfig->isSystemCalendarEnabled()) {
+            $event->getMenu()
+                ->getChild('system_tab')
+                ->getChild('oro_system_calendar_list')
+                ->setDisplay(false);
         }
     }
 }

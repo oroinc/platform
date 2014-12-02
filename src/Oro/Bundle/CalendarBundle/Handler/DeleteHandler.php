@@ -38,18 +38,18 @@ class DeleteHandler extends SoapDeleteHandler
      */
     protected function checkPermissions($entity, ObjectManager $em)
     {
-        if ($entity->isPublic()
-            && !$this->calendarConfig->isPublicCalendarEnabled()) {
-            throw new ForbiddenException('Public Calendars does not supported.');
-        }
-
-        if (!$entity->isPublic()
-            && !$this->calendarConfig->isSystemCalendarEnabled()) {
-            throw new ForbiddenException('System Calendars does not supported.');
-        }
-
-        if (!$entity->isPublic() && !$this->securityFacade->isGranted('oro_system_calendar_delete', $entity)) {
-            throw new ForbiddenException('Access denied to system calendars from another organization');
+        if ($entity->isPublic()) {
+            if (!$this->calendarConfig->isPublicCalendarEnabled()) {
+                throw new ForbiddenException('Public calendars are disabled.');
+            } elseif (!$this->securityFacade->isGranted('oro_public_calendar_management')) {
+                throw new ForbiddenException('Access denied.');
+            }
+        } else {
+            if (!$this->calendarConfig->isSystemCalendarEnabled()) {
+                throw new ForbiddenException('System calendars are disabled.');
+            } elseif (!$this->securityFacade->isGranted('DELETE', $entity)) {
+                throw new ForbiddenException('Access denied.');
+            }
         }
     }
 }

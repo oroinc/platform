@@ -110,10 +110,10 @@ class CalendarEventManager
             $systemCalendar = $this->findSystemCalendar($calendarId);
             //@TODO: Added permission verification
             if ($systemCalendar->isPublic() && !$this->calendarConfig->isPublicCalendarEnabled()) {
-                throw new ForbiddenException('Public Calendars does not supported.');
+                throw new ForbiddenException('Public calendars are disabled.');
             }
             if (!$systemCalendar->isPublic() && !$this->calendarConfig->isSystemCalendarEnabled()) {
-                throw new ForbiddenException('System Calendars does not supported.');
+                throw new ForbiddenException('System calendars are disabled.');
             }
             $event->setSystemCalendar($systemCalendar);
         } else {
