@@ -99,7 +99,8 @@
             form_row(form.allDay),
             form_row(form.backgroundColor),
             form_row(form.reminders),
-            form_row(form.childEvents)
+            form_row(form.childEvents),
+            form_row(form.notifyInvitedUsers)
         ]
     %}
     {% set templateReplacement = {
@@ -113,6 +114,9 @@
         <form id="{{ form.vars.name }}" action="#">
             <fieldset class="form-horizontal">
                 {{ UI.scrollSubblock(null, data, true, false)|replace(templateReplacement)|raw }}
+                <% if (typeof notifiable !== 'undefined' && notifiable) { %>
+                    {{ _self.notifyGuestsComponent() }}
+                <% } %>
                 <div class="widget-actions form-actions" style="display: none;">
                     <% if (id != null && removable) { %>
                     {{
@@ -136,6 +140,12 @@
         {{ oro_form_js_validation(form)|replace(templateReplacement)|raw }}
     </div>
 </script>
+{% endmacro %}
+
+{% macro notifyGuestsComponent() %}
+    <div id = "component-element" style="display: none" data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ {'view': 'orocalendar/js/app/views/guest-notifier-view'}|json_encode }}">
+    </div>
 {% endmacro %}
 
 {% macro renderCalendar(containerSelector, entity, startDate, endDate, calendar, eventsOptions, connectionsOptions, callbackMacro) %}

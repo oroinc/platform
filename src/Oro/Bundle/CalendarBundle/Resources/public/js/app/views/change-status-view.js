@@ -2,27 +2,27 @@
 define(function (require) {
     'use strict';
 
-    var ChangeStatusComponent,
+    var ChangeStatusView,
         $ = require('jquery'),
         mediator = require('oroui/js/mediator'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+        BaseView = require('oroui/js/app/views/base/view');
 
     /**
-     * @export orocalendar/js/app/components/change-status-component
-     * @extends oroui.app.components.base.Component
-     * @class orocalendar.app.components.ChangeStatusComponent
+     * @export orocalendar/js/app/views/change-status-view
+     * @extends oroui.app.views.base.Component
+     * @class orocalendar.app.views.ChangeStatusView
      */
-    ChangeStatusComponent = BaseComponent.extend({
+    ChangeStatusView = BaseView.extend({
         /**
          * @property {Object}
          */
         $element: null,
 
         /**
-         * @inheritDoc
+         * @constructor
          */
-        initialize: function (options) {
-            this.$element = options._sourceElement;
+        initialize: function () {
+            this.$element = this.$el;
             if (!this.$element) {
                 return;
             }
@@ -51,9 +51,9 @@ define(function (require) {
             if (!this.disposed && this.$element) {
                 this.$element.off('.' + this.cid);
             }
-            ChangeStatusComponent.__super__.dispose.call(this);
+            ChangeStatusView.__super__.dispose.call(this);
         }
     });
 
-    return ChangeStatusComponent;
+    return ChangeStatusView;
 });

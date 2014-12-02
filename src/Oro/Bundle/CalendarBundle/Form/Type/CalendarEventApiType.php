@@ -97,6 +97,13 @@ class CalendarEventApiType extends CalendarEventType
                     'required' => false,
                     'label'    => 'oro.calendar.calendarevent.invitation.label'
                 ]
+            )
+            ->add(
+                'notifyInvitedUsers',
+                'hidden',
+                [
+                    'mapped' => false
+                ]
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());

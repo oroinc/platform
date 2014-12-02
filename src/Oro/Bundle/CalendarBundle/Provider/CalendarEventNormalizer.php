@@ -48,8 +48,10 @@ class CalendarEventNormalizer
     {
         $result = [];
 
+        /** @var CalendarEvent[] $items */
         $items = $qb->getQuery()->getResult();
         foreach ($items as $item) {
+            $notifiable = $item->getInvitationStatus() && !$item->getParent() && !$item->getChildEvents()->isEmpty();
             $item = $this->serializeCalendarEvent($item);
             $resultItem = array();
             foreach ($item as $field => $value) {
@@ -63,6 +65,7 @@ class CalendarEventNormalizer
             $resultItem['removable'] =
                 $resultItem['calendar'] === $calendarId
                 && $this->securityFacade->isGranted('oro_calendar_event_delete');
+            $resultItem['notifiable'] = $notifiable;
 
             $result[] = $resultItem;
         }

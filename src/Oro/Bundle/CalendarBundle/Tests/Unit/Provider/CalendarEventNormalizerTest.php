@@ -119,7 +119,8 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'childEvents'      => [],
                         'invitedUsers'     => [],
                         'editable'         => true,
-                        'removable'        => true
+                        'removable'        => true,
+                        'notifiable'       => false
                     ],
                 ]
             ],
@@ -151,7 +152,8 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'childEvents'      => [],
                         'invitedUsers'     => [],
                         'editable'         => true,
-                        'removable'        => true
+                        'removable'        => true,
+                        'notifiable'       => false
                     ],
                 ]
             ],
