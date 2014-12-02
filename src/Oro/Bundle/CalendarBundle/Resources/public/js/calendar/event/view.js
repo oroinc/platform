@@ -259,8 +259,15 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         $selector = $(e.currentTarget),
                         tagName = $selector.prop('tagName').toUpperCase(),
                         calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
-                        colors = this.options.colorManager.getCalendarColors(calendarUid);
+                        colors = this.options.colorManager.getCalendarColors(calendarUid),
+                        newCalendar = this.parseCalendarUid(calendarUid),
+                        $reminders = form.find('.reminders-collection').closest('.control-group');
                     $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
+                    if (newCalendar.calendarAlias === 'user') {
+                        $reminders.show();
+                    } else {
+                        $reminders.hide();
+                    }
                 }, this));
             return form;
         },
@@ -286,13 +293,22 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
             if (data.hasOwnProperty('calendarUid')) {
                 if (data.calendarUid) {
-                    data.calendarAlias = data.calendarUid.substr(0, data.calendarUid.lastIndexOf('_'));
-                    data.calendar = parseInt(data.calendarUid.substr(data.calendarUid.lastIndexOf('_') + 1));
+                    _.extend(data, this.parseCalendarUid(data.calendarUid));
+                    if (data.calendarAlias !== 'user') {
+                        data.reminders = {};
+                    }
                 }
                 delete data.calendarUid;
             }
 
             return data;
+        },
+
+        parseCalendarUid: function (calendarUid) {
+            return {
+                calendarAlias: calendarUid.substr(0, calendarUid.lastIndexOf('_')),
+                calendar: parseInt(calendarUid.substr(calendarUid.lastIndexOf('_') + 1))
+            };
         },
 
         setValueByPath: function (obj, value, path) {
