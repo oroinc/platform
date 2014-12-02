@@ -1,3 +1,16 @@
+CHANGELOG for 1.4.2
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.2 versions.
+* 1.4.2 (2014-12-02)
+ * List of improvements and fixed bugs
+ <ul><li>Implemented form type guessers for custom fields of existing entities</li>
+ <li>Added support of cascade option for association in Extend Extension</li>
+ <li>Fixed insecure content from websockets when HTTPS used</li>
+ <li>Fixed IMAP Sync with date parsing exception</li>
+ <li>Magento Integration: Sensitive data displayed in API request logs</li>
+ <li>Magento Integration: Memory Issue on Error</li>
+ <li>Magento Integration: Duplicated jobs on two way Magento sync</li></ul>
+
 CHANGELOG for 1.4.1
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.4.1 versions.
