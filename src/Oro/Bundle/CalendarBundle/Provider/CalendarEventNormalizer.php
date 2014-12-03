@@ -51,26 +51,61 @@ class CalendarEventNormalizer
         /** @var CalendarEvent[] $items */
         $items = $qb->getQuery()->getResult();
         foreach ($items as $item) {
-            $notifiable = $item->getInvitationStatus() && !$item->getParent() && !$item->getChildEvents()->isEmpty();
-            $item = $this->serializeCalendarEvent($item);
-            $resultItem = array();
-            foreach ($item as $field => $value) {
-                $this->transformEntityField($value);
-                $resultItem[$field] = $value;
-            }
-            $resultItem['editable']  =
-                $resultItem['calendar'] === $calendarId
-                && empty($resultItem['parentEventId'])
-                && $this->securityFacade->isGranted('oro_calendar_event_update');
-            $resultItem['removable'] =
-                $resultItem['calendar'] === $calendarId
-                && $this->securityFacade->isGranted('oro_calendar_event_delete');
-            $resultItem['notifiable'] = $notifiable;
-
-            $result[] = $resultItem;
+            $result[] = $this->convertCalendarEvent($item, $calendarId);
         }
 
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+
+        return $result;
+    }
+
+    /**
+     * Converts calendar event to form that can be used in API
+     *
+     * @param CalendarEvent $event      The calendar event object
+     * @param int           $calendarId The target calendar id
+     *
+     * @return array
+     */
+    public function getCalendarEvent(CalendarEvent $event, $calendarId = null)
+    {
+        $result = [$this->convertCalendarEvent($event, $calendarId)];
+        $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+
+        return $result[0];
+    }
+
+    /**
+     * Converts calendar event to an array that can be used in API
+     *
+     * @param CalendarEvent $event      The calendar event object
+     * @param int           $calendarId The target calendar id
+     *
+     * @return array
+     */
+    protected function convertCalendarEvent(CalendarEvent $event, $calendarId = null)
+    {
+        $serializedData = $this->serializeCalendarEvent($event);
+
+        $result = [];
+        foreach ($serializedData as $field => $value) {
+            $this->transformEntityField($value);
+            $result[$field] = $value;
+        }
+        if (!$calendarId) {
+            $calendarId = $result['calendar'];
+        }
+        $result['editable']  =
+            $result['calendar'] === $calendarId
+            && empty($result['parentEventId'])
+            && $this->securityFacade->isGranted('oro_calendar_event_update');
+        $result['removable'] =
+            $result['calendar'] === $calendarId
+            && $this->securityFacade->isGranted('oro_calendar_event_delete');
+        $result['notifiable'] =
+            $event->getInvitationStatus()
+            && !$event->getParent()
+            && !$event->getChildEvents()->isEmpty();
 
         return $result;
     }

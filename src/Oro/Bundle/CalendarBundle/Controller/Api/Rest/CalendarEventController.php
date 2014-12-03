@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\Rest\Util\Codes;
@@ -132,6 +133,67 @@ class CalendarEventController extends RestController implements ClassResourceInt
         }
 
         return new Response(json_encode($result), Codes::HTTP_OK);
+    }
+
+    /**
+     * Get calendar event.
+     *
+     * @param int $id Calendar event id
+     *
+     * @ApiDoc(
+     *      description="Get calendar event",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_calendar_event_view")
+     *
+     * @return Response
+     */
+    public function getAction($id)
+    {
+        $entity = $this->getManager()->find($id);
+
+        $result = null;
+        $code = Codes::HTTP_NOT_FOUND;
+        if ($entity) {
+            $result = $this->get('oro_calendar.calendar_event.normalizer')
+                ->getCalendarEvent($entity);
+            $code   = Codes::HTTP_OK;
+        }
+
+        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+    }
+
+    /**
+     * Get calendar event supposing it is displayed in the specified calendar.
+     *
+     * @param int $id      The id of a calendar where an event is displayed
+     * @param int $eventId Calendar event id
+     *
+     * @Get(
+     *      "/calendars/{id}/events/{eventId}",
+     *      requirements={"id"="\d+", "eventId"="\d+"}
+     * )
+     * @ApiDoc(
+     *      description="Get calendar event supposing it is displayed in the specified calendar",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_calendar_event_view")
+     *
+     * @return Response
+     */
+    public function getByCalendarAction($id, $eventId)
+    {
+        $entity = $this->getManager()->find($eventId);
+
+        $result = null;
+        $code = Codes::HTTP_NOT_FOUND;
+        if ($entity) {
+            $result = $this->get('oro_calendar.calendar_event.normalizer')
+                ->getCalendarEvent($entity, (int)$id);
+            $code   = Codes::HTTP_OK;
+        }
+
+        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
     }
 
     /**
