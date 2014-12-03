@@ -4,10 +4,11 @@
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/loading-mask',
     'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
     'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
-    'orolocale/js/formatter/datetime', 'jquery.fullcalendar'
+    'orolocale/js/formatter/datetime', 'orolocale/js/locale-settings', 'jquery.fullcalendar'
     ], function (_, Backbone, __, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
-         ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
+         ConnectionCollection, ConnectionView, ColorManager,
+         dateTimeFormatter, localeSettings) {
     'use strict';
 
     var $ = Backbone.$;
@@ -38,13 +39,32 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         /** @property {Object} */
         options: {
             eventsOptions: {
+                defaultView: 'month',
+                allDayText: __('oro.calendar.control.all_day'),
+                buttonText: {
+                    today: __('oro.calendar.control.today'),
+                    month: __('oro.calendar.control.month'),
+                    week: __('oro.calendar.control.week'),
+                    day: __('oro.calendar.control.day')
+                },
                 editable: true,
                 removable: true,
                 collection: null,
                 itemViewTemplateSelector: null,
                 itemFormTemplateSelector: null,
                 itemFormDeleteButtonSelector: null,
-                calendar: null
+                calendar: null,
+                subordinate: true,
+                header: {
+                    ignoreTimezone: false,
+                    allDayDefault: false
+                },
+                firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1,
+                monthNames: localeSettings.getCalendarMonthNames('wide', true),
+                monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
+                dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
+                timezone: false // display as is, in timezone of value
             },
             connectionsOptions: {
                 collection: null,
@@ -299,7 +319,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             var onEventsLoad = _.bind(function () {
                 var fcEvents = this.collection.toJSON();
                 _.each(fcEvents, function (fcEvent) {
-                    this.prepareViewModel(fcEvent, false);
+                    this.prepareViewModel(fcEvent, true);
                 }, this);
                 this.eventsLoaded = {};
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
@@ -348,14 +368,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
             if (applyTZCorrection !== false) {
-                fcEvent.start = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.start);
-                fcEvent.end = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.end);
+                fcEvent.start = moment(fcEvent.start).zone(-localeSettings.getTimeZoneShift());
+                fcEvent.end = moment(fcEvent.end).zone(-localeSettings.getTimeZoneShift());
             }
         },
 
+        /**
+         *
+         * @param date {moment}
+         * @returns {moment}
+         */
         formatDateTimeForModel: function (date) {
-            date = dateTimeFormatter.applyTimeZoneCorrection(date.date(), -1);
-            return dateTimeFormatter.convertDateTimeToBackendFormat(date);
+            return date.clone().utc().toDate();
         },
 
         showSavingMask: function () {
@@ -437,9 +461,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             keys = [
                 'date', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'allDaySlot', 'buttonText',
-                'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
-                'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
                 'contentHeight'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
@@ -457,6 +479,31 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 options.contentHeight = "auto";
                 options.height = "auto";
             }
+
+            var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
+            var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
+            // prepare FullCalendar specific date/time formats
+            var isDateFormatStartedWithDay = dateFormat[0] === 'D';
+            var weekFormat = isDateFormatStartedWithDay
+                ? 'D MMMM YYYY'
+                : 'MMMM D YYYY';
+
+            options.titleFormat = {
+                month: 'MMMM YYYY',
+                week: weekFormat,
+                day: 'dddd, ' + dateFormat
+            };
+            options.columnFormat = {
+                month: 'ddd',
+                week: 'ddd ' + dateFormat,
+                day: 'dddd ' + dateFormat
+            };
+            options.timeFormat = {
+                '': timeFormat,
+                agenda: timeFormat + '{ - ' + timeFormat + '}'
+            };
+            options.axisFormat = timeFormat;
+
 
             self = this;
             options.viewDisplay = function () {

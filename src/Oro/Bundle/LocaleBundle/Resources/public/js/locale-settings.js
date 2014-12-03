@@ -162,13 +162,22 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @returns {number}
          */
         getTimeZoneShift: function () {
-            var tz = localeSettings.getTimeZoneOffset(),
-                matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
+            return this.calculateTimeZoneShift(localeSettings.getTimeZoneOffset());
+        },
+
+        /**
+         * Calculates timezone shift in minutes by given string
+         *
+         * @param tz {string} timezone specification, just like "+08:00"
+         * @returns {number} shift in minutes
+         */
+        calculateTimeZoneShift: _.memoize(function (tz) {
+            var matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
                 sign = Number(matches[1] + '1'),
                 hours = Number(matches[2]),
                 minutes = Number(matches[3]);
             return sign * (hours * 60 + minutes);
-        },
+        }),
 
         getNameFormats: function() {
             return this.settings.format.name;
