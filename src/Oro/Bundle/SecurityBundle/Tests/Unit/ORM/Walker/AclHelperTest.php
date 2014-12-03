@@ -80,8 +80,14 @@ class AclHelperTest extends OrmTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult, $exception, $customWalker)
-    {
+    public function testApply(
+        QueryBuilder $queryBuilder,
+        $conditions,
+        $resultHandler,
+        $walkerResult,
+        $exception,
+        $customWalker
+    ) {
         $this->conditionBuilder = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
         )
