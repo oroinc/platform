@@ -11,13 +11,11 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     protected $securityFacade;
 
     /**
-     * @param SecurityFacade    $securityFacade
-     * @param ReminderManager   $reminderManager
+     * @param ReminderManager $reminderManager
+     * @param SecurityFacade  $securityFacade
      */
-    public function __construct(
-        SecurityFacade $securityFacade,
-        ReminderManager $reminderManager
-    ) {
+    public function __construct(ReminderManager $reminderManager, SecurityFacade $securityFacade)
+    {
         parent::__construct($reminderManager);
         $this->securityFacade = $securityFacade;
     }
@@ -25,13 +23,13 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     /**
      * {@inheritdoc}
      */
-    protected function applyPermission(&$resultItem, $calendarId)
+    protected function applyPermissions(&$item, $calendarId)
     {
-        $resultItem['editable']  =
-            ($resultItem['calendar'] === $calendarId)
+        $item['editable']  =
+            ($item['calendar'] === $calendarId)
             && $this->securityFacade->isGranted('oro_calendar_event_update');
-        $resultItem['removable'] =
-            ($resultItem['calendar'] === $calendarId)
+        $item['removable'] =
+            ($item['calendar'] === $calendarId)
             && $this->securityFacade->isGranted('oro_calendar_event_delete');
     }
 }

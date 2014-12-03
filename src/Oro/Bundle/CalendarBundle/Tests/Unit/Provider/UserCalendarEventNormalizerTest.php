@@ -7,36 +7,37 @@ use Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer;
 class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
+    protected $reminderManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $reminderManager;
+    protected $securityFacade;
 
     /** @var UserCalendarEventNormalizer */
     protected $normalizer;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->reminderManager = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->reminderManager = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager')
+        $this->securityFacade  = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->normalizer = new UserCalendarEventNormalizer(
-            $this->securityFacade,
-            $this->reminderManager
+            $this->reminderManager,
+            $this->securityFacade
         );
     }
 
     /**
      * @dataProvider getCalendarEventsProvider
      */
-    public function testGetCalendarEvents($events, $eventIds, $expected)
+    public function testGetCalendarEvents($events, $expected)
     {
         $calendarId = 123;
-        $query      = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
             ->setMethods(['getArrayResult'])
             ->getMockForAbstractClass();
@@ -72,12 +73,11 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 
         return [
             [
-                'events'    => [],
-                'eventIds'  => [],
-                'expected'  => []
+                'events'   => [],
+                'expected' => []
             ],
             [
-                'events'    => [
+                'events'   => [
                     [
                         'calendar' => 123,
                         'id'       => 1,
@@ -86,8 +86,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'end'      => $endDate
                     ],
                 ],
-                'eventIds'  => [1],
-                'expected'  => [
+                'expected' => [
                     [
                         'calendar'  => 123,
                         'id'        => 1,
@@ -100,7 +99,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
-                'events'    => [
+                'events'   => [
                     [
                         'calendar' => 123,
                         'id'       => 1,
@@ -109,8 +108,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'end'      => $endDate
                     ],
                 ],
-                'eventIds'  => [1],
-                'expected'  => [
+                'expected' => [
                     [
                         'calendar'  => 123,
                         'id'        => 1,

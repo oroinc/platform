@@ -15,17 +15,16 @@ abstract class AbstractCalendarEventNormalizer
     /**
      * @param ReminderManager $reminderManager
      */
-    public function __construct(
-        ReminderManager $reminderManager
-    ) {
+    public function __construct(ReminderManager $reminderManager)
+    {
         $this->reminderManager = $reminderManager;
     }
 
     /**
      * Converts calendar events returned by the given query to form that can be used in API
      *
-     * @param int               $calendarId The target calendar id
-     * @param AbstractQuery     $query      The query that should be used to get events
+     * @param int           $calendarId The target calendar id
+     * @param AbstractQuery $query      The query that should be used to get events
      *
      * @return array
      */
@@ -35,12 +34,12 @@ abstract class AbstractCalendarEventNormalizer
 
         $items = $query->getArrayResult();
         foreach ($items as $item) {
-            $resultItem = array();
+            $resultItem = [];
             foreach ($item as $field => $value) {
                 $this->transformEntityField($value);
                 $resultItem[$field] = $value;
             }
-            $this->applyPermission($resultItem, $calendarId);
+            $this->applyPermissions($resultItem, $calendarId);
 
             $result[] = $resultItem;
         }
@@ -65,11 +64,11 @@ abstract class AbstractCalendarEventNormalizer
     }
 
     /**
-     * Method applies permission to edit or to delete event on the calendar page
-     * It must be implemented into real class for different types of calendars
+     * Applies permission to the given calendar event
+     * {@see Oro\Bundle\CalendarBundle\Provider\CalendarProviderInterface::getCalendarEvents}
      *
-     * @param array     &$resultItem
-     * @param int       $calendarId
+     * @param array $item
+     * @param int   $calendarId
      */
-    abstract protected function applyPermission(&$resultItem, $calendarId);
+    abstract protected function applyPermissions(&$item, $calendarId);
 }
