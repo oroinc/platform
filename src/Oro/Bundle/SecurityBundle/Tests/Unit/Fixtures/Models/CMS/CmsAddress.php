@@ -6,7 +6,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS;
  * @Entity
  * @Table(name="cms_addresses")
  */
-class CmsAddress
+class CmsAddress extends CmsBaseAddress
 {
     /**
      * @Column(type="integer")

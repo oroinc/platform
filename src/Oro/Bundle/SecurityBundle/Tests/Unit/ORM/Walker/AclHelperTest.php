@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
+use Symfony\Component\Form\FormEvents;
 
 class AclHelperTest extends OrmTestCase
 {
@@ -79,7 +80,7 @@ class AclHelperTest extends OrmTestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult, $exception)
+    public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult, $exception, $customWalker)
     {
         $this->conditionBuilder = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
@@ -101,9 +102,17 @@ class AclHelperTest extends OrmTestCase
                     }
                 )
             );
+        $query = $queryBuilder->getQuery();
+        if ($customWalker) {
+            $translatableListener = $this->getMockBuilder('\Gedmo\Translatable\TranslatableListener')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $query->getEntityManager()->getEventManager()->addEventListener('dummy_event', $translatableListener);
+            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, $customWalker);
+        }
 
         $this->helper = new AclHelper($this->conditionBuilder);
-        $query        = $this->helper->apply($queryBuilder);
+        $query        = $this->helper->apply($query);
         $this->$resultHandler($query->getHints());
 
         $parserResult = $this->getMockBuilder('Doctrine\ORM\Query\ParserResult')
@@ -136,7 +145,8 @@ class AclHelperTest extends OrmTestCase
                 [],
                 'resultHelper0',
                 'resultWalker0',
-                []
+                [],
+                null
             ],
             [
                 $this->getRequest1(),
@@ -160,7 +170,8 @@ class AclHelperTest extends OrmTestCase
                 ],
                 'resultHelper1',
                 'resultWalker1',
-                []
+                [],
+                null
             ],
             [
                 $this->getRequest2(),
@@ -177,7 +188,8 @@ class AclHelperTest extends OrmTestCase
                 ],
                 'resultHelper2',
                 'resultWalker2',
-                []
+                [],
+                'Gedmo\Translatable\Query\TreeWalker\TranslationWalker'
             ],
             [
                 $this->getRequest3(),
@@ -217,7 +229,8 @@ class AclHelperTest extends OrmTestCase
                 ],
                 'resultHelper3',
                 'resultWalker3',
-                []
+                [],
+                null
             ]
             ,
             [
@@ -242,7 +255,8 @@ class AclHelperTest extends OrmTestCase
                 ],
                 'resultHelper4',
                 'resultWalker4',
-                []
+                [],
+                null
             ]
         ];
     }
@@ -299,6 +313,7 @@ class AclHelperTest extends OrmTestCase
             $joinCondition->getEntityClass()
         );
         $this->assertEquals([1], $joinCondition->getValue());
+        $this->assertEquals(AclHelper::ORO_SQL_WALKER, $hints[Query::HINT_CUSTOM_OUTPUT_WALKER]);
     }
 
     protected function resultWalker1(SelectStatement $resultAst)
@@ -336,7 +351,7 @@ class AclHelperTest extends OrmTestCase
         $this->assertEmpty($hints[AclWalker::ORO_ACL_CONDITION]->getWhereConditions());
         $joinCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getJoinConditions()[0];
         $this->assertEquals([1], $joinCondition->getValue());
-
+        $this->assertEquals(AclHelper::ORO_TRANSLATION_WALKER, $hints[Query::HINT_CUSTOM_OUTPUT_WALKER]);
     }
 
     protected function resultWalker2(SelectStatement $resultAst)
