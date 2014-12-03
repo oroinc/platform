@@ -32,4 +32,9 @@ class DataStorageExtension
     {
         $this->storage = $storage;
     }
+
+    public function cleanStorage()
+    {
+        $this->storage = new ArrayCollection();
+    }
 }
