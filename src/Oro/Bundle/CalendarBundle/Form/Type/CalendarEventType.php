@@ -82,14 +82,23 @@ class CalendarEventType extends AbstractType
                     'required' => false,
                     'label'    => 'oro.reminder.entity_plural_label'
                 ]
-            )->add(
+            )
+            ->add(
                 'childEvents',
                 'oro_calendar_event_invitees',
                 [
                     'required' => false,
                     'label'    => 'oro.calendar.calendarevent.invitation.label'
                 ]
-            );
+            )
+            ->add(
+                'notifyInvitedUsers',
+                'hidden',
+                [
+                    'mapped' => false
+                ]
+            )
+        ;
 
         $this->subscribeOnChildEvents($builder);
     }
