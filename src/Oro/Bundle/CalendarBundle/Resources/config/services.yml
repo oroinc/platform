@@ -4,6 +4,7 @@ parameters:
     oro_calendar.calendar_property.entity.class:                 Oro\Bundle\CalendarBundle\Entity\CalendarProperty
     oro_calendar.listener.entity_listener.class:                 Oro\Bundle\CalendarBundle\EventListener\EntityListener
     oro_calendar.listener.datagrid.activity.class:               Oro\Bundle\CalendarBundle\EventListener\Datagrid\ActivityGridListener
+    oro_calendar.datagrid.action_permission_provider.class:      Oro\Bundle\CalendarBundle\Datagrid\ActionPermissionProvider
     oro_calendar.calendar_event.manager.api.class:               Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.calendar_property.manager.api.class:            Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
@@ -32,6 +33,9 @@ services:
             - @oro_locale.settings
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-calendar-event-grid, method: onBuildAfter }
+
+    oro_calendar.datagrid.action_permission_provider:
+        class: %oro_calendar.datagrid.action_permission_provider.class%
 
     oro_calendar.calendar_event.manager.api:
         class: %oro_calendar.calendar_event.manager.api.class%
