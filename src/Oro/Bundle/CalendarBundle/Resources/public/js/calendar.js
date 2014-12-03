@@ -478,16 +478,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 }
                 if (fcEvent.invitationStatus === 'tentatively_accepted') {
                     element.find('.fc-event-inner').prepend(
-                        '<i class="invitation-status-icon icon-question-sign" title="' + __('Tentatively accepted') + '"></i>'
+                        '<i class="invitation-status icon-question-sign" title="' + __('Tentatively accepted') + '"></i>'
                     );
                 } else if (fcEvent.invitationStatus === 'not_responded') {
                     element.find('.fc-event-inner').prepend(
-                        '<i class="invitation-status-icon icon-reply" title="' + __('Not responded') + '"></i>'
+                        '<i class="invitation-status icon-reply" title="' + __('Not responded') + '"></i>'
                     );
                 } else if (fcEvent.invitationStatus === 'declined') {
                     element.find('.fc-event-inner').addClass('invitation-status-declined');
                 } else {
-                    element.find('.invitation-status-icon').remove();
+                    element.find('.invitation-status').remove();
                     element.find('.invitation-status-declined').removeClass('invitation-status-declined');
                 }
             };

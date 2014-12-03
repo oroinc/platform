@@ -251,7 +251,7 @@
     text-decoration: line-through;
 }
 
-.fc-event-inner i.invitation-status-icon {
+.fc-event-inner i.invitation-status {
     font-size: 13px;
     padding-right: 3px;
 }
