@@ -1,12 +1,15 @@
 /*jslint nomen: true*/
 /*global define*/
-define(['jquery', 'underscore', 'oroui/js/app/components/base/component',
-    'orocalendar/js/calendar', 'orocalendar/js/calendar/event/collection',
-    'orocalendar/js/calendar/connection/collection', 'orolocale/js/locale-settings', 'oroui/js/mediator', 'orotranslation/js/translator'
-    ], function ($, _, BaseComponent,
-                 Calendar, EventCollection,
-                 ConnectionCollection, localeSettings, mediator, __) {
+define(function (require) {
     'use strict';
+
+    var _ = require('underscore'),
+        BaseComponent = require('oroui/js/app/components/base/component'),
+        Calendar = require('orocalendar/js/calendar'),
+        EventCollection = require('orocalendar/js/calendar/event/collection'),
+        ConnectionCollection = require('orocalendar/js/calendar/connection/collection'),
+        localeSettings = require('orolocale/js/locale-settings'),
+        __ = require('orotranslation/js/translator');
 
     /**
      * Creates calendar
@@ -19,6 +22,16 @@ define(['jquery', 'underscore', 'oroui/js/app/components/base/component',
         calendar: null,
 
         /**
+         * @type {EventCollection}
+         */
+        eventCollection: null,
+
+        /**
+         * @type {ConnectionCollection}
+         */
+        connectionCollection: null,
+
+        /**
          * @constructor
          * @param {Object} options
          */
@@ -27,14 +40,18 @@ define(['jquery', 'underscore', 'oroui/js/app/components/base/component',
             if (!this.options.el) {
                 this.options.el = this.options._sourceElement;
             }
+            this.eventCollection = new EventCollection(JSON.parse(this.options.eventsItemsJson));
+            this.connectionCollection = new ConnectionCollection(JSON.parse(this.options.connectionsItemsJson));
+            delete this.options.eventsItemsJson;
+            delete this.options.connectionsItemsJson;
             this.prepareOptions();
             this.renderCalendar();
         },
         prepareOptions: function () {
             var options = this.options;
             // prepare data for collections
-            options.collection = new EventCollection(JSON.parse(options.eventsItemsJson));
-            options.connectionsOptions.collection = new ConnectionCollection(JSON.parse(options.connectionsItemsJson));
+            options.collection = this.eventCollection;
+            options.connectionsOptions.collection = this.connectionCollection;
             options.eventsOptions.subordinate = true;
             options.eventsOptions.date = options.date;
             options.eventsOptions.header = {
@@ -87,8 +104,6 @@ define(['jquery', 'underscore', 'oroui/js/app/components/base/component',
             };
             options.eventsOptions.axisFormat = timeFormat;
 
-            delete options.eventsItemsJson;
-            delete options.connectionsItemsJson;
             delete options.calendarOptions;
             delete options.date;
             delete options.eventsOptions.centerHeader;
@@ -98,7 +113,6 @@ define(['jquery', 'underscore', 'oroui/js/app/components/base/component',
         renderCalendar: function () {
             this.calendar = new Calendar(this.options);
             this.calendar.render();
-            this.calendar.$el.data('calendar', this.calendar);
         }
     });
 
