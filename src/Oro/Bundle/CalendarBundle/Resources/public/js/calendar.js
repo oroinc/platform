@@ -229,11 +229,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                         return fcEvent.calendarUid === calendarUid;
                     });
                 }
-            } else if (_.has(changes, 'backgroundColor') && connectionModel.get('visible')) {
+            }
+            if (_.has(changes, 'backgroundColor') && connectionModel.get('visible')) {
                 _.each(this.getCalendarEvents(calendarUid), function (fcEvent) {
                     this.prepareViewModel(fcEvent, false);
-                    this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
                 }, this);
+                this.getCalendarElement().fullCalendar('rerenderEvents');
             }
         },
 
@@ -294,7 +295,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             }
         },
 
-        loadEvents: function (start, end, callback) {
+        loadEvents: function (start, end, timezone, callback) {
             var onEventsLoad = _.bind(function () {
                 var fcEvents = this.collection.toJSON();
                 _.each(fcEvents, function (fcEvent) {
@@ -353,7 +354,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         formatDateTimeForModel: function (date) {
-            date = dateTimeFormatter.applyTimeZoneCorrection(date, -1);
+            date = dateTimeFormatter.applyTimeZoneCorrection(date.date(), -1);
             return dateTimeFormatter.convertDateTimeToBackendFormat(date);
         },
 
@@ -449,9 +450,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 options.date = options.date.getDate();
             }
 
-            if (options.aspectRatio !== undefined) {
+            if (options.aspectRatio) {
                 delete options.contentHeight;
                 delete options.height;
+            } else if (!options.contentHeight) {
+                options.contentHeight = "auto";
+                options.height = "auto";
             }
 
             self = this;

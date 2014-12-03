@@ -80,16 +80,16 @@ define(function (require) {
 
             _.extend(options.eventsOptions, options.calendarOptions);
 
-            var dateFormat = localeSettings.getVendorDateTimeFormat('fullcalendar', 'date', 'MMM d, yyyy');
-            var timeFormat = localeSettings.getVendorDateTimeFormat('fullcalendar', 'time', 'h:mm TT');
+            var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
+            var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
             // prepare FullCalendar specific date/time formats
-            var isDateFormatStartedWithDay = dateFormat.indexOf('d') === 0;
+            var isDateFormatStartedWithDay = dateFormat[0] === 'D';
             var weekFormat = isDateFormatStartedWithDay
-                ? 'd[ MMMM][ yyyy]{ \'&#8212;\' d MMMM yyyy}'
-                : 'MMMM d[ yyyy]{ \'&#8212;\'[ MMMM] d yyyy}';
+                ? 'D MMMM YYYY'
+                : 'MMMM D YYYY';
 
             options.eventsOptions.titleFormat = {
-                month: 'MMMM yyyy',
+                month: 'MMMM YYYY',
                 week: weekFormat,
                 day: 'dddd, ' + dateFormat
             };
