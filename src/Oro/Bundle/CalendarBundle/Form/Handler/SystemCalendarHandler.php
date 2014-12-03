@@ -21,9 +21,9 @@ class SystemCalendarHandler
     protected $manager;
 
     /**
-     * @param FormInterface       $form
-     * @param Request             $request
-     * @param ObjectManager       $manager
+     * @param FormInterface $form
+     * @param Request       $request
+     * @param ObjectManager $manager
      */
     public function __construct(
         FormInterface $form,

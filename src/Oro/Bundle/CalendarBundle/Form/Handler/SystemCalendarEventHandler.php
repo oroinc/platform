@@ -21,18 +21,18 @@ class SystemCalendarEventHandler
     protected $manager;
 
     /**
-     * @param FormInterface       $form
-     * @param Request             $request
-     * @param ObjectManager       $manager
+     * @param FormInterface $form
+     * @param Request       $request
+     * @param ObjectManager $manager
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $manager
     ) {
-        $this->form                = $form;
-        $this->request             = $request;
-        $this->manager             = $manager;
+        $this->form    = $form;
+        $this->request = $request;
+        $this->manager = $manager;
     }
 
     /**
@@ -48,9 +48,9 @@ class SystemCalendarEventHandler
     /**
      * Process form
      *
-     * @param  CalendarEvent $entity
+     * @param CalendarEvent $entity
      *
-     * @return bool  True on successful processing, false otherwise
+     * @return bool True on successful processing, false otherwise
      */
     public function process(CalendarEvent $entity)
     {

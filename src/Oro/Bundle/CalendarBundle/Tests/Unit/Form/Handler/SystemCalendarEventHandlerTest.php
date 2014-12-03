@@ -4,10 +4,10 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
-use Oro\Bundle\CalendarBundle\Form\Handler\SystemCalendarHandler;
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Form\Handler\SystemCalendarEventHandler;
 
-class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
+class SystemCalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $form;
@@ -18,10 +18,10 @@ class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $om;
 
-    /** @var SystemCalendarHandler */
+    /** @var SystemCalendarEventHandler */
     protected $handler;
 
-    /** @var SystemCalendar */
+    /** @var CalendarEvent */
     protected $entity;
 
     protected function setUp()
@@ -34,8 +34,8 @@ class SystemCalendarHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entity  = new SystemCalendar();
-        $this->handler = new SystemCalendarHandler(
+        $this->entity  = new CalendarEvent();
+        $this->handler = new SystemCalendarEventHandler(
             $this->form,
             $this->request,
             $this->om
