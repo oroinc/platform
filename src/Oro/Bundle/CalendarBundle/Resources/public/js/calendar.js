@@ -416,6 +416,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             var options, keys, self;
             // prepare options for jQuery FullCalendar control
             options = {
+                aspectRatio: this.options.aspectRatio,
+                contentHeight: this.options.contentHeight,
+                height: this.options.height,
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
@@ -446,14 +449,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 options.date = options.date.getDate();
             }
 
-            //Fix aspect ration to prevent double scroll for week and day views.
-            options.viewRender = _.bind(function (view) {
-                if (view.name !== 'month') {
-                    this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.0);
-                } else {
-                    this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.35);
-                }
-            }, this);
+            if (options.aspectRatio !== undefined) {
+                delete options.contentHeight;
+                delete options.height;
+            }
 
             self = this;
             options.viewDisplay = function () {
