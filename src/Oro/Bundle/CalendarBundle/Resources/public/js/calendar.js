@@ -470,9 +470,25 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             options.eventAfterRender = function (fcEvent, element) {
                 var reminders = self.collection.get(fcEvent.id).get('reminders');
                 if (reminders && _.keys(reminders).length) {
-                    element.find('.fc-event-inner').append('<i class="icon icon-bell"></i>');
+                    element.find('.fc-event-inner').append(
+                        '<i class="reminder-status icon-bell" title="' + __('Reminders') + '"></i>'
+                    );
                 } else {
-                    element.find('.icon').remove();
+                    element.find('.reminder-status').remove();
+                }
+                if (fcEvent.invitationStatus === 'tentatively_accepted') {
+                    element.find('.fc-event-inner').prepend(
+                        '<i class="invitation-status icon-question-sign" title="' + __('Tentatively accepted') + '"></i>'
+                    );
+                } else if (fcEvent.invitationStatus === 'not_responded') {
+                    element.find('.fc-event-inner').prepend(
+                        '<i class="invitation-status icon-reply" title="' + __('Not responded') + '"></i>'
+                    );
+                } else if (fcEvent.invitationStatus === 'declined') {
+                    element.find('.fc-event-inner').addClass('invitation-status-declined');
+                } else {
+                    element.find('.invitation-status').remove();
+                    element.find('.invitation-status-declined').removeClass('invitation-status-declined');
                 }
             };
 
