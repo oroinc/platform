@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 class DataStorageExtension
 {
-    /** @var ArrayCollection */
+    /** @var array */
     protected $storage;
 
     /** @var DataStorageExtension */
@@ -14,27 +12,35 @@ class DataStorageExtension
 
     public function __construct()
     {
-        $this->storage = new ArrayCollection();
+        $this->storage = [];
     }
 
     /**
-     * @return ArrayCollection
+     * @param mixed $key
+     *
+     * @return mixed
      */
-    public function getStorage()
+    public function get($key)
     {
-        return $this->storage;
+        return $this->storage[$key];
     }
 
     /**
-     * @param ArrayCollection $storage
+     * @param mixed $key
+     *
+     * @return bool
      */
-    public function setStorage(ArrayCollection $storage)
+    public function has($key)
     {
-        $this->storage = $storage;
+        return in_array($key, $this->storage);
     }
 
-    public function cleanStorage()
+    /**
+     * @param $key
+     * @param $value
+     */
+    public function put($key, $value)
     {
-        $this->storage = new ArrayCollection();
+        $this->storage[$key] = $value;
     }
 }
