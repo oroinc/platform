@@ -32,7 +32,7 @@ class DataStorageExtension
      */
     public function has($key)
     {
-        return in_array($key, $this->storage);
+        return array_key_exists($key, $this->storage);
     }
 
     /**
