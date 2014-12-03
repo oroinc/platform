@@ -9,11 +9,11 @@ Table of content
 
 ##Overview
 
-System calendars can be used to provide common events for all users, for example they can be used for employees' birthdays, company weekends, vacations, etc. Such calendars can be organization or system wide. It means that you can restrict a visibility of such calendars in scope of an organization as well as create calendars shared between all organizations. To manage system calendars go to *System > System Calendar* section. Since a system calendar is created it will be visible in for all users. The visibility organization wide calendars can be restricted by ACL, against system wide calendars which are always visible.
+System calendars can be used to provide common events for all users, for example they can be used for employees' birthdays, company weekends, vacations, etc. These calendars might be made available in scope of a single organization or be shared across all organizations in the system. To manage system calendars go to *System > System Calendar* section. Since a system calendar is created it will be visible in for all users. The visibility organization wide calendars can be restricted by ACL, against system wide calendars which are always visible.
 
 ##Configuration
 
-By default both organization ans system wide calendars are enabled, but you can easy disable any of them in `app/config.yml`. Just add `enabled_system_calendar` option as it is shown in the following example:
+By default both organization and system wide calendars are enabled, but you can easy disable any of them in `app/config.yml`. Just add `enabled_system_calendar` option as it is shown in the following example:
 
 ``` yml
 oro_calendar:
