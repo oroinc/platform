@@ -1,12 +1,12 @@
 @name = calendar_invitation_update
 @entityName = Oro\Bundle\CalendarBundle\Entity\CalendarEvent
-@subject = {{ entity.title }}
+@subject = Update: {{ entity.title }}
 @isSystem = 1
 @isEditable = 1
 
+<p><b>{{ entity.parent.calendar.owner.getFullName() }} update the event {{ entity.title }}.</b></p>
 <h1>{{ entity.title }}</h1>
 <div>
-    {{ entity.parent.calendar }} update the event {{ entity.title }}.
     <p><i>Start date:</i> {{ entity.start|date('F j, Y, g:i A') }}</p>
     <p><i>End date:</i> {{ entity.end|date('F j, Y, g:i A') }}</p>
     <p><i>Description:</i>{{ entity.description }}</p>

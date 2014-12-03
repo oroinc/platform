@@ -1,10 +1,10 @@
-@name = calendar_invitation_uninvite
+@name = calendar_invitation_respond
 @entityName = Oro\Bundle\CalendarBundle\Entity\CalendarEvent
-@subject = Un-invite: {{ entity.title }}
+@subject = Accepted: {{ entity.title }}
 @isSystem = 1
 @isEditable = 1
 
-<p><b>{{ entity.parent.calendar.owner.getFullName() }} un-invites you from {{ entity.title }}.</b></p>
+<p><b>{{ entity.calendar.owner.getFullName() }} has accepted this invitation.</b></p>
 <h1>{{ entity.title }}</h1>
 <div>
     <p><i>Start date:</i> {{ entity.start|date('F j, Y, g:i A') }}</p>
