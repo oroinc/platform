@@ -15,6 +15,6 @@ class OroCalendarBundle implements Migration
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_calendar_event');
-        $table->addIndex(['updated_at'], 'oro_calendar_event_updated_at_idx', []);
+        $table->addIndex(['updated_at'], 'oro_calendar_event_up_idx', []);
     }
 }

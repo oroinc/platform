@@ -43,6 +43,7 @@
                     form_row(form.end),
                     form_row(form.allDay),
                     form_row(form.backgroundColor),
+                    form.calendarUid is defined ? form_row(form.calendarUid) : null,
                     form_row(form.reminders)
                 ]
             }
