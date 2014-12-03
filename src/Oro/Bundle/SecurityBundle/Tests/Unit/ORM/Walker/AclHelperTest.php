@@ -12,7 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder;
-use Symfony\Component\Form\FormEvents;
 
 class AclHelperTest extends OrmTestCase
 {
