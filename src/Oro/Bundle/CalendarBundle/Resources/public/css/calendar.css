@@ -245,3 +245,7 @@
 .connection-item .custom-color-link:hover {
     color: #333;
 }
+
+.fc-event-inner.invitation-status-declined {
+    text-decoration: line-through;
+}

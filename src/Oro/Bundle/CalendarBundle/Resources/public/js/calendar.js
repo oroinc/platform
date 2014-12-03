@@ -474,6 +474,20 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 } else {
                     element.find('.icon').remove();
                 }
+                if (fcEvent.invitationStatus === 'not_responded') {
+                    element.find('.fc-event-time, .fc-event-title').first().prepend(
+                        '<i class="invitation-status-icon icon-question"></i>'
+                    );
+                } else if (fcEvent.invitationStatus === 'not_responded') {
+                    element.find('.fc-event-time, .fc-event-title').first().prepend(
+                        '<i class="invitation-status-icon icon-reply"></i>'
+                    );
+                } else if (fcEvent.invitationStatus === 'declined') {
+                    element.find('.fc-event-inner').addClass('invitation-status-declined');
+                } else {
+                    element.find('.invitation-status-icon').remove();
+                    element.find('.invitation-status-declined').removeClass('invitation-status-declined');
+                }
             };
 
             // create jQuery FullCalendar control
