@@ -44,6 +44,15 @@ class OrganizationExtension extends \Twig_Extension
         return self::EXTENSION_NAME;
     }
 
+    /**
+     * Returns organization select box for the login page
+     *
+     * @param \Twig_Environment $environment
+     * @param  string           $fieldName
+     * @param  string           $label
+     * @param  bool             $showLabels
+     * @return string
+     */
     public function getLoginOrganizations(\Twig_Environment $environment, $fieldName, $label, $showLabels)
     {
         $organizations = $this->entityManager->getRepository('OroOrganizationBundle:Organization')->getEnabled();

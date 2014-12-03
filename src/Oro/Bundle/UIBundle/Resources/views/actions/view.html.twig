@@ -50,14 +50,13 @@
                             <div class="clearfix">
                                 <ul class="inline">
                                     {% block stats %}
-                                        {% placeholder additional_entity_stats with {entity: entity} %}
                                         <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
                                         <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
                                     {% endblock stats %}
                                     {% if isMobileVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
                                 </ul>
@@ -83,7 +82,7 @@
                                     {% if isDesktopVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
 
