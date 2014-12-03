@@ -11,6 +11,7 @@ use Doctrine\ORM\Proxy\Proxy;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\Rest\Util\Codes;
@@ -139,14 +140,8 @@ class CalendarEventController extends RestController implements ClassResourceInt
     /**
      * Get calendar event.
      *
-     * @param string $id Calendar event id
+     * @param int $id Calendar event id
      *
-     * @QueryParam(
-     *      name="calendar", requirements="\d+",
-     *      nullable=true,
-     *      strict=true,
-     *      description="The id of calendar where an event is displayed."
-     * )
      * @ApiDoc(
      *      description="Get calendar event",
      *      resource=true
@@ -157,21 +152,46 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function getAction($id)
     {
-        $calendarId = $this->getRequest()->get('calendar');
-
         $entity = $this->getManager()->find($id);
-
-        if ($entity instanceof Proxy && !$entity->__isInitialized()) {
-            $entity->__load();
-        }
 
         $result = null;
         $code = Codes::HTTP_NOT_FOUND;
         if ($entity) {
-            $result = $this->get('oro_calendar.calendar_event.normalizer')->getCalendarEvent(
-                $entity,
-                $calendarId ? (int)$calendarId : null
-            );
+            $result = $this->get('oro_calendar.calendar_event.normalizer')
+                ->getCalendarEvent($entity);
+            $code   = Codes::HTTP_OK;
+        }
+
+        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+    }
+
+    /**
+     * Get calendar event supposing it is displayed in the specified calendar.
+     *
+     * @param int $id      The id of a calendar where an event is displayed
+     * @param int $eventId Calendar event id
+     *
+     * @Get(
+     *      "/calendars/{id}/events/{eventId}",
+     *      requirements={"id"="\d+", "eventId"="\d+"}
+     * )
+     * @ApiDoc(
+     *      description="Get calendar event supposing it is displayed in the specified calendar",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_calendar_event_view")
+     *
+     * @return Response
+     */
+    public function getByCalendarAction($id, $eventId)
+    {
+        $entity = $this->getManager()->find($eventId);
+
+        $result = null;
+        $code = Codes::HTTP_NOT_FOUND;
+        if ($entity) {
+            $result = $this->get('oro_calendar.calendar_event.normalizer')
+                ->getCalendarEvent($entity, (int)$id);
             $code   = Codes::HTTP_OK;
         }
 
