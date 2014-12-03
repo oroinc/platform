@@ -4,9 +4,10 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Symfony\Component\Yaml\Yaml;
 
-use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
+use CG\Core\DefaultGeneratorStrategy;
 
+use Oro\Bundle\EntityExtendBundle\Tools\Generator\Visitor;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractEntityGeneratorExtension;
 
 class EntityGenerator
@@ -75,6 +76,10 @@ class EntityGenerator
     {
         // generate PHP code
         $class = PhpClass::create($schema['entity']);
+        if ($schema['doctrine'][$schema['entity']]['type'] === 'mappedSuperclass') {
+            $class->setAbstract(true);
+        }
+
         foreach ($this->getExtensions() as $extension) {
             if ($extension->supports($schema)) {
                 $extension->generate($schema, $class);
@@ -84,7 +89,7 @@ class EntityGenerator
         $className = ExtendHelper::getShortClassName($schema['entity']);
 
         // write PHP class to the file
-        $strategy = new DefaultGeneratorStrategy();
+        $strategy = new DefaultGeneratorStrategy(new Visitor());
         file_put_contents(
             $this->entityCacheDir . DIRECTORY_SEPARATOR . $className . '.php',
             "<?php\n\n" . $strategy->generate($class)
