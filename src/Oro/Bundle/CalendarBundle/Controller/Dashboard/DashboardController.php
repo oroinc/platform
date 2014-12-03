@@ -42,7 +42,7 @@ class DashboardController extends Controller
         }
 
         $result = array(
-            'event_form' => $this->get('oro_calendar.calendar_event.form')->createView(),
+            'event_form' => $this->get('oro_calendar.calendar_event.form.template')->createView(),
             'entity'     => $calendar,
             'calendar'   => array(
                 'selectable'     => $securityFacade->isGranted('oro_calendar_event_create'),

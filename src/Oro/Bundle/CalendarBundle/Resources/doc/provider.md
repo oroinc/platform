@@ -4,16 +4,16 @@ Calendar Provider
 Table of content
 -----------------
 - [Overview](#overview)
-- [Getting Started](#getting-started)
-- [Implementation](#implementation)
+- [Add own provider](#add-own-provider)
 
 ##Overview
-Calendar Provider gives developers access to the formation of an user calendar. The Calendar Manager consist all
- Calendar Providers. Manager generates a list of calendars that will be displayed on the page "My Calendar".
 
-##Getting Started
-You must create Calendar Provider class that implements CalendarProviderInterface. To register this class as service
- with tag "oro_calendar.calendar_provider" and define alias name, for example: "user".
+The goal of calendar providers is to allow developers to add different types of calendars on user's calendar. The main class responsible to work with calendar providers is [Calendar Manager](../../Manager/CalendarManager.php). This class contains all providers and responsible to collect and merge data from them.
+
+##Add own provider
+
+To add a calendar provider you need to create a class implements [CalendarProviderInterface](../../Provider/CalendarProviderInterface.php), register it as a service and mark it with *oro_calendar.calendar_provider* tag. Each provider must have an alias that is unique identifier of a provider. The following example shows how calendar provider can be registered:
+
 ``` yaml
 oro_calendar.calendar_provider.user:
     class: %oro_calendar.calendar_provider.user.class%
@@ -25,36 +25,9 @@ oro_calendar.calendar_provider.user:
         - { name: oro_calendar.calendar_provider, alias: user }
 ```
 
-##Implementation
-You must provide two methods getCalendarDefaultValues and getCalendarDefaultValues.
+As it mentioned below your provider must implements [CalendarProviderInterface](../../Provider/CalendarProviderInterface.php) which contains only two methods:
 
-getCalendarDefaultValues($userId, $calendarId, array $calendarIds), where:
-- $userId - the id of an user requested this information (type: integer),
-- $calendarId - the target calendar id (type: integer),
-- $calendarIds - the list of ids of connected calendars (type: array of integer).
+- **getCalendarDefaultValues** - This method returns default values of a calendar properties, such as calendar name, permissions, widget optionsm etc.
+- **getCalendarEvents** - This method returns a list of calendar events.
 
-Method return array of default properties for the given calendar. Each item of this array can contains any properties of
- a calendar you need to set as default. You can return any property defined in CalendarProperty class. If you need extra
- properties you can return them in 'options' array. There are several additional properties you can return as well:
-- calendarName - a name of a calendar. This property is mandatory,
-- removable - indicated whether a calendar can be disconnected from the target calendar defaults to true.
-
-Also there is special property names 'options' where you can return some additional options. For example:
-- widgetRoute - route name of a widget can be used to view an event. defaults to empty,
-- widgetOptions - options of a widget can be used to view an event. defaults to empty.
-
-You can add additional fields to entity CalendarProperty via UI or Source Code. So you can provide default values for
- this fields into calendar provider. If value of this fields will be changed then system will store it.
-
-getCalendarDefaultValues($userId, $calendarId, array $calendarIds), where:
-- $userId - the id of an user requested this information (type: int),
-- $calendarId - the target calendar id (type: int),
-- $start - a date/time specifies the begin of a time interval (type: DateTime),
-- $end - a date/time specifies the end of a time interval  (type: DateTime),
-- $subordinate - determines whether events from connected calendars should be included or not (type: bool).
-
-Method return array of calendar events. Each item of this array should contains all properties of a calendar event. There
- are several additional properties you can return as well:
-- editable  - indicated whether an event can be modified. defaults to true,
-- removable - indicated whether an event can be deleted. defaults to true,
-- reminders - the list of attached reminders. defaults to empty.
+More details about implementation of a calendar provider you can find in [source code](../../Provider/CalendarProviderInterface.php).
