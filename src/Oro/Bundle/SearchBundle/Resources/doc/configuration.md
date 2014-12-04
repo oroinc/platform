@@ -64,7 +64,8 @@ Acme\DemoBundle\Entity\Product:
         name: acme_demo_search_product                       # Route name to generate url link to the entity record
         parameters:                                          # Array with parameters for route
             id: id
-    title_fields: [name]
+    mode: normal                                             # optional, default normal. Defines behavior for entities
+    title_fields: [name]                                     # with inheritance hierarchy
     fields:
         -
             name: name                                       # Name of field in entity

@@ -225,10 +225,10 @@ class Indexer
                     $isAlias    = true;
                 }
 
-                $partConfig = $this->mapper->getEntityConfig($entityName);
-                if ($partConfig['mode'] === Mode::WITH_DESCENDANTS || $partConfig['mode'] === Mode::ONLY_DESCENDANTS) {
-                    // add descendants
-                    $descendants = $this->getRegisteredDescendants($entityName);
+                $mode        = $this->mapper->getEntityModeConfig($entityName);
+                $descendants = $this->mapper->getRegisteredDescendants($entityName);
+                if (false !== $descendants) {
+                    // add descendants to from clause
                     foreach ($descendants as $fromPart) {
                         if ($isAlias) {
                             $fromPart = $aliases[$fromPart];
@@ -239,7 +239,7 @@ class Indexer
                     }
                 }
 
-                if ($partConfig['mode'] === Mode::ONLY_DESCENDANTS) {
+                if ($mode === Mode::ONLY_DESCENDANTS) {
                     unset($fromHash[$part]);
                 }
             }
@@ -249,25 +249,6 @@ class Indexer
         if ($collectedParts !== $fromParts) {
             $query->from($collectedParts);
         }
-    }
-
-    /**
-     * Find descendants for class from list of known classes
-     *
-     * @param string $parentClassName
-     *
-     * @return array
-     */
-    protected function getRegisteredDescendants($parentClassName)
-    {
-        $descendants = array_filter(
-            $this->mapper->getEntities(),
-            function ($className) use ($parentClassName) {
-                return is_subclass_of($className, $parentClassName);
-            }
-        );
-
-        return $descendants;
     }
 
     /**
