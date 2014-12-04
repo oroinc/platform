@@ -493,6 +493,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                     element.find('.fc-event-inner').prepend(
                         '<i class="invitation-status icon-reply" title="' + __('Not responded') + '"></i>'
                     );
+                } else if (fcEvent.invitationStatus === 'accepted') {
+                    element.find('.fc-event-inner').prepend(
+                        '<i class="invitation-status icon-ok" title="' + __('Accepted') + '"></i>'
+                    );
                 } else if (fcEvent.invitationStatus === 'declined') {
                     element.find('.fc-event-inner').addClass('invitation-status-declined');
                 } else {
