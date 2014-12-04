@@ -4,29 +4,24 @@ This changelog references the relevant changes (new features, changes and bugs) 
 * 1.4.2 (2014-12-02)
  * List of improvements and fixed bugs
  - Implemented form type guessers for custom fields of existing entities
- - Magento import: Fixed failed queries with empty contact phone
- - Magento import: Removed sensitive data displayed in API request logs
- - Magento import: Fixed duplicated jobs on two way Magento sync
- - Magento import: Fixed incorrect implementation Customer TAX/VAT Number
- - Magento import: Fixed lost address types after magento customer update
- - Zendesk: Detached entities issue after Entity Manager fail
+ - Added support of cascade option for association in Extend Extension
+ - Fixed insecure content from websockets when HTTPS used
+ - Fixed IMAP Sync with date parsing exception
+ - Magento Integration: Sensitive data displayed in API request logs
+ - Magento Integration: Memory Issue on Error
+ - Magento Integration: Duplicated jobs on two way Magento sync
 
 CHANGELOG for 1.4.1
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.4.1 versions.
 * 1.4.1 (2014-11-17)
  * List of improvements and fixed bugs
- - Added MailChimp support changes
- - Added migration for b2b customers
- - Added related entities to segments filters
- - Added shopping cart management to Oro Bridge support
- - Made Email campaign entities configurable
- - Made contact address, email and phone entities extendable
- - Fixed issues with lifetime value after update
- - Fixed upload pictures/avatar to entity
- - Fixed missing Campaign details grid and chart
- - Fixed "Sync data" on cart page with invalid API credentials
+ - Refactor extended entity to prevent class name collisions
+ - Implement form type guessers for custom fields of existing entities
+ - Use route from config in email address link to avoid potential errors
  - Fixed duplicates of entities during magento import
+ - Error in "oro_multiple_entity" if it's used without "default_element" option
+ - Lost organization name after upgrade
 
 CHANGELOG for 1.4.0
 ===================
