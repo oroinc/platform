@@ -202,6 +202,30 @@ define(['../locale-settings', 'moment'
         },
 
         /**
+         * @param {moment} moment
+         * @returns {string}
+         */
+        convertMomentToBackendDateFormat: function (moment) {
+            return moment.clone().utc().format(this.backendFormats.date);
+        },
+
+        /**
+         * @param {moment} moment
+         * @returns {string}
+         */
+        convertMomentToBackendTimeFormat: function (moment) {
+            return moment.clone().utc().format(this.backendFormats.time);
+        },
+
+        /**
+         * @param {moment} moment
+         * @returns {string}
+         */
+        convertMomentToBackendDateTimeFormat: function (moment) {
+            return moment.clone().utc().format(this.backendFormats.datetime);
+        },
+
+        /**
          * Applies time zone diff to date object,
          *  subtracts/adds sum of diff local-zone and system-zone time shift
          *

@@ -123,10 +123,12 @@ define(['underscore', 'orolocale/js/locale-settings/data'
 
         extendSettings: function(settings) {
             this.settings = this._deepExtend(this.settings, settings);
+            this._timezone_shift = this.calculateTimeZoneShift(this.getTimeZoneOffset());
         },
 
         extendDefaults: function(defaults) {
             this.defaults = this._deepExtend(this.defaults, defaults);
+            this._timezone_shift = this.calculateTimeZoneShift(this.getTimeZoneOffset());
         },
 
         getLocale: function() {
@@ -162,7 +164,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @returns {number}
          */
         getTimeZoneShift: function () {
-            return this.calculateTimeZoneShift(localeSettings.getTimeZoneOffset());
+            return this._timezone_shift;
         },
 
         /**
@@ -171,13 +173,13 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @param tz {string} timezone specification, just like "+08:00"
          * @returns {number} shift in minutes
          */
-        calculateTimeZoneShift: _.memoize(function (tz) {
+        calculateTimeZoneShift: function (tz) {
             var matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
                 sign = Number(matches[1] + '1'),
                 hours = Number(matches[2]),
                 minutes = Number(matches[3]);
             return sign * (hours * 60 + minutes);
-        }),
+        },
 
         getNameFormats: function() {
             return this.settings.format.name;

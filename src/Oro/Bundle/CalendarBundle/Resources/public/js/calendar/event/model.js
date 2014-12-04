@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'routing'
-    ], function (_, Backbone, routing) {
+define(['underscore', 'backbone', 'routing', 'moment', 'orolocale/js/locale-settings'
+    ], function (_, Backbone, routing, moment, localeSettings) {
     'use strict';
 
     /**
@@ -34,6 +34,10 @@ define(['underscore', 'backbone', 'routing'
             this.urlRoot = routing.generate(this.route);
             this._updateComputableAttributes();
             this.on('change:id change:calendarAlias change:calendar', this._updateComputableAttributes, this);
+
+            // translate start and end to current timezone
+            this._updateTimezone();
+            this.on('change:start change:end change:timezone', this._updateTimezone, this);
         },
 
         url: function () {
@@ -59,10 +63,18 @@ define(['underscore', 'backbone', 'routing'
                 attrs[key] = val;
             }
 
+            // save dates always in UTC
+            if (attrs.start) {
+                attrs.start = moment(attrs.start).zone(0).format();
+            }
+            if (attrs.end) {
+                attrs.end = moment(attrs.end).zone(0).format();
+            }
+
             options.contentType = 'application/json';
             options.data = JSON.stringify(_.extend(
                 {id: this.originalId},
-                _.omit(this.toJSON(), ['id', 'editable', 'removable', 'calendarUid']),
+                _.omit(this.toJSON(), ['id', 'editable', 'removable', 'calendarUid', 'timezoneShift']),
                 attrs || {}
             ));
 
@@ -79,6 +91,21 @@ define(['underscore', 'backbone', 'routing'
             if (!this.originalId && this.id && calendarUid) {
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
+            }
+        },
+
+        _updateTimezone: function () {
+            /**
+             * NOTE: Changes only it's timezone, the end and start properties still point at the same time
+             */
+            var start = moment(this.get('start')),
+                end = moment(this.get('end')),
+                timezoneShift = localeSettings.getTimeZoneShift();
+            if (start.zone() !== timezoneShift) {
+                this.attributes.start = start.zone(timezoneShift).format();
+            }
+            if (end.zone() !== timezoneShift) {
+                this.attributes.end = end.zone(timezoneShift).format();
             }
         }
     });

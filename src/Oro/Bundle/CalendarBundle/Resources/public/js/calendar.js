@@ -63,8 +63,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
-                timezone: false // display as is, in timezone of value
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
             },
             connectionsOptions: {
                 collection: null,
@@ -187,7 +186,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             var fcEvent = eventModel.toJSON();
 
             // don't need time zone correction, on add event
-            this.prepareViewModel(fcEvent, false);
+            this.prepareViewModel(fcEvent);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
@@ -252,7 +251,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             }
             if (_.has(changes, 'backgroundColor') && connectionModel.get('visible')) {
                 _.each(this.getCalendarEvents(calendarUid), function (fcEvent) {
-                    this.prepareViewModel(fcEvent, false);
+                    this.prepareViewModel(fcEvent);
                 }, this);
                 this.getCalendarElement().fullCalendar('rerenderEvents');
             }
@@ -270,8 +269,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                     var eventModel = new EventModel({
                         calendarAlias: 'user',
                         calendar: this.options.calendar,
-                        start: this.formatDateTimeForModel(start),
-                        end: this.formatDateTimeForModel(end),
+                        start: dateTimeFormatter.convertMomentToBackendDateTimeFormat(start),
+                        end: dateTimeFormatter.convertMomentToBackendDateTimeFormat(end),
                         editable: this.options.newEventEditable,
                         removable: this.options.newEventRemovable
                     });
@@ -296,12 +295,23 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         eventDropOrResize: function (fcEvent) {
             this.showSavingMask();
             try {
+                var timezoneShift = localeSettings.getTimeZoneShift();
                 this.collection
                     .get(fcEvent.id)
                     .save(
                         {
-                            start: this.formatDateTimeForModel(fcEvent.start),
-                            end: this.formatDateTimeForModel(!_.isNull(fcEvent.end) ? fcEvent.end : fcEvent.start)
+                            /**
+                             * Fullcalendar returns dates in it specific format that looks like moment,
+                             * but timezone is not applied to value.
+                             *
+                             * Please be carefull with debugging this code
+                             *
+                             * Also format string must be specified. Or fullcalendar moment replacement
+                             * won't add timezone offset to resulting string. That will cause adding browser timezone
+                             * to the specified time when returned string will be parsed.
+                             */
+                            start: fcEvent.start.add(timezoneShift, 'm').format('YYYY-MM-DD HH:mmZZ'),
+                            end: (!_.isNull(fcEvent.end) ? fcEvent.end : fcEvent.start).utc().add(timezoneShift, 'm').format('YYYY-MM-DD HH:mmZZ')
                         },
                         {
                             success: _.bind(this._hideMask, this),
@@ -319,7 +329,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             var onEventsLoad = _.bind(function () {
                 var fcEvents = this.collection.toJSON();
                 _.each(fcEvents, function (fcEvent) {
-                    this.prepareViewModel(fcEvent, true);
+                    this.prepareViewModel(fcEvent);
                 }, this);
                 this.eventsLoaded = {};
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
@@ -333,8 +343,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
             try {
                 this.collection.setRange(
-                    this.formatDateTimeForModel(start),
-                    this.formatDateTimeForModel(end)
+                    dateTimeFormatter.convertMomentToBackendDateTimeFormat(start),
+                    dateTimeFormatter.convertMomentToBackendDateTimeFormat(end)
                 );
                 if (this.enableEventLoading) {
                     // load events from a server
@@ -362,24 +372,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
          * @param {Object} fcEvent
          * @param {boolean=} applyTZCorrection by default applies time zone correction
          */
-        prepareViewModel: function (fcEvent, applyTZCorrection) {
+        prepareViewModel: function (fcEvent) {
             // set an event text and background colors the same as the owning calendar
             var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
-            if (applyTZCorrection !== false) {
-                fcEvent.start = moment(fcEvent.start).zone(-localeSettings.getTimeZoneShift());
-                fcEvent.end = moment(fcEvent.end).zone(-localeSettings.getTimeZoneShift());
-            }
-        },
-
-        /**
-         *
-         * @param date {moment}
-         * @returns {moment}
-         */
-        formatDateTimeForModel: function (date) {
-            return dateTimeFormatter.convertDateTimeToBackendFormat(date.clone().utc().toDate());
         },
 
         showSavingMask: function () {
@@ -461,7 +458,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             keys = [
                 'date', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'allDaySlot', 'buttonText',
+                'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
+                'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
                 'contentHeight'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
