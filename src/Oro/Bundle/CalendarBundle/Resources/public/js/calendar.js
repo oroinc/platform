@@ -1,15 +1,23 @@
 /*jslint nomen:true*/
 /*jshint devel:true*/
 /*global define, console*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/loading-mask',
-    'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
-    'orolocale/js/formatter/datetime', 'orolocale/js/locale-settings', 'jquery.fullcalendar'
-    ], function (_, Backbone, __, messenger, LoadingMask,
-         EventCollection, EventModel, EventView,
-         ConnectionCollection, ConnectionView, ColorManager,
-         dateTimeFormatter, localeSettings) {
+define(function (require) {
     'use strict';
+
+    var _ = require('underscore'),
+        Backbone = require('backbone'),
+        __ = require('orotranslation/js/translator'),
+        messenger = require('oroui/js/messenger'),
+        LoadingMask = require('oroui/js/loading-mask',
+        EventCollection = require('orocalendar/js/calendar/event/collection'),
+        EventModel = require('orocalendar/js/calendar/event/model'),
+        EventView = require('orocalendar/js/calendar/event/view'),
+        ConnectionCollection = require('orocalendar/js/calendar/connection/collection'),
+        ConnectionView = require('orocalendar/js/calendar/connection/view'),
+        ColorManager = require('orocalendar/js/calendar/color-manager'),
+        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
+        localeSettings = require('orolocale/js/locale-settings');
+        require('jquery.fullcalendar');
 
     var $ = Backbone.$;
 
@@ -38,6 +46,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         /** @property {Object} */
         options: {
+            timezone: localeSettings.getTimeZoneShift(),
             eventsOptions: {
                 defaultView: 'month',
                 allDayText: __('oro.calendar.control.all_day'),
@@ -185,8 +194,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         addEventToCalendar: function (eventModel) {
             var fcEvent = eventModel.toJSON();
 
-            // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent);
+            this.applyTzCorrection(1, fcEvent);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
@@ -210,9 +219,14 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         onEventChanged: function (eventModel) {
             var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
             // copy all fields, except id, from event to fcEvent
-            fcEvent = _.extend(fcEvent, _.pick(eventModel.toJSON(), _.keys(_.omit(fcEvent, ['id']))));
+            fcEvent = _.extend(fcEvent, eventModel.toJSON());
             this.prepareViewModel(fcEvent);
-            this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+            this.applyTzCorrection(1, fcEvent);
+            // fullcalendar doesn't remember new duration during updateEvent
+            // so need to store it
+            fcEvent.duration = moment.duration(fcEvent.end.diff(fcEvent.start));
+            $('#calendar').fullCalendar('updateEvent', fcEvent);
+            this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
         onEventDeleted: function (eventModel) {
@@ -264,16 +278,19 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         select: function (start, end) {
             if (!this.eventView) {
                 try {
-                    // TODO: All date values must be in UTC representation according to config timezone,
-                    // https://magecore.atlassian.net/browse/BAP-2203
-                    var eventModel = new EventModel({
-                        calendarAlias: 'user',
-                        calendar: this.options.calendar,
-                        start: dateTimeFormatter.convertMomentToBackendDateTimeFormat(start),
-                        end: dateTimeFormatter.convertMomentToBackendDateTimeFormat(end),
-                        editable: this.options.newEventEditable,
-                        removable: this.options.newEventRemovable
-                    });
+                    var eventModel = new EventModel(_.extend(
+                        this.applyTzCorrection(-1, {
+                            start: start,
+                            end: end
+                        }),
+                        {
+                            calendarAlias: 'user',
+                            calendar: this.options.calendar,
+                            isTimezoneApplied: true,
+                            editable: this.options.newEventEditable,
+                            removable: this.options.newEventRemovable
+                        }
+                    ));
                     this.getEventView(eventModel).render();
                 } catch (err) {
                     this.showMiscError(err);
@@ -292,34 +309,51 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             }
         },
 
-        eventDropOrResize: function (fcEvent) {
+        eventResize: function (fcEvent, newDuration) {
             this.showSavingMask();
             try {
-                var timezoneShift = localeSettings.getTimeZoneShift();
-                this.collection
-                    .get(fcEvent.id)
-                    .save(
-                        {
-                            /**
-                             * Fullcalendar returns dates in it specific format that looks like moment,
-                             * but timezone is not applied to value.
-                             *
-                             * Please be carefull with debugging this code
-                             *
-                             * Also format string must be specified. Or fullcalendar moment replacement
-                             * won't add timezone offset to resulting string. That will cause adding browser timezone
-                             * to the specified time when returned string will be parsed.
-                             */
-                            start: fcEvent.start.add(timezoneShift, 'm').format('YYYY-MM-DD HH:mmZZ'),
-                            end: (!_.isNull(fcEvent.end) ? fcEvent.end : fcEvent.start).utc().add(timezoneShift, 'm').format('YYYY-MM-DD HH:mmZZ')
-                        },
-                        {
-                            success: _.bind(this._hideMask, this),
-                            error: _.bind(function (model, response) {
-                                this.showSaveEventError(response.responseJSON || {});
-                            }, this)
-                        }
-                    );
+                var attrs = {
+                        start: fcEvent.start.clone(),
+                        end: fcEvent.start.clone().add(newDuration)
+                    },
+                    model = this.collection.get(fcEvent.id);
+                this.applyTzCorrection(-1, attrs);
+
+                model.save(
+                    attrs,
+                    {
+                        success: _.bind(this._hideMask, this),
+                        error: _.bind(function (model, response) {
+                            this.showSaveEventError(response.responseJSON || {});
+                        }, this)
+                    }
+                );
+            } catch (err) {
+                this.showLoadEventsError(err);
+            }
+        },
+
+        eventDrop: function (fcEvent) {
+            this.showSavingMask();
+            try {
+                var attrs = {
+                        start: fcEvent.start.clone(),
+                        // due to bug of fullcalendar - use stored duration if defined
+                        end: (!fcEvent.duration) ? fcEvent.end.clone() : fcEvent.start.clone().add(fcEvent.duration)
+                    },
+                    model = this.collection.get(fcEvent.id);
+
+                this.applyTzCorrection(-1, attrs);
+
+                model.save(
+                    attrs,
+                    {
+                        success: _.bind(this._hideMask, this),
+                        error: _.bind(function (model, response) {
+                            this.showSaveEventError(response.responseJSON || {});
+                        }, this)
+                    }
+                );
             } catch (err) {
                 this.showLoadEventsError(err);
             }
@@ -330,6 +364,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 var fcEvents = this.collection.toJSON();
                 _.each(fcEvents, function (fcEvent) {
                     this.prepareViewModel(fcEvent);
+                    this.applyTzCorrection(1, fcEvent);
                 }, this);
                 this.eventsLoaded = {};
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
@@ -343,8 +378,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
             try {
                 this.collection.setRange(
-                    dateTimeFormatter.convertMomentToBackendDateTimeFormat(start),
-                    dateTimeFormatter.convertMomentToBackendDateTimeFormat(end)
+                    // always add timezone to do not eventually apply local timezone to value during parsing
+                    start.format('YYYY-MM-DD HH:mmZZ'),
+                    end.format('YYYY-MM-DD HH:mmZZ')
                 );
                 if (this.enableEventLoading) {
                     // load events from a server
@@ -377,6 +413,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
             fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
+        },
+
+        applyTzCorrection: function (sign, event) {
+            if(!moment.isMoment(event.start)) {
+                event.start = $.fullCalendar.moment(event.start);
+            }
+            if(!moment.isMoment(event.end)) {
+                event.end = $.fullCalendar.moment(event.end);
+            }
+            event.start.zone(0).add(this.options.timezone * sign, 'm');
+            event.end.zone(0).add(this.options.timezone * sign, 'm');
+            return event;
         },
 
         showSavingMask: function () {
@@ -445,8 +493,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
                 eventClick: _.bind(this.eventClick, this),
-                eventDrop: _.bind(this.eventDropOrResize, this),
-                eventResize: _.bind(this.eventDropOrResize, this),
+                eventDrop: _.bind(this.eventDrop, this),
+                eventResize: _.bind(this.eventResize, this),
                 loading: _.bind(function (show) {
                     if (show) {
                         this.showLoadingMask();
@@ -523,6 +571,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             };
 
             // create jQuery FullCalendar control
+            options.timezone = "UTC";
             this.getCalendarElement().fullCalendar(options);
             this.enableEventLoading = true;
         },
