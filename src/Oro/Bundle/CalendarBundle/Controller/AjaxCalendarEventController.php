@@ -13,7 +13,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class AjaxCalendarEventController extends Controller
 {
     /**
-     * @Route("/change-status/{id}/{status}", name="oro_calendar_event_change_status", requirements={"id"="\d+"})
+     * @Route("/accept/{id}",
+     *      name="oro_calendar_event_accepted",
+     *      requirements={"id"="\d+"}, defaults={"status"="accepted"})
+     * @Route("/tentatively/{id}",
+     *      name="oro_calendar_event_tentatively_accepted",
+     *      requirements={"id"="\d+"}, defaults={"status"="tentatively_accepted"})
+     * @Route("/decline/{id}",
+     *      name="oro_calendar_event_declined",
+     *      requirements={"id"="\d+"}, defaults={"status"="declined"})
      * @param CalendarEvent $entity
      * @param string $status
      * @return JsonResponse
@@ -24,6 +32,6 @@ class AjaxCalendarEventController extends Controller
         $entity->setInvitationStatus($status);
         $em->flush($entity);
 
-        return new JsonResponse(["success" => true]);
+        return new JsonResponse(['successful' => true]);
     }
 }
