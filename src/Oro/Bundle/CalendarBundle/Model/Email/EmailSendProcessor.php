@@ -10,7 +10,6 @@ use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class EmailSendProcessor
 {
-    // @TODO: Add name of templates
     const CREATE_INVITE_TEMPLATE_NAME = 'calendar_invitation_invite';
     const UPDATE_INVITE_TEMPLATE_NAME = 'calendar_invitation_update';
     const CANCEL_INVITE_TEMPLATE_NAME = 'calendar_invitation_delete_parent_event';
@@ -82,13 +81,12 @@ class EmailSendProcessor
         ArrayCollection $originalChildren,
         $notify = true
     ) {
-        if (!$notify) {
-            return false;
-        }
-        // Send notification to existing invitees if event was changed time
-        if (count($calendarEvent->getChildEvents()) > 0 && (
+        // Send notification to existing invitees if event was changed
+        if (count($calendarEvent->getChildEvents()) > 0 && $notify && (
             $calendarEvent->getStart() != $dirtyEvent->getStart() ||
-            $calendarEvent->getEnd() != $dirtyEvent->getEnd()
+            $calendarEvent->getEnd() != $dirtyEvent->getEnd() ||
+            $calendarEvent->getDescription() != $dirtyEvent->getDescription() ||
+            $calendarEvent->getTitle() != $dirtyEvent->getTitle()
         )) {
             $this->addEmailNotification(
                 $calendarEvent,
@@ -170,7 +168,7 @@ class EmailSendProcessor
                 self::REMOVE_CHILD_TEMPLATE_NAME
             );
             $this->process();
-        } else if (count($calendarEvent->getChildEvents()) > 0) {
+        } elseif (count($calendarEvent->getChildEvents()) > 0) {
             $this->addEmailNotification(
                 $calendarEvent,
                 $this->getChildEmails($calendarEvent),

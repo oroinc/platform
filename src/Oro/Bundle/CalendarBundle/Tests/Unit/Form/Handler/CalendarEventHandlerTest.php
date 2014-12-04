@@ -36,6 +36,9 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var CalendarEvent */
     protected $entity;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailSendProcessor;
+
     protected function setUp()
     {
         $this->form                = $this->getMockBuilder('Symfony\Component\Form\Form')
@@ -54,6 +57,9 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->emailSendProcessor = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->entity  = new CalendarEvent();
         $this->handler = new CalendarEventHandler(
@@ -62,7 +68,8 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             $this->om,
             $this->activityManager,
             $this->entityRoutingHelper,
-            $this->securityFacade
+            $this->securityFacade,
+            $this->emailSendProcessor
         );
     }
 
@@ -168,6 +175,11 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
+        $this->form->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData');
         $this->entityRoutingHelper->expects($this->once())
             ->method('getEntityClassName')
             ->will($this->returnValue(null));
@@ -266,6 +278,11 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->will($this->returnValue($repository));
 
+        $this->form->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData');
         $this->om->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($this->entity));
@@ -325,6 +342,11 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('addActivityTarget')
             ->with($this->identicalTo($this->entity), $this->identicalTo($targetEntity));
 
+        $this->form->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData');
         $this->om->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($this->entity));

@@ -37,5 +37,4 @@ class DeleteHandler extends BaseDeleteHandler
         $em->flush();
         $this->emailSendProcessor->sendDeleteEventNotification($entity);
     }
-
 }
