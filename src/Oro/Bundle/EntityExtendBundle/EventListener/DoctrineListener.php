@@ -121,6 +121,12 @@ class DoctrineListener
         }
     }
 
+    /**
+     * @param ClassMetadataFactory $factory
+     * @param string               $entityFQCN Class name
+     *
+     * @return mixed
+     */
     protected function getDiscriminatorValue(ClassMetadataFactory $factory, $entityFQCN)
     {
         if (!array_key_exists($entityFQCN, $this->collectedValues)) {
@@ -136,12 +142,6 @@ class DoctrineListener
 
                 if ($annotation instanceof DiscriminatorValue) {
                     $value = $annotation->getValue();
-
-                    if (in_array($value, $this->collectedValues)) {
-                        throw new \RuntimeException(
-                            sprintf('Found duplicate discriminator map entry "%s" in "%s"', $value, $entityFQCN)
-                        );
-                    }
                 }
             }
 
