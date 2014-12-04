@@ -96,7 +96,7 @@ define(['underscore', 'backbone', 'routing', 'moment', 'orolocale/js/locale-sett
 
         _updateTimezone: function () {
             /**
-             * NOTE: Changes only it's timezone, the end and start properties still point at the same time
+             * NOTE: Changes only it's timezone, the end and start properties still point at the same time as before
              */
             var start = moment(this.get('start')),
                 end = moment(this.get('end')),
