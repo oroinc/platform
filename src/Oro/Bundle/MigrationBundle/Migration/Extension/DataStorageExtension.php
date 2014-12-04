@@ -5,28 +5,21 @@ namespace Oro\Bundle\MigrationBundle\Migration\Extension;
 class DataStorageExtension
 {
     /** @var array */
-    protected $storage;
-
-    /** @var DataStorageExtension */
-    protected static $instance;
-
-    public function __construct()
-    {
-        $this->storage = [];
-    }
+    protected $storage = [];
 
     /**
-     * @param mixed $key
+     * @param string $key
+     * @param mixed  $default
      *
      * @return mixed
      */
-    public function get($key)
+    public function get($key, $default = null)
     {
-        return $this->storage[$key];
+        return $this->has($key) ? $this->storage[$key] : $default;
     }
 
     /**
-     * @param mixed $key
+     * @param string $key
      *
      * @return bool
      */
@@ -36,8 +29,8 @@ class DataStorageExtension
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed  $value
      */
     public function put($key, $value)
     {
