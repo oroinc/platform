@@ -494,7 +494,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                         '<i class="invitation-status icon-reply" title="' + __('Not responded') + '"></i>'
                     );
                 } else if (fcEvent.invitationStatus === 'accepted') {
-                    debugger;
                     element.find('.fc-event-inner').prepend(
                         '<i class="invitation-status icon-ok" title="' + __('Accepted') + '"></i>'
                     );
