@@ -7,12 +7,11 @@ Table of content
 - [Calendar Providers](./Resources/doc/provider.md)
 - [Context Calendar Menu](./Resources/doc/contextMenu.md)
 - [UI](#ui)
+- [System Calendars](./Resources/doc/systemCalendars.md)
 
 ##Overview
 
-This bundle integrates the [jQuery FullCalendar](http://arshaw.com/fullcalendar/) plugin into the Oro Platform
-and provides other calendar related functionality, such as view calendars of other users,
-synchronization with external calendars.
+This bundle integrates the [jQuery FullCalendar](http://arshaw.com/fullcalendar/) plugin into the Oro Platform and provides other calendar related functionality, such as view calendars of other users, system calendars, synchronization with external calendars, etc.
 
 ##UI
 

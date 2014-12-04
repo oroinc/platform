@@ -70,7 +70,7 @@ class CalendarController extends Controller
         $dateRange = $calendarConfigProvider->getDateRange();
 
         $result = array(
-            'event_form' => $this->get('oro_calendar.calendar_event.form')->createView(),
+            'event_form' => $this->get('oro_calendar.calendar_event.form.template')->createView(),
             'user_select_form' => $this->get('form.factory')
                 ->createNamed(
                     'new_calendar',

@@ -4,8 +4,9 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CalendarTest extends \PHPUnit_Framework_TestCase
@@ -42,11 +43,35 @@ class CalendarTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($obj === $events[0]->getCalendar());
     }
 
+    public function testToString()
+    {
+        $obj = new Calendar();
+        $obj->setName('testName');
+        $this->assertEquals($obj->getName(), (string)$obj);
+    }
+
+    public function testToStringDefault()
+    {
+        $obj = new Calendar();
+        $this->assertEquals('[default]', (string)$obj);
+    }
+
+    public function testToStringUsername()
+    {
+        $obj = new Calendar();
+        $owner = new User();
+        $owner->setUsername('testUsername');
+        $obj->setOwner($owner);
+
+        $this->assertEquals($owner->getUsername(), (string)$obj);
+    }
+
     public function propertiesDataProvider()
     {
-        return array(
-            array('name', 'testName'),
-            array('owner', new User())
-        );
+        return [
+            ['name', 'testName'],
+            ['owner', new User()],
+            ['organization', new Organization()],
+        ];
     }
 }
