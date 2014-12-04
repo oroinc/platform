@@ -32,6 +32,33 @@
     {% endspaceless %}
 {% endblock %}
 
+{% macro renderOrganizationChildren(form, org_id, children = {}, selected = {}, level = 1) %}
+    {% for child in children %}
+        <div class="oro-clearfix">
+            <span style="float:left;">
+            {% if level != 0 %}
+                {% for i in 1..level %}
+                    {% for si in 0..5 %}{{ '&nbsp;' }}{% endfor %}
+                {% endfor %}
+            {% endif %}
+            </span>
+            <input type="checkbox"
+                   id="{{ form.vars.id }}_businessUnits_{{ child.id }}"
+                   name="{{ form.vars.full_name }}[businessUnits][]"
+                   value="{{ child.id }}"
+                    {% if child.id in selected %} checked="checked" {% endif %}
+                   class="bu"
+                   data-organization="{{ org_id }}"
+                    />
+            <label for="{{ form.vars.id }}_businessUnits_{{ child.id }}">{{ child.name }}</label>
+        </div>
+        {% if child.children is defined %}
+            {% set sublevel = level + 1 %}
+            {{ _self.renderOrganizationChildren(form, org_id, child.children, selected, sublevel) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
 {% block oro_type_choice_ownership_type_widget %}
     {% spaceless %}
         {% if value or disabled %}
