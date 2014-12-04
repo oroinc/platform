@@ -1,3 +1,33 @@
+CHANGELOG for 1.4.2
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.2 versions.
+* 1.4.2 (2014-12-02)
+ * List of improvements and fixed bugs
+ - Implemented form type guessers for custom fields of existing entities
+ - Magento import: Fixed failed queries with empty contact phone
+ - Magento import: Removed sensitive data displayed in API request logs
+ - Magento import: Fixed duplicated jobs on two way Magento sync
+ - Magento import: Fixed incorrect implementation Customer TAX/VAT Number
+ - Magento import: Fixed lost address types after magento customer update
+ - Zendesk: Detached entities issue after Entity Manager fail
+
+CHANGELOG for 1.4.1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.1 versions.
+* 1.4.1 (2014-11-17)
+ * List of improvements and fixed bugs
+ - Added MailChimp support changes
+ - Added migration for b2b customers
+ - Added related entities to segments filters
+ - Added shopping cart management to Oro Bridge support
+ - Made Email campaign entities configurable
+ - Made contact address, email and phone entities extendable
+ - Fixed issues with lifetime value after update
+ - Fixed upload pictures/avatar to entity
+ - Fixed missing Campaign details grid and chart
+ - Fixed "Sync data" on cart page with invalid API credentials
+ - Fixed duplicates of entities during magento import
+
 CHANGELOG for 1.4.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.4.0 versions.
