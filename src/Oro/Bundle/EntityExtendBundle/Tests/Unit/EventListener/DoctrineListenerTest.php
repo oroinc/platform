@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Events;
+use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Symfony\Component\DependencyInjection\Container;
