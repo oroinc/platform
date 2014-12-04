@@ -10,9 +10,14 @@ datagrid:
                     - event.title
                     - event.start
                     - event.end
+                    - event.invitationStatus
+                    - parent.id as parentId
+                    - owner.id as ownerId
                 from:
                     - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
                 join:
+                    left:
+                        - { join: event.parent, alias: parent }
                     inner:
                         - { join: event.calendar, alias: calendar }
                         - { join: calendar.owner, alias: owner }
@@ -36,6 +41,11 @@ datagrid:
             end:
                 label: oro.calendar.calendarevent.end.label
                 frontend_type: datetime
+            invitationStatus:
+                label: oro.calendar.calendarevent.invitationStatus.label
+                type: twig
+                template: OroCalendarBundle:CalendarEvent:Datagrid/Property/status.html.twig
+                frontend_type: html
         sorters:
             columns:
                 title:
@@ -46,6 +56,8 @@ datagrid:
                     data_name: event.start
                 end:
                     data_name: event.end
+                invitationStatus:
+                    data_name: event.invitationStatus
             default:
                 start: ASC
         filters:
@@ -62,6 +74,16 @@ datagrid:
                 end:
                     type: datetime
                     data_name: event.end
+                invitationStatus:
+                    type: choice
+                    data_name: event.invitationStatus
+                    options:
+                        field_options:
+                            choices:
+                                not_responded: oro.calendar.calendarevent.statuses.not_responded
+                                accepted: oro.calendar.calendarevent.statuses.accepted
+                                tentatively_accepted: oro.calendar.calendarevent.statuses.tentatively_accepted
+                                declined: oro.calendar.calendarevent.statuses.declined
         properties:
             id: ~
             view_link:
@@ -76,7 +98,37 @@ datagrid:
                 type:       url
                 route:      oro_api_delete_calendarevent
                 params:     [ id ]
+            accept_link:
+                type:       url
+                route:      oro_calendar_event_accepted
+                params:     [ id ]
+            tentatively_link:
+                type:       url
+                route:      oro_calendar_event_tentatively_accepted
+                params:     [ id ]
+            decline_link:
+                type:       url
+                route:      oro_calendar_event_declined
+                params:     [ id ]
         actions:
+            accept:
+                type:         ajax
+                label:        Accept
+                link:         accept_link
+                icon:         ok
+                acl_recource: oro_calendar_event_view
+            tentatively:
+                type:         ajax
+                label:        Tentative
+                link:         tentatively_link
+                icon:         question
+                acl_recource: oro_calendar_event_view
+            decline:
+                type:         ajax
+                label:        Decline
+                link:         decline_link
+                icon:         remove
+                acl_recource: oro_calendar_event_view
             view:
                 type:         navigate
                 label:        View
@@ -96,6 +148,7 @@ datagrid:
                 label:         Delete
                 icon:          trash
                 link:          delete_link
+        action_configuration: [@oro_calendar.datagrid.action_permission_provider, "getInvitationPermissions"]
         options:
             entityHint: calendar_events
             entity_pagination: true

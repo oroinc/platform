@@ -104,6 +104,7 @@ oro:
             all_day.label:        All-day event
             invitation.label:     Guests
             backgroundColor.label: Color
+            invitationStatus.label: Invitation status
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}
