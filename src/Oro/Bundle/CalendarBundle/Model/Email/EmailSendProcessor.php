@@ -72,12 +72,19 @@ class EmailSendProcessor
      * @param CalendarEvent   $calendarEvent
      * @param CalendarEvent   $dirtyEvent
      * @param ArrayCollection $originalChildren
+     * @param boolean         $notify
+     *
+     * @return boolean
      */
     public function sendUpdateParentEventNotification(
         CalendarEvent $calendarEvent,
         CalendarEvent $dirtyEvent,
-        ArrayCollection $originalChildren
+        ArrayCollection $originalChildren,
+        $notify = true
     ) {
+        if (!$notify) {
+            return false;
+        }
         // Send notification to existing invitees if event was changed time
         if (count($calendarEvent->getChildEvents()) > 0 && (
             $calendarEvent->getStart() != $dirtyEvent->getStart() ||
@@ -112,6 +119,8 @@ class EmailSendProcessor
         if (count($this->emailNotifications) > 0) {
             $this->process();
         }
+
+        return true;
     }
 
     /**

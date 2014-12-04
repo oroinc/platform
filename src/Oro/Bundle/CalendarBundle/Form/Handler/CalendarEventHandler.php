@@ -139,7 +139,12 @@ class CalendarEventHandler
                     }
                 }
 
-                $this->onSuccess($entity, $dirtyEntity, $originalChildren);
+                $this->onSuccess(
+                    $entity,
+                    $dirtyEntity,
+                    $originalChildren,
+                    $this->form->get('notifyInvitedUsers')->getData()
+                );
 
                 return true;
             }
@@ -151,12 +156,17 @@ class CalendarEventHandler
     /**
      * "Success" form handler
      *
-     * @param CalendarEvent $entity
+     * @param CalendarEvent   $entity
      * @param CalendarEvent   $dirtyEntity
      * @param ArrayCollection $originalChildren
+     * @param boolean         $notify
      */
-    protected function onSuccess(CalendarEvent $entity, CalendarEvent $dirtyEntity, ArrayCollection $originalChildren)
-    {
+    protected function onSuccess(
+        CalendarEvent $entity,
+        CalendarEvent $dirtyEntity,
+        ArrayCollection $originalChildren,
+        $notify
+    ) {
         $new = $entity->getId() ? false : true;
         $this->manager->persist($entity);
         $this->manager->flush();
@@ -164,7 +174,12 @@ class CalendarEventHandler
         if ($new) {
             $this->emailSendProcessor->sendInviteNotification($entity);
         } else {
-            $this->emailSendProcessor->sendUpdateParentEventNotification($entity, $dirtyEntity, $originalChildren);
+            $this->emailSendProcessor->sendUpdateParentEventNotification(
+                $entity,
+                $dirtyEntity,
+                $originalChildren,
+                $notify
+            );
         }
     }
 }
