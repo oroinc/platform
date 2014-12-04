@@ -38,6 +38,7 @@ interface CalendarProviderInterface
      *               There are several additional properties you can return as well:
      *                  editable  - indicated whether an event can be modified. defaults to true
      *                  removable - indicated whether an event can be deleted. defaults to true
+     *                  notifiable - indicated whether to notify child events. defaults to false
      *                  reminders - the list of attached reminders. defaults to empty
      */
     public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);

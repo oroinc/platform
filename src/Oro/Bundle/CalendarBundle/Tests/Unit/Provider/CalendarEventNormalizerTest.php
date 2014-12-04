@@ -42,7 +42,7 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getCalendarEventsProvider
      */
-    public function testGetCalendarEvents($events, $eventIds, $expected)
+    public function testGetCalendarEvents($events, $expected)
     {
         $calendarId = 123;
         $qb         = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -88,7 +88,6 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'events'    => [],
-                'eventIds'  => [],
                 'expected'  => []
             ],
             [
@@ -101,7 +100,6 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'end'      => $endDate
                     ],
                 ],
-                'eventIds'  => [1],
                 'expected'  => [
                     [
                         'calendar'         => 123,
@@ -119,7 +117,8 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'childEvents'      => [],
                         'invitedUsers'     => [],
                         'editable'         => true,
-                        'removable'        => true
+                        'removable'        => true,
+                        'notifiable'       => false
                     ],
                 ]
             ],
@@ -133,7 +132,6 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'end'      => $endDate
                     ],
                 ],
-                'eventIds'  => [1],
                 'expected'  => [
                     [
                         'calendar'         => 123,
@@ -151,8 +149,137 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'childEvents'      => [],
                         'invitedUsers'     => [],
                         'editable'         => true,
-                        'removable'        => true
+                        'removable'        => true,
+                        'notifiable'       => false
                     ],
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getCalendarEventProvider
+     */
+    public function testGetCalendarEvent($event, $calendarId, $expected)
+    {
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['oro_calendar_event_update', null, true],
+                        ['oro_calendar_event_delete', null, true],
+                    ]
+                )
+            );
+
+        $this->reminderManager->expects($this->once())
+            ->method('applyReminders')
+            ->with([$expected], 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+
+        $result = $this->normalizer->getCalendarEvent(
+            $this->buildCalendarEvent($event),
+            $calendarId
+        );
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+
+     * @return array
+     */
+    public function getCalendarEventProvider()
+    {
+        $startDate = new \DateTime();
+        $endDate   = $startDate->add(new \DateInterval('PT1H'));
+
+        return [
+            'calendar not specified' => [
+                'event'      => [
+                    'calendar' => 123,
+                    'id'       => 1,
+                    'title'    => 'test',
+                    'start'    => $startDate,
+                    'end'      => $endDate
+                ],
+                'calendarId' => null,
+                'expected'   => [
+                    'calendar'         => 123,
+                    'id'               => 1,
+                    'title'            => 'test',
+                    'description'      => null,
+                    'start'            => $startDate->format('c'),
+                    'end'              => $endDate->format('c'),
+                    'allDay'           => false,
+                    'backgroundColor'  => null,
+                    'createdAt'        => null,
+                    'updatedAt'        => null,
+                    'parentEventId'    => null,
+                    'invitationStatus' => null,
+                    'childEvents'      => [],
+                    'invitedUsers'     => [],
+                    'editable'         => true,
+                    'removable'        => true,
+                    'notifiable'       => false
+                ]
+            ],
+            'own calendar'           => [
+                'event'      => [
+                    'calendar' => 123,
+                    'id'       => 1,
+                    'title'    => 'test',
+                    'start'    => $startDate,
+                    'end'      => $endDate
+                ],
+                'calendarId' => 123,
+                'expected'   => [
+                    'calendar'         => 123,
+                    'id'               => 1,
+                    'title'            => 'test',
+                    'description'      => null,
+                    'start'            => $startDate->format('c'),
+                    'end'              => $endDate->format('c'),
+                    'allDay'           => false,
+                    'backgroundColor'  => null,
+                    'createdAt'        => null,
+                    'updatedAt'        => null,
+                    'parentEventId'    => null,
+                    'invitationStatus' => null,
+                    'childEvents'      => [],
+                    'invitedUsers'     => [],
+                    'editable'         => true,
+                    'removable'        => true,
+                    'notifiable'       => false
+                ]
+            ],
+            'another calendar'       => [
+                'event'      => [
+                    'calendar' => 123,
+                    'id'       => 1,
+                    'title'    => 'test',
+                    'start'    => $startDate,
+                    'end'      => $endDate
+                ],
+                'calendarId' => 456,
+                'expected'   => [
+                    'calendar'         => 123,
+                    'id'               => 1,
+                    'title'            => 'test',
+                    'description'      => null,
+                    'start'            => $startDate->format('c'),
+                    'end'              => $endDate->format('c'),
+                    'allDay'           => false,
+                    'backgroundColor'  => null,
+                    'createdAt'        => null,
+                    'updatedAt'        => null,
+                    'parentEventId'    => null,
+                    'invitationStatus' => null,
+                    'childEvents'      => [],
+                    'invitedUsers'     => [],
+                    'editable'         => false,
+                    'removable'        => false,
+                    'notifiable'       => false
                 ]
             ],
         ];
@@ -167,32 +294,42 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     {
         $events = [];
         foreach ($eventData as $data) {
-            $event = new CalendarEvent();
-            if (!empty($data['id'])) {
-                $reflection = new \ReflectionProperty(get_class($event), 'id');
-                $reflection->setAccessible(true);
-                $reflection->setValue($event, $data['id']);
-            }
-            if (!empty($data['title'])) {
-                $event->setTitle($data['title']);
-            }
-            if (!empty($data['start'])) {
-                $event->setStart($data['start']);
-            }
-            if (!empty($data['end'])) {
-                $event->setEnd($data['end']);
-            }
-            if (!empty($data['calendar'])) {
-                $calendar = new Calendar();
-                $event->setCalendar($calendar);
-                $reflection = new \ReflectionProperty(get_class($calendar), 'id');
-                $reflection->setAccessible(true);
-                $reflection->setValue($calendar, $data['calendar']);
-            }
-
-            $events[] = $event;
+            $events[] = $this->buildCalendarEvent($data);
         }
 
         return $events;
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return CalendarEvent
+     */
+    protected function buildCalendarEvent(array $data)
+    {
+        $event = new CalendarEvent();
+        if (!empty($data['id'])) {
+            $reflection = new \ReflectionProperty(get_class($event), 'id');
+            $reflection->setAccessible(true);
+            $reflection->setValue($event, $data['id']);
+        }
+        if (!empty($data['title'])) {
+            $event->setTitle($data['title']);
+        }
+        if (!empty($data['start'])) {
+            $event->setStart($data['start']);
+        }
+        if (!empty($data['end'])) {
+            $event->setEnd($data['end']);
+        }
+        if (!empty($data['calendar'])) {
+            $calendar = new Calendar();
+            $event->setCalendar($calendar);
+            $reflection = new \ReflectionProperty(get_class($calendar), 'id');
+            $reflection->setAccessible(true);
+            $reflection->setValue($calendar, $data['calendar']);
+        }
+
+        return $event;
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Data\ORM;
 
 use Oro\Bundle\EmailBundle\Migrations\Data\ORM\AbstractEmailFixture;
 
-class LoadEmailTemplates extends AbstractEmailFixture
+class LoadInvitationEmailTemplates extends AbstractEmailFixture
 {
     /**
      * Return path to email templates
@@ -15,6 +15,6 @@ class LoadEmailTemplates extends AbstractEmailFixture
     {
         return $this->container
             ->get('kernel')
-            ->locateResource('@OroCalendarBundle/Migrations/Data/ORM/data/emails/events');
+            ->locateResource('@OroCalendarBundle/Migrations/Data/ORM/data/emails/invitation');
     }
 }
