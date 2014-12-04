@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ReminderBundle\Entity\Manager;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
@@ -40,17 +41,11 @@ class ReminderManager
         }
 
         $reminders = $entity->getReminders();
-        $reminderData = $entity->getReminderData();
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
         $em = $this->doctrineHelper->getEntityManager('OroReminderBundle:Reminder');
 
-        if (!$reminders instanceof RemindersPersistentCollection) {
-            foreach ($reminders as $reminder) {
-                $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
-                $em->persist($reminder);
-            }
-        } else {
+        if ($reminders instanceof RemindersPersistentCollection) {
             if ($reminders->isDirty()) {
                 foreach ($reminders->getInsertDiff() as $reminder) {
                     $em->persist($reminder);
@@ -59,8 +54,27 @@ class ReminderManager
                     $em->remove($reminder);
                 }
             }
-            foreach ($reminders as $reminder) {
-                $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
+            if (!$reminders->isEmpty()) {
+                $reminderData = $entity->getReminderData();
+                foreach ($reminders as $reminder) {
+                    $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
+                }
+            }
+        } elseif ($reminders instanceof Collection) {
+            if (!$reminders->isEmpty()) {
+                $reminderData = $entity->getReminderData();
+                foreach ($reminders as $reminder) {
+                    $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
+                    $em->persist($reminder);
+                }
+            }
+        } elseif (is_array($reminders)) {
+            if (!empty($reminders)) {
+                $reminderData = $entity->getReminderData();
+                foreach ($reminders as $reminder) {
+                    $this->syncEntityReminder($reminder, $reminderData, $entityClass, $entityId);
+                    $em->persist($reminder);
+                }
             }
         }
     }
