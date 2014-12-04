@@ -379,7 +379,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
          * @returns {moment}
          */
         formatDateTimeForModel: function (date) {
-            return date.clone().utc().toDate();
+            return dateTimeFormatter.convertDateTimeToBackendFormat(date.clone().utc().toDate());
         },
 
         showSavingMask: function () {
