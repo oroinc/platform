@@ -153,7 +153,7 @@ class CalendarEventType extends AbstractType
     {
         /** @var CalendarEvent $parentEvent */
         $parentEvent = $event->getForm()->getData();
-        if ($parentEvent) {
+        if ($parentEvent && !$parentEvent->getChildEvents()->isEmpty()) {
             $this->setDefaultEventStatus($parentEvent, CalendarEvent::ACCEPTED);
 
             foreach ($parentEvent->getChildEvents() as $calendarEvent) {
