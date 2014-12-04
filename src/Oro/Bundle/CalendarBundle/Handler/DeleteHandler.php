@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityNotFoundException;
 
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler as BaseDeleteHandler;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class DeleteHandler extends BaseDeleteHandler
 {
@@ -33,9 +34,9 @@ class DeleteHandler extends BaseDeleteHandler
         $em = $manager->getObjectManager();
         $this->checkPermissions($entity, $em);
         $this->deleteEntity($entity, $em);
+        $this->emailSendProcessor->sendDeleteEventNotification($entity);
         $em->flush();
 
-        $this->emailSendProcessor->sendDeleteEventNotification($entity);
     }
 
 }

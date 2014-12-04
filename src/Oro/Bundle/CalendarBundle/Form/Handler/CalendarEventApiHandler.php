@@ -4,8 +4,12 @@ namespace Oro\Bundle\CalendarBundle\Form\Handler;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
 
 class CalendarEventApiHandler
 {
@@ -24,19 +28,28 @@ class CalendarEventApiHandler
      */
     protected $manager;
 
+    /** @var EmailSendProcessor */
+    protected $emailSendProcessor;
+
     /** @var CalendarEvent */
     protected $dirtyEntity;
 
     /**
-     * @param FormInterface $form
-     * @param Request       $request
-     * @param ObjectManager $manager
+     * @param FormInterface      $form
+     * @param Request            $request
+     * @param ObjectManager      $manager
+     * @param EmailSendProcessor $emailSendProcessor
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $manager)
-    {
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        ObjectManager $manager,
+        EmailSendProcessor $emailSendProcessor
+    ) {
         $this->form    = $form;
         $this->request = $request;
         $this->manager = $manager;
+        $this->emailSendProcessor  = $emailSendProcessor;
     }
 
     /**
@@ -50,12 +63,16 @@ class CalendarEventApiHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->dirtyEntity = $entity;
+            $dirtyEntity = clone $entity;
+            $originalChildren = new ArrayCollection();
+            foreach ($entity->getChildEvents() as $childEvent) {
+                $originalChildren->add($childEvent);
+            }
 
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
-                $this->onSuccess($entity);
+                $this->onSuccess($entity, $dirtyEntity, $originalChildren);
                 return true;
             }
         }
@@ -66,19 +83,21 @@ class CalendarEventApiHandler
     /**
      * "Success" form handler
      *
-     * @param CalendarEvent $entity
+     * @param CalendarEvent   $entity
+     * @param CalendarEvent   $dirtyEntity
+     * @param ArrayCollection $originalChildren
      */
-    protected function onSuccess(CalendarEvent $entity)
+    protected function onSuccess(CalendarEvent $entity, CalendarEvent $dirtyEntity, ArrayCollection $originalChildren)
     {
         $new = $entity->getId() ? false : true;
-
         $this->manager->persist($entity);
-        $this->manager->flush();
 
         if ($new) {
             $this->emailSendProcessor->sendInviteNotification($entity);
         } else {
-            $this->emailSendProcessor->sendUpdateEventNotification($entity, $this->dirtyEntity);
+            $this->emailSendProcessor->sendUpdateParentEventNotification($entity, $dirtyEntity, $originalChildren);
         }
+
+        $this->manager->flush();
     }
 }

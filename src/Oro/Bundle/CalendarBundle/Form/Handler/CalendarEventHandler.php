@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Handler;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
@@ -106,7 +107,11 @@ class CalendarEventHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->dirtyEntity = $entity;
+            $dirtyEntity = clone $entity;
+            $originalChildren = new ArrayCollection();
+            foreach ($entity->getChildEvents() as $childEvent) {
+                $originalChildren->add($childEvent);
+            }
 
             $this->form->submit($this->request);
 
@@ -134,7 +139,7 @@ class CalendarEventHandler
                     }
                 }
 
-                $this->onSuccess($entity);
+                $this->onSuccess($entity, $dirtyEntity, $originalChildren);
 
                 return true;
             }
@@ -147,18 +152,20 @@ class CalendarEventHandler
      * "Success" form handler
      *
      * @param CalendarEvent $entity
+     * @param CalendarEvent   $dirtyEntity
+     * @param ArrayCollection $originalChildren
      */
-    protected function onSuccess(CalendarEvent $entity)
+    protected function onSuccess(CalendarEvent $entity, CalendarEvent $dirtyEntity, ArrayCollection $originalChildren)
     {
         $new = $entity->getId() ? false : true;
-
         $this->manager->persist($entity);
-        $this->manager->flush();
 
         if ($new) {
             $this->emailSendProcessor->sendInviteNotification($entity);
         } else {
-            $this->emailSendProcessor->sendUpdateEventNotification($entity, $this->dirtyEntity);
+            $this->emailSendProcessor->sendUpdateParentEventNotification($entity, $dirtyEntity, $originalChildren);
         }
+
+        $this->manager->flush();
     }
 }

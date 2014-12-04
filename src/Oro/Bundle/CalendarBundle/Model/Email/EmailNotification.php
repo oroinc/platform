@@ -57,7 +57,7 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function setTemplateName($templateName)
     {
-        $this->setTemplateName($templateName);
+        $this->templateName = $templateName;
     }
 
     /**
