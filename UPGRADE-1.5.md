@@ -53,3 +53,6 @@ UPGRADE FROM 1.4 to 1.5
 ####OroUIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
+
+####OroSearchBundle:
+- Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.

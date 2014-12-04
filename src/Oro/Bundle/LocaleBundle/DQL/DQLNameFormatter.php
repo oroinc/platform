@@ -10,29 +10,28 @@ class DQLNameFormatter
     protected $nameFormatter;
 
     /** @var array */
-    protected $namePartsMap
-        = [
-            'prefix'      => [
-                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NamePrefixInterface',
-                'suggestedFieldName' => 'namePrefix'
-            ],
-            'first_name'  => [
-                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\FirstNameInterface',
-                'suggestedFieldName' => 'firstName'
-            ],
-            'middle_name' => [
-                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\MiddleNameInterface',
-                'suggestedFieldName' => 'middleName'
-            ],
-            'last_name'   => [
-                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\LastNameInterface',
-                'suggestedFieldName' => 'lastName'
-            ],
-            'suffix'      => [
-                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NameSuffixInterface',
-                'suggestedFieldName' => 'nameSuffix'
-            ],
-        ];
+    protected $namePartsMap = [
+        'prefix'      => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NamePrefixInterface',
+            'suggestedFieldName' => 'namePrefix'
+        ],
+        'first_name'  => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\FirstNameInterface',
+            'suggestedFieldName' => 'firstName'
+        ],
+        'middle_name' => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\MiddleNameInterface',
+            'suggestedFieldName' => 'middleName'
+        ],
+        'last_name'   => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\LastNameInterface',
+            'suggestedFieldName' => 'lastName'
+        ],
+        'suffix'      => [
+            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NameSuffixInterface',
+            'suggestedFieldName' => 'nameSuffix'
+        ],
+    ];
 
     /**
      * @param NameFormatter $nameFormatter
