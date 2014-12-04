@@ -1,0 +1,72 @@
+{% extends 'OroUIBundle:actions:view.html.twig' %}
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
+
+{% oro_title_set({params : {
+    "%entity.title%": entity.title|default('N/A'),
+    "%parent.name%": entity.systemCalendar.name
+}}) %}
+
+{% block navButtons %}
+    {% if editable %}
+        {{ UI.editButton({
+            'path' : path('oro_system_calendar_event_update', { id: entity.id }),
+            'entity_label': 'oro.calendar.calendarevent.entity_label'|trans
+        })  }}
+    {% endif %}
+    {% if removable %}
+        {{ UI.deleteButton({
+            'dataUrl':      path('oro_api_delete_calendarevent', {'id': entity.id}),
+            'dataRedirect': path('oro_system_calendar_view', {'id': entity.systemCalendar.id}),
+            'aCss':         'no-hash remove-button',
+            'dataId':       entity.id,
+            'entity_label': 'oro.calendar.calendarevent.entity_label'|trans
+        }) }}
+    {% endif %}
+{% endblock navButtons %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_system_calendar_index'),
+        'indexLabel':  'oro.calendar.systemcalendar.entity_plural_label'|trans,
+        'entityTitle': entity.title|default('N/A'),
+        'additional': [{
+            'indexPath':   path('oro_system_calendar_view', {'id': entity.systemCalendar.id}),
+            'indexLabel':  entity.systemCalendar.name,
+        }]
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block content_data %}
+    {%- set calendarEventInformation -%}
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderProperty('oro.calendar.calendarevent.title.label'|trans, entity.title) }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, entity.description|escape|nl2br) }}
+                {{ UI.renderProperty('oro.calendar.calendarevent.start.label'|trans, entity.start|oro_format_datetime) }}
+                {{ UI.renderProperty('oro.calendar.calendarevent.end.label'|trans, entity.end|oro_format_datetime) }}
+                {{ UI.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, entity.allDay ? 'Yes'|trans : 'No'|trans) }}
+            </div>
+            <div class="responsive-block">
+                {{ entityConfig.renderDynamicFields(entity) }}
+            </div>
+        </div>
+    {%- endset -%}
+
+    {% set dataBlocks = [
+        {
+            'title': 'General Information'|trans,
+            'class': 'active',
+            'subblocks': [
+                {'data' : [calendarEventInformation]}
+            ]
+        }
+    ] %}
+
+    {% set id = 'calendarEventView' %}
+    {% set data = { 'dataBlocks': dataBlocks } %}
+
+    {{ parent() }}
+{% endblock content_data %}

@@ -72,40 +72,30 @@ class CalendarEventHandler
      * Process form
      *
      * @param  CalendarEvent $entity
+     *
      * @throws \LogicException
      *
      * @return bool  True on successful processing, false otherwise
      */
     public function process(CalendarEvent $entity)
     {
-        if (!$entity->getCalendar()) {
-            if ($this->securityFacade->getLoggedUser() && $this->securityFacade->getOrganization()) {
-                /** @var Calendar $defaultCalendar */
-                $defaultCalendar = $this->manager
-                    ->getRepository('OroCalendarBundle:Calendar')
-                    ->findDefaultCalendar(
-                        $this->securityFacade->getLoggedUser()->getId(),
-                        $this->securityFacade->getOrganization()->getId()
-                    );
-                $entity->setCalendar($defaultCalendar);
-            } else {
-                throw new \LogicException('Current user did not define');
-            }
-        }
-
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
+                $this->ensureCalendarSet($entity);
+
                 $targetEntityClass = $this->entityRoutingHelper->getEntityClassName($this->request);
-
                 if ($targetEntityClass) {
-                    $targetEntityId    = $this->entityRoutingHelper->getEntityId($this->request);
-                    $targetEntity = $this->entityRoutingHelper->getEntityReference($targetEntityClass, $targetEntityId);
-                    $action = $this->entityRoutingHelper->getAction($this->request);
+                    $targetEntityId = $this->entityRoutingHelper->getEntityId($this->request);
+                    $targetEntity   = $this->entityRoutingHelper->getEntityReference(
+                        $targetEntityClass,
+                        $targetEntityId
+                    );
 
+                    $action = $this->entityRoutingHelper->getAction($this->request);
                     if ($action === 'activity') {
                         $this->activityManager->addActivityTarget($entity, $targetEntity);
                     }
@@ -129,6 +119,30 @@ class CalendarEventHandler
         }
 
         return false;
+    }
+
+    /**
+     * @param CalendarEvent $entity
+     *
+     * @throws \LogicException
+     */
+    protected function ensureCalendarSet(CalendarEvent $entity)
+    {
+        if ($entity->getCalendar() || $entity->getSystemCalendar()) {
+            return;
+        }
+        if (!$this->securityFacade->getLoggedUser() || !$this->securityFacade->getOrganization()) {
+            throw new \LogicException('Both logged in user and organization must be defined.');
+        }
+
+        /** @var Calendar $defaultCalendar */
+        $defaultCalendar = $this->manager
+            ->getRepository('OroCalendarBundle:Calendar')
+            ->findDefaultCalendar(
+                $this->securityFacade->getLoggedUser()->getId(),
+                $this->securityFacade->getOrganization()->getId()
+            );
+        $entity->setCalendar($defaultCalendar);
     }
 
     /**

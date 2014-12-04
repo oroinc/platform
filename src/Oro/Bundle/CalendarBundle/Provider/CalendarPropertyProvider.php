@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -100,6 +101,31 @@ class CalendarPropertyProvider
         }
 
         return $result;
+    }
+
+    /**
+     * @param int  $calendarId  The target calendar id
+     * @param bool $subordinate Determines whether events from connected calendars should be included or not
+     *
+     * @return array of [calendarAlias, calendar, visible]
+     */
+    public function getItemsVisibility($calendarId, $subordinate)
+    {
+        $qb = $this->doctrineHelper
+            ->getEntityRepository(self::CALENDAR_PROPERTY_CLASS)
+            ->createQueryBuilder('o')
+            ->select('o.calendarAlias, o.calendar, o.visible')
+            ->where('o.targetCalendar = :calendar_id')
+            ->setParameter('calendar_id', $calendarId);
+        if (!$subordinate) {
+            $qb
+                ->andWhere('o.calendarAlias = :alias AND o.calendar = :calendar_id')
+                ->setParameter('alias', Calendar::CALENDAR_ALIAS);
+        }
+
+        return $qb
+            ->getQuery()
+            ->getArrayResult();
     }
 
     /**

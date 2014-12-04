@@ -4,7 +4,10 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class CalendarEventType extends AbstractType
@@ -62,7 +65,7 @@ class CalendarEventType extends AbstractType
                     'required'           => false,
                     'label'              => 'oro.calendar.calendarevent.backgroundColor.label',
                     'color_schema'       => 'oro_calendar.event_colors',
-                    'empty_value'        => 'oro.calendar.form.no_color',
+                    'empty_value'        => 'oro.calendar.calendarevent.no_color',
                     'allow_empty_color'  => true,
                     'allow_custom_color' => true
                 ]
@@ -75,6 +78,8 @@ class CalendarEventType extends AbstractType
                     'label'    => 'oro.reminder.entity_plural_label'
                 ]
             );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
     }
 
     /**
@@ -84,10 +89,56 @@ class CalendarEventType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                'intention'  => 'calendar_event',
+                'allow_change_calendar' => false,
+                'layout_template'       => false,
+                'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                'intention'             => 'calendar_event'
             ]
         );
+    }
+
+    /**
+     * PRE_SET_DATA event handler
+     *
+     * @param FormEvent $event
+     */
+    public function preSetData(FormEvent $event)
+    {
+        $form   = $event->getForm();
+        $config = $form->getConfig();
+
+        if (!$config->getOption('allow_change_calendar')) {
+            return;
+        }
+
+        if ($config->getOption('layout_template')) {
+            $form->add(
+                'calendarUid',
+                'oro_calendar_choice_template',
+                [
+                    'required' => false,
+                    'mapped'   => false,
+                    'label'    => 'oro.calendar.calendarevent.calendar.label'
+                ]
+            );
+        } else {
+            /** @var CalendarEvent $data */
+            $data = $event->getData();
+            $form->add(
+                $form->getConfig()->getFormFactory()->createNamed(
+                    'calendarUid',
+                    'oro_calendar_choice',
+                    $data ? $data->getCalendarUid() : null,
+                    [
+                        'required'        => false,
+                        'mapped'          => false,
+                        'auto_initialize' => false,
+                        'is_new'          => !$data || !$data->getId(),
+                        'label'           => 'oro.calendar.calendarevent.calendar.label'
+                    ]
+                )
+            );
+        }
     }
 
     /**
