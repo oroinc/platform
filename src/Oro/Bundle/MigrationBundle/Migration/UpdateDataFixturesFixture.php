@@ -30,7 +30,7 @@ class UpdateDataFixturesFixture extends AbstractFixture
      * @inheritdoc
      */
     public function load(ObjectManager $manager)
-    {
+    {return;
         if (!empty($this->dataFixturesClassNames)) {
             $loadedAt = new \DateTime('now', new \DateTimeZone('UTC'));
             foreach ($this->dataFixturesClassNames as $className => $version) {
