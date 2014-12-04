@@ -34,9 +34,8 @@ class DeleteHandler extends BaseDeleteHandler
         $em = $manager->getObjectManager();
         $this->checkPermissions($entity, $em);
         $this->deleteEntity($entity, $em);
-        $this->emailSendProcessor->sendDeleteEventNotification($entity);
         $em->flush();
-
+        $this->emailSendProcessor->sendDeleteEventNotification($entity);
     }
 
 }

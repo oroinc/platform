@@ -84,6 +84,11 @@ class EmailNotification implements EmailNotificationInterface
         return $this->emails;
     }
 
+    public function getEntity()
+    {
+        return $this->calendarEvent;
+    }
+
     /**
      * @param string $className
      * @param string $templateName

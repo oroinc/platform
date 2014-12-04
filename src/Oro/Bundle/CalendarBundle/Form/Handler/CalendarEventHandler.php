@@ -159,13 +159,12 @@ class CalendarEventHandler
     {
         $new = $entity->getId() ? false : true;
         $this->manager->persist($entity);
+        $this->manager->flush();
 
         if ($new) {
             $this->emailSendProcessor->sendInviteNotification($entity);
         } else {
             $this->emailSendProcessor->sendUpdateParentEventNotification($entity, $dirtyEntity, $originalChildren);
         }
-
-        $this->manager->flush();
     }
 }

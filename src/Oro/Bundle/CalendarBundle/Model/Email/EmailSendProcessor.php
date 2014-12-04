@@ -7,19 +7,18 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Model\Email\EmailNotification;
 
 class EmailSendProcessor
 {
     // @TODO: Add name of templates
     const CREATE_INVITE_TEMPLATE_NAME = 'calendar_invitation_invite';
-    const UPDATE_INVITE_TEMPLATE_NAME = 'calendar_invitation_invite';
-    const CANCEL_INVITE_TEMPLATE_NAME = 'calendar_invitation_invite';
-    const UN_INVITE_TEMPLATE_NAME     = 'calendar_invitation_invite';
-    const ACCEPTED_TEMPLATE_NAME      = 'calendar_invitation_invite';
-    const TENTATIVE_TEMPLATE_NAME     = 'calendar_invitation_invite';
-    const DECLINED_TEMPLATE_NAME      = 'calendar_invitation_invite';
-    const REMOVE_CHILD_TEMPLATE_NAME  = 'calendar_invitation_invite';
+    const UPDATE_INVITE_TEMPLATE_NAME = 'calendar_invitation_update';
+    const CANCEL_INVITE_TEMPLATE_NAME = 'calendar_invitation_delete_parent_event';
+    const UN_INVITE_TEMPLATE_NAME     = 'calendar_invitation_uninvite';
+    const ACCEPTED_TEMPLATE_NAME      = 'calendar_invitation_accepted';
+    const TENTATIVE_TEMPLATE_NAME     = 'calendar_invitation_tentative';
+    const DECLINED_TEMPLATE_NAME      = 'calendar_invitation_declined';
+    const REMOVE_CHILD_TEMPLATE_NAME  = 'calendar_invitation_delete_child_event';
 
     /**
      * @var EmailNotificationProcessor
@@ -56,12 +55,14 @@ class EmailSendProcessor
     public function sendInviteNotification(CalendarEvent $calendarEvent)
     {
         if (!$calendarEvent->getParent() && count($calendarEvent->getChildEvents()) > 0) {
-            $this->addEmailNotification(
-                $calendarEvent,
-                $this->getChildEmails($calendarEvent),
-                self::CREATE_INVITE_TEMPLATE_NAME
-            );
-            $this->sendNotificationEmail($calendarEvent);
+            foreach ($calendarEvent->getChildEvents() as $childEvent) {
+                $this->addEmailNotification(
+                    $childEvent,
+                    [$childEvent->getCalendar()->getOwner()->getEmail()],
+                    self::CREATE_INVITE_TEMPLATE_NAME
+                );
+            }
+            $this->process();
         }
     }
 
@@ -87,7 +88,7 @@ class EmailSendProcessor
                 $this->getChildEmails($calendarEvent),
                 self::UPDATE_INVITE_TEMPLATE_NAME
             );
-            $this->sendNotificationEmail($calendarEvent);
+            $this->process();
         }
         // Send notification to new invitees
         foreach ($calendarEvent->getChildEvents() as $childEvent) {
@@ -102,14 +103,14 @@ class EmailSendProcessor
         foreach ($originalChildren as $childEvent) {
             if (false === $calendarEvent->getChildEvents()->contains($childEvent)) {
                 $this->addEmailNotification(
-                    $childEvent,
+                    $calendarEvent,
                     [$childEvent->getCalendar()->getOwner()->getEmail()],
                     self::UN_INVITE_TEMPLATE_NAME
                 );
             }
         }
         if (count($this->emailNotifications) > 0) {
-            $this->sendNotificationEmail($calendarEvent);
+            $this->process();
         }
     }
 
@@ -142,7 +143,7 @@ class EmailSendProcessor
                 $this->getParentEmail($calendarEvent),
                 $templateName
             );
-            $this->sendNotificationEmail($calendarEvent);
+            $this->process();
         }
     }
 
@@ -159,32 +160,24 @@ class EmailSendProcessor
                 $this->getParentEmail($calendarEvent),
                 self::REMOVE_CHILD_TEMPLATE_NAME
             );
-            $this->sendNotificationEmail($calendarEvent);
+            $this->process();
         } else if (count($calendarEvent->getChildEvents()) > 0) {
             $this->addEmailNotification(
                 $calendarEvent,
                 $this->getChildEmails($calendarEvent),
                 self::CANCEL_INVITE_TEMPLATE_NAME
             );
-            $this->sendNotificationEmail($calendarEvent);
+            $this->process();
         }
     }
 
-    /**
-     * Send notification email
-     *
-     * @param CalendarEvent              $calendarEvent
-     */
-    public function sendNotificationEmail(CalendarEvent $calendarEvent)
+    public function process()
     {
-        try {
-            $this->emailNotificationProcessor->process(
-                $calendarEvent,
-                $this->emailNotifications
-            );
-        } catch (\Exception $exception) {
+        foreach ($this->emailNotifications as $notification) {
+            $this->emailNotificationProcessor->process($notification->getEntity(), [$notification]);
         }
         $this->emailNotifications = [];
+        $this->em->flush();
     }
 
     /**
@@ -211,7 +204,7 @@ class EmailSendProcessor
     protected function getParentEmail(CalendarEvent $childEvent)
     {
         if ($childEvent->getParent()) {
-            return (array)$childEvent->getParent()->getCalendar()->getOwner()->getEmail();
+            return [$childEvent->getParent()->getCalendar()->getOwner()->getEmail()];
         } else {
             return [];
         }
