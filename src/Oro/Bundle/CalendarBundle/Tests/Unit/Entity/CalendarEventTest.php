@@ -6,7 +6,10 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
+use Oro\Bundle\ReminderBundle\Model\ReminderData;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CalendarEventTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,6 +39,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
     {
         return array(
             array('calendar', new Calendar()),
+            array('systemCalendar', new SystemCalendar()),
             array('title', 'testTitle'),
             array('description', 'testdDescription'),
             array('start', new \DateTime()),
@@ -199,5 +203,110 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($firstEvent, $masterEvent->getChildEventByCalendar($firstCalendar));
         $this->assertEquals($secondEvent, $masterEvent->getChildEventByCalendar($secondCalendar));
         $this->assertNull($masterEvent->getChildEventByCalendar(new Calendar));
+    }
+
+    public function testGetReminderData()
+    {
+        $obj = new CalendarEvent();
+        ReflectionUtil::setId($obj, 1);
+        $obj->setTitle('testTitle');
+        $calendar = new Calendar();
+        $calendar->setOwner(new User());
+        $obj->setCalendar($calendar);
+        /** @var ReminderData $reminderData */
+        $reminderData = $obj->getReminderData();
+
+        $this->assertEquals($reminderData->getSubject(), $obj->getTitle());
+        $this->assertEquals($reminderData->getExpireAt(), $obj->getStart());
+        $this->assertTrue($reminderData->getRecipient() === $calendar->getOwner());
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Only user's calendar events can have reminders. Event Id: 1.
+     */
+    public function testGetReminderDataWithLogicException()
+    {
+        $obj = new CalendarEvent();
+        ReflectionUtil::setId($obj, 1);
+        $obj->getReminderData();
+    }
+
+    public function testToString()
+    {
+        $obj = new CalendarEvent();
+        $obj->setTitle('testTitle');
+        $this->assertEquals($obj->getTitle(), (string)$obj);
+    }
+
+    public function testGetCalendarUidNoCalendar()
+    {
+        $obj = new CalendarEvent();
+        $this->assertNull($obj->getCalendarUid());
+    }
+
+    public function testGetCalendarUidUserCalendar()
+    {
+        $calendar = new Calendar();
+        ReflectionUtil::setId($calendar, 123);
+
+        $obj = new CalendarEvent();
+        $obj->setCalendar($calendar);
+        $this->assertEquals('user_123', $obj->getCalendarUid());
+    }
+
+    public function testGetCalendarUidSystemCalendar()
+    {
+        $calendar = new SystemCalendar();
+        ReflectionUtil::setId($calendar, 123);
+
+        $obj = new CalendarEvent();
+        $obj->setSystemCalendar($calendar);
+        $this->assertEquals('system_123', $obj->getCalendarUid());
+    }
+
+    public function testGetCalendarUidPublicCalendar()
+    {
+        $calendar = new SystemCalendar();
+        ReflectionUtil::setId($calendar, 123);
+        $calendar->setPublic(true);
+
+        $obj = new CalendarEvent();
+        $obj->setSystemCalendar($calendar);
+        $this->assertEquals('public_123', $obj->getCalendarUid());
+    }
+
+    public function testSetCalendar()
+    {
+        $calendar       = new Calendar();
+        $systemCalendar = new SystemCalendar();
+
+        $obj = new CalendarEvent();
+
+        $this->assertNull($obj->getCalendar());
+        $this->assertNull($obj->getSystemCalendar());
+
+        $obj->setCalendar($calendar);
+        $this->assertSame($calendar, $obj->getCalendar());
+        $this->assertNull($obj->getSystemCalendar());
+
+        $obj->setSystemCalendar($systemCalendar);
+        $this->assertNull($obj->getCalendar());
+        $this->assertSame($systemCalendar, $obj->getSystemCalendar());
+
+        $obj->setCalendar($calendar);
+        $this->assertSame($calendar, $obj->getCalendar());
+        $this->assertNull($obj->getSystemCalendar());
+
+        $obj->setCalendar(null);
+        $this->assertNull($obj->getCalendar());
+
+        $obj->setSystemCalendar($systemCalendar);
+        $this->assertNull($obj->getCalendar());
+        $this->assertSame($systemCalendar, $obj->getSystemCalendar());
+
+        $obj->setSystemCalendar(null);
+        $this->assertNull($obj->getCalendar());
+        $this->assertNull($obj->getSystemCalendar());
     }
 }

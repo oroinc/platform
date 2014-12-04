@@ -4,13 +4,16 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\EventListener\EntityListener;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EntityListenerTest extends \PHPUnit_Framework_TestCase
@@ -20,6 +23,9 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $uow;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityContext;
 
     /** @var EntityListener */
     protected $listener;
@@ -36,7 +42,56 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
 
-        $this->listener = new EntityListener();
+        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $securityContextLink   =
+            $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $securityContextLink->expects($this->any())->method('getService')
+            ->will($this->returnValue($this->securityContext));
+
+        $this->listener = new EntityListener($securityContextLink);
+    }
+
+    /**
+     * Test update of public calendar
+     */
+    public function testPreUpdatePublicCalendar()
+    {
+        $entity = new SystemCalendar();
+        $entity->setOrganization(new Organization());
+        $this->assertNotNull($entity->getOrganization());
+
+        $changeSet = [];
+        $args      = new PreUpdateEventArgs($entity, $this->em, $changeSet);
+
+        $entity->setPublic(true);
+        $this->listener->preUpdate($args);
+        $this->assertNull($entity->getOrganization());
+    }
+
+    /**
+     * Test update of system calendar
+     */
+    public function testPreUpdateSystemCalendar()
+    {
+        $organization = new Organization();
+
+        $entity = new SystemCalendar();
+        $this->assertNull($entity->getOrganization());
+
+        $changeSet = [];
+        $args      = new PreUpdateEventArgs($entity, $this->em, $changeSet);
+
+        $token = new UsernamePasswordOrganizationToken(new User(), 'admin', 'key', $organization);
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $this->listener->preUpdate($args);
+        $this->assertSame($organization, $entity->getOrganization());
     }
 
     /**

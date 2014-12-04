@@ -16,8 +16,8 @@
                     UI.deleteButton({
                         'aCss': 'no-hash',
                         'id': 'btn-remove-calendarevent',
-                        'dataMessage': 'Are you sure you want to delete this event?',
-                        'title': 'Delete event',
+                        'dataMessage': 'oro.calendar.delete_event.confirmation',
+                        'title': 'oro.calendar.delete_event.title',
                         'label': 'Delete',
                         'data': {'action-name': 'delete'}
                     })
@@ -98,22 +98,17 @@
             form_row(form.end),
             form_row(form.allDay),
             form_row(form.backgroundColor),
+            form.calendarUid is defined ? form_row(form.calendarUid) : null,
             form_row(form.reminders),
             form_row(form.childEvents),
             form_row(form.notifyInvitedUsers)
         ]
     %}
-    {% set templateReplacement = {
-        '<script': '<% print("<sc" + "ript") %>',
-        '</script>': '<% print("</sc" + "ript>") %>',
-        '<%': '<% print("<" + "%") %>',
-        '%>': '<% print("%" + ">") %>',
-    } %}
     <div class="widget-content">
         <div class="alert alert-error" style="display: none;"></div>
         <form id="{{ form.vars.name }}" action="#">
             <fieldset class="form-horizontal">
-                {{ UI.scrollSubblock(null, data, true, false)|replace(templateReplacement)|raw }}
+                {{ UI.scrollSubblock(null, data, true, false)|oro_js_template_content|raw }}
                 <% if (typeof notifiable !== 'undefined' && notifiable) { %>
                     {{ _self.notifyGuestsComponent() }}
                 <% } %>
@@ -123,8 +118,8 @@
                         UI.deleteButton({
                             'aCss': 'no-hash',
                             'id': 'btn-remove-calendarevent',
-                            'dataMessage': 'Are you sure you want to delete this event?',
-                            'title': 'Delete event',
+                            'dataMessage': 'oro.calendar.delete_event.confirmation',
+                            'title': 'oro.calendar.delete_event.title',
                             'label': 'Delete',
                             'data': {'action-name': 'delete'}
                         })
@@ -137,7 +132,7 @@
                 </div>
             </fieldset>
         </form>
-        {{ oro_form_js_validation(form)|replace(templateReplacement)|raw }}
+        {{ oro_form_js_validation(form)|oro_js_template_content|raw }}
     </div>
 </script>
 {% endmacro %}

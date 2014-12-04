@@ -4,60 +4,57 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Provider\CalendarEventNormalizer;
+use Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer;
 
-class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
+class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrine;
+    protected $reminderManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $reminderManager;
+    protected $doctrineHelper;
 
-    /** @var CalendarEventNormalizer */
+    /** @var UserCalendarEventNormalizer */
     protected $normalizer;
 
     protected function setUp()
     {
-        $this->doctrine       = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->reminderManager = $this->getMockBuilder('Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->securityFacade  = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper  = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->normalizer = new CalendarEventNormalizer(
-            $this->doctrine,
+        $this->normalizer = new UserCalendarEventNormalizer(
+            $this->reminderManager,
             $this->securityFacade,
-            $this->reminderManager
+            $this->doctrineHelper
         );
     }
 
     /**
      * @dataProvider getCalendarEventsProvider
      */
-    public function testGetCalendarEvents($events, $expected)
+    public function testGetCalendarEvents($events, $invitees, $expectedParentEventIds, $expected)
     {
         $calendarId = 123;
-        $qb         = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->getMock();
-        $query      = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(['getResult'])
+            ->setMethods(['getArrayResult'])
             ->getMockForAbstractClass();
-        $qb->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($query));
         $query->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnValue($this->buildCalendarEvents($events)));
+            ->method('getArrayResult')
+            ->will($this->returnValue($events));
+
+        $this->setGetInvitedUsersExpectations($invitees, $expectedParentEventIds);
 
         if (!empty($events)) {
             $this->securityFacade->expects($this->exactly(2))
@@ -76,7 +73,7 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('applyReminders')
             ->with($expected, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
-        $result = $this->normalizer->getCalendarEvents($calendarId, $qb);
+        $result = $this->normalizer->getCalendarEvents($calendarId, $query);
         $this->assertEquals($expected, $result);
     }
 
@@ -86,21 +83,32 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         $endDate   = $startDate->add(new \DateInterval('PT1H'));
 
         return [
-            [
-                'events'    => [],
-                'expected'  => []
+            'no events'             => [
+                'events'                 => [],
+                'invitees'               => [],
+                'expectedParentEventIds' => [],
+                'expected'               => []
             ],
-            [
-                'events'    => [
+            'event without invitees' => [
+                'events'                 => [
                     [
-                        'calendar' => 123,
-                        'id'       => 1,
-                        'title'    => 'test',
-                        'start'    => $startDate,
-                        'end'      => $endDate
+                        'calendar'         => 123,
+                        'id'               => 1,
+                        'title'            => 'test',
+                        'description'      => null,
+                        'start'            => $startDate,
+                        'end'              => $endDate,
+                        'allDay'           => false,
+                        'backgroundColor'  => null,
+                        'createdAt'        => null,
+                        'updatedAt'        => null,
+                        'parentEventId'    => null,
+                        'invitationStatus' => null
                     ],
                 ],
-                'expected'  => [
+                'invitees'               => [],
+                'expectedParentEventIds' => [1],
+                'expected'               => [
                     [
                         'calendar'         => 123,
                         'id'               => 1,
@@ -122,17 +130,29 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]
             ],
-            [
-                'events'    => [
+            'event with invitees' => [
+                'events'                 => [
                     [
-                        'calendar' => 123,
-                        'id'       => 1,
-                        'title'    => 'test',
-                        'start'    => $startDate,
-                        'end'      => $endDate
+                        'calendar'         => 123,
+                        'id'               => 1,
+                        'title'            => 'test',
+                        'description'      => null,
+                        'start'            => $startDate,
+                        'end'              => $endDate,
+                        'allDay'           => false,
+                        'backgroundColor'  => null,
+                        'createdAt'        => null,
+                        'updatedAt'        => null,
+                        'parentEventId'    => null,
+                        'invitationStatus' => null
                     ],
                 ],
-                'expected'  => [
+                'invitees'               => [
+                    ['parentEventId' => 1, 'eventId' => 2, 'userId' => 21],
+                    ['parentEventId' => 1, 'eventId' => 3, 'userId' => 31],
+                ],
+                'expectedParentEventIds' => [1],
+                'expected'               => [
                     [
                         'calendar'         => 123,
                         'id'               => 1,
@@ -146,8 +166,8 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                         'updatedAt'        => null,
                         'parentEventId'    => null,
                         'invitationStatus' => null,
-                        'childEvents'      => [],
-                        'invitedUsers'     => [],
+                        'childEvents'      => [2, 3],
+                        'invitedUsers'     => [21, 31],
                         'editable'         => true,
                         'removable'        => true,
                         'notifiable'       => false
@@ -160,7 +180,7 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getCalendarEventProvider
      */
-    public function testGetCalendarEvent($event, $calendarId, $expected)
+    public function testGetCalendarEvent($event, $calendarId, $invitees, $expectedParentEventIds, $expected)
     {
         $this->securityFacade->expects($this->any())
             ->method('isGranted')
@@ -172,6 +192,8 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+
+        $this->setGetInvitedUsersExpectations($invitees, $expectedParentEventIds);
 
         $this->reminderManager->expects($this->once())
             ->method('applyReminders')
@@ -186,7 +208,6 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-
      * @return array
      */
     public function getCalendarEventProvider()
@@ -196,15 +217,24 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 
         return [
             'calendar not specified' => [
-                'event'      => [
-                    'calendar' => 123,
-                    'id'       => 1,
-                    'title'    => 'test',
-                    'start'    => $startDate,
-                    'end'      => $endDate
+                'event'                  => [
+                    'calendar'         => 123,
+                    'id'               => 1,
+                    'title'            => 'test',
+                    'description'      => null,
+                    'start'            => $startDate,
+                    'end'              => $endDate,
+                    'allDay'           => false,
+                    'backgroundColor'  => null,
+                    'createdAt'        => null,
+                    'updatedAt'        => null,
+                    'parentEventId'    => null,
+                    'invitationStatus' => null
                 ],
-                'calendarId' => null,
-                'expected'   => [
+                'calendarId'             => null,
+                'invitees'               => [],
+                'expectedParentEventIds' => [1],
+                'expected'               => [
                     'calendar'         => 123,
                     'id'               => 1,
                     'title'            => 'test',
@@ -225,15 +255,24 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'own calendar'           => [
-                'event'      => [
-                    'calendar' => 123,
-                    'id'       => 1,
-                    'title'    => 'test',
-                    'start'    => $startDate,
-                    'end'      => $endDate
+                'event'                  => [
+                    'calendar'         => 123,
+                    'id'               => 1,
+                    'title'            => 'test',
+                    'description'      => null,
+                    'start'            => $startDate,
+                    'end'              => $endDate,
+                    'allDay'           => false,
+                    'backgroundColor'  => null,
+                    'createdAt'        => null,
+                    'updatedAt'        => null,
+                    'parentEventId'    => null,
+                    'invitationStatus' => null
                 ],
-                'calendarId' => 123,
-                'expected'   => [
+                'calendarId'             => 123,
+                'invitees'               => [],
+                'expectedParentEventIds' => [1],
+                'expected'               => [
                     'calendar'         => 123,
                     'id'               => 1,
                     'title'            => 'test',
@@ -254,15 +293,23 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'another calendar'       => [
-                'event'      => [
-                    'calendar' => 123,
-                    'id'       => 1,
-                    'title'    => 'test',
-                    'start'    => $startDate,
-                    'end'      => $endDate
+                'event'                  => [
+                    'calendar'         => 123,
+                    'id'               => 1,
+                    'title'            => 'test',
+                    'start'            => $startDate,
+                    'end'              => $endDate,
+                    'allDay'           => false,
+                    'backgroundColor'  => null,
+                    'createdAt'        => null,
+                    'updatedAt'        => null,
+                    'parentEventId'    => null,
+                    'invitationStatus' => null
                 ],
-                'calendarId' => 456,
-                'expected'   => [
+                'calendarId'             => 456,
+                'invitees'               => [],
+                'expectedParentEventIds' => [1],
+                'expected'               => [
                     'calendar'         => 123,
                     'id'               => 1,
                     'title'            => 'test',
@@ -285,19 +332,35 @@ class CalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    /**
-     * @param array $eventData
-     *
-     * @return array
-     */
-    protected function buildCalendarEvents(array $eventData)
+    protected function setGetInvitedUsersExpectations($invitees, $expectedParentEventIds)
     {
-        $events = [];
-        foreach ($eventData as $data) {
-            $events[] = $this->buildCalendarEvent($data);
-        }
+        if (!empty($expectedParentEventIds)) {
+            $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $repo->expects($this->once())
+                ->method('getInvitedUsersByParentsQueryBuilder')
+                ->with($expectedParentEventIds)
+                ->will($this->returnValue($qb));
+            $this->doctrineHelper->expects($this->once())
+                ->method('getEntityRepository')
+                ->with('OroCalendarBundle:CalendarEvent')
+                ->will($this->returnValue($repo));
 
-        return $events;
+            $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+                ->disableOriginalConstructor()
+                ->setMethods(['getArrayResult'])
+                ->getMockForAbstractClass();
+            $qb->expects($this->once())
+                ->method('getQuery')
+                ->will($this->returnValue($query));
+            $query->expects($this->once())
+                ->method('getArrayResult')
+                ->will($this->returnValue($invitees));
+        }
     }
 
     /**

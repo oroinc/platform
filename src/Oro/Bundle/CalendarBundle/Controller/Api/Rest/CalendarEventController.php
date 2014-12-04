@@ -18,11 +18,15 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
+use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 /**
  * @RouteResource("calendarevent")
@@ -101,6 +105,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
         $qb = null;
         if ($this->getRequest()->get('start') && $this->getRequest()->get('end')) {
             $result = $this->get('oro_calendar.calendar_manager')->getCalendarEvents(
+                $this->get('oro_security.security_facade')->getOrganization()->getId(),
                 $this->getUser()->getId(),
                 $calendarId,
                 new \DateTime($this->getRequest()->get('start')),
@@ -114,15 +119,18 @@ class CalendarEventController extends RestController implements ClassResourceInt
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
-            $qb    = $repo->getEventListQueryBuilder($calendarId, $subordinate, $filterCriteria);
+            $qb    = $repo->getUserEventListQueryBuilder($filterCriteria);
             $page  = (int)$this->getRequest()->get('page', 1);
             $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
+            $qb
+                ->andWhere('c.id = :calendarId')
+                ->setParameter('calendarId', $calendarId);
             $qb->setMaxResults($limit)
                 ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
 
-            $result = $this->get('oro_calendar.calendar_event.normalizer')->getCalendarEvents(
+            $result = $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvents(
                 $calendarId,
-                $qb
+                $qb->getQuery()
             );
 
             return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
@@ -150,12 +158,13 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function getAction($id)
     {
+        /** @var CalendarEvent|null $entity */
         $entity = $this->getManager()->find($id);
 
         $result = null;
         $code = Codes::HTTP_NOT_FOUND;
         if ($entity) {
-            $result = $this->get('oro_calendar.calendar_event.normalizer')
+            $result = $this->get('oro_calendar.calendar_event_normalizer.user')
                 ->getCalendarEvent($entity);
             $code   = Codes::HTTP_OK;
         }
@@ -183,12 +192,13 @@ class CalendarEventController extends RestController implements ClassResourceInt
      */
     public function getByCalendarAction($id, $eventId)
     {
+        /** @var CalendarEvent|null $entity */
         $entity = $this->getManager()->find($eventId);
 
         $result = null;
         $code = Codes::HTTP_NOT_FOUND;
         if ($entity) {
-            $result = $this->get('oro_calendar.calendar_event.normalizer')
+            $result = $this->get('oro_calendar.calendar_event_normalizer.user')
                 ->getCalendarEvent($entity, (int)$id);
             $code   = Codes::HTTP_OK;
         }
@@ -293,11 +303,72 @@ class CalendarEventController extends RestController implements ClassResourceInt
         // remove auxiliary attributes if any
         unset($data['createdAt']);
         unset($data['updatedAt']);
-        unset($data['calendarAlias']);
         unset($data['editable']);
         unset($data['removable']);
         unset($data['notifiable']);
 
         return true;
+    }
+
+    /**
+     * @return SystemCalendarConfig
+     */
+    protected function getCalendarConfig()
+    {
+        return $this->get('oro_calendar.system_calendar_config');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleUpdateRequest($id)
+    {
+        /** @var CalendarEvent $entity */
+        $entity = $this->getManager()->find($id);
+
+        if ($entity) {
+            try {
+                if ($this->processForm($entity)) {
+                    $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+                } else {
+                    $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+                }
+            } catch (ForbiddenException $forbiddenEx) {
+                $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+            }
+        } else {
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+        }
+
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleCreateRequest($_ = null)
+    {
+        $entity      = call_user_func_array(array($this, 'createEntity'), func_get_args());
+        try {
+            $isProcessed = $this->processForm($entity);
+
+            if ($isProcessed) {
+                $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
+            } else {
+                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+            }
+        } catch (ForbiddenException $forbiddenEx) {
+            $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
+        }
+
+        return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->get('oro_calendar.calendar_event.handler.delete');
     }
 }

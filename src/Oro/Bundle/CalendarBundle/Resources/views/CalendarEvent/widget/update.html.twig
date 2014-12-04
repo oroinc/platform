@@ -29,6 +29,9 @@
                     {{ form_row(form.end) }}
                     {{ form_row(form.allDay) }}
                     {{ form_row(form.backgroundColor) }}
+                    {% if form.calendarUid is defined %}
+                        {{ form_row(form.calendarUid) }}
+                    {% endif %}
                     {{ form_row(form.reminders) }}
                     {{ form_row(form.childEvents) }}
                     {{ form_rest(form) }}

@@ -70,7 +70,7 @@ class CalendarEventType extends AbstractType
                     'required'           => false,
                     'label'              => 'oro.calendar.calendarevent.backgroundColor.label',
                     'color_schema'       => 'oro_calendar.event_colors',
-                    'empty_value'        => 'oro.calendar.form.no_color',
+                    'empty_value'        => 'oro.calendar.calendarevent.no_color',
                     'allow_empty_color'  => true,
                     'allow_custom_color' => true
                 ]
@@ -97,9 +97,9 @@ class CalendarEventType extends AbstractType
                 [
                     'mapped' => false
                 ]
-            )
-        ;
+            );
 
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
         $this->subscribeOnChildEvents($builder);
     }
 
@@ -109,19 +109,21 @@ class CalendarEventType extends AbstractType
     protected function subscribeOnChildEvents(FormBuilderInterface $builder)
     {
         // extract master event
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'onPreSubmit']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
 
         // get existing events
-        $builder->get('childEvents')->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onChildPostSubmit']);
+        $builder->get('childEvents')->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitChildEvents']);
 
         // synchronize child events
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'onPostSubmit']);
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
     /**
+     * PRE_SUBMIT event handler
+     *
      * @param FormEvent $event
      */
-    public function onPreSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $event)
     {
         $data = $event->getForm()->getData();
         if ($data) {
@@ -130,9 +132,11 @@ class CalendarEventType extends AbstractType
     }
 
     /**
+     * POST_SUBMIT event handler for 'childEvents' child field
+     *
      * @param FormEvent $event
      */
-    public function onChildPostSubmit(FormEvent $event)
+    public function postSubmitChildEvents(FormEvent $event)
     {
         /** @var CalendarEvent[] $data */
         $data = $event->getForm()->getData();
@@ -147,9 +151,11 @@ class CalendarEventType extends AbstractType
     }
 
     /**
+     * POST_SUBMIT event handler
+     *
      * @param FormEvent $event
      */
-    public function onPostSubmit(FormEvent $event)
+    public function postSubmit(FormEvent $event)
     {
         /** @var CalendarEvent $parentEvent */
         $parentEvent = $event->getForm()->getData();
@@ -157,7 +163,8 @@ class CalendarEventType extends AbstractType
             $this->setDefaultEventStatus($parentEvent, CalendarEvent::ACCEPTED);
 
             foreach ($parentEvent->getChildEvents() as $calendarEvent) {
-                $calendarEvent->setTitle($parentEvent->getTitle())
+                $calendarEvent
+                    ->setTitle($parentEvent->getTitle())
                     ->setDescription($parentEvent->getDescription())
                     ->setStart($parentEvent->getStart())
                     ->setEnd($parentEvent->getEnd())
@@ -170,7 +177,7 @@ class CalendarEventType extends AbstractType
 
     /**
      * @param CalendarEvent $calendarEvent
-     * @param string $status
+     * @param string        $status
      */
     protected function setDefaultEventStatus(CalendarEvent $calendarEvent, $status = CalendarEvent::NOT_RESPONDED)
     {
@@ -186,10 +193,56 @@ class CalendarEventType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                'intention'  => 'calendar_event',
+                'allow_change_calendar' => false,
+                'layout_template'       => false,
+                'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                'intention'             => 'calendar_event'
             ]
         );
+    }
+
+    /**
+     * PRE_SET_DATA event handler
+     *
+     * @param FormEvent $event
+     */
+    public function preSetData(FormEvent $event)
+    {
+        $form   = $event->getForm();
+        $config = $form->getConfig();
+
+        if (!$config->getOption('allow_change_calendar')) {
+            return;
+        }
+
+        if ($config->getOption('layout_template')) {
+            $form->add(
+                'calendarUid',
+                'oro_calendar_choice_template',
+                [
+                    'required' => false,
+                    'mapped'   => false,
+                    'label'    => 'oro.calendar.calendarevent.calendar.label'
+                ]
+            );
+        } else {
+            /** @var CalendarEvent $data */
+            $data = $event->getData();
+            $form->add(
+                $form->getConfig()->getFormFactory()->createNamed(
+                    'calendarUid',
+                    'oro_calendar_choice',
+                    $data ? $data->getCalendarUid() : null,
+                    [
+                        'required'        => false,
+                        'mapped'          => false,
+                        'auto_initialize' => false,
+                        'is_new'          => !$data || !$data->getId(),
+                        'label'           => 'oro.calendar.calendarevent.calendar.label'
+                    ]
+                )
+            );
+        }
     }
 
     /**
