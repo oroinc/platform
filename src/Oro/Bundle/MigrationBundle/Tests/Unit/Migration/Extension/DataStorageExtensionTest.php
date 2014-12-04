@@ -9,11 +9,11 @@ class DataStorageExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGet()
     {
         $dataStorage = new DataStorageExtension();
-        $dataStorage->put('test', ['test1'=>'test1']);
+        $dataStorage->put('test', ['test1' => 'test1']);
 
         $this->assertEquals(
             $dataStorage->get('test'),
-            ['test1'=>'test1']
+            ['test1' => 'test1']
         );
 
         $this->assertTrue($dataStorage->has('test'));
@@ -22,7 +22,7 @@ class DataStorageExtensionTest extends \PHPUnit_Framework_TestCase
     public function testHas()
     {
         $dataStorage = new DataStorageExtension();
-        $dataStorage->put('test', ['test1'=>'test1']);
+        $dataStorage->put('test', ['test1' => 'test1']);
 
         $this->assertTrue($dataStorage->has('test'));
     }
