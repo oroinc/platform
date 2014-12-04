@@ -36,6 +36,8 @@ services:
 
     oro_calendar.datagrid.action_permission_provider:
         class: %oro_calendar.datagrid.action_permission_provider.class%
+        arguments:
+            - @oro_security.security_facade
 
     oro_calendar.calendar_event.manager.api:
         class: %oro_calendar.calendar_event.manager.api.class%

@@ -12,6 +12,7 @@ datagrid:
                     - event.end
                     - event.invitationStatus
                     - parent.id as parentId
+                    - owner.id as ownerId
                 from:
                     - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
                 join:

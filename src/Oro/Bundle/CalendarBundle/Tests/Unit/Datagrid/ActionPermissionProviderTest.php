@@ -3,9 +3,17 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\CalendarBundle\Datagrid\ActionPermissionProvider;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 {
+    const ADMIN = 1;
+    const USER  = 2;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @var ActionPermissionProvider
      */
@@ -13,7 +21,10 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->provider = new ActionPermissionProvider();
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->provider = new ActionPermissionProvider($this->securityFacade);
     }
 
     /**
@@ -25,6 +36,12 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetInvitationPermissions(array $params, array $expected)
     {
         $record = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+        $user   = new User();
+        $user->setId(self::ADMIN);
+
+        $this->securityFacade->expects($this->any())
+            ->method('getLoggedUser')
+            ->will($this->returnValue($user));
 
         $record->expects($this->at(0))
             ->method('getValue')
@@ -35,6 +52,11 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getValue')
             ->with('parentId')
             ->will($this->returnValue($params['parentId']));
+
+        $record->expects($this->at(2))
+            ->method('getValue')
+            ->with('ownerId')
+            ->will($this->returnValue($params['ownerId']));
 
         $result = $this->provider->getInvitationPermissions($record);
 
@@ -50,7 +72,8 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             'invitation child' => [
                 'params' => [
                     'invitationStatus' => 'accepted',
-                    'parentId' => '3512'
+                    'parentId' => '3512',
+                    'ownerId' => self::ADMIN
                 ],
                 'expected' => [
                     'accept'      => false,
@@ -63,7 +86,8 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             'invitation parent' => [
                 'params' => [
                     'invitationStatus' => 'accepted',
-                    'parentId' => '3512'
+                    'parentId' => '3512',
+                    'ownerId' => self::ADMIN
                 ],
                 'expected' => [
                     'accept'      => false,
@@ -76,7 +100,8 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             'not invitation' => [
                 'params' => [
                     'invitationStatus' => null,
-                    'parentId' => null
+                    'parentId' => null,
+                    'ownerId' => self::ADMIN
                 ],
                 'expected' => [
                     'accept'      => false,
@@ -84,6 +109,20 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'tentatively' => false,
                     'view'        => true,
                     'update'      => true
+                ]
+            ],
+            'other user invitation' => [
+                'params' => [
+                    'invitationStatus' => 'accepted',
+                    'parentId' => '3512',
+                    'ownerId' => self::USER
+                ],
+                'expected' => [
+                    'accept'      => false,
+                    'decline'     => false,
+                    'tentatively' => false,
+                    'view'        => true,
+                    'update'      => false
                 ]
             ]
         ];
