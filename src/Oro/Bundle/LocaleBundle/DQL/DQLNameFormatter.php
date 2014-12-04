@@ -10,28 +10,29 @@ class DQLNameFormatter
     protected $nameFormatter;
 
     /** @var array */
-    protected $namePartsMap = [
-        'prefix'      => [
-            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NamePrefixInterface',
-            'suggestedFieldName' => 'namePrefix'
-        ],
-        'first_name'  => [
-            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\FirstNameInterface',
-            'suggestedFieldName' => 'firstName'
-        ],
-        'middle_name' => [
-            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\MiddleNameInterface',
-            'suggestedFieldName' => 'middleName'
-        ],
-        'last_name'   => [
-            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\LastNameInterface',
-            'suggestedFieldName' => 'lastName'
-        ],
-        'suffix'      => [
-            'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NameSuffixInterface',
-            'suggestedFieldName' => 'nameSuffix'
-        ],
-    ];
+    protected $namePartsMap
+        = [
+            'prefix'      => [
+                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NamePrefixInterface',
+                'suggestedFieldName' => 'namePrefix'
+            ],
+            'first_name'  => [
+                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\FirstNameInterface',
+                'suggestedFieldName' => 'firstName'
+            ],
+            'middle_name' => [
+                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\MiddleNameInterface',
+                'suggestedFieldName' => 'middleName'
+            ],
+            'last_name'   => [
+                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\LastNameInterface',
+                'suggestedFieldName' => 'lastName'
+            ],
+            'suffix'      => [
+                'interface'          => 'Oro\\Bundle\\LocaleBundle\\Model\\NameSuffixInterface',
+                'suggestedFieldName' => 'nameSuffix'
+            ],
+        ];
 
     /**
      * @param NameFormatter $nameFormatter
@@ -72,13 +73,16 @@ class DQLNameFormatter
                 $prependSeparator = isset($matches[2], $matches[2][$idx]) ? $matches[2][$idx] : '';
                 $lowerCaseKey     = strtolower($key);
                 if (isset($nameParts[$lowerCaseKey])) {
+                    $value = $nameParts[$lowerCaseKey];
                     if ($key !== $lowerCaseKey) {
-                        $nameParts[$lowerCaseKey] = sprintf('UPPER(%s)', $nameParts[$lowerCaseKey]);
+                        $value = sprintf('UPPER(%s)', $nameParts[$lowerCaseKey]);
                     }
-                    $parts[] = $nameParts[$lowerCaseKey];
-                }
 
-                $parts[] = sprintf("'%s'", $prependSeparator);
+                    $parts[] = $value;
+                    if (strlen($prependSeparator) !== 0) {
+                        $parts[] = sprintf("'%s'", $prependSeparator);
+                    }
+                }
             }
         } else {
             throw new \LogicException('Unexpected name format given');
