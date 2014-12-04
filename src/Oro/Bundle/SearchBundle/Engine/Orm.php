@@ -48,7 +48,9 @@ class Orm extends AbstractEngine
         if (null === $class) {
             $this->clearAllSearchIndexes();
             $entityNames = $this->mapper->getEntities();
+            // TODO skip abstract, but include all real
         } else {
+            // TODO fetch real entity for abstract and only clear them
             $this->clearSearchIndexForEntity($class);
             $entityNames = array($class);
         }
