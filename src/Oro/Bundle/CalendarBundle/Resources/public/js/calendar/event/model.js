@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'routing', 'moment'
-    ], function (_, Backbone, routing, moment) {
+define(['underscore', 'backbone', 'routing'
+    ], function (_, Backbone, routing) {
     'use strict';
 
     /**
@@ -57,13 +57,6 @@ define(['underscore', 'backbone', 'routing', 'moment'
             } else {
                 attrs = {};
                 attrs[key] = val;
-            }
-
-            if (moment.isMoment(attrs.start)) {
-                attrs.start = attrs.start.format('YYYY-MM-DD HH:mmZZ');
-            }
-            if (moment.isMoment(attrs.end)) {
-                attrs.end = attrs.end.format('YYYY-MM-DD HH:mmZZ');
             }
 
             options.contentType = 'application/json';
