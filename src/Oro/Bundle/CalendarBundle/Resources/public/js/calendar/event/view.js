@@ -27,6 +27,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             loadingMaskContent: '.loading-content'
         },
 
+        /** @property {Array} */
+        userCalendarOnlyFields: [
+            {fieldName: 'reminders', emptyValue: {}, selector: '.reminders-collection'},
+            {fieldName: 'childEvents', emptyValue: '', selector: 'input[name$="[childEvents]"]'}
+        ],
+
         initialize: function (options) {
             this.options = _.defaults(_.pick(options || {}, _.keys(this.options)), this.options);
             this.viewTemplate = _.template($(options.viewTemplateSelector).html());
@@ -272,7 +278,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             form.find('[name*="backgroundColor"]')
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
             if (modelData.calendarAlias !== 'user') {
-                form.find('.reminders-collection').closest('.control-group').hide();
+                this._showUserCalendarOnlyFields(form, false);
             }
             form.find('[name*="calendarUid"]')
                 .on('change', _.bind(function (e) {
@@ -281,13 +287,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         tagName = $selector.prop('tagName').toUpperCase(),
                         calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
                         colors = this.options.colorManager.getCalendarColors(calendarUid),
-                        newCalendar = this.parseCalendarUid(calendarUid),
-                        $reminders = form.find('.reminders-collection').closest('.control-group');
+                        newCalendar = this.parseCalendarUid(calendarUid);
                     $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
                     if (newCalendar.calendarAlias === 'user') {
-                        $reminders.show();
+                        this._showUserCalendarOnlyFields(form);
                     } else {
-                        $reminders.hide();
+                        this._showUserCalendarOnlyFields(form, false);
                     }
                 }, this));
             return form;
@@ -316,7 +321,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 if (data.calendarUid) {
                     _.extend(data, this.parseCalendarUid(data.calendarUid));
                     if (data.calendarAlias !== 'user') {
-                        data.reminders = {};
+                        _.each(this.userCalendarOnlyFields, function (item) {
+                            if (item.fieldName) {
+                                data[item.fieldName] = item.emptyValue;
+                            }
+                        });
                     }
                 }
                 delete data.calendarUid;
@@ -330,6 +339,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 calendarAlias: calendarUid.substr(0, calendarUid.lastIndexOf('_')),
                 calendar: parseInt(calendarUid.substr(calendarUid.lastIndexOf('_') + 1))
             };
+        },
+
+        _showUserCalendarOnlyFields: function (form, visible) {
+            _.each(this.userCalendarOnlyFields, function (item) {
+                if (item.selector) {
+                    if (_.isUndefined(visible) || visible) {
+                        form.find(item.selector).closest('.control-group').show();
+                    } else {
+                        form.find(item.selector).closest('.control-group').hide();
+                    }
+                }
+            });
         },
 
         setValueByPath: function (obj, value, path) {

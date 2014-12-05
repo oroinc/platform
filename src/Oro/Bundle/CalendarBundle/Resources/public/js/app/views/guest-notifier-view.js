@@ -11,16 +11,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
         initialize: function () {
             var $form = $(this.$el).closest('form'),
                 isModalShown = false,
-                getFormState = function($form) {
+                getFormState = function ($form) {
                     var $submit = $form.find('input[name="input_action"]');
                     $submit.attr('disabled', true);
                     var result = $form.serialize();
                     $submit.attr('disabled', false);
 
-                    return result
+                    return result;
                 },
                 formInitialState = getFormState($form),
-                isChanged = function($currentForm) {
+                isChanged = function ($currentForm) {
                     return getFormState($currentForm) != formInitialState;
                 };
 
@@ -29,7 +29,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             this.$parent.on('submit.' + this.cid, function (e) {
                 if (!isModalShown && isChanged($form)) {
                     var formId = $form.attr('id'),
-                        $notifyInvitedUsers = $form.find('input[name="'+formId+'[notifyInvitedUsers]"]'),
+                        $notifyInvitedUsers = $form.find('input[name="' + formId + '[notifyInvitedUsers]"]'),
                         confirm = new Modal({
                             title: __('Notify invited users'),
                             okText: __('Notify'),
