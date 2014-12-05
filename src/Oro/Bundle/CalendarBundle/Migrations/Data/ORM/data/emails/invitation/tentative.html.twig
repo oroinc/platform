@@ -4,7 +4,7 @@
 @isSystem = 1
 @isEditable = 1
 
-<p><b>{{ entity.calendar.owner.getFullName() }} has changed invitation state to tentative.</b></p>
+<p><b>{{ entity.calendar.owner|oro_format_name|default('N/A') }} has changed invitation state to tentative.</b></p>
 <h1>{{ entity.title }}</h1>
 <div>
     <p><i>Start date:</i> {{ entity.start|date('F j, Y, g:i A') }}</p>

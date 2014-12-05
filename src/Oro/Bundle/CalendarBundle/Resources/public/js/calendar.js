@@ -3,11 +3,14 @@
 /*global define, console*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/loading-mask',
     'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view', 'orocalendar/js/calendar/color-manager',
-    'orolocale/js/formatter/datetime', 'jquery.fullcalendar'
+    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view',
+    'orocalendar/js/calendar/event-decorator',
+    'orocalendar/js/calendar/color-manager', 'orolocale/js/formatter/datetime', 'jquery.fullcalendar'
     ], function (_, Backbone, __, messenger, LoadingMask,
          EventCollection, EventModel, EventView,
-         ConnectionCollection, ConnectionView, ColorManager, dateTimeFormatter) {
+         ConnectionCollection, ConnectionView,
+         eventDecorator,
+         ColorManager, dateTimeFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -166,8 +169,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         addEventToCalendar: function (eventModel) {
-            var fcEvent = eventModel.toJSON();
-
+            var fcEvent = this.createViewModel(eventModel);
             // don't need time zone correction, on add event
             this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
@@ -198,7 +200,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
                 fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
             // copy all fields, except id, from event to fcEvent
-            fcEvent = _.extend(fcEvent, _.pick(eventModel.toJSON(), _.keys(_.omit(fcEvent, ['id']))));
+            fcEvent = _.extend(fcEvent, _.pick(this.createViewModel(eventModel), _.keys(_.omit(fcEvent, ['id']))));
             this.prepareViewModel(fcEvent);
             // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
             this.getCalendarElement().fullCalendar('refetchEvents');
@@ -308,9 +310,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         loadEvents: function (start, end, callback) {
             var onEventsLoad = _.bind(function () {
-                var fcEvents = this.collection.toJSON();
-                _.each(fcEvents, function (fcEvent) {
+                var fcEvents = this.collection.map(function (eventModel) {
+                    var fcEvent = this.createViewModel(eventModel);
                     this.prepareViewModel(fcEvent, false);
+                    return fcEvent;
                 }, this);
                 this.eventsLoaded = {};
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
@@ -345,6 +348,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 callback({});
                 this.showLoadEventsError(err);
             }
+        },
+
+        /**
+         * Creates event entry for rendering in calendar plugin from the given event model
+         *
+         * @param {Object} eventModel
+         */
+        createViewModel: function (eventModel) {
+            return _.pick(
+                eventModel.attributes,
+                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid']
+            );
         },
 
         /**
@@ -425,31 +440,29 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         initializeFullCalendar: function () {
-            var options, keys, self;
-            // prepare options for jQuery FullCalendar control
-            options = {
-                selectHelper: true,
-                events: _.bind(this.loadEvents, this),
-                select: _.bind(this.select, this),
-                eventClick: _.bind(this.eventClick, this),
-                eventDrop: _.bind(this.eventDropOrResize, this),
-                eventResize: _.bind(this.eventDropOrResize, this),
-                loading: _.bind(function (show) {
-                    if (show) {
-                        this.showLoadingMask();
-                    } else {
-                        this._hideMask();
-                    }
-                }, this)
-            };
-            keys = [
-                'date', 'defaultView', 'editable', 'selectable',
-                'header', 'allDayText', 'allDaySlot', 'buttonText',
-                'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
-                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
-                'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
-                'contentHeight'
-            ];
+            var options = { // prepare options for jQuery FullCalendar control
+                    selectHelper: true,
+                    events: _.bind(this.loadEvents, this),
+                    select: _.bind(this.select, this),
+                    eventClick: _.bind(this.eventClick, this),
+                    eventDrop: _.bind(this.eventDropOrResize, this),
+                    eventResize: _.bind(this.eventDropOrResize, this),
+                    loading: _.bind(function (show) {
+                        if (show) {
+                            this.showLoadingMask();
+                        } else {
+                            this._hideMask();
+                        }
+                    }, this)
+                },
+                keys = [
+                    'date', 'defaultView', 'editable', 'selectable',
+                    'header', 'allDayText', 'allDaySlot', 'buttonText',
+                    'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
+                    'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
+                    'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
+                    'contentHeight'
+                ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
                 options.date = dateTimeFormatter.applyTimeZoneCorrection(options.date);
@@ -467,43 +480,17 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 }
             }, this);
 
-            self = this;
-            options.viewDisplay = function () {
-                self.setTimeline();
-                setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
-            };
-            options.windowResize = function () {
-                self.setTimeline();
-            };
+            options.viewDisplay = _.bind(function () {
+                this.setTimeline();
+                setInterval(_.bind(function () { this.setTimeline(); }, this), 5 * 60 * 1000);
+            }, this);
+            options.windowResize = _.bind(function () {
+                this.setTimeline();
+            }, this);
 
-            options.eventAfterRender = function (fcEvent, element) {
-                var reminders = self.collection.get(fcEvent.id).get('reminders');
-                if (reminders && _.keys(reminders).length) {
-                    element.find('.fc-event-inner').append(
-                        '<i class="reminder-status icon-bell" title="' + __('Reminders') + '"></i>'
-                    );
-                } else {
-                    element.find('.reminder-status').remove();
-                }
-                if (fcEvent.invitationStatus === 'tentatively_accepted') {
-                    element.find('.fc-event-inner').prepend(
-                        '<i class="invitation-status icon-question-sign" title="' + __('Tentatively accepted') + '"></i>'
-                    );
-                } else if (fcEvent.invitationStatus === 'not_responded') {
-                    element.find('.fc-event-inner').prepend(
-                        '<i class="invitation-status icon-reply" title="' + __('Not responded') + '"></i>'
-                    );
-                } else if (fcEvent.invitationStatus === 'accepted') {
-                    element.find('.fc-event-inner').prepend(
-                        '<i class="invitation-status icon-ok" title="' + __('Accepted') + '"></i>'
-                    );
-                } else if (fcEvent.invitationStatus === 'declined') {
-                    element.find('.fc-event-inner').addClass('invitation-status-declined');
-                } else {
-                    element.find('.invitation-status').remove();
-                    element.find('.invitation-status-declined').removeClass('invitation-status-declined');
-                }
-            };
+            options.eventAfterRender = _.bind(function (fcEvent, $el) {
+                eventDecorator.decorate(this.collection.get(fcEvent.id), $el);
+            }, this);
 
             // create jQuery FullCalendar control
             this.getCalendarElement().fullCalendar(options);

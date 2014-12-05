@@ -31,6 +31,7 @@ class AjaxCalendarEventController extends Controller
         $em = $this->getDoctrine()->getManager();
         $entity->setInvitationStatus($status);
         $em->flush($entity);
+        $this->get('oro_calendar.send_processor.email')->sendRespondNotification($entity);
 
         return new JsonResponse(['successful' => true]);
     }
