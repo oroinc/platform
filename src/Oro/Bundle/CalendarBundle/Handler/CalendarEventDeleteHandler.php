@@ -4,11 +4,13 @@ namespace Oro\Bundle\CalendarBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
+use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class CalendarEventDeleteHandler extends DeleteHandler
 {
@@ -17,6 +19,21 @@ class CalendarEventDeleteHandler extends DeleteHandler
 
     /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var EmailSendProcessor */
+    protected $emailSendProcessor;
+
+    /**
+     * @param EmailSendProcessor $emailSendProcessor
+     *
+     * @return self
+     */
+    public function setEmailSendProcessor(EmailSendProcessor $emailSendProcessor)
+    {
+        $this->emailSendProcessor = $emailSendProcessor;
+
+        return $this;
+    }
 
     /**
      * @param SystemCalendarConfig $calendarConfig
@@ -66,5 +83,22 @@ class CalendarEventDeleteHandler extends DeleteHandler
         } else {
             parent::checkPermissions($entity, $em);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleDelete($id, ApiEntityManager $manager)
+    {
+        $entity = $manager->find($id);
+        if (!$entity) {
+            throw new EntityNotFoundException();
+        }
+
+        $em = $manager->getObjectManager();
+        $this->checkPermissions($entity, $em);
+        $this->deleteEntity($entity, $em);
+        $em->flush();
+        $this->emailSendProcessor->sendDeleteEventNotification($entity);
     }
 }
