@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\ORM\Query;
@@ -11,6 +12,8 @@ use Doctrine\ORM\Mapping\ClassMetadata;
  * Fixes a Doctrine bug with joining on tables with Joined type inheritance
  *
  * @TODO: This should be removed after upgrading Doctrine to 2.4.6+ (BAP-6712).
+ * @SuppressWarnings(PHPMD)
+ * @codingStandardsIgnoreStart
  */
 class SqlWalker extends DoctrineSqlWalker
 {
@@ -365,3 +368,4 @@ class SqlWalker extends DoctrineSqlWalker
         return $sql;
     }
 }
+// @codingStandardsIgnoreEnd
