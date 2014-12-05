@@ -101,6 +101,13 @@ class ConfigEntity extends CustomEntity
         return $this;
     }
 
+    public function setStorageType($type)
+    {
+        $field = $this->test->select($this->test->byId('oro_entity_extend_field_type_is_serialized'));
+        $field->selectOptionByLabel($type);
+        return $this;
+    }
+
     /**
      * @param string $value
      * @return $this
@@ -149,7 +156,7 @@ class ConfigEntity extends CustomEntity
     public function checkEntityField($fieldName)
     {
         $this->assertElementPresent(
-            "//div[@class='control-group']/label[normalize-space(text()) = '{$fieldName}']",
+            "//div[@class='control-group']/label[contains(., '{$fieldName}')]",
             'Custom entity field not found'
         );
 
