@@ -125,12 +125,13 @@
     Parameters:
         title - property title
         data  - property data
+        empty - a value which should be used if data is empty
 #}
-{% macro renderColorProperty(title, data) %}
+{% macro renderColorProperty(title, data, empty) %}
     {% if data is not none %}
        {% set data = '<i class="color hide-text" title="' ~ data ~ '" style="background-color: ' ~ data ~ ';">' ~ data ~ '</i>' %}
     {% endif %}
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default(empty)|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
