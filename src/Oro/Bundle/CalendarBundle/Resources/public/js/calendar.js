@@ -225,7 +225,7 @@ define(function (require) {
             // fullcalendar doesn't remember new duration during updateEvent
             // so need to store it
             fcEvent.duration = moment.duration(fcEvent.end.diff(fcEvent.start));
-            $('#calendar').fullCalendar('updateEvent', fcEvent);
+            this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
