@@ -22,29 +22,12 @@ class AjaxCalendarEventControllerTest extends WebTestCase
         $this->calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_TITLE);
     }
 
-    public function testNotValidInvitationStatus()
-    {
-        $calendarEventId = $this->calendarEvent->getId();
-        $this->client->request(
-            'GET',
-            $this->getUrl(
-                'oro_calendar_event_change_status',
-                ['id' => $calendarEventId, 'status' => 'wrong']
-            )
-        );
-        $response = $this->client->getResponse();
-        $this->assertEquals(500, $response->getStatusCode());
-        $calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_TITLE);
-        $this->assertSame(null, $calendarEvent->getInvitationStatus());
-    }
-
     public function testChangeInvitationStatus()
     {
         $availableStatuses = [
             CalendarEvent::ACCEPTED,
             CalendarEvent::TENTATIVELY_ACCEPTED,
-            CalendarEvent::DECLINED,
-            CalendarEvent::NOT_RESPONDED,
+            CalendarEvent::DECLINED
         ];
 
         foreach ($availableStatuses as $status) {
@@ -52,13 +35,13 @@ class AjaxCalendarEventControllerTest extends WebTestCase
             $this->client->request(
                 'GET',
                 $this->getUrl(
-                    'oro_calendar_event_change_status',
+                    'oro_calendar_event_'.$status,
                     ['id' => $calendarEventId, 'status' => $status]
                 )
             );
             $response = $this->client->getResponse();
             $data = json_decode($response->getContent(), true);
-            $this->assertTrue($data['success']);
+            $this->assertTrue($data['successful']);
             $calendarEvent = $this->getCalendarEventByTitle(LoadCalendarEventData::CALENDAR_EVENT_TITLE);
             $this->assertEquals($status, $calendarEvent->getInvitationStatus());
         }

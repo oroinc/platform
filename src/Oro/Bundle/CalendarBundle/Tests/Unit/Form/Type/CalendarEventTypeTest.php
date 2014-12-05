@@ -20,7 +20,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->type = new CalendarEventType(array());
+        $this->type = new CalendarEventType();
     }
 
     /**
@@ -81,7 +81,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                     'required'           => false,
                     'label'              => 'oro.calendar.calendarevent.backgroundColor.label',
                     'color_schema'       => 'oro_calendar.event_colors',
-                    'empty_value'        => 'oro.calendar.form.no_color',
+                    'empty_value'        => 'oro.calendar.calendarevent.no_color',
                     'allow_empty_color'  => true,
                     'allow_custom_color' => true
                 )
@@ -115,21 +115,25 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
 
         $builder->expects($this->at(9))
             ->method('addEventListener')
-            ->with(FormEvents::PRE_SUBMIT, [$this->type, 'onPreSubmit']);
+            ->with(FormEvents::PRE_SET_DATA, [$this->type, 'preSetData']);
+
+        $builder->expects($this->at(10))
+            ->method('addEventListener')
+            ->with(FormEvents::PRE_SUBMIT, [$this->type, 'preSubmit']);
 
         $childBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
         $childBuilder->expects($this->once())
             ->method('addEventListener')
-            ->with(FormEvents::POST_SUBMIT, [$this->type, 'onChildPostSubmit']);
+            ->with(FormEvents::POST_SUBMIT, [$this->type, 'postSubmitChildEvents']);
 
-        $builder->expects($this->at(10))
+        $builder->expects($this->at(11))
             ->method('get')
             ->with('childEvents')
             ->will($this->returnValue($childBuilder));
 
-        $builder->expects($this->at(11))
+        $builder->expects($this->at(12))
             ->method('addEventListener')
-            ->with(FormEvents::POST_SUBMIT, [$this->type, 'onPostSubmit']);
+            ->with(FormEvents::POST_SUBMIT, [$this->type, 'postSubmit']);
 
         $this->type->buildForm($builder, array());
     }
@@ -141,8 +145,10 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaults')
             ->with(
                 array(
-                    'data_class' => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                    'intention'  => 'calendar_event',
+                    'allow_change_calendar' => false,
+                    'layout_template'       => false,
+                    'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                    'intention'             => 'calendar_event',
                 )
             );
 
@@ -154,7 +160,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_calendar_event', $this->type->getName());
     }
 
-    public function testOnPreSubmit()
+    public function testPreSubmit()
     {
         $calendarEvent = new CalendarEvent();
         $calendarEvent->setTitle('test');
@@ -165,11 +171,11 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($calendarEvent));
 
         $this->assertAttributeEmpty('parentEvent', $this->type);
-        $this->type->onPreSubmit(new FormEvent($form, []));
+        $this->type->preSubmit(new FormEvent($form, []));
         $this->assertAttributeEquals($calendarEvent, 'parentEvent', $this->type);
     }
 
-    public function testOnChildPostSubmit()
+    public function testPostSubmitChildEvents()
     {
         $firstCalendar = new Calendar();
         $firstCalendar->setName('1');
@@ -202,8 +208,8 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getData')
             ->will($this->returnValue($events));
 
-        $this->type->onPreSubmit(new FormEvent($parentForm, []));
-        $this->type->onChildPostSubmit(new FormEvent($form, []));
+        $this->type->preSubmit(new FormEvent($parentForm, []));
+        $this->type->postSubmitChildEvents(new FormEvent($form, []));
 
         $this->assertCount(2, $events);
         $this->assertEquals($firstExistingEvent, $events[0]);
@@ -233,7 +239,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($parentEvent));
 
         // assert default data with default status
-        $this->type->onPostSubmit(new FormEvent($form, []));
+        $this->type->postSubmit(new FormEvent($form, []));
 
         $this->assertEquals(CalendarEvent::ACCEPTED, $parentEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::NOT_RESPONDED, $firstEvent->getInvitationStatus());
@@ -253,7 +259,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
         $secondEvent->setInvitationStatus(CalendarEvent::TENTATIVELY_ACCEPTED);
 
         // assert modified data
-        $this->type->onPostSubmit(new FormEvent($form, []));
+        $this->type->postSubmit(new FormEvent($form, []));
 
         $this->assertEquals(CalendarEvent::ACCEPTED, $parentEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::DECLINED, $firstEvent->getInvitationStatus());

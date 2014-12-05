@@ -53,3 +53,26 @@ UPGRADE FROM 1.4 to 1.5
 ####OroUIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
+- Added `oro_js_template_content` twig filter to allow include `<script>` blocks inside JS templates. Example of usage:
+
+```twig
+<script type="text/html" id="my_template">
+    {% set data = [
+        form_row(form.name),
+        form_row(form.assignedUsers),
+    ] %}
+    <div class="widget-content">
+        <div class="alert alert-error" style="display: none;"></div>
+        <form id="{{ form.vars.name }}" action="#">
+            <fieldset class="form-horizontal">
+                {{ UI.scrollSubblock(null, data, true, false)|oro_js_template_content|raw }}
+                <div class="widget-actions form-actions" style="display: none;">
+                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                    <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                </div>
+            </fieldset>
+        </form>
+        {{ oro_form_js_validation(form)|oro_js_template_content|raw }}
+    </div>
+</script>
+```

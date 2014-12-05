@@ -112,6 +112,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 // create a view for event details
                 this.eventView = new EventView(_.extend({}, options, {
                     model: eventModel,
+                    calendar: this.options.calendar,
+                    connections: this.getConnectionCollection(),
                     viewTemplateSelector: this.options.eventsOptions.itemViewTemplateSelector,
                     formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector,
                     colorManager: this.colorManager
@@ -182,6 +184,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
             this.addEventToCalendar(eventModel);
 
+            eventModel.set('editable', connectionModel.get('canEditEvent'));
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+
             // make sure that a calendar is visible when a new event is added to it
             if (!connectionModel.get('visible')) {
                 this.connectionsView.showCalendar(connectionModel);
@@ -190,12 +195,16 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         },
 
         onEventChanged: function (eventModel) {
-            var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
+            var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
+                fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, _.pick(eventModel.toJSON(), _.keys(_.omit(fcEvent, ['id']))));
             this.prepareViewModel(fcEvent);
             // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
             this.getCalendarElement().fullCalendar('refetchEvents');
+
+            eventModel.set('editable', connectionModel.get('canEditEvent'));
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
         },
 
         onEventDeleted: function (eventModel) {
@@ -484,6 +493,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                     element.find('.fc-event-inner').prepend(
                         '<i class="invitation-status icon-reply" title="' + __('Not responded') + '"></i>'
                     );
+                } else if (fcEvent.invitationStatus === 'accepted') {
+                    element.find('.fc-event-inner').prepend(
+                        '<i class="invitation-status icon-ok" title="' + __('Accepted') + '"></i>'
+                    );
                 } else if (fcEvent.invitationStatus === 'declined') {
                     element.find('.fc-event-inner').addClass('invitation-status-declined');
                 } else {
@@ -530,7 +543,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                     return lastBackgroundColor;
                 });
                 this.colorManager.setCalendarColors(obj.calendarUid, obj.backgroundColor);
-                if (obj.calendarAlias === 'user') {
+                if (['user', 'system', 'public'].indexOf(obj.calendarAlias) !== -1) {
                     lastBackgroundColor = obj.backgroundColor;
                 }
             }, this));

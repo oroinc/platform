@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 
 class CalendarRepository extends EntityRepository
@@ -27,7 +28,9 @@ class CalendarRepository extends EntityRepository
     }
 
     /**
-     * @param array $userIds
+     * Gets default calendars for the given users
+     *
+     * @param int[] $userIds
      * @param int   $organizationId
      *
      * @return Calendar[]
@@ -41,5 +44,22 @@ class CalendarRepository extends EntityRepository
             ->andWhere($queryBuilder->expr()->in('c.owner', $userIds))
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Returns a query builder which can be used to get all user's calendars
+     *
+     * @param int $organizationId
+     * @param int $userId
+     *
+     * @return QueryBuilder
+     */
+    public function getUserCalendarsQueryBuilder($organizationId, $userId)
+    {
+        return $this->createQueryBuilder('c')
+            ->select('c')
+            ->where('c.organization = :organizationId AND c.owner = :userId')
+            ->setParameter('organizationId', $organizationId)
+            ->setParameter('userId', $userId);
     }
 }

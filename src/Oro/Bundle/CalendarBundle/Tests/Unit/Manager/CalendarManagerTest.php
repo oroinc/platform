@@ -36,9 +36,10 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCalendarsEmpty()
     {
-        $userId      = 123;
-        $calendarId  = 2;
-        $connections = [];
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 2;
+        $connections    = [];
 
         $this->calendarPropertyProvider->expects($this->once())
             ->method('getItems')
@@ -47,14 +48,14 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->provider1->expects($this->once())
             ->method('getCalendarDefaultValues')
-            ->with($userId, $calendarId, [])
+            ->with($organizationId, $userId, $calendarId, [])
             ->will($this->returnValue([]));
         $this->provider2->expects($this->once())
             ->method('getCalendarDefaultValues')
-            ->with($userId, $calendarId, [])
+            ->with($organizationId, $userId, $calendarId, [])
             ->will($this->returnValue([]));
 
-        $result = $this->manager->getCalendars($userId, $calendarId);
+        $result = $this->manager->getCalendars($organizationId, $userId, $calendarId);
         $this->assertSame([], $result);
     }
 
@@ -63,9 +64,10 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCalendars()
     {
-        $userId        = 123;
-        $calendarId    = 2;
-        $connections   = [
+        $organizationId = 123;
+        $userId         = 123;
+        $calendarId     = 2;
+        $connections    = [
             [
                 'id'             => 1,
                 'targetCalendar' => $calendarId,
@@ -73,6 +75,15 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                 'calendar'       => 1,
                 'visible'        => true,
                 'position'       => 2,
+                'extra_field'    => null,
+            ],
+            [
+                'id'             => 2,
+                'targetCalendar' => $calendarId,
+                'calendarAlias'  => 'provider1',
+                'calendar'       => 10,
+                'visible'        => true,
+                'position'       => 3,
                 'extra_field'    => null,
             ],
             [
@@ -105,19 +116,20 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->provider1->expects($this->once())
             ->method('getCalendarDefaultValues')
-            ->with($userId, $calendarId, [1])
+            ->with($organizationId, $userId, $calendarId, [1, 10])
             ->will(
                 $this->returnValue(
                     [
                         1 => [
                             'calendarName' => 'calendar1'
                         ],
+                        10 => null
                     ]
                 )
             );
         $this->provider2->expects($this->once())
             ->method('getCalendarDefaultValues')
-            ->with($userId, $calendarId, [2])
+            ->with($organizationId, $userId, $calendarId, [2])
             ->will(
                 $this->returnValue(
                     [
@@ -131,7 +143,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $result = $this->manager->getCalendars($userId, $calendarId);
+        $result = $this->manager->getCalendars($organizationId, $userId, $calendarId);
         $this->assertEquals(
             [
                 [
@@ -184,15 +196,26 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCalendarEvents()
     {
-        $userId      = 123;
-        $calendarId  = 1;
-        $start       = new \DateTime();
-        $end         = new \DateTime();
-        $subordinate = true;
+        $organizationId = 1;
+        $userId         = 123;
+        $calendarId     = 10;
+        $start          = new \DateTime();
+        $end            = new \DateTime();
+        $subordinate    = true;
+        $allConnections = [
+            ['calendarAlias' => 'provider1', 'calendar' => 10, 'visible' => true],
+            ['calendarAlias' => 'provider1', 'calendar' => 20, 'visible' => false],
+            ['calendarAlias' => 'provider2', 'calendar' => 10, 'visible' => false],
+        ];
+
+        $this->calendarPropertyProvider->expects($this->once())
+            ->method('getItemsVisibility')
+            ->with($calendarId, $subordinate)
+            ->will($this->returnValue($allConnections));
 
         $this->provider1->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($userId, $calendarId, $start, $end, $subordinate)
+            ->with($organizationId, $userId, $calendarId, $start, $end, [10 => true, 20 => false])
             ->will(
                 $this->returnValue(
                     [
@@ -211,7 +234,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
             );
         $this->provider2->expects($this->once())
             ->method('getCalendarEvents')
-            ->with($userId, $calendarId, $start, $end, $subordinate)
+            ->with($organizationId, $userId, $calendarId, $start, $end, [10 => false])
             ->will(
                 $this->returnValue(
                     [
@@ -230,7 +253,7 @@ class CalendarManagerTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $result = $this->manager->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
+        $result = $this->manager->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $subordinate);
         $this->assertEquals(
             [
                 [
