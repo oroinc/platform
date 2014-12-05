@@ -1,85 +1,33 @@
 /*jslint nomen: true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'oroui/js/modal'
-], function ($, _, __, BaseView, Modal) {
+define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'oroui/js/modal'
+    ], function (_, __, BaseView, Modal) {
     'use strict';
 
     var GuestNotifierView = BaseView.extend({
+        /** @property {Array} */
+        exclusions: [
+            'input[name="input_action"]',
+            'input[name$="[backgroundColor]"]',
+            'select[name*="[reminders]"]',
+            'input[name*="[reminders]"]'
+        ],
+
         /**
          * @constructor
          */
         initialize: function () {
-            var $form = $(this.$el).closest('form'),
-                isModalShown = false,
-                getFormState = _.bind(function ($form) {
-                    var $exclude = [
-                            $form.find('input[name="input_action"]'),
-                            $form.find('#oro_calendar_event_form_backgroundColor'),
-                            $form.find('[name*="reminders"]')
-                        ];
-                    this.disabledControls($exclude, true);
-                    var result = $form.serialize();
-                    this.disabledControls($exclude, false);
+            this.$form = this.$el.closest('form');
+            this.formInitialState = this.getFormState();
+            this.isModalShown = false;
 
-                    return result;
-                }, this),
-                formInitialState = getFormState($form),
-                isChanged = _.bind(function ($currentForm) {
-                    var notify,
-                        $exclude = [
-                            $currentForm.find('#oro_calendar_event_form_backgroundColor'),
-                            $currentForm.find('[name*="reminders"]')
-                        ];
-                    this.disabledControls($exclude, true);
-                    notify = getFormState($currentForm) != formInitialState;
-                    this.disabledControls($exclude, false);
-
-                    return notify;
-                }, this);
-
-            this.$parent = $form.parent();
-
-            this.$parent.on('submit.' + this.cid, function (e) {
-                if (!isModalShown && isChanged($form)) {
-                    var formId = $form.attr('id'),
-                        $notifyInvitedUsers = $form.find('input[name="' + formId + '[notifyInvitedUsers]"]'),
-                        confirm = new Modal({
-                            title: __('Notify invited users'),
-                            okText: __('Notify'),
-                            cancelText: __("Don't notify"),
-                            content: __('All invited users will be notified of changes. Do you want to notify all invited users about changes?'),
-                            className: 'modal modal-primary',
-                            okButtonClass: 'btn-primary btn-large',
-                            handleClose: true
-                        });
-
-                    confirm.on('ok', function () {
-                        $notifyInvitedUsers.val(true);
-                        $form.submit();
-                        isModalShown = false;
-                    });
-
-                    confirm.on('cancel', function () {
-                        $form.submit();
-                        isModalShown = false;
-                    });
-
-                    confirm.on('close', function () {
-                        isModalShown = false;
-                    });
-
-                    confirm.open();
-
-                    isModalShown = true;
+            this.$form.parent().on('submit.' + this.cid, _.bind(function (e) {
+                if (!this.isModalShown && this.getFormState() != this.formInitialState) {
+                    this.getConfirmDialog().open();
+                    this.isModalShown = true;
                     e.preventDefault();
                 }
-            });
-        },
-
-        disabledControls: function($controls, state) {
-            _.map($controls, function($control) {
-                $control.attr('disabled', state);
-            });
+            }, this));
         },
 
         /**
@@ -87,11 +35,56 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          */
         dispose: function () {
             if (!this.disposed) {
-                if (this.$parent) {
-                    this.$parent.off('.' + this.cid);
+                if (this.$form) {
+                    this.$form.parent().off('.' + this.cid);
+                }
+                if (this.confirmModal) {
+                    this.confirmModal.dispose();
+                    delete this.confirmModal;
                 }
             }
             GuestNotifierView.__super__.dispose.call(this);
+        },
+
+        getConfirmDialog: function () {
+            if (!this.confirmModal) {
+                this.confirmModal = new Modal({
+                    title: __('Notify invited users'),
+                    okText: __('Notify'),
+                    cancelText: __("Don't notify"),
+                    content: __('All invited users will be notified of changes. Do you want to notify all invited users about changes?'),
+                    className: 'modal modal-primary',
+                    okButtonClass: 'btn-primary btn-large',
+                    handleClose: true
+                });
+                this.listenTo(this.confirmModal, 'ok', _.bind(function () {
+                    this.$form.find('input[name*="[notifyInvitedUsers]"]').val(true);
+                    this.$form.submit();
+                    this.isModalShown = false;
+                }, this));
+                this.listenTo(this.confirmModal, 'cancel', _.bind(function () {
+                    this.$form.submit();
+                    this.isModalShown = false;
+                }, this));
+                this.listenTo(this.confirmModal, 'close', _.bind(function () {
+                    this.isModalShown = false;
+                }, this));
+            }
+            return this.confirmModal;
+        },
+
+        getFormState: function () {
+            this.disableExclusions(true);
+            var result = this.$form.serialize();
+            this.disableExclusions(false);
+
+            return result;
+        },
+
+        disableExclusions: function (state) {
+            _.each(this.exclusions, function (selector) {
+                this.$form.find(selector).attr('disabled', state);
+            }, this);
         }
     });
 

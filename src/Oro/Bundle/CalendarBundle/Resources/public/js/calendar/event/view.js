@@ -24,7 +24,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         /** @property {Object} */
         selectors: {
-            loadingMaskContent: '.loading-content'
+            loadingMaskContent: '.loading-content',
+            backgroundColor: 'input[name$="[backgroundColor]"]',
+            calendarUid: '[name*="calendarUid"]',
+            childEvents: 'input[name$="[childEvents]"]'
         },
 
         /** @property {Array} */
@@ -234,8 +237,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 }
 
                 // hide loading mask if child events users should be updated
-                if (name.indexOf('[childEvents]') != -1 && modelData.childEvents) {
-                    input.on('select2-data-loaded', function() {
+                if (name.indexOf('[childEvents]') !== -1 && modelData.childEvents) {
+                    input.on('select2-data-loaded', function () {
                         self._hideMask();
                     });
                 }
@@ -275,49 +278,33 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData),
                 form = this.fillForm(this.template(templateData), modelData),
                 calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
-            form.find('[name*="backgroundColor"]')
+
+            form.find(this.selectors.backgroundColor)
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
             if (modelData.calendarAlias !== 'user') {
                 this._showUserCalendarOnlyFields(form, false);
             }
-            form.find('[name*="calendarUid"]')
-                .on('change', _.bind(function (e) {
-                    var $emptyColor = form.find('.empty-color'),
-                        $selector = $(e.currentTarget),
-                        tagName = $selector.prop('tagName').toUpperCase(),
-                        calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
-                        colors = this.options.colorManager.getCalendarColors(calendarUid),
-                        newCalendar = this.parseCalendarUid(calendarUid);
-                    $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
-                    if (newCalendar.calendarAlias === 'user') {
-                        this._showUserCalendarOnlyFields(form);
-                    } else {
-                        this._showUserCalendarOnlyFields(form, false);
-                    }
-                }, this));
-            form.find('[name*="childEvents"]')
-                .on('change', _.bind(function (e) {
-                    this.toggleCalendarSelectByChildren(form);
-                }, this));
-            this.toggleCalendarSelectByChildren(form);
-            return form;
-        },
+            this._toggleCalendarUidByChildEvents(form);
 
-        toggleCalendarSelectByChildren: function($form) {
-            var $calendarSelect = $form.find('[name*="calendarUid"]');
-            if ($form.find('[name*="childEvents"]').val()) {
-                $calendarSelect.attr('disabled', '');
-                if (!$calendarSelect.parent().hasClass('disabled')) {
-                    $calendarSelect.parent().addClass('disabled');
-                    $calendarSelect.parent().attr('title', __("You can't change Calendar until Event has Guests"));
+            form.find(this.selectors.calendarUid).on('change', _.bind(function (e) {
+                var $emptyColor = form.find('.empty-color'),
+                    $selector = $(e.currentTarget),
+                    tagName = $selector.prop('tagName').toUpperCase(),
+                    calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
+                    colors = this.options.colorManager.getCalendarColors(calendarUid),
+                    newCalendar = this.parseCalendarUid(calendarUid);
+                $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
+                if (newCalendar.calendarAlias === 'user') {
+                    this._showUserCalendarOnlyFields(form);
+                } else {
+                    this._showUserCalendarOnlyFields(form, false);
                 }
-            } else {
-                $calendarSelect.attr('disabled', false);
-                if ($calendarSelect.parent().hasClass('disabled')) {
-                    $calendarSelect.parent().removeClass('disabled');
-                    $calendarSelect.parent().attr('title', false);
-                }
-            }
+            }, this));
+            form.find(this.selectors.childEvents).on('change', _.bind(function (e) {
+                this._toggleCalendarUidByChildEvents(form);
+            }, this));
+
+            return form;
         },
 
         getEventFormData: function () {
@@ -373,6 +360,23 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     }
                 }
             });
+        },
+
+        _toggleCalendarUidByChildEvents: function (form) {
+            var $calendarUid = form.find(this.selectors.calendarUid);
+            if (form.find(this.selectors.childEvents).val()) {
+                $calendarUid.attr('disabled', 'disabled');
+                $calendarUid.parent().attr('title', __("The calendar cannot be changed because the event has guests"));
+                if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
+                    $calendarUid.parent().find('label').addClass('disabled');
+                }
+            } else {
+                $calendarUid.removeAttr('disabled');
+                $calendarUid.removeAttr('title');
+                if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
+                    $calendarUid.parent().find('label').removeClass('disabled');
+                }
+            }
         },
 
         setValueByPath: function (obj, value, path) {
