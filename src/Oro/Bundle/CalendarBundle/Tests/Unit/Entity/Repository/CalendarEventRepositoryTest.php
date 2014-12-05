@@ -288,4 +288,25 @@ class CalendarEventRepositoryTest extends OrmTestCase
 
         $this->assertTrue($qb->getQuery()->getParameter('allDay')->getValue());
     }
+
+    public function testGetInvitedUsersByParentsQueryBuilder()
+    {
+        $parentEventIds = [1, 2];
+
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
+
+        $qb = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds);
+
+        $this->assertEquals(
+            'SELECT IDENTITY(e.parent) AS parentEventId, e.id AS eventId, u.id AS userId'
+            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            . ' INNER JOIN e.calendar c'
+            . ' INNER JOIN c.owner u'
+            . ' WHERE e.parent IN (:parentEventIds)',
+            $qb->getQuery()->getDQL()
+        );
+
+        $this->assertEquals($parentEventIds, $qb->getQuery()->getParameter('parentEventIds')->getValue());
+    }
 }
