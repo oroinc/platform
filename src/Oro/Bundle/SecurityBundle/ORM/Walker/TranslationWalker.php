@@ -2,20 +2,23 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
-use Gedmo\Translatable\Mapping\Event\Adapter\ORM as TranslatableEventAdapter;
 use Gedmo\Translatable\TranslatableListener;
+use Gedmo\Translatable\Mapping\Event\Adapter\ORM as TranslatableEventAdapter;
+
 use Doctrine\ORM\Query;
-use Doctrine\ORM\Query\TreeWalkerAdapter;
+use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\Exec\SingleSelectExecutor;
 use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
-use Doctrine\ORM\Query\AST\Join;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\SqlWalker as AclSqlWalker;
+
 /**
  * This is a copy of Gedmo\Translatable\Query\TreeWalker\TranslationWalker.
  * It was added here to extend on the fixed version of Doctrine's SqlWalker.
  * @TODO: This should be removed after upgrading Doctrine to 2.4.6+ (BAP-6712).
+ * @SuppressWarnings(PHPMD)
+ * @codingStandardsIgnoreStart
  */
 class TranslationWalker extends AclSqlWalker
 {
@@ -409,3 +412,4 @@ class TranslationWalker extends AclSqlWalker
         return $str;
     }
 }
+// @codingStandardsIgnoreEnd
