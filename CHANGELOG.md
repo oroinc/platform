@@ -1,3 +1,10 @@
+CHANGELOG for 1.4.3
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.3 versions.
+* 1.4.3 (2014-12-05)
+ * List of improvements and fixed bugs
+ - Fixed extended entity is set to "false" after oro:entity-config:update with force
+
 CHANGELOG for 1.4.2
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.4.2 versions.
