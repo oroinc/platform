@@ -109,7 +109,7 @@ class UserType extends AbstractType
                 'oro_organizations_select',
                 array(
                     'required' => false,
-                    'label'    => 'oro.user.form.business_units.label',
+                    'label'    => 'oro.user.form.access_settings.label',
                 )
             );
         }

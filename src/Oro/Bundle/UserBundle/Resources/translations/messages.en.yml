@@ -33,7 +33,7 @@ resetting:
 oro:
     user:
         form:
-            business_units.label: Business Units
+            access_settings.label: Business Units
         menu:
             system_tab.label: System
             user_list.description: List of system users
