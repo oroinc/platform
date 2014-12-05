@@ -31,9 +31,6 @@ class CalendarEventApiHandler
     /** @var EmailSendProcessor */
     protected $emailSendProcessor;
 
-    /** @var CalendarEvent */
-    protected $dirtyEntity;
-
     /**
      * @param FormInterface      $form
      * @param Request            $request

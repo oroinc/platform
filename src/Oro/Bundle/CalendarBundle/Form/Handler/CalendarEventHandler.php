@@ -39,9 +39,6 @@ class CalendarEventHandler
     /** @var EmailSendProcessor */
     protected $emailSendProcessor;
 
-    /** @var CalendarEvent */
-    protected $dirtyEntity;
-
     /**
      * @param FormInterface       $form
      * @param Request             $request
@@ -93,7 +90,6 @@ class CalendarEventHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $dirtyEntity = clone $entity;
             $originalChildren = new ArrayCollection();
             foreach ($entity->getChildEvents() as $childEvent) {
                 $originalChildren->add($childEvent);
@@ -131,7 +127,6 @@ class CalendarEventHandler
 
                 $this->onSuccess(
                     $entity,
-                    $dirtyEntity,
                     $originalChildren,
                     $this->form->get('notifyInvitedUsers')->getData()
                 );
@@ -171,16 +166,11 @@ class CalendarEventHandler
      * "Success" form handler
      *
      * @param CalendarEvent   $entity
-     * @param CalendarEvent   $dirtyEntity
      * @param ArrayCollection $originalChildren
      * @param boolean         $notify
      */
-    protected function onSuccess(
-        CalendarEvent $entity,
-        CalendarEvent $dirtyEntity,
-        ArrayCollection $originalChildren,
-        $notify
-    ) {
+    protected function onSuccess(CalendarEvent $entity, ArrayCollection $originalChildren, $notify)
+    {
         $new = $entity->getId() ? false : true;
         $this->manager->persist($entity);
         $this->manager->flush();
@@ -190,7 +180,6 @@ class CalendarEventHandler
         } else {
             $this->emailSendProcessor->sendUpdateParentEventNotification(
                 $entity,
-                $dirtyEntity,
                 $originalChildren,
                 $notify
             );

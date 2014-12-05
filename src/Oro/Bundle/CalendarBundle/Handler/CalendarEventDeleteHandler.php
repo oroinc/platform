@@ -10,6 +10,7 @@ use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class CalendarEventDeleteHandler extends DeleteHandler
 {
