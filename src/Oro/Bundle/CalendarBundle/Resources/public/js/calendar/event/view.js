@@ -295,7 +295,29 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                         this._showUserCalendarOnlyFields(form, false);
                     }
                 }, this));
+            form.find('[name*="childEvents"]')
+                .on('change', _.bind(function (e) {
+                    this.toggleCalendarSelectByChildren(form);
+                }, this));
+            this.toggleCalendarSelectByChildren(form);
             return form;
+        },
+
+        toggleCalendarSelectByChildren: function($form) {
+            var $calendarSelect = $form.find('[name*="calendarUid"]');
+            if ($form.find('[name*="childEvents"]').val()) {
+                $calendarSelect.attr('disabled', '');
+                if (!$calendarSelect.parent().hasClass('disabled')) {
+                    $calendarSelect.parent().addClass('disabled');
+                    $calendarSelect.parent().attr('title', __("You can't change Calendar until Event has Guests"));
+                }
+            } else {
+                $calendarSelect.attr('disabled', false);
+                if ($calendarSelect.parent().hasClass('disabled')) {
+                    $calendarSelect.parent().removeClass('disabled');
+                    $calendarSelect.parent().attr('title', false);
+                }
+            }
         },
 
         getEventFormData: function () {

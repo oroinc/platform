@@ -14,13 +14,20 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 getFormState = function ($form) {
                     var $submit = $form.find('input[name="input_action"]');
                     $submit.attr('disabled', true);
+                    // Verification Rule: Change calendar event color is not influence into notification popup
+                    var $colors = $form.find('#oro_calendar_event_form_backgroundColor');
+                    $colors.attr('disabled', true);
                     var result = $form.serialize();
                     $submit.attr('disabled', false);
+                    $colors.attr('disabled', false);
 
                     return result;
                 },
                 formInitialState = getFormState($form),
                 isChanged = function ($currentForm) {
+                    // Verification Rule: Change calendar event color is not influence into notification popup
+                    var $colors = $currentForm.find('#oro_calendar_event_form_backgroundColor');
+                    $colors.attr('disabled', true);
                     return getFormState($currentForm) != formInitialState;
                 };
 
