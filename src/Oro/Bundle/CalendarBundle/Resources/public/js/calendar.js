@@ -8,7 +8,7 @@ define(function (require) {
         Backbone = require('backbone'),
         __ = require('orotranslation/js/translator'),
         messenger = require('oroui/js/messenger'),
-        LoadingMask = require('oroui/js/loading-mask',
+        LoadingMask = require('oroui/js/loading-mask'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel = require('orocalendar/js/calendar/event/model'),
         EventView = require('orocalendar/js/calendar/event/view'),
