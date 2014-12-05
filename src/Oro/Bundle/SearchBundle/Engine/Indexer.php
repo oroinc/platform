@@ -21,10 +21,6 @@ class Indexer
 
     const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
-    const TYPE_REGULAR     = 'entity';
-    const TYPE_INHERITANCE = 'inheritance';
-    const TYPE_ABSTRACT    = 'abstract';
-
     /**
      * @var EngineInterface
      */
