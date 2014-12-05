@@ -11,25 +11,31 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
         initialize: function () {
             var $form = $(this.$el).closest('form'),
                 isModalShown = false,
-                getFormState = function ($form) {
-                    var $submit = $form.find('input[name="input_action"]');
-                    $submit.attr('disabled', true);
-                    // Verification Rule: Change calendar event color is not influence into notification popup
-                    var $colors = $form.find('#oro_calendar_event_form_backgroundColor');
-                    $colors.attr('disabled', true);
+                getFormState = _.bind(function ($form) {
+                    var $exclude = [
+                            $form.find('input[name="input_action"]'),
+                            $form.find('#oro_calendar_event_form_backgroundColor'),
+                            $form.find('[name*="reminders"]')
+                        ];
+                    this.disabledControls($exclude, true);
                     var result = $form.serialize();
-                    $submit.attr('disabled', false);
-                    $colors.attr('disabled', false);
+                    this.disabledControls($exclude, false);
 
                     return result;
-                },
+                }, this),
                 formInitialState = getFormState($form),
-                isChanged = function ($currentForm) {
-                    // Verification Rule: Change calendar event color is not influence into notification popup
-                    var $colors = $currentForm.find('#oro_calendar_event_form_backgroundColor');
-                    $colors.attr('disabled', true);
-                    return getFormState($currentForm) != formInitialState;
-                };
+                isChanged = _.bind(function ($currentForm) {
+                    var notify,
+                        $exclude = [
+                            $currentForm.find('#oro_calendar_event_form_backgroundColor'),
+                            $currentForm.find('[name*="reminders"]')
+                        ];
+                    this.disabledControls($exclude, true);
+                    notify = getFormState($currentForm) != formInitialState;
+                    this.disabledControls($exclude, false);
+
+                    return notify;
+                }, this);
 
             this.$parent = $form.parent();
 
@@ -67,6 +73,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                     isModalShown = true;
                     e.preventDefault();
                 }
+            });
+        },
+
+        disabledControls: function($controls, state) {
+            _.map($controls, function($control) {
+                $control.attr('disabled', state);
             });
         },
 
