@@ -43,13 +43,13 @@
             {% endif %}
             </span>
             <input type="checkbox"
-                   id="{{ form.vars.id }}_businessUnits_{{ child.id }}"
-                   name="{{ form.vars.full_name }}[businessUnits][]"
-                   value="{{ child.id }}"
-                    {% if child.id in selected %} checked="checked" {% endif %}
-                   class="bu"
-                   data-organization="{{ org_id }}"
-                    />
+                id="{{ form.vars.id }}_businessUnits_{{ child.id }}"
+                name="{{ form.vars.full_name }}[businessUnits][]"
+                value="{{ child.id }}"
+                {% if child.id in selected %} checked="checked" {% endif %}
+                class="bu"
+                data-organization="{{ org_id }}"
+            />
             <label for="{{ form.vars.id }}_businessUnits_{{ child.id }}">{{ child.name }}</label>
         </div>
         {% if child.children is defined %}
