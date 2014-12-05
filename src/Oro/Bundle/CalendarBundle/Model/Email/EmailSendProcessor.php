@@ -69,7 +69,6 @@ class EmailSendProcessor
      * Send notification to invitees if event was changed
      *
      * @param CalendarEvent   $calendarEvent
-     * @param CalendarEvent   $dirtyEvent
      * @param ArrayCollection $originalChildren
      * @param boolean         $notify
      *
@@ -77,17 +76,11 @@ class EmailSendProcessor
      */
     public function sendUpdateParentEventNotification(
         CalendarEvent $calendarEvent,
-        CalendarEvent $dirtyEvent,
         ArrayCollection $originalChildren,
-        $notify = true
+        $notify = false
     ) {
         // Send notification to existing invitees if event was changed
-        if (count($calendarEvent->getChildEvents()) > 0 && $notify && (
-            $calendarEvent->getStart() != $dirtyEvent->getStart() ||
-            $calendarEvent->getEnd() != $dirtyEvent->getEnd() ||
-            $calendarEvent->getDescription() != $dirtyEvent->getDescription() ||
-            $calendarEvent->getTitle() != $dirtyEvent->getTitle()
-        )) {
+        if (count($calendarEvent->getChildEvents()) > 0 && $notify) {
             $this->addEmailNotification(
                 $calendarEvent,
                 $this->getChildEmails($calendarEvent),

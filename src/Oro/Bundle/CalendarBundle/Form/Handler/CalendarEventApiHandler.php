@@ -63,7 +63,6 @@ class CalendarEventApiHandler
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $dirtyEntity = clone $entity;
             $originalChildren = new ArrayCollection();
             foreach ($entity->getChildEvents() as $childEvent) {
                 $originalChildren->add($childEvent);
@@ -74,7 +73,6 @@ class CalendarEventApiHandler
             if ($this->form->isValid()) {
                 $this->onSuccess(
                     $entity,
-                    $dirtyEntity,
                     $originalChildren,
                     $this->form->get('notifyInvitedUsers')->getData()
                 );
@@ -89,13 +87,11 @@ class CalendarEventApiHandler
      * "Success" form handler
      *
      * @param CalendarEvent   $entity
-     * @param CalendarEvent   $dirtyEntity
      * @param ArrayCollection $originalChildren
      * @param boolean         $notify
      */
     protected function onSuccess(
         CalendarEvent $entity,
-        CalendarEvent $dirtyEntity,
         ArrayCollection $originalChildren,
         $notify
     ) {
@@ -108,7 +104,6 @@ class CalendarEventApiHandler
         } else {
             $this->emailSendProcessor->sendUpdateParentEventNotification(
                 $entity,
-                $dirtyEntity,
                 $originalChildren,
                 $notify
             );
