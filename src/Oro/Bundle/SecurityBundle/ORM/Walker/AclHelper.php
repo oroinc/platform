@@ -117,7 +117,7 @@ class AclHelper
                     )
                 );
                 // Fix for Doctrine bug. @TODO: Remove after upgrade to 2.4.6+ (BAP-6712)
-                $this->addWalkerQueryHint($query, $joinConditions);
+                $this->addWalkerQueryHint($query);
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
             }
         }
@@ -130,29 +130,18 @@ class AclHelper
      * @TODO: Remove after fix BAP-6712
      *
      * @param Query|QueryBuilder $query
-     * @param $joinConditions
      *
      * @throws \RuntimeException
      */
-    protected function addWalkerQueryHint($query, $joinConditions)
+    protected function addWalkerQueryHint($query)
     {
-        $needCustomSqlWalker = false;
-        foreach ($joinConditions as $joinCondition) {
-            $targetClass = $this->em->getClassMetadata($joinCondition->getEntityClass());
-            if ($targetClass->isInheritanceTypeJoined()) {
-                $needCustomSqlWalker = true;
-                break;
-            }
-        }
-        if ($needCustomSqlWalker) {
-            $customWalker = $query->getHint(Query::HINT_CUSTOM_OUTPUT_WALKER);
-            if (!$customWalker || $customWalker == 'Doctrine\ORM\Query\SqlWalker') {
-                $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, self::ORO_SQL_WALKER);
-            } elseif ($customWalker == 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker') {
-                $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, self::ORO_TRANSLATION_WALKER);
-            } else {
-                throw new \RuntimeException('Unknown output walker type received in a query hint.');
-            }
+        $customWalker = $query->getHint(Query::HINT_CUSTOM_OUTPUT_WALKER);
+        if (!$customWalker || $customWalker == 'Doctrine\ORM\Query\SqlWalker') {
+            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, self::ORO_SQL_WALKER);
+        } elseif ($customWalker == 'Gedmo\Translatable\Query\TreeWalker\TranslationWalker') {
+            $query->setHint(Query::HINT_CUSTOM_OUTPUT_WALKER, self::ORO_TRANSLATION_WALKER);
+        } else {
+            throw new \RuntimeException('Unknown output walker type received in a query hint.');
         }
     }
 
