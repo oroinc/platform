@@ -83,13 +83,22 @@ class ConfigSubscriber implements EventSubscriberInterface
      */
     public function updateEntityConfig(EntityConfigEvent $event)
     {
-        $parentClassName = get_parent_class($event->getClassName());
+        $className = $event->getClassName();
+        $parentClassName = get_parent_class($className);
         if (!$parentClassName) {
             return;
         }
-        $shortClassName = ExtendHelper::getShortClassName($event->getClassName());
-        if (ExtendHelper::getShortClassName($parentClassName) !== 'Extend' . $shortClassName) {
-            return;
+
+        if (ExtendHelper::isExtendEntityProxy($parentClassName)) {
+            // When application is installed parent class will be replaced (via class_alias)
+            $extendClass = $parentClassName;
+        } else {
+            // During install parent class is not replaced (via class_alias)
+            $shortClassName = ExtendHelper::getShortClassName($event->getClassName());
+            if (ExtendHelper::getShortClassName($parentClassName) !== 'Extend' . $shortClassName) {
+                return;
+            }
+            $extendClass = ExtendHelper::getExtendEntityProxyClassName($parentClassName);
         }
 
         $config = $event->getConfigManager()->getProvider('extend')->getConfig($event->getClassName());
@@ -98,7 +107,6 @@ class ConfigSubscriber implements EventSubscriberInterface
             $config->set('is_extend', true);
             $hasChanges = true;
         }
-        $extendClass = ExtendHelper::getExtendEntityProxyClassName($parentClassName);
         if (!$config->is('extend_class', $extendClass)) {
             $config->set('extend_class', $extendClass);
             $hasChanges = true;
