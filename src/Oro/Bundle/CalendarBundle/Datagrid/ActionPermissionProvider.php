@@ -31,16 +31,20 @@ class ActionPermissionProvider
         $invitationStatus = $record->getValue('invitationStatus');
         $parentId = $record->getValue('parentId');
         $ownerId = $record->getValue('ownerId');
+        $children = $record->getValue('childrenCount');
 
         $isEnableAccepted = $invitationStatus
             && $invitationStatus != CalendarEvent::ACCEPTED
-            && $user->getId() == $ownerId;
+            && $user->getId() == $ownerId
+            && $children;
         $isEnableTentatively = $invitationStatus
             && $invitationStatus != CalendarEvent::TENTATIVELY_ACCEPTED
-            && $user->getId() == $ownerId;
+            && $user->getId() == $ownerId
+            && $children;
         $isEnableDecline = $invitationStatus
             && $invitationStatus != CalendarEvent::DECLINED
-            && $user->getId() == $ownerId;
+            && $user->getId() == $ownerId
+            && $children;
 
         $isEditable = !$invitationStatus || ($invitationStatus && !$parentId);
 
