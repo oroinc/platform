@@ -27,7 +27,7 @@ class SerializedFieldTest extends Selenium2TestCase
         $login = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->filterBy('Name', 'User', 'is equal to')
             ->open(array('User'));
-        foreach($fields as $field) {
+        foreach ($fields as $field) {
             /** @var ConfigEntity $login */
                 $login->createField()
                 ->setFieldName(strtolower($field).'_field')
@@ -54,7 +54,7 @@ class SerializedFieldTest extends Selenium2TestCase
             ->edit()
             /** @var ConfigEntities $login */
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle');
-        foreach($fields as $field) {
+        foreach ($fields as $field) {
             /** @var ConfigEntity $login */
             $login->checkEntityField(strtolower($field).'_field');
         }
