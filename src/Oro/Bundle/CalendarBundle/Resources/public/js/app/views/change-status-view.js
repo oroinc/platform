@@ -1,57 +1,43 @@
+/*jslint nomen: true*/
 /*global define*/
-define(function (require) {
+define(['jquery', 'underscore', 'orotranslation/js/translator',
+    'oroui/js/mediator', 'oroui/js/messenger', 'oroui/js/app/views/base/view'
+    ], function ($, _, __, mediator, messenger, BaseView) {
     'use strict';
 
-    var ChangeStatusView,
-        $ = require('jquery'),
-        mediator = require('oroui/js/mediator'),
-        BaseView = require('oroui/js/app/views/base/view');
-
-    /**
-     * @export orocalendar/js/app/views/change-status-view
-     * @extends oroui.app.views.base.Component
-     * @class orocalendar.app.views.ChangeStatusView
-     */
-    ChangeStatusView = BaseView.extend({
-        /**
-         * @property {Object}
-         */
-        $element: null,
-
+    var ChangeStatusView = BaseView.extend({
         /**
          * @constructor
          */
         initialize: function () {
-            this.$element = this.$el;
-            if (!this.$element) {
-                return;
-            }
-
-            var self = this;
-            this.$element.on('click.' + this.cid, function (e) {
+            this.$el.on('click.' + this.cid, _.bind(function (e) {
                 e.preventDefault();
-                $.ajax({
-                    url: self.$element.attr('href'),
-                    type: 'GET',
-                    success: function() {
-                        mediator.execute('refreshPage');
-                    },
-                    error: function(xhr) {
-                        Error.handle({}, xhr, {enforce: true});
-                    }
-                });
+                this.sendUpdate();
                 return false;
-            });
+            }, this));
         },
 
         /**
          * @inheritDoc
          */
         dispose: function () {
-            if (!this.disposed && this.$element) {
-                this.$element.off('.' + this.cid);
+            if (!this.disposed && this.$el) {
+                this.$el.off('.' + this.cid);
             }
             ChangeStatusView.__super__.dispose.call(this);
+        },
+
+        sendUpdate: function () {
+            $.ajax({
+                url: this.$el.attr('href'),
+                type: 'GET',
+                success: function () {
+                    mediator.execute('refreshPage');
+                },
+                error: function (jqXHR) {
+                    messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
+                }
+            });
         }
     });
 

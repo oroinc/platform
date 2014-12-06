@@ -1,12 +1,13 @@
 {% import 'OroCalendarBundle::macros.html.twig' as calendarMacros %}
 <div class="btn-group" role="group">
-    {% set statuses = entity.availableInvitationStatuses %}
-    {% for status in statuses  %}
+    {% for status in entity.availableInvitationStatuses %}
         {{ UI.link({
             'aCss':  'btn btn-default',
             'iCss':  calendarMacros.get_invitatition_status_class(status),
-            'data':  {'page-component-module': 'oroui/js/app/components/view-component', 'page-component-options': {'view':'orocalendar/js/app/views/change-status-view'}|json_encode},
-            'path':  path('oro_calendar_event_'~status, {'id': entity.id}),
+            'data':  {
+                'page-component-module': 'oroui/js/app/components/view-component',
+                'page-component-options': {'view':'orocalendar/js/app/views/change-status-view'}|json_encode},
+            'path':  path('oro_calendar_event_' ~ status, {'id': entity.id}),
             'label': calendarMacros.calendar_event_invitation_action(status)|trans,
             'title': calendarMacros.calendar_event_invitation_action(status)|trans
         }) }}
