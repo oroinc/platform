@@ -364,6 +364,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         _toggleCalendarUidByChildEvents: function (form) {
             var $calendarUid = form.find(this.selectors.calendarUid);
+            if (!$calendarUid.length) {
+                return;
+            }
             if (form.find(this.selectors.childEvents).val()) {
                 $calendarUid.attr('disabled', 'disabled');
                 $calendarUid.parent().attr('title', __("The calendar cannot be changed because the event has guests"));
