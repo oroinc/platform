@@ -23,6 +23,10 @@ define(['underscore', 'backbone', 'routing'
             allDay: false,
             backgroundColor: null,
             reminders: {},
+            parentEventId: null,
+            invitationStatus: null,
+            childEvents: null,
+            invitedUsers: null,
             editable: false,
             removable: false,
             calendarAlias: null,
@@ -64,7 +68,7 @@ define(['underscore', 'backbone', 'routing'
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    ['id', 'editable', 'removable', 'calendarUid', 'invitedUsers', 'parentEventId', 'invitationStatus']
+                    ['id', 'editable', 'removable', 'calendarUid', 'invitationStatus', 'invitedUsers', 'parentEventId']
                 ),
                 attrs || {}
             ));
