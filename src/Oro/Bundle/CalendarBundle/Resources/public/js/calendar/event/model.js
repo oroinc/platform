@@ -68,7 +68,7 @@ define(['underscore', 'backbone', 'routing'
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    ['id', 'editable', 'removable', 'calendarUid', 'invitationStatus', 'invitedUsers', 'parentEventId']
+                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus', 'invitedUsers']
                 ),
                 attrs || {}
             ));
