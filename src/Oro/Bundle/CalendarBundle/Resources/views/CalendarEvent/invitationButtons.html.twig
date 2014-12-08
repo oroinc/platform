@@ -1,3 +1,4 @@
+{% if entity.parent or entity.childEvents is not empty %}
 {% import 'OroCalendarBundle::macros.html.twig' as calendarMacros %}
 <div class="btn-group" role="group">
     {% for status in entity.availableInvitationStatuses %}
@@ -13,3 +14,4 @@
         }) }}
     {% endfor %}
 </div>
+{% endif %}

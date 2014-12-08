@@ -13,11 +13,13 @@ datagrid:
                     - event.invitationStatus
                     - parent.id as parentId
                     - owner.id as ownerId
+                    - COUNT(children.id) as childrenCount
                 from:
                     - { table: %oro_calendar.calendar_event.entity.class%, alias: event }
                 join:
                     left:
                         - { join: event.parent, alias: parent }
+                        - { join:  %oro_calendar.calendar_event.entity.class%, alias: children, conditionType: WITH, condition: 'children.parent = event' }
                     inner:
                         - { join: event.calendar, alias: calendar }
                         - { join: calendar.owner, alias: owner }
@@ -30,6 +32,7 @@ datagrid:
                 where:
                     and:
                         - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
+                groupBy: event.id
         columns:
             title:
                 label: oro.calendar.calendarevent.title.label
