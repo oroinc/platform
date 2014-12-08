@@ -11,6 +11,8 @@ UPGRADE FROM 1.4 to 1.5
 
 ####OroConfigBundle:
 - `oro_config_entity` twig function was removed (deprecated since **1.3**)
+- Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
+  as well as already existing `routeName` and `routeView` properties
 
 ####OroDataAuditBundle
 - REST `Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController` was refactored to be based on `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController`
@@ -22,6 +24,11 @@ UPGRADE FROM 1.4 to 1.5
 - `Tools\ExtendConfigDumper` constant `ENTITY` has been deprecated
 - Naming of proxy classes for extended entities has been changed to fix naming conflicts
 - Adding of extended fields to form has been changed. From now `form.additional` is not available in TWIG template, because extended fields are added to main form and have  `extra_field` flag. The following statement can be used to loop through extended fields in TWIG template: `{% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}`.
+- Extend entity generation changes: all entities that replace their copies via `class_alias` will be generated 
+  as **abstract** classes in order to allow to use them in the middle of **doctrine inheritance hierarchy**. This changes affect only 
+  entities with `type=Extend`(they actually doctrine `mappedSuperclass`es)
+- Added possibility to define **discriminator map** entries on child level using annotation `@Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue("VALUE")`.
+  This is useful when auto-generated strategy fails due to duplication of short class names in the hierarchy.
 
 ####OroIntegrationBundle:
 - `Oro\Bundle\IntegrationBundle\Entity\Channel#getEnabled` deprecated in favor of `isEnabled` of the same class
@@ -53,6 +60,7 @@ UPGRADE FROM 1.4 to 1.5
 ####OroUIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
+- Added context provider(`oro_ui.provider.widget_context`) that allows to customize application behavior based depends on current context.
 - Added `oro_js_template_content` twig filter to allow include `<script>` blocks inside JS templates. Example of usage:
 
 ```twig
@@ -76,3 +84,7 @@ UPGRADE FROM 1.4 to 1.5
     </div>
 </script>
 ```
+
+
+####OroSearchBundle:
+- Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.
