@@ -167,7 +167,10 @@ define(['jquery', 'underscore'
                     return item.id;
                 });
 
-                if (dataIds.sort().join(',') === currentValue.sort().join(',')) {
+                // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
+                dataIds = _.compact(dataIds);
+
+                if (dataIds.length === 0 || dataIds.sort().join(',') === currentValue.sort().join(',')) {
                     handleResults(elementData);
                 } else {
                     setSelect2ValueById(currentValue);

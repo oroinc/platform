@@ -190,18 +190,20 @@ class LoggableManager
 
             foreach ($this->pendingRelatedEntities[$oid] as $props) {
                 /** @var Audit $logEntry */
-                $logEntry              = $props['log'];
-                $oldData               = $data = $logEntry->getData();
-                $data[$props['field']] = $identifiers;
-                $logEntry->setData($data);
+                $logEntry = $props['log'];
+                $oldData  = $data = $logEntry->getData();
+                if (empty($data[$props['field']]['new'])) {
+                    $data[$props['field']]['new'] = $identifiers;
+                    $logEntry->setData($data);
 
-                $uow->scheduleExtraUpdate(
-                    $logEntry,
-                    array(
-                        'data' => array($oldData, $data)
-                    )
-                );
-                $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $data);
+                    $uow->scheduleExtraUpdate(
+                        $logEntry,
+                        array(
+                            'data' => array($oldData, $data)
+                        )
+                    );
+                    $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $data);
+                }
             }
 
             unset($this->pendingRelatedEntities[$oid]);
