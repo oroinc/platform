@@ -20,7 +20,7 @@ oro_calendar.calendar_provider.user:
     arguments:
         - @oro_entity.doctrine_helper
         - @oro_locale.formatter.name
-        - @oro_calendar.calendar_event.normalizer
+        - @oro_calendar.calendar_event_normalizer.user
     tags:
         - { name: oro_calendar.calendar_provider, alias: user }
 ```

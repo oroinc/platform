@@ -8,6 +8,8 @@ use Symfony\Component\Form\Test\TypeTestCase;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
@@ -18,11 +20,18 @@ use Oro\Bundle\ReminderBundle\Form\Type\ReminderIntervalType;
 use Oro\Bundle\ReminderBundle\Form\Type\ReminderType;
 use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
+use Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer;
+use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventInviteesType;
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
 
 class CalendarEventApiTypeTest extends TypeTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarEventManager;
@@ -36,6 +45,54 @@ class CalendarEventApiTypeTest extends TypeTestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Manager\CalendarEventManager')
                 ->disableOriginalConstructor()
                 ->getMock();
+
+        $userMeta = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $userMeta->expects($this->any())
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('id'));
+
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['execute'])
+            ->getMockForAbstractClass();
+        $query->expects($this->any())
+            ->method('execute')
+            ->will($this->returnValue([]));
+
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->any())
+            ->method('where')
+            ->will($this->returnSelf());
+        $qb->expects($this->any())
+            ->method('setParameter')
+            ->will($this->returnSelf());
+        $qb->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+
+        $userRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $userRepo->expects($this->any())
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->will($this->returnValue($qb));
+
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with('OroUserBundle:User')
+            ->will($this->returnValue($userRepo));
+        $this->entityManager->expects($this->any())
+            ->method('getClassMetadata')
+            ->with('OroUserBundle:User')
+            ->will($this->returnValue($userMeta));
 
         return array(
             new PreloadedExtension(
@@ -55,7 +112,8 @@ class CalendarEventApiTypeTest extends TypeTestCase
             'end'             => '2013-10-05T13:30:00+00:00',
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
-            'reminders'       => new ArrayCollection()
+            'reminders'       => new ArrayCollection(),
+            'invitedUsers'    => new ArrayCollection(),
         );
 
         $type = new CalendarEventApiType($this->calendarEventManager);
@@ -165,6 +223,24 @@ class CalendarEventApiTypeTest extends TypeTestCase
      */
     protected function loadTypes()
     {
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $searchHandler = $this->getMock('Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface');
+        $searchHandler->expects($this->any())
+            ->method('getEntityName')
+            ->will($this->returnValue('OroUserBundle:User'));
+
+        $searchRegistry = $this->getMockBuilder('Oro\Bundle\FormBundle\Autocomplete\SearchRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $searchRegistry->expects($this->any())
+            ->method('getSearchHandler')
+            ->will($this->returnValue($searchHandler));
+
+        $configProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+
         $types = [
             new ReminderCollectionType($this->registry),
             new CollectionType($this->registry),
@@ -172,6 +248,15 @@ class CalendarEventApiTypeTest extends TypeTestCase
             new MethodType(new SendProcessorRegistry([])),
             new ReminderIntervalType(),
             new UnitType(),
+            new CalendarEventInviteesType(
+                new EventsToUsersTransformer(
+                    $this->registry,
+                    $securityFacade
+                )
+            ),
+            new UserMultiSelectType($this->entityManager),
+            new OroJquerySelect2HiddenType($this->entityManager, $searchRegistry, $configProvider),
+            new Select2Type('hidden'),
         ];
 
         $keys = array_map(
