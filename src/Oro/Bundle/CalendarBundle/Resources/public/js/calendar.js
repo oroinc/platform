@@ -193,7 +193,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             if (!connectionModel.get('visible')) {
                 this.connectionsView.showCalendar(connectionModel);
             }
-            this.getCalendarElement().fullCalendar('refetchEvents');
+            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
+                this.getCalendarElement().fullCalendar('refetchEvents');
+            }
         },
 
         onEventChanged: function (eventModel) {
@@ -202,16 +204,21 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, _.pick(this.createViewModel(eventModel), _.keys(_.omit(fcEvent, ['id']))));
             this.prepareViewModel(fcEvent);
-            // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
-            this.getCalendarElement().fullCalendar('refetchEvents');
-
-            eventModel.set('editable', connectionModel.get('canEditEvent'));
-            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
+                this.getCalendarElement().fullCalendar('refetchEvents');
+            } else {
+                this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+                eventModel.set('editable', connectionModel.get('canEditEvent'));
+                eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+            }
         },
 
         onEventDeleted: function (eventModel) {
-            // this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
-            this.getCalendarElement().fullCalendar('refetchEvents');
+            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
+                this.getCalendarElement().fullCalendar('refetchEvents');
+            } else {
+                this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            }
         },
 
         onConnectionAdded: function () {
@@ -597,6 +604,35 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                     });
                 }
             }
+        },
+
+        hasParentEvent: function (eventModel) {
+            var result = false,
+                parentEventId = eventModel.get('parentEventId'),
+                alias = eventModel.get('calendarAlias');
+            if (parentEventId) {
+                result = Boolean(this.getConnectionCollection().find(function (c) {
+                    return c.get('calendarAlias') === alias && this.collection.get(c.get('calendarUid') + '_' + parentEventId);
+                }, this));
+            }
+            return result;
+        },
+
+        hasGuestEvent: function (eventModel) {
+            var result = false,
+                guests = eventModel.get('childEvents');
+            guests = guests ? guests.split(',') : [];
+            if (eventModel.hasChanged('childEvents') && eventModel.previous('childEvents')) {
+                guests = _.union(guests, eventModel.previous('childEvents').split(','));
+            }
+            if (guests) {
+                result = Boolean(this.getConnectionCollection().find(function (c) {
+                    return Boolean(_.find(guests, function (userId) {
+                        return c.get('userId') == userId;
+                    }));
+                }, this));
+            }
+            return result;
         }
     });
 });
