@@ -264,7 +264,7 @@ define([
             if (!this.confirmModal[type]) {
                 this.confirmModal[type] = new Modal(_.extend({
                     title: __('Confirmation'),
-                    okText: __('Ok, got it.'),
+                    okText: __('OK, got it.'),
                     className: 'modal modal-primary',
                     okButtonClass: 'btn-primary btn-large'
                 }, options));
