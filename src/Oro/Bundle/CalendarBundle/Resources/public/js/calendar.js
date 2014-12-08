@@ -27,6 +27,7 @@ define(function (require) {
      * @extends Backbone.View
      */
     return Backbone.View.extend({
+        MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend'),
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
@@ -288,8 +289,8 @@ define(function (require) {
                         eventModel;
                     this.applyTzCorrection(-1, attrs);
 
-                    attrs.start = attrs.start.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
-                    attrs.end = attrs.end.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
+                    attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
+                    attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
 
                     _.extend(
                         attrs,
@@ -340,8 +341,8 @@ define(function (require) {
 
                 this.applyTzCorrection(-1, attrs);
 
-                attrs.start = attrs.start.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
-                attrs.end = attrs.end.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
+                attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
+                attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
 
                 model.save(
                     attrs,
@@ -376,8 +377,8 @@ define(function (require) {
 
             try {
                 this.collection.setRange(
-                    start.format(localeSettings.getVendorDateTimeFormat('moment', 'date')),
-                    end.format(localeSettings.getVendorDateTimeFormat('moment', 'date'))
+                    start.format(this.MOMENT_BACKEND_FORMAT),
+                    end.format(this.MOMENT_BACKEND_FORMAT)
                 );
                 if (this.enableEventLoading) {
                     // load events from a server
