@@ -1,0 +1,13 @@
+@name = calendar_invitation_uninvite
+@entityName = Oro\Bundle\CalendarBundle\Entity\CalendarEvent
+@subject = Removed: {{ entity.title }}
+@isSystem = 1
+@isEditable = 1
+
+<p><b>You have been removed from {{ entity.title }}.</b></p>
+<h1>{{ entity.title }}</h1>
+<div>
+    <p><i>Start date:</i> {{ entity.start|date('F j, Y, g:i A') }}</p>
+    <p><i>End date:</i> {{ entity.end|date('F j, Y, g:i A') }}</p>
+    <p><i>Description:</i>{{ entity.description }}</p>
+</div>
