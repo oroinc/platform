@@ -38,21 +38,12 @@
 
 {% block breadcrumbs %}
     {{ parent() }}
-    {% set invitationStatus = entity.invitationStatus %}
-    {% if invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::TENTATIVELY_ACCEPTED') %}
-        {% set invitationClass = 'tentatively' %}
-    {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::ACCEPTED') %}
-        {% set invitationClass = 'enabled' %}
-    {% elseif invitationStatus == constant('Oro\\Bundle\\CalendarBundle\\Entity\\CalendarEvent::DECLINED') %}
-        {% set invitationClass = 'disabled' %}
-    {% else %}
-        {% set invitationClass = '' %}
-    {% endif %}
     <div class="pull-left">
-        {% if (invitationStatus and invitationClass) %}
-            <div class="badge badge-{{ invitationClass }} status-{{ invitationClass }}">
+        {% set invitationClass = calendarMacros.get_invitatition_badge_class(entity.invitationStatus) %}
+        {% if (entity.invitationStatus and invitationClass) %}
+            <div class="invitation-status badge badge-{{ invitationClass }} status-{{ invitationClass }}">
                 <i class="icon-status-{{ invitationClass }} icon-circle"></i>
-                {{ calendarMacros.calendar_event_invitation_status(invitationStatus) }}
+                {{ calendarMacros.calendar_event_invitation_status(entity.invitationStatus) }}
             </div>
         {% endif %}
     </div>
