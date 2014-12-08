@@ -75,43 +75,18 @@ class ConfigExtension extends \Twig_Extension
     }
 
     /**
-     * @param string $entityClass The entity class name
-     * @param string $routeType   Route Type
+     * @param string $className The entity class name
+     * @param string $routeType Route Type
+     * @param bool   $strict    Should exception be thrown if no route of given type found
      *
      * @return string
      */
-    public function getClassRoute($entityClass, $routeType = 'view')
+    public function getClassRoute($className, $routeType = 'view', $strict = false)
     {
-        if (!in_array($routeType, ['view', 'name', 'create'])) {
+        if (!$this->configManager->hasConfig($className)) {
             return null;
         }
 
-        $property = 'route' . ucfirst($routeType);
-        $metadata = $this->configManager->getEntityMetadata($entityClass);
-
-        if ($metadata && $metadata->{$property}) {
-            return $metadata->{$property};
-        }
-
-        return $this->getDefaultClassRoute($entityClass, $routeType);
-    }
-
-    /**
-     * @param $className
-     * @param $routeType
-     *
-     * @return string
-     */
-    protected function getDefaultClassRoute($className, $routeType)
-    {
-        static $routeMap = [
-            'view'   => 'view',
-            'name'   => 'index',
-            'create' => 'create'
-        ];
-        $postfix = $routeMap[$routeType];
-        $parts   = explode('\\', $className);
-
-        return strtolower(reset($parts)) . '_' . strtolower(end($parts)) . '_' . $postfix;
+        return $this->configManager->getEntityMetadata($className)->getClassRoute($routeType, $strict);
     }
 }

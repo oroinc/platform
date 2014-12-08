@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\Common\Util\ClassUtils;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -28,22 +29,28 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     /** @var Router */
     protected $router;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param ServiceLink    $doctrineRegistryLink
      * @param ServiceLink    $nameFormatterLink
      * @param Router         $router
+     * @param ConfigManager  $configManager
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $doctrineRegistryLink,
         ServiceLink $nameFormatterLink,
-        Router $router
+        Router $router,
+        ConfigManager $configManager
     ) {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
-        $this->nameFormatterLink = $nameFormatterLink;
-        $this->router = $router;
+        $this->nameFormatterLink    = $nameFormatterLink;
+        $this->router               = $router;
+        $this->configManager        = $configManager;
     }
 
     /**
@@ -62,7 +69,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function getRoutes()
     {
         return [
-            'itemView'   => 'oro_email_view',
+            'itemView' => 'oro_email_view',
         ];
     }
 
@@ -101,16 +108,25 @@ class EmailActivityListProvider implements ActivityListProviderInterface
         $email = $this->doctrineRegistryLink->getService()
             ->getRepository($activityListEntity->getRelatedActivityClass())
             ->find($activityListEntity->getRelatedActivityId());
-        $owner = $email->getFromEmailAddress()->getOwner();
 
-        // TODO: we need EntityConfig to get view url for an entities
-        $classParts = explode('\\', $owner->getClass());
-        $routeName  = strtolower(array_shift($classParts)) . '_' . strtolower(array_pop($classParts)) . '_view';
-
-        return [
-            'owner_name'  => $this->nameFormatterLink->getService()->format($owner),
-            'owner_route' => $this->router->generate($routeName, ['id' => $owner->getId()]),
+        $data = [
+            'ownerName' => $email->getFromName(),
+            'ownerLink' => null
         ];
+
+        if ($email->getFromEmailAddress()->hasOwner()) {
+            $owner             = $email->getFromEmailAddress()->getOwner();
+            $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
+
+            $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
+                ->getClassRoute('view');
+            if (null !== $route) {
+                $id                = $this->doctrineHelper->getSingleEntityIdentifier($owner);
+                $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -135,7 +151,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function isApplicable($entity)
     {
         return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
-            && $entity->getFromEmailAddress()->hasOwner();
+        && $entity->getFromEmailAddress()->hasOwner();
     }
 
     /**
