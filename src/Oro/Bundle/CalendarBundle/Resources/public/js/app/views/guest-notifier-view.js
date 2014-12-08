@@ -10,7 +10,8 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
             'input[name="input_action"]',
             'input[name$="[backgroundColor]"]',
             'select[name*="[reminders]"]',
-            'input[name*="[reminders]"]'
+            'input[name*="[reminders]"]',
+            'select[name*="[calendarUid]"]'
         ],
 
         /**
