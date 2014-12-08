@@ -153,12 +153,47 @@ class ConfigEntity extends CustomEntity
         return $this;
     }
 
+    /**
+     * @param string $fieldName
+     * @return $this
+     */
     public function checkEntityField($fieldName)
     {
         $this->assertElementPresent(
             "//div[@class='control-group']/label[contains(., '{$fieldName}')]",
             'Custom entity field not found'
         );
+
+        return $this;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $value
+     * @return $this
+     */
+    public function setCustomField($fieldName, $value)
+    {
+        if ($this->isElementPresent("//div[@class='control-group']/div/input[contains(@id, '{$fieldName}')]")) {
+            $field = $this->test->byXpath("//div[@class='control-group']/div/input[contains(@id, '{$fieldName}')]");
+            $field->clear();
+            $field->value($value);
+        } else {
+            if ($this->isElementPresent("//div[@class='control-group']//select[contains(@id, '{$fieldName}')]")) {
+                $field = $this->test->select(
+                    $this->test->byXPath("//div[@class='control-group']//select[contains(@id, '{$fieldName}')]")
+                );
+                $field->selectOptionByLabel($value);
+            } else {
+                if ($this->isElementPresent("//div[@class='control-group']//textarea[contains(@id, '{$fieldName}')]")) {
+                    $field = $this->test->byXpath(
+                        "//div[@class='control-group']//textarea[contains(@id, '{$fieldName}')]"
+                    );
+                    $field->clear();
+                    $field->value($value);
+                }
+            }
+        }
 
         return $this;
     }
