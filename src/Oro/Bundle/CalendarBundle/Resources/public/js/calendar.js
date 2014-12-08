@@ -225,8 +225,10 @@ define(function (require) {
             // fullcalendar doesn't remember new duration during updateEvent
             // so need to store it
             fcEvent.duration = moment.duration(fcEvent.end.diff(fcEvent.start));
-            this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
-            this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+            // due to fullcalendar bug cannot update single event
+            // please check that after updating fullcalendar
+            // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+            this.getCalendarElement().fullCalendar('rerenderEvents');
         },
 
         onEventDeleted: function (eventModel) {
@@ -278,18 +280,27 @@ define(function (require) {
         select: function (start, end) {
             if (!this.eventView) {
                 try {
-                    var eventModel = new EventModel(_.extend(
-                        this.applyTzCorrection(-1, {
+
+                    var attrs = {
                             start: start,
                             end: end
-                        }),
+                        },
+                        eventModel;
+                    this.applyTzCorrection(-1, attrs);
+
+                    attrs.start = attrs.start.format();
+                    attrs.end = attrs.end.format();
+
+                    _.extend(
+                        attrs,
                         {
                             calendarAlias: 'user',
                             calendar: this.options.calendar,
                             editable: this.options.newEventEditable,
                             removable: this.options.newEventRemovable
                         }
-                    ));
+                    );
+                    eventModel = new EventModel(attrs);
                     this.getEventView(eventModel).render();
                 } catch (err) {
                     this.showMiscError(err);
@@ -308,48 +319,29 @@ define(function (require) {
             }
         },
 
-        eventResize: function (fcEvent, newDuration) {
-            this.showSavingMask();
-            try {
-                var attrs = {
-                        start: fcEvent.start.clone(),
-                        end: fcEvent.start.clone().add(newDuration)
-                    },
-                    model = this.collection.get(fcEvent.id);
-
-                this.applyTzCorrection(-1, attrs);
-
-                attrs.start = attrs.start.format('YYYY-MM-DD HH:mmZZ');
-                attrs.end = attrs.end.format('YYYY-MM-DD HH:mmZZ');
-
-                model.save(
-                    attrs,
-                    {
-                        success: _.bind(this._hideMask, this),
-                        error: _.bind(function (model, response) {
-                            this.showSaveEventError(response.responseJSON || {});
-                        }, this)
-                    }
-                );
-            } catch (err) {
-                this.showLoadEventsError(err);
-            }
+        eventResize: function (fcEvent, newDuration, undo) {
+            fcEvent.end = fcEvent.start.clone().add(newDuration);
+            this.saveFcEvent(fcEvent);
         },
 
-        eventDrop: function (fcEvent) {
+        eventDrop: function (fcEvent, dateChangeDiff, undo) {
+            fcEvent.end = (!fcEvent.duration) ? fcEvent.end.clone() : fcEvent.start.clone().add(fcEvent.duration);
+            this.saveFcEvent(fcEvent);
+        },
+
+        saveFcEvent: function (fcEvent) {
             this.showSavingMask();
             try {
                 var attrs = {
                         start: fcEvent.start.clone(),
-                        // due to bug of fullcalendar - use stored duration if defined
-                        end: (!fcEvent.duration) ? fcEvent.end.clone() : fcEvent.start.clone().add(fcEvent.duration)
+                        end: fcEvent.end.clone()
                     },
                     model = this.collection.get(fcEvent.id);
 
                 this.applyTzCorrection(-1, attrs);
 
-                attrs.start = attrs.start.format('YYYY-MM-DD HH:mmZZ');
-                attrs.end = attrs.end.format('YYYY-MM-DD HH:mmZZ');
+                attrs.start = attrs.start.format();
+                attrs.end = attrs.end.format();
 
                 model.save(
                     attrs,
@@ -384,9 +376,8 @@ define(function (require) {
 
             try {
                 this.collection.setRange(
-                    // always add timezone to do not eventually apply local timezone to value during parsing
-                    start.format('YYYY-MM-DD HH:mmZZ'),
-                    end.format('YYYY-MM-DD HH:mmZZ')
+                    start.format(),
+                    end.format()
                 );
                 if (this.enableEventLoading) {
                     // load events from a server
@@ -422,10 +413,10 @@ define(function (require) {
         },
 
         applyTzCorrection: function (sign, event) {
-            if(!moment.isMoment(event.start)) {
+            if (!moment.isMoment(event.start)) {
                 event.start = $.fullCalendar.moment(event.start);
             }
-            if(!moment.isMoment(event.end)) {
+            if (!moment.isMoment(event.end)) {
                 event.end = $.fullCalendar.moment(event.end);
             }
             event.start.zone(0).add(this.options.timezone * sign, 'm');

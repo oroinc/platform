@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'routing', 'moment'
-    ], function (_, Backbone, routing, moment) {
+define(['underscore', 'backbone', 'routing'
+    ], function (_, Backbone, routing) {
     'use strict';
 
     /**

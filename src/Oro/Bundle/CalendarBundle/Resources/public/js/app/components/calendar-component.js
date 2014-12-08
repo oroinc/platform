@@ -55,7 +55,7 @@ define(function (require) {
                 left: options.eventsOptions.leftHeader || '',
                 center: options.eventsOptions.centerHeader || '',
                 right: options.eventsOptions.rightHeader || ''
-            }
+            };
 
             _.extend(options.eventsOptions, options.calendarOptions);
 

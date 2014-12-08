@@ -48,7 +48,8 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                     moment: {
                         date: 'YYYY-MM-DD',
                         time: 'HH:mms',
-                        datetime: 'YYYY-MM-DD HH:mm'
+                        datetime: 'YYYY-MM-DD HH:mm',
+                        utc: ''
                     }
                 },
                 address: {
