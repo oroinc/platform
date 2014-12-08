@@ -113,7 +113,7 @@ class CalendarEventApiTypeTest extends TypeTestCase
             'allDay'          => true,
             'backgroundColor' => '#FF0000',
             'reminders'       => new ArrayCollection(),
-            'childEvents'     => new ArrayCollection(),
+            'invitedUsers'    => new ArrayCollection(),
         );
 
         $type = new CalendarEventApiType($this->calendarEventManager);

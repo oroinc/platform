@@ -25,7 +25,6 @@ define(['underscore', 'backbone', 'routing'
             reminders: {},
             parentEventId: null,
             invitationStatus: null,
-            childEvents: null,
             invitedUsers: null,
             editable: false,
             removable: false,

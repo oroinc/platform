@@ -620,10 +620,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         hasGuestEvent: function (eventModel) {
             var result = false,
-                guests = eventModel.get('childEvents');
-            guests = guests ? guests.split(',') : [];
-            if (eventModel.hasChanged('childEvents') && eventModel.previous('childEvents')) {
-                guests = _.union(guests, eventModel.previous('childEvents').split(','));
+                guests = eventModel.get('invitedUsers');
+            guests = _.isNull(guests) ? [] : guests;
+            if (eventModel.hasChanged('invitedUsers') && eventModel.previous('invitedUsers')) {
+                guests = _.union(guests, eventModel.previous('invitedUsers'));
             }
             if (guests) {
                 result = Boolean(this.getConnectionCollection().find(function (c) {
