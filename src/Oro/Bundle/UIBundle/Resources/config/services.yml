@@ -13,6 +13,8 @@ parameters:
     oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
     oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
 
+    oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
+
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
 services:
@@ -83,3 +85,8 @@ services:
 
     oro_ui.content_provider.manager:
         class: %oro_ui.content_provider.manager.class%
+
+    oro_ui.provider.widget_context:
+        class: %oro_ui.provider.widget_context.class%
+        calls:
+            - [setRequest, ["@?request="]]

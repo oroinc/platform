@@ -70,7 +70,6 @@ Containers
 -   Block - display embedded widget content on page
 
 
-
 API
 ---
 
@@ -376,3 +375,24 @@ Parameters:
 Name |  Type |  Description
 -----|-------|-------------
 wid | string | unique widget identifier
+
+
+Backend-end
+============
+
+Widget context provider
+-----------------------
+
+Provide possibility to know current context of application during rendering. It allows you to customize application based on current context.
+It registered as DI service named `oro_ui.provider.widget_context`. Possible to inject it as global variable for twig templates.
+ 
+API
+---
+
+#### isActive
+ 
+ Returns whether current **widget context** is in active state. 
+ 
+#### getWid
+
+ Returns unique widget identifier if **widget context** is active or `FALSE` otherwise.
