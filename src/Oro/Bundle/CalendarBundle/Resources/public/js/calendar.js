@@ -286,7 +286,6 @@ define(function (require) {
                         {
                             calendarAlias: 'user',
                             calendar: this.options.calendar,
-                            isTimezoneApplied: true,
                             editable: this.options.newEventEditable,
                             removable: this.options.newEventRemovable
                         }
@@ -317,7 +316,11 @@ define(function (require) {
                         end: fcEvent.start.clone().add(newDuration)
                     },
                     model = this.collection.get(fcEvent.id);
+
                 this.applyTzCorrection(-1, attrs);
+
+                attrs.start = attrs.start.format('YYYY-MM-DD HH:mmZZ');
+                attrs.end = attrs.end.format('YYYY-MM-DD HH:mmZZ');
 
                 model.save(
                     attrs,
@@ -344,6 +347,9 @@ define(function (require) {
                     model = this.collection.get(fcEvent.id);
 
                 this.applyTzCorrection(-1, attrs);
+
+                attrs.start = attrs.start.format('YYYY-MM-DD HH:mmZZ');
+                attrs.end = attrs.end.format('YYYY-MM-DD HH:mmZZ');
 
                 model.save(
                     attrs,

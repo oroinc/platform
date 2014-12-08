@@ -59,13 +59,6 @@ define(['underscore', 'backbone', 'routing', 'moment'
                 attrs[key] = val;
             }
 
-            if (moment.isMoment(attrs.start)) {
-                attrs.start = attrs.start.format('YYYY-MM-DD HH:mmZZ');
-            }
-            if (moment.isMoment(attrs.end)) {
-                attrs.end = attrs.end.format('YYYY-MM-DD HH:mmZZ');
-            }
-
             options.contentType = 'application/json';
             options.data = JSON.stringify(_.extend(
                 {id: this.originalId},
