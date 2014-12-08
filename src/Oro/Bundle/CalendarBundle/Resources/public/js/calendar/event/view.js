@@ -370,12 +370,20 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             if (form.find(this.selectors.childEvents).val()) {
                 $calendarUid.attr('disabled', 'disabled');
                 $calendarUid.parent().attr('title', __("The calendar cannot be changed because the event has guests"));
+                // fix select2 dynamic change disabled
+                if (!$calendarUid.parent().hasClass('disabled')) {
+                    $calendarUid.parent().addClass('disabled');
+                }
                 if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
                     $calendarUid.parent().find('label').addClass('disabled');
                 }
             } else {
                 $calendarUid.removeAttr('disabled');
                 $calendarUid.removeAttr('title');
+                // fix select2 dynamic change disabled
+                if ($calendarUid.parent().hasClass('disabled')) {
+                    $calendarUid.parent().removeClass('disabled');
+                }
                 if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
                     $calendarUid.parent().find('label').removeClass('disabled');
                 }
