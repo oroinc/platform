@@ -12,6 +12,7 @@ parameters:
     oro_entity.virtual_field_provider.chain.class:                 Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
     oro_entity.virtual_field_provider.enum.class:                  Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
+    oro_entity.virtual_relation_provider.class:                    Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
@@ -121,6 +122,12 @@ services:
         arguments:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.virtual_fields%
+
+    oro_entity.virtual_relation_provider:
+        class: %oro_entity.virtual_relation_provider.class%
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - [] # %oro_entity.virtual_relations%
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%
