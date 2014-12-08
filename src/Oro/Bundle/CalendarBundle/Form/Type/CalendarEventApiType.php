@@ -107,11 +107,11 @@ class CalendarEventApiType extends CalendarEventType
                 ]
             )
             ->add(
-                'childEvents',
+                'invitedUsers',
                 'oro_calendar_event_invitees',
                 [
-                    'required' => false,
-                    'label'    => 'oro.calendar.calendarevent.invitation.label'
+                    'required'      => false,
+                    'property_path' => 'childEvents'
                 ]
             )
             ->add(
@@ -124,7 +124,7 @@ class CalendarEventApiType extends CalendarEventType
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
-        $this->subscribeOnChildEvents($builder);
+        $this->subscribeOnChildEvents($builder, 'invitedUsers');
     }
 
     /**

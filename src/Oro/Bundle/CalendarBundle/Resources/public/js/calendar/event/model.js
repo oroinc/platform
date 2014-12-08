@@ -25,7 +25,6 @@ define(['underscore', 'backbone', 'routing'
             reminders: {},
             parentEventId: null,
             invitationStatus: null,
-            childEvents: null,
             invitedUsers: null,
             editable: false,
             removable: false,
@@ -86,14 +85,6 @@ define(['underscore', 'backbone', 'routing'
             if (!this.originalId && this.id && calendarUid) {
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
-            }
-
-            // UI component for child events uin fact uses IDs of invited users
-            if (_.isArray(this.get('childEvents'))) {
-                this.set('childEvents', '');
-                if (this.get('invitedUsers')) {
-                    this.set('childEvents', this.get('invitedUsers').join(','));
-                }
             }
         }
     });
