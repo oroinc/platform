@@ -11,6 +11,8 @@ UPGRADE FROM 1.4 to 1.5
 
 ####OroConfigBundle:
 - `oro_config_entity` twig function was removed (deprecated since **1.3**)
+- Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
+  as well as already existing `routeName` and `routeView` properties
 
 ####OroDataAuditBundle
 - REST `Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController` was refactored to be based on `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController`
