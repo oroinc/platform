@@ -611,9 +611,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 parentEventId = eventModel.get('parentEventId'),
                 alias = eventModel.get('calendarAlias');
             if (parentEventId) {
-                result = !!this.getConnectionCollection().find(function (c) {
+                result = Boolean(this.getConnectionCollection().find(function (c) {
                     return c.get('calendarAlias') === alias && this.collection.get(c.get('calendarUid') + '_' + parentEventId);
-                }, this);
+                }, this));
             }
             return result;
         },
@@ -626,11 +626,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 guests = _.union(guests, eventModel.previous('childEvents').split(','));
             }
             if (guests) {
-                result = !!this.getConnectionCollection().find(function (c) {
-                    return !!_.find(guests, function (userId) {
+                result = Boolean(this.getConnectionCollection().find(function (c) {
+                    return Boolean(_.find(guests, function (userId) {
                         return c.get('userId') == userId;
-                    });
-                }, this);
+                    }));
+                }, this));
             }
             return result;
         }
