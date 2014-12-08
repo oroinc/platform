@@ -105,14 +105,16 @@ class CalendarEventType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
+     * @param string               $childEventsFieldName
      */
-    protected function subscribeOnChildEvents(FormBuilderInterface $builder)
+    protected function subscribeOnChildEvents(FormBuilderInterface $builder, $childEventsFieldName = 'childEvents')
     {
         // extract master event
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
 
         // get existing events
-        $builder->get('childEvents')->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitChildEvents']);
+        $builder->get($childEventsFieldName)
+            ->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitChildEvents']);
 
         // synchronize child events
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);

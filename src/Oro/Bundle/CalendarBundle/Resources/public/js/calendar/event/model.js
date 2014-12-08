@@ -83,14 +83,6 @@ define(['underscore', 'backbone', 'routing'
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
             }
-
-            // UI component for child events uin fact uses IDs of invited users
-            if (_.isArray(this.get('childEvents'))) {
-                this.set('childEvents', '');
-                if (this.get('invitedUsers')) {
-                    this.set('childEvents', this.get('invitedUsers').join(','));
-                }
-            }
         }
     });
 });

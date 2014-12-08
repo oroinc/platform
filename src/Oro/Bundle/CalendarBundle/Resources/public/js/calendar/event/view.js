@@ -27,13 +27,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             loadingMaskContent: '.loading-content',
             backgroundColor: 'input[name$="[backgroundColor]"]',
             calendarUid: '[name*="calendarUid"]',
-            childEvents: 'input[name$="[childEvents]"]'
+            invitedUsers: 'input[name$="[invitedUsers]"]'
         },
 
         /** @property {Array} */
         userCalendarOnlyFields: [
             {fieldName: 'reminders', emptyValue: {}, selector: '.reminders-collection'},
-            {fieldName: 'childEvents', emptyValue: '', selector: 'input[name$="[childEvents]"]'}
+            {fieldName: 'invitedUsers', emptyValue: '', selector: 'input[name$="[invitedUsers]"]'}
         ],
 
         initialize: function (options) {
@@ -206,7 +206,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             var fieldNameRegex = /\[(\w+)\]/g;
 
             // show loading mask if child events users should be updated
-            if (modelData.childEvents) {
+            if (modelData.invitedUsers) {
                 this.eventDialog.once('renderComplete', function() {
                     self.showLoadingMask();
                 });
@@ -237,7 +237,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 }
 
                 // hide loading mask if child events users should be updated
-                if (name.indexOf('[childEvents]') !== -1 && modelData.childEvents) {
+                if (name.indexOf('[invitedUsers]') !== -1 && modelData.invitedUsers) {
                     input.on('select2-data-loaded', function () {
                         self._hideMask();
                     });
@@ -284,7 +284,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             if (modelData.calendarAlias !== 'user') {
                 this._showUserCalendarOnlyFields(form, false);
             }
-            this._toggleCalendarUidByChildEvents(form);
+            this._toggleCalendarUidByInvitedUsers(form);
 
             form.find(this.selectors.calendarUid).on('change', _.bind(function (e) {
                 var $emptyColor = form.find('.empty-color'),
@@ -300,8 +300,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     this._showUserCalendarOnlyFields(form, false);
                 }
             }, this));
-            form.find(this.selectors.childEvents).on('change', _.bind(function (e) {
-                this._toggleCalendarUidByChildEvents(form);
+            form.find(this.selectors.invitedUsers).on('change', _.bind(function (e) {
+                this._toggleCalendarUidByInvitedUsers(form);
             }, this));
 
             return form;
@@ -340,6 +340,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 delete data.calendarUid;
             }
 
+            if (data.hasOwnProperty('invitedUsers')) {
+                data.invitedUsers = _.map(data.invitedUsers ? data.invitedUsers.split(',') : [], function (item) {
+                    return parseInt(item);
+                });
+            }
+
             return data;
         },
 
@@ -362,12 +368,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             });
         },
 
-        _toggleCalendarUidByChildEvents: function (form) {
+        _toggleCalendarUidByInvitedUsers: function (form) {
             var $calendarUid = form.find(this.selectors.calendarUid);
             if (!$calendarUid.length) {
                 return;
             }
-            if (form.find(this.selectors.childEvents).val()) {
+            if (form.find(this.selectors.invitedUsers).val()) {
                 $calendarUid.attr('disabled', 'disabled');
                 $calendarUid.parent().attr('title', __("The calendar cannot be changed because the event has guests"));
                 if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {

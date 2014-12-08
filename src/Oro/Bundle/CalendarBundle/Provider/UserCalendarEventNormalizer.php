@@ -96,18 +96,18 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             }
 
             foreach ($items as &$item) {
-                $item['childEvents']  = [];
+                //!!!$item['childEvents']  = [];
                 $item['invitedUsers'] = [];
                 if (isset($groupedInvitees[$item['id']])) {
                     foreach ($groupedInvitees[$item['id']] as $invitee) {
-                        $item['childEvents'][]  = $invitee['eventId'];
+                        //!!!$item['childEvents'][]  = $invitee['eventId'];
                         $item['invitedUsers'][] = $invitee['userId'];
                     }
                 }
             }
         } else {
             foreach ($items as &$item) {
-                $item['childEvents']  = [];
+                //!!!$item['childEvents']  = [];
                 $item['invitedUsers'] = [];
             }
         }
@@ -128,7 +128,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         $item['notifiable'] =
             !empty($item['invitationStatus'])
             && empty($item['parentEventId'])
-            && !empty($item['childEvents']);
+            && !empty($item['invitedUsers']);
+            //&& !empty($item['childEvents']);
     }
 
     /**
