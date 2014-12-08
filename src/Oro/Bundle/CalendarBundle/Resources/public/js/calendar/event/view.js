@@ -206,7 +206,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             var fieldNameRegex = /\[(\w+)\]/g;
 
             // show loading mask if child events users should be updated
-            if (modelData.invitedUsers) {
+            if (!_.isEmpty(modelData.invitedUsers)) {
                 this.eventDialog.once('renderComplete', function() {
                     self.showLoadingMask();
                 });
@@ -237,7 +237,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 }
 
                 // hide loading mask if child events users should be updated
-                if (name.indexOf('[invitedUsers]') !== -1 && modelData.invitedUsers) {
+                if (name.indexOf('[invitedUsers]') !== -1 && !_.isEmpty(modelData.invitedUsers)) {
                     input.on('select2-data-loaded', function () {
                         self._hideMask();
                     });

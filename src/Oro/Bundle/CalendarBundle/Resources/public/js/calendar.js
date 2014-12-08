@@ -622,10 +622,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             var result = false,
                 guests = eventModel.get('invitedUsers');
             guests = _.isNull(guests) ? [] : guests;
-            if (eventModel.hasChanged('invitedUsers') && eventModel.previous('invitedUsers')) {
+            if (eventModel.hasChanged('invitedUsers') && !_.isEmpty(eventModel.previous('invitedUsers'))) {
                 guests = _.union(guests, eventModel.previous('invitedUsers'));
             }
-            if (guests) {
+            if (!_.isEmpty(guests)) {
                 result = Boolean(this.getConnectionCollection().find(function (c) {
                     return Boolean(_.find(guests, function (userId) {
                         return c.get('userId') == userId;
