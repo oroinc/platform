@@ -27,7 +27,7 @@ define(function (require) {
      * @extends Backbone.View
      */
     return Backbone.View.extend({
-        MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend'),
+        MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
