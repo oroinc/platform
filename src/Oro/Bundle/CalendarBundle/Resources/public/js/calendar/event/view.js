@@ -15,6 +15,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
     return Backbone.View.extend({
         /** @property {Object} */
         options: {
+            calendar: null,
+            connections: null,
             colorManager: null,
             widgetRoute: null,
             widgetOptions: null
@@ -203,7 +205,11 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 if (matches.length) {
                     var value = self.getValueByPath(modelData, matches);
                     if (input.is(':checkbox')) {
-                        input.prop('checked', value);
+                        if (value === false || value === true) {
+                            input.prop('checked', value);
+                        } else {
+                            input.prop('checked', input.val() == value);
+                        }
                     } else {
                         input.val(value);
                     }
@@ -242,10 +248,30 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         getEventForm: function () {
             var modelData = this.model.toJSON(),
-                form = this.fillForm(this.template(modelData), modelData),
+                templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData),
+                form = this.fillForm(this.template(templateData), modelData),
                 calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
             form.find('[name*="backgroundColor"]')
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
+            if (modelData.calendarAlias !== 'user') {
+                form.find('.reminders-collection').closest('.control-group').hide();
+            }
+            form.find('[name*="calendarUid"]')
+                .on('change', _.bind(function (e) {
+                    var $emptyColor = form.find('.empty-color'),
+                        $selector = $(e.currentTarget),
+                        tagName = $selector.prop('tagName').toUpperCase(),
+                        calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
+                        colors = this.options.colorManager.getCalendarColors(calendarUid),
+                        newCalendar = this.parseCalendarUid(calendarUid),
+                        $reminders = form.find('.reminders-collection').closest('.control-group');
+                    $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
+                    if (newCalendar.calendarAlias === 'user') {
+                        $reminders.show();
+                    } else {
+                        $reminders.hide();
+                    }
+                }, this));
             return form;
         },
 
@@ -268,7 +294,24 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 }
             }, this);
 
+            if (data.hasOwnProperty('calendarUid')) {
+                if (data.calendarUid) {
+                    _.extend(data, this.parseCalendarUid(data.calendarUid));
+                    if (data.calendarAlias !== 'user') {
+                        data.reminders = {};
+                    }
+                }
+                delete data.calendarUid;
+            }
+
             return data;
+        },
+
+        parseCalendarUid: function (calendarUid) {
+            return {
+                calendarAlias: calendarUid.substr(0, calendarUid.lastIndexOf('_')),
+                calendar: parseInt(calendarUid.substr(calendarUid.lastIndexOf('_') + 1))
+            };
         },
 
         setValueByPath: function (obj, value, path) {
@@ -295,6 +338,43 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
 
             return current;
+        },
+
+        getEventFormTemplateData: function (isNew) {
+            var templateType = '',
+                calendars = [],
+                ownCalendar = null,
+                isOwnCalendar = function (item) {
+                    return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
+                };
+
+            this.options.connections.each(function (item) {
+                var calendar;
+                if (item.get('canAddEvent')) {
+                    calendar = {uid: item.get('calendarUid'), name: item.get('calendarName')};
+                    if (!ownCalendar && isOwnCalendar(item)) {
+                        ownCalendar = calendar;
+                    } else {
+                        calendars.push(calendar);
+                    }
+                }
+            }, this);
+
+            if (calendars.length) {
+                if (isNew && calendars.length === 1) {
+                    templateType = 'single';
+                } else {
+                    if (ownCalendar) {
+                        calendars.unshift(ownCalendar);
+                    }
+                    templateType = 'multiple';
+                }
+            }
+
+            return {
+                calendarUidTemplateType: templateType,
+                calendars: calendars
+            };
         }
     });
 });

@@ -1,60 +1,60 @@
 .search-entity-types-column {
-  width: 200px;
-  vertical-align: top;
-  border: 1px solid #cccccc;
-  background-color: #f8f8f8;
   .entity-type {
     border-bottom: 1px solid #e6e6e6;
-    width: 200px;
-    height: 30px;
-    font-size: 13px;
-    padding: 5px 0 5px 10px;
-    > img {
-      position: relative;
-      top: -2px;
+    a {
+      padding-top: 5px;
+      padding-bottom: 4px;
+    }
+    i[class^="icon-"] {
+      color: #444;
     }
   }
   .entity-type.selected {
-    font-weight: bold;
-    background-color: #e8e8e8;
-  }
-  .entity-type.selected .arrow {
-    float: right;
-    padding-right: 5px;
-  }
-}
-
-.search-header{
-  &.container-fluid {
-    background-color: #f8f8f8;
-  }
-  h2 {
-    font-size: 22px;
-    float: left;
-    width: 160px;
-  }
-  .search-form {
-    float: left;
-    margin: 16px 0 0;
-    input[type="text"] {
-      width: 300px;
+    a{
+      font-weight: bold;
+      background-color: #e8e8e8 !important;
+      color: #444;
+    }
+    .arrow {
+      float: right;
+      margin-right: -7px;
     }
   }
 }
 
-.search-form {
-  display:inline;
-  padding-left: 20px;
+.search-header {
+  padding: 16px 20px 13px;
+  &.container-fluid {
+    background-color: #f8f8f8;
+  }
+  h2, .search-form {
+    margin: 0 0 5px;
+  }
+  h2 {
+    font-size: 20px;
+    float: left;
+    line-height: 30px;
+    margin-right: 15px;
+  }
+  .search-form {
+    float: left;
+    min-width: 260px;
+    padding-left: 0px;
+    input[type="text"] {
+      width: 300px;
+    }
+    .btn { height: 30px; line-height: 29px; }
+  }
 }
 
 .search-results-column {
-  vertical-align: top;
-  border: 1px solid #cccccc;
-  padding: 10px;
-  background-color: #ffffff;
   .customer-info {
     padding: 0 0 5px 60px;
     margin-top: -10px;
+    h1{
+      font-size: 18px;
+      line-height: 18px;
+    }
     .sub-title {
       font-size: 13px;
       line-height: 1em;
@@ -74,4 +74,36 @@
   font-size: 16px;
   border-top: 1px solid #cccccc;
   border-bottom: 1px solid #cccccc;
+}
+.search-grid {
+  .table.grid{
+    margin-bottom: 20px;
+  }
+}
+.mobile-version {
+  .search-header .search-form {
+    input[type="text"] {
+      width: 218px;
+    }
+    @media only screen and (max-width : 512px) {
+      clear: both;
+      width: 100%;
+      .input-append {
+        width: 100%;
+      }
+      input[type="text"] {
+        width: calc(~"100% - 88px");
+      }
+    }
+  }
+  .search-grid {
+    .pagination-container {
+      .pull-right {
+        margin-left: 5px;
+      }
+      .separator {
+        display: none;
+      }
+    }
+  }
 }
