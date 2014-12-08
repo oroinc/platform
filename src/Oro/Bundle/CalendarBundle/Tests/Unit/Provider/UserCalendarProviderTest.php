@@ -52,11 +52,13 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $calendar1 = new Calendar();
         ReflectionUtil::setId($calendar1, $calendarIds[0]);
         $user1 = new User();
+        ReflectionUtil::setId($user1, $userId);
         $calendar1->setOwner($user1);
 
         $calendar2 = new Calendar();
         ReflectionUtil::setId($calendar2, $calendarIds[1]);
         $user2 = new User();
+        ReflectionUtil::setId($user2, 456);
         $calendar2->setOwner($user2);
 
         $calendars = [$calendar1, $calendar2];
@@ -115,10 +117,12 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 $calendarIds[0] => [
-                    'calendarName' => 'John Doo'
+                    'calendarName' => 'John Doo',
+                    'userId'       => $userId,
                 ],
                 $calendarIds[1] => [
                     'calendarName'   => 'John Smith',
+                    'userId'         => 456,
                     'removable'      => false,
                     'canAddEvent'    => true,
                     'canEditEvent'   => true,

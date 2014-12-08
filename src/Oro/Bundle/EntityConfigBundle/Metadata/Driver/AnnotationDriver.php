@@ -46,6 +46,7 @@ class AnnotationDriver implements DriverInterface
             $metadata->defaultValues = $annotation->defaultValues;
             $metadata->routeName     = $annotation->routeName;
             $metadata->routeView     = $annotation->routeView;
+            $metadata->routeCreate   = $annotation->routeCreate;
             $metadata->mode          = $annotation->mode;
 
             foreach ($class->getProperties() as $property) {

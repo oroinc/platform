@@ -29,15 +29,15 @@ class CalendarEventRepository extends EntityRepository
     /**
      * Returns a query builder which can be used to get a list of user calendar events
      *
-     * @param array|Criteria $filters   Additional filtering criteria, e.g. ['allDay' => true, ...]
-     *                                  or \Doctrine\Common\Collections\Criteria
+     * @param array|Criteria $filters Additional filtering criteria, e.g. ['allDay' => true, ...]
+     *                                or \Doctrine\Common\Collections\Criteria
      *
      * @return QueryBuilder
      */
     public function getUserEventListQueryBuilder($filters = [])
     {
         $qb = $this->getEventListQueryBuilder()
-            ->addSelect('c.id as calendar')
+            ->addSelect('e.invitationStatus, IDENTITY(e.parent) AS parentEventId, c.id as calendar')
             ->innerJoin('e.calendar', 'c');
 
         $this->addFilters($qb, $filters);
@@ -125,6 +125,23 @@ class CalendarEventRepository extends EntityRepository
             ->setParameter('start', $startDate)
             ->setParameter('end', $endDate)
             ->orderBy('c.id, e.start');
+    }
+
+    /**
+     * Returns a query builder which can be used to get invited users for the given calendar events
+     *
+     * @param int[] $parentEventIds
+     *
+     * @return QueryBuilder
+     */
+    public function getInvitedUsersByParentsQueryBuilder($parentEventIds)
+    {
+        return $this->createQueryBuilder('e')
+            ->select('IDENTITY(e.parent) AS parentEventId, e.id AS eventId, u.id AS userId')
+            ->innerJoin('e.calendar', 'c')
+            ->innerJoin('c.owner', 'u')
+            ->where('e.parent IN (:parentEventIds)')
+            ->setParameter('parentEventIds', $parentEventIds);
     }
 
     /**
