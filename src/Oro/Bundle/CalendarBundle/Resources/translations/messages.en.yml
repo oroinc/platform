@@ -79,10 +79,10 @@ oro:
             entity_description:   Represent system calendar
             id.label:             Id
             name.label:           Calendar Name
-            backgroundColor.label: Color
             public.label:         Scope
             events.label:         Events
             organization.label:   Organization
+            background_color.label: Color
 
             scope.system:         System
             scope.organization:   Organization
@@ -102,7 +102,9 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All-day event
-            backgroundColor.label: Color
+
+            background_color.label: Color
+            system_calendar.label:  System Calendar
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}

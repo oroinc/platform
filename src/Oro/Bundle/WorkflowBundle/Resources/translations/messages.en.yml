@@ -131,6 +131,7 @@ oro:
             label.label:                  Name
             related_entity.label:         Related entity
             datagrid.view:                View
+            exclude_definitions.label:    Exclude Definitions
 
         processtrigger:
             entity_label:         Process Trigger
