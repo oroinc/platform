@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use Oro\Bundle\TranslationBundle\Provider\OroTranslationAdapter;
 
 class OroTranslationAdapterTest extends \PHPUnit_Framework_TestCase

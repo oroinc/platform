@@ -5,7 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -37,7 +37,7 @@ class SegmentController extends RestController implements ClassResourceInterface
      *      name="term", nullable=true, strict=false, default="",
      *      description="Search term")
      *
-     * @Get(name="oro_api_get_segment_items", requirements={"entityName"="((\w+)_)+(\w+)"})
+     * @Get(requirements={"entityName"="((\w+)_)+(\w+)"})
      * @ApiDoc(
      *      description="Get entity segments",
      *      resource=true
