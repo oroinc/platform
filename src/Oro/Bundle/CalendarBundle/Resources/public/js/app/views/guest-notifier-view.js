@@ -49,10 +49,10 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
         getConfirmDialog: function () {
             if (!this.confirmModal) {
                 this.confirmModal = new Modal({
-                    title: __('Notify invited users'),
+                    title: __('Notification confirmation'),
                     okText: __('Notify'),
                     cancelText: __("Don't notify"),
-                    content: __('All invited users will be notified of changes. Do you want to notify all invited users about changes?'),
+                    content: __('Notify guests about changes?'),
                     className: 'modal modal-primary',
                     okButtonClass: 'btn-primary btn-large',
                     handleClose: true
