@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *  routeName="oro_entity_index",
  *  routeView="oro_entity_view",
+ *  routeCreate="oro_entity_create",
  *  defaultValues={
  *      "ownership"={
  *          "owner_type"="USER",

@@ -91,9 +91,49 @@ class RestCalendarEventTest extends WebTestCase
 
     /**
      * @depends testPut
+     *
      * @param int $id
      */
     public function testGet($id)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertEquals($id, $result['id']);
+    }
+
+    /**
+     * @depends testPut
+     *
+     * @param int $id
+     */
+    public function testGetByCalendar($id)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_calendarevent_by_calendar',
+                ['id' => self::DEFAULT_USER_CALENDAR_ID, 'eventId' => $id]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertEquals($id, $result['id']);
+    }
+
+    /**
+     * @depends testPut
+     *
+     * @param int $id
+     */
+    public function testCget($id)
     {
         $request = array(
             'calendar'    => self::DEFAULT_USER_CALENDAR_ID,

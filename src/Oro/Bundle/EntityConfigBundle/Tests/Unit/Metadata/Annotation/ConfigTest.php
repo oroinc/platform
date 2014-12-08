@@ -14,12 +14,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $expectedMode,
         $expectedRouteName,
         $expectedRouteView,
+        $expectedRouteCreate,
         $expectedDefaultValues
     ) {
         $config = new Config($data);
         $this->assertEquals($expectedMode, $config->mode);
         $this->assertEquals($expectedRouteName, $config->routeName);
         $this->assertEquals($expectedRouteView, $config->routeView);
+        $this->assertEquals($expectedRouteCreate, $config->routeCreate);
         $this->assertEquals($expectedDefaultValues, $config->defaultValues);
     }
 
@@ -47,11 +49,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'default',
                 '',
                 '',
+                '',
                 [],
             ],
             [
                 ['mode' => 'readonly'],
                 'readonly',
+                '',
                 '',
                 '',
                 [],
@@ -61,6 +65,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'readonly',
                 '',
                 '',
+                '',
                 [],
             ],
             [
@@ -68,6 +73,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                     'mode'          => 'readonly',
                     'routeName'     => 'test_route_name',
                     'routeView'     => 'test_route_view',
+                    'routeCreate'   => 'test_route_create',
                     'defaultValues' => [
                         'test' => 'test_val'
                     ]
@@ -75,6 +81,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'readonly',
                 'test_route_name',
                 'test_route_view',
+                'test_route_create',
                 [
                     'test' => 'test_val'
                 ],

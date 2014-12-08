@@ -10,3 +10,5 @@ config:
         'orocalendar/js/calendar/event/view': 'bundles/orocalendar/js/calendar/event/view.js'
         'orocalendar/js/form-validation': 'bundles/orocalendar/js/form-validation.js'
         'orocalendar/js/calendar/color-manager': 'bundles/orocalendar/js/calendar/color-manager.js'
+        'orocalendar/js/app/views/change-status-view': 'bundles/orocalendar/js/app/views/change-status-view.js'
+        'orocalendar/js/app/views/guest-notifier-view': 'bundles/orocalendar/js/app/views/guest-notifier-view.js'

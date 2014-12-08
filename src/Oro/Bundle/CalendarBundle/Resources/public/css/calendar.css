@@ -165,10 +165,11 @@
     font-weight: bold;
 }
 
-.calendar-container .fc-event i.icon {
+.calendar-container .fc-event i.reminder-status {
+    font-size: 13px;
     position: absolute;
     right: 0;
-    top: 5px;
+    top: 3px;
 }
 
 .calendar-container .fc-border-separate thead th {
@@ -244,4 +245,13 @@
 
 .connection-item .custom-color-link:hover {
     color: #333;
+}
+
+.fc-event-inner.invitation-status-declined {
+    text-decoration: line-through;
+}
+
+.fc-event-inner i.invitation-status {
+    font-size: 13px;
+    padding-right: 3px;
 }
