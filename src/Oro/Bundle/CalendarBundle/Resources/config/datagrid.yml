@@ -45,7 +45,7 @@ datagrid:
                 label: oro.calendar.calendarevent.end.label
                 frontend_type: datetime
             invitationStatus:
-                label: oro.calendar.calendarevent.invitationStatus.label
+                label: oro.calendar.calendarevent.invitation_status.label
                 type: twig
                 template: OroCalendarBundle:CalendarEvent:Datagrid/Property/status.html.twig
                 frontend_type: html

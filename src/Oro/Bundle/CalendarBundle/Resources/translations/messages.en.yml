@@ -102,10 +102,12 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All-day event
-            background_color.label: Color
-            system_calendar.label:  System Calendar
-            invitation.label:     Guests
-            invitationStatus.label: Invitation status
+            child_events.label:   Child events
+            parent.label:         Parent
+            background_color.label:  Color
+            system_calendar.label:   System Calendar
+            invitation.label:        Guests
+            invitation_status.label: Invitation status
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}

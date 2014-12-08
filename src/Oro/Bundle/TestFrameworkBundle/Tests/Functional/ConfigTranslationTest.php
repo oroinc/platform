@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Functional;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -57,21 +57,13 @@ class ConfigTranslationTest extends WebTestCase
      */
     protected function getMissingTranslationKeys(ConfigInterface $config)
     {
-        $id = $config->getId();
-        $path = $id->getClassName();
-        if ($id instanceof FieldConfigId) {
-            $keys = ['label'];
-            $path .= '::' . $id->getFieldName();
-        } else {
-            $keys = ['label', 'plural_label'];
+        $keys = ['label'];
+        if ($config->getId() instanceof EntityConfigId) {
+            $keys[] = 'plural_label';
         }
 
         $missingTranslationKeys = [];
         foreach ($keys as $key) {
-            if (!$config->has($key)) {
-                $missingTranslationKeys[] = sprintf('%s: %s', $path, $key);
-            }
-
             $transKey = $config->get($key);
             if (!$this->getTranslator()->hasTrans($transKey)) {
                 $missingTranslationKeys[] = $transKey;
