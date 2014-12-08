@@ -53,3 +53,28 @@ UPGRADE FROM 1.4 to 1.5
 ####OroUIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
+
+####OroWorkflowBundle:
+- Added `multiple` option for `entity` attribute to allow use many-to-many relations in workflows. Example of usage of Multi-Select type (in this example it is supposed that Opportunity entity has `Multi-Select` field named `interested_in` and `enum_code` of this type is `opportunity_interested_in`):
+
+``` yaml
+workflows:
+    b2b_flow_sales_funnel:
+        attributes:
+            opportunity_interested_in:
+                label: orocrm.sales.opportunity.interested_in.label
+                property_path: sales_funnel.opportunity.interested_in
+                type:  entity
+                options:
+                    class: Extend\Entity\EV_OpportunityInterestedIn
+                    multiple: true
+        transitions:
+            start_from_opportunity:
+                form_options:
+                    attribute_fields:
+                        opportunity_interested_in:
+                            form_type: oro_enum_select
+                            options:
+                                enum_code: opportunity_interested_in
+                                expanded: true
+```
