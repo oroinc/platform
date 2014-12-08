@@ -20,7 +20,7 @@ define([
      */
     Modal = Backbone.BootstrapModal.extend({
         defaults: {
-            okText: __('Ok'),
+            okText: __('OK'),
             cancelText: __('Cancel')
         },
 
