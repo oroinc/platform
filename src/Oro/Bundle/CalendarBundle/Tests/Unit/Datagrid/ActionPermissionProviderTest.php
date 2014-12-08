@@ -79,7 +79,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'invitationStatus' => 'accepted',
                     'parentId' => '3512',
                     'ownerId' => self::ADMIN,
-                    'childrenCount' => 1
+                    'childrenCount' => null
                 ],
                 'expected' => [
                     'accept'      => false,
@@ -94,7 +94,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'invitationStatus' => 'accepted',
                     'parentId' => '3512',
                     'ownerId' => self::ADMIN,
-                    'childrenCount' => 2
+                    'childrenCount' => null
                 ],
                 'expected' => [
                     'accept'      => false,
@@ -137,18 +137,18 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
             'without child events' => [
                 'params' => [
                     'invitationStatus' => 'accepted',
-                    'parentId' => '3512',
+                    'parentId' => null,
                     'ownerId' => self::ADMIN,
-                    'childrenCount' => 0
+                    'childrenCount' => null
                 ],
                 'expected' => [
                     'accept'      => false,
                     'decline'     => false,
                     'tentatively' => false,
                     'view'        => true,
-                    'update'      => false
+                    'update'      => true
                 ]
-            ],
+            ]
         ];
     }
 }

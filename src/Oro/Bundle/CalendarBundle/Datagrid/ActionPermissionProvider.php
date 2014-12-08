@@ -31,29 +31,60 @@ class ActionPermissionProvider
         $invitationStatus = $record->getValue('invitationStatus');
         $parentId = $record->getValue('parentId');
         $ownerId = $record->getValue('ownerId');
-        $children = $record->getValue('childrenCount');
-
-        $isEnableAccepted = $invitationStatus
-            && $invitationStatus != CalendarEvent::ACCEPTED
-            && $user->getId() == $ownerId
-            && $children;
-        $isEnableTentatively = $invitationStatus
-            && $invitationStatus != CalendarEvent::TENTATIVELY_ACCEPTED
-            && $user->getId() == $ownerId
-            && $children;
-        $isEnableDecline = $invitationStatus
-            && $invitationStatus != CalendarEvent::DECLINED
-            && $user->getId() == $ownerId
-            && $children;
+        $childrenCount = $record->getValue('childrenCount');
 
         $isEditable = !$invitationStatus || ($invitationStatus && !$parentId);
 
         return array(
-            'accept'      => $isEnableAccepted,
-            'decline'     => $isEnableDecline,
-            'tentatively' => $isEnableTentatively,
+            'accept'      => $this->isAvailableResponseButton(
+                $user,
+                $parentId,
+                $ownerId,
+                $childrenCount,
+                $invitationStatus,
+                CalendarEvent::ACCEPTED
+            ),
+            'decline'     => $this->isAvailableResponseButton(
+                $user,
+                $parentId,
+                $ownerId,
+                $childrenCount,
+                $invitationStatus,
+                CalendarEvent::DECLINED
+            ),
+            'tentatively' => $this->isAvailableResponseButton(
+                $user,
+                $parentId,
+                $ownerId,
+                $childrenCount,
+                $invitationStatus,
+                CalendarEvent::TENTATIVELY_ACCEPTED
+            ),
             'view'        => true,
             'update'      => $isEditable
         );
+    }
+
+    /**
+     * @param User $user
+     * @param int $parentId
+     * @param int $ownerId
+     * @param int $childrenCount
+     * @param string $invitationStatus
+     * @param string $buttonStatus
+     * @return bool
+     */
+    protected function isAvailableResponseButton(
+        $user,
+        $parentId,
+        $ownerId,
+        $childrenCount,
+        $invitationStatus,
+        $buttonStatus
+    ) {
+        return $invitationStatus
+        && $invitationStatus != $buttonStatus
+        && $user->getId() == $ownerId
+        && ($parentId || $childrenCount);
     }
 }
