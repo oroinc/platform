@@ -65,7 +65,7 @@ class WidgetContextProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->provider->setRequest($request);
 
-        $this->assertSame($expectedValue, $this->provider->isActive());
+        $this->assertSame($expectedValue, $this->provider->getWid());
     }
 
     /**

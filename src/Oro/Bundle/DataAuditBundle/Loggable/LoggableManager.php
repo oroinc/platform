@@ -193,7 +193,7 @@ class LoggableManager
                 $logEntry = $props['log'];
                 $oldData  = $data = $logEntry->getData();
                 if (empty($data[$props['field']]['new'])) {
-                    $data[$props['field']] = $identifiers;
+                    $data[$props['field']]['new'] = $identifiers;
                     $logEntry->setData($data);
 
                     $uow->scheduleExtraUpdate(
