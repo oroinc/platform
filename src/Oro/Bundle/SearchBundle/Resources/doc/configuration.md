@@ -65,8 +65,8 @@ Acme\DemoBundle\Entity\Product:
         parameters:                                          # Array with parameters for route
             id: id
     mode: normal                                             # optional, default normal. Defines behavior for entities
-    title_fields: [name]                                     # with inheritance hierarchy
-    fields:
+    title_fields: [name]                                     # with inheritance hierarchy. See possible values in config
+    fields:                                                  # dump reference or in class constants Oro\Bundle\SearchBundle\Query\Mode
         -
             name: name                                       # Name of field in entity
             target_type: text                                # Type of virtual search field. Supported target types:
