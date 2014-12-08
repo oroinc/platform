@@ -49,7 +49,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                         date: 'YYYY-MM-DD',
                         time: 'HH:mms',
                         datetime: 'YYYY-MM-DD HH:mm',
-                        utc: ''
+                        backend: 'YYYY-MM-DD HH:mm:ssZZ'
                     }
                 },
                 address: {

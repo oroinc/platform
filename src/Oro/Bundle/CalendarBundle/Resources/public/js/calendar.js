@@ -288,8 +288,8 @@ define(function (require) {
                         eventModel;
                     this.applyTzCorrection(-1, attrs);
 
-                    attrs.start = attrs.start.format();
-                    attrs.end = attrs.end.format();
+                    attrs.start = attrs.start.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
+                    attrs.end = attrs.end.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
 
                     _.extend(
                         attrs,
@@ -340,8 +340,8 @@ define(function (require) {
 
                 this.applyTzCorrection(-1, attrs);
 
-                attrs.start = attrs.start.format();
-                attrs.end = attrs.end.format();
+                attrs.start = attrs.start.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
+                attrs.end = attrs.end.format(localeSettings.getVendorDateTimeFormat('moment', 'backend'));
 
                 model.save(
                     attrs,
@@ -376,8 +376,8 @@ define(function (require) {
 
             try {
                 this.collection.setRange(
-                    start.format(),
-                    end.format()
+                    start.format(localeSettings.getVendorDateTimeFormat('moment', 'date')),
+                    end.format(localeSettings.getVendorDateTimeFormat('moment', 'date'))
                 );
                 if (this.enableEventLoading) {
                     // load events from a server
