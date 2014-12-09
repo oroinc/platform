@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension;
 
 class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
@@ -78,14 +77,15 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $expectedScope
+     * @param string      $expectedScope
      * @param string|null $inputScope
+     *
      * @dataProvider getClassConfigDataProvider
      */
     public function testGetClassConfig($expectedScope, $inputScope)
     {
         $className = 'Test\Entity';
-        $config = array('key' => 'value');
+        $config    = array('key' => 'value');
 
         $configEntity = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
         $configEntity->expects($this->any())->method('all')->will($this->returnValue($config));
@@ -102,6 +102,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
                     function (EntityConfigId $configId) use ($className, $expectedScope, $configEntity) {
                         self::assertEquals($className, $configId->getClassName());
                         self::assertEquals($expectedScope, $configId->getScope());
+
                         return $configEntity;
                     }
                 )
@@ -118,13 +119,13 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     public function getClassConfigDataProvider()
     {
         return array(
-            'default scope' => array(
+            'default scope'   => array(
                 'expectedScope' => 'entity',
-                'inputScope' => null,
+                'inputScope'    => null,
             ),
             'specified scope' => array(
                 'expectedScope' => 'test',
-                'inputScope' => 'test',
+                'inputScope'    => 'test',
             ),
         );
     }
@@ -145,7 +146,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassConfigValue()
     {
-        $className = 'Test\Entity';
+        $className         = 'Test\Entity';
         $configEntityScope = new Config(new EntityConfigId('entity', $className));
         $configEntityScope->set('test', 'entity_val');
         $configAnotherScope = new Config(new EntityConfigId('another', $className));
@@ -190,56 +191,39 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider getClassRouteProvider
-     *
-     * @param $metadata
-     * @param $expectedRouteView
-     * @param $expectedRouteName
-     * @param $expectedRouteCreate
-     */
-    public function testGetClassRoute($metadata, $expectedRouteView, $expectedRouteName, $expectedRouteCreate)
+    public function testGetClassRouteInNonStrictMode()
     {
-        $className = $metadata->name;
+        $className = 'Test\Entity';
+        $viewRoute = 'route_view';
 
-        $this->configManager->expects($this->any())->method('getEntityMetadata')
-            ->will($this->returnValue($metadata));
+        $metadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
+            ->disableOriginalConstructor()->getMock();
+        $metadata->expects($this->once())->method('getRoute')
+            ->with('view', false)->willReturn($viewRoute);
 
-        $this->assertNull($this->twigExtension->getClassRoute($className, 'undefined'));
-        $this->assertEquals($expectedRouteView, $this->twigExtension->getClassRoute($className));
-        $this->assertEquals($expectedRouteView, $this->twigExtension->getClassRoute($className, 'view'));
-        $this->assertEquals($expectedRouteName, $this->twigExtension->getClassRoute($className, 'name'));
-        $this->assertEquals($expectedRouteCreate, $this->twigExtension->getClassRoute($className, 'create'));
+        $this->configManager->expects($this->once())->method('hasConfig')
+            ->with($className)->willReturn(true);
+        $this->configManager->expects($this->once())->method('getEntityMetadata')
+            ->with($className)->willReturn($metadata);
+
+        $this->assertSame($viewRoute, $this->twigExtension->getClassRoute($className));
     }
 
-    /**
-     * @return array
-     */
-    public function getClassRouteProvider()
+    public function testGetClassRouteShouldPassArgumentsToDelegatingMethod()
     {
-        $metadataWithoutRoutes         = new EntityMetadata(
-            'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity'
-        );
-        $metadataWithRoutes            = new EntityMetadata(
-            'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\EntityForAnnotationTests'
-        );
-        $metadataWithRoutes->routeView   = 'test_route_view';
-        $metadataWithRoutes->routeName   = 'test_route_name';
-        $metadataWithRoutes->routeCreate = 'test_route_create';
+        $className = 'Test\Entity';
+        $createRoute = 'route_create';
 
-        return [
-            'with_routes'    => [
-                'metadata'            => $metadataWithRoutes,
-                'expectedRouteView'   => 'test_route_view',
-                'expectedRouteName'   => 'test_route_name',
-                'expectedRouteCreate' => 'test_route_create',
-            ],
-            'without_routes' => [
-                'metadata'            => $metadataWithoutRoutes,
-                'expectedRouteView'   => 'oro_demoentity_view',
-                'expectedRouteName'   => 'oro_demoentity_index',
-                'expectedRouteCreate' => 'oro_demoentity_create',
-            ],
-        ];
+        $metadata = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata')
+            ->disableOriginalConstructor()->getMock();
+        $metadata->expects($this->once())->method('getRoute')
+            ->with('create', $strict = true)->willReturn($createRoute);
+
+        $this->configManager->expects($this->once())->method('hasConfig')
+            ->with($className)->willReturn(true);
+        $this->configManager->expects($this->once())->method('getEntityMetadata')
+            ->with($className)->willReturn($metadata);
+
+        $this->assertSame($createRoute, $this->twigExtension->getClassRoute($className, 'create', $strict));
     }
 }
