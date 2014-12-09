@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 
-class AkeneoBatchBundleInstaller implements Installation
+class OroBatchBundleInstaller implements Installation
 {
     /**
      * {@inheritdoc}
