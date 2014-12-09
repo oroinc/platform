@@ -49,15 +49,13 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
         return [
             'first and last name exists'                                 => [
                 "CONCAT(CASE WHEN a.lastName IS NOT NULL THEN a.lastName ELSE '' END, " .
-                "CONCAT(' ', CONCAT(CASE WHEN a.firstName IS NOT NULL THEN a.firstName ELSE '' END, " .
-                "CONCAT(' ', ''))))",
+                "CONCAT(' ', CONCAT(CASE WHEN a.firstName IS NOT NULL THEN a.firstName ELSE '' END, ' ')))",
                 '%last_name% %first_name% %suffix%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
             'first and last name exists, first name should be uppercase' => [
                 "CONCAT(CASE WHEN a.lastName IS NOT NULL THEN a.lastName ELSE '' END, " .
-                "CONCAT(' ', CONCAT(UPPER(CASE WHEN a.firstName IS NOT NULL THEN a.firstName ELSE '' END), " .
-                "CONCAT(' ', ''))))",
+                "CONCAT(' ', CONCAT(UPPER(CASE WHEN a.firstName IS NOT NULL THEN a.firstName ELSE '' END), ' ')))",
                 '%last_name% %FIRST_NAME% %suffix%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Tests\Unit\Fixtures\FirstLastNameAwareInterface')
             ],
@@ -65,7 +63,7 @@ class DQLNameFormatterTest extends \PHPUnit_Framework_TestCase
                 "CONCAT(CASE WHEN a.namePrefix IS NOT NULL THEN a.namePrefix ELSE '' END, " .
                 "CONCAT(' ', CONCAT(CASE WHEN a.lastName IS NOT NULL THEN a.lastName ELSE '' END, " .
                 "CONCAT(' ', CONCAT(CASE WHEN a.firstName IS NOT NULL THEN a.firstName ELSE '' END, " .
-                "CONCAT(' - ', CONCAT(CASE WHEN a.nameSuffix IS NOT NULL THEN a.nameSuffix ELSE '' END, '')))))))",
+                "CONCAT(' - ', CASE WHEN a.nameSuffix IS NOT NULL THEN a.nameSuffix ELSE '' END))))))",
                 '%prefix% %last_name% %first_name% - %suffix%',
                 $this->getMock('Oro\Bundle\LocaleBundle\Model\FullNameInterface')
             ]

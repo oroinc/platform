@@ -15,6 +15,7 @@ parameters:
     oro_user.group.manager.class:                 Oro\Bundle\UserBundle\Entity\Manager\GroupManager
     oro_user.group.manager.api.class:             Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.autocomplete.user.search_handler:    Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
+    oro_user.autocomplete.user.search_without_current_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler
     oro_user.autocomplete.user.search_acl_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
     oro_user.email.owner.provider.class:          Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
     oro_user.gender_provider.class:               Oro\Bundle\UserBundle\Provider\GenderProvider
@@ -128,6 +129,17 @@ services:
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
+
+    oro_user.autocomplete.user.search_without_current_handler:
+        class: %oro_user.autocomplete.user.search_without_current_handler.class%
+        parent: oro_form.autocomplete.full_name.search_handler
+        arguments:
+            - @oro_security.security_facade
+            - @oro_attachment.manager
+            - %oro_user.entity.class%
+            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
 
     oro_user.gender_provider:
         class: %oro_user.gender_provider.class%

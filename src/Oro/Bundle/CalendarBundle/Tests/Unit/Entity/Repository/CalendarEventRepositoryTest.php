@@ -59,7 +59,9 @@ class CalendarEventRepositoryTest extends OrmTestCase
 
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt,'
+            . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE '
@@ -84,7 +86,9 @@ class CalendarEventRepositoryTest extends OrmTestCase
 
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt,'
+            . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE e.allDay = :allDay'
@@ -112,7 +116,9 @@ class CalendarEventRepositoryTest extends OrmTestCase
 
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
-            . ' e.backgroundColor, e.createdAt, e.updatedAt, c.id as calendar'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt,'
+            . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' c.id as calendar'
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' WHERE e.allDay = :allDay'
@@ -281,5 +287,26 @@ class CalendarEventRepositoryTest extends OrmTestCase
         );
 
         $this->assertTrue($qb->getQuery()->getParameter('allDay')->getValue());
+    }
+
+    public function testGetInvitedUsersByParentsQueryBuilder()
+    {
+        $parentEventIds = [1, 2];
+
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
+
+        $qb = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds);
+
+        $this->assertEquals(
+            'SELECT IDENTITY(e.parent) AS parentEventId, e.id AS eventId, u.id AS userId'
+            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            . ' INNER JOIN e.calendar c'
+            . ' INNER JOIN c.owner u'
+            . ' WHERE e.parent IN (:parentEventIds)',
+            $qb->getQuery()->getDQL()
+        );
+
+        $this->assertEquals($parentEventIds, $qb->getQuery()->getParameter('parentEventIds')->getValue());
     }
 }
