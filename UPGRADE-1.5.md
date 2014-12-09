@@ -11,8 +11,6 @@ UPGRADE FROM 1.4 to 1.5
 
 ####OroConfigBundle:
 - `oro_config_entity` twig function was removed (deprecated since **1.3**)
-- Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
-  as well as already existing `routeName` and `routeView` properties
 
 ####OroDataAuditBundle
 - REST `Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController` was refactored to be based on `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController`
@@ -29,6 +27,10 @@ UPGRADE FROM 1.4 to 1.5
   entities with `type=Extend`(they actually doctrine `mappedSuperclass`es)
 - Added possibility to define **discriminator map** entries on child level using annotation `@Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue("VALUE")`.
   This is useful when auto-generated strategy fails due to duplication of short class names in the hierarchy.
+
+####OroEntityConfigBundle:
+- Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
+  as well as already existing `routeName` and `routeView` properties
 
 ####OroIntegrationBundle:
 - `Oro\Bundle\IntegrationBundle\Entity\Channel#getEnabled` deprecated in favor of `isEnabled` of the same class
