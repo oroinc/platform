@@ -1,6 +1,10 @@
 {% macro renderAvailableVariablesWidget(entityName, entityChoiceFieldId) %}
     <script type="text/javascript">
-        require(['jquery', 'orotranslation/js/translator', 'oroemail/js/email/variable/view', 'oroemail/js/email/variable/model', 'oroui/js/delete-confirmation'],
+        require(['jquery',
+                    'orotranslation/js/translator',
+                    'oroemail/js/app/views/email-variable-view',
+                    'oroemail/js/app/models/email-variable-model',
+                    'oroui/js/delete-confirmation'],
         function($, __, View, Model, DeleteConfirmation){
             $(function() {
                 'use strict';

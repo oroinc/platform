@@ -1,17 +1,20 @@
 /*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
-    ], function ($, _, Backbone) {
+define(function (require) {
     'use strict';
 
-    var document = window.document;
+    var EmailVariableView,
+        document = window.document,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        BaseView= require('oroui/js/app/views/base/view'),
+        __ = require('orotranslation/js/translator');
+    require('jquery-ui');
 
     /**
-     * @export  oroemail/js/email/variable/view
-     * @class   oro.email.variable.View
-     * @extends Backbone.View
+     * @export  oroemail/js/app/views/email-variable-view
      */
-    return Backbone.View.extend({
+    EmailVariableView = BaseView.extend({
         options: {
             templateSelector:        null,
             sectionTemplateSelector: null,
@@ -289,4 +292,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator'
             this.lastElement = $(e.currentTarget);
         }
     });
+
+    return EmailVariableView;
 });
