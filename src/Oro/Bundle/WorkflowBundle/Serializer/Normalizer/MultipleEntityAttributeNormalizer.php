@@ -108,7 +108,7 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
         }
 
         $expectedType = $attribute->getOption('class');
-        foreach ($attributeValue as $key => $value) {
+        foreach ($attributeValue as $value) {
             if (!$value instanceof $expectedType) {
                 throw new SerializerException(
                     sprintf(
