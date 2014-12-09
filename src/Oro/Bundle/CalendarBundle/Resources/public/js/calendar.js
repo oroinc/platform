@@ -13,6 +13,7 @@ define(function (require) {
         EventModel = require('orocalendar/js/calendar/event/model'),
         EventView = require('orocalendar/js/calendar/event/view'),
         ConnectionView = require('orocalendar/js/calendar/connection/view'),
+        eventDecorator = require('orocalendar/js/calendar/event-decorator'),
         ColorManager = require('orocalendar/js/calendar/color-manager'),
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
         localeSettings = require('orolocale/js/locale-settings');
@@ -141,6 +142,8 @@ define(function (require) {
                 // create a view for event details
                 this.eventView = new EventView(_.extend({}, options, {
                     model: eventModel,
+                    calendar: this.options.calendar,
+                    connections: this.getConnectionCollection(),
                     viewTemplateSelector: this.options.eventsOptions.itemViewTemplateSelector,
                     formTemplateSelector: this.options.eventsOptions.itemFormTemplateSelector,
                     colorManager: this.colorManager
@@ -193,8 +196,7 @@ define(function (require) {
         },
 
         addEventToCalendar: function (eventModel) {
-            var fcEvent = eventModel.toJSON();
-
+            var fcEvent = this.createViewModel(eventModel);
             this.prepareViewModel(fcEvent);
             this.applyTzCorrection(1, fcEvent);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
@@ -211,14 +213,23 @@ define(function (require) {
 
             this.addEventToCalendar(eventModel);
 
+            eventModel.set('editable', connectionModel.get('canEditEvent'));
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+
             // make sure that a calendar is visible when a new event is added to it
             if (!connectionModel.get('visible')) {
                 this.connectionsView.showCalendar(connectionModel);
             }
+            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
+                this.getCalendarElement().fullCalendar('refetchEvents');
+            }
         },
 
         onEventChanged: function (eventModel) {
-            var fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
+            var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
+                fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
+            eventModel.set('editable', connectionModel.get('canEditEvent'));
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, eventModel.toJSON());
             this.prepareViewModel(fcEvent);
@@ -230,10 +241,19 @@ define(function (require) {
             // please check that after updating fullcalendar
             // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
             this.getCalendarElement().fullCalendar('rerenderEvents');
+                this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
+            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
+                // start refetch procedure
+                this.getCalendarElement().fullCalendar('refetchEvents');
+            }
         },
 
         onEventDeleted: function (eventModel) {
-            this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
+                this.getCalendarElement().fullCalendar('refetchEvents');
+            } else {
+                this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
+            }
         },
 
         onConnectionAdded: function () {
@@ -367,10 +387,11 @@ define(function (require) {
 
         loadEvents: function (start, end, timezone, callback) {
             var onEventsLoad = _.bind(function () {
-                var fcEvents = this.collection.toJSON();
-                _.each(fcEvents, function (fcEvent) {
-                    this.prepareViewModel(fcEvent);
+                var fcEvents = this.collection.map(function (eventModel) {
+                    var fcEvent = this.createViewModel(eventModel);
+                    this.prepareViewModel(fcEvent, false);
                     this.applyTzCorrection(1, fcEvent);
+                    return fcEvent;
                 }, this);
                 this.eventsLoaded = {};
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
@@ -405,6 +426,18 @@ define(function (require) {
                 callback({});
                 this.showLoadEventsError(err);
             }
+        },
+
+        /**
+         * Creates event entry for rendering in calendar plugin from the given event model
+         *
+         * @param {Object} eventModel
+         */
+        createViewModel: function (eventModel) {
+            return _.pick(
+                eventModel.attributes,
+                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid']
+            );
         },
 
         /**
@@ -502,10 +535,7 @@ define(function (require) {
         initializeFullCalendar: function () {
             var options, keys, self;
             // prepare options for jQuery FullCalendar control
-            options = {
-                aspectRatio: this.options.aspectRatio,
-                contentHeight: this.options.contentHeight,
-                height: this.options.height,
+            options = { // prepare options for jQuery FullCalendar control
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
@@ -578,14 +608,9 @@ define(function (require) {
                 self.setTimeline();
             };
 
-            options.eventAfterRender = function (fcEvent, element) {
-                var reminders = self.collection.get(fcEvent.id).get('reminders');
-                if (reminders && _.keys(reminders).length) {
-                    element.find('.fc-event-inner').append('<i class="icon icon-bell"></i>');
-                } else {
-                    element.find('.icon').remove();
-                }
-            };
+            options.eventAfterRender = _.bind(function (fcEvent, $el) {
+                eventDecorator.decorate(this.collection.get(fcEvent.id), $el);
+            }, this);
 
             // create jQuery FullCalendar control
             options.timezone = "UTC";
@@ -626,7 +651,7 @@ define(function (require) {
                     return lastBackgroundColor;
                 });
                 this.colorManager.setCalendarColors(obj.calendarUid, obj.backgroundColor);
-                if (obj.calendarAlias === 'user') {
+                if (['user', 'system', 'public'].indexOf(obj.calendarAlias) !== -1) {
                     lastBackgroundColor = obj.backgroundColor;
                 }
             }, this));
@@ -693,6 +718,35 @@ define(function (require) {
                     });
                 }
             }
+        },
+
+        hasParentEvent: function (eventModel) {
+            var result = false,
+                parentEventId = eventModel.get('parentEventId'),
+                alias = eventModel.get('calendarAlias');
+            if (parentEventId) {
+                result = Boolean(this.getConnectionCollection().find(function (c) {
+                    return c.get('calendarAlias') === alias && this.collection.get(c.get('calendarUid') + '_' + parentEventId);
+                }, this));
+            }
+            return result;
+        },
+
+        hasGuestEvent: function (eventModel) {
+            var result = false,
+                guests = eventModel.get('invitedUsers');
+            guests = _.isNull(guests) ? [] : guests;
+            if (eventModel.hasChanged('invitedUsers') && !_.isEmpty(eventModel.previous('invitedUsers'))) {
+                guests = _.union(guests, eventModel.previous('invitedUsers'));
+            }
+            if (!_.isEmpty(guests)) {
+                result = Boolean(this.getConnectionCollection().find(function (c) {
+                    return Boolean(_.find(guests, function (userId) {
+                        return c.get('userId') == userId;
+                    }));
+                }, this));
+            }
+            return result;
         }
     });
 });

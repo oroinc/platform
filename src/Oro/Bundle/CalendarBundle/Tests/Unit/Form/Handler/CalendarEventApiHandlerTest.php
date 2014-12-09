@@ -6,51 +6,79 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler;
+use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 
 class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider supportedMethods
-     * @param string $method
-     */
-    public function testProcess($method)
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $form;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $request;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $om;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailSendProcessor;
+
+    /** @var CalendarEvent */
+    protected $obj;
+
+    protected function setUp()
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+        $this->form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
-        $request = new Request();
-        $om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->request = new Request();
+        $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailSendProcessor = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $request->setMethod($method);
+        $this->obj  = new CalendarEvent();
 
-        $obj  = new CalendarEvent();
-
-        $form->expects($this->once())
+        $this->form->expects($this->once())
             ->method('setData')
-            ->with($this->identicalTo($obj));
-        $form->expects($this->once())
+            ->with($this->identicalTo($this->obj));
+        $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->identicalTo($request));
-        $form->expects($this->once())
+            ->with($this->identicalTo($this->request));
+        $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
-        $om->expects($this->once())
+        $this->om->expects($this->once())
             ->method('persist')
-            ->with($this->identicalTo($obj));
-        $om->expects($this->once())
+            ->with($this->identicalTo($this->obj));
+        $this->om->expects($this->once())
             ->method('flush');
-
-        $handler = new CalendarEventApiHandler($form, $request, $om);
-        $handler->process($obj);
+        $this->form->expects($this->once())
+            ->method('get')
+            ->will($this->returnValue($this->form));
+        $this->form->expects($this->once())
+            ->method('getData');
     }
 
-    public function supportedMethods()
+    public function testProcessPOST()
     {
-        return array(
-            array('POST'),
-            array('PUT')
-        );
+        $this->request->setMethod('POST');
+        $this->emailSendProcessor->expects($this->once())
+            ->method('sendInviteNotification');
+
+        $handler = new CalendarEventApiHandler($this->form, $this->request, $this->om, $this->emailSendProcessor);
+        $handler->process($this->obj);
+    }
+
+    public function testProcessPUT()
+    {
+        ReflectionUtil::setId($this->obj, 1);
+        $this->request->setMethod('PUT');
+        $this->emailSendProcessor->expects($this->once())
+            ->method('sendUpdateParentEventNotification');
+
+        $handler = new CalendarEventApiHandler($this->form, $this->request, $this->om, $this->emailSendProcessor);
+        $handler->process($this->obj);
     }
 }

@@ -196,8 +196,9 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
      * @param $metadata
      * @param $expectedRouteView
      * @param $expectedRouteName
+     * @param $expectedRouteCreate
      */
-    public function testGetClassRoute($metadata, $expectedRouteView, $expectedRouteName)
+    public function testGetClassRoute($metadata, $expectedRouteView, $expectedRouteName, $expectedRouteCreate)
     {
         $className = $metadata->name;
 
@@ -208,6 +209,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedRouteView, $this->twigExtension->getClassRoute($className));
         $this->assertEquals($expectedRouteView, $this->twigExtension->getClassRoute($className, 'view'));
         $this->assertEquals($expectedRouteName, $this->twigExtension->getClassRoute($className, 'name'));
+        $this->assertEquals($expectedRouteCreate, $this->twigExtension->getClassRoute($className, 'create'));
     }
 
     /**
@@ -221,19 +223,22 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $metadataWithRoutes            = new EntityMetadata(
             'Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\EntityForAnnotationTests'
         );
-        $metadataWithRoutes->routeView = 'test_route_view';
-        $metadataWithRoutes->routeName = 'test_route_name';
+        $metadataWithRoutes->routeView   = 'test_route_view';
+        $metadataWithRoutes->routeName   = 'test_route_name';
+        $metadataWithRoutes->routeCreate = 'test_route_create';
 
         return [
             'with_routes'    => [
-                'metadata'          => $metadataWithRoutes,
-                'expectedRouteView' => 'test_route_view',
-                'expectedRouteName' => 'test_route_name',
+                'metadata'            => $metadataWithRoutes,
+                'expectedRouteView'   => 'test_route_view',
+                'expectedRouteName'   => 'test_route_name',
+                'expectedRouteCreate' => 'test_route_create',
             ],
             'without_routes' => [
-                'metadata'          => $metadataWithoutRoutes,
-                'expectedRouteView' => 'oro_demoentity_view',
-                'expectedRouteName' => 'oro_demoentity_index',
+                'metadata'            => $metadataWithoutRoutes,
+                'expectedRouteView'   => 'oro_demoentity_view',
+                'expectedRouteName'   => 'oro_demoentity_index',
+                'expectedRouteCreate' => 'oro_demoentity_create',
             ],
         ];
     }

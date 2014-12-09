@@ -1,4 +1,5 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
+{% import 'OroCalendarBundle::macros.html.twig' as calendarMacros %}
 
 {% oro_title_set({params : {"%entity.title%": entity.title, "%entityName%": 'oro.calendar.calendarevent.entity_label'|trans } }) %}
 {% set entityId = entity.id %}
@@ -43,7 +44,11 @@
                     form_row(form.end),
                     form_row(form.allDay),
                     form_row(form.backgroundColor),
-                    form_row(form.reminders)
+                    form.calendarUid is defined ? form_row(form.calendarUid) : null,
+                    form_row(form.childEvents),
+                    form_row(form.reminders),
+                    form_row(form.notifyInvitedUsers),
+                    entity.invitationStatus and entity.parent is null and entity.childEvents is not empty ? calendarMacros.notifyGuestsComponent() : null
                 ]
             }
         ]

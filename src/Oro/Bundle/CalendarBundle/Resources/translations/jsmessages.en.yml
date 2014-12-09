@@ -14,12 +14,6 @@
 "Sorry, the calendar excluding was failed": "Sorry, the calendar removing was failed"
 "Sorry, the calendar updating was failed": "Sorry, the calendar updating was failed"
 "Sorry, synchronization error was occurred": "Sorry, synchronization error was occurred"
-
-"My Calendar": "My Calendar"
-"Today calendar": "Today's Calendar"
-"Delete event": "Delete event"
-"Are you sure you want to delete this event?": "Are you sure you want to delete this event?"
-
 oro:
     calendar:
         control:
@@ -28,3 +22,12 @@ oro:
             month:   month
             week:    week
             day:     day
+"The calendar cannot be changed because the event has guests": "The calendar cannot be changed because the event has guests"
+"Notify guests title": "Notification confirmation"
+"Notify guests message": "Do you want to notify all invited users about changes?"
+"Notify": "Notify"
+"Don't notify": "Don't notify"
+"Not responded": "Not responded"
+"Tentatively accepted": "Tentatively accepted"
+"Accepted": "Accepted"
+"Reminders": "Reminders"

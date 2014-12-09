@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\CalendarBundle\Manager;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider;
 use Oro\Bundle\CalendarBundle\Provider\CalendarProviderInterface;
 use Oro\Bundle\UIBundle\Tools\ArrayUtils;
@@ -37,12 +36,13 @@ class CalendarManager
     /**
      * Gets calendars connected to the given calendar
      *
-     * @param int $userId     The id of an user requested this information
-     * @param int $calendarId The target calendar id
+     * @param int $organizationId The id of an organization for which this information is requested
+     * @param int $userId         The id of an user requested this information
+     * @param int $calendarId     The target calendar id
      *
      * @return array
      */
-    public function getCalendars($userId, $calendarId)
+    public function getCalendars($organizationId, $userId, $calendarId)
     {
         // make sure input parameters have proper types
         $userId     = (int)$userId;
@@ -57,13 +57,22 @@ class CalendarManager
 
         foreach ($this->providers as $alias => $provider) {
             $calendarIds           = isset($existing[$alias]) ? array_keys($existing[$alias]) : [];
-            $calendarDefaultValues = $provider->getCalendarDefaultValues($userId, $calendarId, $calendarIds);
+            $calendarDefaultValues = $provider->getCalendarDefaultValues(
+                $organizationId,
+                $userId,
+                $calendarId,
+                $calendarIds
+            );
             foreach ($calendarDefaultValues as $id => $values) {
                 if (isset($existing[$alias][$id])) {
-                    $key      = $existing[$alias][$id];
-                    $calendar = $result[$key];
-                    $this->applyCalendarDefaultValues($calendar, $values);
-                    $result[$key] = $calendar;
+                    $key = $existing[$alias][$id];
+                    if ($values !== null) {
+                        $calendar = $result[$key];
+                        $this->applyCalendarDefaultValues($calendar, $values);
+                        $result[$key] = $calendar;
+                    } else {
+                        unset($result[$key]);
+                    }
                 } else {
                     $values['targetCalendar'] = $calendarId;
                     $values['calendarAlias']  = $alias;
@@ -81,24 +90,33 @@ class CalendarManager
     /**
      * Gets the list of calendar events
      *
-     * @param int       $userId      The id of an user requested this information
-     * @param int       $calendarId  The target calendar id
-     * @param \DateTime $start       A date/time specifies the begin of a time interval
-     * @param \DateTime $end         A date/time specifies the end of a time interval
-     * @param bool      $subordinate Determines whether events from connected calendars should be included or not
+     * @param int       $organizationId The id of an organization for which this information is requested
+     * @param int       $userId         The id of an user requested this information
+     * @param int       $calendarId     The target calendar id
+     * @param \DateTime $start          A date/time specifies the begin of a time interval
+     * @param \DateTime $end            A date/time specifies the end of a time interval
+     * @param bool      $subordinate    Determines whether events from connected calendars should be included or not
      *
      * @return array
      */
-    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $subordinate)
     {
         // make sure input parameters have proper types
         $calendarId  = (int)$calendarId;
         $subordinate = (bool)$subordinate;
 
+        $allConnections = $this->calendarPropertyProvider->getItemsVisibility($calendarId, $subordinate);
+
         $result = [];
 
         foreach ($this->providers as $alias => $provider) {
-            $events = $provider->getCalendarEvents($userId, $calendarId, $start, $end, $subordinate);
+            $connections = [];
+            foreach ($allConnections as $c) {
+                if ($c['calendarAlias'] === $alias) {
+                    $connections[$c['calendar']] = $c['visible'];
+                }
+            }
+            $events = $provider->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
             if (!empty($events)) {
                 foreach ($events as &$event) {
                     $event['calendarAlias'] = $alias;
@@ -107,6 +125,9 @@ class CalendarManager
                     }
                     if (!isset($event['removable'])) {
                         $event['removable'] = true;
+                    }
+                    if (!isset($event['notifiable'])) {
+                        $event['notifiable'] = false;
                     }
                 }
                 $result = array_merge($result, $events);
