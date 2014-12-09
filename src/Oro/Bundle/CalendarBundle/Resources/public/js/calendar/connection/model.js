@@ -32,6 +32,7 @@ define(['underscore', 'backbone', 'routing'
             visible: true,
             backgroundColor: null,
             calendarName: null,
+            userId: null,
             removable: true,
             canAddEvent: false,
             canEditEvent: false,
@@ -61,7 +62,7 @@ define(['underscore', 'backbone', 'routing'
             options.data = JSON.stringify(
                 _.extend({}, _.omit(
                     this.toJSON(),
-                    ['calendarUid', 'calendarName', 'removable', 'canAddEvent', 'canEditEvent', 'canDeleteEvent']
+                    ['calendarUid', 'calendarName', 'userId', 'removable', 'canAddEvent', 'canEditEvent', 'canDeleteEvent']
                 ), attrs || {})
             );
 

@@ -17,21 +17,27 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $manager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $emailSendProcessor;
+
     /** @var CalendarEventDeleteHandler */
     protected $handler;
 
     protected function setUp()
     {
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+        $this->securityFacade     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->calendarConfig = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
+        $this->calendarConfig     = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->manager        = $this->getMockBuilder('Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager')
+        $this->manager            = $this->getMockBuilder('Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $objectManager        = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+        $this->emailSendProcessor = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $objectManager            = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->manager->expects($this->any())
@@ -45,6 +51,7 @@ class CalendarEventDeleteHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler->setCalendarConfig($this->calendarConfig);
         $this->handler->setSecurityFacade($this->securityFacade);
         $this->handler->setOwnerDeletionManager($ownerDeletionManager);
+        $this->handler->setEmailSendProcessor($this->emailSendProcessor);
     }
 
     public function testHandleDelete()

@@ -19,9 +19,9 @@ class UserCalendarProvider implements CalendarProviderInterface
     protected $calendarEventNormalizer;
 
     /**
-     * @param DoctrineHelper                    $doctrineHelper
-     * @param NameFormatter                     $nameFormatter
-     * @param AbstractCalendarEventNormalizer   $calendarEventNormalizer
+     * @param DoctrineHelper                  $doctrineHelper
+     * @param NameFormatter                   $nameFormatter
+     * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -50,7 +50,8 @@ class UserCalendarProvider implements CalendarProviderInterface
         $calendars = $qb->getQuery()->getResult();
         foreach ($calendars as $calendar) {
             $resultItem = [
-                'calendarName' => $this->buildCalendarName($calendar)
+                'calendarName' => $this->buildCalendarName($calendar),
+                'userId'       => $calendar->getOwner()->getId()
             ];
             // prohibit to remove the current calendar from the list of connected calendars
             if ($calendar->getId() === $calendarId) {
@@ -75,6 +76,7 @@ class UserCalendarProvider implements CalendarProviderInterface
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
         $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end);
+
         $visibleIds = [];
         foreach ($connections as $id => $visible) {
             if ($visible) {
