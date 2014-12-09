@@ -243,7 +243,6 @@ define(function (require) {
             // please check that after updating fullcalendar
             // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
             this.getCalendarElement().fullCalendar('rerenderEvents');
-                this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
                 // start refetch procedure
                 this.getCalendarElement().fullCalendar('refetchEvents');
@@ -300,7 +299,7 @@ define(function (require) {
             this.getCalendarElement().fullCalendar('refetchEvents');
         },
 
-        select: function (start, end) {
+        onFcSelect: function (start, end) {
             if (!this.eventView) {
                 try {
 
@@ -310,6 +309,10 @@ define(function (require) {
                         },
                         eventModel;
                     this.applyTzCorrection(-1, attrs);
+
+                    // if start and end date has no information about time of the day
+                    // tract that as full day event
+                    attrs.allDay = start.time().milliseconds() === 0 && end.time().milliseconds() === 0;
 
                     attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
                     attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
@@ -352,6 +355,10 @@ define(function (require) {
                 fcEvent.end = fcEvent.start.clone().add(fcEvent.duration);
             } else {
                 fcEvent.end = (fcEvent.end !== null) ? fcEvent.end.clone() : null;
+            }
+            // fix for case when all day event dragged to the hours grid
+            if (!fcEvent.allDay && fcEvent.end === null) {
+                fcEvent.end = fcEvent.start.clone().add(2, 'h');
             }
             this.saveFcEvent(fcEvent, undo);
         },
@@ -550,7 +557,7 @@ define(function (require) {
             options = { // prepare options for jQuery FullCalendar control
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
-                select: _.bind(this.select, this),
+                select: _.bind(this.onFcSelect, this),
                 eventClick: _.bind(this.onFcEventClick, this),
                 eventDrop: _.bind(this.onFcEventDrop, this),
                 eventResize: _.bind(this.onFcEventResize, this),
@@ -606,7 +613,7 @@ define(function (require) {
             };
             options.timeFormat = {
                 '': timeFormat,
-                agenda: timeFormat + '{ - ' + timeFormat + '}'
+                agenda: timeFormat
             };
             options.axisFormat = timeFormat;
 
