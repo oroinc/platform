@@ -60,7 +60,7 @@
         "guzzle/http": "3.7.*",
         "lexik/maintenance-bundle": "v1.0.3",
         "sylius/flow-bundle": "0.6.*",
-        "composer/composer": "1.0.0-alpha8",
+        "composer/composer": "1.0.0-alpha9",
         "akeneo/batch-bundle": "~0.3",
         "luxifer/doctrine-functions": "1.2.1",
         "nesbot/Carbon": "1.8.*",
