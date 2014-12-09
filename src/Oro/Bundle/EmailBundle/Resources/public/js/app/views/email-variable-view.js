@@ -7,8 +7,7 @@ define(function (require) {
         document = window.document,
         $ = require('jquery'),
         _ = require('underscore'),
-        BaseView= require('oroui/js/app/views/base/view'),
-        __ = require('orotranslation/js/translator');
+        BaseView= require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
     /**
