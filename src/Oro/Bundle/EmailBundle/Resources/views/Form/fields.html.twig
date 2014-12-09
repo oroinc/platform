@@ -1,6 +1,8 @@
 {% block oro_email_template_list_row %}
     <script type="text/javascript">
-        require(['jquery', 'oroemail/js/email/template/view', 'oroemail/js/email/template/collection'],
+        require(['jquery',
+                    'oroemail/js/app/views/email-template-view',
+                    'oroemail/js/app/models/email-template-collection'],
         function($, View, Collection) {
             $(function () {
                 'use strict';
