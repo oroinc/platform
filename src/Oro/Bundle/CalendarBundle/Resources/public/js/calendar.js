@@ -12,7 +12,6 @@ define(function (require) {
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel = require('orocalendar/js/calendar/event/model'),
         EventView = require('orocalendar/js/calendar/event/view'),
-        ConnectionCollection = require('orocalendar/js/calendar/connection/collection'),
         ConnectionView = require('orocalendar/js/calendar/connection/view'),
         ColorManager = require('orocalendar/js/calendar/color-manager'),
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
@@ -123,6 +122,7 @@ define(function (require) {
          * @inheritDoc
          */
         dispose: function () {
+            clearInterval(this.timelineUpdateIntervalId);
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
             }
@@ -226,7 +226,7 @@ define(function (require) {
             // fullcalendar doesn't remember new duration during updateEvent
             // so need to store it
             fcEvent.duration = moment.duration(fcEvent.end.diff(fcEvent.start));
-            // due to fullcalendar bug cannot update single event
+            // cannot update single event due to fullcalendar bug
             // please check that after updating fullcalendar
             // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
             this.getCalendarElement().fullCalendar('rerenderEvents');
@@ -309,7 +309,7 @@ define(function (require) {
             }
         },
 
-        eventClick: function (fcEvent) {
+        onFcEventClick: function (fcEvent) {
             if (!this.eventView) {
                 try {
                     var eventModel = this.collection.get(fcEvent.id);
@@ -320,13 +320,17 @@ define(function (require) {
             }
         },
 
-        eventResize: function (fcEvent, newDuration, undo) {
+        onFcEventResize: function (fcEvent, newDuration, undo) {
             fcEvent.end = fcEvent.start.clone().add(newDuration);
             this.saveFcEvent(fcEvent);
         },
 
-        eventDrop: function (fcEvent, dateChangeDiff, undo) {
-            fcEvent.end = (!fcEvent.duration) ? fcEvent.end.clone() : fcEvent.start.clone().add(fcEvent.duration);
+        onFcEventDrop: function (fcEvent, dateDiff, undo) {
+            if (fcEvent.duration && fcEvent.end) {
+                fcEvent.end = fcEvent.start.clone().add(fcEvent.duration);
+            } else {
+                fcEvent.end = (fcEvent.end !== null) ? fcEvent.end.clone() : null;
+            }
             this.saveFcEvent(fcEvent);
         },
 
@@ -334,15 +338,18 @@ define(function (require) {
             this.showSavingMask();
             try {
                 var attrs = {
+                        allDay: fcEvent.allDay,
                         start: fcEvent.start.clone(),
-                        end: fcEvent.end.clone()
+                        end: (fcEvent.end !== null) ? fcEvent.end.clone() : null
                     },
                     model = this.collection.get(fcEvent.id);
 
                 this.applyTzCorrection(-1, attrs);
 
                 attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
-                attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
+                if (attrs.end) {
+                    attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
+                }
 
                 model.save(
                     attrs,
@@ -404,7 +411,6 @@ define(function (require) {
          * Prepares event entry for rendering in calendar plugin
          *
          * @param {Object} fcEvent
-         * @param {boolean=} applyTZCorrection by default applies time zone correction
          */
         prepareViewModel: function (fcEvent) {
             // set an event text and background colors the same as the owning calendar
@@ -413,16 +419,29 @@ define(function (require) {
             fcEvent.color = colors.backgroundColor;
         },
 
-        applyTzCorrection: function (sign, event) {
-            if (!moment.isMoment(event.start)) {
-                event.start = $.fullCalendar.moment(event.start);
+        /**
+         * Applies timezone correction for data. The timezone taken from the settings and
+         * it equals current application timezone by default
+         * NOTE: changes passed model
+         *
+         * @param multiplier {int} allows to add or subtract timezone, pass 1 or -1 here please
+         * @param obj {object} object with start and end properties to which timezone will be applied
+         * @returns {object} object passed to function
+         */
+        applyTzCorrection: function (multiplier, obj) {
+            if (obj.end !== null) {
+                if (!moment.isMoment(obj.start)) {
+                    obj.start = $.fullCalendar.moment(obj.start);
+                }
+                obj.start.zone(0).add(this.options.timezone * multiplier, 'm');
             }
-            if (!moment.isMoment(event.end)) {
-                event.end = $.fullCalendar.moment(event.end);
+            if (obj.end !== null) {
+                if (!moment.isMoment(obj.end)) {
+                    obj.end = $.fullCalendar.moment(obj.end);
+                }
+                obj.end.zone(0).add(this.options.timezone * multiplier, 'm');
             }
-            event.start.zone(0).add(this.options.timezone * sign, 'm');
-            event.end.zone(0).add(this.options.timezone * sign, 'm');
-            return event;
+            return obj;
         },
 
         showSavingMask: function () {
@@ -474,7 +493,7 @@ define(function (require) {
             // init events container
             var eventsContainer = this.$el.find(this.options.eventsOptions.containerSelector);
             if (eventsContainer.length === 0) {
-                throw new Error("Cannot find '" + this.options.eventsOptions.containerSelector + "' element.");
+                throw new Error("Cannot find container selector '" + this.options.eventsOptions.containerSelector + "' element.");
             }
             eventsContainer.empty();
             eventsContainer.append($(this.eventsTemplate()));
@@ -490,9 +509,9 @@ define(function (require) {
                 selectHelper: true,
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.select, this),
-                eventClick: _.bind(this.eventClick, this),
-                eventDrop: _.bind(this.eventDrop, this),
-                eventResize: _.bind(this.eventResize, this),
+                eventClick: _.bind(this.onFcEventClick, this),
+                eventDrop: _.bind(this.onFcEventDrop, this),
+                eventResize: _.bind(this.onFcEventResize, this),
                 loading: _.bind(function (show) {
                     if (show) {
                         this.showLoadingMask();
@@ -553,7 +572,7 @@ define(function (require) {
             self = this;
             options.viewDisplay = function () {
                 self.setTimeline();
-                setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
+                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
             };
             options.windowResize = function () {
                 self.setTimeline();
