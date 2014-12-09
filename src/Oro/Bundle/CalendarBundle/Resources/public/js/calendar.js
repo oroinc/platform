@@ -236,7 +236,9 @@ define(function (require) {
             this.applyTzCorrection(1, fcEvent);
             // fullcalendar doesn't remember new duration during updateEvent
             // so need to store it
-            fcEvent.duration = moment.duration(fcEvent.end.diff(fcEvent.start));
+            if (fcEvent.end !== null) {
+                fcEvent.duration = moment.duration(fcEvent.end.diff(fcEvent.start));
+            }
             // cannot update single event due to fullcalendar bug
             // please check that after updating fullcalendar
             // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
@@ -342,7 +344,7 @@ define(function (require) {
 
         onFcEventResize: function (fcEvent, newDuration, undo) {
             fcEvent.end = fcEvent.start.clone().add(newDuration);
-            this.saveFcEvent(fcEvent);
+            this.saveFcEvent(fcEvent, undo);
         },
 
         onFcEventDrop: function (fcEvent, dateDiff, undo) {
@@ -351,10 +353,10 @@ define(function (require) {
             } else {
                 fcEvent.end = (fcEvent.end !== null) ? fcEvent.end.clone() : null;
             }
-            this.saveFcEvent(fcEvent);
+            this.saveFcEvent(fcEvent, undo);
         },
 
-        saveFcEvent: function (fcEvent) {
+        saveFcEvent: function (fcEvent, undo) {
             this.showSavingMask();
             try {
                 var attrs = {
@@ -363,6 +365,10 @@ define(function (require) {
                         end: (fcEvent.end !== null) ? fcEvent.end.clone() : null
                     },
                     model = this.collection.get(fcEvent.id);
+
+                if (attrs.allDay && attrs.end === null) {
+                    attrs.end = attrs.start.clone().add(24, 'h');
+                }
 
                 this.applyTzCorrection(-1, attrs);
 
@@ -376,12 +382,18 @@ define(function (require) {
                     {
                         success: _.bind(this._hideMask, this),
                         error: _.bind(function (model, response) {
+                            if (undo) {
+                                undo();
+                            }
                             this.showSaveEventError(response.responseJSON || {});
                         }, this)
                     }
                 );
             } catch (err) {
-                this.showLoadEventsError(err);
+                if (undo) {
+                    undo();
+                }
+                this.showSaveEventError(err);
             }
         },
 
