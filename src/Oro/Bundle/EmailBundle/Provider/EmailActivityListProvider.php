@@ -120,7 +120,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
             $data['ownerName'] = $this->nameFormatterLink->getService()->format($owner);
 
             $route = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))
-                ->getClassRoute('view');
+                ->getRoute('view');
             if (null !== $route) {
                 $id                = $this->doctrineHelper->getSingleEntityIdentifier($owner);
                 $data['ownerLink'] = $this->router->generate($route, ['id' => $id]);
