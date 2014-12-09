@@ -18,7 +18,8 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *      name="oro_calendar_event",
  *      indexes={
  *          @ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"}),
- *          @ORM\Index(name="oro_calendar_event_updated_at_idx", columns={"updated_at"})
+ *          @ORM\Index(name="oro_sys_calendar_event_idx", columns={"system_calendar_id", "start_at", "end_at"}),
+ *          @ORM\Index(name="oro_calendar_event_up_idx", columns={"updated_at"})
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
@@ -57,21 +58,74 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          }
  *      }
  * )
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
 {
+    const NOT_RESPONDED        = 'not_responded';
+    const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
+    const ACCEPTED             = 'accepted';
+    const DECLINED             = 'declined';
+    const WITHOUT_STATUS       = null;
+
+    protected $invitationStatuses = [
+        CalendarEvent::NOT_RESPONDED,
+        CalendarEvent::ACCEPTED,
+        CalendarEvent::TENTATIVELY_ACCEPTED,
+        CalendarEvent::DECLINED
+    ];
+
+    protected $availableStatuses = [
+        CalendarEvent::ACCEPTED,
+        CalendarEvent::TENTATIVELY_ACCEPTED,
+        CalendarEvent::DECLINED
+    ];
+
+    /**
+     * @return array
+     */
+    public function getAvailableInvitationStatuses()
+    {
+        $currentStatus = $this->getInvitationStatus();
+        $availableStatuses = [];
+        if ($currentStatus) {
+            $availableStatuses = $this->availableStatuses;
+            if (($key = array_search($currentStatus, $availableStatuses)) !== false) {
+                unset($availableStatuses[$key]);
+            }
+        }
+
+        return $availableStatuses;
+    }
+
     /**
      * @ORM\Id
-     * @ORM\Column(type="integer")
+     * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="parent", orphanRemoval=true, cascade={"all"})
+     **/
+    protected $childEvents;
+
+    /**
+     * @var CalendarEvent
+     *
+     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="childEvents")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
+     **/
+    protected $parent;
+
+    /**
      * @var Calendar
      *
      * @ORM\ManyToOne(targetEntity="Calendar", inversedBy="events")
-     * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="calendar_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
      * @ConfigField(
      *      defaultValues={
      *          "dataaudit"={
@@ -81,6 +135,21 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * )
      */
     protected $calendar;
+
+    /**
+     * @var SystemCalendar
+     *
+     * @ORM\ManyToOne(targetEntity="SystemCalendar", inversedBy="events")
+     * @ORM\JoinColumn(name="system_calendar_id", referencedColumnName="id", nullable=true, onDelete="CASCADE")
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $systemCalendar;
 
     /**
      * @var string
@@ -192,11 +261,26 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     protected $updatedAt;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="invitation_status", type="string", length=32, nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $invitationStatus;
+
     public function __construct()
     {
         parent::__construct();
 
-        $this->reminders = new ArrayCollection();
+        $this->reminders   = new ArrayCollection();
+        $this->childEvents = new ArrayCollection();
     }
 
     /**
@@ -210,9 +294,30 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * Gets owning calendar
+     * Gets UID of a calendar this event belongs to
+     * The calendar UID is a string includes a calendar alias and id in the following format: {alias}_{id}
      *
-     * @return Calendar
+     * @return string|null
+     */
+    public function getCalendarUid()
+    {
+        if ($this->calendar) {
+            return sprintf('%s_%d', Calendar::CALENDAR_ALIAS, $this->calendar->getId());
+        } elseif ($this->systemCalendar) {
+            $alias = $this->systemCalendar->isPublic()
+                ? SystemCalendar::PUBLIC_CALENDAR_ALIAS
+                : SystemCalendar::CALENDAR_ALIAS;
+
+            return sprintf('%s_%d', $alias, $this->systemCalendar->getId());
+        }
+
+        return null;
+    }
+
+    /**
+     * Gets owning user's calendar
+     *
+     * @return Calendar|null
      */
     public function getCalendar()
     {
@@ -220,15 +325,47 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     }
 
     /**
-     * Sets owning calendar
+     * Sets owning user's calendar
      *
      * @param Calendar $calendar
      *
-     * @return CalendarEvent
+     * @return self
      */
-    public function setCalendar(Calendar $calendar)
+    public function setCalendar(Calendar $calendar = null)
     {
         $this->calendar = $calendar;
+        // unlink an event from system calendar
+        if ($calendar && $this->getSystemCalendar()) {
+            $this->setSystemCalendar(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Gets owning system calendar
+     *
+     * @return SystemCalendar|null
+     */
+    public function getSystemCalendar()
+    {
+        return $this->systemCalendar;
+    }
+
+    /**
+     * Sets owning system calendar
+     *
+     * @param SystemCalendar $systemCalendar
+     *
+     * @return self
+     */
+    public function setSystemCalendar(SystemCalendar $systemCalendar = null)
+    {
+        $this->systemCalendar = $systemCalendar;
+        // unlink an event from user's calendar
+        if ($systemCalendar && $this->getCalendar()) {
+            $this->setCalendar(null);
+        }
 
         return $this;
     }
@@ -248,7 +385,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param string $title
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setTitle($title)
     {
@@ -272,7 +409,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param  string $description
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setDescription($description)
     {
@@ -296,7 +433,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param \DateTime $start
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setStart($start)
     {
@@ -327,7 +464,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param \DateTime $end
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setEnd($end)
     {
@@ -351,7 +488,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      *
      * @param bool $allDay
      *
-     * @return CalendarEvent
+     * @return self
      */
     public function setAllDay($allDay)
     {
@@ -407,13 +544,145 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      */
     public function getReminderData()
     {
-        $result = new ReminderData();
+        if (!$this->getCalendar()) {
+            throw new \LogicException(
+                sprintf('Only user\'s calendar events can have reminders. Event Id: %d.', $this->id)
+            );
+        }
 
+        $result = new ReminderData();
         $result->setSubject($this->getTitle());
         $result->setExpireAt($this->getStart());
         $result->setRecipient($this->getCalendar()->getOwner());
 
         return $result;
+    }
+
+    /**
+     * Get child calendar events
+     *
+     * @return Collection|CalendarEvent[]
+     */
+    public function getChildEvents()
+    {
+        return $this->childEvents;
+    }
+
+    /**
+     * Set children calendar events.
+     *
+     * @param Collection|CalendarEvent[] $calendarEvents
+     *
+     * @return CalendarEvent
+     */
+    public function resetChildEvents($calendarEvents)
+    {
+        $this->childEvents->clear();
+
+        foreach ($calendarEvents as $calendarEvent) {
+            $this->addChildEvent($calendarEvent);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add child calendar event
+     *
+     * @param CalendarEvent $calendarEvent
+     *
+     * @return CalendarEvent
+     */
+    public function addChildEvent(CalendarEvent $calendarEvent)
+    {
+        if (!$this->childEvents->contains($calendarEvent)) {
+            $this->childEvents->add($calendarEvent);
+            $calendarEvent->setParent($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove child calendar event
+     *
+     * @param CalendarEvent $calendarEvent
+     *
+     * @return CalendarEvent
+     */
+    public function removeChildEvent(CalendarEvent $calendarEvent)
+    {
+        if ($this->childEvents->contains($calendarEvent)) {
+            $this->childEvents->removeElement($calendarEvent);
+            $calendarEvent->setParent(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Calendar $calendar
+     *
+     * @return CalendarEvent|null
+     */
+    public function getChildEventByCalendar(Calendar $calendar)
+    {
+        $result = $this->childEvents->filter(
+            function (CalendarEvent $item) use ($calendar) {
+                return $item->getCalendar() == $calendar;
+            }
+        );
+
+        return $result->count() ? $result->first() : null;
+    }
+
+    /**
+     * Set parent calendar event.
+     *
+     * @param CalendarEvent $parent
+     */
+    public function setParent(CalendarEvent $parent = null)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * Get parent calendar event.
+     *
+     * @return CalendarEvent|null
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getInvitationStatus()
+    {
+        return $this->invitationStatus;
+    }
+
+    /**
+     * @param string|null $invitationStatus
+     */
+    public function setInvitationStatus($invitationStatus)
+    {
+        if ($this->isValid($invitationStatus)) {
+            $this->invitationStatus = $invitationStatus;
+        } else {
+            throw new \LogicException(sprintf('Investigation status "%s" is not supported', $invitationStatus));
+        }
+    }
+
+    /**
+     * @param string|null $invitationStatus
+     * @return bool
+     */
+    protected function isValid($invitationStatus)
+    {
+        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->invitationStatuses);
     }
 
     /**

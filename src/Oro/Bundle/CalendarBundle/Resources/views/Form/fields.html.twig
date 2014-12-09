@@ -1,0 +1,47 @@
+{% block oro_calendar_choice_row %}
+    {% if choices is not empty %}
+        {% if choices|length > 1 %}
+            {{ form_row(form) }}
+        {% else %}
+            {{ form_row(form, {'label': false}) }}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block oro_calendar_choice_template_row %}
+    <% var {{ name|raw }}Template = '';
+    if ({{ name }}TemplateType === 'single') {
+        {{ name|raw }}Template = '
+        {%- spaceless %}
+        <div class="control-group">
+            <div class="controls">
+                <div id="{{ id }}" class="horizontal validate-group">
+                    <div class="oro-clearfix">
+                        <input type="checkbox" id="{{ id }}_0" name="{{ full_name }}[]" value="< %= calendars[0].uid % >">
+                        <label for="{{ id }}_0">< %= {{ 'oro.calendar.add_to_calendar'|trans|json_encode|raw }}.replace("%name%", calendars[0].name) % ><em>&nbsp;</em></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endspaceless -%}
+        ';
+    } else if ({{ name }}TemplateType === 'multiple') {
+        {{ name|raw }}Template = '
+        {%- spaceless %}
+        <div class="control-group">
+            <label data-required="1" class="control-label required" for="{{ id }}">{{ label|trans }}<em>*</em></label>
+            <div class="controls">
+                <select id="{{ id }}" name="{{ full_name }}" data-required="1">
+                < % for (var i = 0; i < calendars.length; i++) { % >
+                    <option value="< %= calendars[i].uid % >">< %= calendars[i].name % ></option>
+                < % } % >
+                </select>
+            </div>
+        </div>
+        {% endspaceless -%}
+        ';
+    } %>
+    <% if ({{ name|raw }}Template) { %>
+        <%= _.template({{ name|raw }}Template.replace(/\< %/g, '<' + '%').replace(/% \>/g, '%' + '>'))({calendars: calendars}) %>
+    <% } %>
+{% endblock %}

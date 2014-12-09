@@ -5,8 +5,9 @@ namespace Oro\Bundle\SearchBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 class Configuration implements ConfigurationInterface
 {
@@ -16,6 +17,7 @@ class Configuration implements ConfigurationInterface
      * Bundle configuration structure
      *
      * @return TreeBuilder
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
@@ -73,6 +75,11 @@ class Configuration implements ConfigurationInterface
                                     ->prototype('variable')->end()
                                 ->end()
                             ->end()
+                        ->end()
+                        ->enumNode('mode')
+                            ->values([Mode::NORMAL, Mode::ONLY_DESCENDANTS, Mode::WITH_DESCENDANTS])
+                            ->defaultValue(Mode::NORMAL)
+                            ->info('Defines behavior for entities with inheritance hierarchy')
                         ->end()
                         ->scalarNode('search_template')
                             ->isRequired()

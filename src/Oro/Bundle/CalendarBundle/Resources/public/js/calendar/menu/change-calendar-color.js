@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
     return BaseView.extend({
         /** @property */
         customColorPickerActionsTemplate: _.template('<div class="form-actions">' +
-                '<button class="btn btn-primary pull-right" data-action="ok" type="button"><%= __("Ok") %></button>' +
+                '<button class="btn btn-primary pull-right" data-action="ok" type="button"><%= __("OK") %></button>' +
                 '<button class="btn pull-right" data-action="cancel" type="button"><%= __("Cancel") %></button>' +
             '</div>'),
 
