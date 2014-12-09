@@ -15,6 +15,7 @@ class AddEmailActivityLists extends AddActivityListsData implements DependentFix
     public function getDependencies()
     {
         return [
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization',
             'Oro\Bundle\EmailBundle\Migrations\Data\ORM\UpdateEmailTemplateWithOrganization'
         ];
     }
