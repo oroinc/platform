@@ -16,7 +16,7 @@
         'oro_config_configuration_system',
         {activeGroup: activeGroup, activeSubGroup: activeSubGroup}
     ) %}
-
+    "{{ oro_config_value('oro_ui.wysiwyg_enabled') }}"
     <form
         id="{{ form.vars.name }}"
         {{ form_enctype(form) }}

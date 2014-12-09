@@ -250,3 +250,10 @@ oro:
             wrench: wrench
             zoom-in: zoom in
             zoom-out: zoom out
+        system_configuration:
+            groups:
+                wysiwyg_settings.title: 'WYSIWYG settings'
+            fields:
+                wysiwyg_enabled:
+                    label: 'Enable WYSIWYG editor'
+                    tooltip: 'Enables WYSIWYG editor for all text fields'
