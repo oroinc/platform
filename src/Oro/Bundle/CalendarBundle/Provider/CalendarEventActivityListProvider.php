@@ -76,7 +76,9 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity CalendarEvent */
-        return $activityEntity->getCalendar()->getOrganization();
+        return $activityEntity->getCalendar()
+            ? $activityEntity->getCalendar()->getOrganization()
+            : $activityEntity->getSystemCalendar()->getOrganization();
     }
 
     /**

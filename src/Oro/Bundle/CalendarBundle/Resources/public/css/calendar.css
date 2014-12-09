@@ -159,10 +159,15 @@
     padding-top: 15px;
 }
 
+.calendar-container .fc-event-title {
+    font-weight: bold;
+}
+
 .calendar-container .fc-event i.icon {
+    font-size: 13px;
     position: absolute;
     right: 0;
-    top: 5px;
+    top: 3px;
 }
 
 .calendar-container .fc-widget-header {
@@ -237,4 +242,13 @@
 
 .connection-item .custom-color-link:hover {
     color: #333;
+}
+
+.fc-event-inner.invitation-status-declined {
+    text-decoration: line-through;
+}
+
+.fc-event-inner i.invitation-status {
+    font-size: 13px;
+    padding-right: 3px;
 }

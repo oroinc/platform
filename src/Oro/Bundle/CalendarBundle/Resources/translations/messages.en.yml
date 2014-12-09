@@ -1,8 +1,3 @@
-"My Calendar": "My Calendar"
-"Today calendar": "Today's Calendar"
-"Delete event": "Delete event"
-"Are you sure you want to delete this event?": "Are you sure you want to delete this event?"
-
 oro:
     dashboard:
         calendar:
@@ -11,12 +6,24 @@ oro:
 
     calendar:
         my_calendar:                My Calendar
+        my_calendar_widget_title:   Today's Calendar
+        my_calendar_widget_description: This widget displays a calendar for today.
         add_event:                  Add Event
         add_event.title:            Add an event to this record
         assign_event:               Assign Event
         assign_event.title:         Assign an event to this user
         assign_event.widget_title:  Assign Event to %username%
+        delete_event.title:         Delete event
+        delete_event.confirmation:  Are you sure you want to delete this event?
+        print: Print
         view_events:                Events
+        add_to_calendar:            Add to %name%
+        organization_calendar:      Organization Calendar
+
+        action:
+            public_calendar_management: Manage system calendars
+            public_calendar_event_management: Manage system calendar events
+            system_calendar_event_management: Manage organization calendar events
 
         system_configuration:
             groups:
@@ -26,14 +33,11 @@ oro:
                 event_colors.label:       Event colors
 
         controller:
-            event.saved.message:  Calendar event saved
+            event.saved.message:          Calendar event saved
+            systemcalendar.saved.message: Calendar saved
 
         form:
             choose_user_to_add_calendar: "Choose a user to add..."
-            no_color: Use calendar color
-
-        my_calendar_widget_descriptions: This widget displays a calendar for today.
-        print: Print
 
         menu:
             view_default: My Calendar
@@ -59,13 +63,30 @@ oro:
         #
         entity_label:        Calendar
         entity_plural_label: Calendars
-        entity_description:  Represent calendar
+        entity_description:  Represent user's calendar
         id.label:            Id
         name.label:          Name
-        events.label:        Event
-        connections.label:   Connection
+        events.label:        Events
         owner.label:         Owner
         organization.label:  Organization
+
+        #
+        # Oro/Bundle/CalendarBundle/Entity/SystemCalendar
+        #
+        systemcalendar:
+            entity_label:         System Calendar
+            entity_plural_label:  System Calendars
+            entity_description:   Represent system calendar
+            id.label:             Id
+            name.label:           Calendar Name
+            backgroundColor.label: Color
+            public.label:         Scope
+            events.label:         Events
+            organization.label:   Organization
+
+            scope.system:         System
+            scope.organization:   Organization
+            no_color:             Assign automatically
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarEvent
@@ -81,12 +102,26 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All-day event
+            invitation.label:     Guests
             backgroundColor.label: Color
+            invitationStatus.label: Invitation status
 
+            no_color:             Use calendar color
             updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}
             added_by:             added by {{ user }} at {{ date }}
             update_event:         Update {{ entity }}
             delete_event:         Delete {{ entity }}
+
+            statuses:
+                not_responded:        Not responded
+                tentatively_accepted: Tentatively accepted
+                accepted:             Accepted
+                declined:             Declined
+
+            actions:
+                tentatively_accepted: Tentative
+                accepted:             Accept
+                declined:             Decline
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty

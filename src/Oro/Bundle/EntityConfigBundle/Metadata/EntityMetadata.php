@@ -25,6 +25,11 @@ class EntityMetadata extends MergeableClassMetadata
     /**
      * @var string
      */
+    public $routeCreate;
+
+    /**
+     * @var string
+     */
     public $mode;
 
     /**
@@ -44,6 +49,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->defaultValues = $object->defaultValues;
             $this->routeName     = $object->routeName;
             $this->routeView     = $object->routeView;
+            $this->routeCreate   = $object->routeCreate;
             $this->mode          = $object->mode;
         }
     }
@@ -59,6 +65,7 @@ class EntityMetadata extends MergeableClassMetadata
                 $this->defaultValues,
                 $this->routeName,
                 $this->routeView,
+                $this->routeCreate,
                 $this->mode,
                 parent::serialize(),
             )
@@ -75,6 +82,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->defaultValues,
             $this->routeName,
             $this->routeView,
+            $this->routeCreate,
             $this->mode,
             $parentStr
             ) = unserialize($str);
