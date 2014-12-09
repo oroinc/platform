@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -151,7 +152,7 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function isApplicable($entity)
     {
         return $this->doctrineHelper->getEntityClass($entity) == self::ACTIVITY_CLASS
-        && $entity->getFromEmailAddress()->hasOwner();
+            && $entity->getFromEmailAddress()->hasOwner();
     }
 
     /**

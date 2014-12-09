@@ -96,7 +96,7 @@ class EntityMetadata extends MergeableClassMetadata
      *
      * @return string
      */
-    public function getClassRoute($routeType = 'view', $strict = false)
+    public function getRoute($routeType = 'view', $strict = false)
     {
         if (in_array($routeType, ['view', 'name', 'create'])) {
             $propertyName = 'route' . ucfirst($routeType);

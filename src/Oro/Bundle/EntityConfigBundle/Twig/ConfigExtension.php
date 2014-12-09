@@ -87,6 +87,6 @@ class ConfigExtension extends \Twig_Extension
             return null;
         }
 
-        return $this->configManager->getEntityMetadata($className)->getClassRoute($routeType, $strict);
+        return $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
     }
 }
