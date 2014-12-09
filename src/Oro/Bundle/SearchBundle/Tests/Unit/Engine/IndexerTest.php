@@ -3,7 +3,8 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
+use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -38,91 +39,21 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $config = array(
-        'Oro\Bundle\DataBundle\Entity\Product' => array(
-            'alias' => 'test_product',
-            'label' => 'test product',
-            'fields' => array(
-                array(
-                    'name' => 'name',
-                    'target_type' => 'string',
-                    'target_fields' => array('name', 'all_data')
-                ),
-                array(
-                    'name' => 'description',
-                    'target_type' => 'string',
-                    'target_fields' => array('description', 'all_data')
-                ),
-                array(
-                    'name' => 'price',
-                    'target_type' => 'decimal',
-                    'target_fields' => array('price')
-                ),
-                array(
-                    'name' => 'count',
-                    'target_type' => 'integer',
-                    'target_fields' => array('count')
-                ),
-                array(
-                    'name' => 'createDate',
-                    'target_type' => 'datetime',
-                    'target_fields' => array('create_date')
-                ),
-                array(
-                    'name' => 'manufacturer',
-                    'relation_type' => 'to',
-                    'relation_fields' => array(
-                        array(
-                            'name' => 'name',
-                            'target_type' => 'string',
-                            'target_fields' => array('manufacturer', 'all_data')
-                        )
-                    )
-                ),
-            )
-        ),
-        'Oro\Bundle\DataBundle\Entity\Customer' => array(
-            'alias' => 'test_customer',
-            'label' => 'test customer',
-            'fields' => array(),
-        ),
-    );
+    protected $config;
 
     protected function setUp()
     {
+        $this->config        = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->engine = $this->getMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
-
-        $this->mapper = $this->getMockBuilder('Oro\Bundle\SearchBundle\Engine\ObjectMapper')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getMappingConfig', 'getEntitiesListAliases'))
-            ->getMock();
-        $this->mapper->expects($this->any())
-            ->method('getMappingConfig')
-            ->will($this->returnValue($this->config));
-        $config = $this->config;
-        $this->mapper->expects($this->any())
-            ->method('getEntitiesListAliases')
-            ->will(
-                $this->returnCallback(
-                    function () use ($config) {
-                        $aliases = array();
-                        foreach ($config as $entityName => $entityOptions) {
-                            if (!empty($entityOptions['alias'])) {
-                                $aliases[$entityName] = $entityOptions['alias'];
-                            }
-                        }
-                        return $aliases;
-                    }
-                )
-            );
+            ->disableOriginalConstructor()->getMock();
+        $this->engine        = $this->getMock('Oro\Bundle\SearchBundle\Engine\EngineInterface');
+        $this->mapper        = new ObjectMapper(
+            $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface'),
+            $this->config
+        );
 
         $this->securityProvider = $this->getMockBuilder('Oro\Bundle\SearchBundle\Security\SecurityProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
         $this->securityProvider->expects($this->any())
             ->method('isGranted')
             ->will($this->returnValue(true));
@@ -175,48 +106,63 @@ class IndexerTest extends \PHPUnit_Framework_TestCase
     public function simpleSearchDataProvider()
     {
         return array(
-            'no extra parameters' => array(
-                'expectedQuery'
-                    => 'select from * where and((text)all_text ~ qwerty)',
-                'string' => 'qwerty',
+            'no extra parameters'             => array(
+                'expectedQuery' => 'select from * where and((text)all_text ~ qwerty)',
+                'string'        => 'qwerty',
             ),
-            'custom offset' => array(
-                'expectedQuery'
-                    => 'select from * where and((text)all_text ~ qwerty) offset 10',
-                'string' => 'qwerty',
-                'offset' => 10,
+            'custom offset'                   => array(
+                'expectedQuery' => 'select from * where and((text)all_text ~ qwerty) offset 10',
+                'string'        => 'qwerty',
+                'offset'        => 10,
             ),
             'custom offset custom maxResults' => array(
-                'expectedQuery'
-                    => 'select from * where and((text)all_text ~ qwerty) limit 200 offset 10',
-                'string' => 'qwerty',
-                'offset' => 10,
-                'maxResults' => 200,
+                'expectedQuery' => 'select from * where and((text)all_text ~ qwerty) limit 200 offset 10',
+                'string'        => 'qwerty',
+                'offset'        => 10,
+                'maxResults'    => 200,
             ),
-            'custom from' => array(
-                'expectedQuery'
-                    => 'select from test_customer where and((text)all_text ~ qwerty)',
-                'string' => 'qwerty',
-                'offset' => 0,
-                'maxResults' => 0,
-                'from' => 'test_customer',
+            'custom from'                     => array(
+                'expectedQuery' => 'select from test_customer where and((text)all_text ~ qwerty)',
+                'string'        => 'qwerty',
+                'offset'        => 0,
+                'maxResults'    => 0,
+                'from'          => 'test_customer',
             ),
-            'all custom parameters' => array(
-                'expectedQuery'
-                    => 'select from test_customer where and((text)all_text ~ qwerty) limit 200 offset 400',
-                'string' => 'qwerty',
-                'offset' => 10,
-                'maxResults' => 200,
-                'from' => 'test_customer',
-                'page' => 3,
+            'all custom parameters'           => array(
+                'expectedQuery' => 'select from test_customer where and((text)all_text ~ qwerty) limit 200 offset 400',
+                'string'        => 'qwerty',
+                'offset'        => 10,
+                'maxResults'    => 200,
+                'from'          => 'test_customer',
+                'page'          => 3,
             ),
-            'unknown from' => array(
-                'expectedQuery'
-                    => 'select where and((text)all_text ~ qwerty)',
-                'string' => 'qwerty',
-                'offset' => 0,
-                'maxResults' => 0,
-                'from' => 'unknown_entity',
+            'search by inherited entity'      => array(
+                'expectedQuery' => 'select from concrete_customer where and((text)all_text ~ qwerty)',
+                'string'        => 'qwerty',
+                'offset'        => null,
+                'maxResults'    => null,
+                'from'          => 'concrete_customer',
+            ),
+            'search by superclass entity, mode including descendants'     => array(
+                'expectedQuery' => 'select from customer, concrete_customer where and((text)all_text ~ qwerty)',
+                'string'        => 'qwerty',
+                'offset'        => null,
+                'maxResults'    => null,
+                'from'          => 'customer',
+            ),
+            'search by abstract entity, mode descendants only'     => array(
+                'expectedQuery' => 'select from repeatable_task, scheduled_task where and((text)all_text ~ qwerty)',
+                'string'        => 'qwerty',
+                'offset'        => null,
+                'maxResults'    => null,
+                'from'          => 'task',
+            ),
+            'unknown from'                    => array(
+                'expectedQuery' => 'select where and((text)all_text ~ qwerty)',
+                'string'        => 'qwerty',
+                'offset'        => 0,
+                'maxResults'    => 0,
+                'from'          => 'unknown_entity',
             ),
         );
     }

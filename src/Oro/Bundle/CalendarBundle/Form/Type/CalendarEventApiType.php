@@ -105,10 +105,26 @@ class CalendarEventApiType extends CalendarEventType
                 [
                     'required' => false,
                 ]
+            )
+            ->add(
+                'invitedUsers',
+                'oro_calendar_event_invitees',
+                [
+                    'required'      => false,
+                    'property_path' => 'childEvents'
+                ]
+            )
+            ->add(
+                'notifyInvitedUsers',
+                'hidden',
+                [
+                    'mapped' => false
+                ]
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
+        $this->subscribeOnChildEvents($builder, 'invitedUsers');
     }
 
     /**
@@ -118,9 +134,9 @@ class CalendarEventApiType extends CalendarEventType
     {
         $resolver->setDefaults(
             array(
-                'data_class'      => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                'intention'       => 'calendar_event',
-                'csrf_protection' => false,
+                'data_class'           => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                'intention'            => 'calendar_event',
+                'csrf_protection'      => false,
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
             )
         );
