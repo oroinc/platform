@@ -161,7 +161,13 @@ define(['jquery', 'underscore'
                 currentValue = [currentValue];
             }
 
-            var elementData = element.data('selected-data');
+            // elementData must have name
+            var elementData = _.filter(
+                element.data('selected-data'),
+                function (item) {
+                    return item.name !== undefined && item.name !== null;
+                }
+            );
 
             if (_.isArray(elementData) && elementData.length > 0) {
                 var dataIds = _.map(elementData, function(item) {
