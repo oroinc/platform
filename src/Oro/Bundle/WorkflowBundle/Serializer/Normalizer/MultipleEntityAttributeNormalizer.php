@@ -10,7 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class EntityAttributeNormalizer implements AttributeNormalizer
+class MultipleEntityAttributeNormalizer implements AttributeNormalizer
 {
     /**
      * @var ManagerRegistry
@@ -43,8 +43,47 @@ class EntityAttributeNormalizer implements AttributeNormalizer
 
         $this->validateAttributeValue($workflow, $attribute, $attributeValue);
 
-        $identifier = $this->doctrineHelper->getEntityIdentifier($attributeValue);
-        return $identifier ? : null;
+        $result = [];
+        foreach ($attributeValue as $value) {
+            $result[] = $this->doctrineHelper->getEntityIdentifier($value);
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function denormalize(Workflow $workflow, Attribute $attribute, $attributeValue)
+    {
+        if (null === $attributeValue || !is_array($attributeValue)) {
+            return null;
+        }
+
+        $em = $this->getEntityManager($workflow, $attribute);
+
+        $result = [];
+        foreach ($attributeValue as $value) {
+            $result[] = $em->getReference($attribute->getOption('class'), $value);
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsNormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
+    {
+        return $attribute->getType() == 'entity' && $attribute->getOption('multiple');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsDenormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
+    {
+        return $attribute->getType() == 'entity' && $attribute->getOption('multiple');
     }
 
     /**
@@ -57,17 +96,30 @@ class EntityAttributeNormalizer implements AttributeNormalizer
      */
     protected function validateAttributeValue(Workflow $workflow, Attribute $attribute, $attributeValue)
     {
-        $expectedType = $attribute->getOption('class');
-        if (!$attributeValue instanceof $expectedType) {
+        if (!is_array($attributeValue) && !$attributeValue instanceof \Traversable) {
             throw new SerializerException(
                 sprintf(
-                    'Attribute "%s" of workflow "%s" must be an instance of "%s", but "%s" given',
+                    'Attribute "%s" of workflow "%s" must be a collection or an array, but "%s" given',
                     $attribute->getName(),
                     $workflow->getName(),
-                    $expectedType,
                     is_object($attributeValue) ? get_class($attributeValue) : gettype($attributeValue)
                 )
             );
+        }
+
+        $expectedType = $attribute->getOption('class');
+        foreach ($attributeValue as $value) {
+            if (!$value instanceof $expectedType) {
+                throw new SerializerException(
+                    sprintf(
+                        'Each value of attribute "%s" of workflow "%s" must be an instance of "%s", but "%s" found',
+                        $attribute->getName(),
+                        $workflow->getName(),
+                        $expectedType,
+                        is_object($value) ? get_class($value) : gettype($value)
+                    )
+                );
+            }
         }
     }
 
@@ -95,33 +147,5 @@ class EntityAttributeNormalizer implements AttributeNormalizer
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function denormalize(Workflow $workflow, Attribute $attribute, $attributeValue)
-    {
-        if (null === $attributeValue || !is_array($attributeValue)) {
-            return null;
-        }
-        $em = $this->getEntityManager($workflow, $attribute);
-        return $em->getReference($attribute->getOption('class'), $attributeValue);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsNormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
-    {
-        return $attribute->getType() == 'entity' && !$attribute->getOption('multiple');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function supportsDenormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
-    {
-        return $attribute->getType() == 'entity' && !$attribute->getOption('multiple');
     }
 }

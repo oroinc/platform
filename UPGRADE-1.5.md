@@ -11,8 +11,6 @@ UPGRADE FROM 1.4 to 1.5
 
 ####OroConfigBundle:
 - `oro_config_entity` twig function was removed (deprecated since **1.3**)
-- Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
-  as well as already existing `routeName` and `routeView` properties
 
 ####OroDataAuditBundle
 - REST `Oro\Bundle\DataAuditBundle\Controller\Api\Rest\AuditController` was refactored to be based on `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController`
@@ -29,6 +27,10 @@ UPGRADE FROM 1.4 to 1.5
   entities with `type=Extend`(they actually doctrine `mappedSuperclass`es)
 - Added possibility to define **discriminator map** entries on child level using annotation `@Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue("VALUE")`.
   This is useful when auto-generated strategy fails due to duplication of short class names in the hierarchy.
+
+####OroEntityConfigBundle:
+- Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
+  as well as already existing `routeName` and `routeView` properties
 
 ####OroIntegrationBundle:
 - `Oro\Bundle\IntegrationBundle\Entity\Channel#getEnabled` deprecated in favor of `isEnabled` of the same class
@@ -85,6 +87,30 @@ UPGRADE FROM 1.4 to 1.5
 </script>
 ```
 
-
 ####OroSearchBundle:
 - Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.
+
+####OroWorkflowBundle:
+- Added `multiple` option for `entity` attribute to allow use many-to-many relations in workflows. Example of usage of Multi-Select type (in this example it is supposed that Opportunity entity has `Multi-Select` field named `interested_in` and `enum_code` of this type is `opportunity_interested_in`):
+
+``` yaml
+workflows:
+    b2b_flow_sales_funnel:
+        attributes:
+            opportunity_interested_in:
+                label: orocrm.sales.opportunity.interested_in.label
+                property_path: sales_funnel.opportunity.interested_in
+                type:  entity
+                options:
+                    class: Extend\Entity\EV_OpportunityInterestedIn
+                    multiple: true
+        transitions:
+            start_from_opportunity:
+                form_options:
+                    attribute_fields:
+                        opportunity_interested_in:
+                            form_type: oro_enum_select
+                            options:
+                                enum_code: opportunity_interested_in
+                                expanded: true
+```
