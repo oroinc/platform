@@ -46,11 +46,11 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(self::EMAIL_ADDRESS_PROXY_CLASS));
 
         $this->checker = new KnownEmailAddressChecker(
-            $this->log,
             $this->em,
             $this->emailAddressManager,
             new EmailAddressHelper()
         );
+        $this->checker->setLogger($this->log);
     }
 
     /**
@@ -64,7 +64,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     ) {
         $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult'))
+            ->setMethods(array('getArrayResult'))
             ->getMockForAbstractClass();
 
         $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
@@ -97,7 +97,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryBuilder));
 
         $query->expects($this->once())
-            ->method('getResult')
+            ->method('getArrayResult')
             ->will($this->returnValue($result));
 
         $this->checker->isAtLeastOneKnownEmailAddress($emailAddress);
@@ -122,7 +122,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
     {
         $query1 = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult'))
+            ->setMethods(array('getArrayResult'))
             ->getMockForAbstractClass();
         $queryBuilder1 = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -158,7 +158,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 
         $query2 = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
             ->disableOriginalConstructor()
-            ->setMethods(array('getResult'))
+            ->setMethods(array('getArrayResult'))
             ->getMockForAbstractClass();
         $queryBuilder2 = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -189,7 +189,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
             ->will($this->onConsecutiveCalls($queryBuilder1, $queryBuilder2));
 
         $query1->expects($this->once())
-            ->method('getResult')
+            ->method('getArrayResult')
             ->will(
                 $this->returnValue(
                     [
@@ -199,7 +199,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
                 )
             );
         $query2->expects($this->once())
-            ->method('getResult')
+            ->method('getArrayResult')
             ->will(
                 $this->returnValue(
                     [

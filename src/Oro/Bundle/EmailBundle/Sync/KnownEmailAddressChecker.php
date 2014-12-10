@@ -5,12 +5,13 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
-class KnownEmailAddressChecker
+class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, LoggerAwareInterface
 {
     /** @var LoggerInterface */
     protected $log;
@@ -30,30 +31,30 @@ class KnownEmailAddressChecker
     /**
      * Constructor
      *
-     * @param LoggerInterface     $log
      * @param EntityManager       $em
      * @param EmailAddressManager $emailAddressManager
      * @param EmailAddressHelper  $emailAddressHelper
      */
     public function __construct(
-        LoggerInterface $log,
         EntityManager $em,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper
     ) {
-        $this->log                 = $log;
         $this->em                  = $em;
         $this->emailAddressManager = $emailAddressManager;
         $this->emailAddressHelper  = $emailAddressHelper;
     }
 
     /**
-     * Check if at least one of the given email addresses is known
-     *
-     * @param mixed $_ Email address(es) to check
-     *                 Each parameter can be a string or array of strings
-     *
-     * @return bool
+     * {@inheritdoc}
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->log = $logger;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isAtLeastOneKnownEmailAddress($_)
     {
@@ -91,9 +92,7 @@ class KnownEmailAddressChecker
     }
 
     /**
-     * Performs pre-loading of the given email addresses
-     *
-     * @param array $emails Each item can be a string or array of strings
+     * {@inheritdoc}
      */
     public function preLoadEmailAddresses(array $emails)
     {
@@ -126,16 +125,8 @@ class KnownEmailAddressChecker
     {
         $this->log->notice(sprintf('Loading email address(es) "%s" ...', implode(',', $emailsToLoad)));
 
-        $repo  = $this->emailAddressManager->getEmailAddressRepository($this->em);
-        $query = $repo->createQueryBuilder('a')
-            ->select('a.email')
-            ->where('a.hasOwner = ?1 AND a.email IN (?2)')
-            ->setParameter(1, true)
-            ->setParameter(2, $emailsToLoad)
-            ->getQuery();
-        $query->setHydrationMode(Query::HYDRATE_ARRAY);
+        $emails = $this->getKnownEmailAddresses($emailsToLoad);
 
-        $emails           = $query->getResult();
         $loadedEmailCount = count($emails);
 
         foreach ($emails as $item) {
@@ -149,6 +140,24 @@ class KnownEmailAddressChecker
         }
 
         $this->log->notice(sprintf('Loaded %d email address(es).', $loadedEmailCount));
+    }
+
+    /**
+     * @param string[] $emailsToLoad
+     *
+     * @return array
+     */
+    protected function getKnownEmailAddresses(array $emailsToLoad)
+    {
+        $repo  = $this->emailAddressManager->getEmailAddressRepository($this->em);
+        $query = $repo->createQueryBuilder('a')
+            ->select('a.email')
+            ->where('a.hasOwner = ?1 AND a.email IN (?2)')
+            ->setParameter(1, true)
+            ->setParameter(2, $emailsToLoad)
+            ->getQuery();
+
+        return $query->getArrayResult();
     }
 
     /**

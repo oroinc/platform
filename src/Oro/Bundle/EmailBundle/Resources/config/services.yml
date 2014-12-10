@@ -20,6 +20,7 @@ parameters:
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
     oro_email.email.activity.manager.class:       Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
+    oro_email.known_email_address_checker_factory.class: Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory
     oro_email.twig.extension.email.class:         Oro\Bundle\EmailBundle\Twig\EmailExtension
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
@@ -349,6 +350,15 @@ services:
         class: %oro_email.email_synchronization_manager.class%
         arguments:
             - @service_container
+
+    oro_email.known_email_address_checker_factory:
+        class: %oro_email.known_email_address_checker_factory.class%
+        public: false
+        scope: prototype
+        arguments:
+            - @doctrine
+            - @oro_email.email.address.manager
+            - @oro_email.email.address.helper
 
     oro_email.email.activity.manager:
         class: %oro_email.email.activity.manager.class%

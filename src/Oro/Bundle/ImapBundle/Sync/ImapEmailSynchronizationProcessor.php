@@ -6,16 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
-use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
+use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
@@ -47,22 +44,18 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     /**
      * Constructor
      *
-     * @param LoggerInterface          $log
-     * @param EntityManager            $em
-     * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param EmailAddressManager      $emailAddressManager
-     * @param KnownEmailAddressChecker $knownEmailAddressChecker
-     * @param ImapEmailManager         $manager
+     * @param EntityManager                     $em
+     * @param EmailEntityBuilder                $emailEntityBuilder
+     * @param KnownEmailAddressCheckerInterface $knownEmailAddressChecker
+     * @param ImapEmailManager                  $manager
      */
     public function __construct(
-        LoggerInterface $log,
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager,
-        KnownEmailAddressChecker $knownEmailAddressChecker,
+        KnownEmailAddressCheckerInterface $knownEmailAddressChecker,
         ImapEmailManager $manager
     ) {
-        parent::__construct($log, $em, $emailEntityBuilder, $emailAddressManager, $knownEmailAddressChecker);
+        parent::__construct($em, $emailEntityBuilder, $knownEmailAddressChecker);
         $this->manager = $manager;
     }
 

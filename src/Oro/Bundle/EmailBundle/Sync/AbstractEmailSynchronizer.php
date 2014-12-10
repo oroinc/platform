@@ -7,78 +7,53 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
-abstract class AbstractEmailSynchronizer
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 {
     const SYNC_CODE_IN_PROCESS = 1;
     const SYNC_CODE_FAILURE    = 2;
     const SYNC_CODE_SUCCESS    = 3;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $log = null;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @var EmailEntityBuilder
-     */
-    protected $emailEntityBuilder;
+    /** @var KnownEmailAddressCheckerFactory */
+    protected $knownEmailAddressCheckerFactory;
 
-    /**
-     * @var EmailAddressManager
-     */
-    protected $emailAddressManager;
-
-    /**
-     * @var EmailAddressHelper
-     */
-    protected $emailAddressHelper;
-
-    /**
-     * @var KnownEmailAddressChecker
-     */
-    protected $knownEmailAddressChecker;
+    /** @var KnownEmailAddressCheckerInterface */
+    private $knownEmailAddressChecker;
 
     /**
      * Constructor
      *
-     * @param ManagerRegistry     $doctrine
-     * @param EmailEntityBuilder  $emailEntityBuilder
-     * @param EmailAddressManager $emailAddressManager
-     * @param EmailAddressHelper  $emailAddressHelper
+     * @param ManagerRegistry                 $doctrine
+     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
      */
     protected function __construct(
         ManagerRegistry $doctrine,
-        EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper
+        KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
     ) {
-        $this->doctrine            = $doctrine;
-        $this->emailEntityBuilder  = $emailEntityBuilder;
-        $this->emailAddressManager = $emailAddressManager;
-        $this->emailAddressHelper  = $emailAddressHelper;
+        $this->doctrine                        = $doctrine;
+        $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
     }
 
     /**
-     * Sets a logger
-     *
-     * @param LoggerInterface $log
+     * {@inheritdoc}
      */
-    public function setLogger(LoggerInterface $log)
+    public function setLogger(LoggerInterface $logger)
     {
-        $this->log = $log;
+        $this->log = $logger;
     }
 
     /**
@@ -223,8 +198,10 @@ abstract class AbstractEmailSynchronizer
      */
     protected function doSyncOrigin(EmailOrigin $origin)
     {
-        $this->ensureKnownEmailAddressCheckerCreated();
         $processor = $this->createSynchronizationProcessor($origin);
+        if ($processor instanceof LoggerAwareInterface) {
+            $processor->setLogger($this->log);
+        }
 
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
@@ -274,16 +251,16 @@ abstract class AbstractEmailSynchronizer
     /**
      * Makes sure $this->knownEmailAddressChecker initialized
      */
-    protected function ensureKnownEmailAddressCheckerCreated()
+    protected function getKnownEmailAddressChecker()
     {
         if (!$this->knownEmailAddressChecker) {
-            $this->knownEmailAddressChecker = new KnownEmailAddressChecker(
-                $this->log,
-                $this->getEntityManager(),
-                $this->emailAddressManager,
-                $this->emailAddressHelper
-            );
+            $this->knownEmailAddressChecker = $this->knownEmailAddressCheckerFactory->create();
+            if ($this->knownEmailAddressChecker instanceof LoggerAwareInterface) {
+                $this->knownEmailAddressChecker->setLogger($this->log);
+            }
         }
+
+        return $this->knownEmailAddressChecker;
     }
 
     /**

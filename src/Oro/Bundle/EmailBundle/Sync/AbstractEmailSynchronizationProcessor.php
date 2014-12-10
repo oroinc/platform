@@ -5,17 +5,17 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 
-abstract class AbstractEmailSynchronizationProcessor
+abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
     /** Determines how many emails can be stored in a database at once */
     const DB_BATCH_SIZE = 30;
@@ -36,31 +36,28 @@ abstract class AbstractEmailSynchronizationProcessor
     protected $emailEntityBuilder;
 
     /**
-     * @var EmailAddressManager
-     */
-    protected $emailAddressManager;
-
-    /**
      * Constructor
      *
-     * @param LoggerInterface          $log
-     * @param EntityManager            $em
-     * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param EmailAddressManager      $emailAddressManager
-     * @param KnownEmailAddressChecker $knownEmailAddressChecker
+     * @param EntityManager                     $em
+     * @param EmailEntityBuilder                $emailEntityBuilder
+     * @param KnownEmailAddressCheckerInterface $knownEmailAddressChecker
      */
     protected function __construct(
-        LoggerInterface $log,
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager,
-        KnownEmailAddressChecker $knownEmailAddressChecker
+        KnownEmailAddressCheckerInterface $knownEmailAddressChecker
     ) {
-        $this->log                      = $log;
         $this->em                       = $em;
         $this->emailEntityBuilder       = $emailEntityBuilder;
-        $this->emailAddressManager      = $emailAddressManager;
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->log = $logger;
     }
 
     /**
