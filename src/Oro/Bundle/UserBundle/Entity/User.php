@@ -453,6 +453,14 @@ class User extends ExtendUser implements
      */
     protected $emails;
 
+
+    /**
+     * @var Phone[]|ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="Phone", mappedBy="user", orphanRemoval=true, cascade={"persist"})
+     */
+    protected $phones;
+
     /**
      * @var Tag[]
      *
