@@ -27,8 +27,9 @@ class OroBatchExtension extends Extension
         );
         $configLoader->registerResources($container);
 
-        $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
+        $container->setParameter('oro_batch.debug_batch', $config['debug_batch']);
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
     }

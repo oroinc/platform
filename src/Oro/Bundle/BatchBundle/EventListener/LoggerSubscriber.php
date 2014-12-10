@@ -15,7 +15,7 @@ class LoggerSubscriber extends AkeneoLoggerSubscriber
 {
 
     /** @var bool */
-    protected $isActive = true;
+    protected $isActive = false;
 
      /**
      * @param boolean $isActive

@@ -5,7 +5,7 @@ namespace Oro\Bundle\BatchBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
-class DebugTranslatorPass implements CompilerPassInterface
+class DebugBatchPass implements CompilerPassInterface
 {
     const DEBUG_BATCH_PARAMETER = 'oro_batch.debug_batch';
 
@@ -14,8 +14,8 @@ class DebugTranslatorPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($debugBatch = $container->getParameter(self::DEBUG_BATCH_PARAMETER)) {
-            $container->get('akeneo_batch.logger_subscriber')->setIsActive($debugBatch);
-        }
+        $isDebugBatchEnabled = $container->getParameter(self::DEBUG_BATCH_PARAMETER);
+        $container->getDefinition('akeneo_batch.logger_subscriber')
+                ->addMethodCall('setIsActive', [$isDebugBatchEnabled]);
     }
 }
