@@ -302,11 +302,11 @@ define(function (require) {
             if (!this.eventView) {
                 try {
 
-                    var attrs = {
+                    var eventModel,
+                        attrs = {
                             start: start,
                             end: end
-                        },
-                        eventModel;
+                        };
                     this.applyTzCorrection(-1, attrs);
 
                     // if start and end date has no information about time of the day
@@ -628,11 +628,7 @@ define(function (require) {
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
                 var event = this.collection.get(fcEvent.id);
-                if (event) {
-                    eventDecorator.decorate(event, $el);
-                } else {
-                    console.log(fcEvent);
-                }
+                eventDecorator.decorate(event, $el);
             }, this);
 
             // create jQuery FullCalendar control
