@@ -86,13 +86,13 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $datasource
      * @param bool                                     $useOrmDatasource
-     * @param int                                      $expects
      * @param \Exception                               $exception
      * @param \Exception                               $configurationException
+     * @param int                                      $expectsCount
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidate($datasource, $useOrmDatasource, $expects, $exception, $configurationException)
+    public function testValidate($datasource, $useOrmDatasource, $exception, $configurationException, $expectsCount)
     {
         $provider = $this
             ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
@@ -134,11 +134,11 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
         $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
 
         $this->gridBuilder
-            ->expects($this->exactly($expects))
+            ->expects($this->exactly($expectsCount))
             ->method('build')
             ->will($this->returnValue($datagrid));
         $datagrid
-            ->expects($this->exactly($expects))
+            ->expects($this->exactly($expectsCount))
             ->method('getDatasource')
             ->will($this->returnValue($datasource));
         $qb = $this
@@ -146,24 +146,24 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $datasource
-            ->expects($this->exactly($expects))
+            ->expects($this->exactly($expectsCount))
             ->method('getQueryBuilder')
             ->will($this->returnValue($qb));
 
         if ($useOrmDatasource) {
             $qb
-                ->expects($this->exactly($expects))
+                ->expects($this->exactly($expectsCount))
                 ->method('setMaxResults')
                 ->will($this->returnSelf());
         }
         if ($exception) {
             $datasource
-                ->expects($this->exactly($expects))
+                ->expects($this->exactly($expectsCount))
                 ->method('getResults')
                 ->will($this->throwException($exception));
         } else {
             $datasource
-                ->expects($this->exactly($expects))
+                ->expects($this->exactly($expectsCount))
                 ->method('getResults')
                 ->will($this->returnValue([]));
         }
@@ -190,45 +190,45 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             [
                 $this->getDataSourceInterfaceMock(),
                 false,
-                1,
                 DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql'),
-                null
+                null,
+                1
             ],
             [
                 $this->getDataSourceInterfaceMock(),
                 false,
-                1,
                 new InvalidConfigurationException(),
-                null
+                null,
+                1
             ],
             [
                 $this->getDataSourceInterfaceMock(),
                 false,
-                1,
                 null,
-                null
+                null,
+                1
             ],
             [
                 $this->getOrmDataSourceInterfaceMock(),
                 true,
-                1,
                 DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql'),
-                null
+                null,
+                1
             ],
             [
                 $this->getOrmDataSourceInterfaceMock(),
                 true,
-                1,
                 new InvalidConfigurationException(),
-                null
+                null,
+                1
             ],
             [
                 $this->getOrmDataSourceInterfaceMock(),
                 false,
-                0,
                 null,
-                new InvalidConfigurationException()
-            ],
+                new InvalidConfigurationException(),
+                0
+            ]
         ];
     }
 
