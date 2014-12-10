@@ -65,6 +65,8 @@ define(function (require) {
                 itemFormDeleteButtonSelector: null,
                 calendar: null,
                 subordinate: true,
+                defaultTimedEventDuration: moment.duration('02:00:00'),
+                defaultAllDayEventDuration: moment.duration('24:00:00'),
                 header: {
                     ignoreTimezone: false,
                     allDayDefault: false
@@ -102,6 +104,12 @@ define(function (require) {
         eventsLoaded: {},
 
         initialize: function (options) {
+            if (!options) {
+                options = {};
+            }
+            if (options.eventsOptions) {
+                _.defaults(options.eventsOptions, this.options.eventsOptions);
+            }
             this.options = _.defaults(options || {}, this.options);
             // init event collection
             this.collection = this.collection || new EventCollection();
@@ -227,15 +235,13 @@ define(function (require) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
                 calendarElement = this.getCalendarElement(),
                 fcEvent = calendarElement.fullCalendar('clientEvents', eventModel.id)[0];
+
             eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
             eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
+
             // copy all fields, except id, from event to fcEvent
             fcEvent = _.extend(fcEvent, this.createViewModel(eventModel));
-            // fullcalendar doesn't remember new duration during updateEvent
-            // so need to store it
-            if (fcEvent.end !== null) {
-                fcEvent.duration = moment.duration(fcEvent.end.diff(fcEvent.start));
-            }
+
             // cannot update single event due to fullcalendar bug
             // please check that after updating fullcalendar
             // calendarElement.fullCalendar('updateEvent', fcEvent);
@@ -243,7 +249,7 @@ define(function (require) {
 
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
                 // view is updated to closest possible
-                // and start refetching after server update 'cause it has linked events
+                // start refetching 'cause event had linked events
                 eventModel.once('sync', _.bind(calendarElement.fullCalendar, calendarElement, 'refetchEvents'));
             }
         },
@@ -309,10 +315,7 @@ define(function (require) {
                         };
                     this.applyTzCorrection(-1, attrs);
 
-                    // if start and end date has no information about time of the day
-                    // tract that as full day event
-                    attrs.allDay = start.time().milliseconds() === 0 && end.time().milliseconds() === 0;
-
+                    attrs.allDay = start.time()._milliseconds === 0 && end.time()._milliseconds === 0;
                     attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
                     attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
 
@@ -349,15 +352,35 @@ define(function (require) {
             this.saveFcEvent(fcEvent, undo);
         },
 
-        onFcEventDrop: function (fcEvent, dateDiff, undo) {
-            if (fcEvent.duration && fcEvent.end) {
-                fcEvent.end = fcEvent.start.clone().add(fcEvent.duration);
-            } else {
-                fcEvent.end = (fcEvent.end !== null) ? fcEvent.end.clone() : null;
+        onFcEventDragStart: function (fcEvent) {
+            fcEvent._beforeDragState = {
+                allDay: fcEvent.allDay,
+                start: fcEvent.start.clone(),
+                end: fcEvent.end ? fcEvent.end.clone() : null
             }
-            // fix for case when all day event dragged to the hours grid
-            if (!fcEvent.allDay && fcEvent.end === null) {
-                fcEvent.end = fcEvent.start.clone().add(2, 'h');
+        },
+        onFcEventDrop: function (fcEvent, dateDiff, undo) {
+            var oldState = fcEvent._beforeDragState,
+                // please do not change accessing _milliseconds property to milliseconds() call
+                // that will cause issues
+                isDroppedOnDayGrid = fcEvent.start.time()._milliseconds === 0
+                    && (fcEvent.end === null || fcEvent.end.time()._milliseconds === 0);
+
+            fcEvent.allDay = isDroppedOnDayGrid;
+            if (isDroppedOnDayGrid) {
+                if (oldState.allDay) {
+                    if (fcEvent.end === null) {
+                        fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
+                    }
+                } else {
+                    fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
+                }
+            } else {
+                if (oldState.allDay) {
+                    fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultTimedEventDuration);
+                } else {
+                    fcEvent.end = fcEvent.start.clone().add(oldState.end.diff(oldState.start));
+                }
             }
             this.saveFcEvent(fcEvent, undo);
         },
@@ -371,11 +394,6 @@ define(function (require) {
                         end: (fcEvent.end !== null) ? fcEvent.end.clone() : null
                     },
                     model = this.collection.get(fcEvent.id);
-
-                if (attrs.allDay && attrs.end === null) {
-                    attrs.end = attrs.start.clone().add(24, 'h');
-                }
-
                 this.applyTzCorrection(-1, attrs);
 
                 attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
@@ -558,6 +576,7 @@ define(function (require) {
                 events: _.bind(this.loadEvents, this),
                 select: _.bind(this.onFcSelect, this),
                 eventClick: _.bind(this.onFcEventClick, this),
+                eventDragStart: _.bind(this.onFcEventDragStart, this),
                 eventDrop: _.bind(this.onFcEventDrop, this),
                 eventResize: _.bind(this.onFcEventResize, this),
                 loading: _.bind(function (show) {
@@ -574,7 +593,7 @@ define(function (require) {
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
                 'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
-                'contentHeight'
+                'contentHeight', 'defaultAllDayEventDuration', 'defaultTimedEventDuration'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
