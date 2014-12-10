@@ -173,18 +173,41 @@ i.color {
 }
 .context-menu,
 .controls {
+  .simplecolorpicker.icon,
+  .simplecolorpicker span.color {
+    width: 18px;
+    height: 18px;
+    margin: 0 3px 3px 0;
+  }
   .simplecolorpicker.icon {
     margin-top: 3px;
+  }
+  .simplecolorpicker span.vr {
+    margin: 0 5px 0 2px;
+    padding: 3px 0 0 0;
+  }
+  .simplecolorpicker.fontawesome {
+    span.color {
+      position: relative;
+      margin: 0 3px -3px 0;
+    }
+    span.color[data-selected]:after {
+      margin: 0;
+      display: block;
+      position: absolute;
+      top: -2px;
+      left: 2px;
+    }
   }
   .simplecolorpicker.inline {
     padding-top: 3px;
     padding-bottom: 0px;
     margin-bottom: -3px;
-    max-width: 283px;
+    max-width: 263px;
   }
   .simplecolorpicker.inline.with-empty-color,
   .simplecolorpicker.inline.with-custom-color {
-    max-width: 306px;
+    max-width: 294px;
   }
   .simplecolorpicker {
     .minicolors-swatch {
@@ -223,22 +246,6 @@ i.color {
   }
 }
 .context-menu {
-  .simplecolorpicker.icon,
-  .simplecolorpicker span.color {
-    width: 18px;
-    height: 18px;
-  }
-  .simplecolorpicker.fontawesome span.color {
-    position: relative;
-    margin: 0 3px -3px 0;
-  }
-  .simplecolorpicker.fontawesome span.color[data-selected]:after {
-    margin: 0;
-    display: block;
-    position: absolute;
-    top: -2px;
-    left: 2px;
-  }
   .minicolors-swatch {
     cursor: pointer;
     position: relative;
