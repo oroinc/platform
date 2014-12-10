@@ -1,5 +1,6 @@
 parameters:
     oro_batch.orm.query_builder.count_query_optimizer.class: Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer
+    akeneo_batch.logger_subscriber.class:                    Oro\Bundle\BatchBundle\EventListener\LoggerSubscriber
 
 services:
     oro_batch.orm.query_builder.count_query_optimizer:
