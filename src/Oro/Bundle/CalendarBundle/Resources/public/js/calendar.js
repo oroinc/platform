@@ -359,12 +359,19 @@ define(function (require) {
                 end: fcEvent.end ? fcEvent.end.clone() : null
             }
         },
-        onFcEventDrop: function (fcEvent, dateDiff, undo) {
+        onFcEventDrop: function (fcEvent, dateDiff, undo, jsEvent) {
             var oldState = fcEvent._beforeDragState,
                 // please do not change accessing _milliseconds property to milliseconds() call
                 // that will cause issues
-                isDroppedOnDayGrid = fcEvent.start.time()._milliseconds === 0
+                isDroppedOnDayGrid =
+                    fcEvent.start.time()._milliseconds === 0
                     && (fcEvent.end === null || fcEvent.end.time()._milliseconds === 0);
+
+            // when on week view all-day event is dropped at 12AM to hour view
+            // previous condition gives false positive result
+            if (fcEvent.end === null && isDroppedOnDayGrid === true && fcEvent.start.time()._milliseconds === 0) {
+                isDroppedOnDayGrid = !$(jsEvent.target).parents(".fc-time-grid-event").length;
+            }
 
             fcEvent.allDay = isDroppedOnDayGrid;
             if (isDroppedOnDayGrid) {
