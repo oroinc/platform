@@ -593,7 +593,7 @@ define(function (require) {
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
                 'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
-                'contentHeight', 'defaultAllDayEventDuration', 'defaultTimedEventDuration'
+                'aspectRatio', 'defaultAllDayEventDuration', 'defaultTimedEventDuration'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
@@ -603,10 +603,7 @@ define(function (require) {
                 options.date = options.date.getDate();
             }
 
-            if (options.aspectRatio) {
-                delete options.contentHeight;
-                delete options.height;
-            } else if (!options.contentHeight) {
+            if (!options.aspectRatio) {
                 options.contentHeight = "auto";
                 options.height = "auto";
             }
