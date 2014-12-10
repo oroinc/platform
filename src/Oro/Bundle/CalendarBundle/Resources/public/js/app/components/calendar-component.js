@@ -7,9 +7,7 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         Calendar = require('orocalendar/js/calendar'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
-        ConnectionCollection = require('orocalendar/js/calendar/connection/collection'),
-        localeSettings = require('orolocale/js/locale-settings'),
-        __ = require('orotranslation/js/translator');
+        ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
 
     /**
      * Creates calendar
@@ -49,60 +47,17 @@ define(function (require) {
         },
         prepareOptions: function () {
             var options = this.options;
-            // prepare data for collections
             options.collection = this.eventCollection;
             options.connectionsOptions.collection = this.connectionCollection;
-            options.eventsOptions.subordinate = true;
+
             options.eventsOptions.date = options.date;
             options.eventsOptions.header = {
                 left: options.eventsOptions.leftHeader || '',
                 center: options.eventsOptions.centerHeader || '',
-                right: options.eventsOptions.rightHeader || '',
-                ignoreTimezone: false,
-                allDayDefault: false
-            }
-            if (!options.eventsOptions.defaultView) {
-                options.eventsOptions.defaultView = 'month';
-            }
-            options.eventsOptions.allDayText = __('oro.calendar.control.all_day');
-            options.eventsOptions.buttonText = {
-                today: __('oro.calendar.control.today'),
-                month: __('oro.calendar.control.month'),
-                week: __('oro.calendar.control.week'),
-                day: __('oro.calendar.control.day')
+                right: options.eventsOptions.rightHeader || ''
             };
-
-            options.eventsOptions.firstDay = localeSettings.getCalendarFirstDayOfWeek() - 1;
-            options.eventsOptions.monthNames = localeSettings.getCalendarMonthNames('wide', true);
-            options.eventsOptions.monthNamesShort = localeSettings.getCalendarMonthNames('abbreviated', true);
-            options.eventsOptions.dayNames = localeSettings.getCalendarDayOfWeekNames('wide', true);
-            options.eventsOptions.dayNamesShort = localeSettings.getCalendarDayOfWeekNames('abbreviated', true);
 
             _.extend(options.eventsOptions, options.calendarOptions);
-
-            var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
-            var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
-            // prepare FullCalendar specific date/time formats
-            var isDateFormatStartedWithDay = dateFormat[0] === 'D';
-            var weekFormat = isDateFormatStartedWithDay
-                ? 'D MMMM YYYY'
-                : 'MMMM D YYYY';
-
-            options.eventsOptions.titleFormat = {
-                month: 'MMMM YYYY',
-                week: weekFormat,
-                day: 'dddd, ' + dateFormat
-            };
-            options.eventsOptions.columnFormat = {
-                month: 'ddd',
-                week: 'ddd ' + dateFormat,
-                day: 'dddd ' + dateFormat
-            };
-            options.eventsOptions.timeFormat = {
-                '': timeFormat,
-                agenda: timeFormat + '{ - ' + timeFormat + '}'
-            };
-            options.eventsOptions.axisFormat = timeFormat;
 
             delete options.calendarOptions;
             delete options.date;

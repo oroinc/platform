@@ -14,7 +14,7 @@ define(['underscore', 'orotranslation/js/translator'
         },
 
         decorate: function (eventModel, $el) {
-            var $body = $el.find('.fc-event-inner'),
+            var $body = $el.find('.fc-content'),
                 reminders = eventModel.get('reminders'),
                 invitationStatus = eventModel.get('invitationStatus');
             if (reminders && _.keys(reminders).length) {
