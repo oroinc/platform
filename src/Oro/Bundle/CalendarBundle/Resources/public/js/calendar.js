@@ -310,12 +310,12 @@ define(function (require) {
 
                     var eventModel,
                         attrs = {
+                            allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
                             start: start,
                             end: end
                         };
                     this.applyTzCorrection(-1, attrs);
 
-                    attrs.allDay = start.time()._milliseconds === 0 && end.time()._milliseconds === 0;
                     attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
                     attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
 
