@@ -197,8 +197,6 @@ define(function (require) {
 
         addEventToCalendar: function (eventModel) {
             var fcEvent = this.createViewModel(eventModel);
-            this.prepareViewModel(fcEvent);
-            this.applyTzCorrection(1, fcEvent);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
@@ -211,10 +209,10 @@ define(function (require) {
         onEventAdded: function (eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
 
-            this.addEventToCalendar(eventModel);
+            eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
 
-            eventModel.set('editable', connectionModel.get('canEditEvent'));
-            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+            this.addEventToCalendar(eventModel);
 
             // make sure that a calendar is visible when a new event is added to it
             if (!connectionModel.get('visible')) {
@@ -227,13 +225,12 @@ define(function (require) {
 
         onEventChanged: function (eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
-                fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
-            eventModel.set('editable', connectionModel.get('canEditEvent'));
-            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+                calendarElement = this.getCalendarElement(),
+                fcEvent = calendarElement.fullCalendar('clientEvents', eventModel.id)[0];
+            eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
             // copy all fields, except id, from event to fcEvent
-            fcEvent = _.extend(fcEvent, eventModel.toJSON());
-            this.prepareViewModel(fcEvent);
-            this.applyTzCorrection(1, fcEvent);
+            fcEvent = _.extend(fcEvent, this.createViewModel(eventModel));
             // fullcalendar doesn't remember new duration during updateEvent
             // so need to store it
             if (fcEvent.end !== null) {
@@ -241,11 +238,13 @@ define(function (require) {
             }
             // cannot update single event due to fullcalendar bug
             // please check that after updating fullcalendar
-            // this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
-            this.getCalendarElement().fullCalendar('rerenderEvents');
+            // calendarElement.fullCalendar('updateEvent', fcEvent);
+            calendarElement.fullCalendar('rerenderEvents');
+
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                // start refetch procedure
-                this.getCalendarElement().fullCalendar('refetchEvents');
+                // view is updated to closest possible
+                // and start refetching after server update 'cause it has linked events
+                eventModel.once('sync', _.bind(calendarElement.fullCalendar, calendarElement, 'refetchEvents'));
             }
         },
 
@@ -407,10 +406,7 @@ define(function (require) {
         loadEvents: function (start, end, timezone, callback) {
             var onEventsLoad = _.bind(function () {
                 var fcEvents = this.collection.map(function (eventModel) {
-                    var fcEvent = this.createViewModel(eventModel);
-                    this.prepareViewModel(fcEvent, false);
-                    this.applyTzCorrection(1, fcEvent);
-                    return fcEvent;
+                    return this.createViewModel(eventModel);
                 }, this);
                 this.eventsLoaded = {};
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
@@ -453,10 +449,13 @@ define(function (require) {
          * @param {Object} eventModel
          */
         createViewModel: function (eventModel) {
-            return _.pick(
+            var fcEvent = _.pick(
                 eventModel.attributes,
-                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid']
+                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
             );
+            this.prepareViewModel(fcEvent);
+            this.applyTzCorrection(1, fcEvent);
+            return fcEvent;
         },
 
         /**
@@ -628,7 +627,12 @@ define(function (require) {
             };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
-                eventDecorator.decorate(this.collection.get(fcEvent.id), $el);
+                var event = this.collection.get(fcEvent.id);
+                if (event) {
+                    eventDecorator.decorate(event, $el);
+                } else {
+                    console.log(fcEvent);
+                }
             }, this);
 
             // create jQuery FullCalendar control
