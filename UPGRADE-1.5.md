@@ -114,3 +114,7 @@ workflows:
                                 enum_code: opportunity_interested_in
                                 expanded: true
 ```
+
+####OroUserBundle:
+ - Added user search handler that return users that was assigned to current organization and limit by search string minus current user. 
+ Autocomplite alias for this handler is `organization_users`. 
