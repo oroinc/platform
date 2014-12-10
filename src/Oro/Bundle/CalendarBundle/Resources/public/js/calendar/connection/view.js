@@ -248,7 +248,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 calendarUid = calendarAlias + '_' + calendarId,
                 el = this.$el.find(this.selectors.findItemByCalendar(calendarUid));
             if (el.length > 0) {
-                messenger.notificationFlashMessage('warning', __('This calendar already exists.'));
+                messenger.setNotificationFlashMessage('warning', __('This calendar already exists.'), 'calendar-ns');
             } else {
                 savingMsg = messenger.notificationMessage('warning', __('Adding the calendar, please wait ...'));
                 try {
@@ -263,7 +263,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         wait: true,
                         success: _.bind(function () {
                             savingMsg.close();
-                            messenger.notificationFlashMessage('success', __('The calendar was added.'));
+                            messenger.setNotificationFlashMessage('success', __('The calendar was added.'), 'calendar-ns');
                         }, this),
                         error: _.bind(function (collection, response) {
                             savingMsg.close();
@@ -312,7 +312,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     wait: true,
                     success: _.bind(function () {
                         savingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                        messenger.setNotificationFlashMessage('success', __('The calendar was updated.'), 'calendar-ns');
                         this._addVisibilityButtonEventListener($connection, model);
                         if (this._actionSyncObject) {
                             this._actionSyncObject.resolve();

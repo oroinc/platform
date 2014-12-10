@@ -22,6 +22,9 @@ function ($, _, tools) {
                 $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container),
                 delay = opt.delay || (opt.flash && 5000),
                 actions = {close: _.bind($el.alert, $el, 'close')};
+            if (opt.namespace) {
+                $el.attr('data-messenger-namespace', opt.namespace);
+            }
             if (delay) {
                 _.delay(actions.close, delay);
             }
@@ -103,6 +106,28 @@ function ($, _, tools) {
             },
 
             /**
+             * Shows only one flash notification message within namespace
+             *
+             * @param {(string|boolean)} type 'error'|'success'|false
+             * @param {string} message text of message
+             * @param {string} namespace
+             * @param {Object=} options
+             *
+             * @param {(string|jQuery)} options.container selector of jQuery with container element
+             * @param {(number|boolean)} options.delay time in ms to auto close message
+             *      or false - means to not close automatically
+             * @param {Function} options.template template function
+             * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
+             *
+             * @return {Object} collection of methods - actions over message element,
+             *      at the moment there's only one method 'close', allows to close the message
+             */
+            setNotificationFlashMessage: function(type, message, namespace, options) {
+                this.clear(namespace, options);
+                return this.notificationFlashMessage(type, message, _.extend({namespace: namespace}, options));
+            },
+
+            /**
              * Shows error message
              *
              * @param {string} message text of message
@@ -158,6 +183,17 @@ function ($, _, tools) {
                     flashMessages.push([args, actions]);
                     setStoredMessages(flashMessages);
                 }*/
+            },
+
+            /**
+             * Clears all messages within namespace
+             *
+             * @param {string} namespace
+             * @param {Object=} options
+             */
+            clear: function(namespace, options) {
+                var opt = _.extend({}, defaults, options || {});
+                $(opt.container).find('[data-messenger-namespace=' + namespace +']').remove();
             }
         };
 });
