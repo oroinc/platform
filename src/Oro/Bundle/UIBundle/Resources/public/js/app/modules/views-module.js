@@ -29,7 +29,7 @@ require([
         'oroui/js/app/views/page/content-view'
     ], function (PageContentView) {
         BaseController.addToReuse('content', PageContentView, {
-            el: 'mainContainer'
+            region: 'mainContainer'
         });
     });
 
@@ -40,7 +40,7 @@ require([
         'oroui/js/app/views/page/before-content-addition-view'
     ], function (PageBeforeContentAdditionView) {
         BaseController.addToReuse('beforeContentAddition', PageBeforeContentAdditionView, {
-            el: 'beforeContentAddition'
+            region: 'beforeContentAddition'
         });
     });
 
@@ -52,10 +52,10 @@ require([
         'oroui/js/app/views/page/breadcrumb-view'
     ], function (PageMainMenuView, BreadcrumbView) {
         BaseController.addToReuse('breadcrumb', BreadcrumbView, {
-            el: 'breadcrumb'
+            region: 'breadcrumb'
         });
         BaseController.addToReuse('mainMenu', PageMainMenuView, {
-            el: 'mainMenu'
+            region: 'mainMenu'
         });
     });
 
@@ -66,7 +66,7 @@ require([
         'oroui/js/app/views/page/user-menu-view'
     ], function (PageUserMenuView) {
         BaseController.addToReuse('userMenu', PageUserMenuView, {
-            el: 'userMenu'
+            region: 'userMenu'
         });
     });
 
@@ -98,7 +98,7 @@ require([
         'oroui/js/app/views/page/messages-view'
     ], function (PageMessagesView) {
         BaseController.addToReuse('messages', PageMessagesView, {
-            el: 'messages'
+            region: 'messages'
         });
     });
 
