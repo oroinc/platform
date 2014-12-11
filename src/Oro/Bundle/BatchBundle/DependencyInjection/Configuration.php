@@ -17,7 +17,11 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_batch');
+        $treeBuilder->root('oro_batch')->children()
+            ->scalarNode('cleanup_interval')
+            ->defaultValue('1 month')
+            ->cannotBeEmpty()
+            ->example('1 month');
 
         return $treeBuilder;
     }
