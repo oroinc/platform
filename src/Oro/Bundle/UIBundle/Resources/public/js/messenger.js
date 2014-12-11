@@ -102,29 +102,14 @@ function ($, _, tools) {
              */
             notificationFlashMessage: function(type, message, options) {
                 var isFlash = notFlashTypes.indexOf(type) == -1;
-                return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
-            },
-
-            /**
-             * Shows only one flash notification message within namespace
-             *
-             * @param {(string|boolean)} type 'error'|'success'|false
-             * @param {string} message text of message
-             * @param {string} namespace
-             * @param {Object=} options
-             *
-             * @param {(string|jQuery)} options.container selector of jQuery with container element
-             * @param {(number|boolean)} options.delay time in ms to auto close message
-             *      or false - means to not close automatically
-             * @param {Function} options.template template function
-             * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
-             *
-             * @return {Object} collection of methods - actions over message element,
-             *      at the moment there's only one method 'close', allows to close the message
-             */
-            setNotificationFlashMessage: function(type, message, namespace, options) {
-                this.clear(namespace, options);
-                return this.notificationFlashMessage(type, message, _.extend({namespace: namespace}, options));
+                var namespace = (options || {}).namespace;
+                if (namespace) {
+                    this.clear(namespace, options);
+                }
+                return this.notificationMessage(type, message, _.extend({
+                    flash: isFlash,
+                    namespace: namespace
+                }, options));
             },
 
             /**

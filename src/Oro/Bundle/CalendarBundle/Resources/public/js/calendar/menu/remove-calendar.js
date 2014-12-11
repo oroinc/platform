@@ -23,7 +23,9 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
                     wait: true,
                     success: _.bind(function () {
                         removingMsg.close();
-                        messenger.setNotificationFlashMessage('success', __('The calendar was removed.'), 'calendar-ns');
+                        messenger.notificationFlashMessage('success', __('The calendar was removed.'), {
+                            namespace: 'calendar-ns'
+                        });
                         actionSyncObject.resolve();
                     }, this),
                     error: _.bind(function (model, response) {
