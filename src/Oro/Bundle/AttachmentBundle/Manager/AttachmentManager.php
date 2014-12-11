@@ -22,6 +22,10 @@ use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
 class AttachmentManager
 {
+    const READ_COUNT = 100000;
+    const DEFAULT_IMAGE_WIDTH = 100;
+    const DEFAULT_IMAGE_HEIGHT = 100;
+
     /** @var Filesystem */
     protected $filesystem;
 
@@ -69,7 +73,11 @@ class AttachmentManager
                 $fileName = substr($fileName, 0, $parametersPosition);
             }
             $filesystem = new SymfonyFileSystem();
-            $tmpFile    = realpath(sys_get_temp_dir()) . DIRECTORY_SEPARATOR . $fileName;
+            $tmpDir = ini_get('upload_tmp_dir');
+            if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
+                $tmpDir = sys_get_temp_dir();
+            }
+            $tmpFile    = realpath($tmpDir) . DIRECTORY_SEPARATOR . $fileName;
             $filesystem->copy($fileUrl, $tmpFile, true);
             $file       = new FileType($tmpFile);
             $attachment = new File();
@@ -118,8 +126,9 @@ class AttachmentManager
 
             $entity->setFilename(uniqid() . '.' . $entity->getExtension());
 
-            if ($this->filesystem->getAdapter() instanceof MetadataSupporter) {
-                $this->filesystem->getAdapter()->setMetadata(
+            $fsAdapter = $this->filesystem->getAdapter();
+            if ($fsAdapter instanceof MetadataSupporter) {
+                $fsAdapter->setMetadata(
                     $entity->getFilename(),
                     ['contentType' => $entity->getMimeType()]
                 );
@@ -155,7 +164,7 @@ class AttachmentManager
         $dst->open(new StreamMode('wb+'));
 
         while (!$src->eof()) {
-            $dst->write($src->read(100000));
+            $dst->write($src->read(self::READ_COUNT));
         }
         $dst->close();
         $src->close();
@@ -270,8 +279,11 @@ class AttachmentManager
      * @param int  $height
      * @return string
      */
-    public function getResizedImageUrl(File $entity, $width = 100, $height = 100)
-    {
+    public function getResizedImageUrl(
+        File $entity,
+        $width = self::DEFAULT_IMAGE_WIDTH,
+        $height = self::DEFAULT_IMAGE_HEIGHT
+    ) {
         return $this->router->generate(
             'oro_resize_attachment',
             [
