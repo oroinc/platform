@@ -678,7 +678,8 @@
 {% endblock %}
 
 {% block oro_link_type_widget %}
-    {% if acl ? resource_granted(acl) : true %}
+    {% if acl ? resource_granted(acl) : true %} {# @todo after BAP-4696 implementation acl will always be string #}
+        {# @todo after BAP-4696 implementation remove link class #}
         <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}">
             {{ title|trans }}
         </a>
