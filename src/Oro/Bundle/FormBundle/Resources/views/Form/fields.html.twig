@@ -678,8 +678,8 @@
 {% endblock %}
 
 {% block oro_link_type_widget %}
-    {% if resource_granted(acl) %}
-        <a href="{{ path(route, routeParameters) }}">
+    {% if acl ? resource_granted(acl) : true %}
+        <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}">
             {{ title|trans }}
         </a>
     {% endif %}

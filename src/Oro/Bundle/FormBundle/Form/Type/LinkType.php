@@ -16,12 +16,19 @@ class LinkType extends AbstractType
     {
         $resolver
             ->setRequired(['route', 'acl', 'title'])
-            ->setOptional(['routeParameters'])
-            ->setDefaults(['routeParameters' => []])
+            ->setOptional([
+                'routeParameters',
+                'isPath',
+                'class'
+            ])
+            ->setDefaults([
+                'routeParameters' => [],
+                'isPath'          => false,
+                'class'           => ''
+            ])
             ->setAllowedTypes(
                 [
                     'route' => 'string',
-                    'acl'   => 'string',
                     'title' => 'string',
                 ]
             );
@@ -36,6 +43,8 @@ class LinkType extends AbstractType
         $view->vars['acl']             = $options['acl'];
         $view->vars['title']           = $options['title'];
         $view->vars['routeParameters'] = $options['routeParameters'];
+        $view->vars['isPath']          = $options['isPath'];
+        $view->vars['class']           = $options['class'];
     }
 
     /**
