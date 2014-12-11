@@ -29,9 +29,13 @@
                 var loader = new Loader($('.ajax-loading'));
                 var util = new Util($('#alerts'));
                 var pm = new PackageManager(Urls, util);
-
-                $('.ajax').on('click', function () {
+                var ajaxButtons = $('.ajax');
+                ajaxButtons.on('click', function () {
                     var me = $(this);
+                    if (me.hasClass('disabled')) {
+                        return;
+                    }
+
                     var action = me.data('action');
                     var params = me.data('params');
                     var actionParams = {};
@@ -50,10 +54,13 @@
                             }
                         }
                     }
+
+                    ajaxButtons.addClass('disabled');
                     loader.setClickedElement(me);
                     loader.displayLoadingProgress();
                     pm[action](actionParams, function () {
                         loader.displayOriginalElement();
+                        ajaxButtons.removeClass('disabled');
                     });
 
                     return false;
