@@ -18,6 +18,11 @@ class PlaceholderFilter
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /**
+     * @param ActivityListChainProvider $activityListChainProvider
+     * @param ManagerRegistry           $doctrine
+     * @param DoctrineHelper            $doctrineHelper
+     */
     public function __construct(
         ActivityListChainProvider $activityListChainProvider,
         ManagerRegistry $doctrine,
