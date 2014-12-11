@@ -60,6 +60,7 @@ define(function (require) {
                 editable: true,
                 removable: true,
                 collection: null,
+                fixedWeekCount: false, // http://fullcalendar.io/docs/display/fixedWeekCount/
                 itemViewTemplateSelector: null,
                 itemFormTemplateSelector: null,
                 itemFormDeleteButtonSelector: null,
@@ -305,9 +306,20 @@ define(function (require) {
         },
 
         onFcSelect: function (start, end) {
+            this.showAddEventDialog(start, end);
+        },
+
+        showAddEventDialog: function (start, end) {
+            // need to be able to accept native moments here
+            // convert arguments
+            if (!start._fullCalendar) {
+                start = $.fullCalendar.moment(start.clone().utc().format());
+            }
+            if (end && !end._fullCalendar) {
+                end = $.fullCalendar.moment(end.clone().utc().format());
+            }
             if (!this.eventView) {
                 try {
-
                     var eventModel,
                         attrs = {
                             allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
@@ -600,7 +612,8 @@ define(function (require) {
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
                 'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
                 'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
-                'aspectRatio', 'defaultAllDayEventDuration', 'defaultTimedEventDuration'
+                'aspectRatio', 'defaultAllDayEventDuration', 'defaultTimedEventDuration',
+                'fixedWeekCount'
             ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {

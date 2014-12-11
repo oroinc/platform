@@ -163,6 +163,10 @@
     font-weight: bold;
 }
 
+.calendar-container .fc-event {
+    font-size: 12px;
+    line-height: 16px;
+}
 .calendar-container .fc-event i.icon {
     font-size: 13px;
     position: absolute;

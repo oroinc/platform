@@ -19,7 +19,7 @@ define(function (require) {
             widgetManager.getWidgetInstance(this.options.widgetId, function (widget) {
                 widget.getAction('new-event', 'adopted', function(newEventAction) {
                     newEventAction.on('click', function () {
-                        component.calendar.select(roundToHalfAnHour(moment()), roundToHalfAnHour(moment()).add(1, 'h'));
+                        component.calendar.showAddEventDialog(roundToHalfAnHour(moment()), roundToHalfAnHour(moment()).add(1, 'h'));
                     });
                 });
             });
