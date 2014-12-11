@@ -106,10 +106,7 @@ function ($, _, tools) {
                 if (namespace) {
                     this.clear(namespace, options);
                 }
-                return this.notificationMessage(type, message, _.extend({
-                    flash: isFlash,
-                    namespace: namespace
-                }, options));
+                return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
             },
 
             /**
