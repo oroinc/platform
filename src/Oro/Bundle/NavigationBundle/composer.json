@@ -12,7 +12,7 @@
         "oro/user-bundle": "dev-master",
         "knplabs/knp-menu": "v2.0.0-alpha1",
         "knplabs/knp-menu-bundle": "v2.0.0-alpha1",
-        "friendsofsymfony/rest-bundle": "0.11.*",
+        "friendsofsymfony/rest-bundle": "1.5.0-RC2",
         "nelmio/api-doc-bundle": "dev-master",
         "symfony/assetic-bundle": "2.1.*",
         "kriswallsmith/assetic": "1.1.*@dev",

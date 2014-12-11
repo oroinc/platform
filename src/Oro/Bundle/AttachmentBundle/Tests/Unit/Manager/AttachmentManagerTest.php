@@ -94,10 +94,12 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->attachment->setId(1);
         $this->attachment->setExtension('txt');
+        $this->attachment->setOriginalFilename('testFile.withForwardSlash?.txt');
         $fieldName = 'testField';
         $parentEntity = new TestClass();
-        $expectsString = 'T3JvXEJ1bmRsZVxBdHRhY2htZW50QnVuZGxlXFRlc3RzXFVuaXRcRml4dHVyZXNcVGVzdENsYXNzfHRlc3RGaW'.
-            'VsZHwxfGRvd25sb2FkfHRlc3RGaWxlLnR4dA==';
+        $expectsString = 'T3JvXEJ1bmRsZVxBdHRhY2htZW50QnVuZGxlXFRlc3RzXFVuaXRcRml4dHVyZXNcVGVzdENsYXNzfHRlc3RG'.
+            'aWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g_LnR4dA==';
+                                                                  //^Underscore should replace / character
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
@@ -119,10 +121,10 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 'testField',
                 1,
                 'download',
-                'testFile.txt'
+                'testFile.withForwardSlash?.txt'
             ],
             $this->attachmentManager->decodeAttachmentUrl(
-                'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLnR4dA=='
+                'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g/LnR4dA=='
             )
         );
     }

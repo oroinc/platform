@@ -7,7 +7,7 @@ use Doctrine\ORM\Query;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -27,7 +27,6 @@ class EnumController extends FOSRestController
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *
      * @Get("/entity_extends/enum/{entityName}",
-     *      name="oro_api_get_entity_extend_enum",
      *      requirements={"entityName"="((\w+)_)+(\w+)"}
      * )
      * @ApiDoc(

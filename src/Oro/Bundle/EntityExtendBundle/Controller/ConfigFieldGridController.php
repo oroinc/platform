@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -20,8 +20,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
