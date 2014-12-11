@@ -7,15 +7,17 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 class DebugBatchPass implements CompilerPassInterface
 {
-    const DEBUG_BATCH_PARAMETER = 'oro_batch.debug_batch';
+    const LOG_BATCH_PARAMETER = 'oro_batch.log_batch';
+    const BATCH_LOG_HANDLER     = 'akeneo_batch.logger.batch_log_handler';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $isDebugBatchEnabled = $container->getParameter(self::DEBUG_BATCH_PARAMETER);
-        $container->getDefinition('akeneo_batch.logger_subscriber')
-                ->addMethodCall('setIsActive', [$isDebugBatchEnabled]);
+        if ($container->has(self::BATCH_LOG_HANDLER)) {
+            $isDebugBatchEnabled = $container->getParameter(self::LOG_BATCH_PARAMETER);
+            $container->getDefinition(self::BATCH_LOG_HANDLER)->addMethodCall('setIsActive', [$isDebugBatchEnabled]);
+        }
     }
 }

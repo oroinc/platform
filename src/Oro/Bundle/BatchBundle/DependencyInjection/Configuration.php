@@ -19,7 +19,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('oro_batch')
             ->children()
-                ->scalarNode('debug_batch')->defaultFalse()->end()
+                ->scalarNode('log_batch')->defaultFalse()->end()
             ->end();
 
         return $treeBuilder;
