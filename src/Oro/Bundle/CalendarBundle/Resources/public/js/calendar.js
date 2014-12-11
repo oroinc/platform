@@ -204,9 +204,11 @@ define(function (require) {
 
         },
 
-        addEventToCalendar: function (eventModel) {
+        addEventToCalendar: function (eventModel, needRender) {
             var fcEvent = this.createViewModel(eventModel);
-            this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+            if (needRender !== false) {
+                this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
+            }
         },
 
         getCalendarEvents: function (calendarUid) {
@@ -282,8 +284,9 @@ define(function (require) {
                 if (changes.visible) {
                     if (this.eventsLoaded[calendarUid]) {
                         _.each(this.collection.where({calendarUid: calendarUid}), function (eventModel) {
-                            this.addEventToCalendar(eventModel);
+                            this.addEventToCalendar(eventModel, false);
                         }, this);
+                        this.getCalendarElement().fullCalendar('rerenderEvents');
                     } else {
                         this.getCalendarElement().fullCalendar('refetchEvents');
                     }

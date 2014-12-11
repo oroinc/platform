@@ -165,7 +165,11 @@
 
 .calendar-container .fc-event {
     font-size: 12px;
-    line-height: 16px;
+    line-height: 14px;
+    padding: 1px 0 1px 2px;
+}
+.calendar-container .fc-time {
+    overflow: hidden;
 }
 .calendar-container .fc-event i.icon {
     font-size: 13px;
@@ -250,7 +254,7 @@
     color: #333;
 }
 
-.invitation-status-declined {
+.fc-content.invitation-status-declined {
     text-decoration: line-through;
 }
 
@@ -259,4 +263,8 @@ i.invitation-status {
     float: left;
     margin: 2px 4px 0 1px;
     line-height: 13px;
+}
+i.invitation-status.icon-question-sign {
+    font-size: 13px;
+    margin: 1px 4px 0 1px;
 }
