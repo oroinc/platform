@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Controller;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\HttpFoundation\JsonResponse;
