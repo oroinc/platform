@@ -3,11 +3,11 @@
 namespace Oro\Bundle\NavigationBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
 
 class Configuration implements ConfigurationInterface
 {

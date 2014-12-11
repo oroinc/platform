@@ -86,9 +86,9 @@ oro_titles:
 oro_navigation_elements:
     pinButton:
         routes:
-            oro_calendar_view: false
+            oro_calendar_view:         false
             oro_calendar_view_default: false
     favoriteButton:
         routes:
-            oro_calendar_view: false
+            oro_calendar_view:         false
             oro_calendar_view_default: false

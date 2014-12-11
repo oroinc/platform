@@ -95,9 +95,6 @@ define([
             };
             return attrs;
         }
-    },
-    {
-        optionNames: ['navigationElementType']
     });
 
     return BookmarkButtonView;

@@ -89,6 +89,7 @@ UPGRADE FROM 1.4 to 1.5
 ```
 - Added `oro_ui_content_providers_manager` global variable in order to fetch content provider's content.
   It contains reference on instance `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
+- `show_pin_button_on_start_page` config node is node used anymore. Please use ability to hide navigation elements in `navigation.yml` 
 
 ####OroSearchBundle:
 - Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.
