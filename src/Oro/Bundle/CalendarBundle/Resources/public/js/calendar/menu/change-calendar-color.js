@@ -131,7 +131,9 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                         wait: true,
                         success: _.bind(function () {
                             savingMsg.close();
-                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                            messenger.notificationFlashMessage('success', __('The calendar was updated.'), {
+                                namespace: 'calendar-ns'
+                            });
                             this.colorManager.setCalendarColors(this.model.get('calendarUid'), color);
                             this.connectionsView._actionSyncObject.resolve();
                         }, this),
