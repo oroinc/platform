@@ -9,8 +9,10 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $activityListProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrine;
 
     /** @var PlaceholderFilter */
