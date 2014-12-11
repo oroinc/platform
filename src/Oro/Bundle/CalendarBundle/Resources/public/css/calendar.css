@@ -261,10 +261,19 @@
 i.invitation-status {
     font-size: 11px;
     float: left;
-    margin: 2px 4px 0 1px;
+    margin: 1px 4px 0 1px;
     line-height: 13px;
 }
 i.invitation-status.icon-question-sign {
     font-size: 13px;
-    margin: 1px 4px 0 1px;
+    margin: 0 4px 0 1px;
+}
+.fc-time-grid-event .fc-resizer {
+    display: none;
+}
+.fc-time-grid-event:hover .fc-resizer {
+    display: block;
+}
+.fc-short .fc-content{
+    margin: 2px 0;
 }
