@@ -250,7 +250,7 @@
     color: #333;
 }
 
-.fc-event-inner.invitation-status-declined {
+.invitation-status-declined {
     text-decoration: line-through;
 }
 
