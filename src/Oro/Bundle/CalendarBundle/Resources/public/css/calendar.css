@@ -254,7 +254,9 @@
     text-decoration: line-through;
 }
 
-.fc-event-inner i.invitation-status {
-    font-size: 13px;
-    padding-right: 3px;
+i.invitation-status {
+    font-size: 11px;
+    float: left;
+    margin: 2px 4px 0 1px;
+    line-height: 13px;
 }
