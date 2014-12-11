@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 class KnownEmailAddressCheckerFactory
@@ -19,19 +20,31 @@ class KnownEmailAddressCheckerFactory
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
+    /** @var EmailOwnerProviderStorage */
+    protected $emailOwnerProviderStorage;
+
+    /** @var string[] */
+    protected $exclusions;
+
     /**
-     * @param ManagerRegistry     $doctrine
-     * @param EmailAddressManager $emailAddressManager
-     * @param EmailAddressHelper  $emailAddressHelper
+     * @param ManagerRegistry           $doctrine
+     * @param EmailAddressManager       $emailAddressManager
+     * @param EmailAddressHelper        $emailAddressHelper
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
+     * @param string[]                  $exclusions Class names of email address owners which should be excluded
      */
     public function __construct(
         ManagerRegistry $doctrine,
         EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper
+        EmailAddressHelper $emailAddressHelper,
+        EmailOwnerProviderStorage $emailOwnerProviderStorage,
+        $exclusions = []
     ) {
-        $this->doctrine            = $doctrine;
-        $this->emailAddressManager = $emailAddressManager;
-        $this->emailAddressHelper  = $emailAddressHelper;
+        $this->doctrine                  = $doctrine;
+        $this->emailAddressManager       = $emailAddressManager;
+        $this->emailAddressHelper        = $emailAddressHelper;
+        $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
+        $this->exclusions                = $exclusions;
     }
 
     /**
@@ -44,7 +57,9 @@ class KnownEmailAddressCheckerFactory
         return new KnownEmailAddressChecker(
             $this->getEntityManager(),
             $this->emailAddressManager,
-            $this->emailAddressHelper
+            $this->emailAddressHelper,
+            $this->emailOwnerProviderStorage,
+            $this->exclusions
         );
     }
 

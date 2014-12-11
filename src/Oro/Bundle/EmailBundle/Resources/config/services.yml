@@ -86,6 +86,8 @@ services:
         arguments:
             - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
+        calls:
+            - [setLogger, [@logger]]
 
     oro_email.email_holder_helper:
         class: %oro_email.email_holder_helper.class%
@@ -359,6 +361,8 @@ services:
             - @doctrine
             - @oro_email.email.address.manager
             - @oro_email.email.address.helper
+            - @oro_email.email.owner.provider.storage
+            - [%oro_user.entity.class%]
 
     oro_email.email.activity.manager:
         class: %oro_email.email.activity.manager.class%

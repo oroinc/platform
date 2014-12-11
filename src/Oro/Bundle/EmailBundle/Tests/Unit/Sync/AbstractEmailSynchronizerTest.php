@@ -12,7 +12,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
     private $sync;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $log;
+    private $logger;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $doctrine;
@@ -31,7 +31,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->log = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -63,8 +63,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             $this->knownEmailAddressCheckerFactory,
             $this->emailEntityBuilder
         );
-
-        $this->sync->setLogger($this->log);
+        $this->sync->setLogger($this->logger);
     }
 
     public function testSyncNoOrigin()
@@ -85,7 +84,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')
@@ -129,7 +128,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')
@@ -176,7 +175,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->never())
             ->method('getCurrentUtcDateTime');
@@ -218,7 +217,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')
@@ -266,7 +265,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')

@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareTrait;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
@@ -17,13 +17,10 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
 
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** Determines how many emails can be stored in a database at once */
     const DB_BATCH_SIZE = 30;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $log;
 
     /**
      * @var EntityManager
@@ -50,14 +47,6 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         $this->em                       = $em;
         $this->emailEntityBuilder       = $emailEntityBuilder;
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->log = $logger;
     }
 
     /**

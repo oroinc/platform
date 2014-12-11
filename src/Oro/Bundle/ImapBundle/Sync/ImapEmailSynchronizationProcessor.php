@@ -110,7 +110,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function cleanupOutdatedFolders(EmailOrigin $origin)
     {
-        $this->log->notice('Removing empty outdated folders ...');
+        $this->logger->notice('Removing empty outdated folders ...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
@@ -118,7 +118,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $folders     = new ArrayCollection();
 
         foreach ($imapFolders as $imapFolder) {
-            $this->log->notice(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
+            $this->logger->notice(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
 
             if (!$folders->contains($imapFolder->getFolder())) {
                 $folders->add($imapFolder->getFolder());
@@ -133,7 +133,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         if (count($imapFolders) > 0) {
             $this->em->flush();
-            $this->log->notice(sprintf('Removed %d folder(s).', count($imapFolders)));
+            $this->logger->notice(sprintf('Removed %d folder(s).', count($imapFolders)));
         }
     }
 
@@ -169,7 +169,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             // check if new folder need to be created
             if (!$imapFolder) {
-                $this->log->notice(sprintf('Persisting "%s" folder ...', $folderFullName));
+                $this->logger->notice(sprintf('Persisting "%s" folder ...', $folderFullName));
 
                 $folder = new EmailFolder();
                 $folder
@@ -184,7 +184,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $imapFolder->setUidValidity($uidValidity);
                 $this->em->persist($imapFolder);
 
-                $this->log->notice(sprintf('The "%s" folder was persisted.', $folderFullName));
+                $this->logger->notice(sprintf('The "%s" folder was persisted.', $folderFullName));
             }
 
             // save folder to the list of folders to be synchronized
@@ -193,7 +193,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         // mark the rest of existing folders as outdated
         foreach ($existingImapFolders as $imapFolder) {
-            $this->log->notice(
+            $this->logger->notice(
                 sprintf('Mark "%s" folder as outdated.', $imapFolder->getFolder()->getFullName())
             );
             $imapFolder->getFolder()->setOutdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
@@ -216,13 +216,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function getExistingImapFolders(EmailOrigin $origin)
     {
-        $this->log->notice('Loading existing folders ...');
+        $this->logger->notice('Loading existing folders ...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
         $imapFolders = $repo->getFoldersByOrigin($origin);
 
-        $this->log->notice(sprintf('Loaded %d folder(s).', count($imapFolders)));
+        $this->logger->notice(sprintf('Loaded %d folder(s).', count($imapFolders)));
 
         return $imapFolders;
     }
@@ -234,7 +234,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function getFolders()
     {
-        $this->log->notice('Retrieving folders from an email server ...');
+        $this->logger->notice('Retrieving folders from an email server ...');
 
         $srcFolders = $this->manager->getFolders(null, true);
 
@@ -250,7 +250,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folders[] = $srcFolder;
         }
 
-        $this->log->notice(sprintf('Retrieved %d folder(s).', count($folders)));
+        $this->logger->notice(sprintf('Retrieved %d folder(s).', count($folders)));
 
         return $folders;
     }
@@ -283,8 +283,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $folderType         = $folder->getType();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
 
-        $this->log->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
-        $this->log->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
+        $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
+        $this->logger->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
 
         $emails = $this->manager->getEmails($searchQuery);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
@@ -293,7 +293,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->registerEmailsInKnownEmailAddressChecker($batch, $folderType);
             }
         );
-        $this->log->notice(sprintf('Found %d email(s).', $emails->count()));
+        $this->logger->notice(sprintf('Found %d email(s).', $emails->count()));
 
         $count     = 0;
         $processed = 0;
@@ -302,7 +302,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         foreach ($emails as $email) {
             $processed++;
             if ($processed % self::READ_HINT_COUNT === 0) {
-                $this->log->notice(sprintf('Processed %d of %d emails ...', $processed, $emails->count()));
+                $this->logger->notice(sprintf('Processed %d of %d emails ...', $processed, $emails->count()));
             }
 
             if (!$this->isApplicableEmail($email, $folderType)) {
@@ -353,7 +353,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         foreach ($emails as $email) {
             if (in_array($email->getId()->getUid(), $existingUids)) {
-                $this->log->notice(
+                $this->logger->notice(
                     sprintf(
                         'Skip "%s" (UID: %d) email, because it is already synchronised.',
                         $email->getSubject(),
@@ -379,7 +379,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if ($existingImapEmail) {
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
-                $this->log->notice(
+                $this->logger->notice(
                     sprintf('Persisting "%s" email (UID: %d) ...', $email->getSubject(), $email->getId()->getUid())
                 );
                 $imapEmail       = $this->createImapEmail(
@@ -389,7 +389,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 );
                 $newImapEmails[] = $imapEmail;
                 $this->em->persist($imapEmail);
-                $this->log->notice(sprintf('The "%s" email was persisted.', $email->getSubject()));
+                $this->logger->notice(sprintf('The "%s" email was persisted.', $email->getSubject()));
             }
 
             $this->removeEmailFromOutdatedFolders($relatedExistingImapEmails);
@@ -482,7 +482,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function moveEmailToOtherFolder(ImapEmail $imapEmail, ImapEmailFolder $newImapFolder, $newUid)
     {
-        $this->log->notice(
+        $this->logger->notice(
             sprintf(
                 'Move "%s" (UID: %d) email from "%s" to "%s". New UID: %d.',
                 $imapEmail->getEmail()->getSubject(),
@@ -506,7 +506,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function removeImapEmailReference(ImapEmail $imapEmail)
     {
-        $this->log->notice(
+        $this->logger->notice(
             sprintf(
                 'Remove "%s" (UID: %d) email from "%s".',
                 $imapEmail->getEmail()->getSubject(),

@@ -20,6 +20,10 @@ class KnownEmailAddressCheckerFactoryTest extends \PHPUnit_Framework_TestCase
         $emailAddressHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tools\EmailAddressHelper')
             ->disableOriginalConstructor()
             ->getMock();
+        $emailOwnerProviderStorage =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage')
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $doctrine->expects($this->exactly(2))
             ->method('getManager')
@@ -34,7 +38,9 @@ class KnownEmailAddressCheckerFactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new KnownEmailAddressCheckerFactory(
             $doctrine,
             $emailAddressManager,
-            $emailAddressHelper
+            $emailAddressHelper,
+            $emailOwnerProviderStorage,
+            []
         );
 
         $result = $factory->create();
