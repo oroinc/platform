@@ -15,6 +15,7 @@ define(function (require) {
         ConnectionView = require('orocalendar/js/calendar/connection/view'),
         eventDecorator = require('orocalendar/js/calendar/event-decorator'),
         ColorManager = require('orocalendar/js/calendar/color-manager'),
+        colorUtil = require('oroui/js/tools/color-util'),
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
         localeSettings = require('orolocale/js/locale-settings');
         require('jquery.fullcalendar');
@@ -506,8 +507,12 @@ define(function (require) {
         prepareViewModel: function (fcEvent) {
             // set an event text and background colors the same as the owning calendar
             var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
-            fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
+            if (fcEvent.backgroundColor) {
+                fcEvent.textColor = colorUtil.getContrastColor(fcEvent.backgroundColor);
+            } else {
+                fcEvent.textColor = colors.color;
+            }
         },
 
         /**
@@ -650,7 +655,7 @@ define(function (require) {
                 day: 'dddd ' + dateFormat
             };
             options.timeFormat = {
-                '': timeFormat,
+                default: timeFormat,
                 agenda: timeFormat
             };
             options.axisFormat = timeFormat;
@@ -672,6 +677,9 @@ define(function (require) {
 
             // create jQuery FullCalendar control
             options.timezone = "UTC";
+
+            console.log(options);
+
             this.getCalendarElement().fullCalendar(options);
             this.enableEventLoading = true;
         },
