@@ -362,7 +362,7 @@ services:
             - @oro_email.email.address.manager
             - @oro_email.email.address.helper
             - @oro_email.email.owner.provider.storage
-            - [%oro_user.entity.class%]
+            - %oro_email.email_sync_exclusions%
 
     oro_email.email.activity.manager:
         class: %oro_email.email.activity.manager.class%
