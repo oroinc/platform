@@ -6,7 +6,6 @@ use Akeneo\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler as AkeneoBatchLogH
 
 /**
  * Write the log into a separate log file
- *
  */
 class BatchLogHandler extends AkeneoBatchLogHandler
 {

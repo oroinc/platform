@@ -19,7 +19,10 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('oro_batch')
             ->children()
-                ->scalarNode('log_batch')->defaultFalse()->end()
+                ->scalarNode('log_batch')
+                ->info("Enables/Disables writing of batch log files for each batch job in app/logs/batch directory")
+                ->defaultFalse()
+                ->end()
             ->end();
 
         return $treeBuilder;
