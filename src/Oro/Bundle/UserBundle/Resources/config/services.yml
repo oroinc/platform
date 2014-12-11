@@ -131,7 +131,7 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
 
-    # Autocomplite seach user handler limit by current organization
+    # Autocomplite search user handler limit by current organization
     oro_user.autocomplete.user.organization_search_handler:
         class: %oro_user.autocomplete.user.organization_search_handler.class%
         parent: oro_user.autocomplete.user.search_handler
