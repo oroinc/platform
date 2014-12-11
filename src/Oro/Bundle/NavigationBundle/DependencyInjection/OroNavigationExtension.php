@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
@@ -17,16 +17,16 @@ use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
  */
 class OroNavigationExtension extends Extension
 {
-    const MENU_CONFIG_KEY = 'oro_menu_config';
-    const TITLES_KEY = 'oro_titles';
+    const TITLES_KEY              = 'oro_titles';
+    const MENU_CONFIG_KEY         = 'oro_menu_config';
+    const NAVIGATION_ELEMENTS_KEY = 'oro_navigation_elements';
 
     /**
      * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $entitiesConfig = array();
-        $titlesConfig = array();
+        $entitiesConfig = $titlesConfig = array();
 
         $configLoader = new CumulativeConfigLoader(
             'oro_navigation',
@@ -42,6 +42,13 @@ class OroNavigationExtension extends Extension
             if (!empty($resource->data[self::TITLES_KEY])) {
                 $titlesConfig = array_merge($titlesConfig, (array)$resource->data[self::TITLES_KEY]);
             }
+            // Merge navigation elements node from bundle configuration
+            if (!empty($resource->data[self::NAVIGATION_ELEMENTS_KEY])) {
+                $this->mergeNavigationElementsConfig(
+                    $entitiesConfig[self::MENU_CONFIG_KEY],
+                    $resource->data[self::NAVIGATION_ELEMENTS_KEY]
+                );
+            }
         }
 
         // Merge menu from application configuration
@@ -53,9 +60,9 @@ class OroNavigationExtension extends Extension
 
         // process configurations to validate and merge
         $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $entitiesConfig);
+        $config        = $this->processConfiguration($configuration, $entitiesConfig);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('content_providers.yml');
 
@@ -72,6 +79,9 @@ class OroNavigationExtension extends Extension
         $container
             ->getDefinition('oro_navigation.title_service')
             ->addMethodCall('setTitles', array($titlesConfig));
+        $container
+            ->getDefinition('oro_navigation.content_provider.navigation_elements')
+            ->replaceArgument(0, $config[self::NAVIGATION_ELEMENTS_KEY]);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
@@ -97,10 +107,28 @@ class OroNavigationExtension extends Extension
 
         foreach ($configPart as $entity => $entityConfig) {
             if (isset($config[self::MENU_CONFIG_KEY][$entity])) {
-                $config[self::MENU_CONFIG_KEY][$entity] =
-                    array_replace_recursive($config[self::MENU_CONFIG_KEY][$entity], $entityConfig);
+                $config[self::MENU_CONFIG_KEY][$entity]
+                    = array_replace_recursive($config[self::MENU_CONFIG_KEY][$entity], $entityConfig);
             } else {
                 $config[self::MENU_CONFIG_KEY][$entity] = $entityConfig;
+            }
+        }
+    }
+
+    /**
+     * Merge navigation elements configuration
+     *
+     * @param array $config
+     * @param array $configPart
+     */
+    protected function mergeNavigationElementsConfig(array &$config, array &$configPart)
+    {
+        foreach ($configPart as $entity => $entityConfig) {
+            if (isset($config[self::NAVIGATION_ELEMENTS_KEY][$entity])) {
+                $config[self::NAVIGATION_ELEMENTS_KEY][$entity]
+                    = array_replace_recursive($config[self::NAVIGATION_ELEMENTS_KEY][$entity], $entityConfig);
+            } else {
+                $config[self::NAVIGATION_ELEMENTS_KEY][$entity] = $entityConfig;
             }
         }
     }
@@ -119,7 +147,7 @@ class OroNavigationExtension extends Extension
                         if (!empty($existingItem['children'])) {
                             $childChildren = isset($childConfig['children']) ? $childConfig['children'] : array();
                             $childConfig['children']
-                                = array_merge($existingItem['children'], $childChildren);
+                                           = array_merge($existingItem['children'], $childChildren);
                         }
                     }
                     $this->removeItem($config, $childName);
@@ -131,7 +159,7 @@ class OroNavigationExtension extends Extension
     }
 
     /**
-     * @param array $config
+     * @param array  $config
      * @param string $childName
      */
     protected function removeItem(array &$config, $childName)
@@ -149,7 +177,8 @@ class OroNavigationExtension extends Extension
 
     /**
      * @param array $config
-     * @param $childName
+     * @param       $childName
+     *
      * @return array|null
      */
     protected function getMenuItemByName(array $config, $childName)
@@ -163,6 +192,7 @@ class OroNavigationExtension extends Extension
                 }
             }
         }
+
         return null;
     }
 }

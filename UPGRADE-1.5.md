@@ -42,6 +42,7 @@ UPGRADE FROM 1.4 to 1.5
 
 ####OroNavigationBundle
 - Added support of [System Aware Resolver](/src/Oro/Component/Config/Resources/doc/system_aware_resolver.md) in navigation.yml
+- Added possibility to hide **pin** and **add to favorites** buttons on pages that does not support this kind of functionality. 
 
 ####OroSoapBundle
 - Refactored `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController` added possibility to filter input parameters using **filter objects** as well as closures
@@ -86,6 +87,8 @@ UPGRADE FROM 1.4 to 1.5
     </div>
 </script>
 ```
+- Added `oro_ui_content_providers_manager` global variable in order to fetch content provider's content.
+  It contains reference on instance `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
 
 ####OroSearchBundle:
 - Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.

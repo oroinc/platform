@@ -82,3 +82,13 @@ oro_titles:
     oro_system_calendar_event_view: '%%entity.title%% - %%parent.name%%'
     oro_system_calendar_event_create: 'oro.ui.create_entity - %%parent.name%%'
     oro_system_calendar_event_update: '%%entity.title%% - Edit - %%parent.name%%'
+
+oro_navigation_elements:
+    pinButton:
+        routes:
+            oro_calendar_view: false
+            oro_calendar_view_default: false
+    favoriteButton:
+        routes:
+            oro_calendar_view: false
+            oro_calendar_view_default: false
