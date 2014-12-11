@@ -213,17 +213,20 @@ class AttachmentManager
         $type = 'get',
         $absolute = false
     ) {
-
-        $urlString = base64_encode(
-            implode(
-                '|',
-                [
-                    $parentClass,
-                    $fieldName,
-                    $parentId,
-                    $type,
-                    $entity->getOriginalFilename()
-                ]
+        $urlString = str_replace(
+            '/',
+            '_',
+            base64_encode(
+                implode(
+                    '|',
+                    [
+                        $parentClass,
+                        $fieldName,
+                        $parentId,
+                        $type,
+                        $entity->getOriginalFilename()
+                    ]
+                )
             )
         );
         return $this->router->generate(
@@ -250,7 +253,9 @@ class AttachmentManager
      */
     public function decodeAttachmentUrl($urlString)
     {
-        if (!($decodedString = base64_decode($urlString)) || count($result = explode('|', $decodedString)) < 5) {
+        if (!($decodedString = base64_decode(str_replace('_', '/', $urlString)))
+            || count($result = explode('|', $decodedString)) < 5
+        ) {
             throw new \LogicException('Input string is not correct attachment encoded parameters');
         }
 
