@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
  * This user search handler return users that was assigned to current organization and limit by search string
- * minus current user.
+ * excluding current user.
  * This handler does not use ACL helper and search engine because we does not needed any ACL checks
  *
  * Class OrganizationUsersHandler
@@ -58,7 +58,7 @@ class OrganizationUsersHandler extends UserSearchHandler
 
     /**
      * Returns query builder that uses to build query for search bu id or by search string.
-     * Result data limit by users that was have access to the current organization and by current user.
+     * Result data limit by users that was have access to the current organization and excluding current user.
      *
      * @return QueryBuilder
      */
