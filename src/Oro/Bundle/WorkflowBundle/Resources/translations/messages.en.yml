@@ -25,7 +25,7 @@ View form: View form
 Popup window: Popup window
 Separate page: Separate page
 Cancel: Cancel
-Ok: Ok
+OK: OK
 This value should be {{ limit }} or more.: This value should be {{ limit }} or more.
 This value should be {{ limit }} or less.: This value should be {{ limit }} or less.
 This value should be a valid number.: This value should be a valid number.

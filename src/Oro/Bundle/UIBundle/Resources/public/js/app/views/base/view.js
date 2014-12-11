@@ -39,9 +39,11 @@ define([
          * @override
          */
         _ensureElement: function () {
-            var $el;
-            if (this.el && typeof this.el === 'string') {
-                $el = this._findRegionElem(this.el);
+            var $el, el;
+            el = this.el;
+
+            if (el && typeof el === 'string' && el.substr(0, 7) === 'region:') {
+                $el = this._findRegionElem(el.substr(7));
             }
 
             if ($el) {

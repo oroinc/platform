@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Controller\Api;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;

@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\ReminderBundle\Controller\Api\Rest;
 
-use Symfony\Component\HttpKernel\Exception\HttpException;
-
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\ReminderBundle\Model\WebSocket\MessageParamsProvider;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 
 /**
@@ -32,7 +29,7 @@ class ReminderController extends FOSRestController implements ClassResourceInter
 
         $userId = $user->getId();
 
-        $reminders = $this->getReminderRepository()->findReminders($this->getRequest()->get('ids', array()));
+        $reminders = $this->getReminderRepository()->findReminders($this->getRequest()->get('ids', []));
 
         /**
          * @var Reminder $reminder
