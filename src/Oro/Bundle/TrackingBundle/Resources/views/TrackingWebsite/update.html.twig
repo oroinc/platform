@@ -56,12 +56,8 @@
     {% endfor %}
     {% if additionalData is not empty %}
         {% set dataBlocks = dataBlocks|merge([{
-                'title': 'Additional'|trans,
-                'subblocks': [{
-                'title': '',
-                'useSpan': false,
-                'data' : additionalData
-            }]
+            'title':     'oro.tracking.block.additional'|trans,
+            'subblocks': [{ 'title': '', 'useSpan': false, 'data' : additionalData }]
         }] ) %}
     {% endif %}
 
