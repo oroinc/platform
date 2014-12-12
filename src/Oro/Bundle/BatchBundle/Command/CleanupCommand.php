@@ -4,6 +4,7 @@ namespace Oro\Bundle\BatchBundle\Command;
 
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
@@ -27,7 +28,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      */
     public function getDefaultDefinition()
     {
-        return '*/30 * * * *';
+        return '0 1 * * *';
     }
 
     /**
@@ -53,37 +54,39 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     {
         $interval = $input->getOption('interval');
 
-        $batchJobs = $this->findObsoleteBatchJobs($this->prepareDateInterval($interval));
+        $batchJobs         = $this->getObsoleteBatchJobsQueryBuilder($this->prepareDateInterval($interval));
         $batchJobsIterator = new DeletionQueryResultIterator($batchJobs);
         $batchJobsIterator->setBufferSize(self::FLUSH_BATCH_SIZE);
+        $batchJobsIterator->setHydrationMode(AbstractQuery::HYDRATE_SCALAR);
 
         if (!count($batchJobsIterator)) {
             $output->writeln('<info>There are no jobs eligible for clean up</info>');
+
             return;
         }
-        $output->writeln(
-            sprintf('<comment>Batch jobs will be deleted:</comment> %d', count($batchJobsIterator))
-        );
+        $output->writeln(sprintf('<comment>Batch jobs will be deleted:</comment> %d', count($batchJobsIterator)));
 
-        $this->deleteRecords($batchJobsIterator);
+        $this->deleteRecords($batchJobsIterator, 'AkeneoBatchBundle:JobExecution');
 
-        $jobExecutions = $this->findObsoleteJobInstances();
+        $jobExecutions       = $this->getObsoleteJobInstancesQueryBuilder();
         $jobInstanceIterator = new DeletionQueryResultIterator($jobExecutions);
         $jobInstanceIterator->setBufferSize(self::FLUSH_BATCH_SIZE);
-        $this->deleteRecords($jobInstanceIterator);
+        $batchJobsIterator->setHydrationMode(AbstractQuery::HYDRATE_SCALAR);
+        $this->deleteRecords($jobInstanceIterator, 'AkeneoBatchBundle:JobInstance');
 
-        $output->writeln('<info>Batch job cleanup complete</info>');
+        $output->writeln('<info>Batch job history cleanup complete</info>');
     }
 
     /**
      * Subtract given interval from current date time
      *
      * @param string $intervalString
+     *
      * @return \DateTime
      */
     protected function prepareDateInterval($intervalString = null)
     {
-        $date = new \DateTime('now', new \DateTimeZone('UTC'));
+        $date           = new \DateTime('now', new \DateTimeZone('UTC'));
         $intervalString = $intervalString ?: $this->getContainer()->getParameter('oro_batch.cleanup_interval');
         $date->sub(\DateInterval::createFromDateString($intervalString));
 
@@ -94,17 +97,21 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      * Delete records using iterator
      *
      * @param DeletionQueryResultIterator $iterator
+     *
+     * @param string                      $className Entity FQCN
+     *
      * @throws \Exception
      */
-    protected function deleteRecords(DeletionQueryResultIterator $iterator)
+    protected function deleteRecords(DeletionQueryResultIterator $iterator, $className)
     {
         $iteration = 0;
-        $em = $this->getEntityManager();
+        $em        = $this->getEntityManager();
         try {
             $em->beginTransaction();
 
-            foreach ($iterator as $batchJob) {
-                $em->remove($batchJob);
+            foreach ($iterator as $row) {
+                $id = reset($row);
+                $em->remove($em->getReference($className, $id));
 
                 $iteration++;
                 if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
@@ -128,21 +135,23 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     protected function finishBatch()
     {
         $this->getEntityManager()->flush();
-        if ($this->getEntityManager()->getConnection()->getTransactionNestingLevel() == 1) {
-            $this->getEntityManager()->clear();
-        }
+        $this->getEntityManager()->clear();
     }
 
     /**
      * Find job executions created before the given date time
      *
      * @param $endTime
+     *
      * @return QueryBuilder
      */
-    public function findObsoleteBatchJobs($endTime)
+    public function getObsoleteBatchJobsQueryBuilder($endTime)
     {
         $repository = $this->getEntityManager()->getRepository('AkeneoBatchBundle:JobExecution');
+
         return $repository->createQueryBuilder('je')
+            ->resetDQLPart('select')
+            ->select('je.id')
             ->where('je.status NOT IN (:statuses)')
             ->andWhere('je.createTime < (:endTime)')
             ->setParameter(
@@ -158,10 +167,13 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      *
      * @return QueryBuilder
      */
-    public function findObsoleteJobInstances()
+    public function getObsoleteJobInstancesQueryBuilder()
     {
         $repository = $this->getEntityManager()->getRepository('AkeneoBatchBundle:JobInstance');
+
         return $repository->createQueryBuilder('ji')
+            ->resetDQLPart('select')
+            ->select('ji.id')
             ->leftJoin('ji.jobExecutions', 'je')
             ->where('je.id IS NULL');
     }

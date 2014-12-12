@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Functional\Fixture;
 
-use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 
 use Doctrine\Common\Persistence\ObjectManager;
@@ -11,9 +11,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 
 class LoadJobExecutionData extends AbstractFixture
 {
-    /** @var ObjectManager */
-    protected $em;
-
     /** @var array */
     protected $jobInstances = [];
 
@@ -21,6 +18,14 @@ class LoadJobExecutionData extends AbstractFixture
      * {@inheritdoc}
      */
     public function load(ObjectManager $manager)
+    {
+        $this->loadJobInstances($manager);
+        $this->loadJobExecutions($manager);
+
+        $manager->flush();
+    }
+
+    public function loadJobInstances(ObjectManager $manager)
     {
         $handle  = fopen(__DIR__ . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'job_instance_data.csv', 'r');
         $headers = fgetcsv($handle, 1000, ',');
@@ -34,16 +39,13 @@ class LoadJobExecutionData extends AbstractFixture
             $jobInstanceEntity->setStatus($combined['Status']);
             $jobInstanceEntity->setConnector($combined['Connector']);
             $jobInstanceEntity->setType($combined['Type']);
-            $jobInstanceEntity->setRawConfiguration([]);
 
             $manager->persist($jobInstanceEntity);
             $this->jobInstances[$combined['Id']] = $jobInstanceEntity;
         }
 
-        $this->loadJobExecutions($manager);
-
-        $manager->flush();
         fclose($handle);
+
     }
 
     public function loadJobExecutions(ObjectManager $manager)
@@ -52,7 +54,7 @@ class LoadJobExecutionData extends AbstractFixture
         $headers = fgetcsv($handle, 1000, ',');
 
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-            $combined = array_combine($headers, $data);
+            $combined   = array_combine($headers, $data);
             $createTime = new \DateTime('now', new \DateTimeZone('UTC'));
             $createTime->sub(\DateInterval::createFromDateString($combined['Create Time']));
 

@@ -29,13 +29,14 @@ class CleanupCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron:batch:cleanup', $params);
         $this->assertContains($expectedContent, $result);
 
-        $fileName        = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixture'
+        $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixture'
             . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'expected_results.yml';
+
         $expectedResults = Yaml::parse(file_get_contents($fileName));
         if (isset($params['-i']) && isset($expectedResults['data'][$params['-i']])) {
             $expectedJobData  = $expectedResults['data'][$params['-i']];
-            $jobInstanceCodes  = $this->getEntityFieldAsArray('AkeneoBatchBundle:JobInstance', 'code');
-            $jobExecutionPids = $this->getEntityFieldAsArray('AkeneoBatchBundle:JobExecution','pid');
+            $jobInstanceCodes = $this->getEntityFieldAsArray('AkeneoBatchBundle:JobInstance', 'code');
+            $jobExecutionPids = $this->getEntityFieldAsArray('AkeneoBatchBundle:JobExecution', 'pid');
             $this->assertEquals($expectedJobData['job_instance_codes'], $jobInstanceCodes);
             $this->assertEquals(explode(',', $expectedJobData['job_execution_pids']), $jobExecutionPids);
         }
@@ -47,16 +48,16 @@ class CleanupCommandTest extends WebTestCase
     public function paramProvider()
     {
         return [
-            'should show help' => [
+            'should show help'                             => [
                 '$expectedContent' => "Usage:\n oro:cron:batch:cleanup [-i|--interval[=\"...\"]]",
                 '$params'          => ['--help']
             ],
-            'should show no records found' => [
+            'should show no records found'                 => [
                 '$expectedContent' => 'There are no jobs eligible for clean up',
                 '$params'          => ['-i' => '1 year']
             ],
             'should show success output and records count' => [
-                '$expectedContent' => "Batch jobs will be deleted: 7" . PHP_EOL . "Batch job cleanup complete",
+                '$expectedContent' => "Batch jobs will be deleted: 6" . PHP_EOL . "Batch job history cleanup complete",
                 '$params'          => ['-i' => '2 weeks']
             ]
         ];
@@ -65,6 +66,7 @@ class CleanupCommandTest extends WebTestCase
     /**
      * @param string $repositoryName
      * @param string $field
+     *
      * @return array
      */
     protected function getEntityFieldAsArray($repositoryName, $field)
