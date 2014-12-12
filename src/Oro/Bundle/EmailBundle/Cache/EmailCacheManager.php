@@ -39,6 +39,8 @@ class EmailCacheManager implements LoggerAwareInterface
      * If do not, load it using appropriate email extension add it to a cache.
      *
      * @param Email $email
+     *
+     * @throw LoadEmailBodyException if a body of the given email cannot be loaded
      */
     public function ensureEmailBodyCached(Email $email)
     {
