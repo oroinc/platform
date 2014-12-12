@@ -12,13 +12,19 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $options;
 
-    /** @var CommandExecutor */
+    /**
+     * @var CommandExecutor
+     */
     protected $commandExecutor;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $configProcessorOptionsPath;
 
     /**
@@ -77,7 +83,6 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
                 $logger
             );
             $this->removeConfigProcessorOptionsFile();
-
         } catch (\Exception $ex) {
             $this->removeConfigProcessorOptionsFile();
             throw $ex;
