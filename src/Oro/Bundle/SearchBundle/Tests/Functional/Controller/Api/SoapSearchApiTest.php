@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
+namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -16,10 +16,10 @@ class SoapSearchApiTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->initSoapClient();
 
-        $this->loadFixtures(array('Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures\LoadSearchItemData'));
+        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
     }
 
     /**
@@ -64,7 +64,7 @@ class SoapSearchApiTest extends WebTestCase
 
         // if only one element
         if (empty($result['elements']['item'][0])) {
-            $result['elements']['item'] = array($result['elements']['item']);
+            $result['elements']['item'] = [$result['elements']['item']];
         }
 
         // remove ID references
@@ -86,7 +86,9 @@ class SoapSearchApiTest extends WebTestCase
      */
     public function searchDataProvider()
     {
-        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
+        return $this->getApiRequestsData(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'requests'
+        );
     }
 
     /**
