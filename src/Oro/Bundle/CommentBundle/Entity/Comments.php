@@ -107,7 +107,9 @@ class Comments
      */
     protected $updatedAt;
 
-     /**
+    /**
+     * Get id
+     *
      * @return int
      */
     public function getId()
@@ -116,6 +118,8 @@ class Comments
     }
 
     /**
+     * Get message
+     *
      * @return string
      */
     public function getMessage()
@@ -124,6 +128,8 @@ class Comments
     }
 
     /**
+     * Set message
+     *
      * @param string $message
      */
     public function setMessage($message)
@@ -132,6 +138,8 @@ class Comments
     }
 
     /**
+     * Get user who have updated this comment
+     *
      * @return User
      */
     public function getUpdatedBy()
@@ -140,6 +148,8 @@ class Comments
     }
 
     /**
+     * Set user who have updated this comment
+     *
      * @param User $updatedBy
      */
     public function setUpdatedBy(User $updatedBy)
@@ -148,6 +158,8 @@ class Comments
     }
 
     /**
+     * Set comment owner
+     *
      * @return User
      */
     public function getOwner()
@@ -156,6 +168,8 @@ class Comments
     }
 
     /**
+     * Set comment owner
+     *
      * @param User $owner
      */
     public function setOwner(User $owner)
@@ -164,6 +178,8 @@ class Comments
     }
 
     /**
+     * Get organization
+     *
      * @return Organization
      */
     public function getOrganization()
@@ -172,6 +188,8 @@ class Comments
     }
 
     /**
+     * Set organization
+     *
      * @param Organization $organization
      */
     public function setOrganization(Organization $organization)
@@ -180,6 +198,8 @@ class Comments
     }
 
     /**
+     * Get creation date
+     *
      * @return \DateTime
      */
     public function getCreatedAt()
@@ -188,6 +208,8 @@ class Comments
     }
 
     /**
+     * Set creation date
+     *
      * @param \DateTime $createdAt
      */
     public function setCreatedAt(\DateTime $createdAt)
@@ -196,6 +218,8 @@ class Comments
     }
 
     /**
+     * Get a date update
+     *
      * @return \DateTime
      */
     public function getUpdatedAt()
@@ -204,6 +228,8 @@ class Comments
     }
 
     /**
+     * Set a date update
+     *
      * @param \DateTime $updatedAt
      */
     public function setUpdatedAt(\DateTime $updatedAt)
@@ -212,6 +238,8 @@ class Comments
     }
 
     /**
+     * Set date on prePersist action
+     *
      * @ORM\PrePersist
      */
     public function prePersist()
@@ -220,6 +248,8 @@ class Comments
     }
 
     /**
+     * Update date on preUpdate action
+     *
      * @ORM\PreUpdate
      */
     public function preUpdate()

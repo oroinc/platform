@@ -27,10 +27,10 @@ class OroCommentBundle implements Migration
     {
         $table = $schema->createTable('oro_comments');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('user_owner_id', 'integer', ['notnull' => true]);
         $table->addColumn('updated_by_user_id', 'integer', ['notnull' => false]);
         $table->addColumn('message', 'text');
-        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => true]);
         $table->addColumn('createdAt', 'datetime', []);
         $table->addColumn('updatedAt', 'datetime', []);
         $table->addColumn('comments_type', 'string', ['length' => 255]);

@@ -17,6 +17,20 @@ class CommentsTest extends AbstractEntityTestCase
         return 'Oro\Bundle\CommentBundle\Entity\Comments';
     }
 
+    public function testPrePersist()
+    {
+        $this->entity->prePersist();
+
+        $this->assertNotNull($this->entity->getCreatedAt());
+    }
+
+    public function testPreUpdate()
+    {
+        $this->entity->preUpdate();
+
+        $this->assertNotNull($this->entity->getUpdatedAt());
+    }
+
     /**
      * @return array
      */
@@ -29,7 +43,7 @@ class CommentsTest extends AbstractEntityTestCase
 
         return [
             'message'      => ['message', 'some test message', 'some test message'],
-            'updatedBy' =>  ['updatedBy', $owner, $owner],
+            'updatedBy'    => ['updatedBy', $owner, $owner],
             'owner'        => ['owner', $owner, $owner],
             'organization' => ['organization', $organization, $organization],
             'createdAt'    => ['createdAt', $createdAt, $createdAt],
