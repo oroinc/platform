@@ -675,8 +675,6 @@ define(function (require) {
             // create jQuery FullCalendar control
             options.timezone = "UTC";
 
-            console.log(options);
-
             this.getCalendarElement().fullCalendar(options);
             this.enableEventLoading = true;
         },
