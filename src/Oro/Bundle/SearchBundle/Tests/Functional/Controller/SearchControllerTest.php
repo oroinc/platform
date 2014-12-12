@@ -49,10 +49,10 @@ class SearchControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertResponseStatusCodeEquals($result, 200);
-        $result = $result->getContent();
+        $content = $result->getContent();
 
         foreach ($response['rest']['data'] as $item) {
-            $this->assertContains($item['record_url'], $result);
+            $this->assertContains($item['record_url'], $content);
         }
     }
 
