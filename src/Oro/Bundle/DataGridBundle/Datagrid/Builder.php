@@ -61,6 +61,27 @@ class Builder
      */
     public function build(DatagridConfiguration $config, ParameterBag $parameters)
     {
+        /**
+         * @TODO: should be refactored in BAP-6849
+         */
+        $minified = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
+
+        $gridParams = [];
+        if (is_array($minified)) {
+            foreach ($minified as $param => $value) {
+                if ($param == 'g') {
+                    foreach ($value as $gridParamName => $gridParamValue) {
+                        $gridParams[$gridParamName] = $gridParamValue;
+                    }
+                }
+            }
+        }
+
+        $parameters->add($gridParams);
+
+        /**
+         * @TODO: should be refactored in BAP-6826
+         */
         $event = new PreBuild($config, $parameters);
         $this->eventDispatcher->dispatch(PreBuild::NAME, $event);
 
