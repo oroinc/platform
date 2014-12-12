@@ -118,3 +118,6 @@ workflows:
 ####OroUserBundle:
  - Added user search handler that return users that was assigned to current organization and limit by search string excluding current user. 
  Autocomplite alias for this handler is `organization_users`. 
+
+####OroTrackingBundle:
+ - Entities `TrackingWebsite` and `TrackingEvent` were made extendable
