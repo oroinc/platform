@@ -90,10 +90,10 @@ class MigrationExecutor
             $platform->supportsSequences() ? $sm->listSequences() : [],
             $sm->createSchemaConfig()
         );
-        $hasFailures = false;
+        $failedMigrations = false;
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
-            if ($hasFailures && !$migration instanceof FailIndependentMigration) {
+            if (!empty($failedMigrations) && !$migration instanceof FailIndependentMigration) {
                 $this->logger->notice(sprintf('> %s - skipped', get_class($migration)));
                 continue;
             }
@@ -102,8 +102,11 @@ class MigrationExecutor
                 $item->setSuccessful();
             } else {
                 $item->setFailed();
-                $hasFailures = true;
+                $failedMigrations[] = get_class($migration);
             }
+        }
+        if (!empty($failedMigrations)) {
+            throw new \RuntimeException(sprintf('Failed migrations: %s.', implode(', ', $failedMigrations)));
         }
     }
 
