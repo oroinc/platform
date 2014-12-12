@@ -1,0 +1,4 @@
+oro_comment_bundle:
+    resource:     "@OroCommentBundle/Controller"
+    type:         annotation
+    prefix:       /
