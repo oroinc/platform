@@ -12,19 +12,13 @@ use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 
 class UpdateExtendConfigMigrationQuery implements MigrationQuery
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options;
 
-    /**
-     * @var CommandExecutor
-     */
+    /** @var CommandExecutor */
     protected $commandExecutor;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $configProcessorOptionsPath;
 
     /**
@@ -83,12 +77,6 @@ class UpdateExtendConfigMigrationQuery implements MigrationQuery
                 $logger
             );
             $this->removeConfigProcessorOptionsFile();
-
-            /**
-             * We should update schema for custom entities and fields in case running platform:update
-             * with existing custom entities/fields which was created via UI but not applied.
-             */
-            $this->commandExecutor->runCommand('oro:entity-extend:update-schema', ['--process-isolation' => true]);
 
         } catch (\Exception $ex) {
             $this->removeConfigProcessorOptionsFile();

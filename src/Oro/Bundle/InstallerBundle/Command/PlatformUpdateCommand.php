@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -42,9 +43,17 @@ class PlatformUpdateCommand extends ContainerAwareCommand
         $force = $input->getOption('force');
 
         if ($force) {
-            $assetsOptions = array(
-                '--exclude' => array('OroInstallerBundle')
-            );
+            /**
+             * Before proceed with update we need to be sure all custom entities/fields are synchronized with schema.
+             */
+            $output->writeln('Process custom entities and fields...');
+            /** @var EntityProcessor $entityProcessor */
+            $entityProcessor = $this->getContainer()->get('oro_entity_extend.extend.entity_processor');
+            $entityProcessor->updateDatabase();
+
+            $assetsOptions = [
+                '--exclude' => ['OroInstallerBundle']
+            ];
             if ($input->hasOption('symlink') && $input->getOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
             }
@@ -58,17 +67,17 @@ class PlatformUpdateCommand extends ContainerAwareCommand
             $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
 
             $commandExecutor
-                ->runCommand('oro:migration:load', array('--process-isolation' => true, '--force' => true))
-                ->runCommand('oro:workflow:definitions:load', array('--process-isolation' => true))
-                ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
-                ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
-                ->runCommand('oro:navigation:init', array('--process-isolation' => true))
+                ->runCommand('oro:migration:load', ['--process-isolation' => true, '--force' => true])
+                ->runCommand('oro:workflow:definitions:load', ['--process-isolation' => true])
+                ->runCommand('oro:process:configuration:load', ['--process-isolation' => true])
+                ->runCommand('oro:migration:data:load', ['--process-isolation' => true])
+                ->runCommand('oro:navigation:init', ['--process-isolation' => true])
                 ->runCommand('oro:assets:install', $assetsOptions)
                 ->runCommand('assetic:dump')
-                ->runCommand('fos:js-routing:dump', array('--target' => 'web/js/routes.js'))
+                ->runCommand('fos:js-routing:dump', ['--target' => 'web/js/routes.js'])
                 ->runCommand('oro:localization:dump')
                 ->runCommand('oro:translation:dump')
-                ->runCommand('oro:requirejs:build', array('--ignore-errors' => true));
+                ->runCommand('oro:requirejs:build', ['--ignore-errors' => true]);
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'
