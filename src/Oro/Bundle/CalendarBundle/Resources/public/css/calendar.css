@@ -288,6 +288,11 @@ i.invitation-status.icon-question-sign {
 .fc-time-grid-event .fc-time {
     line-height: 12px;
 }
+
 .fc-time-grid-event.fc-short .fc-time {
     line-height: 14px;
+}
+
+.calendar-dashboard-widget {
+    margin-top: 10px;
 }

@@ -98,7 +98,10 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
                     );
                 }
             }
-            $manager->persist($provider->getActivityListEntitiesByActivityEntity($entity));
+            $activityListEntity = $provider->getActivityListEntitiesByActivityEntity($entity);
+            if ($activityListEntity) {
+                $manager->persist($activityListEntity);
+            }
         }
         $manager->flush();
     }
