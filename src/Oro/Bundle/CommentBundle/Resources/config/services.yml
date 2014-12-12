@@ -1,7 +1,8 @@
 parameters:
-#    oro_comment.example.class: Oro\Bundle\CommentBundle\Example
+    oro_comment.migration.extension.comments.class: Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
 
 services:
-#    oro_comment.example:
-#        class: %oro_comment.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    oro_comment.migration.extension.comments:
+        class: %oro_comment.migration.extension.comments.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: comments }

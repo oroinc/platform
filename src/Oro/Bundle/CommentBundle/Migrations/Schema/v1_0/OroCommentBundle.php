@@ -27,18 +27,24 @@ class OroCommentBundle implements Migration
     {
         $table = $schema->createTable('oro_comments');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_owner_id', 'integer', ['notnull' => true]);
+
+        #todo what should we do when user was deleted
+        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
+
+        #todo what should we do when user was deleted
         $table->addColumn('updated_by_user_id', 'integer', ['notnull' => false]);
         $table->addColumn('message', 'text');
-        $table->addColumn('organization_id', 'integer', ['notnull' => true]);
+
+        #todo what should we do when organization was deleted
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('createdAt', 'datetime', []);
         $table->addColumn('updatedAt', 'datetime', []);
         $table->addColumn('comments_type', 'string', ['length' => 255]);
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id']);
-        $table->addIndex(['updated_by_user_id']);
-        $table->addIndex(['organization_id']);
+        $table->addIndex(['updated_by_user_id'], 'IDX_30E6463D2793CC5E', []);
+        $table->addIndex(['organization_id'], 'IDX_30E6463D32C8A3DE', []);
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
@@ -58,7 +64,8 @@ class OroCommentBundle implements Migration
             $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null],
+            'FK_30E6463D32C8A3DE'
         );
     }
 }

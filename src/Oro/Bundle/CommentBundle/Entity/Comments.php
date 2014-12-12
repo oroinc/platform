@@ -118,7 +118,7 @@ class Comments
     }
 
     /**
-     * Get message
+     * Gets message
      *
      * @return string
      */
@@ -128,7 +128,7 @@ class Comments
     }
 
     /**
-     * Set message
+     * Sets message
      *
      * @param string $message
      */
@@ -138,7 +138,7 @@ class Comments
     }
 
     /**
-     * Get user who have updated this comment
+     * Gets user who have updated this comment
      *
      * @return User
      */
@@ -148,7 +148,7 @@ class Comments
     }
 
     /**
-     * Set user who have updated this comment
+     * Sets user who have updated this comment
      *
      * @param User $updatedBy
      */
@@ -158,7 +158,7 @@ class Comments
     }
 
     /**
-     * Set comment owner
+     * Sets comment owner
      *
      * @return User
      */
@@ -168,7 +168,7 @@ class Comments
     }
 
     /**
-     * Set comment owner
+     * Sets comment owner
      *
      * @param User $owner
      */
@@ -178,7 +178,7 @@ class Comments
     }
 
     /**
-     * Get organization
+     * Gets organization
      *
      * @return Organization
      */
@@ -188,7 +188,7 @@ class Comments
     }
 
     /**
-     * Set organization
+     * Sets organization
      *
      * @param Organization $organization
      */
@@ -198,7 +198,7 @@ class Comments
     }
 
     /**
-     * Get creation date
+     * Gets creation date
      *
      * @return \DateTime
      */
@@ -208,7 +208,7 @@ class Comments
     }
 
     /**
-     * Set creation date
+     * Sets creation date
      *
      * @param \DateTime $createdAt
      */
@@ -218,7 +218,7 @@ class Comments
     }
 
     /**
-     * Get a date update
+     * Gets a date update
      *
      * @return \DateTime
      */
@@ -228,7 +228,7 @@ class Comments
     }
 
     /**
-     * Set a date update
+     * Sets a date update
      *
      * @param \DateTime $updatedAt
      */
@@ -238,7 +238,7 @@ class Comments
     }
 
     /**
-     * Set date on prePersist action
+     * Sets date on prePersist action
      *
      * @ORM\PrePersist
      */
@@ -248,7 +248,7 @@ class Comments
     }
 
     /**
-     * Update date on preUpdate action
+     * Updates date on preUpdate action
      *
      * @ORM\PreUpdate
      */
