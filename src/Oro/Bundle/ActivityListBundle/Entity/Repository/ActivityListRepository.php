@@ -99,7 +99,7 @@ class ActivityListRepository extends EntityRepository
     public function getRecordsCountForTargetClassAndId($className, $entityId)
     {
         // we need try/catch here to avoid crash on non exist entity relation
-        try{
+        try {
             $result = $this->createQueryBuilder('list')
                 ->select('COUNT(list.id)')
                 ->join('list.' . $this->getAssociationName($className), 'r')
