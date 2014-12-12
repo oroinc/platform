@@ -607,7 +607,7 @@ define(function (require) {
             } else {
                 this._show();
                 if (this.options.initLayout) {
-                    mediator.execute('layout:init', this.widget);
+                    mediator.execute('layout:init', this.widget, this);
                 }
             }
             this.firstRun = false;
@@ -625,7 +625,7 @@ define(function (require) {
             this.setElement($(content).filter('.widget-content:first'));
             this._show();
             if (initLayout || (initLayout === undefined && this.options.initLayout)) {
-                mediator.execute('layout:init', this.widget);
+                mediator.execute('layout:init', this.widget, this);
             }
         },
 
