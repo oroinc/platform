@@ -7,13 +7,13 @@ use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\BatchBundle\ORM\Query\DeletionQueryResultIterator;
 
 /**
  * Command to clean up old batch job records
