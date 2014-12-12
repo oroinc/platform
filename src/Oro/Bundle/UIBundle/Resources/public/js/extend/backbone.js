@@ -31,6 +31,15 @@ define([
             prop = properties[_j];
             delete this[prop];
         }
+
+        // dispose attached components
+        _.each(this, function (component, name) {
+            if ('component:' === name.substr(0, 10)) {
+                component.dispose();
+                delete this[name];
+            }
+        }, this);
+
         this.disposed = true;
         return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
     };
