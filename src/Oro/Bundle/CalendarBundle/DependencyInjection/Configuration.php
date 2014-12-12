@@ -41,7 +41,7 @@ class Configuration implements ConfigurationInterface
                         'The "enabled_system_calendar" must be boolean, "organization" or "system", given %s.'
                     )
                 ->end()
-                ->defaultTrue()
+                ->defaultValue('system')
             ->end()
         ->end();
 

@@ -5,15 +5,16 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
-class KnownEmailAddressChecker
+class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, LoggerAwareInterface
 {
-    /** @var LoggerInterface */
-    protected $log;
+    use LoggerAwareTrait;
 
     /** @var EntityManager */
     protected $em;
@@ -24,36 +25,46 @@ class KnownEmailAddressChecker
     /** @var EmailAddressHelper */
     protected $emailAddressHelper;
 
+    /** @var EmailOwnerProviderStorage */
+    protected $emailOwnerProviderStorage;
+
+    /** @var array */
+    protected $exclusions;
+
     /** @var array key = email address, value = 1 - known, -1 - unknown */
     protected $knownEmailAddresses = [];
 
     /**
      * Constructor
      *
-     * @param LoggerInterface     $log
-     * @param EntityManager       $em
-     * @param EmailAddressManager $emailAddressManager
-     * @param EmailAddressHelper  $emailAddressHelper
+     * @param EntityManager             $em
+     * @param EmailAddressManager       $emailAddressManager
+     * @param EmailAddressHelper        $emailAddressHelper
+     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
+     * @param string[]                  $exclusions Class names of email address owners which should be excluded
      */
     public function __construct(
-        LoggerInterface $log,
         EntityManager $em,
         EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper
+        EmailAddressHelper $emailAddressHelper,
+        EmailOwnerProviderStorage $emailOwnerProviderStorage,
+        $exclusions = []
     ) {
-        $this->log                 = $log;
-        $this->em                  = $em;
-        $this->emailAddressManager = $emailAddressManager;
-        $this->emailAddressHelper  = $emailAddressHelper;
+        $this->em                        = $em;
+        $this->emailAddressManager       = $emailAddressManager;
+        $this->emailAddressHelper        = $emailAddressHelper;
+        $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
+
+        $this->exclusions = [];
+        if (!empty($exclusions)) {
+            foreach ($exclusions as $className) {
+                $this->exclusions[$className] = true;
+            }
+        }
     }
 
     /**
-     * Check if at least one of the given email addresses is known
-     *
-     * @param mixed $_ Email address(es) to check
-     *                 Each parameter can be a string or array of strings
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function isAtLeastOneKnownEmailAddress($_)
     {
@@ -91,9 +102,7 @@ class KnownEmailAddressChecker
     }
 
     /**
-     * Performs pre-loading of the given email addresses
-     *
-     * @param array $emails Each item can be a string or array of strings
+     * {@inheritdoc}
      */
     public function preLoadEmailAddresses(array $emails)
     {
@@ -124,18 +133,10 @@ class KnownEmailAddressChecker
      */
     protected function loadKnownEmailAddresses(array $emailsToLoad)
     {
-        $this->log->notice(sprintf('Loading email address(es) "%s" ...', implode(',', $emailsToLoad)));
+        $this->logger->notice(sprintf('Loading email address(es) "%s" ...', implode(',', $emailsToLoad)));
 
-        $repo  = $this->emailAddressManager->getEmailAddressRepository($this->em);
-        $query = $repo->createQueryBuilder('a')
-            ->select('a.email')
-            ->where('a.hasOwner = ?1 AND a.email IN (?2)')
-            ->setParameter(1, true)
-            ->setParameter(2, $emailsToLoad)
-            ->getQuery();
-        $query->setHydrationMode(Query::HYDRATE_ARRAY);
+        $emails = $this->getKnownEmailAddresses($emailsToLoad);
 
-        $emails           = $query->getResult();
         $loadedEmailCount = count($emails);
 
         foreach ($emails as $item) {
@@ -148,7 +149,33 @@ class KnownEmailAddressChecker
             $this->knownEmailAddresses[$email] = -1; // unknown
         }
 
-        $this->log->notice(sprintf('Loaded %d email address(es).', $loadedEmailCount));
+        $this->logger->notice(sprintf('Loaded %d email address(es).', $loadedEmailCount));
+    }
+
+    /**
+     * @param string[] $emailsToLoad
+     *
+     * @return array
+     */
+    protected function getKnownEmailAddresses(array $emailsToLoad)
+    {
+        $repo = $this->emailAddressManager->getEmailAddressRepository($this->em);
+        $qb   = $repo->createQueryBuilder('a')
+            ->select('a.email')
+            ->where('a.hasOwner = :hasOwner AND a.email IN (:emails)')
+            ->setParameter('hasOwner', true)
+            ->setParameter('emails', $emailsToLoad);
+
+        if (!empty($this->exclusions)) {
+            foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
+                if (isset($this->exclusions[$provider->getEmailOwnerClass()])) {
+                    $fieldName = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
+                    $qb->andWhere(sprintf('a.%s IS NULL', $fieldName));
+                }
+            }
+        }
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     /**
