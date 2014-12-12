@@ -30,7 +30,8 @@ class LinkType extends AbstractType
             ->setAllowedTypes(
                 [
                     'route' => 'string',
-                    'title' => 'string', // add "'acl' => 'string'" after BAP-4696 implementation
+                    'acl'   => 'string',
+                    'title' => 'string',
                 ]
             );
     }
