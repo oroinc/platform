@@ -296,3 +296,13 @@ i.invitation-status.icon-question-sign {
 .calendar-dashboard-widget {
     margin-top: 10px;
 }
+
+.reminder-status {
+    float: right;
+    margin-top: 1px;
+}
+
+.fc-event:hover {
+    /* less than 900 - popups z-index */
+    z-index: 500 !important;
+}

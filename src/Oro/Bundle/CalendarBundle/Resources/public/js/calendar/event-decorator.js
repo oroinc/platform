@@ -15,27 +15,27 @@ define(['underscore', 'orotranslation/js/translator'
 
         decorate: function (eventModel, $el) {
             var $body = $el.find('.fc-content'),
-                $time = $el.find('.fc-time'),
+                $timePlace = $el.find('.fc-time'),
                 reminders = eventModel.get('reminders'),
                 invitationStatus = eventModel.get('invitationStatus');
             // if $time is not displayed show related info into $body
-            if (!$time.length) {
-                $time = $body;
+            if (!$timePlace.length) {
+                $timePlace = $body;
             }
             if (reminders && _.keys(reminders).length) {
-                $body.append(this.templates.reminderIcon);
+                $el.prepend(this.templates.reminderIcon);
             } else {
-                $body.find('.reminder-status').remove();
+                $el.find('.reminder-status').remove();
             }
             switch (invitationStatus) {
                 case 'not_responded':
-                    $time.prepend(this.templates.notRespondedIcon);
+                    $timePlace.prepend(this.templates.notRespondedIcon);
                     break;
                 case 'accepted':
-                    $time.prepend(this.templates.acceptedIcon);
+                    $timePlace.prepend(this.templates.acceptedIcon);
                     break;
                 case 'tentatively_accepted':
-                    $time.prepend(this.templates.tentativelyIcon);
+                    $timePlace.prepend(this.templates.tentativelyIcon);
                     break;
                 case 'declined':
                     $body.addClass('invitation-status-declined');
