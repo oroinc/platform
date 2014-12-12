@@ -10,9 +10,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 class GridParamsExtension extends AbstractExtension
 {
-    const MINIFIED_GRID_PARAM_KEY = 'g';
-    const GRID_PARAM_KEY = 'grid';
-
     /**
      * {@inheritdoc}
      */

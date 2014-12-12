@@ -67,17 +67,12 @@ class Builder
         $minified = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
 
         $gridParams = [];
-        if (is_array($minified)) {
-            foreach ($minified as $param => $value) {
-                if ($param == 'g') {
-                    foreach ($value as $gridParamName => $gridParamValue) {
-                        $gridParams[$gridParamName] = $gridParamValue;
-                    }
-                }
+        if (is_array($minified) && array_key_exists('g', $minified) && is_array($minified['g'])) {
+            foreach ($minified['g'] as $gridParamName => $gridParamValue) {
+                $gridParams[$gridParamName] = $gridParamValue;
             }
+            $parameters->add($gridParams);
         }
-
-        $parameters->add($gridParams);
 
         /**
          * @TODO: should be refactored in BAP-6826
