@@ -102,10 +102,10 @@ define(function (require) {
 
                         name = 'component:' + (component.cid || _.uniqueId('component'));
                         if (typeof superInstance.subview === 'function') {
-                            // the super instance is a Chaplin view
+                            // the super instance implements subview method (like a Chaplin.View)
                             superInstance.subview(name, component);
                         } else {
-                            // the super instance is a controller or Backbone View
+                            // the super instance is a controller or Backbone.View
                             superInstance[name] = component;
                         }
                     });
