@@ -5,10 +5,6 @@ namespace Oro\Bundle\BatchBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * Configuration
- *
- */
 class Configuration implements ConfigurationInterface
 {
     /**
@@ -20,8 +16,8 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->root('oro_batch')
             ->children()
                 ->scalarNode('log_batch')
-                ->info("Enables/Disables writing of batch log files for each batch job in app/logs/batch directory")
-                ->defaultFalse()
+                    ->info('Enables/Disables writing of batch log files for each batch job in app/logs/batch directory')
+                    ->defaultFalse()
                 ->end()
             ->end();
 
