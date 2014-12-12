@@ -3,7 +3,7 @@
 
 {% block content %}
     {% set calendarId = 'calendar-' ~ widgetId %}
-    <div id="{{ calendarId }}">
+    <div id="{{ calendarId }}" class="calendar-dashboard-widget">
         <div class="calendar-events"></div>
     </div>
     {% set eventsOptions = {

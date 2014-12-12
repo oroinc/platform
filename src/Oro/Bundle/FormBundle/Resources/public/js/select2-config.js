@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore'
-    ], function ($, _) {
+define(['jquery', 'underscore', 'oroui/js/tools'
+    ], function ($, _, tools) {
     'use strict';
 
     /**
@@ -189,7 +189,7 @@ define(['jquery', 'underscore'
 
         highlightSelection: function(str, selection) {
             return str && selection && selection.term ?
-                str.replace(new RegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
+                str.replace(tools.safeRegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
         },
 
         getTitle: function(data, properties) {
