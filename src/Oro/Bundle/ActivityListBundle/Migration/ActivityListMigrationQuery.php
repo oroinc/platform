@@ -83,6 +83,9 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
         $toSchema         = clone $this->schema;
         $hasSchemaChanges = false;
         foreach ($targetEntities as $targetEntity) {
+            if (!$toSchema->hasTable($targetEntity)) {
+                continue;
+            }
             $associationName   = ExtendHelper::buildAssociationName(
                 $targetEntity,
                 ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND
