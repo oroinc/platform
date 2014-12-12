@@ -21,6 +21,7 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('cleanup_interval')
             ->defaultValue('1 month')
             ->cannotBeEmpty()
+            ->info('Sets the time interval to keep the batch job records in the database')
             ->example('1 month');
 
         return $treeBuilder;
