@@ -81,7 +81,7 @@ class MigrationExecutor
      * @param MigrationState[] $migrations
      * @param bool             $dryRun
      *
-     * @throw \RuntimeException if at lease one migration failed
+     * @throws \RuntimeException if at lease one migration failed
      */
     public function executeUp(array $migrations, $dryRun = false)
     {
