@@ -6,38 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="oro_comments")
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="comments_type")
- * @ORM\HasLifecycleCallbacks()
- * @Config(
- *      defaultValues={
- *          "entity"={
- *              "icon"="icon-comments"
- *          },
- *          "ownership"={
- *              "owner_type"="USER",
- *              "owner_field_name"="owner",
- *              "owner_column_name"="user_owner_id",
- *              "organization_field_name"="organization",
- *              "organization_column_name"="organization_id"
- *          },
- *          "security"={
- *              "type"="ACL",
- *              "group_name"=""
- *          },
- *          "activity"={
- *              "immutable"=true
- *          }
- *      }
- * )
- */
-class Comments
+abstract class BaseComment
 {
     /**
      * @var integer
@@ -158,7 +129,7 @@ class Comments
     }
 
     /**
-     * Sets comment owner
+     * Get owner comment
      *
      * @return User
      */
@@ -168,7 +139,7 @@ class Comments
     }
 
     /**
-     * Sets comment owner
+     * Set the owner comment
      *
      * @param User $owner
      */
@@ -218,7 +189,7 @@ class Comments
     }
 
     /**
-     * Gets a date update
+     * Gets modification date
      *
      * @return \DateTime
      */
@@ -238,7 +209,7 @@ class Comments
     }
 
     /**
-     * Sets date on prePersist action
+     * Sets the date on which the comment is created
      *
      * @ORM\PrePersist
      */
@@ -249,7 +220,7 @@ class Comments
     }
 
     /**
-     * Updates date on preUpdate action
+     * Update the updatedAt when the updated comment
      *
      * @ORM\PreUpdate
      */

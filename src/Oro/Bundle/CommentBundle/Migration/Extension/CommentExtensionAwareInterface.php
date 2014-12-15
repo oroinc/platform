@@ -8,7 +8,7 @@ namespace Oro\Bundle\CommentBundle\Migration\Extension;
 interface CommentExtensionAwareInterface
 {
     /**
-     * Sets the NoteExtension
+     * Sets the CommentExtension
      *
      * @param CommentExtension $commentExtension
      */

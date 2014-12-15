@@ -13,7 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class CommentExtension implements ExtendExtensionAwareInterface
 {
-    const COMMENT_TABLE_NAME = 'oro_comments';
+    const COMMENT_TABLE_NAME = 'oro_comment';
 
     /** @var ExtendExtension */
     protected $extendExtension;
@@ -34,7 +34,7 @@ class CommentExtension implements ExtendExtensionAwareInterface
      * @throws DBALException
      * @throws SchemaException
      */
-    public function addNoteAssociation(Schema $schema, $targetTableName, $targetColumnName = null)
+    public function addCommentAssociation(Schema $schema, $targetTableName, $targetColumnName = null)
     {
         $commentTable = $schema->getTable(self::COMMENT_TABLE_NAME);
         $targetTable  = $schema->getTable($targetTableName);
@@ -45,7 +45,7 @@ class CommentExtension implements ExtendExtensionAwareInterface
         }
 
         $options = new OroOptions();
-        $options->set('comments', 'enabled', true);
+        $options->set('comment', 'enabled', true);
         $targetTable->addOption(OroOptions::KEY, $options);
 
         $associationName = ExtendHelper::buildAssociationName(

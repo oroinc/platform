@@ -1,8 +1,8 @@
 parameters:
-    oro_comment.migration.extension.comments.class: Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
+    oro_comment.migration.extension.comment.class: Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
 
 services:
-    oro_comment.migration.extension.comments:
-        class: %oro_comment.migration.extension.comments.class%
+    oro_comment.migration.extension.comment:
+        class: %oro_comment.migration.extension.comment.class%
         tags:
-            - { name: oro_migration.extension, extension_name: comments }
+            - { name: oro_migration.extension, extension_name: comment }
