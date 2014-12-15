@@ -680,9 +680,17 @@
 {% block oro_link_type_widget %}
     {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
         {# @todo after BAP-4696 implementation remove link class #}
-        <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
-            {{ title|trans }}
-        </a>
+        {% if value is defined and value is iterable%}
+            {% for fileName, route in value %}
+                <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                    {{ fileName }}
+                </a>
+            {% endfor %}
+        {% else %}
+            <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                {{ title|trans }}
+            </a>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
