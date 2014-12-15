@@ -145,7 +145,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      *
      * @return QueryBuilder
      */
-    public function getObsoleteBatchJobsQueryBuilder($endTime)
+    protected function getObsoleteBatchJobsQueryBuilder($endTime)
     {
         $repository = $this->getEntityManager()->getRepository('AkeneoBatchBundle:JobExecution');
 
@@ -167,7 +167,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
      *
      * @return QueryBuilder
      */
-    public function getObsoleteJobInstancesQueryBuilder()
+    protected function getObsoleteJobInstancesQueryBuilder()
     {
         $repository = $this->getEntityManager()->getRepository('AkeneoBatchBundle:JobInstance');
 
