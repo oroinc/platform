@@ -71,7 +71,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
         $jobExecutions       = $this->getObsoleteJobInstancesQueryBuilder();
         $jobInstanceIterator = new DeletionQueryResultIterator($jobExecutions);
         $jobInstanceIterator->setBufferSize(self::FLUSH_BATCH_SIZE);
-        $batchJobsIterator->setHydrationMode(AbstractQuery::HYDRATE_SCALAR);
+        $jobInstanceIterator->setHydrationMode(AbstractQuery::HYDRATE_SCALAR);
         $this->deleteRecords($jobInstanceIterator, 'AkeneoBatchBundle:JobInstance');
 
         $output->writeln('<info>Batch job history cleanup complete</info>');

@@ -45,7 +45,6 @@ class LoadJobExecutionData extends AbstractFixture
         }
 
         fclose($handle);
-
     }
 
     public function loadJobExecutions(ObjectManager $manager)
@@ -66,6 +65,7 @@ class LoadJobExecutionData extends AbstractFixture
 
             $manager->persist($jobExecutionEntity);
         }
+
         fclose($handle);
     }
 }

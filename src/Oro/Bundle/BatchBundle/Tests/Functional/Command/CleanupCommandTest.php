@@ -7,7 +7,6 @@ use Symfony\Component\Yaml\Yaml;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering false
  * @dbIsolation
  */
 class CleanupCommandTest extends WebTestCase
