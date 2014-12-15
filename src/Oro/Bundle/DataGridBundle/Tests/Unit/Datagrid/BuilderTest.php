@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 
 class BuilderTest extends \PHPUnit_Framework_TestCase
@@ -71,11 +72,31 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
      * @param array                 $raisedEvents
      * @param int                   $extensionsCount
      * @param array                 $extensionsMocks
+     * @param array                 $minifiedParams
      */
-    public function testBuild($config, $resultFQCN, $raisedEvents, $extensionsCount, $extensionsMocks = [])
-    {
+    public function testBuild(
+        $config,
+        $resultFQCN,
+        $raisedEvents,
+        $extensionsCount,
+        $extensionsMocks = [],
+        $minifiedParams = []
+    ) {
         $builder = $this->getBuilderMock(['buildDataSource']);
         $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+
+        $parameters->expects($this->once())
+            ->method('get')
+            ->with(ParameterBag::MINIFIED_PARAMETERS)
+            ->will($this->returnValue($minifiedParams));
+
+        if (is_array($minifiedParams) && array_key_exists('g', $minifiedParams) && is_array($minifiedParams['g'])) {
+            $parameters->expects($this->once())
+                ->method('add');
+        } else {
+            $parameters->expects($this->never())
+                ->method('add');
+        }
 
         foreach ($extensionsMocks as $extension) {
             $builder->registerExtension($extension);
@@ -156,6 +177,22 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 $baseEventList,
                 2,
                 [$extToAdd, $extNotToAdd, $extToAdd2]
+            ],
+            'With minified parameters without grid params'               => [
+                DatagridConfiguration::createNamed(self::TEST_DATAGRID_NAME, []),
+                self::DEFAULT_DATAGRID_CLASS,
+                $baseEventList,
+                0,
+                [],
+                ['i' => '1', 'p' => '25']
+            ],
+            'With minified parameters with grid params'                  => [
+                DatagridConfiguration::createNamed(self::TEST_DATAGRID_NAME, []),
+                self::DEFAULT_DATAGRID_CLASS,
+                $baseEventList,
+                0,
+                [],
+                ['g' => ['class_name' => 'Extended_Entity_Test']]
             ]
         ];
     }

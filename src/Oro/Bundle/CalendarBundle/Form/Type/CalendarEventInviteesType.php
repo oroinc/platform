@@ -42,7 +42,7 @@ class CalendarEventInviteesType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(['autocomplete_alias' => 'users_without_current']);
+        $resolver->setDefaults(['autocomplete_alias' => 'organization_users']);
     }
 
     /**

@@ -201,6 +201,19 @@ define(['jquery', 'underscore'], function ($, _) {
          */
         isErrorPage: function () {
             return Boolean($('meta[name=error]').length);
+        },
+
+        /**
+         * Creates safe regexp expression from string
+         *
+         * @param {string} str
+         * @param {string} flags
+         */
+        safeRegExp: function (str, flags) {
+            var expression;
+            str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            expression = new RegExp(str, flags);
+            return expression;
         }
     };
 });

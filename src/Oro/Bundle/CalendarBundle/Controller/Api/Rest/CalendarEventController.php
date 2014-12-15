@@ -12,7 +12,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -228,7 +228,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
     /**
      * Create new calendar event.
      *
-     * @Post("calendarevents", name="oro_api_post_calendarevent")
+     * @Post("calendarevents")
      * @ApiDoc(
      *      description="Create new calendar event",
      *      resource=true
