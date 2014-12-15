@@ -11,13 +11,15 @@
                 <span class="visual">
                     <span class="details">
                         {{ entityName|raw }}
-                        <% var template = {{ 'oro.email.sent_by.label'|trans|json_encode|raw }}; %>
+                        <%
+                            var hasLink   = !!data.ownerLink;
+                            var ownerLink = hasLink
+                                ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.ownerName) + '</a>'
+                                : '<span class="user">' + _.escape(data.ownerName) + '</span>';
+                        %>
                         <%= _.template(
-                            template,
-                            {
-                                user: '<a class="user" href="' + data.owner_route + '">' +  _.escape(data.owner_name) + '</a>',
-                                date: '<i class="date">' + updatedAt + '</i>'
-                            },
+                            {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
+                            { user: ownerLink, date: '<i class="date">' + updatedAt + '</i>'},
                             { interpolate: /\{\{(.+?)\}\}/g }
                         ) %>
                     </span>

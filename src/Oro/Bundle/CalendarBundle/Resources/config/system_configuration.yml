@@ -29,7 +29,6 @@ oro_system_configuration:
                                             - oro_calendar.event_colors
 
     api_tree:
-        outlook:
-            contacts:
-                oro_calendar.calendar_colors: ~
-                oro_calendar.event_colors: ~
+        look-and-feel:
+            oro_calendar.calendar_colors: ~
+            oro_calendar.event_colors: ~

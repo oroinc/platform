@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 use Guzzle\Http\Url;
 use Guzzle\Parser\ParserRegistry;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 

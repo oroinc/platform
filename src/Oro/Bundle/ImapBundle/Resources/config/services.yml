@@ -8,6 +8,7 @@ parameters:
     oro_imap.storage.other.class:                    Oro\Bundle\ImapBundle\Mail\Storage\Imap
     oro_imap.email_body_loader.class:                Oro\Bundle\ImapBundle\Provider\ImapEmailBodyLoader
     oro_imap.email_synchronizer.class:               Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer
+    oro_imap.email_sync_processor_factory.class:     Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory
 
     oro_imap.form.type.configuration.class:          Oro\Bundle\ImapBundle\Form\Type\ConfigurationType
 
@@ -40,13 +41,20 @@ services:
         class: %oro_imap.email_synchronizer.class%
         arguments:
             - @doctrine
-            - @oro_email.email.entity.builder
-            - @oro_email.email.address.manager
-            - @oro_email.email.address.helper
+            - @oro_email.known_email_address_checker_factory
+            - @oro_imap.email_sync_processor_factory
             - @oro_imap.connector.factory
             - @oro_security.encoder.mcrypt
         tags:
             - { name: oro_email.email_synchronizer }
+
+    oro_imap.email_sync_processor_factory:
+        class: %oro_imap.email_sync_processor_factory.class%
+        public: false
+        scope: prototype
+        arguments:
+            - @doctrine
+            - @oro_email.email.entity.builder
 
     oro_imap.form.type.configuration:
         class: %oro_imap.form.type.configuration.class%

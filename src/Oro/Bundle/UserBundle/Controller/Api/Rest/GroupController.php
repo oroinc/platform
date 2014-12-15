@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;

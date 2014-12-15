@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\Controller\FOSRestController;
 
