@@ -403,9 +403,8 @@ class ExtendConfigDumper
 
                 /** @var FieldConfigId $relationFieldId */
                 $relationFieldId = $relation['field_id'];
-                if ($relationFieldId && count($schema)) {
-                    $schema['relation'][$relationFieldId->getFieldName()] =
-                        $relationFieldId->getFieldName();
+                if ($relationFieldId) {
+                    $schema['relation'][$relationFieldId->getFieldName()] = $relationFieldId->getFieldName();
                 }
             }
         }
