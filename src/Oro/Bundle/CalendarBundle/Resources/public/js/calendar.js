@@ -432,19 +432,30 @@ define(function (require) {
                 var fcEvents,
                     visibleConnectionIds = [];
 
-                fcEvents = this.collection.map(function (eventModel) {
-                    return this.createViewModel(eventModel);
-                }, this);
-                this.eventsLoaded = {};
+                if (this.enableEventLoading) {
+                    // data is loaded, need to update eventsLoaded
+                    this.eventsLoaded = {};
+                    this.options.connectionsOptions.collection.each(function (connectionModel) {
+                        if (connectionModel.get('visible')) {
+                            this.eventsLoaded[connectionModel.get('calendarUid')] = true;
+                        }
+                    }, this);
+                }
+                // collect visible collections
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
                     if (connectionModel.get('visible')) {
-                        this.eventsLoaded[connectionModel.get('calendarUid')] = true;
                         visibleConnectionIds.push(connectionModel.get('calendarUid'));
                     }
                 }, this);
-                fcEvents = _.filter(fcEvents, function (item) {
-                    return -1 !== _.indexOf(visibleConnectionIds, item.calendarUid);
+                // filter visible events
+                fcEvents = this.collection.filter(function (item) {
+                    return -1 !== _.indexOf(visibleConnectionIds, item.get('calendarUid'));
                 });
+                // prepare them for full calendar
+                fcEvents = _.map(fcEvents, function (eventModel) {
+                    return this.createViewModel(eventModel);
+                }, this);
+
                 this._hideMask();
                 callback(fcEvents);
             }, this);
