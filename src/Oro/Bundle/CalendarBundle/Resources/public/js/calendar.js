@@ -229,7 +229,7 @@ define(function (require) {
                 this.connectionsView.showCalendar(connectionModel);
             }
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                this.getCalendarElement().fullCalendar('refetchEvents');
+                this.smartRefetch();
             }
         },
 
@@ -254,26 +254,26 @@ define(function (require) {
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
                 // view is updated to closest possible
                 // start refetching 'cause event had linked events
-                eventModel.once('sync', _.bind(calendarElement.fullCalendar, calendarElement, 'refetchEvents'));
+                eventModel.once('sync', this.smartRefetch, this);
             }
         },
 
         onEventDeleted: function (eventModel) {
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                this.getCalendarElement().fullCalendar('refetchEvents');
+                this.smartRefetch();
             } else {
                 this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
             }
         },
 
         onConnectionAdded: function () {
-            this.getCalendarElement().fullCalendar('refetchEvents');
+            this.smartRefetch();
         },
 
         onConnectionChanged: function (connectionModel) {
             if (connectionModel.reloadEventsRequest !== null) {
                 if (connectionModel.reloadEventsRequest === true) {
-                    this.getCalendarElement().fullCalendar('refetchEvents');
+                    this.smartRefetch();
                 }
                 connectionModel.reloadEventsRequest = null;
                 return;
@@ -281,17 +281,15 @@ define(function (require) {
 
             var changes = connectionModel.changedAttributes(),
                 calendarUid = connectionModel.get('calendarUid');
-            if ((changes.visible && !this.eventsLoaded[calendarUid]) || this.enableEventLoading !== true) {
-                this.getCalendarElement().fullCalendar('refetchEvents');
+            if (changes.visible && !this.eventsLoaded[calendarUid]) {
+                this.smartRefetch();
             } else {
-                this.enableEventLoading = false;
-                this.getCalendarElement().fullCalendar('refetchEvents');
-                this.enableEventLoading = true;
+                this.updateEventsWithoutReload();
             }
         },
 
         onConnectionDeleted: function () {
-            this.getCalendarElement().fullCalendar('refetchEvents');
+            this.smartRefetch();
         },
 
         onFcSelect: function (start, end) {
@@ -427,6 +425,30 @@ define(function (require) {
                 }
                 this.showSaveEventError(err);
             }
+        },
+
+        smartRefetch: function () {
+            try {
+                this._showMask();
+                // load events from a server
+                this.collection.fetch({
+                    reset: true,
+                    success: _.bind(this.updateEventsWithoutReload, this),
+                    error: _.bind(function (collection, response) {
+                        this.showLoadEventsError(response.responseJSON || {});
+                        this._hideMask();
+                    }, this)
+                });
+            } catch (err) {
+                this.showLoadEventsError(err);
+            }
+        },
+
+        updateEventsWithoutReload: function () {
+            var oldEnableEventLoading = this.enableEventLoading;
+            this.enableEventLoading = false;
+            this.getCalendarElement().fullCalendar('refetchEvents');
+            this.enableEventLoading = oldEnableEventLoading;
         },
 
         loadEvents: function (start, end, timezone, callback) {
