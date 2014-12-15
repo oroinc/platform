@@ -26,11 +26,11 @@ Twig
 ----
 
 When page loaded first time its content mostly renders by twig. In order to get content from content providers from 
-twig template `oro_ui_content_providers_manager` global variable was added. It contains instance of `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
+twig template `oro_ui_content_provider_manager` global variable was added. It contains instance of `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
 
 Example:
 Getting array of all flash messages
 
 ```twig
-{% set contentProviderContent = oro_ui_content_providers_manager.getContent(['flashMessages'])|first %}
+{% set contentProviderContent = oro_ui_content_provider_manager.getContent(['flashMessages'])|first %}
 ```

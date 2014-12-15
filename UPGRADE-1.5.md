@@ -87,7 +87,7 @@ UPGRADE FROM 1.4 to 1.5
     </div>
 </script>
 ```
-- Added `oro_ui_content_providers_manager` global variable in order to fetch content provider's content.
+- Added `oro_ui_content_provider_manager` global variable in order to fetch content provider's content.
   It contains reference on instance `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
 - `show_pin_button_on_start_page` config node is node used anymore. Please use ability to hide navigation elements in `navigation.yml` 
 

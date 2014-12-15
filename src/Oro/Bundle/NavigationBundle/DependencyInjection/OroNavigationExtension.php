@@ -44,9 +44,10 @@ class OroNavigationExtension extends Extension
             }
             // Merge navigation elements node from bundle configuration
             if (!empty($resource->data[self::NAVIGATION_ELEMENTS_KEY])) {
-                $this->mergeNavigationElementsConfig(
+                $this->appendConfigPart(
                     $entitiesConfig[self::MENU_CONFIG_KEY],
-                    $resource->data[self::NAVIGATION_ELEMENTS_KEY]
+                    $resource->data[self::NAVIGATION_ELEMENTS_KEY],
+                    self::NAVIGATION_ELEMENTS_KEY
                 );
             }
         }
@@ -105,30 +106,28 @@ class OroNavigationExtension extends Extension
             }
         }
 
-        foreach ($configPart as $entity => $entityConfig) {
-            if (isset($config[self::MENU_CONFIG_KEY][$entity])) {
-                $config[self::MENU_CONFIG_KEY][$entity]
-                    = array_replace_recursive($config[self::MENU_CONFIG_KEY][$entity], $entityConfig);
-            } else {
-                $config[self::MENU_CONFIG_KEY][$entity] = $entityConfig;
-            }
-        }
+        $this->appendConfigPart($config, $configPart, self::MENU_CONFIG_KEY);
     }
 
     /**
-     * Merge navigation elements configuration
+     * Smart append of particular config into base config. Config to append will be iterated through and each node
+     * will be append or merged via array_replace_recursive
      *
-     * @param array $config
-     * @param array $configPart
+     * @param array  $parentConfig
+     * @param array  $particularConfig
+     * @param string $configBranchName Node name to append into
+     *
+     * @internal param array $config
+     * @internal param array $configPart
      */
-    protected function mergeNavigationElementsConfig(array &$config, array &$configPart)
+    protected function appendConfigPart(array &$parentConfig, array &$particularConfig, $configBranchName)
     {
-        foreach ($configPart as $entity => $entityConfig) {
-            if (isset($config[self::NAVIGATION_ELEMENTS_KEY][$entity])) {
-                $config[self::NAVIGATION_ELEMENTS_KEY][$entity]
-                    = array_replace_recursive($config[self::NAVIGATION_ELEMENTS_KEY][$entity], $entityConfig);
+        foreach ($particularConfig as $entity => $entityConfig) {
+            if (isset($parentConfig[$configBranchName][$entity])) {
+                $parentConfig[$configBranchName][$entity]
+                    = array_replace_recursive($parentConfig[$configBranchName][$entity], $entityConfig);
             } else {
-                $config[self::NAVIGATION_ELEMENTS_KEY][$entity] = $entityConfig;
+                $parentConfig[$configBranchName][$entity] = $entityConfig;
             }
         }
     }
