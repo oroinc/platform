@@ -245,9 +245,10 @@ define(function (require) {
             fcEvent = calendarElement.fullCalendar('clientEvents', eventModel.id)[0];
             _.extend(fcEvent, this.createViewModel(eventModel));
 
-            // cannot update single event due to fullcalendar bug
-            // please check that after updating fullcalendar
-            // calendarElement.fullCalendar('updateEvent', fcEvent);
+            // notify fullCalendar about update
+            // NOTE: cannot update single event due to fullcalendar bug
+            //       please check that after updating fullcalendar
+            //       calendarElement.fullCalendar('updateEvent', fcEvent);
             calendarElement.fullCalendar('rerenderEvents');
 
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
