@@ -36,7 +36,7 @@ class ContentProviderPassTest extends \PHPUnit_Framework_TestCase
             [
                 'addGlobal',
                 [
-                    'oro_ui_content_providers_manager',
+                    'oro_ui_content_provider_manager',
                     new Reference(ContentProviderPass::CONTENT_PROVIDER_MANAGER_SERVICE)
                 ]
             ]

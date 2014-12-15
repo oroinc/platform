@@ -41,7 +41,7 @@ class ContentProviderPass implements CompilerPassInterface
             $twig = $container->getDefinition(self::TWIG_SERVICE_KEY);
             $twig->addMethodCall(
                 'addGlobal',
-                ['oro_ui_content_providers_manager', new Reference(self::CONTENT_PROVIDER_MANAGER_SERVICE)]
+                ['oro_ui_content_provider_manager', new Reference(self::CONTENT_PROVIDER_MANAGER_SERVICE)]
             );
         }
     }
