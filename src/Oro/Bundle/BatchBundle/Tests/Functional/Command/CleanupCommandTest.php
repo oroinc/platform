@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Functional\Command;
 
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -70,10 +71,13 @@ class CleanupCommandTest extends WebTestCase
      */
     protected function getEntityFieldAsArray($repositoryName, $field)
     {
-        $items = $this->getContainer()->get('doctrine')
+        /** @var QueryBuilder $qb */
+        $qb = $this->getContainer()->get('doctrine')
             ->getRepository($repositoryName)
-            ->createQueryBuilder('i')
-            ->select('i.' . $field)
+            ->createQueryBuilder('i');
+
+        $items = $qb->select('i.' . $field)
+            ->orderBy('i.' . $field)
             ->getQuery()
             ->getArrayResult();
 
