@@ -236,13 +236,14 @@ define(function (require) {
         onEventChanged: function (eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
                 calendarElement = this.getCalendarElement(),
-                fcEvent = calendarElement.fullCalendar('clientEvents', eventModel.id)[0];
+                fcEvent;
 
             eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
             eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
 
-            // copy all fields, except id, from event to fcEvent
-            fcEvent = _.extend(fcEvent, this.createViewModel(eventModel));
+            // find and update fullCalendar event model
+            fcEvent = calendarElement.fullCalendar('clientEvents', eventModel.id)[0];
+            _.extend(fcEvent, this.createViewModel(eventModel));
 
             // cannot update single event due to fullcalendar bug
             // please check that after updating fullcalendar
