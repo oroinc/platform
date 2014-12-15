@@ -878,7 +878,9 @@ define(function (require) {
 
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
-                // do nothing
+                if (newLayout === 'fullscreen') {
+                    $calendarEl.fullCalendar('option', 'contentHeight', this.getAvailableHeight() - 1);
+                }
                 return;
             }
             this.layout = newLayout;
