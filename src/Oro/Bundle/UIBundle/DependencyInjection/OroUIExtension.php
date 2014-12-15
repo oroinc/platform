@@ -36,7 +36,6 @@ class OroUIExtension extends Extension
         $loader->load('twig.yml');
         $loader->load('content_providers.yml');
 
-        $container->setParameter('oro_ui.show_pin_button_on_start_page', $config['show_pin_button_on_start_page']);
         $container->setParameter(
             'oro_ui.placeholders',
             [

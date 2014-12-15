@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
+namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -15,8 +15,8 @@ class RestSearchApiTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
-        $this->loadFixtures(array('Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures\LoadSearchItemData'));
+        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
     }
 
     /**
@@ -35,11 +35,7 @@ class RestSearchApiTest extends WebTestCase
             unset($request['supported_engines']);
         }
 
-        foreach ($request as $key => $value) {
-            if (is_null($value)) {
-                unset($request[$key]);
-            }
-        }
+        $request = array_filter($request);
 
         $this->client->request(
             'GET',
@@ -76,7 +72,9 @@ class RestSearchApiTest extends WebTestCase
      */
     public function searchDataProvider()
     {
-        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'requests');
+        return $this->getApiRequestsData(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'requests'
+        );
     }
 
     /**

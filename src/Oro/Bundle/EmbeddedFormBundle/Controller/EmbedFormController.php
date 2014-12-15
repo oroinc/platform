@@ -43,10 +43,12 @@ class EmbedFormController extends Controller
         if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             $dataClass = $form->getConfig()->getOption('data_class');
             if (isset($dataClass) && class_exists($dataClass)) {
-                $ref = new \ReflectionClass($dataClass);
-                $data = $ref->getConstructor()->getNumberOfRequiredParameters() ?
-                    $ref->newInstanceWithoutConstructor() :
-                    $ref->newInstance();
+                $ref         = new \ReflectionClass($dataClass);
+                $constructor = $ref->getConstructor();
+                $data        = $constructor && $constructor->getNumberOfRequiredParameters()
+                    ? $ref->newInstanceWithoutConstructor()
+                    : $ref->newInstance();
+
                 $form->setData($data);
             } else {
                 $data = [];

@@ -1,19 +1,10 @@
 parameters:
     oro_ui.content_provider.current_route.class:   Oro\Bundle\UIBundle\ContentProvider\CurrentRouteContentProvider
     oro_ui.content_provider.flash_messages.class:  Oro\Bundle\UIBundle\ContentProvider\FlashMessagesContentProvider
-    oro_ui.content_provider.show_pin_button.class: Oro\Bundle\UIBundle\ContentProvider\ShowPinButtonContentProvider
 
 services:
     oro_ui.content_provider.current_route:
         class: %oro_ui.content_provider.current_route.class%
-        synchronized: true
-        calls:
-            - [setRequest, ["@?request="]]
-        tags:
-            - { name: oro_ui.content_provider }
-
-    oro_ui.content_provider.show_pin_button:
-        class: %oro_ui.content_provider.show_pin_button.class%
         synchronized: true
         calls:
             - [setRequest, ["@?request="]]
