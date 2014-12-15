@@ -19,6 +19,17 @@
     ]
 
 #}
+{% set lableTrans = {
+    'data_schema': {
+        'label': {
+            'label': null
+        },
+        'value': {
+            'label': options.data_schema.value.label|trans
+        }
+    }
+}%}
+{% set options = options|marge_recursive(lableTrans) %}
 {% if data|length > 0  %}
     {{ chart.renderChart(data, options, config, isMobileVersion()) }}
 {% else %}
