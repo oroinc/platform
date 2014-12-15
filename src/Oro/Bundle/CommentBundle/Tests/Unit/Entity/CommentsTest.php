@@ -22,6 +22,7 @@ class CommentsTest extends AbstractEntityTestCase
         $this->entity->prePersist();
 
         $this->assertNotNull($this->entity->getCreatedAt());
+        $this->assertNotNull($this->entity->getUpdatedAt());
     }
 
     public function testPreUpdate()

@@ -40,9 +40,10 @@ oro:
             id.label:         Id
 
         block:
-            general: General
-            tracking: Tracking Code
-            events: Events
+            general:    General
+            additional: Additional
+            tracking:   Tracking Code
+            events:     Events
 
         help:
             event_tooltip: |
