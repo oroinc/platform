@@ -62,7 +62,7 @@ require([
                   searchDropdown.empty();
               } else {
                   $.ajax({
-                      url: routing.generate('oro_api_get_search', { _format: 'html' }),
+                      url: routing.generate('oro_search_suggestion'),
                       data: {
                           search: queryString,
                           from: searchBarForm.val(),
