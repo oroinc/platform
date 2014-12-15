@@ -1,8 +1,20 @@
 parameters:
-    oro_comment.migration.extension.comment.class: Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
-
+    oro_comment.migration.extension.comment.class:    Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
+    oro_comment.entity_generator.extension.class:     Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
+    oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
 services:
     oro_comment.migration.extension.comment:
         class: %oro_comment.migration.extension.comment.class%
         tags:
             - { name: oro_migration.extension, extension_name: comment }
+
+    oro_comment.entity_generator.extension:
+        class: %oro_comment.entity_generator.extension.class%
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension }
+
+    oro_comment.entity_config_dumper.extension:
+        class: %oro_comment.entity_config_dumper.extension.class%
+        parent: oro_entity_extend.entity_config_dumper.extension.association
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
