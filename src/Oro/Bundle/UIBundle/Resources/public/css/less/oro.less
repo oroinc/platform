@@ -3142,7 +3142,7 @@ iframe.email-body {
   #font > #family > .monospace;
   color: @grayDark;
   padding: (@baseLineHeight - 1) / 2;
-  margin: 0;
+  margin: 0 0 @baseLineHeight / 2;
   display: block;
   font-size: @baseFontSize - 1; // 14px to 13px
   line-height: @baseLineHeight;
@@ -3160,6 +3160,9 @@ iframe.email-body {
       .controls {
         margin-left: 82px;
       }
+    }
+    iframe.email-body {
+      margin: 0;
     }
   }
 }
