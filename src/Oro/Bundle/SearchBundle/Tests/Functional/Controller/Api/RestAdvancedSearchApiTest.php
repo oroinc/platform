@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Functional\API;
+namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\Api;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -13,8 +13,8 @@ class RestAdvancedSearchApiTest extends WebTestCase
 {
     protected function setUp()
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
-        $this->loadFixtures(array('Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures\LoadSearchItemData'));
+        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->loadFixtures(['Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData']);
     }
 
     /**
@@ -29,7 +29,7 @@ class RestAdvancedSearchApiTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_search_advanced'),
-            array('query' => $requestUrl)
+            ['query' => $requestUrl]
         );
 
         $result = $this->client->getResponse();
@@ -55,6 +55,8 @@ class RestAdvancedSearchApiTest extends WebTestCase
      */
     public function advancedSearchDataProvider()
     {
-        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'advanced_requests');
+        return $this->getApiRequestsData(
+            __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'advanced_requests'
+        );
     }
 }
