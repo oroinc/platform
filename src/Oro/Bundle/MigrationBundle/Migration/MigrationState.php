@@ -22,7 +22,9 @@ class MigrationState
     protected $state;
 
     /**
-     * @param Migration $migration
+     * @param Migration   $migration
+     * @param string|null $bundleName
+     * @param string|null $version
      */
     public function __construct(Migration $migration, $bundleName = null, $version = null)
     {
