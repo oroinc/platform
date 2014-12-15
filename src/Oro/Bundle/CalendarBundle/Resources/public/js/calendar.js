@@ -279,26 +279,12 @@ define(function (require) {
 
             var changes = connectionModel.changedAttributes(),
                 calendarUid = connectionModel.get('calendarUid');
-            if (_.has(changes, 'visible')) {
-                if (changes.visible) {
-                    if (this.eventsLoaded[calendarUid]) {
-                        _.each(this.collection.where({calendarUid: calendarUid}), function (eventModel) {
-                            this.addEventToCalendar(eventModel);
-                        }, this);
-                    } else {
-                        this.getCalendarElement().fullCalendar('refetchEvents');
-                    }
-                } else {
-                    this.getCalendarElement().fullCalendar('removeEvents', function (fcEvent) {
-                        return fcEvent.calendarUid === calendarUid;
-                    });
-                }
-            }
-            if (_.has(changes, 'backgroundColor') && connectionModel.get('visible')) {
-                _.each(this.getCalendarEvents(calendarUid), function (fcEvent) {
-                    this.prepareViewModel(fcEvent);
-                }, this);
-                this.getCalendarElement().fullCalendar('rerenderEvents');
+            if (changes.visible && !this.eventsLoaded[calendarUid]) {
+                this.getCalendarElement().fullCalendar('refetchEvents');
+            } else {
+                this.enableEventLoading = false;
+                this.getCalendarElement().fullCalendar('refetchEvents');
+                this.enableEventLoading = true;
             }
         },
 
@@ -443,15 +429,22 @@ define(function (require) {
 
         loadEvents: function (start, end, timezone, callback) {
             var onEventsLoad = _.bind(function () {
-                var fcEvents = this.collection.map(function (eventModel) {
+                var fcEvents,
+                    visibleConnectionIds = [];
+
+                fcEvents = this.collection.map(function (eventModel) {
                     return this.createViewModel(eventModel);
                 }, this);
                 this.eventsLoaded = {};
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
                     if (connectionModel.get('visible')) {
                         this.eventsLoaded[connectionModel.get('calendarUid')] = true;
+                        visibleConnectionIds.push(connectionModel.get('calendarUid'));
                     }
                 }, this);
+                fcEvents = _.filter(fcEvents, function (item) {
+                    return -1 !== _.indexOf(visibleConnectionIds, item.calendarUid);
+                });
                 this._hideMask();
                 callback(fcEvents);
             }, this);
