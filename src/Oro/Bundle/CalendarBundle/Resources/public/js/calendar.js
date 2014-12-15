@@ -4,20 +4,22 @@
 define(function (require) {
     'use strict';
 
-    var _ = require('underscore'),
-        Backbone = require('backbone'),
-        __ = require('orotranslation/js/translator'),
-        messenger = require('oroui/js/messenger'),
-        LoadingMask = require('oroui/js/loading-mask'),
+    var _               = require('underscore'),
+        Backbone        = require('backbone'),
+        __              = require('orotranslation/js/translator'),
+        messenger       = require('oroui/js/messenger'),
+        LoadingMask     = require('oroui/js/loading-mask'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
-        EventModel = require('orocalendar/js/calendar/event/model'),
-        EventView = require('orocalendar/js/calendar/event/view'),
-        ConnectionView = require('orocalendar/js/calendar/connection/view'),
-        eventDecorator = require('orocalendar/js/calendar/event-decorator'),
-        ColorManager = require('orocalendar/js/calendar/color-manager'),
-        colorUtil = require('oroui/js/tools/color-util'),
+        EventModel      = require('orocalendar/js/calendar/event/model'),
+        EventView       = require('orocalendar/js/calendar/event/view'),
+        mediator        = require('oroui/js/mediator'),
+        ConnectionView  = require('orocalendar/js/calendar/connection/view'),
+        eventDecorator  = require('orocalendar/js/calendar/event-decorator'),
+        ColorManager    = require('orocalendar/js/calendar/color-manager'),
+        colorUtil       = require('oroui/js/tools/color-util'),
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
-        localeSettings = require('orolocale/js/locale-settings');
+        localeSettings  = require('orolocale/js/locale-settings');
+
         require('jquery.fullcalendar');
 
     var $ = Backbone.$;
@@ -77,7 +79,8 @@ define(function (require) {
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
+                minimalHeightForFullScreenLayout: 500 // chrome 768px height and a lot
             },
             connectionsOptions: {
                 collection: null,
@@ -105,6 +108,12 @@ define(function (require) {
          */
         eventsLoaded: {},
 
+        /**
+         * One of 'fullscreen' | 'scroll' | 'default'
+         * @property
+         */
+        layout: undefined,
+
         initialize: function (options) {
             if (!options) {
                 options = {};
@@ -127,6 +136,10 @@ define(function (require) {
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
+
+            var devTollbar = $('.sf-toolbarreset')
+            this.hasDevToolbar = devTollbar.length;
+            this.devToolbarHeight = this.hasDevToolbar ? devTollbar.height() : 0;
         },
 
         /**
@@ -697,6 +710,7 @@ define(function (require) {
             };
             options.windowResize = function () {
                 self.setTimeline();
+                _.delay(_.bind(self.checkLayout, self));
             };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
@@ -708,6 +722,7 @@ define(function (require) {
             options.timezone = "UTC";
 
             this.getCalendarElement().fullCalendar(options);
+            this.checkLayout();
             this.enableEventLoading = true;
         },
 
@@ -840,6 +855,59 @@ define(function (require) {
                 }, this));
             }
             return result;
+        },
+
+        getAvailableHeight: function () {
+            var $calendarEl = this.getCalendarElement(),
+                $viewEl = $calendarEl.find('.fc-view:first'),
+                heightDiff = $(document).height() - $viewEl[0].getBoundingClientRect().top;
+            return heightDiff - this.devToolbarHeight;
+        },
+
+        checkLayout: function () {
+            if (this.options.eventsOptions.aspectRatio) {
+                this.setLayout('default');
+                // do nothing
+                return;
+            }
+            if (this.getAvailableHeight() > this.options.eventsOptions.minimalHeightForFullScreenLayout) {
+                this.setLayout('fullscreen');
+            } else {
+                this.setLayout('scroll');
+            }
+        },
+
+        setLayout: function (newLayout) {
+            if (newLayout === this.layout) {
+                // do nothing
+                return;
+            }
+            this.layout = newLayout;
+            var $calendarEl = this.getCalendarElement(),
+                $scrollableParents = $calendarEl.parents('.scrollable-container'),
+                contentHeight = '',
+                height = '',
+                overflow = 'auto';
+            switch (newLayout) {
+                case 'fullscreen':
+                    $scrollableParents.addClass('disable-scroll');
+                    contentHeight = this.getAvailableHeight() - 1;
+                    break;
+                case 'scroll':
+                    $scrollableParents.removeClass('disable-scroll');
+                    height = 'auto';
+                    contentHeight = 'auto';
+                    break;
+                case 'default':
+                    $scrollableParents.removeClass('disable-scroll');
+                    // default values
+                    break;
+                default:
+                    throw new Error('Unknown calendar layout');
+            }
+            $calendarEl.fullCalendar('option', 'height', height);
+            $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
+            $scrollableParents.css('overflow-y', overflow);
         }
     });
 });
