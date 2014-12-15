@@ -359,7 +359,8 @@ define(function (require) {
             }
         },
         onFcEventDrop: function (fcEvent, dateDiff, undo, jsEvent) {
-            var oldState = fcEvent._beforeDragState,
+            var realDuration,
+                oldState = fcEvent._beforeDragState,
                 // please do not change accessing _milliseconds property to milliseconds() call
                 // that will cause issues
                 isDroppedOnDayGrid =
@@ -376,20 +377,21 @@ define(function (require) {
             if (isDroppedOnDayGrid) {
                 if (oldState.allDay) {
                     if (fcEvent.end === null && oldState.end === null) {
-                        fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
+                        realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
                     } else {
-                        fcEvent.end = fcEvent.start.clone().add(oldState.end.diff(oldState.start));
+                        realDuration = oldState.end.diff(oldState.start);
                     }
                 } else {
-                    fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
+                    realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
                 }
             } else {
                 if (oldState.allDay) {
-                    fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultTimedEventDuration);
+                    realDuration = this.options.eventsOptions.defaultTimedEventDuration;
                 } else {
-                    fcEvent.end = fcEvent.start.clone().add(oldState.end.diff(oldState.start));
+                    realDuration = oldState.end.diff(oldState.start);
                 }
             }
+            fcEvent.end = fcEvent.start.clone().add(realDuration);
             this.saveFcEvent(fcEvent, undo);
         },
 
