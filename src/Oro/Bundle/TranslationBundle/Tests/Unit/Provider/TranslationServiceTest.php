@@ -35,7 +35,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->testPath = realpath(__DIR__ . '/../Fixtures') . '/testRootDir';
+        $this->testPath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '/oro_trans_dir';
         $this->removeTestDir($this->testPath);
         mkdir($this->testPath);
         $this->service = new TranslationServiceProvider(
@@ -152,7 +152,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
         );
 
-        $tempDir = $this->testPath . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+        $tempDir = $this->testPath . DIRECTORY_SEPARATOR . ltrim(uniqid(), DIRECTORY_SEPARATOR);
         $path = $tempDir . DIRECTORY_SEPARATOR . 'zip';
         mkdir(dirname($path), 0777, true);
         touch($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
