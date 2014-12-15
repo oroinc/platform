@@ -375,8 +375,10 @@ define(function (require) {
             fcEvent.allDay = isDroppedOnDayGrid;
             if (isDroppedOnDayGrid) {
                 if (oldState.allDay) {
-                    if (fcEvent.end === null) {
+                    if (fcEvent.end === null && oldState.end === null) {
                         fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
+                    } else {
+                        fcEvent.end = fcEvent.start.clone().add(oldState.end.diff(oldState.start));
                     }
                 } else {
                     fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
