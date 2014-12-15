@@ -12,7 +12,6 @@ define(function (require) {
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
         EventView       = require('orocalendar/js/calendar/event/view'),
-        mediator        = require('oroui/js/mediator'),
         ConnectionView  = require('orocalendar/js/calendar/connection/view'),
         eventDecorator  = require('orocalendar/js/calendar/event-decorator'),
         ColorManager    = require('orocalendar/js/calendar/color-manager'),
@@ -886,8 +885,7 @@ define(function (require) {
             var $calendarEl = this.getCalendarElement(),
                 $scrollableParents = $calendarEl.parents('.scrollable-container'),
                 contentHeight = '',
-                height = '',
-                overflow = 'auto';
+                height = '';
             switch (newLayout) {
                 case 'fullscreen':
                     $scrollableParents.addClass('disable-scroll');
@@ -907,7 +905,6 @@ define(function (require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
-            $scrollableParents.css('overflow-y', overflow);
         }
     });
 });
