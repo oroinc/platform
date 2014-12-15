@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Entity;
 
-use Oro\Bundle\CommentBundle\Entity\Comments;
+use Oro\Bundle\CommentBundle\Entity\Comment;
 
-class CommentsTest extends AbstractEntityTestCase
+class CommentTest extends AbstractEntityTestCase
 {
-    /** @var Comments */
+    /** @var Comment */
     protected $entity;
 
     /**
@@ -14,7 +14,7 @@ class CommentsTest extends AbstractEntityTestCase
      */
     public function getEntityFQCN()
     {
-        return 'Oro\Bundle\CommentBundle\Entity\Comments';
+        return 'Oro\Bundle\CommentBundle\Entity\Comment';
     }
 
     public function testPrePersist()

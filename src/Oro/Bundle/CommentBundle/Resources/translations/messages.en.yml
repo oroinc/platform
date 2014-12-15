@@ -1,9 +1,12 @@
 oro:
     comment:
-        comments:
-            entity_label: Comments
-            id.label: Id
-            message.label: Message
-            organization.label: Organization
-            owner.label: Owner
-            updated_by.label: Updated by
+        enabled: Enable comments
+
+        entity_label: Comment
+        plural_label: Comments
+        id.label: Id
+        message.label: Message
+        organization.label: Organization
+        owner.label: Owner
+        updated_by.label: Updated by
+
