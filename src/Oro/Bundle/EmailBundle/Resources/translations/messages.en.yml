@@ -108,7 +108,7 @@ oro:
         type.label:               Type
 
         empty_body:               Empty body
-        unable_to_load_body:      Unfortunately we could not load the email body from the server. It is possible that it has been deleted.
+        unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
 
         entity_config:
             email:

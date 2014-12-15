@@ -257,3 +257,7 @@
     font-size: 13px;
     padding-right: 3px;
 }
+
+.calendar-dashboard-widget {
+    margin-top: 10px;
+}

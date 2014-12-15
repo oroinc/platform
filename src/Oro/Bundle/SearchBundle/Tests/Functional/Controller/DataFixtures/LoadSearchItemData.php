@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Functional\API\DataFixtures;
+namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -76,7 +76,7 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             //blob
             $item->blobValue = "blob-{$ind}";
             //array
-            $item->arrayValue = array($ind);
+            $item->arrayValue = [$ind];
             //datetime
             $date = new \DateTime('now', new \DateTimeZone('UTC'));
             $date->add(new \DateInterval("P{$ind}Y"));

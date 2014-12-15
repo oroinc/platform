@@ -50,7 +50,7 @@ class SearchController extends FOSRestController
             $this->view(
                 $searchResults->toSearchResultData(),
                 Codes::HTTP_OK
-            )->setTemplate('OroSearchBundle:Search:searchSuggestion.html.twig')
+            )
         );
     }
 }
