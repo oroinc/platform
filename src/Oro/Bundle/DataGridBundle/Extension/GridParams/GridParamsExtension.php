@@ -8,6 +8,9 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
+/**
+ * @TODO: should be refactored in BAP-6849
+ */
 class GridParamsExtension extends AbstractExtension
 {
     /**
