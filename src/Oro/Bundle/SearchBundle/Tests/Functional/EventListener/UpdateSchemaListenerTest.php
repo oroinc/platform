@@ -24,13 +24,12 @@ class UpdateSchemaListenerTest extends WebTestCase
     {
         $result = $this->runCommand($commandName, $params);
 
-        $expectedresult = $expectedContent;
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
         if ($connection->getParams()['driver'] === 'pdo_pgsql') {
-            $expectedresult = $postgreSQLContent;
+            $expectedContent = $postgreSQLContent;
         }
-        $this->assertContains($expectedresult, $result);
+        $this->assertContains($expectedContent, $result);
     }
 
     public function commandDataProvider()
