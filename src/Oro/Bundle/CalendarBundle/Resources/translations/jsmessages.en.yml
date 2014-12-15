@@ -14,6 +14,14 @@
 "Sorry, the calendar excluding was failed": "Sorry, the calendar removing was failed"
 "Sorry, the calendar updating was failed": "Sorry, the calendar updating was failed"
 "Sorry, synchronization error was occurred": "Sorry, synchronization error was occurred"
+oro:
+    calendar:
+        control:
+            all_day: " "
+            today:   today
+            month:   month
+            week:    week
+            day:     day
 "The calendar cannot be changed because the event has guests": "The calendar cannot be changed because the event has guests"
 "Notify guests title": "Notification confirmation"
 "Notify guests message": "Do you want to notify all invited users about changes?"

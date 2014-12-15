@@ -6,7 +6,7 @@ use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\FOSRestController;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -26,7 +26,7 @@ class CalendarController extends FOSRestController
     /**
      * Get Default Calendar of User
      *
-     * @Get("/calendars/default", name="oro_api_get_calendar_default")
+     * @Get("/calendars/default")
      *
      * @ApiDoc(
      *      description="Get default calendar of user",

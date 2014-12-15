@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 class OroTranslationAdapter extends AbstractAPIAdapter
 {

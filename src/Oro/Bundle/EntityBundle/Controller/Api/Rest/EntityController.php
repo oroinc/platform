@@ -10,7 +10,7 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -68,7 +68,6 @@ class EntityController extends FOSRestController implements ClassResourceInterfa
      *      description="Get entities with fields",
      *      resource=true
      * )
-     * @Get(name="oro_api_fields_entity")
      *
      * @return Response
      */

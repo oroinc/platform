@@ -77,6 +77,7 @@ class ActivityListChainProvider
                         && !in_array($configId->getClassName(), $this->targetClasses)
                     ) {
                         $this->targetClasses[] = $configId->getClassName();
+                        continue;
                     }
                 }
             }

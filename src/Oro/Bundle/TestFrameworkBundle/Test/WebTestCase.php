@@ -241,7 +241,12 @@ abstract class WebTestCase extends BaseWebTestCase
             );
 
             $client = $this->getClientInstance();
-            $client->request('GET', $wsdl);
+            if ($options['soap_version'] == SOAP_1_2) {
+                $contentType = 'application/soap+xml';
+            } else {
+                $contentType = 'text/xml';
+            }
+            $client->request('GET', $wsdl, [], [], ['CONTENT_TYPE' => $contentType]);
             $status = $client->getResponse()->getStatusCode();
             $wsdl = $client->getResponse()->getContent();
             if ($status >= 400) {

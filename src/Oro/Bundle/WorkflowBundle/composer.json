@@ -14,7 +14,7 @@
         "doctrine/doctrine-fixtures-bundle": "@dev",
         "jms/serializer": "0.12.*@dev",
         "jms/serializer-bundle": "0.12.*@dev",
-        "friendsofsymfony/rest-bundle": "0.12.*",
+        "friendsofsymfony/rest-bundle": "1.5.0-RC2",
         "nelmio/api-doc-bundle": "dev-master",
         "sensio/framework-extra-bundle": "2.3.*",
         "oro/user-bundle": "@dev",

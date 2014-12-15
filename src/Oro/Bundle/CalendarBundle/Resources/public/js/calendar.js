@@ -1,17 +1,24 @@
 /*jslint nomen:true*/
 /*jshint devel:true*/
 /*global define, console*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/loading-mask',
-    'orocalendar/js/calendar/event/collection', 'orocalendar/js/calendar/event/model', 'orocalendar/js/calendar/event/view',
-    'orocalendar/js/calendar/connection/collection', 'orocalendar/js/calendar/connection/view',
-    'orocalendar/js/calendar/event-decorator',
-    'orocalendar/js/calendar/color-manager', 'orolocale/js/formatter/datetime', 'jquery.fullcalendar'
-    ], function (_, Backbone, __, messenger, LoadingMask,
-         EventCollection, EventModel, EventView,
-         ConnectionCollection, ConnectionView,
-         eventDecorator,
-         ColorManager, dateTimeFormatter) {
+define(function (require) {
     'use strict';
+
+    var _ = require('underscore'),
+        Backbone = require('backbone'),
+        __ = require('orotranslation/js/translator'),
+        messenger = require('oroui/js/messenger'),
+        LoadingMask = require('oroui/js/loading-mask'),
+        EventCollection = require('orocalendar/js/calendar/event/collection'),
+        EventModel = require('orocalendar/js/calendar/event/model'),
+        EventView = require('orocalendar/js/calendar/event/view'),
+        ConnectionView = require('orocalendar/js/calendar/connection/view'),
+        eventDecorator = require('orocalendar/js/calendar/event-decorator'),
+        ColorManager = require('orocalendar/js/calendar/color-manager'),
+        colorUtil = require('oroui/js/tools/color-util'),
+        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
+        localeSettings = require('orolocale/js/locale-settings');
+        require('jquery.fullcalendar');
 
     var $ = Backbone.$;
 
@@ -21,6 +28,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
      * @extends Backbone.View
      */
     return Backbone.View.extend({
+        MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
@@ -40,14 +48,36 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         /** @property {Object} */
         options: {
+            timezone: localeSettings.getTimeZoneShift(),
             eventsOptions: {
+                defaultView: 'month',
+                allDayText: __('oro.calendar.control.all_day'),
+                buttonText: {
+                    today: __('oro.calendar.control.today'),
+                    month: __('oro.calendar.control.month'),
+                    week: __('oro.calendar.control.week'),
+                    day: __('oro.calendar.control.day')
+                },
                 editable: true,
                 removable: true,
                 collection: null,
+                fixedWeekCount: false, // http://fullcalendar.io/docs/display/fixedWeekCount/
                 itemViewTemplateSelector: null,
                 itemFormTemplateSelector: null,
                 itemFormDeleteButtonSelector: null,
-                calendar: null
+                calendar: null,
+                subordinate: true,
+                defaultTimedEventDuration: moment.duration('02:00:00'),
+                defaultAllDayEventDuration: moment.duration('24:00:00'),
+                header: {
+                    ignoreTimezone: false,
+                    allDayDefault: false
+                },
+                firstDay: localeSettings.getCalendarFirstDayOfWeek() - 1,
+                monthNames: localeSettings.getCalendarMonthNames('wide', true),
+                monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
+                dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
             },
             connectionsOptions: {
                 collection: null,
@@ -76,6 +106,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         eventsLoaded: {},
 
         initialize: function (options) {
+            if (!options) {
+                options = {};
+            }
+            if (options.eventsOptions) {
+                _.defaults(options.eventsOptions, this.options.eventsOptions);
+            }
             this.options = _.defaults(options || {}, this.options);
             // init event collection
             this.collection = this.collection || new EventCollection();
@@ -97,6 +133,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
          * @inheritDoc
          */
         dispose: function () {
+            clearInterval(this.timelineUpdateIntervalId);
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
             }
@@ -170,8 +207,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
         addEventToCalendar: function (eventModel) {
             var fcEvent = this.createViewModel(eventModel);
-            // don't need time zone correction, on add event
-            this.prepareViewModel(fcEvent, false);
             this.getCalendarElement().fullCalendar('renderEvent', fcEvent);
         },
 
@@ -184,51 +219,61 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
         onEventAdded: function (eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')});
 
-            this.addEventToCalendar(eventModel);
+            eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
 
-            eventModel.set('editable', connectionModel.get('canEditEvent'));
-            eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+            this.addEventToCalendar(eventModel);
 
             // make sure that a calendar is visible when a new event is added to it
             if (!connectionModel.get('visible')) {
                 this.connectionsView.showCalendar(connectionModel);
             }
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                this.getCalendarElement().fullCalendar('refetchEvents');
+                this.smartRefetch();
             }
         },
 
         onEventChanged: function (eventModel) {
             var connectionModel = this.getConnectionCollection().findWhere({calendarUid: eventModel.get('calendarUid')}),
-                fcEvent = this.getCalendarElement().fullCalendar('clientEvents', eventModel.id)[0];
-            // copy all fields, except id, from event to fcEvent
-            fcEvent = _.extend(fcEvent, _.pick(this.createViewModel(eventModel), _.keys(_.omit(fcEvent, ['id']))));
-            this.prepareViewModel(fcEvent);
+                calendarElement = this.getCalendarElement(),
+                fcEvent;
+
+            eventModel.set('editable', connectionModel.get('canEditEvent') && !this.hasParentEvent(eventModel), {silent: true});
+            eventModel.set('removable', connectionModel.get('canDeleteEvent'), {silent: true});
+
+            // find and update fullCalendar event model
+            fcEvent = calendarElement.fullCalendar('clientEvents', eventModel.id)[0];
+            _.extend(fcEvent, this.createViewModel(eventModel));
+
+            // notify fullCalendar about update
+            // NOTE: cannot update single event due to fullcalendar bug
+            //       please check that after updating fullcalendar
+            //       calendarElement.fullCalendar('updateEvent', fcEvent);
+            calendarElement.fullCalendar('rerenderEvents');
+
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                this.getCalendarElement().fullCalendar('refetchEvents');
-            } else {
-                this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
-                eventModel.set('editable', connectionModel.get('canEditEvent'));
-                eventModel.set('removable', connectionModel.get('canDeleteEvent'));
+                // view is updated to closest possible
+                // start refetching 'cause event had linked events
+                eventModel.once('sync', this.smartRefetch, this);
             }
         },
 
         onEventDeleted: function (eventModel) {
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
-                this.getCalendarElement().fullCalendar('refetchEvents');
+                this.smartRefetch();
             } else {
                 this.getCalendarElement().fullCalendar('removeEvents', eventModel.id);
             }
         },
 
         onConnectionAdded: function () {
-            this.getCalendarElement().fullCalendar('refetchEvents');
+            this.smartRefetch();
         },
 
         onConnectionChanged: function (connectionModel) {
             if (connectionModel.reloadEventsRequest !== null) {
                 if (connectionModel.reloadEventsRequest === true) {
-                    this.getCalendarElement().fullCalendar('refetchEvents');
+                    this.smartRefetch();
                 }
                 connectionModel.reloadEventsRequest = null;
                 return;
@@ -236,45 +281,53 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
 
             var changes = connectionModel.changedAttributes(),
                 calendarUid = connectionModel.get('calendarUid');
-            if (_.has(changes, 'visible')) {
-                if (changes.visible) {
-                    if (this.eventsLoaded[calendarUid]) {
-                        _.each(this.collection.where({calendarUid: calendarUid}), function (eventModel) {
-                            this.addEventToCalendar(eventModel);
-                        }, this);
-                    } else {
-                        this.getCalendarElement().fullCalendar('refetchEvents');
-                    }
-                } else {
-                    this.getCalendarElement().fullCalendar('removeEvents', function (fcEvent) {
-                        return fcEvent.calendarUid === calendarUid;
-                    });
-                }
-            } else if (_.has(changes, 'backgroundColor') && connectionModel.get('visible')) {
-                _.each(this.getCalendarEvents(calendarUid), function (fcEvent) {
-                    this.prepareViewModel(fcEvent, false);
-                    this.getCalendarElement().fullCalendar('updateEvent', fcEvent);
-                }, this);
+            if (changes.visible && !this.eventsLoaded[calendarUid]) {
+                this.smartRefetch();
+            } else {
+                this.updateEventsWithoutReload();
             }
         },
 
         onConnectionDeleted: function () {
-            this.getCalendarElement().fullCalendar('refetchEvents');
+            this.smartRefetch();
         },
 
-        select: function (start, end) {
+        onFcSelect: function (start, end) {
+            this.showAddEventDialog(start, end);
+        },
+
+        showAddEventDialog: function (start, end) {
+            // need to be able to accept native moments here
+            // convert arguments
+            if (!start._fullCalendar) {
+                start = $.fullCalendar.moment(start.clone().utc().format());
+            }
+            if (end && !end._fullCalendar) {
+                end = $.fullCalendar.moment(end.clone().utc().format());
+            }
             if (!this.eventView) {
                 try {
-                    // TODO: All date values must be in UTC representation according to config timezone,
-                    // https://magecore.atlassian.net/browse/BAP-2203
-                    var eventModel = new EventModel({
-                        calendarAlias: 'user',
-                        calendar: this.options.calendar,
-                        start: this.formatDateTimeForModel(start),
-                        end: this.formatDateTimeForModel(end),
-                        editable: this.options.newEventEditable,
-                        removable: this.options.newEventRemovable
-                    });
+                    var eventModel,
+                        attrs = {
+                            allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
+                            start: start,
+                            end: end
+                        };
+                    this.applyTzCorrection(-1, attrs);
+
+                    attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
+                    attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
+
+                    _.extend(
+                        attrs,
+                        {
+                            calendarAlias: 'user',
+                            calendar: this.options.calendar,
+                            editable: this.options.newEventEditable,
+                            removable: this.options.newEventRemovable
+                        }
+                    );
+                    eventModel = new EventModel(attrs);
                     this.getEventView(eventModel).render();
                 } catch (err) {
                     this.showMiscError(err);
@@ -282,7 +335,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             }
         },
 
-        eventClick: function (fcEvent) {
+        onFcEventClick: function (fcEvent) {
             if (!this.eventView) {
                 try {
                     var eventModel = this.collection.get(fcEvent.id);
@@ -293,49 +346,148 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             }
         },
 
-        eventDropOrResize: function (fcEvent) {
+        onFcEventResize: function (fcEvent, newDuration, undo) {
+            fcEvent.end = fcEvent.start.clone().add(newDuration);
+            this.saveFcEvent(fcEvent, undo);
+        },
+
+        onFcEventDragStart: function (fcEvent) {
+            fcEvent._beforeDragState = {
+                allDay: fcEvent.allDay,
+                start: fcEvent.start.clone(),
+                end: fcEvent.end ? fcEvent.end.clone() : null
+            }
+        },
+        onFcEventDrop: function (fcEvent, dateDiff, undo, jsEvent) {
+            var oldState = fcEvent._beforeDragState,
+                // please do not change accessing _milliseconds property to milliseconds() call
+                // that will cause issues
+                isDroppedOnDayGrid =
+                    fcEvent.start.time()._milliseconds === 0
+                    && (fcEvent.end === null || fcEvent.end.time()._milliseconds === 0);
+
+            // when on week view all-day event is dropped at 12AM to hour view
+            // previous condition gives false positive result
+            if (fcEvent.end === null && isDroppedOnDayGrid === true && fcEvent.start.time()._milliseconds === 0) {
+                isDroppedOnDayGrid = !$(jsEvent.target).parents(".fc-time-grid-event").length;
+            }
+
+            fcEvent.allDay = isDroppedOnDayGrid;
+            if (isDroppedOnDayGrid) {
+                if (oldState.allDay) {
+                    if (fcEvent.end === null) {
+                        fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
+                    }
+                } else {
+                    fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultAllDayEventDuration);
+                }
+            } else {
+                if (oldState.allDay) {
+                    fcEvent.end = fcEvent.start.clone().add(this.options.eventsOptions.defaultTimedEventDuration);
+                } else {
+                    fcEvent.end = fcEvent.start.clone().add(oldState.end.diff(oldState.start));
+                }
+            }
+            this.saveFcEvent(fcEvent, undo);
+        },
+
+        saveFcEvent: function (fcEvent, undo) {
             this.showSavingMask();
             try {
-                this.collection
-                    .get(fcEvent.id)
-                    .save(
-                        {
-                            start: this.formatDateTimeForModel(fcEvent.start),
-                            end: this.formatDateTimeForModel(!_.isNull(fcEvent.end) ? fcEvent.end : fcEvent.start)
-                        },
-                        {
-                            success: _.bind(this._hideMask, this),
-                            error: _.bind(function (model, response) {
-                                this.showSaveEventError(response.responseJSON || {});
-                            }, this)
-                        }
-                    );
+                var attrs = {
+                        allDay: fcEvent.allDay,
+                        start: fcEvent.start.clone(),
+                        end: (fcEvent.end !== null) ? fcEvent.end.clone() : null
+                    },
+                    model = this.collection.get(fcEvent.id);
+                this.applyTzCorrection(-1, attrs);
+
+                attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
+                if (attrs.end) {
+                    attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
+                }
+
+                model.save(
+                    attrs,
+                    {
+                        success: _.bind(this._hideMask, this),
+                        error: _.bind(function (model, response) {
+                            if (undo) {
+                                undo();
+                            }
+                            this.showSaveEventError(response.responseJSON || {});
+                        }, this)
+                    }
+                );
+            } catch (err) {
+                if (undo) {
+                    undo();
+                }
+                this.showSaveEventError(err);
+            }
+        },
+
+        smartRefetch: function () {
+            try {
+                this._showMask();
+                // load events from a server
+                this.collection.fetch({
+                    reset: true,
+                    success: _.bind(this.updateEventsWithoutReload, this),
+                    error: _.bind(function (collection, response) {
+                        this.showLoadEventsError(response.responseJSON || {});
+                        this._hideMask();
+                    }, this)
+                });
             } catch (err) {
                 this.showLoadEventsError(err);
             }
         },
 
-        loadEvents: function (start, end, callback) {
+        updateEventsWithoutReload: function () {
+            var oldEnableEventLoading = this.enableEventLoading;
+            this.enableEventLoading = false;
+            this.getCalendarElement().fullCalendar('refetchEvents');
+            this.enableEventLoading = oldEnableEventLoading;
+        },
+
+        loadEvents: function (start, end, timezone, callback) {
             var onEventsLoad = _.bind(function () {
-                var fcEvents = this.collection.map(function (eventModel) {
-                    var fcEvent = this.createViewModel(eventModel);
-                    this.prepareViewModel(fcEvent, false);
-                    return fcEvent;
-                }, this);
-                this.eventsLoaded = {};
+                var fcEvents,
+                    visibleConnectionIds = [];
+
+                if (this.enableEventLoading || _.size(this.eventsLoaded) === 0) {
+                    // data is loaded, need to update eventsLoaded
+                    this.eventsLoaded = {};
+                    this.options.connectionsOptions.collection.each(function (connectionModel) {
+                        if (connectionModel.get('visible')) {
+                            this.eventsLoaded[connectionModel.get('calendarUid')] = true;
+                        }
+                    }, this);
+                }
+                // collect visible collections
                 this.options.connectionsOptions.collection.each(function (connectionModel) {
                     if (connectionModel.get('visible')) {
-                        this.eventsLoaded[connectionModel.get('calendarUid')] = true;
+                        visibleConnectionIds.push(connectionModel.get('calendarUid'));
                     }
                 }, this);
+                // filter visible events
+                fcEvents = this.collection.filter(function (item) {
+                    return -1 !== _.indexOf(visibleConnectionIds, item.get('calendarUid'));
+                });
+                // prepare them for full calendar
+                fcEvents = _.map(fcEvents, function (eventModel) {
+                    return this.createViewModel(eventModel);
+                }, this);
+
                 this._hideMask();
                 callback(fcEvents);
             }, this);
 
             try {
                 this.collection.setRange(
-                    this.formatDateTimeForModel(start),
-                    this.formatDateTimeForModel(end)
+                    start.format(this.MOMENT_BACKEND_FORMAT),
+                    end.format(this.MOMENT_BACKEND_FORMAT)
                 );
                 if (this.enableEventLoading) {
                     // load events from a server
@@ -363,32 +515,54 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
          * @param {Object} eventModel
          */
         createViewModel: function (eventModel) {
-            return _.pick(
+            var fcEvent = _.pick(
                 eventModel.attributes,
-                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid']
+                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
             );
+            this.prepareViewModel(fcEvent);
+            this.applyTzCorrection(1, fcEvent);
+            return fcEvent;
         },
 
         /**
          * Prepares event entry for rendering in calendar plugin
          *
          * @param {Object} fcEvent
-         * @param {boolean=} applyTZCorrection by default applies time zone correction
          */
-        prepareViewModel: function (fcEvent, applyTZCorrection) {
+        prepareViewModel: function (fcEvent) {
             // set an event text and background colors the same as the owning calendar
             var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
-            fcEvent.textColor = colors.color;
             fcEvent.color = colors.backgroundColor;
-            if (applyTZCorrection !== false) {
-                fcEvent.start = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.start);
-                fcEvent.end = dateTimeFormatter.applyTimeZoneCorrection(fcEvent.end);
+            if (fcEvent.backgroundColor) {
+                fcEvent.textColor = colorUtil.getContrastColor(fcEvent.backgroundColor);
+            } else {
+                fcEvent.textColor = colors.color;
             }
         },
 
-        formatDateTimeForModel: function (date) {
-            date = dateTimeFormatter.applyTimeZoneCorrection(date, -1);
-            return dateTimeFormatter.convertDateTimeToBackendFormat(date);
+        /**
+         * Applies timezone correction for data. The timezone taken from the settings and
+         * it equals current application timezone by default
+         * NOTE: changes passed model
+         *
+         * @param multiplier {int} allows to add or subtract timezone, pass 1 or -1 here please
+         * @param obj {object} object with start and end properties to which timezone will be applied
+         * @returns {object} object passed to function
+         */
+        applyTzCorrection: function (multiplier, obj) {
+            if (obj.end !== null) {
+                if (!moment.isMoment(obj.start)) {
+                    obj.start = $.fullCalendar.moment(obj.start);
+                }
+                obj.start.zone(0).add(this.options.timezone * multiplier, 'm');
+            }
+            if (obj.end !== null) {
+                if (!moment.isMoment(obj.end)) {
+                    obj.end = $.fullCalendar.moment(obj.end);
+                }
+                obj.end.zone(0).add(this.options.timezone * multiplier, 'm');
+            }
+            return obj;
         },
 
         showSavingMask: function () {
@@ -440,36 +614,40 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
             // init events container
             var eventsContainer = this.$el.find(this.options.eventsOptions.containerSelector);
             if (eventsContainer.length === 0) {
-                throw new Error("Cannot find '" + this.options.eventsOptions.containerSelector + "' element.");
+                throw new Error("Cannot find container selector '" + this.options.eventsOptions.containerSelector + "' element.");
             }
             eventsContainer.empty();
             eventsContainer.append($(this.eventsTemplate()));
         },
 
         initializeFullCalendar: function () {
-            var options = { // prepare options for jQuery FullCalendar control
-                    selectHelper: true,
-                    events: _.bind(this.loadEvents, this),
-                    select: _.bind(this.select, this),
-                    eventClick: _.bind(this.eventClick, this),
-                    eventDrop: _.bind(this.eventDropOrResize, this),
-                    eventResize: _.bind(this.eventDropOrResize, this),
-                    loading: _.bind(function (show) {
-                        if (show) {
-                            this.showLoadingMask();
-                        } else {
-                            this._hideMask();
-                        }
-                    }, this)
-                },
-                keys = [
-                    'date', 'defaultView', 'editable', 'selectable',
-                    'header', 'allDayText', 'allDaySlot', 'buttonText',
-                    'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
-                    'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
-                    'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
-                    'contentHeight'
-                ];
+            var options, keys, self;
+            // prepare options for jQuery FullCalendar control
+            options = { // prepare options for jQuery FullCalendar control
+                selectHelper: true,
+                events: _.bind(this.loadEvents, this),
+                select: _.bind(this.onFcSelect, this),
+                eventClick: _.bind(this.onFcEventClick, this),
+                eventDragStart: _.bind(this.onFcEventDragStart, this),
+                eventDrop: _.bind(this.onFcEventDrop, this),
+                eventResize: _.bind(this.onFcEventResize, this),
+                loading: _.bind(function (show) {
+                    if (show) {
+                        this.showLoadingMask();
+                    } else {
+                        this._hideMask();
+                    }
+                }, this)
+            };
+            keys = [
+                'date', 'defaultView', 'editable', 'selectable',
+                'header', 'allDayText', 'allDaySlot', 'buttonText',
+                'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
+                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
+                'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
+                'aspectRatio', 'defaultAllDayEventDuration', 'defaultTimedEventDuration',
+                'fixedWeekCount'
+            ];
             _.extend(options, _.pick(this.options.eventsOptions, keys));
             if (!_.isUndefined(options.date)) {
                 options.date = dateTimeFormatter.applyTimeZoneCorrection(options.date);
@@ -478,28 +656,53 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mess
                 options.date = options.date.getDate();
             }
 
-            //Fix aspect ration to prevent double scroll for week and day views.
-            options.viewRender = _.bind(function (view) {
-                if (view.name !== 'month') {
-                    this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.0);
-                } else {
-                    this.getCalendarElement().fullCalendar('option', 'aspectRatio', 1.35);
-                }
-            }, this);
+            if (!options.aspectRatio) {
+                options.contentHeight = "auto";
+                options.height = "auto";
+            }
 
-            options.viewDisplay = _.bind(function () {
-                this.setTimeline();
-                setInterval(_.bind(function () { this.setTimeline(); }, this), 5 * 60 * 1000);
-            }, this);
-            options.windowResize = _.bind(function () {
-                this.setTimeline();
-            }, this);
+            var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
+            var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
+            // prepare FullCalendar specific date/time formats
+            var isDateFormatStartedWithDay = dateFormat[0] === 'D';
+            var weekFormat = isDateFormatStartedWithDay
+                ? 'D MMMM YYYY'
+                : 'MMMM D YYYY';
+
+            options.titleFormat = {
+                month: 'MMMM YYYY',
+                week: weekFormat,
+                day: 'dddd, ' + dateFormat
+            };
+            options.columnFormat = {
+                month: 'ddd',
+                week: 'ddd ' + dateFormat,
+                day: 'dddd ' + dateFormat
+            };
+            options.timeFormat = {
+                default: timeFormat,
+                agenda: timeFormat
+            };
+            options.axisFormat = timeFormat;
+
+
+            self = this;
+            options.viewDisplay = function () {
+                self.setTimeline();
+                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
+            };
+            options.windowResize = function () {
+                self.setTimeline();
+            };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
-                eventDecorator.decorate(this.collection.get(fcEvent.id), $el);
+                var event = this.collection.get(fcEvent.id);
+                eventDecorator.decorate(event, $el);
             }, this);
 
             // create jQuery FullCalendar control
+            options.timezone = "UTC";
+
             this.getCalendarElement().fullCalendar(options);
             this.enableEventLoading = true;
         },

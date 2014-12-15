@@ -22,6 +22,9 @@ function ($, _, tools) {
                 $el = $(opt.template({type: type, message: message}))[opt.insertMethod](opt.container),
                 delay = opt.delay || (opt.flash && 5000),
                 actions = {close: _.bind($el.alert, $el, 'close')};
+            if (opt.namespace) {
+                $el.attr('data-messenger-namespace', opt.namespace);
+            }
             if (delay) {
                 _.delay(actions.close, delay);
             }
@@ -99,6 +102,10 @@ function ($, _, tools) {
              */
             notificationFlashMessage: function(type, message, options) {
                 var isFlash = notFlashTypes.indexOf(type) == -1;
+                var namespace = (options || {}).namespace;
+                if (namespace) {
+                    this.clear(namespace, options);
+                }
                 return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
             },
 
@@ -158,6 +165,17 @@ function ($, _, tools) {
                     flashMessages.push([args, actions]);
                     setStoredMessages(flashMessages);
                 }*/
+            },
+
+            /**
+             * Clears all messages within namespace
+             *
+             * @param {string} namespace
+             * @param {Object=} options
+             */
+            clear: function(namespace, options) {
+                var opt = _.extend({}, defaults, options || {});
+                $(opt.container).find('[data-messenger-namespace=' + namespace +']').remove();
             }
         };
 });
