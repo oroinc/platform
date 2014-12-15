@@ -12,7 +12,7 @@ use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\Common\Collections\Criteria;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;

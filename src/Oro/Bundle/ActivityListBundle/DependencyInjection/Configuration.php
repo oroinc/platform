@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
             [
                 'sorting_field'     => ['value' => 'updatedAt'],
                 'sorting_direction' => ['value' => 'DESC'],
-                'per_page'          => ['value' => 25]
+                'per_page'          => ['value' => 10]
             ]
         );
 

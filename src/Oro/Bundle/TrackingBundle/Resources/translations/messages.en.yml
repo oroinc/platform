@@ -40,9 +40,10 @@ oro:
             id.label:         Id
 
         block:
-            general: General
-            tracking: Tracking Code
-            events: Events
+            general:    General
+            additional: Additional
+            tracking:   Tracking Code
+            events:     Events
 
         help:
             event_tooltip: |
@@ -50,6 +51,9 @@ oro:
                 To track custom events, please uncomment the trackEvent string and replace
                 [name], [value], and [user_identifier] parameters with your values.
                 The script will log an event with the [name] name and optional [value].
+            secure: |
+                To enable tracking on secure (HTTPS) websites HTTPS should also be enabled
+                on the OroCRM web server.
 
         website_configuration: Tracking websites
 

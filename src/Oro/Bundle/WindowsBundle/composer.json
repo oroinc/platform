@@ -9,7 +9,7 @@
         "php": ">=5.3.3",
         "symfony/symfony": "2.3.*",
         "oro/ui-bundle": "dev-master",
-        "friendsofsymfony/rest-bundle": "0.11.*",
+        "friendsofsymfony/rest-bundle": "1.5.0-RC2",
         "nelmio/api-doc-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master"
     },

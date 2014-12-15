@@ -46,7 +46,7 @@ class CalendarEventInviteesTypeTest extends \PHPUnit_Framework_TestCase
         $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
         $resolver->expects($this->once())
             ->method('setDefaults')
-            ->with(['autocomplete_alias' => 'users_without_current']);
+            ->with(['autocomplete_alias' => 'organization_users']);
 
         $this->type->setDefaultOptions($resolver);
     }
