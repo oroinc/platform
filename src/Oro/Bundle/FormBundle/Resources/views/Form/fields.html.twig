@@ -346,7 +346,7 @@
                 altFormat: 'yy-mm-dd',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
                 showButtonPanel: true,
                 onSelect: function () {
                     var form = selector.parents('form');
@@ -405,7 +405,7 @@
                 altSeparator: 'T',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
                 showButtonPanel: true,
                 onSelect: function () {
                     selector.trigger('change');

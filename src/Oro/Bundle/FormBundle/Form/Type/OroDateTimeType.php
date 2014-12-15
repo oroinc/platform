@@ -20,11 +20,18 @@ class OroDateTimeType extends AbstractType
     protected $localeSettings;
 
     /**
-     * @param LocaleSettings $localeSettings
+     * @var OroDateType
      */
-    public function __construct(LocaleSettings $localeSettings)
+    protected $dateType;
+
+    /**
+     * @param LocaleSettings $localeSettings
+     * @param OroDateType $dateType
+     */
+    public function __construct(LocaleSettings $localeSettings, OroDateType $dateType)
     {
         $this->localeSettings = $localeSettings;
+        $this->dateType = $dateType;
     }
 
     /**
@@ -32,7 +39,7 @@ class OroDateTimeType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['attr']['placeholder'] = $options['placeholder'];
+        $this->dateType->finishView($view, $form, $options);
     }
 
     /**
@@ -40,15 +47,9 @@ class OroDateTimeType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'model_timezone'   => 'UTC',
-                'view_timezone'    => 'UTC',
-                'format'           => DateTimeType::HTML5_FORMAT,
-                'widget'           => 'single_text',
-                'placeholder'      => 'oro.form.click_here_to_select',
-            )
-        );
+        $this->dateType->setDefaultOptions($resolver);
+
+        $resolver->setDefaults(['format' => DateTimeType::HTML5_FORMAT]);
     }
 
     /**

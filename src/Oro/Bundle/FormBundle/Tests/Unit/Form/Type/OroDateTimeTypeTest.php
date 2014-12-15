@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
+use Oro\Bundle\FormBundle\Form\Type\OroDateType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -28,7 +29,7 @@ class OroDateTimeTypeTest extends TypeTestCase
             ->setMethods(array('getLocale', 'getCurrency', 'getCurrencySymbolByCurrency'))
             ->getMock();
 
-        $this->type = new OroDateTimeType($this->localeSettings);
+        $this->type = new OroDateTimeType($this->localeSettings, new OroDateType());
     }
 
     public function testGetName()
@@ -49,6 +50,7 @@ class OroDateTimeTypeTest extends TypeTestCase
             'format'           => DateTimeType::HTML5_FORMAT,
             'widget'           => 'single_text',
             'placeholder'      => 'oro.form.click_here_to_select',
+            'years'            => [],
         );
 
         $form = $this->factory->create($this->type);
@@ -74,8 +76,8 @@ class OroDateTimeTypeTest extends TypeTestCase
 
         $view = new FormView();
         $this->type->finishView($view, $form, $options);
-        $this->assertArrayHasKey($expectedKey, $view->vars['attr']);
-        $this->assertEquals($expectedValue, $view->vars['attr'][$expectedKey]);
+        $this->assertArrayHasKey($expectedKey, $view->vars);
+        $this->assertEquals($expectedValue, $view->vars[$expectedKey]);
     }
 
     public function optionsDataProvider()
@@ -83,8 +85,13 @@ class OroDateTimeTypeTest extends TypeTestCase
         return array(
             array(
                 array('placeholder' => 'some.placeholder'),
-                'placeholder',
-                'some.placeholder',
+                'attr',
+                array('placeholder' => 'some.placeholder'),
+            ),
+            array(
+                array('years' => [2001, 2002, 2003]),
+                'years',
+                '2001:2003',
             ),
         );
     }
