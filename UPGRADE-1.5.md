@@ -121,3 +121,11 @@ workflows:
 
 ####OroTrackingBundle:
  - Entities `TrackingWebsite` and `TrackingEvent` were made extendable
+
+####OroBatchBundle:
+ - Added possibility to disable debug logging for integration/import/export processes(were placed in `app/logs/batch/`) 
+ on application level under `oro_batch.log_batch` node. Default value is `disabled`
+ - Added cleanup job for DB tables of entities from `AkeneoBatchBundle`. It performs by cron every day in 1 am, and also 
+  it's possible to run manually using `oro:cron:batch:cleanup` command. By default log records lifetime is `1 month`, but this
+  option is configurable on application level under `oro_batch.cleanup_interval` node. For manual run it's possible to pass
+  interval directly as command argument `[-i|--interval[="..."]]` 
