@@ -48,7 +48,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          */
         dispose: function () {
             if (!this.disposed) {
-                if (this.$el) {
+                if (this.$el && this.$el.data('simplecolorpicker')) {
                     this.$el.simplecolorpicker('destroy');
                 }
                 if (this.$parent) {
