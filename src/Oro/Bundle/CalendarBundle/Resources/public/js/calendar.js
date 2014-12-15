@@ -254,7 +254,7 @@ define(function (require) {
             if (this.hasParentEvent(eventModel) || this.hasGuestEvent(eventModel)) {
                 // view is updated to closest possible
                 // start refetching 'cause event had linked events
-                eventModel.once('sync', _.bind(this.smartRefetch, this));
+                eventModel.once('sync', this.smartRefetch, this);
             }
         },
 
@@ -281,12 +281,10 @@ define(function (require) {
 
             var changes = connectionModel.changedAttributes(),
                 calendarUid = connectionModel.get('calendarUid');
-            if ((changes.visible && !this.eventsLoaded[calendarUid]) || this.enableEventLoading !== true) {
+            if (changes.visible && !this.eventsLoaded[calendarUid]) {
                 this.smartRefetch();
             } else {
-                this.enableEventLoading = false;
-                this.getCalendarElement().fullCalendar('refetchEvents');
-                this.enableEventLoading = true;
+                this.updateEventsWithoutReload();
             }
         },
 
@@ -435,12 +433,7 @@ define(function (require) {
                 // load events from a server
                 this.collection.fetch({
                     reset: true,
-                    success: _.bind(function () {
-                        var oldEnableEventLoading = this.enableEventLoading;
-                        this.enableEventLoading = false;
-                        this.getCalendarElement().fullCalendar('refetchEvents');
-                        this.enableEventLoading = oldEnableEventLoading;
-                    }, this),
+                    success: _.bind(this.updateEventsWithoutReload, this),
                     error: _.bind(function (collection, response) {
                         this.showLoadEventsError(response.responseJSON || {});
                         this._hideMask();
@@ -449,6 +442,13 @@ define(function (require) {
             } catch (err) {
                 this.showLoadEventsError(err);
             }
+        },
+
+        updateEventsWithoutReload: function () {
+            var oldEnableEventLoading = this.enableEventLoading;
+            this.enableEventLoading = false;
+            this.getCalendarElement().fullCalendar('refetchEvents');
+            this.enableEventLoading = oldEnableEventLoading;
         },
 
         loadEvents: function (start, end, timezone, callback) {
