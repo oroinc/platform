@@ -281,7 +281,7 @@ define(function (require) {
 
             var changes = connectionModel.changedAttributes(),
                 calendarUid = connectionModel.get('calendarUid');
-            if (changes.visible && !this.eventsLoaded[calendarUid]) {
+            if ((changes.visible && !this.eventsLoaded[calendarUid]) || this.enableEventLoading !== true) {
                 this.getCalendarElement().fullCalendar('refetchEvents');
             } else {
                 this.enableEventLoading = false;
@@ -434,7 +434,7 @@ define(function (require) {
                 var fcEvents,
                     visibleConnectionIds = [];
 
-                if (this.enableEventLoading) {
+                if (this.enableEventLoading || _.size(this.eventsLoaded) === 0) {
                     // data is loaded, need to update eventsLoaded
                     this.eventsLoaded = {};
                     this.options.connectionsOptions.collection.each(function (connectionModel) {
