@@ -1,6 +1,30 @@
 UPGRADE FROM 1.4 to 1.5
 =======================
 
+####General changes
+- FOSRestBundle updated from 0.12.* to 1.5.0-RC2 [FOSRestBundle Upgrading](https://github.com/FriendsOfSymfony/FOSRestBundle/blob/master/UPGRADING.md)
+  fos_rest section in config.yml must be updated prior to new version of bundle.
+
+```yaml
+fos_rest:
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
+    view:
+        failed_validation: HTTP_BAD_REQUEST
+        default_engine: php
+        formats:
+            json: true
+            xml: false
+    format_listener:
+        rules:
+            - { path: '^/api/rest', priorities: [ json ], fallback_format: json, prefer_extension: false }
+            - { path: '^/api/soap', stop: true }
+            - { path: '^/', stop: true }
+    routing_loader:
+        default_format: json
+```
+
 ####OroAddressBundle:
 - `PhoneProvider` class has been added to help getting phone number(s) from object.
 
