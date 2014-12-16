@@ -8,6 +8,7 @@ define(function (require) {
         Backbone        = require('backbone'),
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
+        mediator        = require('oroui/js/mediator'),
         LoadingMask     = require('oroui/js/loading-mask'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
@@ -136,9 +137,11 @@ define(function (require) {
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
 
-            var devTollbar = $('.sf-toolbarreset')
-            this.hasDevToolbar = devTollbar.length;
-            this.devToolbarHeight = this.hasDevToolbar ? devTollbar.height() : 0;
+            this.devToolbarHeight = 0;
+            var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
+            if (devToolbarComposition && devToolbarComposition.view) {
+                this.devToolbarHeight = devToolbarComposition.view.$el.height();
+            }
         },
 
         /**
@@ -891,7 +894,7 @@ define(function (require) {
             switch (newLayout) {
                 case 'fullscreen':
                     $scrollableParents.addClass('disable-scroll');
-                    contentHeight = this.getAvailableHeight() - 1;
+                    contentHeight = this.getAvailableHeight();
                     break;
                 case 'scroll':
                     $scrollableParents.removeClass('disable-scroll');
