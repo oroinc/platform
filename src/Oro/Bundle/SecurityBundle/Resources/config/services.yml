@@ -470,10 +470,10 @@ services:
     oro_security.listener.api_listener:
           class: %oro_security.listener.api_listener.class%
           arguments:
-              - @request
               - @oro_security.security_facade
               - @oro_security.acl_helper
-          scope: request
+          calls:
+              - [setRequest, [@?request=]]
           tags:
               - { name: kernel.event_listener, event: oro_api.request.get_list.before, method: onGetListBefore }
               - { name: kernel.event_listener, event: oro_api.request.find.after, method: onFindAfter }
