@@ -471,12 +471,6 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                     '--fixtures-type'     => 'demo',
                 )
             );
-            $commandExecutor->runCommand(
-                'oro:search:reindex',
-                array(
-                    '--process-isolation' => true,
-                )
-            );
         }
 
         $output->writeln('');
