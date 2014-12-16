@@ -15,21 +15,11 @@ class OroDateTimeTypeTest extends TypeTestCase
      */
     private $type;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $localeSettings;
-
     protected function setUp()
     {
         parent::setUp();
 
-        $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getLocale', 'getCurrency', 'getCurrencySymbolByCurrency'))
-            ->getMock();
-
-        $this->type = new OroDateTimeType($this->localeSettings);
+        $this->type = new OroDateTimeType();
     }
 
     public function testGetName()
