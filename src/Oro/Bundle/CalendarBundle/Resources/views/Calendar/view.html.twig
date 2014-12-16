@@ -1,5 +1,5 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroCalendarBundle::macros.html.twig' as c %}
+{% import 'OroCalendarBundle::templates.html.twig' as calendarTemplates %}
 
 {% set name = entity.owner|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name, "%calendarname%": entity.name|default(name) }}) %}
@@ -105,6 +105,6 @@
         </li>
     </script>
 
-    {{ c.calendar_event_view_template('template-view-calendar-event') }}
-    {{ c.calendar_event_form_template('template-calendar-event', event_form) }}
+    {{ calendarTemplates.calendar_event_view_template('template-view-calendar-event') }}
+    {{ calendarTemplates.calendar_event_form_template('template-calendar-event', event_form) }}
 {% endblock content_data %}
