@@ -29,7 +29,7 @@ class OroDateTimeTypeTest extends TypeTestCase
             ->setMethods(array('getLocale', 'getCurrency', 'getCurrencySymbolByCurrency'))
             ->getMock();
 
-        $this->type = new OroDateTimeType($this->localeSettings, new OroDateType());
+        $this->type = new OroDateTimeType($this->localeSettings);
     }
 
     public function testGetName()
