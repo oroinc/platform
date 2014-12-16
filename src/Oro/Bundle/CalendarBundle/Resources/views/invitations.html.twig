@@ -63,3 +63,9 @@
 {%- macro calendar_event_invitation_action(statusCode) -%}
     {{ ('oro.calendar.calendarevent.actions.' ~ statusCode)|trans }}
 {%- endmacro -%}
+
+{% macro notifyGuestsComponent() %}
+    <div id = "component-element" style="display: none" data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-options="{{ {'view': 'orocalendar/js/app/views/guest-notifier-view'}|json_encode }}">
+    </div>
+{% endmacro %}
