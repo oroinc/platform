@@ -1,5 +1,5 @@
 {% extends 'OroDashboardBundle:Dashboard:widget.html.twig' %}
-{% import 'OroCalendarBundle::macros.html.twig' as c %}
+{% import 'OroCalendarBundle::templates.html.twig' as calendarTemplates %}
 
 {% block content %}
     {%  set dashboardCalendarOptions = {
@@ -28,8 +28,8 @@
          data-page-component-options="{{ dashboardCalendarOptions | json_encode }}">
         <div class="calendar-events"></div>
     </div>
-    {{ c.calendar_event_view_template('template-view-calendar-event-' ~ widgetId) }}
-    {{ c.calendar_event_form_template('template-calendar-event-' ~ widgetId, event_form) }}
+    {{ calendarTemplates.calendar_event_view_template('template-view-calendar-event-' ~ widgetId) }}
+    {{ calendarTemplates.calendar_event_form_template('template-calendar-event-' ~ widgetId, event_form) }}
 {% endblock %}
 
 {% block actions %}
