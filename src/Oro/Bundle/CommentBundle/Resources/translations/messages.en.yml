@@ -10,3 +10,6 @@ oro:
         owner.label: Owner
         updated_by.label: Updated by
 
+        message.placeholder: Enter your comment...
+
+add_comment: Add Comment

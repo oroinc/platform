@@ -2,6 +2,9 @@ parameters:
     oro_comment.migration.extension.comment.class:    Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
     oro_comment.entity_generator.extension.class:     Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
     oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
+    oro_comment.form.type.comment.class:              Oro\Bundle\CommentBundle\Form\Type\CommentType
+    oro_comment.form.handler.comment.class:           Oro\Bundle\CommentBundle\Form\Handler\CommentHandler
+
 services:
     oro_comment.migration.extension.comment:
         class: %oro_comment.migration.extension.comment.class%
@@ -18,3 +21,24 @@ services:
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_comment.form.type.comment:
+        class: %oro_comment.form.type.comment.class%
+        tags:
+            - { name: form.type, alias: oro_comment }
+
+    oro_comment.form.handler.note:
+        class: %oro_comment.form.handler.comment.class%
+        scope: request
+        arguments:
+            - @oro_comment.form.type.comment
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_comment.form.comment:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - 'oro_comment_form'
+            - 'oro_comment'

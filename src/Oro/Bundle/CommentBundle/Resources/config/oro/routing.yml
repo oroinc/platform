@@ -2,3 +2,18 @@ oro_comment_bundle:
     resource:     "@OroCommentBundle/Controller"
     type:         annotation
     prefix:       /
+
+#
+# REST actions
+#
+oro_comment_list_api_get_concrete_list:
+    pattern: api/rest/{version}/commentlist/{entityClass}/{entityId}/{page}.{_format}
+    defaults: {_controller: OroCommentBundle:Api/Rest/CommentController:cget, _format: json, version: latest, page: 1 }
+    requirements:
+         _method: GET
+
+oro_comment_list_api_get_list:
+    pattern: api/rest/{version}/commentlist/{entityClass}/{entityId}.{_format}
+    defaults: {_controller: OroCommentBundle:Api/Rest/CommentController:cget, _format: json, version: latest}
+    requirements:
+         _method: GET

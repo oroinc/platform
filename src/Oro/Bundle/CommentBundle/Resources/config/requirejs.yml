@@ -1,0 +1,8 @@
+config:
+    paths:
+        'orocomment/js/app/components/comment-list-component': 'bundles/orocomment/js/app/components/comment-list-component.js'
+        'orocomment/js/app/models/comment-list-collection':    'bundles/orocomment/js/app/models/comment-list-collection.js'
+        'orocomment/js/app/models/comment-list-model':         'bundles/orocomment/js/app/models/comment-list-model.js'
+        'orocomment/js/app/views/comment-list-view':           'bundles/orocomment/js/app/views/comment-list-view.js'
+        'orocomment/js/app/views/comment-view':                'bundles/orocomment/js/app/views/comment-view.js'
+

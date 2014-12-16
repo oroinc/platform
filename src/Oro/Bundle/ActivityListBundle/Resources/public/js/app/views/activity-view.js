@@ -89,7 +89,7 @@ define([
             }
             this.$('.accordion-toggle').toggleClass('collapsed', collapse);
             this.$('.collapse').toggleClass('in', !collapse);
-            this.$('.accordion-body .message').empty().html(this.model.get('contentHTML'));
+            this.$('.accordion-body .message .info').empty().html(this.model.get('contentHTML'));
         },
 
         isCollapsed: function () {

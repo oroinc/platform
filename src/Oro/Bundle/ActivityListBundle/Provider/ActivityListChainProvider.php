@@ -163,10 +163,11 @@ class ActivityListChainProvider
         foreach ($this->providers as $provider) {
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
-                'icon'     => $entityConfig->get('icon'),
-                'label'    => $this->translator->trans($entityConfig->get('label')),
-                'template' => $provider->getTemplate(),
-                'routes'   => $provider->getRoutes(),
+                'icon'         => $entityConfig->get('icon'),
+                'label'        => $this->translator->trans($entityConfig->get('label')),
+                'template'     => $provider->getTemplate(),
+                'routes'       => $provider->getRoutes(),
+                'has_comments' => $provider->hasComments($this->configManager, $provider->getActivityClass()),
             ];
         }
 

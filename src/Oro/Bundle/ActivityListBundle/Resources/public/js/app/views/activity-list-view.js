@@ -14,6 +14,8 @@ define(function (require) {
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
+    var CommentListComponent = require('orocomment/js/app/components/comment-list-component');
+
     ActivityListView = BaseCollectionView.extend({
         options: {
             configuration: {},
@@ -243,6 +245,13 @@ define(function (require) {
                         var response = $('<html />').html(data);
                         currentModel.set('is_loaded', true);
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
+
+                        var commentOptions = {
+                            _sourceElement: $('.accordion-body .message .info'),
+                            activityId: currentModel.get('relatedActivityId'),
+                            activityClassName: currentModel.get('relatedActivityClass').split('\\').join('_')
+                        };
+                        currentModel.set('comment',  new CommentListComponent(commentOptions));
 
                         that._hideLoading();
 

@@ -37,5 +37,5 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Comment extends ExtendComment
 {
-
+    const ENTITY_NAME = 'Oro\Bundle\CommentBundle\Entity\Comment';
 }
