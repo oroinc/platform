@@ -34,11 +34,9 @@ class MergeRecursiveExtensionTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertArrayHasKey('merge_recursive', $filters);
-        $this->assertEmpty(
-            array_diff(
-                ['Oro\Bundle\UIBundle\Tools\ArrayUtils', 'arrayMergeRecursiveDistinct'],
-                $filters['merge_recursive']
-            )
+        $this->assertEquals(
+            ['Oro\Bundle\UIBundle\Tools\ArrayUtils', 'arrayMergeRecursiveDistinct'],
+            $filters['merge_recursive']
         );
     }
 }
