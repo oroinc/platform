@@ -104,7 +104,7 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('orocrm_sales_lead');
-        $extendExtension->addManyToOneRelation(
+        $this->extendExtension->addManyToOneRelation(
             $schema,
             $table,
             'users',
