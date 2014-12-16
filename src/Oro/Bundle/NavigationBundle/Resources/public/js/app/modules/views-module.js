@@ -44,7 +44,8 @@ require([
         BaseController.addToReuse('favoritePage', FavoriteComponent, {
             dataSource: '#favorite-content [data-data]',
             buttonOptions: {
-                el: '#pin-button-div .favorite-button'
+                el: '#bookmark-buttons .favorite-button',
+                navigationElementType: 'favoriteButton'
             },
             tabItemTemplate: $('#template-dot-menu-item').html(),
             tabOptions: {
@@ -77,7 +78,8 @@ require([
         BaseController.addToReuse('pagePin', PinComponent, {
             dataSource: '#pinbar [data-data]',
             buttonOptions: {
-                el: '#pin-button-div .minimize-button'
+                el: '#bookmark-buttons .minimize-button',
+                navigationElementType: 'pinButton'
             },
             dropdownItemTemplate: template,
             dropdownOptions: {

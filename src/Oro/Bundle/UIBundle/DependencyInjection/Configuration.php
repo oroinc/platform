@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
         $rootNode->children()
             ->booleanNode('show_pin_button_on_start_page')
                 ->defaultValue(true)
+                ->info('Not used since 1.5, config node is deprecated and still there only for BC')
             ->end()
             ->arrayNode('placeholders')
                 ->useAttributeAsKey('name')
