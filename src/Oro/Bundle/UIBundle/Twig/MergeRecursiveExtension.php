@@ -11,7 +11,7 @@ class MergeRecursiveExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFilter(
-                'marge_recursive',
+                'merge_recursive',
                 ['Oro\Bundle\UIBundle\Tools\ArrayUtils', 'arrayMergeRecursiveDistinct']
             )
         ];

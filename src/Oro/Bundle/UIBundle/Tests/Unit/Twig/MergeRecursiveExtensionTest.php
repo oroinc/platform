@@ -30,9 +30,15 @@ class MergeRecursiveExtensionTest extends \PHPUnit_Framework_TestCase
         $filters = [];
         foreach ($this->extension->getFilters() as $filter) {
             /** @var $filter Twig_SimpleFilter */
-            $filters[] = $filter->getName();
+            $filters[$filter->getName()] = $filter->getCallable();
         }
 
-        $this->assertContains('marge_recursive', $filters);
+        $this->assertArrayHasKey('merge_recursive', $filters);
+        $this->assertEmpty(
+            array_diff(
+                ['Oro\Bundle\UIBundle\Tools\ArrayUtils', 'arrayMergeRecursiveDistinct'],
+                $filters['merge_recursive']
+            )
+        );
     }
 }

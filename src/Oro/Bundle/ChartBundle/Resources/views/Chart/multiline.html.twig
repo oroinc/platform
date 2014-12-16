@@ -22,14 +22,14 @@
 {% set lableTrans = {
     'data_schema': {
         'label': {
-            'label': null
+            'label': options.data_schema.label.label|trans
         },
         'value': {
             'label': options.data_schema.value.label|trans
         }
     }
 }%}
-{% set options = options|marge_recursive(lableTrans) %}
+{% set options = options|merge_recursive(lableTrans) %}
 {% if data|length > 0  %}
     {{ chart.renderChart(data, options, config, isMobileVersion()) }}
 {% else %}
