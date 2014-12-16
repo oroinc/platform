@@ -53,10 +53,12 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 }
                 if (this.$parent) {
                     this.$parent.off('.' + this.cid);
+                    delete this.$parent;
                 }
                 if (this.$picker) {
                     this.$picker.minicolors('destroy');
                     this.$picker.off('.' + this.cid);
+                    delete this.$picker;
                 }
             }
             BaseSimpleColorPickerView.__super__.dispose.call(this);
