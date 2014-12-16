@@ -120,6 +120,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 continue;
             }
 
+            // check if a field exists, because it is possible that it can be removed by some event listener
+            if (!isset($view->children[$fieldName])) {
+                continue;
+            }
+
             $view->children[$fieldName]->vars['extra_field'] = true;
 
             if (!in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToMany'])) {

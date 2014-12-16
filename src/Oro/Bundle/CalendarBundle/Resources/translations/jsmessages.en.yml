@@ -31,3 +31,8 @@ oro:
 "Tentatively accepted": "Tentatively accepted"
 "Accepted": "Accepted"
 "Reminders": "Reminders"
+oro:
+    calendar:
+        error_message:
+            event_model:
+                end_date_earlier_than_start: "The end date can't be earlier than start date"

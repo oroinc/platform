@@ -12,20 +12,13 @@ User interface layouts and controls.
 - [TWIG Filters](./Resources/doc/reference/twig-filters.md)
 - [JavaScript Widgets](./Resources/doc/reference/widgets.md)
 - [Items Manager](./Resources/doc/reference/items-manager.md)
+- [Content providers](./Resources/doc/reference/content-providers.md)
 
 ## Configuration Settings
 
 - oro_ui.application_url   - application frontend URL
 - oro_ui.application_name  - application name to display in header
 - oro_ui.application_title - application title for name reference in header
-
-### Hide 'Add to favorites' and 'Minimize to the pinbar' buttons for the start page
-By default all pages have `Add to favorites` and `Minimize to the pinbar` buttons at the top right corner of a screen. If you want to remove these buttons for the start page, add the following configuration in `app/config/config.yml` file:
-
-```yaml
-oro_ui:
-    show_pin_button_on_start_page: false
-```
 
 ## Introduction to placeholders
 
