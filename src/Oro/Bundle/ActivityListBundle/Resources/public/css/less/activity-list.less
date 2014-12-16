@@ -5,7 +5,11 @@
     border-top: 1px solid #ddd;
   }
   .title {
-    border-bottom: 1px solid #ddd;
+    z-index: 1;
+    position: absolute;
+    top: 0;
+    right: -15px;
+    padding: 2px 15px;
   }
   .activity-list {
     position: relative;
@@ -13,7 +17,6 @@
       margin: 20px;
     }
     .list-box {
-      margin-top: 10px;
       .list-item {
         padding: 3px 10px 5px 10px;
         .visual {
@@ -130,13 +133,12 @@
       }
     }
     .filter-box {
-      position: absolute;
+      float: left;
       margin: 0px;
       padding: 0px;
       background: none;
       border: none;
       box-shadow: none;
-      top: -36px;
     }
     .filter-item {
       margin-bottom: 0px;
@@ -144,12 +146,22 @@
     }
   }
   .grid-toolbar {
-    padding: 0;
-    .pagination > ul > li a{
-      width:24px;
-      i {
-        margin: 0 3px;
+    padding: 0 0 1px;
+    margin: 0;
+    border-bottom: 1px solid #ddd;
+    .pagination{
+      white-space: nowrap;
+      padding-top: 1px;
+      display: inline-block;
+      > ul > li a{
+        width:24px;
+        i {
+          margin: 0 3px;
+        }
       }
+    }
+    .filter-container {
+      padding-bottom: 5px;
     }
   }
 }
