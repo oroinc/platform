@@ -25,7 +25,7 @@ define(function (require) {
     var $ = Backbone.$;
 
     /**
-     * @export  orocalendar/js/calendar
+     * @export  orocalendar/js/calendar-view
      * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
