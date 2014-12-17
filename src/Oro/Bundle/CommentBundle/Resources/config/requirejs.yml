@@ -5,4 +5,5 @@ config:
         'orocomment/js/app/models/comment-list-model':         'bundles/orocomment/js/app/models/comment-list-model.js'
         'orocomment/js/app/views/comment-list-view':           'bundles/orocomment/js/app/views/comment-list-view.js'
         'orocomment/js/app/views/comment-view':                'bundles/orocomment/js/app/views/comment-view.js'
+        'orocomment/js/app/views/comment-form-view':           'bundles/orocomment/js/app/views/comment-form-view.js'
 

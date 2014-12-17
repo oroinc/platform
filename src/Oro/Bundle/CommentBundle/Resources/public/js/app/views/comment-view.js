@@ -24,9 +24,6 @@ define([
         attributes: {
             'class': 'list-item'
         },
-        events: {
-            'click #add-comment-button': 'onAdd'
-        },
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
             this.collapsed = true;

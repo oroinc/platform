@@ -13,7 +13,8 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         CommentListCollection = require('orocomment/js/app/models/comment-list-collection'),
         CommentModel = require('orocomment/js/app/models/comment-list-model'),
-        CommentView = require('orocomment/js/app/models/comment-list-model')
+        CommentView = require('orocomment/js/app/models/comment-list-model'),
+        CommentFormView = require('orocomment/js/app/views/comment-form-view')
         ;
 
     CommentListComponent = BaseComponent.extend({
@@ -32,7 +33,12 @@ define(function (require) {
             commentListCount: 0,
             widgetId: '',
             modules: {},
-            formWidgetRoute: '/app_dev.php/comments/form'
+            form: {
+                url: '/app_dev.php/comments/form',
+                isLoaded: false,
+                view: '',
+                contentHTML: ''
+            }
         },
 
         initialize: function (options) {
@@ -42,7 +48,7 @@ define(function (require) {
 
             this.loadForm();
 
-            if (!_.isEmpty(this.options.modules)) {
+            /*if (!_.isEmpty(this.options.modules)) {
                 this._deferredInit();
                 tools.loadModules(this.options.modules, function (modules) {
                     _.extend(this.options.commentListOptions, modules);
@@ -52,18 +58,18 @@ define(function (require) {
             } else {
                 this.loadModules();
                 this.initView();
-
-            }
+            }*/
         },
         loadModules: function () {
             var that = this;
-
+/*
             $.ajax({url: this.options.formWidgetRoute, type: 'get', dataType: 'html'})
                 .done(function (data) {
                     var response = $('<html />').html(data);
                     that._setCommentForm( $(response).find('.widget-content').html());
                 })
                 .fail(_.bind(that._showLoadItemsError, this));
+*/
         },
         processOptions: function () {
             var defaults;
@@ -74,10 +80,16 @@ define(function (require) {
         loadForm: function () {
             var that = this;
 
-            $.ajax({url: this.options.formWidgetRoute, type: 'get', dataType: 'html'})
-                .done(function (data) {
+            $.ajax({url: this.options.form.url, type: 'get', dataType: 'html'})
+                .done(function(data) {
                     var response = $('<html />').html(data);
-                    that._setCommentForm( $(response).find('.widget-content').html());
+                    that._setCommentForm($(response).find('.widget-content').html());
+                    that.options.form.isLoaded = true;
+
+                    that.options.form.view = new CommentFormView({
+                        el: that.options._sourceElement,
+                        contentHTML: that.options.form.contentHTML
+                    });
                 })
                 .fail(_.bind(that._showLoadItemsError, this));
         },
@@ -112,7 +124,7 @@ define(function (require) {
             this._showError(this.options.messages.loadItemsError, err);
         },
         _setCommentForm: function(form) {
-            this.options.commentForm = form;
+            this.options.form.contentHTML = form;
         }
     });
 

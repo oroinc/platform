@@ -237,7 +237,7 @@ define(function (require) {
                         _widgetContainer: 'dialog'
                     }
                 };
-
+debugger;
             if (currentModel.get('is_loaded') !== true) {
                 this._showLoading();
                 Backbone.$.ajax(options)
@@ -247,7 +247,7 @@ define(function (require) {
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
 
                         var commentOptions = {
-                            _sourceElement: $('.accordion-body .message .info'),
+                            _sourceElement: currentModelView.$el,
                             activityId: currentModel.get('relatedActivityId'),
                             activityClassName: currentModel.get('relatedActivityClass').split('\\').join('_')
                         };
