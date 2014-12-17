@@ -290,7 +290,7 @@ define(function (require) {
                 var $el = $(el);
                 var height = widget.height() - $el.position().top;
                 if (height) {
-                    $el.height(height);
+                    $el.outerHeight(height);
                 }
             },this));
             layout.updateResponsiveLayout();

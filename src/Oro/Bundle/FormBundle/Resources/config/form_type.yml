@@ -39,8 +39,6 @@ services:
 
     oro_form.type.datetime:
         class: %oro_form.type.datetime.class%
-        arguments:
-            - @oro_locale.settings
         tags:
             - { name: form.type, alias: oro_datetime }
 

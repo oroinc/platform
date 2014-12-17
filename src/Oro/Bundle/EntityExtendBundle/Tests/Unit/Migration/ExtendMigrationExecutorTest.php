@@ -4,9 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendMigrationExecutor;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
+use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\Migrations\Schema\v1_0\Test1BundleMigration10;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\AbstractTestMigrationExecutor;
 
@@ -46,7 +45,7 @@ class ExtendMigrationExecutorTest extends AbstractTestMigrationExecutor
 
         $migration = new Test1BundleMigration10();
         $migrations = [
-            $migration
+            new MigrationState($migration)
         ];
 
         $this->connection->expects($this->once())
