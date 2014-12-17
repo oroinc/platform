@@ -15,6 +15,9 @@
     .list-box {
       border: solid 1px #ddd;
       border-radius: 4px;
+      &:empty {
+        display: none;
+      }
       .list-item {
         padding: 3px 10px 5px 10px;
         border-bottom-color: #ddd;
