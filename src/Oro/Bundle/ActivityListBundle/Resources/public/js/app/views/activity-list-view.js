@@ -237,7 +237,7 @@ define(function (require) {
                         _widgetContainer: 'dialog'
                     }
                 };
-debugger;
+
             if (currentModel.get('is_loaded') !== true) {
                 this._showLoading();
                 Backbone.$.ajax(options)

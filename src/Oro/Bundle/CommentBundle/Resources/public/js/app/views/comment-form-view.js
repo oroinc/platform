@@ -16,14 +16,8 @@ define([
             configuration: {},
             contentHTML: ''
         },
-        events: {
-            'click #add-comment-button': 'onAdd'
-        },
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-        },
-        onAdd: function () {
-            this.model.collection.trigger('onAdd', this.model);
         },
         render: function () {
             this.$el.find('.accordion-body .message .comment').html(this.options.contentHTML);

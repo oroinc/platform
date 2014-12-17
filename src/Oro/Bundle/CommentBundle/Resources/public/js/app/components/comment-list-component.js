@@ -22,12 +22,13 @@ define(function (require) {
             commentListOptions: {
                 configuration: {},
                 urls: {
-                    getList: '/app_dev.php/api/rest/{version}/commentlist/{entityClass}/{entityId}/{page}.{_format}'
+                    getList: '/app_dev.php/api/rest/latest/commentlist/'
                 },
                 routes: {},
                 pager: {},
                 itemView:  CommentView,
-                itemModel: CommentModel
+                itemModel: CommentModel,
+                defaultPage: 0
             },
             commentListData: '[]',
             commentListCount: 0,
@@ -48,6 +49,8 @@ define(function (require) {
 
             this.loadForm();
 
+            this.loadComments();
+
             /*if (!_.isEmpty(this.options.modules)) {
                 this._deferredInit();
                 tools.loadModules(this.options.modules, function (modules) {
@@ -60,17 +63,6 @@ define(function (require) {
                 this.initView();
             }*/
         },
-        loadModules: function () {
-            var that = this;
-/*
-            $.ajax({url: this.options.formWidgetRoute, type: 'get', dataType: 'html'})
-                .done(function (data) {
-                    var response = $('<html />').html(data);
-                    that._setCommentForm( $(response).find('.widget-content').html());
-                })
-                .fail(_.bind(that._showLoadItemsError, this));
-*/
-        },
         processOptions: function () {
             var defaults;
             defaults = $.extend(true, {}, this.defaults);
@@ -82,9 +74,7 @@ define(function (require) {
 
             $.ajax({url: this.options.form.url, type: 'get', dataType: 'html'})
                 .done(function(data) {
-                    var response = $('<html />').html(data);
-                    that._setCommentForm($(response).find('.widget-content').html());
-                    that.options.form.isLoaded = true;
+                    that._setCommentForm(data);
 
                     that.options.form.view = new CommentFormView({
                         el: that.options._sourceElement,
@@ -92,6 +82,16 @@ define(function (require) {
                     });
                 })
                 .fail(_.bind(that._showLoadItemsError, this));
+        },
+        loadComments: function () {
+            var that = this;
+
+            $.ajax({url: this._genCommentUrl(), type: 'get', dataType: 'html'})
+                .done(function(data) {
+                    console.log(data);
+                })
+                .fail(_.bind(that._showLoadItemsError, this));
+
         },
         initView: function() {
             var commentOptions, collection;
@@ -125,6 +125,16 @@ define(function (require) {
         },
         _setCommentForm: function(form) {
             this.options.form.contentHTML = form;
+        },
+        _genCommentUrl: function () {
+            return this.options.commentListOptions.urls.getList
+                + this.options.activityClassName
+                + '/'
+                + this.options.activityId
+                + '/'
+                + this.options.commentListOptions.defaultPage
+                + '.json'
+                ;
         }
     });
 
