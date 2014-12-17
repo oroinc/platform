@@ -77,7 +77,6 @@ class EntityPaginationController extends Controller
         $navigationService = $this->get('oro_entity_pagination.navigation');
 
         $params = $this->getRequest()->query->all();
-        $params['entityName'] = $entityName;
 
         $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
         $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);
