@@ -16,7 +16,14 @@ class OroDateType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['attr']['placeholder'] = $options['placeholder'];
+        if (!empty($options['placeholder'])) {
+            $view->vars['attr']['placeholder'] = $options['placeholder'];
+        }
+
+        // jquery date/datetime pickers support only year ranges
+        if (!empty($options['years'])) {
+            $view->vars['years'] = sprintf('%d:%d', min($options['years']), max($options['years']));
+        }
     }
 
     /**
@@ -31,6 +38,7 @@ class OroDateType extends AbstractType
                 'format'         => 'yyyy-MM-dd', // ISO format
                 'widget'         => 'single_text',
                 'placeholder'    => 'oro.form.click_here_to_select',
+                'years'          => [],
             )
         );
     }
