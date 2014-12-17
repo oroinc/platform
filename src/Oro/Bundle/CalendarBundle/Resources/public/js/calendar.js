@@ -6,6 +6,7 @@ define(function (require) {
 
     var _               = require('underscore'),
         Backbone        = require('backbone'),
+        moment          = require('moment'),
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
@@ -706,9 +707,12 @@ define(function (require) {
 
 
             self = this;
-            options.viewDisplay = function () {
-                self.setTimeline();
-                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
+            options.eventAfterAllRender = function () {
+                _.delay(_.bind(self.setTimeline, self));
+                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
+            };
+            options.viewDestroy = function () {
+                clearInterval(self.timelineUpdateIntervalId);
             };
             options.windowResize = function () {
                 self.setTimeline();
@@ -782,14 +786,25 @@ define(function (require) {
         },
 
         setTimeline: function () {
-            var todayElement, timeGrid, timelineElement, curCalView, percentOfDay, curSeconds, topLoc, dayCol,
+            var todayElement, timeGrid, timelineElement, curCalView, percentOfDay, curSeconds, timelineTop, dayCol,
                 calendarElement = this.getCalendarElement(),
-                curTime = new Date();
-            curTime = new Date(curTime.getTime() +
-                curTime.getTimezoneOffset() * 60000 +
-                this.options.eventsOptions.timezoneOffset * 60000);
-            // this function is called every 5 minutes
-            if (curTime.getHours() === 0 && curTime.getMinutes() <= 5) {
+                currentView = calendarElement.fullCalendar('getView'),
+
+                // shown interval in calendar timezone
+                shownInterval = {
+                    start: currentView.intervalStart.clone().utc(),
+                    end: currentView.intervalEnd.clone().utc()
+                },
+                // current time in calendar timezone
+                now = moment.utc().add(this.options.timezone, 'm');
+
+            if (currentView.name === 'month') {
+                // nothing to do
+                return;
+            }
+
+            // this function is called every 1 minute
+            if (now.hours() === 0 && now.minutes() <= 2) {
                 // the day has changed
                 todayElement = calendarElement.find('.fc-today');
                 todayElement.removeClass('fc-today');
@@ -798,37 +813,32 @@ define(function (require) {
                 todayElement.next().addClass('fc-state-highlight');
             }
 
-            timeGrid = calendarElement.find('.fc-time-grid').parent();
-            if (!timeGrid.length) {
-                // we have no timegrid, nothing to do
-                return;
-            }
-            timelineElement = timeGrid.children('.timeline');
+            timeGrid = calendarElement.find('.fc-time-grid');
+            timelineElement = timeGrid.children('.timeline-marker');
             if (timelineElement.length === 0) {
                 // if timeline isn't there, add it
-                timelineElement = $('<hr>').addClass('timeline');
+                timelineElement = $('<hr class="timeline-marker">');
                 timeGrid.prepend(timelineElement);
             }
 
-            curCalView = calendarElement.fullCalendar('getView');
-            if (curCalView.intervalStart.isBefore(curTime) && curCalView.intervalEnd.isAfter(curTime)) {
+            if (shownInterval.start.isBefore(now) && shownInterval.end.isAfter(now)) {
                 timelineElement.show();
             } else {
                 timelineElement.hide();
             }
 
-            curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+            curSeconds = (now.hours() * 3600) + (now.minutes() * 60) + now.seconds();
             percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
-            topLoc = Math.floor(timeGrid.height() * percentOfDay);
-            timelineElement.css('top', topLoc + 'px');
+            timelineTop = Math.floor(timeGrid.height() * percentOfDay);
+            timelineElement.css('top', timelineTop + 'px');
 
-            if (curCalView.name === 'agendaWeek') {
+            if (currentView.name === 'agendaWeek') {
                 // week view, don't want the timeline to go the whole way across
                 dayCol = calendarElement.find('.fc-today:visible');
                 if (dayCol.position() !== null) {
                     timelineElement.css({
-                        left: (dayCol.position().left - 1) + 'px',
-                        width: (dayCol.width() + 2) + 'px'
+                        left: (dayCol.position().left) + 'px',
+                        width: (dayCol.width() + 3) + 'px'
                     });
                 }
             }
