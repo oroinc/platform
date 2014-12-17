@@ -648,7 +648,7 @@ define(function (require) {
         },
 
         initializeFullCalendar: function () {
-            var options, keys, self;
+            var options, keys, self, scrollTime;
             // prepare options for jQuery FullCalendar control
             options = { // prepare options for jQuery FullCalendar control
                 selectHelper: true,
@@ -689,7 +689,11 @@ define(function (require) {
             }
 
             if (this.options.scrollToCurrentTime) {
-                options.scrollTime = this.applyTzCorrection(1, moment.utc().startOf('hour')).format('HH:mm:ss');
+                scrollTime = this.applyTzCorrection(1, moment.utc());
+                if (scrollTime.minutes() < 10 && scrollTime.hours() !== 0) {
+                    scrollTime.subtract(1, 'h');
+                }
+                options.scrollTime = scrollTime.startOf('hour').format('HH:mm:ss');
             }
 
             var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
