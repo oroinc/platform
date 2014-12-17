@@ -786,7 +786,7 @@ define(function (require) {
         },
 
         setTimeline: function () {
-            var todayElement, timeGrid, timelineElement, curCalView, percentOfDay, curSeconds, timelineTop, dayCol,
+            var todayElement, timeGrid, timelineElement, percentOfDay, curSeconds, timelineTop, dayCol,
                 calendarElement = this.getCalendarElement(),
                 currentView = calendarElement.fullCalendar('getView'),
 
