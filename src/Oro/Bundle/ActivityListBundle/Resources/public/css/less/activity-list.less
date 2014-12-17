@@ -111,9 +111,14 @@
           .message, .subject {
             display: none;
           }
-          .message .responsive-block {
-            width: auto;
-            float: none;
+          .message {
+            &.responsive-block {
+              width: auto;
+              float: none;
+            }
+            .email-body{
+              width: calc(~"100% - 23px");
+            }
           }
           .control-group{
             max-width: none;
