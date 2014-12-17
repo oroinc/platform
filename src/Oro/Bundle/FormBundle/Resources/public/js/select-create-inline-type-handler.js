@@ -17,9 +17,17 @@ function (routing, DialogWidget, widgetManager, __) {
         var handleGridSelect = function (e) {
             e.preventDefault();
 
+            var routeName = urlParts.grid.route,
+                routeParams = urlParts.grid.parameters;
+
+            var additionalRequestParams = selectorEl.data('select2_query_additional_params');
+            if (additionalRequestParams) {
+                routeParams.params = $.extend({}, routeParams.params, additionalRequestParams )
+            }
+
             var entitySelectDialog = new DialogWidget({
                 title: __('Select {{ entity }}', {'entity': label}),
-                url: routing.generate(urlParts.grid.route, urlParts.grid.parameters),
+                url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
                 incrementalPosition: true,
                 dialogOptions: {
