@@ -8,7 +8,8 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ContentProviderPass implements CompilerPassInterface
 {
-    const CONTENT_PROVIDER_TAG = 'oro_ui.content_provider';
+    const TWIG_SERVICE_KEY                 = 'twig';
+    const CONTENT_PROVIDER_TAG             = 'oro_ui.content_provider';
     const CONTENT_PROVIDER_MANAGER_SERVICE = 'oro_ui.content_provider.manager';
 
     /**
@@ -21,7 +22,7 @@ class ContentProviderPass implements CompilerPassInterface
         }
 
         $contentProviderManagerDefinition = $container->getDefinition(self::CONTENT_PROVIDER_MANAGER_SERVICE);
-        $taggedServices = $container->findTaggedServiceIds(self::CONTENT_PROVIDER_TAG);
+        $taggedServices                   = $container->findTaggedServiceIds(self::CONTENT_PROVIDER_TAG);
         foreach ($taggedServices as $id => $attributes) {
             $isEnabled = true;
             foreach ($attributes as $attribute) {
@@ -33,6 +34,14 @@ class ContentProviderPass implements CompilerPassInterface
             $contentProviderManagerDefinition->addMethodCall(
                 'addContentProvider',
                 array(new Reference($id), $isEnabled)
+            );
+        }
+
+        if ($container->hasDefinition(self::TWIG_SERVICE_KEY)) {
+            $twig = $container->getDefinition(self::TWIG_SERVICE_KEY);
+            $twig->addMethodCall(
+                'addGlobal',
+                ['oro_ui_content_provider_manager', new Reference(self::CONTENT_PROVIDER_MANAGER_SERVICE)]
             );
         }
     }

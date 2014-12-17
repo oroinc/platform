@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\OrderedMigrationInterface;
 use Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration;
@@ -99,37 +100,40 @@ class MigrationsLoader
     }
 
     /**
-     * @return Migration[]
+     * @return MigrationState[]
      */
     public function getMigrations()
     {
+        $result = [];
+
         // process "pre" migrations
         $preEvent = new PreMigrationEvent($this->connection);
         $this->eventDispatcher->dispatch(MigrationEvents::PRE_UP, $preEvent);
-        $migrations           = $preEvent->getMigrations();
+        $preMigrations = $preEvent->getMigrations();
+        foreach ($preMigrations as $migration) {
+            $result[] = new MigrationState($migration);
+        }
         $this->loadedVersions = $preEvent->getLoadedVersions();
 
         // process main migrations
         $migrationDirectories = $this->getMigrationDirectories();
         $this->filterMigrations($migrationDirectories);
         $this->createMigrationObjects(
-            $migrations,
+            $result,
             $this->loadMigrationScripts($migrationDirectories)
         );
-        $bundleVersions = $this->getLatestMigrationVersions($migrationDirectories);
-        if (!empty($bundleVersions)) {
-            $migrations[] = new UpdateBundleVersionMigration($bundleVersions);
-        }
+
+        $result[] = new MigrationState(new UpdateBundleVersionMigration($result));
 
         // process "post" migrations
         $postEvent = new PostMigrationEvent($this->connection);
         $this->eventDispatcher->dispatch(MigrationEvents::POST_UP, $postEvent);
         $postMigrations = $postEvent->getMigrations();
         foreach ($postMigrations as $migration) {
-            $migrations[] = $migration;
+            $result[] = new MigrationState($migration);
         }
 
-        return $migrations;
+        return $result;
     }
 
     /**
@@ -192,6 +196,7 @@ class MigrationsLoader
      *               value = array
      *               .    key   = a migration version or empty string for root migration directory
      *               .    value = full path to a migration directory
+     *
      * @return array loaded files
      *               'migrations' => array
      *               .      key   = full file path
@@ -233,45 +238,20 @@ class MigrationsLoader
     }
 
     /**
-     * Extracts latest migration version for each bundle
-     *
-     * @param array $migrationDirectories
-     *      key   = bundle name
-     *      value = array
-     *      .    key   = a migration version or empty string for root migration directory
-     *      .    value = full path to a migration directory
-     * @return string[]
-     *      key   = bundle name
-     *      value = latest migration version
-     */
-    protected function getLatestMigrationVersions(array $migrationDirectories)
-    {
-        $result = [];
-        foreach ($migrationDirectories as $bundleName => $bundleMigrationDirectories) {
-            $versions = array_keys($bundleMigrationDirectories);
-            $version  = array_pop($versions);
-            if ($version) {
-                $result[$bundleName] = $version;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * Creates an instances of all classes implement migration scripts
      *
-     * @param Migration[] $result
-     * @param array       $files Files contain migration scripts
-     *                           'migrations' => array
-     *                           .      key   = full file path
-     *                           .      value = array
-     *                           .            'bundleName' => bundle name
-     *                           .            'version'    => migration version
-     *                           'installers' => array
-     *                           .      key   = full file path
-     *                           .      value = bundle name
-     *                           'bundles'    => string[] names of bundles
+     * @param MigrationState[] $result
+     * @param array            $files Files contain migration scripts
+     *                                'migrations' => array
+     *                                .      key   = full file path
+     *                                .      value = array
+     *                                .            'bundleName' => bundle name
+     *                                .            'version'    => migration version
+     *                                'installers' => array
+     *                                .      key   = full file path
+     *                                .      value = bundle name
+     *                                'bundles'    => string[] names of bundles
+     *
      * @throws \RuntimeException if a migration script contains more than one class
      */
     protected function createMigrationObjects(&$result, $files)
@@ -300,14 +280,24 @@ class MigrationsLoader
             // add installers to the result
             foreach ($files['installers'] as $sourceFile => $installerBundleName) {
                 if ($installerBundleName === $bundleName && isset($migrations[$sourceFile])) {
-                    $result[] = $migrations[$sourceFile];
+                    /** @var Installation $installer */
+                    $installer = $migrations[$sourceFile];
+                    $result[]  = new MigrationState(
+                        $installer,
+                        $installerBundleName,
+                        $installer->getMigrationVersion()
+                    );
                 }
             }
             // add migrations to the result
             if (isset($groupedMigrations[$bundleName])) {
-                foreach ($groupedMigrations[$bundleName] as $versionedMigrations) {
+                foreach ($groupedMigrations[$bundleName] as $version => $versionedMigrations) {
                     foreach ($versionedMigrations as $migration) {
-                        $result[] = $migration;
+                        $result[] = new MigrationState(
+                            $migration,
+                            $bundleName,
+                            $version
+                        );
                     }
                 }
             }
@@ -320,6 +310,7 @@ class MigrationsLoader
      *
      * @param array $files
      * @param array $migrations
+     *
      * @return array
      */
     protected function groupAndSortMigrations($files, $migrations)
@@ -376,6 +367,7 @@ class MigrationsLoader
      * Loads migration objects
      *
      * @param $files
+     *
      * @return array
      * @throws \RuntimeException
      */

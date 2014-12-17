@@ -172,7 +172,7 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
-            var initialization, self;
+            var initPromise, self;
             // suppress 'page:afterChange' event, on server redirection
             if (options.redirection) {
                 return;
@@ -180,20 +180,10 @@ define([
 
             self = this;
 
-            // init components
-            initialization = mediator.execute('layout:init', document.body);
-            initialization.done(function (components) {
-                // attach created components to controller, to get them disposed together
-                _.each(components, function (component) {
-                    if (typeof component.dispose === 'function') {
-                        self['component-' + component.cid || _.uniqueId('component')] = component;
-                    }
-                });
-
-                _.defer(function () {
-                    self.publishEvent('page:afterChange');
-                });
-            });
+            initPromise = mediator.execute('layout:init', document.body, this);
+            initPromise.done(_.debounce(function () {
+                self.publishEvent('page:afterChange');
+            }, 0));
         },
 
         /**
@@ -388,7 +378,7 @@ define([
          */
         _disposeComponents: function () {
             _.each(this, function (component, name) {
-                if ('component-' === name.substr(0, 10)) {
+                if ('component:' === name.substr(0, 10)) {
                     component.dispose();
                     delete this[name];
                 }

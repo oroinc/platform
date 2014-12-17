@@ -76,13 +76,14 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
         },
 
         renderWidget: function() {
+            var widget;
             if (!this.widget) {
                 var title = this.model.get('name') ? __('Edit step') : __('Add new step');
                 if (this.model.get('_is_clone')) {
                     title = __('Clone step');
                 }
 
-                this.widget = new DialogWidget({
+                this.widget = widget = new DialogWidget({
                     'title': title,
                     'el': this.$el,
                     'stateEnabled': false,
@@ -94,7 +95,7 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
                     }
                 });
                 this.listenTo(this.widget, 'renderComplete', function(el) {
-                    mediator.execute('layout:init', el);
+                    mediator.execute('layout:init', el, widget);
                 });
                 this.widget.render();
             } else {

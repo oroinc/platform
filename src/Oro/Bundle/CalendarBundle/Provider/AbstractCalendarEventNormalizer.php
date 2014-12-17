@@ -32,16 +32,13 @@ abstract class AbstractCalendarEventNormalizer
     {
         $result = [];
 
-        $items = $query->getArrayResult();
-        foreach ($items as $item) {
-            $resultItem = [];
-            foreach ($item as $field => $value) {
-                $this->transformEntityField($value);
-                $resultItem[$field] = $value;
-            }
+        $rawData = $query->getArrayResult();
+        foreach ($rawData as $rawDataItem) {
+            $result[] = $this->transformEntity($rawDataItem);
+        }
+        $this->applyAdditionalData($result, $calendarId);
+        foreach ($result as &$resultItem) {
             $this->applyPermissions($resultItem, $calendarId);
-
-            $result[] = $resultItem;
         }
 
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
@@ -50,7 +47,25 @@ abstract class AbstractCalendarEventNormalizer
     }
 
     /**
-     * Prepare entity field for serialization
+     * Converts values of entity fields to form that can be used in API
+     *
+     * @param array $entity
+     *
+     * @return array
+     */
+    protected function transformEntity($entity)
+    {
+        $result = [];
+        foreach ($entity as $field => $value) {
+            $this->transformEntityField($value);
+            $result[$field] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Prepares entity field for serialization
      *
      * @param mixed $value
      */
@@ -61,6 +76,17 @@ abstract class AbstractCalendarEventNormalizer
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
         }
+    }
+
+    /**
+     * Applies additional properties to the given calendar events
+     * The list of additional properties depends on a calendar event type
+     *
+     * @param array $items
+     * @param int   $calendarId
+     */
+    protected function applyAdditionalData(&$items, $calendarId)
+    {
     }
 
     /**

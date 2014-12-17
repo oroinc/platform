@@ -201,6 +201,9 @@ Single attribute can be described with next configuration:
     * **class**
         *string*
         Fully qualified class name. Allowed only when type either entity or object.
+    * **multiple**
+        *boolean*
+        Indicates whether several entities are supported. Allowed only when type is entity.
 
 **Notice**
 Attribute configuration does not contain any information about how to render attribute on step forms,

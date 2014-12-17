@@ -2,21 +2,18 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
+use Knp\Menu\ItemInterface;
+use Knp\Menu\Iterator\RecursiveItemIterator;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\Rest\Util\Codes;
-
-use Knp\Menu\Iterator\RecursiveItemIterator;
-use Knp\Menu\ItemInterface;
-
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @RouteResource("shortcuts")
@@ -24,7 +21,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
  */
 class ShortcutsController extends FOSRestController
 {
-    protected $uris = array();
+    protected $uris = [];
 
     /**
      * REST GET list
@@ -65,13 +62,13 @@ class ShortcutsController extends FOSRestController
         $translator = $this->get('translator');
         $itemIterator = new RecursiveItemIterator($items);
         $iterator = new \RecursiveIteratorIterator($itemIterator, \RecursiveIteratorIterator::SELF_FIRST);
-        $result = array();
+        $result = [];
         /** @var $item ItemInterface */
         foreach ($iterator as $item) {
             if ($this->isItemAllowed($item)) {
                 $key = $translator->trans($item->getLabel());
                 if (strpos(strtolower($key), strtolower($query)) !== false) {
-                    $result[$key] = array('url' => $item->getUri());
+                    $result[$key] = ['url' => $item->getUri()];
                     $this->uris[] = $item->getUri();
                 }
             }

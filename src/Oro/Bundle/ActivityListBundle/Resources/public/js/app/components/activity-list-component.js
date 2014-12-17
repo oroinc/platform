@@ -171,20 +171,20 @@ define(function (require) {
         registerWidget: function () {
             var list = this.list;
             mediator.execute('widgets:getByIdAsync', this.options.widgetId, _.bind(function (widget) {
-                widget.getAction('refresh', 'adopted', function (action) {
+                widget.getAction('refresh', 'top', function (action) {
                     action.on('click', _.bind(list.refresh, list));
                 });
 
                 /**
                  * pager actions
                  */
-                widget.getAction('goto_previous', 'bottom', function (action) {
+                widget.getAction('goto_previous', 'top', function (action) {
                     action.on('click', _.bind(list.goto_previous, list));
                 });
-                widget.getAction('goto_page', 'bottom', function (action) {
+                widget.getAction('goto_page', 'top', function (action) {
                     action.on('change', _.bind(list.goto_page, {e: this, list: list}));
                 });
-                widget.getAction('goto_next', 'bottom', function (action) {
+                widget.getAction('goto_next', 'top', function (action) {
                     action.on('click', _.bind(list.goto_next, list));
                 });
 

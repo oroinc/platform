@@ -21,3 +21,9 @@ oro_titles:
     oro_report_view: '%%report.name%% - %%report.group%% - Reports'
     oro_report_create: 'Create Report - Reports'
     oro_report_update: '%%report.name%% - Edit - Reports'
+
+oro_navigation_elements:
+    pinButton:
+        routes:
+            oro_report_create: false
+            oro_report_update: false

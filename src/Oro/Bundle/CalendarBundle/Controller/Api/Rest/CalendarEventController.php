@@ -9,20 +9,23 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Provider\SystemCalendarConfig;
+use Oro\Bundle\CalendarBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
@@ -142,6 +145,69 @@ class CalendarEventController extends RestController implements ClassResourceInt
     }
 
     /**
+     * Get calendar event.
+     *
+     * @param int $id Calendar event id
+     *
+     * @ApiDoc(
+     *      description="Get calendar event",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_calendar_event_view")
+     *
+     * @return Response
+     */
+    public function getAction($id)
+    {
+        /** @var CalendarEvent|null $entity */
+        $entity = $this->getManager()->find($id);
+
+        $result = null;
+        $code = Codes::HTTP_NOT_FOUND;
+        if ($entity) {
+            $result = $this->get('oro_calendar.calendar_event_normalizer.user')
+                ->getCalendarEvent($entity);
+            $code   = Codes::HTTP_OK;
+        }
+
+        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+    }
+
+    /**
+     * Get calendar event supposing it is displayed in the specified calendar.
+     *
+     * @param int $id      The id of a calendar where an event is displayed
+     * @param int $eventId Calendar event id
+     *
+     * @Get(
+     *      "/calendars/{id}/events/{eventId}",
+     *      requirements={"id"="\d+", "eventId"="\d+"}
+     * )
+     * @ApiDoc(
+     *      description="Get calendar event supposing it is displayed in the specified calendar",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_calendar_event_view")
+     *
+     * @return Response
+     */
+    public function getByCalendarAction($id, $eventId)
+    {
+        /** @var CalendarEvent|null $entity */
+        $entity = $this->getManager()->find($eventId);
+
+        $result = null;
+        $code = Codes::HTTP_NOT_FOUND;
+        if ($entity) {
+            $result = $this->get('oro_calendar.calendar_event_normalizer.user')
+                ->getCalendarEvent($entity, (int)$id);
+            $code   = Codes::HTTP_OK;
+        }
+
+        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+    }
+
+    /**
      * Update calendar event.
      *
      * @param int $id Calendar event id
@@ -162,7 +228,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
     /**
      * Create new calendar event.
      *
-     * @Post("calendarevents", name="oro_api_post_calendarevent")
+     * @Post("calendarevents")
      * @ApiDoc(
      *      description="Create new calendar event",
      *      resource=true
@@ -240,6 +306,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
         unset($data['updatedAt']);
         unset($data['editable']);
         unset($data['removable']);
+        unset($data['notifiable']);
 
         return true;
     }

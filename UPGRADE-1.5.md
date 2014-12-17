@@ -1,6 +1,30 @@
 UPGRADE FROM 1.4 to 1.5
 =======================
 
+####General changes
+- FOSRestBundle updated from 0.12.* to 1.5.0-RC2 [FOSRestBundle Upgrading](https://github.com/FriendsOfSymfony/FOSRestBundle/blob/master/UPGRADING.md)
+  fos_rest section in config.yml must be updated prior to new version of bundle.
+
+```yaml
+fos_rest:
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
+    view:
+        failed_validation: HTTP_BAD_REQUEST
+        default_engine: php
+        formats:
+            json: true
+            xml: false
+    format_listener:
+        rules:
+            - { path: '^/api/rest', priorities: [ json ], fallback_format: json, prefer_extension: false }
+            - { path: '^/api/soap', stop: true }
+            - { path: '^/', stop: true }
+    routing_loader:
+        default_format: json
+```
+
 ####OroAddressBundle:
 - `PhoneProvider` class has been added to help getting phone number(s) from object.
 
@@ -22,6 +46,15 @@ UPGRADE FROM 1.4 to 1.5
 - `Tools\ExtendConfigDumper` constant `ENTITY` has been deprecated
 - Naming of proxy classes for extended entities has been changed to fix naming conflicts
 - Adding of extended fields to form has been changed. From now `form.additional` is not available in TWIG template, because extended fields are added to main form and have  `extra_field` flag. The following statement can be used to loop through extended fields in TWIG template: `{% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}`.
+- Extend entity generation changes: all entities that replace their copies via `class_alias` will be generated 
+  as **abstract** classes in order to allow to use them in the middle of **doctrine inheritance hierarchy**. This changes affect only 
+  entities with `type=Extend`(they actually doctrine `mappedSuperclass`es)
+- Added possibility to define **discriminator map** entries on child level using annotation `@Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue("VALUE")`.
+  This is useful when auto-generated strategy fails due to duplication of short class names in the hierarchy.
+
+####OroEntityConfigBundle:
+- Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
+  as well as already existing `routeName` and `routeView` properties
 
 ####OroIntegrationBundle:
 - `Oro\Bundle\IntegrationBundle\Entity\Channel#getEnabled` deprecated in favor of `isEnabled` of the same class
@@ -33,6 +66,7 @@ UPGRADE FROM 1.4 to 1.5
 
 ####OroNavigationBundle
 - Added support of [System Aware Resolver](/src/Oro/Component/Config/Resources/doc/system_aware_resolver.md) in navigation.yml
+- Added possibility to hide **pin** and **add to favorites** buttons on pages that does not support this kind of functionality. 
 
 ####OroSoapBundle
 - Refactored `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController` added possibility to filter input parameters using **filter objects** as well as closures
@@ -53,3 +87,73 @@ UPGRADE FROM 1.4 to 1.5
 ####OroUIBundle:
 - Added [jquery.simplecolorpicker](https://github.com/tkrotoff/jquery-simplecolorpicker) by Tanguy Krotoff.
 - Added [jquery.minicolors](https://github.com/claviska/jquery-miniColors) by Cory LaViska.
+- Added context provider(`oro_ui.provider.widget_context`) that allows to customize application behavior based depends on current context.
+- Added `oro_js_template_content` twig filter to allow include `<script>` blocks inside JS templates. Example of usage:
+
+```twig
+<script type="text/html" id="my_template">
+    {% set data = [
+        form_row(form.name),
+        form_row(form.assignedUsers),
+    ] %}
+    <div class="widget-content">
+        <div class="alert alert-error" style="display: none;"></div>
+        <form id="{{ form.vars.name }}" action="#">
+            <fieldset class="form-horizontal">
+                {{ UI.scrollSubblock(null, data, true, false)|oro_js_template_content|raw }}
+                <div class="widget-actions form-actions" style="display: none;">
+                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                    <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                </div>
+            </fieldset>
+        </form>
+        {{ oro_form_js_validation(form)|oro_js_template_content|raw }}
+    </div>
+</script>
+```
+- Added `oro_ui_content_provider_manager` global variable in order to fetch content provider's content.
+  It contains reference on instance `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
+- `show_pin_button_on_start_page` config node is node used anymore. Please use ability to hide navigation elements in `navigation.yml` 
+
+####OroSearchBundle:
+- Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.
+
+####OroWorkflowBundle:
+- Added `multiple` option for `entity` attribute to allow use many-to-many relations in workflows. Example of usage of Multi-Select type (in this example it is supposed that Opportunity entity has `Multi-Select` field named `interested_in` and `enum_code` of this type is `opportunity_interested_in`):
+
+``` yaml
+workflows:
+    b2b_flow_sales_funnel:
+        attributes:
+            opportunity_interested_in:
+                label: orocrm.sales.opportunity.interested_in.label
+                property_path: sales_funnel.opportunity.interested_in
+                type:  entity
+                options:
+                    class: Extend\Entity\EV_OpportunityInterestedIn
+                    multiple: true
+        transitions:
+            start_from_opportunity:
+                form_options:
+                    attribute_fields:
+                        opportunity_interested_in:
+                            form_type: oro_enum_select
+                            options:
+                                enum_code: opportunity_interested_in
+                                expanded: true
+```
+
+####OroUserBundle:
+ - Added user search handler that return users that was assigned to current organization and limit by search string excluding current user. 
+ Autocomplite alias for this handler is `organization_users`. 
+
+####OroTrackingBundle:
+ - Entities `TrackingWebsite` and `TrackingEvent` were made extendable
+
+####OroBatchBundle:
+ - Added possibility to disable debug logging for integration/import/export processes(were placed in `app/logs/batch/`) 
+ on application level under `oro_batch.log_batch` node. Default value is `disabled`
+ - Added cleanup job for DB tables of entities from `AkeneoBatchBundle`. It performs by cron every day in 1 am, and also 
+  it's possible to run manually using `oro:cron:batch:cleanup` command. By default log records lifetime is `1 month`, but this
+  option is configurable on application level under `oro_batch.cleanup_interval` node. For manual run it's possible to pass
+  interval directly as command argument `[-i|--interval[="..."]]` 

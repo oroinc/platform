@@ -1,0 +1,4 @@
+{% if value %}
+    {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
+    {{ invitations.calendar_event_invitation_status(value) }}
+{% endif %}

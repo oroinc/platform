@@ -30,3 +30,13 @@ oro_menu_config:
 oro_titles:
     orocrm_call_index: Calls
 
+
+oro_navigation_elements:
+    favoriteButton:
+        routes:
+            call_list:  false
+            some_route: false
+    shortcutsPanel:
+        default: true
+        routes:
+            some_route: false

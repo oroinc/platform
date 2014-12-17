@@ -5,7 +5,7 @@ namespace Oro\Bundle\AddressBundle\Controller\Api\Rest;
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
