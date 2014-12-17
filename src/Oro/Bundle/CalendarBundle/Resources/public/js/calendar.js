@@ -309,28 +309,32 @@ define(function (require) {
         },
 
         onFcSelect: function (start, end) {
-            this.showAddEventDialog(start, end);
+            var attrs = {
+                allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
+                start: start.clone(),
+                end: end.clone()
+            }
+            this.applyTzCorrection(-1, attrs);
+            this.showAddEventDialog(attrs);
         },
 
-        showAddEventDialog: function (start, end) {
+        /**
+         * @param attrs object with properties to set on model before dialog creation
+         *              dates must be in utc
+         */
+        showAddEventDialog: function (attrs) {
+            var eventModel;
+
             // need to be able to accept native moments here
             // convert arguments
-            if (!start._fullCalendar) {
-                start = $.fullCalendar.moment(start.clone().utc().format());
+            if (!attrs.start._fullCalendar) {
+                attrs.start = $.fullCalendar.moment(attrs.start.clone().utc().format());
             }
-            if (end && !end._fullCalendar) {
-                end = $.fullCalendar.moment(end.clone().utc().format());
+            if (attrs.end && !attrs.end._fullCalendar) {
+                attrs.end = $.fullCalendar.moment(attrs.end.clone().utc().format());
             }
             if (!this.eventView) {
                 try {
-                    var eventModel,
-                        attrs = {
-                            allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
-                            start: start,
-                            end: end
-                        };
-                    this.applyTzCorrection(-1, attrs);
-
                     attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
                     attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
 
