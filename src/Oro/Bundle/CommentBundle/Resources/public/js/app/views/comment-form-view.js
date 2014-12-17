@@ -20,7 +20,7 @@ define([
             this.options = _.defaults(options || {}, this.options);
         },
         render: function () {
-            this.$el.find('.accordion-body .message .comment').html(this.options.contentHTML);
+            this.$el.html(this.options.contentHTML);
         }
     });
 
