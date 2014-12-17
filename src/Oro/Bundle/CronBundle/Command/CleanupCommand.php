@@ -78,7 +78,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
                     $buf = $this->processBuff($em, $buf);
                 }
 
-                $this->processBuff($em, $buf);
+                $this->processBuff($em, $buf, 0);
 
                 $em->commit();
             } catch (\Exception $e) {
@@ -129,7 +129,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     {
         $sql = "SELECT %s FROM jms_jobs j
                  LEFT JOIN jms_job_dependencies d ON d.source_job_id=j.id
-                 WHERE j.closedAt < ? AND j.state NOT IN (?, ?)
+                 WHERE j.closedAt < ? AND j.state = ?
                  AND d.dest_job_id IS NULL";
         $sql = sprintf($sql, $isCount ? 'COUNT(j.id)' : 'j.id');
 
@@ -138,8 +138,7 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
 
         $stm = $connection->prepare($sql);
         $stm->bindValue(1, $date);
-        $stm->bindValue(2, Job::STATE_RUNNING, \PDO::PARAM_INT);
-        $stm->bindValue(3, Job::STATE_PENDING, \PDO::PARAM_INT);
+        $stm->bindValue(2, Job::STATE_FINISHED, \PDO::PARAM_INT);
 
         return $stm;
     }
