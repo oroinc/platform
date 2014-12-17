@@ -44,7 +44,7 @@ define(function (require) {
         dateRangeFilter: null,
 
         listen: {
-            'change:is_loaded collection': 'onActivityLoad'
+            'toView collection': 'onViewActivity'
         },
 
         initialize: function (options) {
@@ -136,7 +136,7 @@ define(function (require) {
          *
          * @param {ActivityModel} model
          */
-        onActivityLoad: function (model) {
+        onViewActivity: function (model) {
             var activityClass = model.getRelatedActivityClass(),
                 configuration = this.options.activityListOptions.configuration[activityClass];
 
@@ -152,6 +152,10 @@ define(function (require) {
         initComments: function (model) {
             var itemView, commentOptions, commentList;
             itemView = this.listView.getItemView(model);
+            if (itemView.subview('comments')) {
+                // comments block already initialized
+                return;
+            }
             commentOptions = {
                 _sourceElement: itemView.getCommentsBlock(),
                 activityId: model.get('relatedActivityId'),
