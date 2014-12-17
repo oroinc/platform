@@ -5,7 +5,7 @@
     border-top: 1px solid #ddd;
   }
   .title {
-    border-bottom: 1px solid #ddd;
+    display: none;
   }
   .activity-list {
     position: relative;
@@ -13,7 +13,6 @@
       margin: 20px;
     }
     .list-box {
-      margin-top: 10px;
       border: solid 1px #ddd;
       border-radius: 4px;
       .list-item {
@@ -138,13 +137,12 @@
       }
     }
     .filter-box {
-      position: absolute;
+      float: left;
       margin: 0px;
       padding: 0px;
       background: none;
       border: none;
       box-shadow: none;
-      top: -36px;
     }
     .filter-item {
       margin-bottom: 0px;
@@ -152,12 +150,21 @@
     }
   }
   .grid-toolbar {
-    padding: 0;
-    .pagination > ul > li a{
-      width:24px;
-      i {
-        margin: 0 3px;
+    padding: 0 0 5px;
+    margin: 0;
+    .pagination{
+      white-space: nowrap;
+      padding-top: 1px;
+      display: inline-block;
+      > ul > li a{
+        width:24px;
+        i {
+          margin: 0 3px;
+        }
       }
+    }
+    .filter-container {
+      padding-bottom: 5px;
     }
   }
 }
