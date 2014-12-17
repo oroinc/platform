@@ -782,7 +782,7 @@ define(function (require) {
         },
 
         setTimeline: function () {
-            var todayElement, parentDiv, timelineElement, curCalView, percentOfDay, curSeconds, topLoc, dayCol,
+            var todayElement, timeGrid, timelineElement, curCalView, percentOfDay, curSeconds, topLoc, dayCol,
                 calendarElement = this.getCalendarElement(),
                 curTime = new Date();
             curTime = new Date(curTime.getTime() +
@@ -798,16 +798,20 @@ define(function (require) {
                 todayElement.next().addClass('fc-state-highlight');
             }
 
-            parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
-            timelineElement = parentDiv.children('.timeline');
+            timeGrid = calendarElement.find('.fc-time-grid').parent();
+            if (!timeGrid.length) {
+                // we have no timegrid, nothing to do
+                return;
+            }
+            timelineElement = timeGrid.children('.timeline');
             if (timelineElement.length === 0) {
                 // if timeline isn't there, add it
                 timelineElement = $('<hr>').addClass('timeline');
-                parentDiv.prepend(timelineElement);
+                timeGrid.prepend(timelineElement);
             }
 
             curCalView = calendarElement.fullCalendar('getView');
-            if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
+            if (curCalView.intervalStart.isBefore(curTime) && curCalView.intervalEnd.isAfter(curTime)) {
                 timelineElement.show();
             } else {
                 timelineElement.hide();
@@ -815,7 +819,7 @@ define(function (require) {
 
             curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
             percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
-            topLoc = Math.floor(parentDiv.height() * percentOfDay);
+            topLoc = Math.floor(timeGrid.height() * percentOfDay);
             timelineElement.css('top', topLoc + 'px');
 
             if (curCalView.name === 'agendaWeek') {
