@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
-use Oro\Bundle\EntityExtendBundle\Extend\EntityProcessor;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class PlatformUpdateCommand extends ContainerAwareCommand
@@ -43,14 +42,6 @@ class PlatformUpdateCommand extends ContainerAwareCommand
         $force = $input->getOption('force');
 
         if ($force) {
-            /**
-             * Before proceed with update we need to be sure all custom entities/fields are synchronized with schema.
-             */
-            $output->writeln('Process custom entities and fields...');
-            /** @var EntityProcessor $entityProcessor */
-            $entityProcessor = $this->getContainer()->get('oro_entity_extend.extend.entity_processor');
-            $entityProcessor->updateDatabase();
-
             $assetsOptions = array(
                 '--exclude' => array('OroInstallerBundle')
             );
