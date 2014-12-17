@@ -11,7 +11,7 @@ class BatchLogHandlerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->batchLogHandler = new BatchLogHandler('app/logs');
+        $this->batchLogHandler = new BatchLogHandler(sys_get_temp_dir());
         $this->batchLogHandler->setSubDirectory('batch_test');
     }
 
@@ -24,7 +24,6 @@ class BatchLogHandlerTest extends \PHPUnit_Framework_TestCase
 
         unset($this->batchLogHandler);
     }
-
 
     public function testGetIsActive()
     {
@@ -43,6 +42,7 @@ class BatchLogHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->batchLogHandler->setIsActive(true);
         $this->batchLogHandler->write($record);
+        $this->batchLogHandler->close();
         $this->assertEquals($messageText, file_get_contents($this->batchLogHandler->getFilename()));
     }
 }

@@ -131,14 +131,23 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         saveModel: function () {
-            this.showSavingMask();
-            try {
-                this.model.save(this.getEventFormData(), {
-                    wait: true,
-                    error: _.bind(this._handleResponseError, this)
+            var errors;
+            this.model.set(this.getEventFormData());
+            if (this.model.isValid()) {
+                this.showSavingMask();
+                try {
+                    this.model.save(null, {
+                        wait: true,
+                        error: _.bind(this._handleResponseError, this)
+                    });
+                } catch (err) {
+                    this.showError(err);
+                }
+            } else {
+                errors = _.map(this.model.validationError, function (message) {
+                    return __(message);
                 });
-            } catch (err) {
-                this.showError(err);
+                this.showError({errors: errors});
             }
         },
 

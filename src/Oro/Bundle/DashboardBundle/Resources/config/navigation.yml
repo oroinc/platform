@@ -28,3 +28,14 @@ oro_titles:
     oro_dashboard_update: '%%label%% - Edit'
     oro_dashboard_create: oro.ui.create_entity
     oro_dashboard_view: '%%name%%'
+
+oro_navigation_elements:
+    pinButton:
+        routes:
+            oro_default:        false
+            oro_dashboard_view: false
+
+    favoriteButton:
+        routes:
+            oro_default:        false
+            oro_dashboard_view: false

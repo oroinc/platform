@@ -86,6 +86,16 @@ define(['underscore', 'backbone', 'routing'
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
             }
+        },
+
+        validate: function (attrs) {
+            var errors = [];
+
+            if (attrs.start > attrs.end) {
+                errors.push('oro.calendar.error_message.event_model.end_date_earlier_than_start');
+            }
+
+            return errors.length ? errors : null;
         }
     });
 });
