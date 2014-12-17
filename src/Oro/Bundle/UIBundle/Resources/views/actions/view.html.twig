@@ -56,7 +56,7 @@
                                     {% if isMobileVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
                                 </ul>
@@ -82,7 +82,7 @@
                                     {% if isDesktopVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
 

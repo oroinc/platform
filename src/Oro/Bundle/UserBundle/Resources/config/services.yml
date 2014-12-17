@@ -117,7 +117,7 @@ services:
         calls:
             - [ setProperties, [["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]] ]
         tags:
-            - { name: oro_form.autocomplete.search_handler, alias: acl_users, acl_resource: oro_user_user_view }
+            - { name: oro_form.autocomplete.search_handler, alias: acl_users }
         lazy: true
 
     # Autocomplete search handler
