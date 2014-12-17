@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateConfigCommand extends ContainerAwareCommand
@@ -15,7 +16,13 @@ class UpdateConfigCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:entity-extend:update-config')
-            ->setDescription('Prepare entity config');
+            ->setDescription('Prepare entity config')
+            ->addOption(
+                'skip-origin',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Origin names which will be skipped during configuration update'
+            );
     }
 
     /**
@@ -27,10 +34,11 @@ class UpdateConfigCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $skippedOrigins = (array)$input->getOption('skip-origin');
         $output->writeln($this->getDescription());
 
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
 
-        $dumper->updateConfig();
+        $dumper->updateConfig($skippedOrigins);
     }
 }
