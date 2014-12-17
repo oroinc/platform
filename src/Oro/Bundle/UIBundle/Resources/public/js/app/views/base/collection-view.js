@@ -20,7 +20,17 @@ define([
         // so we need to borrow the method from the View prototype:
         getTemplateFunction: View.prototype.getTemplateFunction,
         _ensureElement: View.prototype._ensureElement,
-        _findRegionElem: View.prototype._findRegionElem
+        _findRegionElem: View.prototype._findRegionElem,
+
+        /**
+         * Fetches model related view
+         *
+         * @param {Chaplin.Model} model
+         * @returns {Chaplin.View}
+         */
+        getItemView: function (model) {
+            return this.subview("itemView:" + model.cid);
+        }
     });
 
     return BaseCollectionView;

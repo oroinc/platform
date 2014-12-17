@@ -17,7 +17,8 @@ define(function (require) {
         ActivityCollection = require('../models/activity-list-collection'),
         MultiSelectFilter  = require('oro/filter/multiselect-filter'),
         DatetimeFilter     = require('oro/filter/datetime-filter'),
-        dataFilterWrapper  = require('orofilter/js/datafilter-wrapper');
+        dataFilterWrapper  = require('orofilter/js/datafilter-wrapper'),
+        CommentListComponent = require('orocomment/js/app/components/comment-list-component');
     require('jquery');
 
     ActivityListComponent = BaseComponent.extend({
@@ -42,6 +43,10 @@ define(function (require) {
         /** @type DatetimeFilter */
         dateRangeFilter: null,
 
+        listen: {
+            'change:is_loaded collection': 'onActivityLoad'
+        },
+
         initialize: function (options) {
             this.options = options || {};
             this.processOptions();
@@ -50,11 +55,11 @@ define(function (require) {
                 this._deferredInit();
                 tools.loadModules(this.options.modules, function (modules) {
                     _.extend(this.options.activityListOptions, modules);
-                    this.initView();
+                    this._init();
                     this._resolveDeferredInit();
                 }, this);
             } else {
-                this.initView();
+                this._init();
             }
         },
 
@@ -78,12 +83,12 @@ define(function (require) {
             }
         },
 
-        initView: function () {
+        _init: function () {
             var activityOptions, collection;
             activityOptions = this.options.activityListOptions;
 
             // setup activity list collection
-            collection = new ActivityCollection(this.options.activityListData, {
+            collection = this.collection = new ActivityCollection(this.options.activityListData, {
                 model: activityOptions.itemModel
             });
             collection.route = activityOptions.urls.route;
@@ -98,7 +103,7 @@ define(function (require) {
                 template: _.template($(activityOptions.itemTemplate).html())
             });
 
-            this.list = new ActivityListView(activityOptions);
+            this.listView = new ActivityListView(activityOptions);
 
             this.registerWidget();
         },
@@ -119,9 +124,41 @@ define(function (require) {
          * Triggered when filter state is changed
          */
         onFilterStateChange: function () {
-            this.list.collection.setFilter(this.getFilterState());
-            this.list.collection.setPage(1);
-            this.list._reload();
+            this.collection.setFilter(this.getFilterState());
+            this.collection.setPage(1);
+            this.listView._reload();
+        },
+
+        /**
+         * Handles activity load event
+         *
+         *  - init comments, if activity is configured to have them
+         *
+         * @param {ActivityModel} model
+         */
+        onActivityLoad: function (model) {
+            var activityClass = model.getRelatedActivityClass(),
+                configuration = this.options.activityListOptions.configuration[activityClass];
+
+            if (configuration && configuration.has_comments) {
+                this.initComments(model);
+            }
+        },
+
+        /**
+         *
+         * @param {ActivityModel} model
+         */
+        initComments: function (model) {
+            var itemView, commentOptions, commentList;
+            itemView = this.listView.getItemView(model);
+            commentOptions = {
+                _sourceElement: itemView.getCommentsBlock(),
+                activityId: model.get('relatedActivityId'),
+                activityClassName: model.getRelatedActivityClass()
+            };
+            commentList = new CommentListComponent(commentOptions);
+            itemView.subview('comments', commentList);
         },
 
         /**
@@ -169,23 +206,23 @@ define(function (require) {
         },
 
         registerWidget: function () {
-            var list = this.list;
+            var listView = this.listView;
             mediator.execute('widgets:getByIdAsync', this.options.widgetId, _.bind(function (widget) {
                 widget.getAction('refresh', 'top', function (action) {
-                    action.on('click', _.bind(list.refresh, list));
+                    action.on('click', _.bind(listView.refresh, listView));
                 });
 
                 /**
                  * pager actions
                  */
                 widget.getAction('goto_previous', 'top', function (action) {
-                    action.on('click', _.bind(list.goto_previous, list));
+                    action.on('click', _.bind(listView.goto_previous, listView));
                 });
                 widget.getAction('goto_page', 'top', function (action) {
-                    action.on('change', _.bind(list.goto_page, {e: this, list: list}));
+                    action.on('change', _.bind(listView.goto_page, {e: this, list: listView}));
                 });
                 widget.getAction('goto_next', 'top', function (action) {
-                    action.on('click', _.bind(list.goto_next, list));
+                    action.on('click', _.bind(listView.goto_next, listView));
                 });
 
                 // render filters
