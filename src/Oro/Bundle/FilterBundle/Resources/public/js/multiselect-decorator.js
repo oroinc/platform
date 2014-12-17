@@ -76,10 +76,12 @@ define([
          *  - removes reference on element
          */
         dispose: function () {
-            if (this.contextSearch) {
+            if (this.contextSearch && this.element.data('ech-multiselectfilter')) {
                 this.multiselectfilter("destroy");
             }
-            this.multiselect("destroy");
+            if (this.element.data('ech-multiselect')) {
+                this.multiselect("destroy");
+            }
             this.element.hide();
             delete this.element;
         },

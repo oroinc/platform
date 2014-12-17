@@ -13,55 +13,55 @@ use Oro\Bundle\EntityPaginationBundle\Navigation\NavigationResult;
 class EntityPaginationController extends Controller
 {
     /**
-     * @Route("/first/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_first")
+     * @Route("/first/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_first")
      *
-     * @param $entityName
-     * @param $scope
-     * @param $routeName
+     * @param $_entityName
+     * @param $_scope
+     * @param $_routeName
      * @return JsonResponse
      */
-    public function firstAction($entityName, $scope, $routeName)
+    public function firstAction($_entityName, $_scope, $_routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::FIRST);
+        return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::FIRST);
     }
 
     /**
-     * @Route("/previous/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_previous")
+     * @Route("/previous/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_previous")
      *
-     * @param $entityName
-     * @param $scope
-     * @param $routeName
+     * @param $_entityName
+     * @param $_scope
+     * @param $_routeName
      * @return JsonResponse
      */
-    public function previousAction($entityName, $scope, $routeName)
+    public function previousAction($_entityName, $_scope, $_routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::PREVIOUS);
+        return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::PREVIOUS);
     }
 
     /**
-     * @Route("/next/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_next")
+     * @Route("/next/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_next")
      *
-     * @param $entityName
-     * @param $scope
-     * @param $routeName
+     * @param $_entityName
+     * @param $_scope
+     * @param $_routeName
      * @return JsonResponse
      */
-    public function nextAction($entityName, $scope, $routeName)
+    public function nextAction($_entityName, $_scope, $_routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::NEXT);
+        return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::NEXT);
     }
 
     /**
-     * @Route("/last/{entityName}/{scope}/{routeName}", name="oro_entity_pagination_last")
+     * @Route("/last/{_entityName}/{_scope}/{_routeName}", name="oro_entity_pagination_last")
      *
-     * @param $entityName
-     * @param $scope
-     * @param $routeName
+     * @param $_entityName
+     * @param $_scope
+     * @param $_routeName
      * @return JsonResponse
      */
-    public function lastAction($entityName, $scope, $routeName)
+    public function lastAction($_entityName, $_scope, $_routeName)
     {
-        return $this->getLink($entityName, $scope, $routeName, EntityPaginationNavigation::LAST);
+        return $this->getLink($_entityName, $_scope, $_routeName, EntityPaginationNavigation::LAST);
     }
 
     /**
@@ -77,7 +77,6 @@ class EntityPaginationController extends Controller
         $navigationService = $this->get('oro_entity_pagination.navigation');
 
         $params = $this->getRequest()->query->all();
-        $params['entityName'] = $entityName;
 
         $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
         $identifier = $doctrineHelper->getSingleEntityIdentifierFieldName($entityName);

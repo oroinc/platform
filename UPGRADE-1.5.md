@@ -1,6 +1,30 @@
 UPGRADE FROM 1.4 to 1.5
 =======================
 
+####General changes
+- FOSRestBundle updated from 0.12.* to 1.5.0-RC2 [FOSRestBundle Upgrading](https://github.com/FriendsOfSymfony/FOSRestBundle/blob/master/UPGRADING.md)
+  fos_rest section in config.yml must be updated prior to new version of bundle.
+
+```yaml
+fos_rest:
+    body_listener:
+        decoders:
+            json: fos_rest.decoder.json
+    view:
+        failed_validation: HTTP_BAD_REQUEST
+        default_engine: php
+        formats:
+            json: true
+            xml: false
+    format_listener:
+        rules:
+            - { path: '^/api/rest', priorities: [ json ], fallback_format: json, prefer_extension: false }
+            - { path: '^/api/soap', stop: true }
+            - { path: '^/', stop: true }
+    routing_loader:
+        default_format: json
+```
+
 ####OroAddressBundle:
 - `PhoneProvider` class has been added to help getting phone number(s) from object.
 
@@ -42,6 +66,7 @@ UPGRADE FROM 1.4 to 1.5
 
 ####OroNavigationBundle
 - Added support of [System Aware Resolver](/src/Oro/Component/Config/Resources/doc/system_aware_resolver.md) in navigation.yml
+- Added possibility to hide **pin** and **add to favorites** buttons on pages that does not support this kind of functionality. 
 
 ####OroSoapBundle
 - Refactored `Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController` added possibility to filter input parameters using **filter objects** as well as closures
@@ -86,6 +111,9 @@ UPGRADE FROM 1.4 to 1.5
     </div>
 </script>
 ```
+- Added `oro_ui_content_provider_manager` global variable in order to fetch content provider's content.
+  It contains reference on instance `\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager`.
+- `show_pin_button_on_start_page` config node is node used anymore. Please use ability to hide navigation elements in `navigation.yml` 
 
 ####OroSearchBundle:
 - Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.

@@ -1,8 +1,9 @@
 parameters:
-    oro_navigation.content_provider.menu.class:             Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
-    oro_navigation.content_provider.title.class:            Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider
-    oro_navigation.content_provider.title_short.class:      Oro\Bundle\NavigationBundle\ContentProvider\TitleShortContentProvider
-    oro_navigation.content_provider.title_serialized.class: Oro\Bundle\NavigationBundle\ContentProvider\TitleSerializedContentProvider
+    oro_navigation.content_provider.menu.class:                 Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
+    oro_navigation.content_provider.title.class:                Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider
+    oro_navigation.content_provider.title_short.class:          Oro\Bundle\NavigationBundle\ContentProvider\TitleShortContentProvider
+    oro_navigation.content_provider.title_serialized.class:     Oro\Bundle\NavigationBundle\ContentProvider\TitleSerializedContentProvider
+    oro_navigation.content_provider.navigation_elements.class:  Oro\Bundle\NavigationBundle\ContentProvider\NavigationElementsContentProvider
 
 services:
     oro_navigation.content_provider.menu.history_menu:
@@ -50,5 +51,15 @@ services:
         class: %oro_navigation.content_provider.title_serialized.class%
         arguments:
             - @oro_navigation.title_service
+        tags:
+            - { name: oro_ui.content_provider }
+
+    oro_navigation.content_provider.navigation_elements:
+        class: %oro_navigation.content_provider.navigation_elements.class%
+        arguments:
+            - []
+        synchronized: true
+        calls:
+            - [setRequest, ["@?request="]]
         tags:
             - { name: oro_ui.content_provider }

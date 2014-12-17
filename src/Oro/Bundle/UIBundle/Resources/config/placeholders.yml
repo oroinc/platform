@@ -29,9 +29,10 @@ placeholders:
         items:
             navbar:
                 order: 150
-    view_navButtons_before:
+    view_navButtons_after:
         items:
-            view_buttons: ~
+            view_buttons:
+                order: 200
 
 items:
     logo:

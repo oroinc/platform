@@ -101,7 +101,8 @@ require([
           }
 
           function updateSearchBar() {
-              searchBarFrame.css('margin-left', searchBarContainer.find('div.btn-group.btn-block').outerWidth());
+              searchBarFrame.css('margin-left', searchBarButton.outerWidth());
+              searchBarFrame.css('margin-right', searchBarFrame.find('.btn-search').outerWidth());
           }
 
           searchBarInput.keydown(function(event) {
@@ -201,6 +202,7 @@ require([
 
           searchBarInput.focusin(function() {
               searchBarContainer.addClass('search-focus');
+              updateSearchBar();
           });
       });
 });

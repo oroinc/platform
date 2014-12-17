@@ -56,6 +56,7 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
             ->setRoles(array('Label_' . $role))
+            ->setBusinessUnit()
             ->setOrganization('OroCRM')
             ->uncheckInviteUser()
             ->save()
@@ -89,7 +90,6 @@ class TrackingWebsiteAclTest extends Selenium2TestCase
 
         return $identifier;
     }
-
 
     /**
      * @depends testCreateUser

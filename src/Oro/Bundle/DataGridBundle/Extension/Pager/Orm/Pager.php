@@ -58,6 +58,7 @@ class Pager extends AbstractPager implements PagerInterface
     public function setQueryBuilder(QueryBuilder $qb)
     {
         $this->qb = $qb;
+        $this->isTotalCalculated = false;
 
         return $this;
     }
