@@ -9,13 +9,15 @@ use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @RouteResource("commentlist")
@@ -28,7 +30,6 @@ class CommentController extends RestController
      *
      * @param string  $entityClass Entity class name
      * @param integer $entityId    Entity id
-     * @param integer $page        Page number
      *
      * @QueryParam(
      *      name="page",
@@ -50,9 +51,82 @@ class CommentController extends RestController
      * )
      * @return JsonResponse
      */
-    public function cgetAction($entityClass, $entityId, $page)
+    public function cgetAction($entityClass, $entityId)
     {
-        return new JsonResponse([]);
+        $result = $this->getManager()->getCommentList($entityClass, $entityId);
+
+        return new JsonResponse($result);
+    }
+
+    /**
+     * Get note
+     *
+     * @param string $id Comment id
+     *
+     * @ApiDoc(
+     *      description="Get comment item",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_comment_view")
+     * @return Response
+     */
+    public function getAction($id)
+    {
+        return $this->handleGetRequest($id);
+    }
+
+    /**
+     * Create new comment
+     *
+     * @ApiDoc(
+     *      description="Create new comment",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_comment_create")
+     */
+    public function postAction()
+    {
+        return $this->handleCreateRequest();
+    }
+
+    /**
+     * Update comment
+     *
+     * @param int $id Comment item id
+     *
+     * @ApiDoc(
+     *      description="Update comment",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_comment_update")
+     *
+     * @return Response
+     */
+    public function putAction($id)
+    {
+        return $this->handleUpdateRequest($id);
+    }
+
+    /**
+     * Delete Comment
+     *
+     * @param int $id comment id
+     *
+     * @ApiDoc(
+     *      description="Delete Comment",
+     *      resource=true
+     * )
+     * @Acl(
+     *      id="oro_comment_delete",
+     *      type="entity",
+     *      permission="DELETE",
+     *      class="OroCommentBundle:Comment"
+     * )
+     * @return Response
+     */
+    public function deleteAction($id)
+    {
+        return $this->handleDeleteRequest($id);
     }
 
     /**
@@ -60,7 +134,7 @@ class CommentController extends RestController
      */
     public function getForm()
     {
-        throw new \BadMethodCallException('FormHandler is not available.');
+        return $this->get('oro_comment.form.comment.api');
     }
 
     /**
@@ -70,7 +144,7 @@ class CommentController extends RestController
      */
     public function getManager()
     {
-        // TODO: Implement getManager() method.
+        return $this->get('oro_comment.comment.manager');
     }
 
     /**
@@ -78,6 +152,6 @@ class CommentController extends RestController
      */
     public function getFormHandler()
     {
-        throw new \BadMethodCallException('FormHandler is not available.');
+        return $this->get('oro_comment.api.form.handler');
     }
 }
