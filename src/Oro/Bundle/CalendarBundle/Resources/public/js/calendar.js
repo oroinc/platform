@@ -570,10 +570,13 @@ define(function (require) {
          * NOTE: changes passed model
          *
          * @param multiplier {int} allows to add or subtract timezone, pass 1 or -1 here please
-         * @param obj {object} object with start and end properties to which timezone will be applied
+         * @param obj {object|moment} a moment or an object with start and end properties to which timezone will be applied
          * @returns {object} object passed to function
          */
         applyTzCorrection: function (multiplier, obj) {
+            if (moment.isMoment(obj)) {
+                return obj.zone(0).add(this.options.timezone * multiplier, 'm');
+            }
             if (obj.end !== null) {
                 if (!moment.isMoment(obj.start)) {
                     obj.start = $.fullCalendar.moment(obj.start);
@@ -667,7 +670,7 @@ define(function (require) {
                 'date', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'allDaySlot', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
-                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
+                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'scrollTime', 'slotEventOverlap',
                 'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
                 'aspectRatio', 'defaultAllDayEventDuration', 'defaultTimedEventDuration',
                 'fixedWeekCount'
@@ -683,6 +686,10 @@ define(function (require) {
             if (!options.aspectRatio) {
                 options.contentHeight = "auto";
                 options.height = "auto";
+            }
+
+            if (this.options.scrollToCurrentTime) {
+                options.scrollTime = this.applyTzCorrection(1, moment.utc().startOf('hour')).format('HH:mm:ss');
             }
 
             var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
