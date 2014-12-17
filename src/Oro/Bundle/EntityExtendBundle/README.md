@@ -104,7 +104,7 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('orocrm_sales_lead');
-        $extendExtension->addManyToOneRelation(
+        $this->extendExtension->addManyToOneRelation(
             $schema,
             $table,
             'users',
@@ -151,7 +151,7 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('orocrm_sales_lead');
-        $extendExtension->addEnumField(
+        $this->extendExtension->addEnumField(
             $schema,
             $table,
             'source', // field name
@@ -366,7 +366,7 @@ There is possibility for customize field rendering using this event.
 
 As example you can create Event Listener. Example:
 
-	oro_entity_extend.listener.extend_field_value_render:
+    oro_entity_extend.listener.extend_field_value_render:
         class: %oro_entity_extend.listener.extend_field_value_render.class%
         arguments:
             - @oro_entity_config.config_manager
@@ -378,7 +378,7 @@ As example you can create Event Listener. Example:
 
 Each event listener try to made decision how we need to show field value and if it know how value need to be shown, he use `$event->setFieldViewValue($viewData);` to change field view value. Example:
 
-	$underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
+    $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
         if ($value && $underlyingFieldType == 'manyToOne') {
             $viewData = $this->getValueForManyToOne(
                 $value,

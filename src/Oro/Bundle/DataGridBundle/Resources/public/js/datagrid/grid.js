@@ -470,8 +470,9 @@ define(function (require) {
                 datagrid: this,
                 model: row.model
             });
-            this.subviews.push(action);
-
+            if (typeof action.dispose === 'function') {
+                this.subviews.push(action);
+            }
             config = row.model.get('action_configuration');
             if (!config || config[action.name] !== false) {
                 action.run();

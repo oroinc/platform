@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MigrationBundle\Migration;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ColumnDiff;
@@ -77,29 +78,65 @@ class MigrationExecutor
     /**
      * Executes UP method for the given migrations
      *
-     * @param Migration[]     $migrations
-     * @param bool            $dryRun
-     * @throws InvalidNameException if invalid table or column name is detected
+     * @param MigrationState[] $migrations
+     * @param bool             $dryRun
+     *
+     * @throws \RuntimeException if at lease one migration failed
      */
     public function executeUp(array $migrations, $dryRun = false)
     {
-        $platform   = $this->queryExecutor->getConnection()->getDatabasePlatform();
-        $sm         = $this->queryExecutor->getConnection()->getSchemaManager();
-        $fromSchema = $this->createSchemaObject(
+        $platform    = $this->queryExecutor->getConnection()->getDatabasePlatform();
+        $sm          = $this->queryExecutor->getConnection()->getSchemaManager();
+        $schema      = $this->createSchemaObject(
             $sm->listTables(),
             $platform->supportsSequences() ? $sm->listSequences() : [],
             $sm->createSchemaConfig()
         );
-        $queryBag   = new QueryBag();
-        foreach ($migrations as $migration) {
-            $this->logger->notice(sprintf('> %s', get_class($migration)));
-            $toSchema = clone $fromSchema;
+        $failedMigrations = false;
+        foreach ($migrations as $item) {
+            $migration = $item->getMigration();
+            if (!empty($failedMigrations) && !$migration instanceof FailIndependentMigration) {
+                $this->logger->notice(sprintf('> %s - skipped', get_class($migration)));
+                continue;
+            }
 
-            $this->setExtensions($migration);
+            if ($this->executeUpMigration($schema, $platform, $migration, $dryRun)) {
+                $item->setSuccessful();
+            } else {
+                $item->setFailed();
+                $failedMigrations[] = get_class($migration);
+            }
+        }
+        if (!empty($failedMigrations)) {
+            throw new \RuntimeException(sprintf('Failed migrations: %s.', implode(', ', $failedMigrations)));
+        }
+    }
+
+    /**
+     * @param Schema           $schema
+     * @param AbstractPlatform $platform
+     * @param Migration        $migration
+     * @param bool             $dryRun
+     *
+     * @return bool
+     */
+    public function executeUpMigration(
+        Schema &$schema,
+        AbstractPlatform $platform,
+        Migration $migration,
+        $dryRun = false
+    ) {
+        $result = true;
+
+        $this->logger->notice(sprintf('> %s', get_class($migration)));
+        $toSchema = clone $schema;
+        $this->setExtensions($migration);
+        try {
+            $queryBag = new QueryBag();
             $migration->up($toSchema, $queryBag);
 
             $comparator = new Comparator();
-            $schemaDiff = $comparator->compare($fromSchema, $toSchema);
+            $schemaDiff = $comparator->compare($schema, $toSchema);
 
             $this->checkTables($schemaDiff, $migration);
             $this->checkIndexes($schemaDiff, $migration);
@@ -110,13 +147,17 @@ class MigrationExecutor
                 $queryBag->getPostQueries()
             );
 
-            $fromSchema = $toSchema;
-            $queryBag->clear();
+            $schema = $toSchema;
 
             foreach ($queries as $query) {
                 $this->queryExecutor->execute($query, $dryRun);
             }
+        } catch (\Exception $ex) {
+            $result = false;
+            $this->logger->error(sprintf('  ERROR: %s', $ex->getMessage()));
         }
+
+        return $result;
     }
 
     /**
@@ -125,6 +166,7 @@ class MigrationExecutor
      * @param Table[]           $tables
      * @param Sequence[]        $sequences
      * @param SchemaConfig|null $schemaConfig
+     *
      * @return Schema
      */
     protected function createSchemaObject(array $tables = [], array $sequences = [], $schemaConfig = null)
@@ -149,6 +191,7 @@ class MigrationExecutor
      *
      * @param SchemaDiff $schemaDiff
      * @param Migration  $migration
+     *
      * @throws InvalidNameException if invalid table or column name is detected
      */
     protected function checkTables(SchemaDiff $schemaDiff, Migration $migration)
@@ -173,6 +216,7 @@ class MigrationExecutor
      * @param string    $tableName
      * @param Column[]  $columns
      * @param Migration $migration
+     *
      * @throws InvalidNameException if invalid column name is detected
      */
     protected function checkColumnNames($tableName, $columns, Migration $migration)
@@ -187,6 +231,7 @@ class MigrationExecutor
      *
      * @param string    $tableName
      * @param Migration $migration
+     *
      * @throws InvalidNameException if table name is invalid
      */
     protected function checkTableName($tableName, Migration $migration)
@@ -199,6 +244,7 @@ class MigrationExecutor
      * @param string    $tableName
      * @param string    $columnName
      * @param Migration $migration
+     *
      * @throws InvalidNameException if column name is invalid
      */
     protected function checkColumnName($tableName, $columnName, Migration $migration)
@@ -232,6 +278,7 @@ class MigrationExecutor
      * @param Table     $table
      * @param Index     $index
      * @param Migration $migration
+     *
      * @throws InvalidNameException
      */
     protected function checkIndex(Table $table, Index $index, Migration $migration)
@@ -255,6 +302,7 @@ class MigrationExecutor
 
     /**
      * @param TableDiff $diff
+     *
      * @return Table
      */
     protected function getTableFromDiff(TableDiff $diff)

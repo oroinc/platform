@@ -1,6 +1,6 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% import 'OroCalendarBundle::macros.html.twig' as calendarMacros %}
+{% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
 {% import 'OroEntityConfigBundle::macros.html.twig' as entityConfig %}
 
 {% oro_title_set({params : {"%entity.title%": entity.title|default('N/A') }}) %}
@@ -39,11 +39,11 @@
 {% block breadcrumbs %}
     {{ parent() }}
     <div class="pull-left">
-        {% set invitationClass = calendarMacros.get_invitatition_badge_class(entity.invitationStatus) %}
+        {% set invitationClass = invitations.get_invitatition_badge_class(entity.invitationStatus) %}
         {% if (entity.invitationStatus and invitationClass) %}
             <div class="invitation-status badge badge-{{ invitationClass }} status-{{ invitationClass }}">
                 <i class="icon-status-{{ invitationClass }} icon-circle"></i>
-                {{ calendarMacros.calendar_event_invitation_status(entity.invitationStatus) }}
+                {{ invitations.calendar_event_invitation_status(entity.invitationStatus) }}
             </div>
         {% endif %}
     </div>
@@ -64,7 +64,7 @@
                     {% set invitationEvent = entity.parent %}
                 {% endif %}
                 {% if invitationEvent is defined %}
-                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.invitation.label'|trans, calendarMacros.calendar_event_invitation(invitationEvent)) }}
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.invitation.label'|trans, invitations.calendar_event_invitation(invitationEvent)) }}
                 {% endif %}
             </div>
             <div class="responsive-block">
