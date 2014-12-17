@@ -1,4 +1,5 @@
 // moved out from oro.less
+@import "../mixins.less";
 .grid-toolbar {
   /* FE */
   position: relative;
@@ -165,18 +166,7 @@
   .action-cell {
     vertical-align: top;
     width: 50px;
-    .dropdown-menu.pull-right {
-      padding: 0;
-      right: 33px;
-      left: auto;
-      top: -10px;
-      .nav.launchers-list {
-        padding: 0;
-        > li:first-child > a{
-          margin-left: 2px;
-        }
-      }
-    }
+    .horizontal-icon-menu;
   }
   .action-column {
     width: 50px;
