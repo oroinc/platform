@@ -4,7 +4,6 @@ define(function (require) {
     'use strict';
     var CalendarComponent = require('orocalendar/js/app/components/calendar-component'),
         widgetManager = require('oroui/js/widget-manager'),
-        localeSettings  = require('orolocale/js/locale-settings'),
         moment = require('moment');
 
     var DashboardCalendarComponent = CalendarComponent.extend({
