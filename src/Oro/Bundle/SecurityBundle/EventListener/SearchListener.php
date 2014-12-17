@@ -35,7 +35,7 @@ class SearchListener
     }
 
     /**
-     * Add organization field mapping
+     * Add organization field to the search mapping
      *
      * @param PrepareEntityMapEvent $event
      */
@@ -73,7 +73,7 @@ class SearchListener
     }
 
     /**
-     * Add check organization to search query
+     * Add Organization limitation for search data
      *
      * @param BeforeSearchEvent $event
      */
