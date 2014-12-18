@@ -314,23 +314,29 @@ class ConfigManager
      * Gets a list of ids for all configurable entities (if $className is not specified)
      * or all configurable fields of the given $className.
      *
-     * @param string      $scope
+     * @param string $scope
      * @param string|null $className
-     * @param bool        $withHidden Set true if you need ids of all configurable entities,
+     * @param bool $withHidden Set true if you need ids of all configurable entities,
      *                                including entities marked as mode="hidden"
+     * @param bool $regenerateCaches Regenerate local caches before getting results
      * @return array
      */
-    public function getIds($scope, $className = null, $withHidden = false)
+    public function getIds($scope, $className = null, $withHidden = false, $regenerateCaches = false)
     {
         if (!$this->modelManager->checkDatabase()) {
             return [];
         }
 
+        if ($regenerateCaches) {
+            $this->modelManager->clearCache();
+        }
+        $models = $this->modelManager->getModels($className, $withHidden);
+
         return array_map(
             function ($model) use ($scope) {
                 return $this->getConfigIdByModel($model, $scope);
             },
-            $this->modelManager->getModels($className, $withHidden)
+            $models
         );
     }
 
