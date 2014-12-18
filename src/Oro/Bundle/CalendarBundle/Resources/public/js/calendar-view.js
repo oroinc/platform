@@ -25,7 +25,7 @@ define(function (require) {
     var $ = Backbone.$;
 
     /**
-     * @export  orocalendar/js/calendar
+     * @export  orocalendar/js/calendar-view
      * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
@@ -148,6 +148,10 @@ define(function (require) {
          * @inheritDoc
          */
         dispose: function () {
+            if (this.layout === 'fullscreen') {
+                // fullscreen layout has side effects, need to clean up
+                this.setLayout('default');
+            }
             clearInterval(this.timelineUpdateIntervalId);
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
