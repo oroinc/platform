@@ -67,7 +67,7 @@ define(['underscore', 'backbone', 'routing'
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus', 'invitedUsers']
+                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus']
                 ),
                 attrs || {}
             ));
@@ -96,6 +96,15 @@ define(['underscore', 'backbone', 'routing'
             }
 
             return errors.length ? errors : null;
+        },
+
+        getInvitationStatus: function () {
+            var invitationStatus = this.get('invitationStatus'),
+                invitedUsers = this.get('invitedUsers');
+            if (!invitationStatus && invitedUsers && invitedUsers.length) {
+                invitationStatus = 'accepted';
+            }
+            return invitationStatus;
         }
     });
 });
