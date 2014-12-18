@@ -12,6 +12,7 @@ class DeprecatedSegmentController extends Controller
      *
      * @param $entityName
      * @return Response
+     * @deprecated
      */
     public function getItemsAction($entityName)
     {
