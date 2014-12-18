@@ -9,8 +9,9 @@ define(function (require) {
     CommentModel = BaseModel.extend({
         route: 'oro_api_comment_get_item',
         idAttribute: 'id',
+        formName: null,
 
-        defaults: {
+        /*defaults: {
             owner: '',
             owner_id: '',
 
@@ -29,6 +30,11 @@ define(function (require) {
 
             editable: true,
             removable: true
+        },*/
+
+        initialize: function (attrs, options) {
+            this._defineFormName(options);
+            CommentModel.__super__.initialize.apply(this, arguments);
         },
 
         url: function () {
@@ -43,6 +49,40 @@ define(function (require) {
                 url = CommentModel.__super__.url.call(this);
             }
             return url;
+        },
+
+        toJSON: function (options) {
+            var serverAttrs = {},
+                formName = this._defineFormName(options);
+            serverAttrs[formName] = CommentModel.__super__.toJSON.call(this, options);
+            return serverAttrs;
+        },
+
+        parse: function(resp, options) {
+            var formName = this._defineFormName(options);
+            if (typeof resp === 'object' && resp.hasOwnProperty(formName)) {
+                resp = resp[formName];
+            }
+            return resp;
+        },
+
+        set: function(key, val, options) {
+            var formName;
+            if (typeof key === 'object') {
+                options = val;
+                formName = this._defineFormName(options);
+                if (key.hasOwnProperty(formName)) {
+                    arguments[0] = key[formName];
+                }
+            }
+            return CommentModel.__super__.set.apply(this, arguments);
+        },
+
+        _defineFormName: function (options) {
+            if (!this.formName) {
+                this.formName = options.formName || options.collection.formName;
+            }
+            return this.formName;
         }
     });
 

@@ -31,6 +31,7 @@ define(function (require) {
                 itemView: ActivityView,
                 itemModel: ActivityModel
             },
+            commentOptions: {},
             activityListData: '[]',
             activityListCount: 0,
             widgetId: '',
@@ -68,6 +69,7 @@ define(function (require) {
             defaults = $.extend(true, {}, this.defaults);
             _.defaults(this.options, defaults);
             _.defaults(this.options.activityListOptions, defaults.activityListOptions);
+            _.defaults(this.options.commentOptions, defaults.commentOptions);
 
             var activityListData = JSON.parse(this.options.activityListData);
             this.options.activityListData  = activityListData.data;
@@ -156,12 +158,15 @@ define(function (require) {
                 // comments block already initialized
                 return;
             }
-            commentOptions = {
+
+            commentOptions = $.extend(true, {}, this.options.commentOptions);
+            _.extend(commentOptions, {
                 _sourceElement: itemView.getCommentsBlock(),
                 relatedEntityId: model.get('relatedActivityId'),
                 relatedEntityClassName: model.getRelatedActivityClass()
-            };
+            });
             commentList = new CommentComponent(commentOptions);
+
             itemView.subview('comments', commentList);
         },
 

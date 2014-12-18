@@ -45,15 +45,17 @@ define(function (require) {
             var collectionOptions;
 
             this.options = options || {};
-            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName']);
+            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName', 'formName']);
 
             this.collection = new CommentCollection([], collectionOptions);
 
             this.view = new CommentListView({
                 el: options._sourceElement,
-                collection: this.collection
+                collection: this.collection,
+                template: options.listTemplate
             });
 
+            this.collection.fetch();
             //var model = this.collection.add({message: 'test'});
             //debugger;
 //debugger;
