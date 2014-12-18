@@ -4,6 +4,7 @@ parameters:
     oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
     oro_comment.form.type.comment.class:              Oro\Bundle\CommentBundle\Form\Type\CommentType
     oro_comment.form.handler.comment.class:           Oro\Bundle\CommentBundle\Form\Handler\CommentHandler
+    oro_comment.placeholder.filter.class:             Oro\Bundle\CommentBundle\Placeholder\PlaceholderFilter
 
 services:
     oro_comment.migration.extension.comment:
@@ -42,3 +43,8 @@ services:
         arguments:
             - 'oro_comment_form'
             - 'oro_comment'
+
+    oro_comment.placeholder.filter:
+        class: %oro_comment.placeholder.filter.class%
+        arguments:
+            - @oro_entity_config.config_manager
