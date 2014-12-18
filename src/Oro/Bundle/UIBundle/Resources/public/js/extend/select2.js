@@ -117,7 +117,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             }
 
             var additionalRequestParams = options.element.data('select2_query_additional_params');
-            if (additionalRequestParams) {
+            if (additionalRequestParams && options.ajax !== undefined) {
                 options.ajax.url += (options.ajax.url.indexOf('?') == -1 ? '?' : '&') + $.param(additionalRequestParams);
             }
 
