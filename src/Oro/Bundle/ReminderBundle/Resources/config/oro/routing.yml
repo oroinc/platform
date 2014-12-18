@@ -8,6 +8,7 @@ oro_reminder_bundle_api:
     defaults:
         version:  latest
 
+# deprecated API route
 oro_api_post_reminder_shown_deprecated:
     path:            /api/rest/{version}/reminder/shown.{_format}
     methods:         [POST]
