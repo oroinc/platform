@@ -33,3 +33,25 @@ oro_user_api_group:
     defaults:
         version:  latest
 
+# deprecated API routes
+oro_api_post_role_deprecated:
+    path:            /api/rest/{version}/role.{_format}
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\RoleController::postAction
+        _format:     json
+        version:     latest
+    requirements:
+        _format:     json|html
+        version:     latest|v1
+
+oro_api_post_user_deprecated:
+    path:            /api/rest/{version}/user.{_format}
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\UserController::postAction
+        _format:     json
+        version:     latest
+    requirements:
+        _format:     json|html
+        version:     latest|v1
