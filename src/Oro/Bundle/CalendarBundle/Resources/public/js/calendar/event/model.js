@@ -51,7 +51,7 @@ define(['underscore', 'backbone', 'routing'
         },
 
         save: function (key, val, options) {
-            var attrs;
+            var attrs, modelData;
 
             // Handle both `"key", value` and `{key: value}` -style arguments.
             if (key == null || typeof key === 'object') {
@@ -62,15 +62,18 @@ define(['underscore', 'backbone', 'routing'
                 attrs[key] = val;
             }
 
-            options.contentType = 'application/json';
-            options.data = JSON.stringify(_.extend(
+            modelData = _.extend(
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus', 'invitedUsers']
+                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus']
                 ),
                 attrs || {}
-            ));
+            );
+            modelData.invitedUsers = modelData.invitedUsers.join(',');
+
+            options.contentType = 'application/json';
+            options.data = JSON.stringify(modelData);
 
             Backbone.Model.prototype.save.call(this, attrs, options);
         },
