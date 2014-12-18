@@ -128,6 +128,7 @@ class ConfigFieldGridController extends Controller
         $fieldOptions = [
             'extend' => [
                 'is_extend' => true,
+                'origin'    => ExtendScope::ORIGIN_CUSTOM,
                 'owner'     => ExtendScope::OWNER_CUSTOM,
                 'state'     => ExtendScope::STATE_NEW
             ]

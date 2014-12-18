@@ -92,6 +92,11 @@ oro_entity_config:
                         auditable:          false
                         default_value:      true
 
+                origin:
+                    options:
+                        auditable:          false
+                        default_value:      'Code'
+
                 relation:
                     options:
                         auditable:          false
@@ -265,6 +270,11 @@ oro_entity_config:
                     options:
                         default_value:      false
                         auditable:          false
+
+                origin:
+                    options:
+                        auditable:          false
+                        default_value:      'Code'
 
                 #
                 # Relations form type fields

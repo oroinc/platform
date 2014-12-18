@@ -88,8 +88,10 @@ class CalendarEventController extends Controller
         $entity = new CalendarEvent();
 
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $endTime   = new \DateTime('now', new \DateTimeZone('UTC'));
+        $endTime->add(new \DateInterval('PT1H'));
         $entity->setStart($startTime);
-        $entity->setEnd($startTime->add(new \DateInterval('PT1H')));
+        $entity->setEnd($endTime);
 
         $formAction = $this->get('oro_entity.routing_helper')
             ->generateUrlByRequest('oro_calendar_event_create', $this->getRequest());

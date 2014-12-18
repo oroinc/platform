@@ -7,3 +7,15 @@ oro_reminder_bundle_api:
         _format:  json
     defaults:
         version:  latest
+
+# deprecated API route
+oro_api_post_reminder_shown_deprecated:
+    path:            /api/rest/{version}/reminder/shown.{_format}
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\ReminderBundle\Controller\Api\Rest\ReminderController::postShownAction
+        _format:     json
+        version:     latest
+    requirements:
+        _format:     json|html
+        version:     latest|v1
