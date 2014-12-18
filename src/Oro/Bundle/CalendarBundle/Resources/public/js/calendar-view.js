@@ -6,6 +6,7 @@ define(function (require) {
 
     var _               = require('underscore'),
         Backbone        = require('backbone'),
+        moment          = require('moment'),
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
@@ -25,7 +26,7 @@ define(function (require) {
     var $ = Backbone.$;
 
     /**
-     * @export  orocalendar/js/calendar
+     * @export  orocalendar/js/calendar-view
      * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
@@ -148,6 +149,10 @@ define(function (require) {
          * @inheritDoc
          */
         dispose: function () {
+            if (this.layout === 'fullscreen') {
+                // fullscreen layout has side effects, need to clean up
+                this.setLayout('default');
+            }
             clearInterval(this.timelineUpdateIntervalId);
             if (this.getCalendarElement().data('fullCalendar')) {
                 this.getCalendarElement().fullCalendar('destroy');
@@ -308,28 +313,32 @@ define(function (require) {
         },
 
         onFcSelect: function (start, end) {
-            this.showAddEventDialog(start, end);
+            var attrs = {
+                allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
+                start: start.clone(),
+                end: end.clone()
+            }
+            this.applyTzCorrection(-1, attrs);
+            this.showAddEventDialog(attrs);
         },
 
-        showAddEventDialog: function (start, end) {
+        /**
+         * @param attrs object with properties to set on model before dialog creation
+         *              dates must be in utc
+         */
+        showAddEventDialog: function (attrs) {
+            var eventModel;
+
             // need to be able to accept native moments here
             // convert arguments
-            if (!start._fullCalendar) {
-                start = $.fullCalendar.moment(start.clone().utc().format());
+            if (!attrs.start._fullCalendar) {
+                attrs.start = $.fullCalendar.moment(attrs.start.clone().utc().format());
             }
-            if (end && !end._fullCalendar) {
-                end = $.fullCalendar.moment(end.clone().utc().format());
+            if (attrs.end && !attrs.end._fullCalendar) {
+                attrs.end = $.fullCalendar.moment(attrs.end.clone().utc().format());
             }
             if (!this.eventView) {
                 try {
-                    var eventModel,
-                        attrs = {
-                            allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
-                            start: start,
-                            end: end
-                        };
-                    this.applyTzCorrection(-1, attrs);
-
                     attrs.start = attrs.start.format(this.MOMENT_BACKEND_FORMAT);
                     attrs.end = attrs.end.format(this.MOMENT_BACKEND_FORMAT);
 
@@ -472,8 +481,7 @@ define(function (require) {
 
         loadEvents: function (start, end, timezone, callback) {
             var onEventsLoad = _.bind(function () {
-                var fcEvents,
-                    visibleConnectionIds = [];
+                var fcEvents;
 
                 if (this.enableEventLoading || _.size(this.eventsLoaded) === 0) {
                     // data is loaded, need to update eventsLoaded
@@ -484,18 +492,9 @@ define(function (require) {
                         }
                     }, this);
                 }
-                // collect visible collections
-                this.options.connectionsOptions.collection.each(function (connectionModel) {
-                    if (connectionModel.get('visible')) {
-                        visibleConnectionIds.push(connectionModel.get('calendarUid'));
-                    }
-                }, this);
-                // filter visible events
-                fcEvents = this.collection.filter(function (item) {
-                    return -1 !== _.indexOf(visibleConnectionIds, item.get('calendarUid'));
-                });
+
                 // prepare them for full calendar
-                fcEvents = _.map(fcEvents, function (eventModel) {
+                fcEvents = _.map(this.filterEvents(this.collection.models), function (eventModel) {
                     return this.createViewModel(eventModel);
                 }, this);
 
@@ -526,6 +525,28 @@ define(function (require) {
                 callback({});
                 this.showLoadEventsError(err);
             }
+        },
+
+        /**
+         * Performs filtration of calendar events before they are rendered
+         *
+         * @param {Array} events
+         * @returns {Array}
+         */
+        filterEvents: function (events) {
+            var visibleConnectionIds = [];
+            // collect visible connections
+            this.options.connectionsOptions.collection.each(function (connectionModel) {
+                if (connectionModel.get('visible')) {
+                    visibleConnectionIds.push(connectionModel.get('calendarUid'));
+                }
+            }, this);
+            // filter visible events
+            events = _.filter(events, function (event) {
+                return -1 !== _.indexOf(visibleConnectionIds, event.get('calendarUid'));
+            });
+
+            return events;
         },
 
         /**
@@ -565,10 +586,13 @@ define(function (require) {
          * NOTE: changes passed model
          *
          * @param multiplier {int} allows to add or subtract timezone, pass 1 or -1 here please
-         * @param obj {object} object with start and end properties to which timezone will be applied
+         * @param obj {object|moment} a moment or an object with start and end properties to which timezone will be applied
          * @returns {object} object passed to function
          */
         applyTzCorrection: function (multiplier, obj) {
+            if (moment.isMoment(obj)) {
+                return obj.zone(0).add(this.options.timezone * multiplier, 'm');
+            }
             if (obj.end !== null) {
                 if (!moment.isMoment(obj.start)) {
                     obj.start = $.fullCalendar.moment(obj.start);
@@ -640,7 +664,7 @@ define(function (require) {
         },
 
         initializeFullCalendar: function () {
-            var options, keys, self;
+            var options, keys, self, scrollTime;
             // prepare options for jQuery FullCalendar control
             options = { // prepare options for jQuery FullCalendar control
                 selectHelper: true,
@@ -662,7 +686,7 @@ define(function (require) {
                 'date', 'defaultView', 'editable', 'selectable',
                 'header', 'allDayText', 'allDaySlot', 'buttonText',
                 'titleFormat', 'columnFormat', 'timeFormat', 'axisFormat',
-                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'slotEventOverlap',
+                'slotMinutes', 'snapMinutes', 'minTime', 'maxTime', 'scrollTime', 'slotEventOverlap',
                 'firstDay', 'firstHour', 'monthNames', 'monthNamesShort', 'dayNames', 'dayNamesShort',
                 'aspectRatio', 'defaultAllDayEventDuration', 'defaultTimedEventDuration',
                 'fixedWeekCount'
@@ -678,6 +702,14 @@ define(function (require) {
             if (!options.aspectRatio) {
                 options.contentHeight = "auto";
                 options.height = "auto";
+            }
+
+            if (this.options.scrollToCurrentTime) {
+                scrollTime = this.applyTzCorrection(1, moment.utc());
+                if (scrollTime.minutes() < 10 && scrollTime.hours() !== 0) {
+                    scrollTime.subtract(1, 'h');
+                }
+                options.scrollTime = scrollTime.startOf('hour').format('HH:mm:ss');
             }
 
             var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
@@ -706,9 +738,12 @@ define(function (require) {
 
 
             self = this;
-            options.viewDisplay = function () {
-                self.setTimeline();
-                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 5 * 60 * 1000);
+            options.eventAfterAllRender = function () {
+                _.delay(_.bind(self.setTimeline, self));
+                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
+            };
+            options.viewDestroy = function () {
+                clearInterval(self.timelineUpdateIntervalId);
             };
             options.windowResize = function () {
                 self.setTimeline();
@@ -782,14 +817,25 @@ define(function (require) {
         },
 
         setTimeline: function () {
-            var todayElement, parentDiv, timelineElement, curCalView, percentOfDay, curSeconds, topLoc, dayCol,
+            var todayElement, timeGrid, timelineElement, percentOfDay, curSeconds, timelineTop, dayCol,
                 calendarElement = this.getCalendarElement(),
-                curTime = new Date();
-            curTime = new Date(curTime.getTime() +
-                curTime.getTimezoneOffset() * 60000 +
-                this.options.eventsOptions.timezoneOffset * 60000);
-            // this function is called every 5 minutes
-            if (curTime.getHours() === 0 && curTime.getMinutes() <= 5) {
+                currentView = calendarElement.fullCalendar('getView'),
+
+                // shown interval in calendar timezone
+                shownInterval = {
+                    start: currentView.intervalStart.clone().utc(),
+                    end: currentView.intervalEnd.clone().utc()
+                },
+                // current time in calendar timezone
+                now = moment.utc().add(this.options.timezone, 'm');
+
+            if (currentView.name === 'month') {
+                // nothing to do
+                return;
+            }
+
+            // this function is called every 1 minute
+            if (now.hours() === 0 && now.minutes() <= 2) {
                 // the day has changed
                 todayElement = calendarElement.find('.fc-today');
                 todayElement.removeClass('fc-today');
@@ -798,33 +844,32 @@ define(function (require) {
                 todayElement.next().addClass('fc-state-highlight');
             }
 
-            parentDiv = calendarElement.find('.fc-agenda-slots:visible').parent();
-            timelineElement = parentDiv.children('.timeline');
+            timeGrid = calendarElement.find('.fc-time-grid');
+            timelineElement = timeGrid.children('.timeline-marker');
             if (timelineElement.length === 0) {
                 // if timeline isn't there, add it
-                timelineElement = $('<hr>').addClass('timeline');
-                parentDiv.prepend(timelineElement);
+                timelineElement = $('<hr class="timeline-marker">');
+                timeGrid.prepend(timelineElement);
             }
 
-            curCalView = calendarElement.fullCalendar('getView');
-            if (curCalView.visStart < curTime && curCalView.visEnd > curTime) {
+            if (shownInterval.start.isBefore(now) && shownInterval.end.isAfter(now)) {
                 timelineElement.show();
             } else {
                 timelineElement.hide();
             }
 
-            curSeconds = (curTime.getHours() * 60 * 60) + (curTime.getMinutes() * 60) + curTime.getSeconds();
+            curSeconds = (now.hours() * 3600) + (now.minutes() * 60) + now.seconds();
             percentOfDay = curSeconds / 86400; //24 * 60 * 60 = 86400, # of seconds in a day
-            topLoc = Math.floor(parentDiv.height() * percentOfDay);
-            timelineElement.css('top', topLoc + 'px');
+            timelineTop = Math.floor(timeGrid.height() * percentOfDay);
+            timelineElement.css('top', timelineTop + 'px');
 
-            if (curCalView.name === 'agendaWeek') {
+            if (currentView.name === 'agendaWeek') {
                 // week view, don't want the timeline to go the whole way across
                 dayCol = calendarElement.find('.fc-today:visible');
                 if (dayCol.position() !== null) {
                     timelineElement.css({
-                        left: (dayCol.position().left - 1) + 'px',
-                        width: (dayCol.width() + 2) + 'px'
+                        left: (dayCol.position().left) + 'px',
+                        width: (dayCol.width() + 3) + 'px'
                     });
                 }
             }
@@ -882,7 +927,7 @@ define(function (require) {
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 if (newLayout === 'fullscreen') {
-                    this.getCalendarElement().fullCalendar('option', 'contentHeight', this.getAvailableHeight() - 1);
+                    this.getCalendarElement().fullCalendar('option', 'contentHeight', this.getAvailableHeight());
                 }
                 return;
             }
