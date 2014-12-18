@@ -1,7 +1,7 @@
 config:
     paths:
         'jquery.fullcalendar': 'bundles/orocalendar/lib/fullcalendar/fullcalendar.js'
-        'orocalendar/js/calendar': 'bundles/orocalendar/js/calendar.js'
+        'orocalendar/js/calendar-view': 'bundles/orocalendar/js/calendar-view.js'
         'orocalendar/js/calendar/connection/collection': 'bundles/orocalendar/js/calendar/connection/collection.js'
         'orocalendar/js/calendar/connection/model': 'bundles/orocalendar/js/calendar/connection/model.js'
         'orocalendar/js/calendar/connection/view': 'bundles/orocalendar/js/calendar/connection/view.js'

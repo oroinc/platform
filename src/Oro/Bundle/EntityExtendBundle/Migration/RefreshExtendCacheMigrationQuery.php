@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Psr\Log\LoggerInterface;
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
@@ -36,7 +37,7 @@ class RefreshExtendCacheMigrationQuery implements MigrationQuery
     {
         $this->commandExecutor->runCommand(
             'oro:entity-extend:update-config',
-            [],
+            [sprintf('--skip-origin=%s', ExtendScope::ORIGIN_CUSTOM)],
             $logger
         );
         $this->commandExecutor->runCommand(
