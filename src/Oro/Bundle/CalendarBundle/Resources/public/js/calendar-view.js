@@ -476,8 +476,7 @@ define(function (require) {
 
         loadEvents: function (start, end, timezone, callback) {
             var onEventsLoad = _.bind(function () {
-                var fcEvents,
-                    visibleConnectionIds = [];
+                var fcEvents;
 
                 if (this.enableEventLoading || _.size(this.eventsLoaded) === 0) {
                     // data is loaded, need to update eventsLoaded
@@ -488,18 +487,9 @@ define(function (require) {
                         }
                     }, this);
                 }
-                // collect visible collections
-                this.options.connectionsOptions.collection.each(function (connectionModel) {
-                    if (connectionModel.get('visible')) {
-                        visibleConnectionIds.push(connectionModel.get('calendarUid'));
-                    }
-                }, this);
-                // filter visible events
-                fcEvents = this.collection.filter(function (item) {
-                    return -1 !== _.indexOf(visibleConnectionIds, item.get('calendarUid'));
-                });
+
                 // prepare them for full calendar
-                fcEvents = _.map(fcEvents, function (eventModel) {
+                fcEvents = _.map(this.filterEvents(this.collection.models), function (eventModel) {
                     return this.createViewModel(eventModel);
                 }, this);
 
@@ -530,6 +520,28 @@ define(function (require) {
                 callback({});
                 this.showLoadEventsError(err);
             }
+        },
+
+        /**
+         * Performs filtration of calendar events before it is rendered
+         *
+         * @param {Array} events
+         * @returns {Array}
+         */
+        filterEvents: function (events) {
+            var visibleConnectionIds = [];
+            // collect visible connections
+            this.options.connectionsOptions.collection.each(function (connectionModel) {
+                if (connectionModel.get('visible')) {
+                    visibleConnectionIds.push(connectionModel.get('calendarUid'));
+                }
+            }, this);
+            // filter visible events
+            events = _.filter(events, function (event) {
+                return -1 !== _.indexOf(visibleConnectionIds, event.get('calendarUid'));
+            });
+
+            return events;
         },
 
         /**
