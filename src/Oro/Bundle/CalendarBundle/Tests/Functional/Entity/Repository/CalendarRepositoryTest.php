@@ -9,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  * @dbIsolation
  * @dbReindex
  */
-class WorkflowItemRepositoryTest extends WebTestCase
+class CalendarRepositoryTest extends WebTestCase
 {
     /**
      * @var CalendarRepository

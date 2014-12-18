@@ -79,7 +79,7 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
      */
     protected function runActivityLists(LoggerInterface $logger, $dryRun = false)
     {
-        $targetEntities   = $this->provider->getTargetEntityClasses();
+        $targetEntities   = $this->provider->getTargetEntityClasses(true);
         $toSchema         = clone $this->schema;
         $hasSchemaChanges = false;
         foreach ($targetEntities as $targetEntity) {

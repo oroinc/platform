@@ -29,7 +29,7 @@ define(['jquery', 'underscore', 'oroform/js/app/views/base-simple-color-picker-v
             return _.extend(options, {
                 change: _.bind(function (hex, opacity) {
                     if (this.$current && this.$current.data('color') !== hex) {
-                        this.$el.simplecolorpicker('replaceColor', this.$current.data('color'), hex);
+                        this.$el.simplecolorpicker('replaceColor', this.$current.data('color'), hex, this.$current);
                         this.$current.data('color', hex);
                         this.$current.css('color', colorUtil.getContrastColor(hex));
                     }

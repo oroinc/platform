@@ -1,3 +1,35 @@
+CHANGELOG for 1.5.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.5.0 versions.
+* 1.5.0 (2014-12-18)
+ * Invitations to calendar events.
+It is now possible to invite other Oro users to events, send them email notifications about this invitation and receive feedback about their responses or lack thereof.
+To invite a user to your event, simply open its edit form and choose guests in a respectively named selector control. After you save the event with invitees, they will receive email notifications about the invitation with a link to their copy of the event in OroCRM. On the view page of that event they will be able to respond to an invitation with three options: Attend, Tentatively attend, and Not attend. Response status (including no response yet) will be displayed on the event tile in the calendar view, and next to the guest's name in the event view. An invitee will be able to change his response after the initial choice, i.e. choose to not attend a previously agreed event. For every response to an invitation, or a change in plans, you (i.e. the organizer of the event) will receive an email notification.
+ * System calendars.
+This feature allows developers to add so-called System calendars to Oro Platform. Use cases for such calendars include company-wide holiday calendar; organization-wide calendar of conferences and conventions, and so on. (Note that organization calendars will only be available in Enterprise Edition 1.7.0).
+These calendars and their events will be automatically added to Calendar views of all users in the entire system. Events of these calendars can be managed on their view forms that are available under System > System Calendars. The permission to add or modify events might be assigned to as many people as needed—e.g. the HR and the office manager.
+ * Task calendar.
+Task calendar is a special kind of system calendar that displays tasks assigned to the user on the calendar view in addition to calendar events. For now, there is no way to add tasks via the calendar view, but it is possible to edit or delete existing tasks. It is not possible to view other users' task calendars either—only the personal task calendar is available.
+The calendar view also features a button that leads to the grid of all tasks, similarly to the existing Events button.
+ * Color coding for calendars and calendar events.
+The user now may change the color of the calendar from the default one in the calendar actions popup menu. Similarly, the user can change the color of the individual event in its Edit dialogue. A palette of standard colors is offered in both cases, with the option to select a custom color with the color wheel.
+Standard palettes for calendars and events may be configured in the system configuration under Display settings > Calendar settings.
+ * Other minor changes to calendar view.
+It is now possible to turn calendars on and off without removing them from the list by clicking on the colored square or via the popup menu.
+Click on the event tile opens its View Event form, not Edit.
+ * Calls, Tasks, and Calendar events as entity activities.
+This is an expansion to the entity activity feature that was first released with 1.3.0 where we introduced the concept of entity activity to the platform and converted emailing to the activity mechanism. Now we are adding three more ubiquitous user actions to this list: logging calls, creating tasks, and scheduling calendar events.
+In order to better accommodate the expanding lot of activities we also have customized the UI for them. Previously, every action/activity had its own button regardless of the number of activities available, so if the admin has enabled a lot of activities, users could easily get confused with a long row of buttons, especially on a low resolution screen. Now all activities and non-activity based actions other than Edit and Delete are conveniently grouped into a single More Actions dropdown button.
+ * Record Activities Widget.
+The Record Activities Widget replaces the Record Activity block, where activities were listed by their type in separate tabs. Instead of tabs, the widget puts all record activities—emails, calls, tasks, calendar events, etc—in a single paginated list.
+The user is able to filter the list by activity type and by date of activity. It is possible to configure the the list to be sorted either by creation date or by last update date.
+ * Custom fields without schema update.
+It is now possible to add custom fields to entities and immediately use them without schema update. This ability comes with drawbacks: these "serialized" fields can only store textual or numeric data—they cannot be option sets, relations, or files/images; nor they are available in reports or segments. But these fields will be displayed on entity view/add forms, and may be added to grid and export/import profile if necessary.
+To create such fields, click Create field button on the entity view page in Entity management, and then choose "Serialized field" in Storage type selector. To create regular field, choose "Table column."
+ * Entity records pagination.
+This feature allows the user to "remember" a set of entity records that existed on the grid (i.e. with filters applied) when he moves to the view page of any record, and then quickly navigate through these records with a new pagination control that appears in top right corner of the page.
+Pagination only works when the user comes to a view page from the main entity grid; in any other case (e.g. search, direct link, grid on another page, segment) the pagination control will not be displayed. Pagination is preserved on a pinned page in both control and in breadcrumbs.
+
 CHANGELOG for 1.4.3
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.4.3 versions.

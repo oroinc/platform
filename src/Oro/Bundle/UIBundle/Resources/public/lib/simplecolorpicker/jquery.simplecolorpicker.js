@@ -214,13 +214,20 @@
      *
      * @param {string} oldColor the hexadecimal color to be replaced, ex: '#fbd75b'
      * @param {string} newColor the hexadecimal color to replace, ex: '#fbd75b'
+     * @param {jQuery.el} $colorSpan element to replace color on
      */
-    replaceColor: function(oldColor, newColor) {
+    replaceColor: function(oldColor, newColor, $colorSpan) {
       var self = this;
 
-      var $colorSpan = self.$colorList.find('> span.color').filter(function() {
-        return $(this).data('color').toLowerCase() === oldColor.toLowerCase();
-      });
+      if (!$colorSpan) {
+          $colorSpan = el || self.$colorList.find('> span.color').filter(function() {
+              return $(this).data('color').toLowerCase() === oldColor.toLowerCase();
+          });
+      } else {
+          if ($colorSpan.parent().get(0) !== self.$colorList.get(0)) {
+              throw new Error('Invalid $colorSpan provided');
+          }
+      }
 
       if ($colorSpan.length > 0) {
         $colorSpan.data('color', newColor);
