@@ -5,6 +5,9 @@ namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @deprecated
+ */
 class DeprecatedSegmentController extends Controller
 {
     /**
