@@ -328,7 +328,7 @@ class ConfigManager
         }
 
         if ($regenerateCaches) {
-            $this->modelManager->resetLocalCaches();
+            $this->modelManager->clearCache();
         }
         $models = $this->modelManager->getModels($className, $withHidden);
 

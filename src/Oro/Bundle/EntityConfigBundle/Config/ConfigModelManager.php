@@ -479,13 +479,4 @@ class ConfigModelManager
 
         return $entityState === UnitOfWork::STATE_DETACHED;
     }
-
-    /**
-     * Reset local caches.
-     */
-    public function resetLocalCaches()
-    {
-        $this->entityLocalCache = null;
-        $this->fieldLocalCache = null;
-    }
 }
