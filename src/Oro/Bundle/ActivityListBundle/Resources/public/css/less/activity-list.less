@@ -13,8 +13,14 @@
       margin: 20px;
     }
     .list-box {
+      border: solid 1px #ddd;
+      border-radius: 4px;
+      &:empty {
+        display: none;
+      }
       .list-item {
         padding: 3px 10px 5px 10px;
+        border-bottom-color: #ddd;
         .visual {
           position: relative;
           top: -2px;
@@ -30,14 +36,15 @@
           white-space: nowrap;
           .icon {
             display: inline-block;
-            width: 28px;
-            font-size: 21px;
-            margin: 0 0 0 7px;
+            width: 27px;
+            font-size: 18px;
+            margin: 0;
+            color: #999;
           }
           .message-item {
             display: block;
             line-height: 12px;
-            padding: 0 0 1px 60px;
+            padding: 0 0 1px 52px;
           }
         }
         .actions {
@@ -62,9 +69,8 @@
           & > div {
             display: table-cell;
           }
-          .dropdown-menu{
-            padding: 1px 2px;
-            right: 30px;
+          .actions{
+            .horizontal-icon-menu;
           }
           .message {
             .accordion-toggle {
@@ -83,8 +89,11 @@
             &:before {
               content: '\f117';
               font-family: FontAwesome;
-              font-size: 24px;
-              color: #727272;
+              font-size: 20px;
+              color: #999;
+            }
+            &:hover:before {
+              color: #444;
             }
           }
           .accordion-toggle.collapsed:before {
@@ -105,9 +114,14 @@
           .message, .subject {
             display: none;
           }
-          .message .responsive-block {
-            width: auto;
-            float: none;
+          .message {
+            &.responsive-block {
+              width: auto;
+              float: none;
+            }
+            .email-body{
+              width: calc(~"100% - 23px");
+            }
           }
           .control-group{
             max-width: none;
@@ -115,6 +129,7 @@
         }
         .accordion-body.in {
           padding: 0;
+          margin: 0 -10px;
         }
         .accordion-body.in .message {
           display: block;
@@ -122,9 +137,9 @@
         }
         .accordion-body.in .subject {
           display: block;
-          padding: 0 0 0 60px;
-          border-bottom: 1px solid #ddd;
-          margin-top: -2px;
+          padding: 0 0 4px 62px;
+          border-bottom: 1px solid #f0f0f0;
+          margin-top: -3px;
         }
       }
     }
@@ -142,13 +157,11 @@
     }
   }
   .grid-toolbar {
-    padding: 0 0 1px;
+    padding: 0 0 5px;
     margin: 0;
-    border-bottom: 1px solid #ddd;
     .pagination{
       white-space: nowrap;
       padding-top: 1px;
-      display: inline-block;
       > ul > li a{
         width:24px;
         i {

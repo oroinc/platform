@@ -35,3 +35,15 @@ oro_navigation_api_pagestate:
 oro_pinbar_help:
     pattern:      /pinbar/help
     defaults:     { _controller: FrameworkBundle:Template:template, template: "OroNavigationBundle:Pinbar:help.html.twig" }
+
+# deprecated API route
+oro_api_post_pagestate_deprecated:
+    path:            /api/rest/{version}/pagestate.{_format}
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\NavigationBundle\Controller\Api\PagestateController::postAction
+        _format:     json
+        version:     latest
+    requirements:
+        _format:     json|html
+        version:     latest|v1
