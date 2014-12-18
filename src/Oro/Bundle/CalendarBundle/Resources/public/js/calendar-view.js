@@ -523,7 +523,7 @@ define(function (require) {
         },
 
         /**
-         * Performs filtration of calendar events before it is rendered
+         * Performs filtration of calendar events before they are rendered
          *
          * @param {Array} events
          * @returns {Array}
