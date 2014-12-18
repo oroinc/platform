@@ -48,6 +48,7 @@ define(function (require) {
         prepareOptions: function () {
             var options = this.options;
             options.collection = this.eventCollection;
+            options.scrollToCurrentTime = true;
             options.connectionsOptions.collection = this.connectionCollection;
 
             options.eventsOptions.date = options.date;
