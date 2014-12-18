@@ -167,7 +167,7 @@ class OwnershipConditionDataBuilder
                 }
             } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
                 if ($metadata->isOrganizationOwned()) {
-                    $constraint = $this->getCondition([$this->getOrganizationId()], $metadata);
+                    $constraint = $this->getCondition([$this->getOrganizationId()], $metadata, null, true);
                 } else {
                     $constraint = $this->getCondition(null, $metadata, null, true);
                 }

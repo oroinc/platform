@@ -5,7 +5,7 @@ define(function (require) {
 
     var _ = require('underscore'),
         BaseComponent = require('oroui/js/app/components/base/component'),
-        Calendar = require('orocalendar/js/calendar'),
+        Calendar = require('orocalendar/js/calendar-view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
 
