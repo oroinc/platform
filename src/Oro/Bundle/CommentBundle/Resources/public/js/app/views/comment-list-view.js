@@ -4,38 +4,33 @@ define(function (require) {
 
     var CommentListView,
         _ = require('underscore'),
+        tools = require('oroui/js/tools'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
-        CommentItemView = require('./comment-item-view'),
-        template = require('text!../../../templates/comment/comment-list-view.html');
+        CommentItemView = require('./comment-item-view');
 
     CommentListView = BaseCollectionView.extend({
         autoRender: true,
         itemView: CommentItemView,
-
-        template: template,
 
         listSelector: 'ul.comments',
         itemSelector: 'li',
         fallbackSelector: '.no-data',
 
         events: {
-            'click .add-comment-button': 'addComment'
+            'submit': 'addComment'
         },
 
-        addComment: function () {
-            var attrs = {},
-                fields = this.$('form').serializeArray();
-            _.each(fields, function (field) {
-                if (attrs[field.name] !== undefined) {
-                    if (!attrs[field.name].push) {
-                        attrs[field.name] = [attrs[field.name]];
-                    }
-                    attrs[field.name].push(field.value || '');
-                } else {
-                    attrs[field.name] = field.value || '';
-                }
-            });
-            var model = this.collection.add(attrs);
+        initialize: function (options) {
+            this.template = _.template($(options.template).html());
+            CommentListView.__super__.initialize.apply(this, arguments);
+        },
+
+        addComment: function (e) {
+            var attrs, model;
+            e.stopPropagation();
+            e.preventDefault();
+            attrs = tools.unpackFromQueryString(this.$('form').serialize());
+            model = this.collection.add(attrs);
             model.save();
         }
     });

@@ -24,7 +24,7 @@ define(function (require) {
         },
 */
         initialize: function (models, options) {
-            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName']));
+            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName', 'formName']));
             CommentCollection.__super__.initialize.apply(this, arguments);
         },
 
