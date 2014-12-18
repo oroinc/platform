@@ -14,7 +14,7 @@ class OroBatchBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return '1_3';
+        return 'v1_3';
     }
 
     /**
