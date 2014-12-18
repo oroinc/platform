@@ -179,4 +179,37 @@ class CommentController extends RestController
     {
         return $this->get('oro_comment.api.form.handler');
     }
+
+    /**
+     * Convert REST request to format applicable for form.
+     *
+     * @param object $entity
+     */
+    /*protected function fixRequestAttributes($entity)
+    {
+        $request  = $this->container->get('request');
+        $formName = $this->getForm()->getName();
+        $data     = [$formName => $request->request->all()];
+
+        if (is_array($data) && $this->fixFormData($data, $entity)) {
+            if (empty($formName)) {
+                // save fixed values for unnamed form
+                foreach ($request->request->keys() as $key) {
+                    if (array_key_exists($key, $data)) {
+                        $request->request->set($key, $data[$key]);
+                    } else {
+                        $request->request->remove($key);
+                    }
+                }
+                foreach ($data as $key => $val) {
+                    if (!$request->request->has($key)) {
+                        $request->request->set($key, $data[$key]);
+                    }
+                }
+            } else {
+                // save fixed values for named form
+                $request->request->set($this->getForm()->getName(), $data);
+            }
+        }
+    }*/
 }

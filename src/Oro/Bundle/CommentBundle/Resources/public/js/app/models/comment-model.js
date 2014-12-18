@@ -50,7 +50,7 @@ define(function (require) {
             }
             return url;
         },
-
+/*
         toJSON: function (options) {
             var serverAttrs = {},
                 formName = this._defineFormName(options);
@@ -64,7 +64,7 @@ define(function (require) {
                 resp = resp[formName];
             }
             return resp;
-        },
+        },*/
 
         set: function(key, val, options) {
             var formName;

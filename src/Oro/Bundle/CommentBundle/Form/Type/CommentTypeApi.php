@@ -13,6 +13,8 @@ use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class CommentTypeApi extends AbstractType
 {
+    const FORM_NAME = 'oro_comment_api';
+
     /** @var  ConfigManager $configManager */
     protected $configManager;
 
@@ -66,6 +68,6 @@ class CommentTypeApi extends AbstractType
      */
     public function getName()
     {
-        return 'oro_comment_api';
+        return self::FORM_NAME;
     }
 }
