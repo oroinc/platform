@@ -3,22 +3,21 @@
 define(function (require) {
     'use strict';
 
-    var CommentListComponent,
-        BaseComponent = require('oroui/js/app/components/base/component'),
+    var CommentComponent,
         $ = require('jquery'),
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         routing = require('routing'),
         tools = require('oroui/js/tools'),
         mediator = require('oroui/js/mediator'),
-        CommentListCollection = require('orocomment/js/app/models/comment-list-collection'),
-        CommentModel = require('orocomment/js/app/models/comment-list-model'),
-        CommentView = require('orocomment/js/app/models/comment-list-model'),
-        CommentFormView = require('orocomment/js/app/views/comment-form-view')
-        ;
+        BaseComponent = require('oroui/js/app/components/base/component'),
+        CommentListView = require('orocomment/js/app/views/comment-list-view'),
+        CommentCollection = require('orocomment/js/app/models/comment-collection');
+        //CommentModel = require('orocomment/js/app/models/comment-list-model'),
+        //CommentFormView = require('orocomment/js/app/views/comment-form-view');
 
-    CommentListComponent = BaseComponent.extend({
-        defaults: {
+    CommentComponent = BaseComponent.extend({
+        /*defaults: {
             commentListOptions: {
                 configuration: {},
                 urls: {
@@ -40,18 +39,31 @@ define(function (require) {
                 view: '',
                 contentHTML: ''
             }
-        },
+        },*/
 
         initialize: function (options) {
-            this.options = options || {};
+            var collectionOptions;
 
-            this.processOptions();
+            this.options = options || {};
+            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName']);
+
+            this.collection = new CommentCollection([], collectionOptions);
+
+            this.view = new CommentListView({
+                el: options._sourceElement,
+                collection: this.collection
+            });
+
+            //var model = this.collection.add({message: 'test'});
+            //debugger;
+//debugger;
+            /*this.processOptions();
 
             this.loadForm();
 
             this.loadComments();
 
-            /*if (!_.isEmpty(this.options.modules)) {
+            if (!_.isEmpty(this.options.modules)) {
                 this._deferredInit();
                 tools.loadModules(this.options.modules, function (modules) {
                     _.extend(this.options.commentListOptions, modules);
@@ -62,8 +74,8 @@ define(function (require) {
                 this.loadModules();
                 this.initView();
             }*/
-        },
-        processOptions: function () {
+        }
+        /*processOptions: function () {
             var defaults;
             defaults = $.extend(true, {}, this.defaults);
             _.defaults(this.options, defaults);
@@ -98,11 +110,10 @@ define(function (require) {
             commentOptions = this.options.commentListOptions;
 
             // setup comment list collection
-            collection = new CommentListCollection(this.options.commentListOptions, {
+            collection = new CommentCollection(this.options.commentListOptions, {
                 model: commentOptions.itemModel
             });
 
-            /*
             collection.route = activityOptions.urls.route;
             collection.routeParameters = activityOptions.urls.parameters;
             collection.setPageSize(this.options.activityListOptions.pager.pagesize);
@@ -118,7 +129,6 @@ define(function (require) {
             this.list = new ActivityListView(activityOptions);
 
             this.registerWidget();
-            */
         },
         _showLoadItemsError: function (err) {
             this._showError(this.options.messages.loadItemsError, err);
@@ -135,9 +145,9 @@ define(function (require) {
                 + this.options.commentListOptions.defaultPage
                 + '.json'
                 ;
-        }
+        }*/
     });
 
 
-    return CommentListComponent;
+    return CommentComponent;
 });

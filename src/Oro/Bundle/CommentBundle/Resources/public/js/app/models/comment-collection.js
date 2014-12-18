@@ -1,19 +1,18 @@
 /*jslint nomen:true*/
 /*global define*/
-
-define([
-    'oroui/js/app/models/base/collection',
-    'underscore',
-    'routing',
-    'orocomment/js/app/models/comment-list-model'
-], function (BaseCollection, _, routing, CommentModel) {
+define(function (require) {
     'use strict';
 
-    var CommentCollection;
+    var CommentCollection,
+        _ = require('underscore'),
+        routing = require('routing'),
+        BaseCollection = require('oroui/js/app/models/base/collection'),
+        CommentModel = require('orocomment/js/app/models/comment-model');
 
     CommentCollection = BaseCollection.extend({
-        model:   CommentModel,
-        route: '',
+        model: CommentModel,
+        route: 'oro_api_comment_get_items',
+        /*route: '',
         formHTML: '',
         routeParameters: {},
         filter:   {},
@@ -23,18 +22,21 @@ define([
             pagesize: 5, //items per page
             total:    1  //total pages
         },
-
-        url: function () {
-            return routing.generate(
-                this.route,
-                _.extend(
-                    _.extend([], this.routeParameters),
-                    _.extend({page: this.getPage()}, {filter: this.filter})
-                )
-            );
+*/
+        initialize: function (models, options) {
+            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName']));
+            CommentCollection.__super__.initialize.apply(this, arguments);
         },
 
-        setFilter: function (filter) {
+        url: function () {
+            var options = {
+                entityId: this.relatedEntityId,
+                entityClass: this.relatedEntityClassName
+            };
+            return routing.generate(this.route, options);
+        }
+
+       /* setFilter: function (filter) {
             this.filter = filter;
         },
 
@@ -66,7 +68,7 @@ define([
             this.setCount(parseInt(response.count));
 
             return response.data;
-        }
+        },*/
     });
 
     return CommentCollection;
