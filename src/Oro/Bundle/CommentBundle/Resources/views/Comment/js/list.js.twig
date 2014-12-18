@@ -1,0 +1,5 @@
+<script type="text/html" id="{{ id|e('html_attr')|raw }}">
+    {{ render(path('oro_comment_form'))|oro_js_template_content|raw }}
+    <ul class="unstyled comments"></ul>
+    <div class="no-data"><span><%= _.__('oro.comment.comment_list.empty_collection') %></span></div>
+</script>

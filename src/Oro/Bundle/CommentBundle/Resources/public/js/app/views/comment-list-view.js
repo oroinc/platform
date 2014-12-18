@@ -1,21 +1,39 @@
-/*jslint nomen:true*/
 /*global define*/
 define(function (require) {
     'use strict';
-/*
-    var CommentListView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        routing = require('routing'),
-        mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
-        DialogWidget = require('oro/dialog-widget'),
-        DeleteConfirmation = require('oroui/js/delete-confirmation'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
-    CommentListView = BaseCollectionView.extend({});
-*/
-    //return CommentListView;
-    return {};
+    var CommentListView,
+        _ = require('underscore'),
+        tools = require('oroui/js/tools'),
+        BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
+        CommentItemView = require('./comment-item-view');
+
+    CommentListView = BaseCollectionView.extend({
+        autoRender: true,
+        itemView: CommentItemView,
+
+        listSelector: 'ul.comments',
+        itemSelector: 'li',
+        fallbackSelector: '.no-data',
+
+        events: {
+            'submit': 'addComment'
+        },
+
+        initialize: function (options) {
+            this.template = _.template($(options.template).html());
+            CommentListView.__super__.initialize.apply(this, arguments);
+        },
+
+        addComment: function (e) {
+            var attrs, model;
+            e.stopPropagation();
+            e.preventDefault();
+            attrs = tools.unpackFromQueryString(this.$('form').serialize());
+            model = this.collection.add(attrs);
+            model.save();
+        }
+    });
+
+    return CommentListView;
 });

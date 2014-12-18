@@ -18,7 +18,9 @@ define([
                 viewItem: null,
                 updateItem: null,
                 deleteItem: null
-            }
+            },
+            infoBlock: '.accordion-body .message .info',
+            commentsBlock: '.accordion-body .message .comment'
         },
         attributes: {
             'class': 'list-item'
@@ -29,7 +31,7 @@ define([
             'click .accordion-toggle': 'onToggle'
         },
         listen: {
-            'change model': '_onModelChanged'
+            'change:contentHTML model': '_onContentChange'
         },
 
         initialize: function (options) {
@@ -76,7 +78,7 @@ define([
 
         onToggle: function (e) {
             e.preventDefault();
-            this.model.collection.trigger('toView', this.model, this);
+            this.model.collection.trigger('toView', this.model);
         },
 
         /**
@@ -89,16 +91,18 @@ define([
             }
             this.$('.accordion-toggle').toggleClass('collapsed', collapse);
             this.$('.collapse').toggleClass('in', !collapse);
-            this.$('.accordion-body .message .info').empty().html(this.model.get('contentHTML'));
         },
 
         isCollapsed: function () {
             return this.$('.accordion-toggle').hasClass('collapsed');
         },
 
-        _onModelChanged: function () {
-            this.collapsed = this.isCollapsed();
-            this.render();
+        _onContentChange: function () {
+            this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+        },
+
+        getCommentsBlock: function () {
+            return this.$(this.options.commentsBlock);
         }
     });
 
