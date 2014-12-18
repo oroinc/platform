@@ -25,7 +25,7 @@ oro_api_comment_create_item:
          _method: POST
 
 oro_api_comment_update_item:
-    pattern: api/rest/{version}/relation/{entityClass}/{entityId}/commentlist/{id}.{_format}
+    pattern: api/rest/{version}/commentlist/{id}.{_format}
     defaults: {_controller: OroCommentBundle:Api/Rest/Comment:put, _format: json, version: latest}
     requirements:
          _method: PUT

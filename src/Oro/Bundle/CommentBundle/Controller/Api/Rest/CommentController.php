@@ -68,6 +68,7 @@ class CommentController extends RestController
      *      resource=true
      * )
      * @AclAncestor("oro_comment_view")
+     *
      * @return Response
      */
     public function getAction($id)
@@ -84,8 +85,9 @@ class CommentController extends RestController
      * )
      * @AclAncestor("oro_comment_create")
      */
-    public function postAction()
+    public function postAction($entityClass, $entityId)
     {
+        # todo: add normal realisation
         return $this->handleCreateRequest();
     }
 

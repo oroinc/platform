@@ -3,7 +3,8 @@
 namespace Oro\Bundle\CommentBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -12,10 +13,11 @@ use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager as BaseApiEntityManager;
 
-class CommentManager
+class CommentManager extends BaseApiEntityManager
 {
-    /** @var EntityManager */
+    /** @var ObjectManager */
     protected $em;
 
     /** @var Pager */
@@ -49,6 +51,8 @@ class CommentManager
         $this->nameFormatter  = $nameFormatter;
         $this->pager          = $pager;
         $this->config         = $config;
+
+        parent::__construct(Comment::ENTITY_NAME, $this->em);
     }
 
     /**
@@ -66,6 +70,7 @@ class CommentManager
         if ($this->isCorrectClassName($entityName)) {
             $fieldName = ExtendHelper::buildAssociationName($entityName);
 
+            /** @var QueryBuilder $qb */
             $qb = $this->getRepository()->getBaseQueryBuilder();
 
             $qb->andWhere('c.' . $fieldName . ' = :param1');
@@ -81,14 +86,6 @@ class CommentManager
         }
 
         return $result;
-    }
-
-    /**
-     * @return CommentRepository
-     */
-    protected function getRepository()
-    {
-        return $this->em->getRepository(Comment::ENTITY_NAME);
     }
 
     /**

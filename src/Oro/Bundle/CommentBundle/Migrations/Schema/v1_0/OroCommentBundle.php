@@ -50,13 +50,11 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface
         $table->addColumn('createdAt', 'datetime', []);
         $table->addColumn('updatedAt', 'datetime', []);
         $table->addColumn('comments_type', 'string', ['length' => 255]);
-        $table->addColumn('note_id', 'integer', ['notnull' => false]);
 
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id']);
         $table->addIndex(['updated_by_user_id'], 'IDX_30E6463D2793CC5E', []);
         $table->addIndex(['organization_id'], 'IDX_30E6463D32C8A3DE', []);
-        $table->addIndex(['note_id']);
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
@@ -75,12 +73,6 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface
             ['organization_id'],
             ['id'],
             ['onDelete' => 'CASCADE', 'onUpdate' => null]
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_note'),
-            ['note_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 
@@ -108,6 +100,6 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface
      */
     public static function addCommentToNote(Schema $schema, CommentExtension $commentExtension)
     {
-        #$commentExtension->addCommentAssociation($schema, 'oro_note');
+        $commentExtension->addCommentAssociation($schema, 'oro_note');
     }
 }
