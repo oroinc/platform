@@ -30,7 +30,7 @@ class OroBatchBundle implements Migration
     {
         $batchStatuses = [BatchStatus::STARTING, BatchStatus::STARTED];
         $date          = new \DateTime('now', new \DateTimeZone('UTC'));
-        $date->sub(\DateInterval::createFromDateString('2 weeks'));
+        $date->sub(\DateInterval::createFromDateString('1 month'));
         $endTime = $date->format('Y-m-d H:i:s');
 
         $sql = <<<SQL
