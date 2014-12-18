@@ -25,7 +25,7 @@ class CommentController extends Controller
      */
     public function getFormAction()
     {
-        $form = $this->get('oro_comment.form.comment');
+        $form = $this->get('oro_comment.form.comment.api');
 
         return [
             'form' => $form->createView()

@@ -1,5 +1,6 @@
 parameters:
     oro_comment.form.type.comment.class:       Oro\Bundle\CommentBundle\Form\Type\CommentType
+    oro_comment.api.form.type.comment.class:   Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi
     oro_comment.form.handler.comment.class:    Oro\Bundle\CommentBundle\Form\Handler\CommentHandler
     oro_comment.api.form.handler.class:        Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler
 
@@ -10,7 +11,7 @@ services:
             - { name: form.type, alias: oro_comment }
 
     oro_comment.form.type.comment_api:
-        class: %oro_note.form.type.note_api.class%
+        class: %oro_comment.api.form.type.comment.class%
         arguments:
             - @oro_entity_config.config_manager
         tags:
@@ -29,10 +30,10 @@ services:
         factory_method: createNamed
         factory_service: form.factory
         arguments:
-            - ~
+            - 'oro_comment_api'
             - 'oro_comment_api'
 
-    oro_comment.form.handler.note:
+    oro_comment.form.handler.comment:
         class: %oro_comment.form.handler.comment.class%
         scope: request
         arguments:

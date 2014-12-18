@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\Form\Type;
 
+use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -22,6 +23,7 @@ class CommentTypeApi extends AbstractType
     {
         $this->configManager = $configManager;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -33,7 +35,7 @@ class CommentTypeApi extends AbstractType
                 'textarea',
                 [
                     'required' => true,
-                    'label'    => 'oro.note.message.label',
+                    'label'    => 'oro.comment.message.label',
                     'attr'     => [
                         'class' => 'comment-text-field',
                         'placeholder' => 'oro.comment.message.placeholder'
@@ -42,7 +44,6 @@ class CommentTypeApi extends AbstractType
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());
-        #$builder->addEventSubscriber(new CommentSubscriber($this->configManager));
     }
 
     /**
@@ -55,6 +56,7 @@ class CommentTypeApi extends AbstractType
                 'data_class'              => Comment::ENTITY_NAME,
                 'intention'               => 'comment',
                 'csrf_protection'         => false,
+                'allow_add'               => true,
             ]
         );
     }
@@ -64,6 +66,6 @@ class CommentTypeApi extends AbstractType
      */
     public function getName()
     {
-        return 'oro_comment';
+        return 'oro_comment_api';
     }
 }

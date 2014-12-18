@@ -11,13 +11,14 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\CommentBundle\Entity\Manager\CommentManager;
 
 /**
  * @RouteResource("commentlist")
@@ -28,8 +29,8 @@ class CommentController extends RestController
     /**
      * Get filtered activity lists for given entity
      *
-     * @param string  $entityClass Entity class name
-     * @param integer $entityId    Entity id
+     * @param string  $relationClass Entity class name
+     * @param integer $relationId    Entity id
      *
      * @QueryParam(
      *      name="page",
@@ -51,15 +52,15 @@ class CommentController extends RestController
      * )
      * @return JsonResponse
      */
-    public function cgetAction($entityClass, $entityId)
+    public function cgetAction($relationClass, $relationId)
     {
-        $result = $this->getManager()->getCommentList($entityClass, $entityId);
+        $result = $this->getManager()->getCommentList($relationClass, $relationId);
 
         return new JsonResponse($result);
     }
 
     /**
-     * Get note
+     * Get comment
      *
      * @param string $id Comment id
      *
@@ -85,10 +86,30 @@ class CommentController extends RestController
      * )
      * @AclAncestor("oro_comment_create")
      */
-    public function postAction($entityClass, $entityId)
+    public function postAction($relationClass, $relationId, Request $request)
     {
-        # todo: add normal realisation
-        return $this->handleCreateRequest();
+        $entity      = call_user_func_array(array($this, 'createEntity'), func_get_args());
+        $isProcessed = false;
+        $exception   = $this->getForm();
+
+        try {
+            $this->getManager()->setRelationField($entity, $relationClass, $relationId);
+
+            $isProcessed = $this->processForm($entity);
+        } catch (\Exception $e) {
+            $exception = $e;
+        }
+
+        if ($isProcessed) {
+            $view = $this->view(
+                $this->getManager()->getEntityViewModel($entity, $relationClass, $relationId),
+                Codes::HTTP_CREATED
+            );
+        } else {
+            $view = $this->view($exception, Codes::HTTP_BAD_REQUEST);
+        }
+
+        return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
     }
 
     /**
@@ -106,6 +127,8 @@ class CommentController extends RestController
      */
     public function putAction($id)
     {
+        # добавить юзера который обновил
+        # возвращать всю сущность
         return $this->handleUpdateRequest($id);
     }
 
@@ -142,7 +165,7 @@ class CommentController extends RestController
     /**
      * Get entity Manager
      *
-     * @return ApiEntityManager
+     * @return CommentManager
      */
     public function getManager()
     {
