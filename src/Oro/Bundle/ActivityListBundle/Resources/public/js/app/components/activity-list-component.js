@@ -18,7 +18,7 @@ define(function (require) {
         MultiSelectFilter  = require('oro/filter/multiselect-filter'),
         DatetimeFilter     = require('oro/filter/datetime-filter'),
         dataFilterWrapper  = require('orofilter/js/datafilter-wrapper'),
-        CommentListComponent = require('orocomment/js/app/components/comment-list-component');
+        CommentComponent = require('orocomment/js/app/components/comment-component');
     require('jquery');
 
     ActivityListComponent = BaseComponent.extend({
@@ -158,10 +158,10 @@ define(function (require) {
             }
             commentOptions = {
                 _sourceElement: itemView.getCommentsBlock(),
-                activityId: model.get('relatedActivityId'),
-                activityClassName: model.getRelatedActivityClass()
+                relatedEntityId: model.get('relatedActivityId'),
+                relatedEntityClassName: model.getRelatedActivityClass()
             };
-            commentList = new CommentListComponent(commentOptions);
+            commentList = new CommentComponent(commentOptions);
             itemView.subview('comments', commentList);
         },
 
