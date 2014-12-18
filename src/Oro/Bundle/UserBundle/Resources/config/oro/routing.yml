@@ -55,3 +55,14 @@ oro_api_post_user_deprecated:
     requirements:
         _format:     json|html
         version:     latest|v1
+
+oro_api_post_group_deprecated:
+    path:            /api/rest/{version}/group.{_format}
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\UserBundle\Controller\Api\Rest\GroupController::postAction
+        _format:     json
+        version:     latest
+    requirements:
+        _format:     json|html
+        version:     latest|v1
