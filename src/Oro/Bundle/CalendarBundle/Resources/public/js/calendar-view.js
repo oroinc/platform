@@ -740,10 +740,8 @@ define(function (require) {
             self = this;
             options.eventAfterAllRender = function () {
                 _.delay(_.bind(self.setTimeline, self));
-                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
-            };
-            options.viewDestroy = function () {
                 clearInterval(self.timelineUpdateIntervalId);
+                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
             };
             options.windowResize = function () {
                 self.setTimeline();
