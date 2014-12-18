@@ -122,9 +122,9 @@ class Notes extends AbstractPageEntity
     public function editNote($note)
     {
         $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
-            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions action-cell']//a[contains(., '...')]";
+            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions']//a[contains(., '...')]";
         $editAction =
-            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu nav nav-pills icons-holder launchers-list']".
+            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu']".
             "//a[@title='Update Note']";
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $this->test->byXPath($actionMenu)->click();
@@ -147,9 +147,9 @@ class Notes extends AbstractPageEntity
     public function deleteNote($note)
     {
         $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
-            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions action-cell']//a[contains(., '...')]";
+            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions']//a[contains(., '...')]";
         $deleteAction =
-            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu nav nav-pills icons-holder launchers-list']".
+            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu']".
             "//a[@title='Delete Note']";
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $this->test->byXPath($actionMenu)->click();

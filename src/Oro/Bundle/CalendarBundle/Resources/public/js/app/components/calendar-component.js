@@ -5,7 +5,7 @@ define(function (require) {
 
     var _ = require('underscore'),
         BaseComponent = require('oroui/js/app/components/base/component'),
-        Calendar = require('orocalendar/js/calendar'),
+        Calendar = require('orocalendar/js/calendar-view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
 
@@ -48,6 +48,7 @@ define(function (require) {
         prepareOptions: function () {
             var options = this.options;
             options.collection = this.eventCollection;
+            options.scrollToCurrentTime = true;
             options.connectionsOptions.collection = this.connectionCollection;
 
             options.eventsOptions.date = options.date;
