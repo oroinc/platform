@@ -111,8 +111,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 viewModel = model.toJSON();
             // init text/background colors
             this.options.colorManager.applyColors(viewModel, _.bind(function () {
-                var $last = this.$el.find(this.selectors.lastItem);
-                return $last.attr(this.attrs.calendarAlias) === 'user' ? $last.attr(this.attrs.backgroundColor) : null;
+                var $last = this.$el.find(this.selectors.lastItem),
+                    calendarAlias = $last.attr(this.attrs.calendarAlias);
+                return ['user', 'system', 'public'].indexOf(calendarAlias) !== -1 ? $last.attr(this.attrs.backgroundColor) : null;
             }, this));
             this.options.colorManager.setCalendarColors(viewModel.calendarUid, viewModel.backgroundColor);
             model.set('backgroundColor', viewModel.backgroundColor);
@@ -247,7 +248,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                 calendarUid = calendarAlias + '_' + calendarId,
                 el = this.$el.find(this.selectors.findItemByCalendar(calendarUid));
             if (el.length > 0) {
-                messenger.notificationFlashMessage('warning', __('This calendar already exists.'));
+                messenger.notificationFlashMessage('warning', __('This calendar already exists.'), {
+                    namespace: 'calendar-ns'
+                });
             } else {
                 savingMsg = messenger.notificationMessage('warning', __('Adding the calendar, please wait ...'));
                 try {
@@ -262,7 +265,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         wait: true,
                         success: _.bind(function () {
                             savingMsg.close();
-                            messenger.notificationFlashMessage('success', __('The calendar was added.'));
+                            messenger.notificationFlashMessage('success', __('The calendar was added.'), {
+                                namespace: 'calendar-ns'
+                            });
                         }, this),
                         error: _.bind(function (collection, response) {
                             savingMsg.close();
@@ -311,7 +316,9 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     wait: true,
                     success: _.bind(function () {
                         savingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                        messenger.notificationFlashMessage('success', __('The calendar was updated.'), {
+                            namespace: 'calendar-ns'
+                        });
                         this._addVisibilityButtonEventListener($connection, model);
                         if (this._actionSyncObject) {
                             this._actionSyncObject.resolve();

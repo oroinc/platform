@@ -107,7 +107,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
     /**
      * @var string
      *
-     * @ORM\Column(name="postal_code", type="string", length=20, nullable=true)
+     * @ORM\Column(name="postal_code", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      * @ConfigField(
      *      defaultValues={

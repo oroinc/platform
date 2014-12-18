@@ -54,6 +54,13 @@ class Role extends AbstractPageEntity
                     "[contains(@name, '[$action][accessLevel')]"
                 )
             );
+            if ($accessLevel == 'System'
+                && !$this->isElementPresent(
+                    "//div[strong/text() = '{$entityName}']/ancestor::tr//select[contains(@name, '[$action]".
+                    "[accessLevel')]/option[text()='{$accessLevel}']"
+                )) {
+                $accessLevel = 'Organization';
+            }
             $this->accessLevel->selectOptionByLabel($accessLevel);
         }
 

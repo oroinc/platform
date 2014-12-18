@@ -34,7 +34,6 @@ parameters:
     oro_integration.utils.form_utils.class:                               Oro\Bundle\IntegrationBundle\Utils\FormUtils
 
     oro_integration.datagrid.status_grid_helper.class:                    Oro\Bundle\IntegrationBundle\Datagrid\StatusGridHelper
-    oro_integration.event_listener.keep_avile.class:                      Oro\Bundle\IntegrationBundle\EventListener\KeepAliveListener
 
     oro_integration.action.save_fields_changes.class:                     Oro\Bundle\IntegrationBundle\Model\Action\SaveFieldsChangesAction
     oro_integration.action.remove_fields_changes.class:                   Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction
@@ -159,6 +158,7 @@ services:
           - @oro_importexport.processor.registry
           - @oro_integration.job_executor
           - @oro_integration.manager.types_registry
+          - @event_dispatcher
           - @oro_integration.logger.strategy
         lazy: true
 
@@ -177,7 +177,9 @@ services:
 
     oro_integration.sync_scheduler:
         class: %oro_integration.sync_scheduler.class%
-        arguments: [ @doctrine.orm.entity_manager, @oro_integration.manager.types_registry ]
+        arguments:
+            - @doctrine
+            - @oro_integration.manager.types_registry
 
     oro_integration.reverse_sync.processor:
         class: %oro_integration.reverse_sync.processor.class%
@@ -185,6 +187,7 @@ services:
             - @oro_importexport.processor.registry
             - @oro_integration.job_executor
             - @oro_integration.manager.types_registry
+            - @event_dispatcher
             - @oro_integration.logger.strategy
         lazy: true
 
@@ -216,13 +219,6 @@ services:
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.oro-integration-status-grid, method: statusGridBuildBefore }
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.oro-integration-status-grid, method: statusGridBuildAfter }
-
-    oro_integration.event_listener.keep_avile:
-        class: %oro_integration.event_listener.keep_avile.class%
-        arguments:
-            - @akeneo_batch.job_repository
-        tags:
-            - { name: kernel.event_listener, event: oro_integration.writer_after_flush, method: onWriterAfterFlush }
 
     oro_integration.workflow.condition.has_active_integration:
         class: %oro_integration.workflow.condition.has_active_integration.class%

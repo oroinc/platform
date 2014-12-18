@@ -20,6 +20,7 @@ parameters:
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
     oro_email.email.activity.manager.class:       Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
+    oro_email.known_email_address_checker_factory.class: Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory
     oro_email.twig.extension.email.class:         Oro\Bundle\EmailBundle\Twig\EmailExtension
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
@@ -85,6 +86,8 @@ services:
         arguments:
             - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
+        calls:
+            - [setLogger, [@logger]]
 
     oro_email.email_holder_helper:
         class: %oro_email.email_holder_helper.class%
@@ -350,6 +353,17 @@ services:
         arguments:
             - @service_container
 
+    oro_email.known_email_address_checker_factory:
+        class: %oro_email.known_email_address_checker_factory.class%
+        public: false
+        scope: prototype
+        arguments:
+            - @doctrine
+            - @oro_email.email.address.manager
+            - @oro_email.email.address.helper
+            - @oro_email.email.owner.provider.storage
+            - %oro_email.email_sync_exclusions%
+
     oro_email.email.activity.manager:
         class: %oro_email.email.activity.manager.class%
         arguments:
@@ -374,6 +388,7 @@ services:
            - @oro_entity_config.link.entity_manager
            - @oro_email.link.formatter.name
            - @router
+           - @oro_entity_config.config_manager
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 

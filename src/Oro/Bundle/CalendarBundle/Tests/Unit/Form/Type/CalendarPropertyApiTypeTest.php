@@ -95,7 +95,7 @@ class CalendarPropertyApiTypeTest extends TypeTestCase
             'backgroundColor' => '#00FF00',
         ];
 
-        $type = new CalendarPropertyApiType([]);
+        $type = new CalendarPropertyApiType();
         $form = $this->factory->create($type);
 
         $form->submit($formData);
@@ -134,13 +134,13 @@ class CalendarPropertyApiTypeTest extends TypeTestCase
                 ]
             );
 
-        $type = new CalendarPropertyApiType([]);
+        $type = new CalendarPropertyApiType();
         $type->setDefaultOptions($resolver);
     }
 
     public function testGetName()
     {
-        $type = new CalendarPropertyApiType([]);
+        $type = new CalendarPropertyApiType();
         $this->assertEquals('oro_calendar_property_api', $type->getName());
     }
 }

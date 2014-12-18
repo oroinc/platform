@@ -3,8 +3,10 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Job;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
+
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 
 class JobExecutorTest extends \PHPUnit_Framework_TestCase
@@ -69,6 +71,16 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->batchJobRepository->expects($this->any())
             ->method('getJobManager')
             ->will($this->returnValue($this->batchJobManager));
+        $this->batchJobRepository->expects($this->any())
+            ->method('createJobExecution')
+            ->willReturnCallback(
+                function ($instance) {
+                    $execution = new JobExecution();
+                    $execution->setJobInstance($instance);
+
+                    return $execution;
+                }
+            );
 
         $this->executor = new JobExecutor(
             $this->batchJobRegistry,
@@ -107,18 +119,10 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->once())
             ->method('commit');
 
-        $this->batchJobManager->expects($this->at(0))
-            ->method('persist')
+        $this->batchJobManager->expects($this->once())->method('persist')
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
-        $this->batchJobManager->expects($this->at(1))
-            ->method('persist')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobExecution'));
-        $this->batchJobManager->expects($this->at(2))
-            ->method('flush')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
-        $this->batchJobManager->expects($this->at(3))
-            ->method('flush')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobExecution'));
+        $this->batchJobManager->expects($this->once())->method('flush')
+            ->with();
 
         $context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
             ->getMockForAbstractClass();
@@ -176,18 +180,10 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->never())
             ->method('commit');
 
-        $this->batchJobManager->expects($this->at(0))
-            ->method('persist')
+        $this->batchJobManager->expects($this->once())->method('persist')
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
-        $this->batchJobManager->expects($this->at(1))
-            ->method('persist')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobExecution'));
-        $this->batchJobManager->expects($this->at(2))
-            ->method('flush')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
-        $this->batchJobManager->expects($this->at(3))
-            ->method('flush')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobExecution'));
+        $this->batchJobManager->expects($this->once())->method('flush')
+            ->with();
 
         $job = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Job\JobInterface')
             ->getMock();
@@ -222,18 +218,10 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->never())
             ->method('commit');
 
-        $this->batchJobManager->expects($this->at(0))
-            ->method('persist')
+        $this->batchJobManager->expects($this->once())->method('persist')
             ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
-        $this->batchJobManager->expects($this->at(1))
-            ->method('persist')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobExecution'));
-        $this->batchJobManager->expects($this->at(2))
-            ->method('flush')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobInstance'));
-        $this->batchJobManager->expects($this->at(3))
-            ->method('flush')
-            ->with($this->isInstanceOf('Akeneo\Bundle\BatchBundle\Entity\JobExecution'));
+        $this->batchJobManager->expects($this->once())->method('flush')
+            ->with();
 
         $job = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Job\JobInterface')
             ->getMock();

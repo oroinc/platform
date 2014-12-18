@@ -72,13 +72,16 @@ class DQLNameFormatter
                 $prependSeparator = isset($matches[2], $matches[2][$idx]) ? $matches[2][$idx] : '';
                 $lowerCaseKey     = strtolower($key);
                 if (isset($nameParts[$lowerCaseKey])) {
+                    $value = $nameParts[$lowerCaseKey];
                     if ($key !== $lowerCaseKey) {
-                        $nameParts[$lowerCaseKey] = sprintf('UPPER(%s)', $nameParts[$lowerCaseKey]);
+                        $value = sprintf('UPPER(%s)', $nameParts[$lowerCaseKey]);
                     }
-                    $parts[] = $nameParts[$lowerCaseKey];
-                }
 
-                $parts[] = sprintf("'%s'", $prependSeparator);
+                    $parts[] = $value;
+                    if (strlen($prependSeparator) !== 0) {
+                        $parts[] = sprintf("'%s'", $prependSeparator);
+                    }
+                }
             }
         } else {
             throw new \LogicException('Unexpected name format given');

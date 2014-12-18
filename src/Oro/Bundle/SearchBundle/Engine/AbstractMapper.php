@@ -75,6 +75,25 @@ abstract class AbstractMapper
     }
 
     /**
+     * Returns mode attribute from entity mapping config
+     *
+     * @param string $entity
+     *
+     * @return bool|string
+     */
+    public function getEntityModeConfig($entity)
+    {
+        $config = $this->getEntityConfig($entity);
+        $value  = false;
+
+        if (false !== $config) {
+            $value = $config['mode'];
+        }
+
+        return $value;
+    }
+
+    /**
      * Set related fields values
      *
      * @param string $alias

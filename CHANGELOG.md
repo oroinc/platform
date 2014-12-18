@@ -1,3 +1,35 @@
+CHANGELOG for 1.4.3
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.3 versions.
+* 1.4.3 (2014-12-05)
+ * List of improvements and fixed bugs
+ - Fixed extended entity is set to "false" after oro:entity-config:update with force
+
+CHANGELOG for 1.4.2
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.2 versions.
+* 1.4.2 (2014-12-02)
+ * List of improvements and fixed bugs
+ - Implemented form type guessers for custom fields of existing entities
+ - Added support of cascade option for association in Extend Extension
+ - Fixed insecure content from websockets when HTTPS used
+ - Fixed IMAP Sync with date parsing exception
+ - Magento Integration: Sensitive data displayed in API request logs
+ - Magento Integration: Memory Issue on Error
+ - Magento Integration: Duplicated jobs on two way Magento sync
+
+CHANGELOG for 1.4.1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.4.1 versions.
+* 1.4.1 (2014-11-17)
+ * List of improvements and fixed bugs
+ - Refactor extended entity to prevent class name collisions
+ - Implement form type guessers for custom fields of existing entities
+ - Use route from config in email address link to avoid potential errors
+ - Fixed duplicates of entities during magento import
+ - Error in "oro_multiple_entity" if it's used without "default_element" option
+ - Lost organization name after upgrade
+
 CHANGELOG for 1.4.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.4.0 versions.

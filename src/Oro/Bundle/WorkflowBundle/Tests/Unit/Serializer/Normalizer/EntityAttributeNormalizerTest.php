@@ -213,6 +213,25 @@ class EntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider normalizeDirectionDataProvider
      */
+    public function testSupportsNormalizationForMultiple($direction)
+    {
+        $attributeValue = 'bar';
+
+        $this->workflow->expects($this->never())->method($this->anything());
+
+        $this->attribute->expects($this->once())->method('getType')->will($this->returnValue('entity'));
+        $this->attribute->expects($this->once())
+            ->method('getOption')
+            ->with('multiple')
+            ->will($this->returnValue(true));
+
+        $method = 'supports' . ucfirst($direction);
+        $this->assertFalse($this->normalizer->$method($this->workflow, $this->attribute, $attributeValue));
+    }
+
+    /**
+     * @dataProvider normalizeDirectionDataProvider
+     */
     public function testNotSupportsNormalizationWhenNotEntityType($direction)
     {
         $attributeValue = 'bar';

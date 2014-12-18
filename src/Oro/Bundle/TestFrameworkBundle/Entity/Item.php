@@ -9,7 +9,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * @ORM\Table(name="test_search_item")
  * @ORM\Entity
  */
-class Item
+class Item implements TestFrameworkEntityInterface
 {
     /**
      * @ORM\Id

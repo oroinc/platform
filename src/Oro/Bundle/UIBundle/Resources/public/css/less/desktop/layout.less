@@ -16,3 +16,14 @@ html{
 #left-panel, #right-panel, #main {
   float: left;
 }
+.desktop-version .oro-page {
+  &.collapsible-sidebar {
+    .oro-page-sidebar {
+      .dropdown-menu {
+        display: block !important;
+        z-index: inherit;
+        width: 100%;
+      }
+    }
+  }
+}

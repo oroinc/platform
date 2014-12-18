@@ -92,6 +92,11 @@ oro_entity_config:
                         auditable:          false
                         default_value:      true
 
+                origin:
+                    options:
+                        auditable:          false
+                        default_value:      'Code'
+
                 relation:
                     options:
                         auditable:          false
@@ -266,6 +271,11 @@ oro_entity_config:
                         default_value:      false
                         auditable:          false
 
+                origin:
+                    options:
+                        auditable:          false
+                        default_value:      'Code'
+
                 #
                 # Relations form type fields
                 #
@@ -325,6 +335,17 @@ oro_entity_config:
                 # the list of field names in the target entity that is used to show detailed info about related entity
                 # this attribute is applicable to many-to-many and one-to-many relations
                 target_detailed: # array of strings
+                    options:
+                        auditable:          false
+
+                # the names of persistence operations to cascade on the relation.
+                # the set of possible values are: 'persist', 'remove', 'detach', 'merge', 'refresh', 'all'
+                # for example: ['persist', 'remove']
+                # see Doctrine's documentation for more details
+                # note that for many-to-one and one-to-many relations the 'detach' operation is applied by default
+                # and this cannot be changed through the config
+                # this attribute is applicable to any type of relations
+                cascade: # array of strings
                     options:
                         auditable:          false
 

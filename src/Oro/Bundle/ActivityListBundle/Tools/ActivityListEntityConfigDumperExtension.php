@@ -4,9 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Tools;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
+
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 
 class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
@@ -78,11 +80,14 @@ class ActivityListEntityConfigDumperExtension extends AbstractEntityConfigDumper
     protected function getTargetEntityConfigs()
     {
         if (null === $this->targetEntityConfigs) {
+            $targetEntityClasses       = $this->listProvider->getTargetEntityClasses();
             $this->targetEntityConfigs = [];
 
             $configs = $this->configManager->getProvider('extend')->getConfigs();
             foreach ($configs as $config) {
-                if (in_array($config->getId()->getClassName(), $this->listProvider->getTargetEntityClasses())) {
+                if ($config->is('upgradeable')
+                    && in_array($config->getId()->getClassName(), $targetEntityClasses)
+                ) {
                     $this->targetEntityConfigs[] = $config;
                 }
             }

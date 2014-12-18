@@ -17,6 +17,34 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_calendar');
 
+        $rootNode
+            ->children()
+                ->scalarNode('enabled_system_calendar')
+                // please note that if you want to disable it on already working system
+                // you need to take care to create a migration to clean up redundant data
+                // in oro_calendar_property table
+                ->info(
+                    "Indicates whether Organization and/or System Calendars are enabled or not.\n"
+                    . "Possible values:\n"
+                    . "    true         - both organization and system calendars are enabled\n"
+                    . "    false        - both organization and system calendars are disabled\n"
+                    . "    organization - only organization calendar is enabled\n"
+                    . "    system       - only system calendar is enabled\n"
+                )
+                ->validate()
+                    ->ifTrue(
+                        function ($v) {
+                            return !(is_bool($v) || (is_string($v) && in_array($v, ['organization', 'system'])));
+                        }
+                    )
+                    ->thenInvalid(
+                        'The "enabled_system_calendar" must be boolean, "organization" or "system", given %s.'
+                    )
+                ->end()
+                ->defaultValue('system')
+            ->end()
+        ->end();
+
         SettingsBuilder::append(
             $rootNode,
             [
@@ -52,6 +80,7 @@ class Configuration implements ConfigurationInterface
                     'value' => [
                         '#5484ED',
                         '#A4BDFC',
+                        '#46D6DB',
                         '#7AE7BF',
                         '#51B749',
                         '#FBD75B',
