@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\DependencyInjection;
 
-use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
-
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
 
 class Configuration implements ConfigurationInterface
 {
@@ -41,11 +41,28 @@ class Configuration implements ConfigurationInterface
      *
      * @param $node NodeBuilder
      * @return Configuration
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function setChildren($node)
     {
         $node->
-        arrayNode('templates')
+            arrayNode('oro_navigation_elements')
+            ->useAttributeAsKey('id')
+            ->prototype('array')
+                ->children()
+                    ->booleanNode('default')->defaultFalse()->end()
+                    ->arrayNode('routes')
+                        ->useAttributeAsKey('routes')
+                            ->prototype('boolean')
+                                ->treatNullLike(false)
+                                ->defaultFalse()
+                            ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ->end()
+        ->arrayNode('templates')
             ->useAttributeAsKey('templates')
             ->prototype('array')
                 ->children()

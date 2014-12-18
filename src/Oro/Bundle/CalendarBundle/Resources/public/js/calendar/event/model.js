@@ -23,6 +23,9 @@ define(['underscore', 'backbone', 'routing'
             allDay: false,
             backgroundColor: null,
             reminders: {},
+            parentEventId: null,
+            invitationStatus: null,
+            invitedUsers: null,
             editable: false,
             removable: false,
             calendarAlias: null,
@@ -62,7 +65,10 @@ define(['underscore', 'backbone', 'routing'
             options.contentType = 'application/json';
             options.data = JSON.stringify(_.extend(
                 {id: this.originalId},
-                _.omit(this.toJSON(), ['id', 'editable', 'removable', 'calendarUid']),
+                _.omit(
+                    this.toJSON(),
+                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus', 'invitedUsers']
+                ),
                 attrs || {}
             ));
 
@@ -80,6 +86,16 @@ define(['underscore', 'backbone', 'routing'
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
             }
+        },
+
+        validate: function (attrs) {
+            var errors = [];
+
+            if (attrs.start > attrs.end) {
+                errors.push('oro.calendar.error_message.event_model.end_date_earlier_than_start');
+            }
+
+            return errors.length ? errors : null;
         }
     });
 });

@@ -11,11 +11,10 @@ use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Put;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
@@ -31,7 +30,7 @@ class CalendarConnectionController extends RestController implements ClassResour
      *
      * @param int $id User's calendar id
      *
-     * @Get("/calendars/{id}/connections", name="oro_api_get_calendar_connections", requirements={"id"="\d+"})
+     * @Get("/calendars/{id}/connections", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Get calendar connections",
      *      resource=true
@@ -44,7 +43,11 @@ class CalendarConnectionController extends RestController implements ClassResour
     public function cgetAction($id)
     {
         $items = $this->getManager()->getCalendarManager()
-            ->getCalendars($this->getUser()->getId(), $id);
+            ->getCalendars(
+                $this->get('oro_security.security_facade')->getOrganization()->getId(),
+                $this->getUser()->getId(),
+                $id
+            );
 
         return new Response(json_encode($items), Codes::HTTP_OK);
     }
@@ -54,7 +57,7 @@ class CalendarConnectionController extends RestController implements ClassResour
      *
      * @param int $id Calendar connection id
      *
-     * @Put("/calendarconnections/{id}", name="oro_api_put_calendar_connection", requirements={"id"="\d+"})
+     * @Put("/calendarconnections/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Update calendar connection",
      *      resource=true
@@ -71,7 +74,7 @@ class CalendarConnectionController extends RestController implements ClassResour
     /**
      * Create new calendar connection.
      *
-     * @Post("/calendarconnections", name="oro_api_post_calendar_connection")
+     * @Post("/calendarconnections")
      * @ApiDoc(
      *      description="Create new calendar connection",
      *      resource=true
@@ -90,7 +93,7 @@ class CalendarConnectionController extends RestController implements ClassResour
      *
      * @param int $id Calendar connection id
      *
-     * @Delete("/calendarconnections/{id}", name="oro_api_delete_calendar_connection", requirements={"id"="\d+"})
+     * @Delete("/calendarconnections/{id}", requirements={"id"="\d+"})
      * @ApiDoc(
      *      description="Remove calendar connection",
      *      resource=true
@@ -137,6 +140,9 @@ class CalendarConnectionController extends RestController implements ClassResour
 
         unset($data['calendarName']);
         unset($data['removable']);
+        unset($data['canAddEvent']);
+        unset($data['canEditEvent']);
+        unset($data['canDeleteEvent']);
 
         return true;
     }

@@ -173,21 +173,41 @@ i.color {
 }
 .context-menu,
 .controls {
+  .simplecolorpicker.icon,
+  .simplecolorpicker span.color {
+    width: 18px;
+    height: 18px;
+    margin: 0 3px 3px 0;
+  }
   .simplecolorpicker.icon {
     margin-top: 3px;
+  }
+  .simplecolorpicker span.vr {
+    margin: 0 5px 0 2px;
+    padding: 3px 0 0 0;
+  }
+  .simplecolorpicker.fontawesome {
+    span.color {
+      position: relative;
+      margin: 0 3px -3px 0;
+    }
+    span.color[data-selected]:after {
+      margin: 0;
+      display: block;
+      position: absolute;
+      top: -2px;
+      left: 2px;
+    }
   }
   .simplecolorpicker.inline {
     padding-top: 3px;
     padding-bottom: 0px;
     margin-bottom: -3px;
-    max-width: 283px;
+    max-width: 263px;
   }
   .simplecolorpicker.inline.with-empty-color,
   .simplecolorpicker.inline.with-custom-color {
-    max-width: 306px;
-  }
-  .simplecolorpicker.inline.with-empty-color.with-custom-color {
-    max-width: 329px;
+    max-width: 294px;
   }
   .simplecolorpicker {
     .minicolors-swatch {
@@ -226,22 +246,6 @@ i.color {
   }
 }
 .context-menu {
-  .simplecolorpicker.icon,
-  .simplecolorpicker span.color {
-    width: 18px;
-    height: 18px;
-  }
-  .simplecolorpicker.fontawesome span.color {
-    position: relative;
-    margin: 0 3px -3px 0;
-  }
-  .simplecolorpicker.fontawesome span.color[data-selected]:after {
-    margin: 0;
-    display: block;
-    position: absolute;
-    top: -2px;
-    left: 2px;
-  }
   .minicolors-swatch {
     cursor: pointer;
     position: relative;
@@ -1211,6 +1215,7 @@ footer {
   border-right: 1px solid #e4e4e4;
 }
 .badge-enabled,
+.badge-tentatively,
 .badge-disabled {
   padding: 3px 10px 3px 5px;
   font-size: 12px;
@@ -1219,6 +1224,10 @@ footer {
 .badge-enabled {
   background-color: #dff2d4;
   color: #4c7940;
+}
+.badge-tentatively {
+  background-color: #faf2cc;
+  color: #a7a50a;
 }
 .badge-disabled {
   color: #aaa;
@@ -1230,7 +1239,11 @@ footer {
 .status-enabled {
   color: #2f8206;
 }
+.status-tentatively {
+  color: #a7a50a;
+}
 .status-disabled,
+.status-tentatively,
 .status-enabled {
   margin-left: 5px;
   margin-top:-4px;
@@ -2906,6 +2919,9 @@ label.radio.error {
     font-size: 20px;
     padding: 0;
   }
+  &.disable-scroll {
+    overflow: hidden !important;
+  }
 }
 
 .collection-fields-list {
@@ -3076,16 +3092,11 @@ label.radio.error {
 .btn.minimize-button.gold-icon:hover i:before{
   color:#ffd631;
 }
-#pin-button-div {
-  .container-fluid {
-    padding-right:10px;
-  }
-}
 .breadcrumb-pin {
   border-bottom: 1px solid #f2f2f2;
   padding:0;
   background-color: #fff;
-  #pin-button-div{
+  #bookmark-buttons{
     float: right;
   }
   #breadcrumb {
@@ -3124,23 +3135,39 @@ label.radio.error {
   }
 }
 pre.email-body {
-  width: 99%;
+  width: 100%;
   min-height: 5em;
   overflow: auto;
 }
 iframe.email-body {
-  width: 99%;
+  width: 100%;
   min-height: 5em;
   #font > #family > .monospace;
   color: @grayDark;
   padding: (@baseLineHeight - 1) / 2;
   margin: 0 0 @baseLineHeight / 2;
+  display: block;
   font-size: @baseFontSize - 1; // 14px to 13px
   line-height: @baseLineHeight;
   background-color: #f5f5f5;
   border: 1px solid #ccc; // fallback for IE7-8
   border: 1px solid rgba(0,0,0,.15);
   .border-radius(@baseBorderRadius);
+}
+.ui-dialog-content {
+  .email-body-holder {
+    .control-group {
+      .control-label {
+        width: 100px;
+      }
+      .controls {
+        margin-left: 112px;
+      }
+    }
+    .email-body {
+      margin: 0;
+    }
+  }
 }
 .security-row {
   display: inline-block;

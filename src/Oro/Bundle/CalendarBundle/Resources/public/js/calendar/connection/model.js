@@ -32,7 +32,11 @@ define(['underscore', 'backbone', 'routing'
             visible: true,
             backgroundColor: null,
             calendarName: null,
+            userId: null,
             removable: true,
+            canAddEvent: false,
+            canEditEvent: false,
+            canDeleteEvent: false,
             options: null
         },
 
@@ -56,7 +60,10 @@ define(['underscore', 'backbone', 'routing'
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(
-                _.extend({}, _.omit(this.toJSON(), ['calendarUid', 'calendarName', 'removable']), attrs || {})
+                _.extend({}, _.omit(
+                    this.toJSON(),
+                    ['calendarUid', 'calendarName', 'userId', 'removable', 'canAddEvent', 'canEditEvent', 'canDeleteEvent']
+                ), attrs || {})
             );
 
             Backbone.Model.prototype.save.call(this, attrs, options);

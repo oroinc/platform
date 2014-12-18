@@ -40,6 +40,12 @@ oro_menu_config:
             extras:
                 position: 50
                 routes: ['oro_calendar_event_*']
+        oro_system_calendar_list:
+            label: 'oro.calendar.systemcalendar.entity_plural_label'
+            route: 'oro_system_calendar_index'
+            extras:
+                position: 95
+                routes: ['oro_system_calendar_*']
 
     tree:
         application_menu:
@@ -47,6 +53,9 @@ oro_menu_config:
                 activities_tab:
                     children:
                         calendar_event_list: ~
+                system_tab:
+                    children:
+                        oro_system_calendar_list: ~
         usermenu:
             children:
                 oro_calendar_view_default: ~
@@ -66,3 +75,20 @@ oro_titles:
     oro_calendar_event_view: '%%entity.title%%'
     oro_calendar_event_create: oro.ui.create_entity
     oro_calendar_event_update: '%%entity.title%% - Edit'
+    oro_system_calendar_index:  ~
+    oro_system_calendar_view: '%%entity.title%%'
+    oro_system_calendar_create: oro.ui.create_entity
+    oro_system_calendar_update: '%%entity.title%% - Edit'
+    oro_system_calendar_event_view: '%%entity.title%% - %%parent.name%%'
+    oro_system_calendar_event_create: 'oro.ui.create_entity - %%parent.name%%'
+    oro_system_calendar_event_update: '%%entity.title%% - Edit - %%parent.name%%'
+
+oro_navigation_elements:
+    pinButton:
+        routes:
+            oro_calendar_view:         false
+            oro_calendar_view_default: false
+    favoriteButton:
+        routes:
+            oro_calendar_view:         false
+            oro_calendar_view_default: false

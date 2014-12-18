@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
@@ -16,18 +15,18 @@ class UserCalendarProvider implements CalendarProviderInterface
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var CalendarEventNormalizer */
+    /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
     /**
-     * @param DoctrineHelper          $doctrineHelper
-     * @param NameFormatter           $nameFormatter
-     * @param CalendarEventNormalizer $calendarEventNormalizer
+     * @param DoctrineHelper                  $doctrineHelper
+     * @param NameFormatter                   $nameFormatter
+     * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         NameFormatter $nameFormatter,
-        CalendarEventNormalizer $calendarEventNormalizer
+        AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
         $this->doctrineHelper          = $doctrineHelper;
         $this->nameFormatter           = $nameFormatter;
@@ -37,7 +36,7 @@ class UserCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarDefaultValues($userId, $calendarId, array $calendarIds)
+    public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
         $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
             ->createQueryBuilder('o')
@@ -51,11 +50,17 @@ class UserCalendarProvider implements CalendarProviderInterface
         $calendars = $qb->getQuery()->getResult();
         foreach ($calendars as $calendar) {
             $resultItem = [
-                'calendarName' => $this->buildCalendarName($calendar)
+                'calendarName' => $this->buildCalendarName($calendar),
+                'userId'       => $calendar->getOwner()->getId()
             ];
             // prohibit to remove the current calendar from the list of connected calendars
             if ($calendar->getId() === $calendarId) {
                 $resultItem['removable'] = false;
+            }
+            if ($calendarId === $calendar->getId()) {
+                $resultItem['canAddEvent']    = true;
+                $resultItem['canEditEvent']   = true;
+                $resultItem['canDeleteEvent'] = true;
             }
             $result[$calendar->getId()] = $resultItem;
         }
@@ -66,13 +71,28 @@ class UserCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($userId, $calendarId, $start, $end, $subordinate)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb   = $repo->getEventListByTimeIntervalQueryBuilder($calendarId, $start, $end, $subordinate);
+        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end);
 
-        return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb);
+        $visibleIds = [];
+        foreach ($connections as $id => $visible) {
+            if ($visible) {
+                $visibleIds[] = $id;
+            }
+        }
+        if (!empty($visibleIds)) {
+            $qb
+                ->andWhere('c.id IN (:visibleIds)')
+                ->setParameter('visibleIds', $visibleIds);
+        } else {
+            $qb
+                ->andWhere('1 = 0');
+        }
+
+        return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
     }
 
     /**
@@ -83,7 +103,7 @@ class UserCalendarProvider implements CalendarProviderInterface
     protected function buildCalendarName(Calendar $calendar)
     {
         $name = $calendar->getName();
-        if (empty($name)) {
+        if (!$name) {
             $name = $this->nameFormatter->format($calendar->getOwner());
         }
 

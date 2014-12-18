@@ -258,10 +258,6 @@ define(function (require) {
 
                 if (form.length > 0) {
                     this.form = form;
-                    var formAction = this.form.attr('action');
-                    if (!this.options.url && formAction.length > 0 && formAction[0] !== '#') {
-                        this.options.url = formAction;
-                    }
                 }
 
                 _.each(actions, function(action, idx) {
@@ -339,7 +335,13 @@ define(function (require) {
                     error: _.bind(this._onContentLoadFail, this)
                 });
             } else {
-                this.loadContent(form.serialize(), form.attr('method'));
+                var formAction = this.form.attr('action');
+                formAction = formAction.length > 0 && formAction[0] !== '#' ? formAction : null;
+                if (!this.options.url && formAction) {
+                    this.options.url = formAction;
+                }
+                var url = formAction ? formAction : this.options.url;
+                this.loadContent(form.serialize(), form.attr('method'), url);
             }
         },
 
@@ -605,7 +607,7 @@ define(function (require) {
             } else {
                 this._show();
                 if (this.options.initLayout) {
-                    mediator.execute('layout:init', this.widget);
+                    mediator.execute('layout:init', this.widget, this);
                 }
             }
             this.firstRun = false;
@@ -623,7 +625,7 @@ define(function (require) {
             this.setElement($(content).filter('.widget-content:first'));
             this._show();
             if (initLayout || (initLayout === undefined && this.options.initLayout)) {
-                mediator.execute('layout:init', this.widget);
+                mediator.execute('layout:init', this.widget, this);
             }
         },
 
@@ -633,9 +635,9 @@ define(function (require) {
          * @param {Object=} data
          * @param {String=} method
          */
-        loadContent: function(data, method) {
+        loadContent: function(data, method, url) {
             this.loading = true;
-            var url = this.options.url;
+            var url = url || this.options.url;
             if (url === undefined || !url) {
                 url = window.location.href;
             }

@@ -7,78 +7,44 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
-abstract class AbstractEmailSynchronizer
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     const SYNC_CODE_IN_PROCESS = 1;
     const SYNC_CODE_FAILURE    = 2;
     const SYNC_CODE_SUCCESS    = 3;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $log = null;
-
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @var EmailEntityBuilder
-     */
-    protected $emailEntityBuilder;
+    /** @var KnownEmailAddressCheckerFactory */
+    protected $knownEmailAddressCheckerFactory;
 
-    /**
-     * @var EmailAddressManager
-     */
-    protected $emailAddressManager;
-
-    /**
-     * @var EmailAddressHelper
-     */
-    protected $emailAddressHelper;
-
-    /**
-     * @var KnownEmailAddressChecker
-     */
-    protected $knownEmailAddressChecker;
+    /** @var KnownEmailAddressCheckerInterface */
+    private $knownEmailAddressChecker;
 
     /**
      * Constructor
      *
-     * @param ManagerRegistry     $doctrine
-     * @param EmailEntityBuilder  $emailEntityBuilder
-     * @param EmailAddressManager $emailAddressManager
-     * @param EmailAddressHelper  $emailAddressHelper
+     * @param ManagerRegistry                 $doctrine
+     * @param KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
      */
     protected function __construct(
         ManagerRegistry $doctrine,
-        EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper
+        KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory
     ) {
-        $this->doctrine            = $doctrine;
-        $this->emailEntityBuilder  = $emailEntityBuilder;
-        $this->emailAddressManager = $emailAddressManager;
-        $this->emailAddressHelper  = $emailAddressHelper;
-    }
-
-    /**
-     * Sets a logger
-     *
-     * @param LoggerInterface $log
-     */
-    public function setLogger(LoggerInterface $log)
-    {
-        $this->log = $log;
+        $this->doctrine                        = $doctrine;
+        $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
     }
 
     /**
@@ -108,12 +74,12 @@ abstract class AbstractEmailSynchronizer
      */
     public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1)
     {
-        if ($this->log === null) {
-            $this->log = new NullLogger();
+        if ($this->logger === null) {
+            $this->logger = new NullLogger();
         }
 
         if (!$this->checkConfiguration()) {
-            $this->log->notice('Exit because synchronization was not configured.');
+            $this->logger->notice('Exit because synchronization was not configured.');
         }
 
         $startTime = $this->getCurrentUtcDateTime();
@@ -128,19 +94,19 @@ abstract class AbstractEmailSynchronizer
             if ($maxExecTimeout !== false) {
                 $date = $this->getCurrentUtcDateTime();
                 if ($date->sub($maxExecTimeout) >= $startTime) {
-                    $this->log->notice('Exit because allocated time frame elapsed.');
+                    $this->logger->notice('Exit because allocated time frame elapsed.');
                     break;
                 }
             }
 
             $origin = $this->findOriginToSync($maxConcurrentTasks, $minExecIntervalInMin);
             if ($origin === null) {
-                $this->log->notice('Exit because nothing to synchronise.');
+                $this->logger->notice('Exit because nothing to synchronise.');
                 break;
             }
 
             if (isset($processedOrigins[$origin->getId()])) {
-                $this->log->notice('Exit because all origins have been synchronised.');
+                $this->logger->notice('Exit because all origins have been synchronised.');
                 break;
             }
 
@@ -152,7 +118,7 @@ abstract class AbstractEmailSynchronizer
             }
 
             if ($maxTasks > 0 && count($processedOrigins) >= $maxTasks) {
-                $this->log->notice('Exit because the limit of tasks are reached.');
+                $this->logger->notice('Exit because the limit of tasks are reached.');
                 break;
             }
         }
@@ -175,12 +141,12 @@ abstract class AbstractEmailSynchronizer
      */
     public function syncOrigins(array $originIds)
     {
-        if ($this->log === null) {
-            $this->log = new NullLogger();
+        if ($this->logger === null) {
+            $this->logger = new NullLogger();
         }
 
         if (!$this->checkConfiguration()) {
-            $this->log->notice('Exit because synchronization was not configured.');
+            $this->logger->notice('Exit because synchronization was not configured.');
         }
 
         $failedOriginIds = array();
@@ -223,8 +189,10 @@ abstract class AbstractEmailSynchronizer
      */
     protected function doSyncOrigin(EmailOrigin $origin)
     {
-        $this->ensureKnownEmailAddressCheckerCreated();
         $processor = $this->createSynchronizationProcessor($origin);
+        if ($processor instanceof LoggerAwareInterface) {
+            $processor->setLogger($this->logger);
+        }
 
         try {
             if ($this->changeOriginSyncState($origin, self::SYNC_CODE_IN_PROCESS)) {
@@ -232,20 +200,20 @@ abstract class AbstractEmailSynchronizer
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
-                $this->log->notice('Skip because it is already in process.');
+                $this->logger->notice('Skip because it is already in process.');
             }
         } catch (\Exception $ex) {
             try {
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
             } catch (\Exception $innerEx) {
                 // ignore any exception here
-                $this->log->error(
+                $this->logger->error(
                     sprintf('Cannot set the fail state. Error: %s.', $innerEx->getMessage()),
                     array('exception' => $innerEx)
                 );
             }
 
-            $this->log->error(
+            $this->logger->error(
                 sprintf('The synchronization failed. Error: %s.', $ex->getMessage()),
                 array('exception' => $ex)
             );
@@ -274,16 +242,16 @@ abstract class AbstractEmailSynchronizer
     /**
      * Makes sure $this->knownEmailAddressChecker initialized
      */
-    protected function ensureKnownEmailAddressCheckerCreated()
+    protected function getKnownEmailAddressChecker()
     {
         if (!$this->knownEmailAddressChecker) {
-            $this->knownEmailAddressChecker = new KnownEmailAddressChecker(
-                $this->log,
-                $this->getEntityManager(),
-                $this->emailAddressManager,
-                $this->emailAddressHelper
-            );
+            $this->knownEmailAddressChecker = $this->knownEmailAddressCheckerFactory->create();
+            if ($this->knownEmailAddressChecker instanceof LoggerAwareInterface) {
+                $this->knownEmailAddressChecker->setLogger($this->logger);
+            }
         }
+
+        return $this->knownEmailAddressChecker;
     }
 
     /**
@@ -350,7 +318,7 @@ abstract class AbstractEmailSynchronizer
      */
     protected function findOriginToSync($maxConcurrentTasks, $minExecIntervalInMin)
     {
-        $this->log->notice('Finding an email origin ...');
+        $this->logger->notice('Finding an email origin ...');
 
         $now = $this->getCurrentUtcDateTime();
         $border = clone $now;
@@ -397,11 +365,11 @@ abstract class AbstractEmailSynchronizer
 
         if ($result === null) {
             if (!empty($origins)) {
-                $this->log->notice('The maximum number of concurrent tasks is reached.');
+                $this->logger->notice('The maximum number of concurrent tasks is reached.');
             }
-            $this->log->notice('An email origin was not found.');
+            $this->logger->notice('An email origin was not found.');
         } else {
-            $this->log->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
+            $this->logger->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
         }
 
         return $result;
@@ -415,7 +383,7 @@ abstract class AbstractEmailSynchronizer
      */
     protected function findOrigin($originId)
     {
-        $this->log->notice(sprintf('Finding an email origin (id: %d) ...', $originId));
+        $this->logger->notice(sprintf('Finding an email origin (id: %d) ...', $originId));
 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $query = $repo->createQueryBuilder('o')
@@ -430,9 +398,9 @@ abstract class AbstractEmailSynchronizer
         $result = !empty($origins) ? $origins[0] : null;
 
         if ($result === null) {
-            $this->log->notice('An email origin was not found.');
+            $this->logger->notice('An email origin was not found.');
         } else {
-            $this->log->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
+            $this->logger->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
         }
 
         return $result;
@@ -443,7 +411,7 @@ abstract class AbstractEmailSynchronizer
      */
     protected function resetHangedOrigins()
     {
-        $this->log->notice('Resetting hanged email origins ...');
+        $this->logger->notice('Resetting hanged email origins ...');
 
         $now = $this->getCurrentUtcDateTime();
         $border = clone $now;
@@ -460,7 +428,7 @@ abstract class AbstractEmailSynchronizer
             ->getQuery();
 
         $affectedRows = $query->execute();
-        $this->log->notice(sprintf('Updated %d row(s).', $affectedRows));
+        $this->logger->notice(sprintf('Updated %d row(s).', $affectedRows));
     }
 
     /**

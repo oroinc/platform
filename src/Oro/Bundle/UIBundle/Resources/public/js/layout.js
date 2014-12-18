@@ -22,7 +22,7 @@ define(function (require) {
     pageRenderedCbPool = [];
 
     layout = {
-        init: function (container) {
+        init: function (container, superInstance) {
             var promise;
             container = $(container);
             this.styleForm(container);
@@ -33,51 +33,86 @@ define(function (require) {
 
             this.initPopover(container.find('label'));
 
-            promise = this.initPageComponents(container);
+            promise = this.initPageComponents(container, superInstance);
             return promise;
         },
 
-        initPageComponents: function (container) {
-            var loads, initialized;
-            loads = [];
-            initialized = $.Deferred();
+        /**
+         * Initializes components defined in HTML of the container
+         * and attaches them to passed superInstance
+         *
+         * @param {jQuery.Element} container
+         * @param {Backbone.View|Chaplin.View|PageController} superInstance
+         * @returns {jQuery.Promise}
+         */
+        initPageComponents: function (container, superInstance) {
+            var loadPromises, initDeferred;
+            loadPromises = [];
+            initDeferred = $.Deferred();
 
             container.find('[data-page-component-module]').each(function () {
-                var $elem, module, options, loaded;
+                var $elem, module, options, loadDeferred;
 
                 $elem = $(this);
                 module = $elem.data('pageComponentModule');
-                options = $elem.data('pageComponentOptions');
+                options = $elem.data('pageComponentOptions') || {};
                 options._sourceElement = $elem;
                 $elem
                     .removeData('pageComponentModule')
                     .removeData('pageComponentOptions')
                     .removeAttr('data-page-component-module')
                     .removeAttr('data-page-component-options');
-                loaded = $.Deferred();
+                loadDeferred = $.Deferred();
 
                 require([module], function (component) {
                     if (typeof component.init === "function") {
-                        loaded.resolve(component.init(options));
+                        loadDeferred.resolve(component.init(options));
                     } else {
-                        loaded.resolve(component(options));
+                        loadDeferred.resolve(component(options));
                     }
                 }, function () {
-                    loaded.resolve();
+                    loadDeferred.resolve();
                 });
 
-                loads.push(loaded.promise());
+                loadPromises.push(loadDeferred.promise());
             });
 
-            $.when.apply($, loads).always(function () {
-                var initializes = _.flatten(_.toArray(arguments), true);
-                $.when.apply($, initializes).always(function () {
+            $.when.apply($, loadPromises).always(function () {
+                var initPromises = _.flatten(_.toArray(arguments), true);
+                $.when.apply($, initPromises).always(function () {
                     var components = _.compact(_.flatten(_.toArray(arguments), true));
-                    initialized.resolve(components);
+                    initDeferred.resolve(components);
                 });
             });
 
-            return initialized.promise();
+            // if the super instance (view/controller) is passed,
+            // attache component instances to that super instance
+            if (superInstance) {
+                initDeferred.done(function (components) {
+                    _.each(components, function (component) {
+                        var name;
+                        if (typeof component.dispose !== 'function') {
+                            // the component is not disposable
+                            return;
+                        } else if (superInstance.disposed) {
+                            // the super instance is already disposed
+                            component.dispose();
+                            return;
+                        }
+
+                        name = 'component:' + (component.cid || _.uniqueId('component'));
+                        if (typeof superInstance.subview === 'function') {
+                            // the super instance implements subview method (like a Chaplin.View)
+                            superInstance.subview(name, component);
+                        } else {
+                            // the super instance is a controller or Backbone.View
+                            superInstance[name] = component;
+                        }
+                    });
+                });
+            }
+
+            return initDeferred.promise();
         },
 
         initPopover: function (container) {

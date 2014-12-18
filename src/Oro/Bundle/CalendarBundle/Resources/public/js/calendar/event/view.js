@@ -2,7 +2,7 @@
 /*global define*/
 define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
     'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
-    ], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
+], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -15,6 +15,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
     return Backbone.View.extend({
         /** @property {Object} */
         options: {
+            calendar: null,
+            connections: null,
             colorManager: null,
             widgetRoute: null,
             widgetOptions: null
@@ -22,8 +24,17 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         /** @property {Object} */
         selectors: {
-            loadingMaskContent: '.loading-content'
+            loadingMaskContent: '.loading-content',
+            backgroundColor: 'input[name$="[backgroundColor]"]',
+            calendarUid: '[name*="calendarUid"]',
+            invitedUsers: 'input[name$="[invitedUsers]"]'
         },
+
+        /** @property {Array} */
+        userCalendarOnlyFields: [
+            {fieldName: 'reminders', emptyValue: {}, selector: '.reminders-collection'},
+            {fieldName: 'invitedUsers', emptyValue: '', selector: 'input[name$="[invitedUsers]"]'}
+        ],
 
         initialize: function (options) {
             this.options = _.defaults(_.pick(options || {}, _.keys(this.options)), this.options);
@@ -120,14 +131,23 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
         },
 
         saveModel: function () {
-            this.showSavingMask();
-            try {
-                this.model.save(this.getEventFormData(), {
-                    wait: true,
-                    error: _.bind(this._handleResponseError, this)
+            var errors;
+            this.model.set(this.getEventFormData());
+            if (this.model.isValid()) {
+                this.showSavingMask();
+                try {
+                    this.model.save(null, {
+                        wait: true,
+                        error: _.bind(this._handleResponseError, this)
+                    });
+                } catch (err) {
+                    this.showError(err);
+                }
+            } else {
+                errors = _.map(this.model.validationError, function (message) {
+                    return __(message);
                 });
-            } catch (err) {
-                this.showError(err);
+                this.showError({errors: errors});
             }
         },
 
@@ -153,6 +173,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         showDeletingMask: function () {
             this._showMask(__('Deleting...'));
+        },
+
+        showLoadingMask: function () {
+            this._showMask(__('Loading...'));
         },
 
         _showMask: function (message) {
@@ -190,6 +214,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             var inputs = form.find('[name]');
             var fieldNameRegex = /\[(\w+)\]/g;
 
+            // show loading mask if child events users should be updated
+            if (!_.isEmpty(modelData.invitedUsers)) {
+                this.eventDialog.once('renderComplete', function() {
+                    self.showLoadingMask();
+                });
+            }
+
             _.each(inputs, function (input) {
                 input = $(input);
                 var name = input.attr('name'),
@@ -203,11 +234,22 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 if (matches.length) {
                     var value = self.getValueByPath(modelData, matches);
                     if (input.is(':checkbox')) {
-                        input.prop('checked', value);
+                        if (value === false || value === true) {
+                            input.prop('checked', value);
+                        } else {
+                            input.prop('checked', input.val() == value);
+                        }
                     } else {
                         input.val(value);
                     }
                     input.change();
+                }
+
+                // hide loading mask if child events users should be updated
+                if (name.indexOf('[invitedUsers]') !== -1 && !_.isEmpty(modelData.invitedUsers)) {
+                    input.on('select2-data-loaded', function () {
+                        self._hideMask();
+                    });
                 }
             });
 
@@ -242,10 +284,35 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         getEventForm: function () {
             var modelData = this.model.toJSON(),
-                form = this.fillForm(this.template(modelData), modelData),
+                templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData),
+                form = this.fillForm(this.template(templateData), modelData),
                 calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
-            form.find('[name*="backgroundColor"]')
+
+            form.find(this.selectors.backgroundColor)
                 .data('page-component-options').emptyColor = calendarColors.backgroundColor;
+            if (modelData.calendarAlias !== 'user') {
+                this._showUserCalendarOnlyFields(form, false);
+            }
+            this._toggleCalendarUidByInvitedUsers(form);
+
+            form.find(this.selectors.calendarUid).on('change', _.bind(function (e) {
+                var $emptyColor = form.find('.empty-color'),
+                    $selector = $(e.currentTarget),
+                    tagName = $selector.prop('tagName').toUpperCase(),
+                    calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
+                    colors = this.options.colorManager.getCalendarColors(calendarUid),
+                    newCalendar = this.parseCalendarUid(calendarUid);
+                $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
+                if (newCalendar.calendarAlias === 'user') {
+                    this._showUserCalendarOnlyFields(form);
+                } else {
+                    this._showUserCalendarOnlyFields(form, false);
+                }
+            }, this));
+            form.find(this.selectors.invitedUsers).on('change', _.bind(function (e) {
+                this._toggleCalendarUidByInvitedUsers(form);
+            }, this));
+
             return form;
         },
 
@@ -268,7 +335,74 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                 }
             }, this);
 
+            if (data.hasOwnProperty('calendarUid')) {
+                if (data.calendarUid) {
+                    _.extend(data, this.parseCalendarUid(data.calendarUid));
+                    if (data.calendarAlias !== 'user') {
+                        _.each(this.userCalendarOnlyFields, function (item) {
+                            if (item.fieldName) {
+                                data[item.fieldName] = item.emptyValue;
+                            }
+                        });
+                    }
+                }
+                delete data.calendarUid;
+            }
+
+            if (data.hasOwnProperty('invitedUsers')) {
+                data.invitedUsers = _.map(data.invitedUsers ? data.invitedUsers.split(',') : [], function (item) {
+                    return parseInt(item);
+                });
+            }
+
             return data;
+        },
+
+        parseCalendarUid: function (calendarUid) {
+            return {
+                calendarAlias: calendarUid.substr(0, calendarUid.lastIndexOf('_')),
+                calendar: parseInt(calendarUid.substr(calendarUid.lastIndexOf('_') + 1))
+            };
+        },
+
+        _showUserCalendarOnlyFields: function (form, visible) {
+            _.each(this.userCalendarOnlyFields, function (item) {
+                if (item.selector) {
+                    if (_.isUndefined(visible) || visible) {
+                        form.find(item.selector).closest('.control-group').show();
+                    } else {
+                        form.find(item.selector).closest('.control-group').hide();
+                    }
+                }
+            });
+        },
+
+        _toggleCalendarUidByInvitedUsers: function (form) {
+            var $calendarUid = form.find(this.selectors.calendarUid);
+            if (!$calendarUid.length) {
+                return;
+            }
+            if (form.find(this.selectors.invitedUsers).val()) {
+                $calendarUid.attr('disabled', 'disabled');
+                $calendarUid.parent().attr('title', __("The calendar cannot be changed because the event has guests"));
+                // fix select2 dynamic change disabled
+                if (!$calendarUid.parent().hasClass('disabled')) {
+                    $calendarUid.parent().addClass('disabled');
+                }
+                if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
+                    $calendarUid.parent().find('label').addClass('disabled');
+                }
+            } else {
+                $calendarUid.removeAttr('disabled');
+                $calendarUid.removeAttr('title');
+                // fix select2 dynamic change disabled
+                if ($calendarUid.parent().hasClass('disabled')) {
+                    $calendarUid.parent().removeClass('disabled');
+                }
+                if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
+                    $calendarUid.parent().find('label').removeClass('disabled');
+                }
+            }
         },
 
         setValueByPath: function (obj, value, path) {
@@ -295,6 +429,43 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             }
 
             return current;
+        },
+
+        getEventFormTemplateData: function (isNew) {
+            var templateType = '',
+                calendars = [],
+                ownCalendar = null,
+                isOwnCalendar = function (item) {
+                    return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
+                };
+
+            this.options.connections.each(function (item) {
+                var calendar;
+                if (item.get('canAddEvent')) {
+                    calendar = {uid: item.get('calendarUid'), name: item.get('calendarName')};
+                    if (!ownCalendar && isOwnCalendar(item)) {
+                        ownCalendar = calendar;
+                    } else {
+                        calendars.push(calendar);
+                    }
+                }
+            }, this);
+
+            if (calendars.length) {
+                if (isNew && calendars.length === 1) {
+                    templateType = 'single';
+                } else {
+                    if (ownCalendar) {
+                        calendars.unshift(ownCalendar);
+                    }
+                    templateType = 'multiple';
+                }
+            }
+
+            return {
+                calendarUidTemplateType: templateType,
+                calendars: calendars
+            };
         }
     });
 });

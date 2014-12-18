@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore'
-    ], function ($, _) {
+define(['jquery', 'underscore', 'oroui/js/tools'
+    ], function ($, _, tools) {
     'use strict';
 
     /**
@@ -151,6 +151,7 @@ define(['jquery', 'underscore'
                         if (typeof response.results != 'undefined') {
                             handleResults(response.results);
                         }
+                        element.trigger('select2-data-loaded');
                     }
                 });
             };
@@ -160,14 +161,23 @@ define(['jquery', 'underscore'
                 currentValue = [currentValue];
             }
 
-            var elementData = element.data('selected-data');
+            // elementData must have name
+            var elementData = _.filter(
+                element.data('selected-data'),
+                function (item) {
+                    return item.name !== undefined && item.name !== null;
+                }
+            );
 
             if (_.isArray(elementData) && elementData.length > 0) {
                 var dataIds = _.map(elementData, function(item) {
                     return item.id;
                 });
 
-                if (dataIds.sort().join(',') === currentValue.sort().join(',')) {
+                // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
+                dataIds = _.compact(dataIds);
+
+                if (dataIds.length === 0 || dataIds.sort().join(',') === currentValue.sort().join(',')) {
                     handleResults(elementData);
                 } else {
                     setSelect2ValueById(currentValue);
@@ -179,7 +189,7 @@ define(['jquery', 'underscore'
 
         highlightSelection: function(str, selection) {
             return str && selection && selection.term ?
-                str.replace(new RegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
+                str.replace(tools.safeRegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
         },
 
         getTitle: function(data, properties) {
