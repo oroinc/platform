@@ -30,7 +30,7 @@ services:
         factory_method: createNamed
         factory_service: form.factory
         arguments:
-            - 'oro_comment_api'
+            - ~
             - 'oro_comment_api'
 
     oro_comment.form.handler.comment:

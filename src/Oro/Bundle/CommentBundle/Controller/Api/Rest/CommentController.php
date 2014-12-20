@@ -88,17 +88,12 @@ class CommentController extends RestController
      */
     public function postAction($relationClass, $relationId, Request $request)
     {
-        $entity      = call_user_func_array(array($this, 'createEntity'), func_get_args());
-        $isProcessed = false;
-        $exception   = $this->getForm();
+        $entity    = call_user_func_array(array($this, 'createEntity'), func_get_args());
+        $exception = $this->getForm();
 
-        try {
-            $this->getManager()->setRelationField($entity, $relationClass, $relationId);
+        $this->getManager()->setRelationField($entity, $relationClass, $relationId);
 
-            $isProcessed = $this->processForm($entity);
-        } catch (\Exception $e) {
-            $exception = $e;
-        }
+        $isProcessed = $this->processForm($entity);
 
         if ($isProcessed) {
             $view = $this->view(
@@ -127,8 +122,8 @@ class CommentController extends RestController
      */
     public function putAction($id)
     {
-        # добавить юзера который обновил
-        # возвращать всю сущность
+        #todo добавить юзера который обновил
+        #todo возвращать всю сущность
         return $this->handleUpdateRequest($id);
     }
 
