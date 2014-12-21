@@ -41,6 +41,11 @@ class RefreshExtendCacheMigrationQuery implements MigrationQuery
             $logger
         );
         $this->commandExecutor->runCommand(
+            'oro:entity-extend:update-schema',
+            [],
+            $logger
+        );
+        $this->commandExecutor->runCommand(
             'oro:entity-extend:cache:clear',
             [],
             $logger
