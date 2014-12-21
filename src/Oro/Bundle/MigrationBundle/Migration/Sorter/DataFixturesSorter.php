@@ -98,13 +98,12 @@ class DataFixturesSorter
         // will handle all fixtures which are not instances of
         // OrderedFixtureInterface
         if ($usedPrioritySorting) {
-            $count = count($this->orderedFixtures);
-
-            for ($i = 0; $i < $count; ++$i) {
-                if (!($this->orderedFixtures[$i] instanceof OrderedFixtureInterface)) {
-                    unset($this->orderedFixtures[$i]);
+            $this->orderedFixtures = array_filter(
+                $this->orderedFixtures,
+                function ($fixture) {
+                    return $fixture instanceof OrderedFixtureInterface;
                 }
-            }
+            );
         }
 
         // First we determine which classes has dependencies and which don't
@@ -176,7 +175,6 @@ class DataFixturesSorter
     protected function validateDependencies($fixtureClass, $dependenciesClasses)
     {
         if (!is_array($dependenciesClasses) || empty($dependenciesClasses)) {
-
             throw new \InvalidArgumentException(
                 sprintf(
                     'Method "%s" in class "%s" must return an array of classes which are'
