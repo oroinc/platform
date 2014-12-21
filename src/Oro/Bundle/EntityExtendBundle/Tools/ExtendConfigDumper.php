@@ -83,9 +83,9 @@ class ExtendConfigDumper
     /**
      * Update config.
      *
-     * @param array|null $skippedOrigins
+     * @param array $originsToSkip
      */
-    public function updateConfig(array $skippedOrigins = null)
+    public function updateConfig(array $originsToSkip = [])
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
@@ -99,25 +99,14 @@ class ExtendConfigDumper
         }
 
         $extendProvider = $this->em->getExtendConfigProvider();
-        $extendConfigs  = $extendProvider->getConfigs(null, true);
+        $extendConfigs  = $extendProvider->filter($this->createOriginFilterCallback($originsToSkip), null, true);
         foreach ($extendConfigs as $extendConfig) {
-            if ($this->isSkippedOrigin($extendConfig, $skippedOrigins)) {
-                continue;
-            }
-
             if ($extendConfig->is('upgradeable')) {
                 if ($extendConfig->is('is_extend')) {
-                    $this->checkSchema($extendConfig, $aliases, $skippedOrigins);
+                    $this->checkSchema($extendConfig, $aliases, $originsToSkip);
                 }
 
-                // some bundles can change configs in pre persist events,
-                // and other bundles can produce more changes depending on already made, it's a bit hacky,
-                // but it's a service operation so called inevitable evil
-                $extendProvider->flush();
-
-                if ($this->checkState($extendConfig)) {
-                    $extendProvider->flush();
-                }
+                $this->updateStateValues($extendConfig);
             }
         }
 
@@ -188,7 +177,6 @@ class ExtendConfigDumper
             krsort($this->extensions);
             $this->sortedExtensions = call_user_func_array('array_merge', $this->extensions);
         }
-
         return $this->sortedExtensions;
     }
 
@@ -291,12 +279,8 @@ class ExtendConfigDumper
         $defaultProperties  = [];
         $addRemoveMethods   = [];
 
-        $fieldConfigs = $extendProvider->getConfigs($className);
+        $fieldConfigs = $extendProvider->filter($this->createOriginFilterCallback($skippedOrigins), $className, true);
         foreach ($fieldConfigs as $fieldConfig) {
-            if ($this->isSkippedOrigin($fieldConfig, $skippedOrigins)) {
-                continue;
-            }
-
             $this->checkFields(
                 $entityName,
                 $fieldConfig,
@@ -328,7 +312,7 @@ class ExtendConfigDumper
                 }
             }
 
-            $this->checkRelation($relation['target_entity'], $relation['field_id']);
+            $this->updateRelationValues($relation['target_entity'], $relation['field_id']);
         }
         $extendConfig->set('relation', $relations);
 
@@ -360,33 +344,21 @@ class ExtendConfigDumper
     }
 
     /**
-     * @param ConfigInterface $config
-     * @param array|null $skippedOrigins
-     * @return bool
-     */
-    protected function isSkippedOrigin(ConfigInterface $config, $skippedOrigins)
-    {
-        return is_array($skippedOrigins) && $skippedOrigins && in_array($config->get('origin'), $skippedOrigins);
-    }
-
-    /**
      * @param ConfigInterface $extendConfig
      *
      * @return bool
      */
-    protected function checkState(ConfigInterface $extendConfig)
+    protected function updateStateValues(ConfigInterface $extendConfig)
     {
-        $hasChanges = false;
         $extendProvider = $this->em->getExtendConfigProvider();
         $className      = $extendConfig->getId()->getClassName();
-        $fieldConfigs = $extendProvider->getConfigs($className, true);
+        $fieldConfigs   = $extendProvider->getConfigs($className, true);
 
         if ($extendConfig->is('state', ExtendScope::STATE_DELETE)) {
             // mark entity as deleted
             if (!$extendConfig->is('is_deleted')) {
                 $extendConfig->set('is_deleted', true);
                 $extendProvider->persist($extendConfig);
-                $hasChanges = true;
             }
 
             // mark all fields as deleted
@@ -394,7 +366,6 @@ class ExtendConfigDumper
                 if (!$fieldConfig->is('is_deleted')) {
                     $fieldConfig->set('is_deleted', true);
                     $extendProvider->persist($fieldConfig);
-                    $hasChanges = true;
                 }
             }
         } elseif (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
@@ -413,18 +384,14 @@ class ExtendConfigDumper
                 $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
                 $extendProvider->persist($extendConfig);
             }
-
-            $hasChanges = true;
         }
-
-        return $hasChanges;
     }
 
     /**
      * @param string        $targetClass
      * @param FieldConfigId $fieldId
      */
-    protected function checkRelation($targetClass, FieldConfigId $fieldId)
+    protected function updateRelationValues($targetClass, FieldConfigId $fieldId)
     {
         $extendProvider = $this->em->getExtendConfigProvider();
         $targetConfig   = $extendProvider->getConfig($targetClass);
@@ -450,5 +417,20 @@ class ExtendConfigDumper
         $targetConfig->set('schema', $schema);
 
         $extendProvider->persist($targetConfig);
+    }
+
+    /**
+     * Return callback that could be used for filtering purposes in order to skip config entries that has origin in list
+     * of currently skipped
+     *
+     * @param array $skippedOrigins
+     *
+     * @return callable
+     */
+    protected function createOriginFilterCallback(array $skippedOrigins)
+    {
+        return function (ConfigInterface $config) use ($skippedOrigins) {
+            return !in_array($config->get('origin'), $skippedOrigins, true);
+        };
     }
 }
