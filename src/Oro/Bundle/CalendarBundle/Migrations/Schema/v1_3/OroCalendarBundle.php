@@ -112,16 +112,16 @@ class OroCalendarBundle implements
     }
 
     /**
-     * @param Table $taskTable
+     * @param Table $table
      */
-    protected function enableDataAudit(Table $taskTable)
+    protected function enableDataAudit(Table $table)
     {
-        $taskTable->addOption(OroOptions::KEY, ['dataaudit' => ['auditable' => true]]);
-        $taskTable->getColumn('title')
+        $table->addOption(OroOptions::KEY, ['dataaudit' => ['auditable' => true]]);
+        $table->getColumn('title')
             ->setOptions([OroOptions::KEY => ['dataaudit' => ['auditable' => true]]]);
-        $taskTable->getColumn('description')
+        $table->getColumn('description')
             ->setOptions([OroOptions::KEY => ['dataaudit' => ['auditable' => true]]]);
-        $taskTable->getColumn('start_at')
+        $table->getColumn('start_at')
             ->setOptions(
                 [
                     OroOptions::KEY => [
@@ -130,7 +130,7 @@ class OroCalendarBundle implements
                     ]
                 ]
             );
-        $taskTable->getColumn('end_at')
+        $table->getColumn('end_at')
             ->setOptions(
                 [
                     OroOptions::KEY => [
@@ -139,7 +139,7 @@ class OroCalendarBundle implements
                     ]
                 ]
             );
-        $taskTable->getColumn('calendar_id')
+        $table->getColumn('calendar_id')
             ->setOptions(
                 [
                     OroOptions::KEY => [
@@ -148,7 +148,7 @@ class OroCalendarBundle implements
                     ]
                 ]
             );
-        $taskTable->getColumn('all_day')
+        $table->getColumn('all_day')
             ->setOptions(
                 [
                     OroOptions::KEY => [
