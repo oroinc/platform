@@ -185,7 +185,7 @@ services:
             - @oro_entity_config.tools.command_executor
             - %oro_entity_extend.migration.config_processor.options.path%
         tags:
-            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -100 }
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -115 }
 
     oro_entity_extend.migration.update_indices.post_up.listener:
         class: %oro_entity_extend.migration.update_indices.post_up.listener.class%
