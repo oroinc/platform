@@ -9,10 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
  * @ORM\Entity()
- * @ORM\Table(name="oro_comment")
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="comments_type")
- * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
  *          "entity"={
@@ -37,5 +33,4 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Comment extends ExtendComment
 {
-
 }
