@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore'
-    ], function ($, _) {
+define(['jquery', 'underscore', 'oroui/js/tools'
+    ], function ($, _, tools) {
     'use strict';
 
     /**
@@ -161,7 +161,13 @@ define(['jquery', 'underscore'
                 currentValue = [currentValue];
             }
 
-            var elementData = element.data('selected-data');
+            // elementData must have name
+            var elementData = _.filter(
+                element.data('selected-data'),
+                function (item) {
+                    return item.name !== undefined && item.name !== null;
+                }
+            );
 
             if (_.isArray(elementData) && elementData.length > 0) {
                 var dataIds = _.map(elementData, function(item) {
@@ -183,7 +189,7 @@ define(['jquery', 'underscore'
 
         highlightSelection: function(str, selection) {
             return str && selection && selection.term ?
-                str.replace(new RegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
+                str.replace(tools.safeRegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
         },
 
         getTitle: function(data, properties) {

@@ -79,27 +79,25 @@ class QueryValidator extends ConstraintValidator
         $builder->setGridName($gridPrefix);
         $builder->setSource($value);
 
-        $dataGrid = $this->gridBuilder->build(
-            $builder->getConfiguration(),
-            new ParameterBag()
-        );
-
-        $dataSource = $dataGrid->getDatasource();
-        if ($dataSource instanceof OrmDatasource) {
-            $qb = $dataSource->getQueryBuilder();
-            $qb->setMaxResults(1);
-        }
-
         $message = $this->translator->trans($constraint->message);
-
         try {
+            $dataGrid = $this->gridBuilder->build(
+                $builder->getConfiguration(),
+                new ParameterBag()
+            );
+            $dataSource = $dataGrid->getDatasource();
+            if ($dataSource instanceof OrmDatasource) {
+                $qb = $dataSource->getQueryBuilder();
+                $qb->setMaxResults(1);
+            }
+
             $dataSource->getResults();
         } catch (DBALException $e) {
             $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
         } catch (ORMException $e) {
             $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
         } catch (InvalidConfigurationException $e) {
-            $this->context->addViolation($message);
+            $this->context->addViolation($this->isDebug ? $e->getMessage() : $message);
         }
     }
 

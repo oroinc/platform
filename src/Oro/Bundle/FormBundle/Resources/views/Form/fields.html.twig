@@ -361,7 +361,7 @@
                 altFormat: 'yy-mm-dd',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
                 showButtonPanel: true,
                 onSelect: function () {
                     var form = selector.parents('form');
@@ -420,7 +420,7 @@
                 altSeparator: 'T',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
                 showButtonPanel: true,
                 onSelect: function () {
                     selector.trigger('change');
@@ -693,10 +693,19 @@
 {% endblock %}
 
 {% block oro_link_type_widget %}
-    {% if resource_granted(acl) %}
-        <a href="{{ path(route, routeParameters) }}">
-            {{ title|trans }}
-        </a>
+    {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
+        {# @todo after BAP-4696 implementation remove link class #}
+        {% if value is defined and value is iterable%}
+            {% for fileName, route in value %}
+                <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                    {{ fileName }}
+                </a>
+            {% endfor %}
+        {% else %}
+            <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                {{ title|trans }}
+            </a>
+        {% endif %}
     {% endif %}
 {% endblock %}
 

@@ -1,7 +1,7 @@
 /*global define*/
 define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/translator', 'oroui/js/mediator',
-    'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item', 'jquery-ui'],
-    function ($, _, Backbone, routing, __, mediator, widgetManager, DashboardItemWidget) {
+    'oroui/js/widget-manager', 'orodashboard/js/widget/dashboard-item', 'orodashboard/js/dashboard-util', 'jquery-ui'],
+    function ($, _, Backbone, routing, __, mediator, widgetManager, DashboardItemWidget, dashboardUtil) {
     'use strict';
 
     /**
@@ -78,6 +78,10 @@ define(['jquery', 'underscore', 'backbone', 'routing', 'orotranslation/js/transl
                         }
                     });
             }
+
+            $('.dashboard-container-wrapper .title-buttons-container .remove-button').on('removesuccess', function () {
+                dashboardUtil.onDashboardRemove($(this).attr('data-id'));
+            });
         },
 
         /**

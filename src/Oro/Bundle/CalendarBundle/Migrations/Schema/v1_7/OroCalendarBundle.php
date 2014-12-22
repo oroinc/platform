@@ -18,7 +18,7 @@ class OroCalendarBundle implements Migration
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 7]);
-        $table->addcolumn('is_public', 'boolean', ['default' => false]);
+        $table->addcolumn('is_public', 'boolean', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
 

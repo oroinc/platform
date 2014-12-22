@@ -1,3 +1,14 @@
+oro:
+    calendar:
+        control:
+            all_day: " "
+            today:   today
+            month:   month
+            week:    week
+            day:     day
+        error_message:
+            event_model:
+                end_date_earlier_than_start: "The end date can't be earlier than start date"
 "Add New Event": "Add New Event"
 "View Event": "View Event"
 "Edit Event": "Edit Event"

@@ -114,7 +114,7 @@ class EntityAttributeNormalizer implements AttributeNormalizer
      */
     public function supportsNormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
     {
-        return $attribute->getType() == 'entity';
+        return $attribute->getType() == 'entity' && !$attribute->getOption('multiple');
     }
 
     /**
@@ -122,6 +122,6 @@ class EntityAttributeNormalizer implements AttributeNormalizer
      */
     public function supportsDenormalization(Workflow $workflow, Attribute $attribute, $attributeValue)
     {
-        return $attribute->getType() == 'entity';
+        return $attribute->getType() == 'entity' && !$attribute->getOption('multiple');
     }
 }

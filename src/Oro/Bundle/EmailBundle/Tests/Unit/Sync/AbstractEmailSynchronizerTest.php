@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures\TestEmailSynchronizer;
@@ -13,7 +12,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
     private $sync;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $log;
+    private $logger;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $doctrine;
@@ -25,26 +24,31 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
     private $emailEntityBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $emailAddressManager;
+    private $knownEmailAddressChecker;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $knownEmailAddressChecker;
+    private $knownEmailAddressCheckerFactory;
 
     protected function setUp()
     {
-        $this->log = $this->getMock('Psr\Log\LoggerInterface');
+        $this->logger = $this->getMock('Psr\Log\LoggerInterface');
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->emailEntityBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->emailAddressManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->knownEmailAddressChecker = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->knownEmailAddressChecker =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $this->knownEmailAddressCheckerFactory =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $this->knownEmailAddressCheckerFactory->expects($this->any())
+            ->method('create')
+            ->will($this->returnValue($this->knownEmailAddressChecker));
 
         $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -56,13 +60,10 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
 
         $this->sync = new TestEmailSynchronizer(
             $this->doctrine,
-            $this->emailEntityBuilder,
-            $this->emailAddressManager,
-            new EmailAddressHelper(),
-            $this->knownEmailAddressChecker
+            $this->knownEmailAddressCheckerFactory,
+            $this->emailEntityBuilder
         );
-
-        $this->sync->setLogger($this->log);
+        $this->sync->setLogger($this->logger);
     }
 
     public function testSyncNoOrigin()
@@ -83,7 +84,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')
@@ -114,41 +115,36 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->setConstructorArgs(
                 [
                     $this->doctrine,
-                    $this->emailEntityBuilder,
-                    $this->emailAddressManager,
-                    new EmailAddressHelper(),
-                    $this->knownEmailAddressChecker
+                    $this->knownEmailAddressCheckerFactory,
+                    $this->emailEntityBuilder
                 ]
             )
             ->setMethods(
                 array(
                     'findOriginToSync',
-                    'ensureKnownEmailAddressCheckerCreated',
                     'createSynchronizationProcessor',
                     'changeOriginSyncState',
                     'getCurrentUtcDateTime'
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')
             ->will($this->returnValue($now));
         $sync->expects($this->once())
-            ->method('ensureKnownEmailAddressCheckerCreated');
-        $sync->expects($this->once())
             ->method('createSynchronizationProcessor')
             ->with($this->identicalTo($origin))
             ->will($this->returnValue($processor));
-        $sync->expects($this->at(2))
+        $sync->expects($this->at(1))
             ->method('changeOriginSyncState')
             ->with($this->identicalTo($origin), AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS)
             ->will($this->returnValue(true));
         $processor->expects($this->once())
             ->method('process')
             ->with($this->identicalTo($origin));
-        $sync->expects($this->at(4))
+        $sync->expects($this->at(3))
             ->method('changeOriginSyncState')
             ->with(
                 $this->identicalTo($origin),
@@ -173,19 +169,16 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(
                 array(
                     'findOriginToSync',
-                    'ensureKnownEmailAddressCheckerCreated',
                     'createSynchronizationProcessor',
                     'changeOriginSyncState',
                     'getCurrentUtcDateTime'
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->never())
             ->method('getCurrentUtcDateTime');
-        $sync->expects($this->once())
-            ->method('ensureKnownEmailAddressCheckerCreated');
         $sync->expects($this->once())
             ->method('createSynchronizationProcessor')
             ->with($this->identicalTo($origin))
@@ -218,25 +211,22 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(
                 array(
                     'findOriginToSync',
-                    'ensureKnownEmailAddressCheckerCreated',
                     'createSynchronizationProcessor',
                     'changeOriginSyncState',
                     'getCurrentUtcDateTime'
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')
             ->will($this->returnValue($now));
         $sync->expects($this->once())
-            ->method('ensureKnownEmailAddressCheckerCreated');
-        $sync->expects($this->once())
             ->method('createSynchronizationProcessor')
             ->with($this->identicalTo($origin))
             ->will($this->returnValue($processor));
-        $sync->expects($this->at(2))
+        $sync->expects($this->at(1))
             ->method('changeOriginSyncState')
             ->with($this->identicalTo($origin), AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS)
             ->will($this->returnValue(true));
@@ -244,7 +234,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('process')
             ->with($this->identicalTo($origin))
             ->will($this->throwException(new \Exception()));
-        $sync->expects($this->at(4))
+        $sync->expects($this->at(3))
             ->method('changeOriginSyncState')
             ->with($this->identicalTo($origin), AbstractEmailSynchronizer::SYNC_CODE_FAILURE);
 
@@ -269,25 +259,22 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->setMethods(
                 array(
                     'findOriginToSync',
-                    'ensureKnownEmailAddressCheckerCreated',
                     'createSynchronizationProcessor',
                     'changeOriginSyncState',
                     'getCurrentUtcDateTime'
                 )
             )
             ->getMock();
-        $sync->setLogger($this->log);
+        $sync->setLogger($this->logger);
 
         $sync->expects($this->once())
             ->method('getCurrentUtcDateTime')
             ->will($this->returnValue($now));
         $sync->expects($this->once())
-            ->method('ensureKnownEmailAddressCheckerCreated');
-        $sync->expects($this->once())
             ->method('createSynchronizationProcessor')
             ->with($this->identicalTo($origin))
             ->will($this->returnValue($processor));
-        $sync->expects($this->at(2))
+        $sync->expects($this->at(1))
             ->method('changeOriginSyncState')
             ->with($this->identicalTo($origin), AbstractEmailSynchronizer::SYNC_CODE_IN_PROCESS)
             ->will($this->returnValue(true));
@@ -295,7 +282,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit_Framework_TestCase
             ->method('process')
             ->with($this->identicalTo($origin))
             ->will($this->throwException(new \InvalidArgumentException()));
-        $sync->expects($this->at(4))
+        $sync->expects($this->at(3))
             ->method('changeOriginSyncState')
             ->with($this->identicalTo($origin), AbstractEmailSynchronizer::SYNC_CODE_FAILURE)
             ->will($this->throwException(new \Exception()));

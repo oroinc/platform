@@ -26,25 +26,21 @@ function (routing, DialogWidget, widgetManager, __) {
                     modal: true,
                     allowMaximize: true,
                     width: 1280,
-                    height: 650
+                    height: 650,
+                    close: function () {
+                        selectorEl.off('.' + entitySelectDialog._wid);
+                    }
                 }
             });
 
-            var processSelectedEntities = function (data) {
+            entitySelectDialog.on('grid-row-select', function (data) {
                 entitySelectDialog._showLoading();
                 selectorEl.select2('val', data.model.get(existingEntityGridId), true);
-                selectorEl.on('change', function(){
-                    widgetManager.getWidgetInstance(
-                        entitySelectDialog._wid,
-                        function(widget) {
-                            widget.remove();
-                            selectorEl.select2('focus');
-                        }
-                    );
+                selectorEl.on('change.' + entitySelectDialog._wid, function(){
+                    entitySelectDialog.remove();
+                    selectorEl.select2('focus');
                 });
-            };
-
-            entitySelectDialog.on('grid-row-select', _.bind(processSelectedEntities, this));
+            });
             entitySelectDialog.render();
         };
 

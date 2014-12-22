@@ -23,7 +23,10 @@ define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
          * @inheritDoc
          */
         dispose: function () {
-            if (!this.disposed && this.$el) {
+            if (this.disposed) {
+                return;
+            }
+            if (this.$el.data('simplecolorpicker')) {
                 this.$el.simplecolorpicker('destroy');
             }
             SimpleColorChoiceView.__super__.dispose.call(this);

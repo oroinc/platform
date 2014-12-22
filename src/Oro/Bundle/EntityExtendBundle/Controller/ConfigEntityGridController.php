@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -109,6 +109,7 @@ class ConfigEntityGridController extends Controller
             $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
             $extendConfig->set('state', ExtendScope::STATE_NEW);
             $extendConfig->set('upgradeable', false);
+            $extendConfig->set('origin', ExtendScope::ORIGIN_CUSTOM);
             $extendConfig->set('is_extend', true);
 
             $config = $configManager->getProvider('security')->getConfig($className);

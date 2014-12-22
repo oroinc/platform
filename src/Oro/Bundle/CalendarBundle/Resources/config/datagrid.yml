@@ -32,7 +32,7 @@ datagrid:
                 where:
                     and:
                         - targetCalendar.owner = @oro_security.security_facade->getLoggedUserId
-                groupBy: event.id
+                groupBy: event.id, calendar.name, owner.firstName, owner.lastName, parentId, ownerId
         columns:
             title:
                 label: oro.calendar.calendarevent.title.label
@@ -45,7 +45,7 @@ datagrid:
                 label: oro.calendar.calendarevent.end.label
                 frontend_type: datetime
             invitationStatus:
-                label: oro.calendar.calendarevent.invitationStatus.label
+                label: oro.calendar.calendarevent.invitation_status.label
                 type: twig
                 template: OroCalendarBundle:CalendarEvent:Datagrid/Property/status.html.twig
                 frontend_type: html

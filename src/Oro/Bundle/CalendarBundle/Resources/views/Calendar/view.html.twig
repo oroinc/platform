@@ -1,5 +1,5 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroCalendarBundle::macros.html.twig' as c %}
+{% import 'OroCalendarBundle::templates.html.twig' as calendarTemplates %}
 
 {% set name = entity.owner|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name, "%calendarname%": entity.name|default(name) }}) %}
@@ -13,51 +13,6 @@
                 'label': 'oro.calendar.view_events'|trans,
                 'title': 'oro.calendar.view_events'|trans
             }) }}
-        </div>
-        {# TODO: The Print button is a temporary solution untill we switch to latest version FullCalendar component #}
-        {# should be removed in https://magecore.atlassian.net/browse/BAP-3826 #}
-        <div class="btn-group">
-            {{ UI.clientButton({
-                'id': 'add-entity-note-button',
-                'aCss': 'no-hash',
-                'iCss': 'icon-print  hide-text',
-                'label' : 'oro.calendar.print'|trans
-            }) }}
-            <script type="text/javascript">
-                require(['jquery'],
-                function($){
-                    $('#add-entity-note-button').on('click', function(e) {
-                        e.preventDefault();
-                        var calendar = $('#calendar').data('calendar'),
-                            $el = calendar.getCalendarElement(),
-                            $agendaEl = $el.find('.fc-agenda-slots').parent().parent(),
-                            contentElOverflowX,
-                            contentElOverflowY,
-                            contentElHeight;
-                        $el.width('960px');
-                        $el.fullCalendar('render');
-                        if ($agendaEl.length) {
-                            contentElOverflowX = $agendaEl.css('overflow-x');
-                            contentElOverflowY = $agendaEl.css('overflow-y');
-                            contentElHeight = $agendaEl.css('height');
-                            $agendaEl.css('overflow-x', 'visible');
-                            $agendaEl.css('overflow-y', 'visible');
-                            $agendaEl.css('height', 'auto');
-                            //debugger;
-                            $el.fullCalendar('option', 'contentHeight', 3000);
-                        }
-                        window.print();
-                        if ($agendaEl.length) {
-                            $agendaEl.css('overflow-x', contentElOverflowX);
-                            $agendaEl.css('overflow-y', contentElOverflowY);
-                            $agendaEl.css('height', contentElHeight);
-                            $el.fullCalendar('option', 'contentHeight', null);
-                        }
-                        $el.css('width', '');
-                        $el.fullCalendar('render');
-                    });
-                });
-            </script>
         </div>
     {% endif %}
 {% endblock navButtons %}
@@ -80,7 +35,33 @@
 {% block stats %}{% endblock stats %}
 
 {% block content_data %}
-    <div class="row-fluid" id="calendar">
+    {% set calendarOptions = {
+            calendar: entity.id,
+            calendarOptions: calendar,
+            eventsItemsJson: render(path('oro_api_get_calendarevents', {calendar: entity.id, start: startDate|date('c'), end: endDate|date('c'), subordinate: true})),
+            connectionsItemsJson: render(path('oro_api_get_calendar_connections', {id: entity.id})),
+            date: 'now'|date('c'),
+            eventsOptions: {
+                'containerSelector': '.calendar-events',
+                'itemViewTemplateSelector': '#template-view-calendar-event',
+                'itemFormTemplateSelector': '#template-calendar-event',
+                'leftHeader': 'prev,next today title',
+                'centerHeader': '',
+                'rightHeader': 'month,agendaWeek,agendaDay',
+            },
+            connectionsOptions: {
+                'containerSelector': '.calendar-connections',
+                'containerTemplateSelector': '#template-calendar-connections',
+                'itemTemplateSelector': '#template-calendar-connection-item',
+            },
+            colorManagerOptions: {
+                colors: oro_config_value('oro_calendar.calendar_colors')
+            }
+        }
+    %}
+    <div class="row-fluid" id="calendar"
+         data-page-component-module="orocalendar/js/app/components/calendar-component"
+         data-page-component-options="{{ calendarOptions | json_encode }}">
         <div class="span2 scrollable-container">
             <div class="calendars">
                 <div class="calendar-connections"></div>
@@ -124,21 +105,6 @@
         </li>
     </script>
 
-    {% set connectionsOptions = {
-        'containerSelector': '.calendar-connections',
-        'containerTemplateSelector': '#template-calendar-connections',
-        'itemTemplateSelector': '#template-calendar-connection-item',
-    } %}
-    {% set eventsOptions = {
-        'containerSelector': '.calendar-events',
-        'itemViewTemplateSelector': '#template-view-calendar-event',
-        'itemFormTemplateSelector': '#template-calendar-event',
-        'leftHeader': 'prev,next today title',
-        'centerHeader': '',
-        'rightHeader': 'month,agendaWeek,agendaDay',
-    } %}
-    {{ c.calendar_event_view_template('template-view-calendar-event') }}
-    {{ c.calendar_event_form_template('template-calendar-event', event_form) }}
-    {{ c.renderCalendar('#calendar', entity, startDate, endDate, calendar, eventsOptions, connectionsOptions) }}
-
+    {{ calendarTemplates.calendar_event_view_template('template-view-calendar-event') }}
+    {{ calendarTemplates.calendar_event_form_template('template-calendar-event', event_form) }}
 {% endblock content_data %}

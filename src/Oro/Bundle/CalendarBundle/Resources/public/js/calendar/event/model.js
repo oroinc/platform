@@ -51,7 +51,7 @@ define(['underscore', 'backbone', 'routing'
         },
 
         save: function (key, val, options) {
-            var attrs;
+            var attrs, modelData;
 
             // Handle both `"key", value` and `{key: value}` -style arguments.
             if (key == null || typeof key === 'object') {
@@ -62,15 +62,18 @@ define(['underscore', 'backbone', 'routing'
                 attrs[key] = val;
             }
 
-            options.contentType = 'application/json';
-            options.data = JSON.stringify(_.extend(
+            modelData = _.extend(
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus', 'invitedUsers']
+                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus']
                 ),
                 attrs || {}
-            ));
+            );
+            modelData.invitedUsers = modelData.invitedUsers.join(',');
+
+            options.contentType = 'application/json';
+            options.data = JSON.stringify(modelData);
 
             Backbone.Model.prototype.save.call(this, attrs, options);
         },
@@ -86,6 +89,25 @@ define(['underscore', 'backbone', 'routing'
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
             }
+        },
+
+        validate: function (attrs) {
+            var errors = [];
+
+            if (attrs.start > attrs.end) {
+                errors.push('oro.calendar.error_message.event_model.end_date_earlier_than_start');
+            }
+
+            return errors.length ? errors : null;
+        },
+
+        getInvitationStatus: function () {
+            var invitationStatus = this.get('invitationStatus'),
+                invitedUsers = this.get('invitedUsers');
+            if (!invitationStatus && invitedUsers && invitedUsers.length) {
+                invitationStatus = 'accepted';
+            }
+            return invitationStatus;
         }
     });
 });

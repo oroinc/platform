@@ -153,7 +153,21 @@
     }
 
     .dashboard-widget-content {
-      padding-top: 12px;
+      margin-top: 0;
+
+      .grid-container {
+        .grid {
+          margin: 0 0 10px 0;
+        }
+
+        .no-data {
+          margin-top: 0px;
+        }
+      }
+
+      .tab-container {
+        padding-top: 10px;
+      }
     }
   }
 
@@ -214,7 +228,7 @@
     }
     .tab-content{
       .no-data{
-        background-color: #fff;
+        background-color: #f9f9f9;
       }
     }
   }
@@ -319,6 +333,7 @@
 .chart-container {
   position: relative;
   overflow-x: visible;
+  margin-top: 5px;
   &.wrapped-chart-legend {
     margin: 0 auto;
   }
