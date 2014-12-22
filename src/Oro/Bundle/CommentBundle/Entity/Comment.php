@@ -31,7 +31,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-
 class Comment extends ExtendComment
 {
 }

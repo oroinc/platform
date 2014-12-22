@@ -109,10 +109,13 @@ abstract class BaseComment
      * Sets message
      *
      * @param string $message
+     * @return self
      */
     public function setMessage($message)
     {
         $this->message = $message;
+
+        return $this;
     }
 
     /**
@@ -129,10 +132,13 @@ abstract class BaseComment
      * Sets user who have updated this comment
      *
      * @param User $updatedBy
+     * @return self
      */
     public function setUpdatedBy(User $updatedBy)
     {
         $this->updatedBy = $updatedBy;
+
+        return $this;
     }
 
     /**
@@ -149,10 +155,13 @@ abstract class BaseComment
      * Set the owner comment
      *
      * @param User $owner
+     * @return self
      */
     public function setOwner(User $owner)
     {
         $this->owner = $owner;
+
+        return $this;
     }
 
     /**
@@ -169,10 +178,13 @@ abstract class BaseComment
      * Sets organization
      *
      * @param Organization $organization
+     * @return self
      */
     public function setOrganization(Organization $organization)
     {
         $this->organization = $organization;
+
+        return $this;
     }
 
     /**
@@ -189,10 +201,13 @@ abstract class BaseComment
      * Sets creation date
      *
      * @param \DateTime $createdAt
+     * @return self
      */
     public function setCreatedAt(\DateTime $createdAt)
     {
         $this->createdAt = $createdAt;
+
+        return $this;
     }
 
     /**
@@ -209,10 +224,13 @@ abstract class BaseComment
      * Sets a date update
      *
      * @param \DateTime $updatedAt
+     * @return self
      */
     public function setUpdatedAt(\DateTime $updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 
     /**
