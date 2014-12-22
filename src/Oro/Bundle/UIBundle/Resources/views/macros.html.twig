@@ -484,8 +484,7 @@
         style="display: none"
         {% endif -%}
         {% if parameters.widget is defined and parameters.widget|length %}
-        data-page-component-module="oroui/js/app/components/widget-component"
-        data-page-component-options="{{ parameters.widget|json_encode(constant('JSON_FORCE_OBJECT')) }}"
+            {{ _self.renderWidgetDataAttributes(parameters.widget) }}
         {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
@@ -496,6 +495,11 @@
         {%- endif %}
         {{- parameters.label is defined ? parameters.label : '' -}}
     </a>
+{% endmacro %}
+
+{% macro renderWidgetDataAttributes(options) %}
+    data-page-component-module="oroui/js/app/components/widget-component"
+    data-page-component-options="{{ options|json_encode(constant('JSON_FORCE_OBJECT')) }}"
 {% endmacro %}
 
 {% macro renderAttributes(options, prefix) %}

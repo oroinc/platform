@@ -35,12 +35,6 @@
     cursor: default;
 }
 
-#entity-pagination .pagination input[type=number]::-webkit-inner-spin-button,
-#entity-pagination .pagination input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
 #entity-pagination .pagination > ul > .disabled a,
 #entity-pagination .pagination > ul > .disabled a:active,
 #entity-pagination .pagination > ul > .disabled a:hover,
