@@ -27,7 +27,8 @@ class CommentType extends AbstractType
                         'placeholder' => 'oro.comment.message.placeholder'
                     ],
                 ]
-            );
+            )
+            ->add('attachment', 'oro_image', ['label' => 'oro.comment.attachment.label', 'required' => false]);
     }
 
     /**

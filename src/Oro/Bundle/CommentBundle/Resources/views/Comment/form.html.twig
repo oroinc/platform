@@ -12,6 +12,8 @@
             <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
         </button>
         <% } %>
+        {{ form_widget(form.attachment) }}
+        {{ form_errors(form.attachment) }}
     </fieldset>
 </form>
 {{ oro_form_js_validation(form) }}
