@@ -16,6 +16,11 @@ define(function (require) {
             'click .form-container': 'edit'
         },
 
+        initialize: function (options) {
+            _.extend(this, _.pick(options || {}, ['accordionId']));
+            CommentItemView.__super__.initialize.apply(this, arguments);
+        },
+
         removeModel: function () {
             this.model.destroy();
         },
@@ -23,6 +28,7 @@ define(function (require) {
         getTemplateData: function () {
             var data = CommentItemView.__super__.getTemplateData.call(this);
             data.cid = this.cid;
+            data.accordionId = this.accordionId;
             return data;
         },
 

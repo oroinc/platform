@@ -1,8 +1,9 @@
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
     <div class="accordion-group">
-        <div class="accordion-heading collapse<% if (!collapsed) { %> in<% } %>">
+        <div class="accordion-heading">
             <div class="title-item">
-                <a href="#accordion-item<%= id %>" class="no-hash accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
+                <a href="#accordion-item<%= id %>" data-toggle="collapse"
+                   class="accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
                 <span class="icon">
                     <i class="icon-check-empty"></i>
                 </span>
@@ -12,7 +13,8 @@
                         <i class="date"><%= updatedAt %></i>
                     </span>
                     <span class="message-item message">
-                        <a href="#" class="no-hash accordion-toggle"><%= subject %></a>
+                        <a href="#accordion-item<%= id %>" data-toggle="collapse"
+                           class="accordion-toggle<% if (collapsed) { %> collapsed<% } %>"><%= subject %></a>
                     </span>
                 </span>
             </div>

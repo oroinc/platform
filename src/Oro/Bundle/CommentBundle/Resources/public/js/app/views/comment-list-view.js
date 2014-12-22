@@ -17,6 +17,29 @@ define(function (require) {
         initialize: function (options) {
             this.template = _.template($(options.template).html());
             CommentListView.__super__.initialize.apply(this, arguments);
+        },
+
+        getTemplateData: function () {
+            var data = CommentListView.__super__.getTemplateData.call(this);
+            data.cid = this.cid;
+            data.accordionId = this.getAccordionId();
+            return data;
+        },
+
+        initItemView: function(model) {
+            if (this.itemView) {
+                return new this.itemView({
+                    autoRender: false,
+                    model: model,
+                    accordionId: this.getAccordionId()
+                });
+            } else {
+                return CommentListView.__super__.initItemView.call(this, model);
+            }
+        },
+
+        getAccordionId: function () {
+            return 'accordion-' + this.cid;
         }
     });
 
