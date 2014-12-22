@@ -80,6 +80,7 @@ class UserCalendarHandler extends UserAclHandler
     {
         $result = parent::convertItem($calendar->getOwner());
         $result['id'] = $calendar->getId();
+        $result['userId'] = $calendar->getOwner()->getId();
 
         return $result;
     }

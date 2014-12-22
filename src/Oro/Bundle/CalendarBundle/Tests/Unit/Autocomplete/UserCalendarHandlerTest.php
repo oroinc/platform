@@ -92,5 +92,6 @@ class UserCalendarHandlerTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->handler->convertItem($calendar);
         $this->assertEquals($result['id'], $calendar->getId());
+        $this->assertEquals($result['userId'], $calendar->getOwner()->getId());
     }
 }
