@@ -106,6 +106,11 @@ class ExtendConfigDumper
                     $this->checkSchema($extendConfig, $aliases, $originsToSkip);
                 }
 
+                // some bundles can change configs in pre persist events,
+                // and other bundles can produce more changes depending on already made, it's a bit hacky,
+                // but it's a service operation so called inevitable evil
+                $extendProvider->flush();
+
                 $this->updateStateValues($extendConfig);
             }
         }
@@ -350,6 +355,7 @@ class ExtendConfigDumper
      */
     protected function updateStateValues(ConfigInterface $extendConfig)
     {
+        $hasChanges     = false;
         $extendProvider = $this->em->getExtendConfigProvider();
         $className      = $extendConfig->getId()->getClassName();
         $fieldConfigs   = $extendProvider->getConfigs($className, true);
@@ -359,6 +365,7 @@ class ExtendConfigDumper
             if (!$extendConfig->is('is_deleted')) {
                 $extendConfig->set('is_deleted', true);
                 $extendProvider->persist($extendConfig);
+                $hasChanges = true;
             }
 
             // mark all fields as deleted
@@ -366,6 +373,7 @@ class ExtendConfigDumper
                 if (!$fieldConfig->is('is_deleted')) {
                     $fieldConfig->set('is_deleted', true);
                     $extendProvider->persist($fieldConfig);
+                    $hasChanges = true;
                 }
             }
         } elseif (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
@@ -384,6 +392,12 @@ class ExtendConfigDumper
                 $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
                 $extendProvider->persist($extendConfig);
             }
+
+            $hasChanges = true;
+        }
+
+        if ($hasChanges) {
+            $extendProvider->flush();
         }
     }
 
