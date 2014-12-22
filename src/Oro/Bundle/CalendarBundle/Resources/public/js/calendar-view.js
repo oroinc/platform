@@ -32,6 +32,7 @@ define(function (require) {
      */
     return Backbone.View.extend({
         MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
+        CALENDAR_BOTTOM_PADDING: 10,
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
@@ -740,10 +741,8 @@ define(function (require) {
             self = this;
             options.eventAfterAllRender = function () {
                 _.delay(_.bind(self.setTimeline, self));
-                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
-            };
-            options.viewDestroy = function () {
                 clearInterval(self.timelineUpdateIntervalId);
+                self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
             };
             options.windowResize = function () {
                 self.setTimeline();
@@ -895,10 +894,8 @@ define(function (require) {
                 guests = _.union(guests, eventModel.previous('invitedUsers'));
             }
             if (!_.isEmpty(guests)) {
-                result = Boolean(this.getConnectionCollection().find(function (c) {
-                    return Boolean(_.find(guests, function (userId) {
-                        return c.get('userId') == userId;
-                    }));
+                result = Boolean(this.getConnectionCollection().find(function (connection) {
+                    return -1 !== guests.indexOf(connection.get('userId'));
                 }, this));
             }
             return result;
@@ -906,9 +903,13 @@ define(function (require) {
 
         getAvailableHeight: function () {
             var $calendarEl = this.getCalendarElement(),
+                $scrollableParents = $calendarEl.parents('.scrollable-container'),
                 $viewEl = $calendarEl.find('.fc-view:first'),
                 heightDiff = $(document).height() - $viewEl[0].getBoundingClientRect().top;
-            return heightDiff - this.devToolbarHeight;
+            $scrollableParents.each(function () {
+                heightDiff += this.scrollTop;
+            });
+            return heightDiff - this.devToolbarHeight - this.CALENDAR_BOTTOM_PADDING;
         },
 
         checkLayout: function () {
@@ -933,21 +934,20 @@ define(function (require) {
             }
             this.layout = newLayout;
             var $calendarEl = this.getCalendarElement(),
-                $scrollableParents = $calendarEl.parents('.scrollable-container'),
                 contentHeight = '',
                 height = '';
             switch (newLayout) {
                 case 'fullscreen':
-                    $scrollableParents.addClass('disable-scroll');
+                    this.disablePageScroll();
                     contentHeight = this.getAvailableHeight();
                     break;
                 case 'scroll':
-                    $scrollableParents.removeClass('disable-scroll');
                     height = 'auto';
                     contentHeight = 'auto';
+                    this.enablePageScroll();
                     break;
                 case 'default':
-                    $scrollableParents.removeClass('disable-scroll');
+                    this.enablePageScroll();
                     // default values
                     break;
                 default:
@@ -955,6 +955,14 @@ define(function (require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
+        },
+        disablePageScroll: function () {
+            var $scrollableParents = this.getCalendarElement().parents('.scrollable-container');
+            $scrollableParents.scrollTop(0);
+            $scrollableParents.addClass('disable-scroll');
+        },
+        enablePageScroll: function () {
+            this.getCalendarElement().parents('.scrollable-container').removeClass('disable-scroll');
         }
     });
 });

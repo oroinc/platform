@@ -17,13 +17,10 @@
     {{ parent() }}
     <script type="text/javascript">
         require(
-            ['jquery', 'oroui/js/mediator'],
-            function ($, mediator) {
+            ['jquery', 'oroui/js/mediator', 'orodashboard/js/dashboard-util'],
+            function ($, mediator, dashboardUtil) {
                 mediator.on('datagrid:beforeRemoveRow:{{ gridName }}', function(model){
-                    $('[data-menu="' + model.get('id') + '"]').remove();
-                    if (!$('[data-menu]').length) {
-                        $('.menu-divider').remove();
-                    }
+                    dashboardUtil.onDashboardRemove(model.get('id'));
                 });
             }
         );

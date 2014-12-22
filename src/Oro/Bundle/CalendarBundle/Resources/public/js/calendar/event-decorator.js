@@ -17,7 +17,7 @@ define(['underscore', 'orotranslation/js/translator'
             var $body = $el.find('.fc-content'),
                 $timePlace = $el.find('.fc-time'),
                 reminders = eventModel.get('reminders'),
-                invitationStatus = eventModel.get('invitationStatus');
+                invitationStatus = eventModel.getInvitationStatus();
             // if $time is not displayed show related info into $body
             if (!$timePlace.length) {
                 $timePlace = $body;
