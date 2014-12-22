@@ -45,7 +45,7 @@ define(function (require) {
             var collectionOptions;
 
             this.options = options || {};
-            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName', 'formName']);
+            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName']);
 
             this.collection = new CommentCollection([], collectionOptions);
 
