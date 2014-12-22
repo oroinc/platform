@@ -92,6 +92,11 @@ oro_entity_config:
                         auditable:          false
                         default_value:      true
 
+                origin:
+                    options:
+                        auditable:          false
+                        default_value:      'Code'
+
                 relation:
                     options:
                         auditable:          false
@@ -261,10 +266,10 @@ oro_entity_config:
                             operator:       '!='
                             value:          true
 
-                is_inverse:
+                origin:
                     options:
-                        default_value:      false
                         auditable:          false
+                        default_value:      'Code'
 
                 #
                 # Relations form type fields
