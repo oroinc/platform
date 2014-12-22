@@ -23,27 +23,27 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param mixed $entity
-     * @param int $count
+     * @param int $callsCount
      * @param bool $applicable
      * @param bool $expected
      * @dataProvider commentProvider
      */
-    public function testIsApplicable($entity, $count, $applicable, $expected)
+    public function testIsApplicable($entity, $callsCount, $applicable, $expected)
     {
         $config =  $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $config->expects($this->exactly($count))
+        $config->expects($this->exactly($callsCount))
             ->method('is')
             ->with('enabled')
             ->will($this->returnValue($applicable));
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $provider->expects($this->exactly($count))
+        $provider->expects($this->exactly($callsCount))
             ->method('getConfig')
             ->will($this->returnValue($config));
-        $this->configManager->expects($this->exactly($count))
+        $this->configManager->expects($this->exactly($callsCount))
             ->method('getProvider')
             ->will($this->returnValue($provider));
 
