@@ -24,11 +24,11 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
     /**
      * @param mixed $entity
      * @param int $callsCount
-     * @param bool $applicable
+     * @param bool $isApplicable
      * @param bool $expected
      * @dataProvider commentProvider
      */
-    public function testIsApplicable($entity, $callsCount, $applicable, $expected)
+    public function testIsApplicable($entity, $callsCount, $isApplicable, $expected)
     {
         $config =  $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
@@ -36,7 +36,7 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
         $config->expects($this->exactly($callsCount))
             ->method('is')
             ->with('enabled')
-            ->will($this->returnValue($applicable));
+            ->will($this->returnValue($isApplicable));
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -55,13 +55,12 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
      */
     public function commentProvider()
     {
-        $applicableEntity = new ItemStub();
-        $notApplicableEntity = new ItemStub();
+        $entity = new ItemStub();
         return [
             'is null' => [null, 0, false, false],
             'is null with enabled on' => [null, 0, true, false],
-            'applicable entity' => [$applicableEntity, 1, true, true],
-            'not applicable entity' => [$notApplicableEntity, 1, false, false],
+            'applicable entity' => [$entity, 1, true, true],
+            'not applicable entity' => [$entity, 1, false, false],
         ];
     }
 }
