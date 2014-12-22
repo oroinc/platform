@@ -4,9 +4,12 @@ namespace Oro\Bundle\RequireJSBundle\Provider;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Yaml\Yaml;
-use Doctrine\Common\Cache\CacheProvider;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+
+use Doctrine\Common\Cache\CacheProvider;
+
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class Config
 {
@@ -146,7 +149,7 @@ class Config
                 $reflection = new \ReflectionClass($bundle);
                 if (is_file($file = dirname($reflection->getFilename()) . '/Resources/config/requirejs.yml')) {
                     $requirejs = Yaml::parse(realpath($file));
-                    $config = array_merge_recursive($config, $requirejs);
+                    $config = ArrayUtils::arrayMergeRecursiveDistinct($config, $requirejs);
                 }
             }
 
