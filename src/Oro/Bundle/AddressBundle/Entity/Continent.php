@@ -123,26 +123,26 @@ class Continent implements Translatable
     }
 
     /**
-     * Add countries
+     * Add country
      *
-     * @param \Oro\Bundle\AddressBundle\Entity\Country $countries
+     * @param \Oro\Bundle\AddressBundle\Entity\Country $country
      * @return Continent
      */
-    public function addCountry(\Oro\Bundle\AddressBundle\Entity\Country $countries)
+    public function addCountry(\Oro\Bundle\AddressBundle\Entity\Country $country)
     {
-        $this->countries[] = $countries;
+        $this->countries[] = $country;
 
         return $this;
     }
 
     /**
-     * Remove countries
+     * Remove country
      *
-     * @param \Oro\Bundle\AddressBundle\Entity\Country $countries
+     * @param \Oro\Bundle\AddressBundle\Entity\Country $country
      */
-    public function removeCountry(\Oro\Bundle\AddressBundle\Entity\Country $countries)
+    public function removeCountry(\Oro\Bundle\AddressBundle\Entity\Country $country)
     {
-        $this->countries->removeElement($countries);
+        $this->countries->removeElement($country);
     }
 
     /**
