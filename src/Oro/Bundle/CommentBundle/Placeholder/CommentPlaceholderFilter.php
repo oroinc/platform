@@ -6,18 +6,17 @@ use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
-class PlaceholderFilter
+class CommentPlaceholderFilter
 {
-
     /** @var ConfigManager */
     protected $configManager;
 
     /**
-     * @param ConfigManager             $configManager
+     * @param ConfigManager $configManager
      */
     public function __construct(ConfigManager $configManager)
     {
-        $this->configManager        = $configManager;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -29,7 +28,7 @@ class PlaceholderFilter
     public function isApplicable($entity = null)
     {
         if (!is_object($entity)) {
-            return null;
+            return false;
         }
 
         $className = ClassUtils::getRealClass($entity);
