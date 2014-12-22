@@ -14,6 +14,11 @@ define(function (require) {
         listSelector: 'ul.comments',
         itemSelector: 'li',
 
+        listen: {
+            // once collection is synced -- recheck items views
+            'sync collection': 'renderAllItems'
+        },
+
         initialize: function (options) {
             this.template = _.template($(options.template).html());
             CommentListView.__super__.initialize.apply(this, arguments);
@@ -36,6 +41,11 @@ define(function (require) {
             } else {
                 return CommentListView.__super__.initItemView.call(this, model);
             }
+        },
+
+        filterer: function (model) {
+            // exclude new models from rendering
+            return !model.isNew();
         },
 
         getAccordionId: function () {
