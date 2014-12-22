@@ -49,7 +49,7 @@ define([], function () {
          * @returns {string} Calculated sufficient contrast color, black or white.
          *                   If the given color is invalid or cannot be parsed, returns black.
          */
-        getContrastColor: function (hex, whitePreference) {
+        getContrastColor: function (hex, blackPreference) {
             var rgb = this.hex2rgb(hex),
                 white = {
                     r: 255,
@@ -61,10 +61,10 @@ define([], function () {
                     g: 0,
                     b: 0
                 };
-            if (!whitePreference) {
-                whitePreference = 0.58;
+            if (!blackPreference) {
+                blackPreference = 0.58;
             }
-            return (this.colorDifference(rgb, black) * whitePreference > this.colorDifference(rgb, white)) ? '#000000' : '#FFFFFF';
+            return (this.colorDifference(rgb, black) * blackPreference > this.colorDifference(rgb, white)) ? '#000000' : '#FFFFFF';
         }
     };
 });
