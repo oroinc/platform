@@ -894,10 +894,8 @@ define(function (require) {
                 guests = _.union(guests, eventModel.previous('invitedUsers'));
             }
             if (!_.isEmpty(guests)) {
-                result = Boolean(this.getConnectionCollection().find(function (c) {
-                    return Boolean(_.find(guests, function (userId) {
-                        return c.get('userId') == userId;
-                    }));
+                result = Boolean(this.getConnectionCollection().find(function (connection) {
+                    return -1 !== guests.indexOf(connection.get('userId'));
                 }, this));
             }
             return result;
