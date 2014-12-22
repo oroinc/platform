@@ -26,7 +26,6 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -88,12 +87,12 @@ class OwnerFormExtension extends AbstractTypeExtension
         AclVoter $aclVoter,
         OwnerTreeProvider $treeProvider
     ) {
-        $this->managerRegistry = $managerRegistry;
+        $this->managerRegistry           = $managerRegistry;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
-        $this->businessUnitManager = $businessUnitManager;
-        $this->securityFacade = $securityFacade;
-        $this->aclVoter = $aclVoter;
-        $this->treeProvider = $treeProvider;
+        $this->businessUnitManager       = $businessUnitManager;
+        $this->securityFacade            = $securityFacade;
+        $this->aclVoter                  = $aclVoter;
+        $this->treeProvider              = $treeProvider;
     }
 
     /**
@@ -412,11 +411,11 @@ class OwnerFormExtension extends AbstractTypeExtension
                     'entity',
                     array_merge(
                         [
-                            'class' => 'OroOrganizationBundle:BusinessUnit',
-                            'property' => 'name',
-                            'choices' => $businessUnits,
-                            'mapped' => true,
-                            'label' => $this->fieldLabel,
+                            'class'                => 'OroOrganizationBundle:BusinessUnit',
+                            'property'             => 'name',
+                            'choices'              => $businessUnits,
+                            'mapped'               => true,
+                            'label'                => $this->fieldLabel,
                             'translatable_options' => false
                         ],
                         $validation
@@ -467,12 +466,9 @@ class OwnerFormExtension extends AbstractTypeExtension
     {
         if (null === $this->currentUser) {
             $user = $this->securityFacade->getLoggedUser();
-            if (!$user || is_string($user)) {
-                $this->currentUser = false;
-                return false;
+            if ($user && !is_string($user)) {
+                $this->currentUser = $user;
             }
-
-            $this->currentUser = $user;
         }
 
         return $this->currentUser;
