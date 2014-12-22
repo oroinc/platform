@@ -7,18 +7,16 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
-use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager as BaseApiEntityManager;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
-class CommentManager extends BaseApiEntityManager
+class CommentApiManager extends ApiEntityManager
 {
     /** @var ObjectManager */
     protected $em;
@@ -41,23 +39,19 @@ class CommentManager extends BaseApiEntityManager
      * @param NameFormatter     $nameFormatter
      * @param Pager             $pager
      * @param UserConfigManager $config
-     * @param EventDispatcher   $eventDispatcher
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config,
-        EventDispatcher $eventDispatcher
+        UserConfigManager $config
     ) {
         $this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
         $this->nameFormatter  = $nameFormatter;
         $this->pager          = $pager;
         $this->config         = $config;
-
-        $this->setEventDispatcher($eventDispatcher);
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
     }
@@ -116,12 +110,12 @@ class CommentManager extends BaseApiEntityManager
 
     /**
      * @param Comment $entity
-     * @param  string $entityClass
-     * @param  string $entityId
+     * @param string  $entityClass
+     * @param string  $entityId
      *
      * @return array
      */
-    public function getEntityViewModel(Comment $entity, $entityClass, $entityId)
+    public function getEntityViewModel(Comment $entity, $entityClass = '', $entityId = '')
     {
         $ownerName = '';
         $ownerId   = '';

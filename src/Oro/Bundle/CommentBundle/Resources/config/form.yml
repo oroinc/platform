@@ -33,14 +33,6 @@ services:
             - ~
             - 'oro_comment_api'
 
-    oro_comment.form.handler.comment:
-        class: %oro_comment.form.handler.comment.class%
-        scope: request
-        arguments:
-            - @oro_comment.form.comment
-            - @request
-            - @doctrine.orm.entity_manager
-
     oro_comment.api.form.handler:
         class: %oro_comment.api.form.handler.class%
         scope: request

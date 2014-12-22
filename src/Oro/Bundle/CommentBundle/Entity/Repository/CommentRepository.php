@@ -7,7 +7,6 @@ use Doctrine\ORM\QueryBuilder;
 
 class CommentRepository extends EntityRepository
 {
-
     /**
      * @param string $orderField
      * @param string $orderDirection

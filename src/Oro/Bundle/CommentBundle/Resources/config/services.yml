@@ -2,7 +2,8 @@ parameters:
     oro_comment.migration.extension.comment.class:    Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
     oro_comment.entity_generator.extension.class:     Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
     oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
-    oro_comment.comment.manager.class:                Oro\Bundle\CommentBundle\Entity\Manager\CommentManager
+    oro_comment.comment.api_manager.class:            Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager
+    oro_comment.comment_lifecycle_listener.class:     Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener
 
 services:
     oro_comment.migration.extension.comment:
@@ -21,12 +22,18 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_comment.comment.manager:
-        class: %oro_comment.comment.manager.class%
+    oro_comment.comment.api_manager:
+        class: %oro_comment.comment.api_manager.class%
         arguments:
             - @doctrine
             - @oro_security.security_facade
             - @oro_locale.formatter.name
             - @oro_datagrid.extension.pager.orm.pager
             - @oro_config.user
-            - @event_dispatcher
+
+    oro_comment.comment_lifecycle_listener:
+        class: %oro_comment.comment_lifecycle_listener.class%
+        arguments:
+            - @oro_security.security_facade.link
+        tags:
+            - { name: doctrine.event_listener, event: preUpdate }

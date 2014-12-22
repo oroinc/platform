@@ -18,7 +18,7 @@ use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-use Oro\Bundle\CommentBundle\Entity\Manager\CommentManager;
+use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 
 /**
  * @RouteResource("commentlist")
@@ -80,13 +80,19 @@ class CommentController extends RestController
     /**
      * Create new comment
      *
+     * @param string $relationClass
+     * @param string $relationId
+     *
      * @ApiDoc(
      *      description="Create new comment",
      *      resource=true
      * )
+     *
      * @AclAncestor("oro_comment_create")
+     *
+     * @return Response
      */
-    public function postAction($relationClass, $relationId, Request $request)
+    public function postAction($relationClass, $relationId)
     {
         $entity    = call_user_func_array(array($this, 'createEntity'), func_get_args());
         $exception = $this->getForm();
@@ -122,9 +128,19 @@ class CommentController extends RestController
      */
     public function putAction($id)
     {
-        #todo добавить юзера который обновил
-        #todo возвращать всю сущность
-        return $this->handleUpdateRequest($id);
+        $entity = $this->getManager()->find($id);
+
+        if ($entity) {
+            if ($this->processForm($entity)) {
+                $view = $this->view($this->getManager()->getEntityViewModel($entity), Codes::HTTP_OK);
+            } else {
+                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+            }
+        } else {
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+        }
+
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
     }
 
     /**
@@ -160,11 +176,11 @@ class CommentController extends RestController
     /**
      * Get entity Manager
      *
-     * @return CommentManager
+     * @return CommentApiManager
      */
     public function getManager()
     {
-        return $this->get('oro_comment.comment.manager');
+        return $this->get('oro_comment.comment.api_manager');
     }
 
     /**
@@ -174,37 +190,4 @@ class CommentController extends RestController
     {
         return $this->get('oro_comment.api.form.handler');
     }
-
-    /**
-     * Convert REST request to format applicable for form.
-     *
-     * @param object $entity
-     */
-    /*protected function fixRequestAttributes($entity)
-    {
-        $request  = $this->container->get('request');
-        $formName = $this->getForm()->getName();
-        $data     = [$formName => $request->request->all()];
-
-        if (is_array($data) && $this->fixFormData($data, $entity)) {
-            if (empty($formName)) {
-                // save fixed values for unnamed form
-                foreach ($request->request->keys() as $key) {
-                    if (array_key_exists($key, $data)) {
-                        $request->request->set($key, $data[$key]);
-                    } else {
-                        $request->request->remove($key);
-                    }
-                }
-                foreach ($data as $key => $val) {
-                    if (!$request->request->has($key)) {
-                        $request->request->set($key, $data[$key]);
-                    }
-                }
-            } else {
-                // save fixed values for named form
-                $request->request->set($this->getForm()->getName(), $data);
-            }
-        }
-    }*/
 }
