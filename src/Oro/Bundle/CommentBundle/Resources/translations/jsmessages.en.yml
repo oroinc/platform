@@ -1,0 +1,10 @@
+oro:
+    comment:
+        from:
+            button:
+                add_comment:
+                    label: Add Comment
+                edit_comment:
+                    label: Save Comment
+                cancel_comment:
+                    label: Cancel

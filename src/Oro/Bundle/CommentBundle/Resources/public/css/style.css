@@ -1,20 +1,4 @@
-
-.comment-form-group {
-    width: 90%;
-}
-.comment-form-group .comment-text-field {
+.comment-form .comment-text-field {
     width: 100%;
+    box-sizing: border-box;
 }
-
-.comment-form-group {
-    width: 90%;
-}
-
-.comment-form-group {
-    background-color: lightgray;
-}
-
-.activity-comments {
-    margin-top: 20px;
-}
-
