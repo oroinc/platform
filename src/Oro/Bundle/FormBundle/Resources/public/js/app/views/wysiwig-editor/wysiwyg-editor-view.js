@@ -10,6 +10,7 @@ define(function (require) {
     WysiwygEditorView = BaseView.extend({
         autoRender: true,
         defaults: {
+            enabled: true,
             plugins: ['textcolor', 'code'],
             menubar : false,
             toolbar: ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code'],
@@ -17,12 +18,16 @@ define(function (require) {
         },
 
         initialize: function (options) {
-            this.options = $.extend(true, {}, this.defaults, options);
+            options = $.extend(true, {}, this.defaults, options);
+            this.enabled = options.enabled;
+            this.options = _.omit(options, ['enabled']);
             WysiwygEditorView.__super__.initialize.apply(this, arguments);
         },
 
         render: function () {
-            this.$el.tinymce(this.options);
+            if (this.enabled) {
+                this.$el.tinymce(this.options);
+            }
         },
 
         dispose: function () {

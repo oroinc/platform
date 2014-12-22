@@ -114,21 +114,6 @@
     {{ form_widget(form) }}
 {% endblock %}
 
-{# adds WYSIWYG editor to textareas
-{% block textarea_widget -%}
-    {% if true %}
-        {% set attr = {
-            'data-page-component-module': 'oroui/js/app/components/view-component',
-            'data-page-component-options': {
-                'view': 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                'content_css': asset('bundles/oroform/css/wysiwyg-editor.css')
-            }|json_encode
-        }|merge(attr) %}
-    {% endif %}
-    {{ parent() }}
-{%- endblock textarea_widget %}
-#}
-
 {# used to populate selected data on pintab restore #}
 {% block oro_combobox_dataconfig_onselect %}
     $field.on('select2-init', function(e) {
