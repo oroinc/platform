@@ -25,6 +25,7 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      routeName="oro_calendar_view_default",
+ *      routeView="oro_calendar_view",
  *      defaultValues={
  *          "entity"={
  *              "icon"="icon-time"
