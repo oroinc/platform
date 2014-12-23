@@ -1,3 +1,10 @@
+CHANGELOG for 1.5.1
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.5.1 versions.
+* 1.5.1 (2014-12-23)
+ * List of improvements and fixed bugs
+ - Fixed incorrect cache generation for extended entities
+ 
 CHANGELOG for 1.5.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.5.0 versions.
