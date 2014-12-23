@@ -47,6 +47,7 @@ class Configuration implements ConfigurationInterface
                 'organization_name'  => ['value' => 'ORO'],
                 'application_url'   => ['value' => 'http://localhost/oro/'],
                 'navbar_position'   => ['value' => 'top'],
+//                'wysiwyg_enabled' => ['value' => true],
             ]
         );
 
