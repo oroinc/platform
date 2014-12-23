@@ -4,7 +4,6 @@ define(function (require) {
 
     var CommentListView,
         _ = require('underscore'),
-        tools = require('oroui/js/tools'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
         CommentItemView = require('./comment-item-view');
 
@@ -14,10 +13,10 @@ define(function (require) {
 
         listSelector: 'ul.comments',
         itemSelector: 'li',
-        fallbackSelector: '.no-data',
 
-        events: {
-            'submit': 'addComment'
+        listen: {
+            // once collection is synced -- recheck items views
+            'sync collection': 'renderAllItems'
         },
 
         initialize: function (options) {
@@ -25,13 +24,32 @@ define(function (require) {
             CommentListView.__super__.initialize.apply(this, arguments);
         },
 
-        addComment: function (e) {
-            var attrs, model;
-            e.stopPropagation();
-            e.preventDefault();
-            attrs = tools.unpackFromQueryString(this.$('form').serialize());
-            model = this.collection.add(attrs);
-            model.save();
+        getTemplateData: function () {
+            var data = CommentListView.__super__.getTemplateData.call(this);
+            data.cid = this.cid;
+            data.accordionId = this.getAccordionId();
+            return data;
+        },
+
+        initItemView: function(model) {
+            if (this.itemView) {
+                return new this.itemView({
+                    autoRender: false,
+                    model: model,
+                    accordionId: this.getAccordionId()
+                });
+            } else {
+                return CommentListView.__super__.initItemView.call(this, model);
+            }
+        },
+
+        filterer: function (model) {
+            // exclude new models from rendering
+            return !model.isNew();
+        },
+
+        getAccordionId: function () {
+            return 'accordion-' + this.cid;
         }
     });
 

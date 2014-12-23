@@ -6,6 +6,10 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\NoResultException;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
@@ -15,9 +19,12 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 
 class CommentApiManager extends ApiEntityManager
 {
+    const ITEMS_PER_PAGE = 10;
+
     /** @var ObjectManager */
     protected $em;
 
@@ -39,13 +46,15 @@ class CommentApiManager extends ApiEntityManager
      * @param NameFormatter     $nameFormatter
      * @param Pager             $pager
      * @param UserConfigManager $config
+     * @param EventDispatcher   $eventDispatcher
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config
+        UserConfigManager $config,
+        EventDispatcher $eventDispatcher
     ) {
         $this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
@@ -54,6 +63,8 @@ class CommentApiManager extends ApiEntityManager
         $this->config         = $config;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
+
+        $this->setEventDispatcher($eventDispatcher);
     }
 
     /**
@@ -66,26 +77,54 @@ class CommentApiManager extends ApiEntityManager
     public function getCommentList($entityClass, $entityId, $page = 1)
     {
         $entityName = $this->convertRelationEntityClassName($entityClass);
-        $result     = [];
+        $result     = [
+            'count' => 0,
+            'data'  => [],
+        ];
 
         if ($this->isCorrectClassName($entityName)) {
             $fieldName = $this->getFieldName($entityName);
 
-            /** @var QueryBuilder $qb */
-            $qb = $this->getRepository()->getBaseQueryBuilder();
+            /** @var CommentRepository $repository */
+            $repository = $this->getRepository();
 
-            $qb->andWhere('c.' . $fieldName . ' = :param1');
-            $qb->setParameter('param1', (int)$entityId);
+            /** @var QueryBuilder $qb */
+            $qb = $repository->getBaseQueryBuilder($fieldName, $entityId);
+            $qb->orderBy('c.updatedAt', 'DESC');
 
             $pager = $this->pager;
             $pager->setQueryBuilder($qb);
             $pager->setPage($page);
-            $pager->setMaxPerPage(10);
+            $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
             $pager->init();
 
-            $result = $this->getEntityViewModels($pager->getResults(), $entityClass, $entityId);
+            $result['data']  = $this->getEntityViewModels($pager->getResults(), $entityClass, $entityId);
+            $result['count'] = $pager->getNbResults();
         }
 
+        return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $entityId
+     *
+     * @return int
+     */
+    public function getCommentCount($entityClass, $entityId)
+    {
+        $entityName = $this->convertRelationEntityClassName($entityClass);
+        $result     = 0;
+
+        try {
+            if ($this->isCorrectClassName($entityName)) {
+                /** @var CommentRepository $repository */
+                $fieldName  = $this->getFieldName($entityName);
+                $repository = $this->getRepository();
+                $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+            }
+        } catch (\Exception $e) {
+        }
         return $result;
     }
 
@@ -102,10 +141,10 @@ class CommentApiManager extends ApiEntityManager
             throw new InvalidEntityException('Invalid entity name ' . $entityName);
         }
 
-        $setter        = $this->getFieldSetter($entityName);
         $relatedEntity = $this->getRelatedEntity($entityName, $entityId);
+        $accessor      = PropertyAccess::createPropertyAccessor();
 
-        call_user_func([$entity, $setter], $relatedEntity);
+        $accessor->setValue($entity, $this->getFieldName($entityName), $relatedEntity);
     }
 
     /**
@@ -153,16 +192,6 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param string $entityName
-     *
-     * @return string
-     */
-    protected function getFieldSetter($entityName)
-    {
-        return 'set' . $this->prepareFieldName($entityName);
-    }
-
-    /**
-     * @param string $entityName
      * @param int    $entityId
      *
      * @return Object Returns instance of $entityName
@@ -180,24 +209,6 @@ class CommentApiManager extends ApiEntityManager
         }
 
         return $relatedEntity;
-    }
-
-    /**
-     * @param string $entityName
-     *
-     * @return string
-     */
-    protected function prepareFieldName($entityName)
-    {
-        $fieldName   = $this->getFieldName($entityName);
-        $dividedName = explode('_', $fieldName);
-        $result      = '';
-
-        foreach ($dividedName as $row) {
-            $result .= ucfirst($row);
-        }
-
-        return $result;
     }
 
     /**

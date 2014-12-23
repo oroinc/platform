@@ -11,7 +11,6 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
@@ -27,7 +26,7 @@ use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 class CommentController extends RestController
 {
     /**
-     * Get filtered activity lists for given entity
+     * Get filtered comment for given entity class name and id
      *
      * @param string  $relationClass Entity class name
      * @param integer $relationId    Entity id
@@ -42,6 +41,8 @@ class CommentController extends RestController
      *      name="filter", nullable=true,
      *      description="Array with Activity type and Date range filters values"
      * )
+     *
+     * @AclAncestor("oro_comment_view")
      *
      * @ApiDoc(
      *      description="Returns an array with collection of CommentList objects and count of all records",
@@ -189,5 +190,27 @@ class CommentController extends RestController
     public function getFormHandler()
     {
         return $this->get('oro_comment.api.form.handler');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array &$data, $entity)
+    {
+        parent::fixFormData($data, $entity);
+
+        unset($data['id']);
+        unset($data['owner']);
+        unset($data['owner_id']);
+        unset($data['editor']);
+        unset($data['editor_id']);
+        unset($data['relationClass']);
+        unset($data['relationId']);
+        unset($data['createdAt']);
+        unset($data['updatedAt']);
+        unset($data['editable']);
+        unset($data['removable']);
+
+        return true;
     }
 }

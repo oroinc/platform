@@ -1,28 +1,16 @@
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
 
-<div class="widget-content">
-
-    <fieldset class="form-horizontal form-horizontal-large">
-        <h5 class="user-fieldset">
-            <span>{{ 'oro.comment.plural_label'|trans }}</span>
-        </h5>
+<form method="post" class="comment-form well">
+    <fieldset class="form-horizontal">
+        {{ form_widget(form.message) }}
+        {{ form_errors(form.message) }}
+        <button class="btn add-comment-button" type="submit">
+            <%= id ? _.__('oro.comment.from.button.edit_comment.label') : _.__('oro.comment.from.button.add_comment.label') %>
+        </button>
+        <% if (id) { %>
+        <button class="btn cancel-comment-button" type="reset">
+            <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
+        </button>
+        <% } %>
     </fieldset>
-
-    <div class="form-container comment-form-group">
-        <form id="{{ form.vars.name }}" method="post" class="comment-form">
-            <fieldset class="form-horizontal">
-                {{ form_widget(form.message) }}
-                {{ form_errors(form.message) }}
-                {#{ form_rest(form) }#}
-                <div style="margin-top: 8px;">
-                    <div style="position: relative; text-align: right;">
-                        <button class="btn add-comment-button" type="submit">
-                            {{ 'add_comment'|trans }}
-                        </button>
-                    </div>
-                </div>
-            </fieldset>
-        </form>
-        {{ oro_form_js_validation(form) }}
-    </div>
-</div>
+</form>

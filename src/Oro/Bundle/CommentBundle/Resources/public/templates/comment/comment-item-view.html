@@ -1,4 +1,17 @@
-<label>
-    <%- message %>
-</label>
-<a href="#" class="remove"><i class="icon icon-remove"></i></a>
+<div class="accordion-group">
+    <div class="accordion-heading">
+        <div class="title-item">
+            <a href="#accordion-item-<%= cid %>" data-parent="#<%- accordionId %>"
+               data-toggle="collapse" class="no-hash accordion-toggle collapsed"></a>
+            <div class="short-comment">
+                <%- message %>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-body collapse" id="accordion-item-<%= cid %>">
+        <div class="form-container">
+            <%- message %>
+        </div>
+        <a href="#" class="remove"><i class="icon icon-remove"></i></a>
+    </div>
+</div>

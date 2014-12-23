@@ -12,11 +12,31 @@ define(function (require) {
         className: 'comment',
 
         events: {
-            'click .remove': 'removeModel'
+            'click .remove': 'removeModel',
+            'click .form-container': 'edit'
+        },
+
+        initialize: function (options) {
+            _.extend(this, _.pick(options || {}, ['accordionId']));
+            CommentItemView.__super__.initialize.apply(this, arguments);
         },
 
         removeModel: function () {
             this.model.destroy();
+        },
+
+        getTemplateData: function () {
+            var data = CommentItemView.__super__.getTemplateData.call(this);
+            data.cid = this.cid;
+            data.accordionId = this.accordionId;
+            return data;
+        },
+
+        edit: function () {
+            if (!this.$('form').length) {
+                // if it's not edit mode yet
+                this.model.trigger('toEdit', this.model);
+            }
         }
     });
 
