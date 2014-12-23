@@ -63,8 +63,8 @@ define(function (require) {
             this.listenTo(formView, 'reset', this.onCommentReset, this)
         },
 
-        onCommentSave: function (attrs) {
-            var model, itemView;
+        onCommentSave: function (attrs, options) {
+            var model, itemView, url;
             if (attrs.id) {
                 model = this.collection.get(attrs.id);
                 model.set(attrs);
@@ -73,7 +73,9 @@ define(function (require) {
                 itemView.render();
             } else {
                 model = this.collection.add(attrs, {at: 0});
-                model.save();
+                url = model.url();
+                options.url = url;
+                model.save(null, options);
             }
         },
 

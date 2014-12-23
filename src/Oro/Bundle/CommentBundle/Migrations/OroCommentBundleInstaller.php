@@ -13,7 +13,10 @@ use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\CommentBundle\Migrations\Schema\v1_0\OroCommentBundle as OroCommentBundle10;
 
-class OroCommentBundleInstaller implements Installation, CommentExtensionAwareInterface, AttachmentExtensionAwareInterface
+class OroCommentBundleInstaller implements
+    Installation,
+    CommentExtensionAwareInterface,
+    AttachmentExtensionAwareInterface
 {
     /** @var CommentExtension */
     protected $comment;
