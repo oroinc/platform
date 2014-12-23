@@ -64,7 +64,7 @@ class PdoMysql extends BaseDriver
         // TODO Need to clarify search requirements in scope of CRM-214
         if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
             $whereExpr = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
-            $shortWords = $this->getWordsLessThanFullTextMinWordLength($searchCondition['fieldValue']);
+            $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
             if ($shortWords) {
                 $whereExpr = $qb->expr()->orX(
                     $whereExpr,
@@ -94,19 +94,25 @@ class PdoMysql extends BaseDriver
     /**
      * Get words that have length less than $this->fullTextMinWordLength
      *
-     * @param  string $value
+     * @param  array $words
      * @return array
      */
-    protected function getWordsLessThanFullTextMinWordLength($value)
+    protected function getWordsLessThanFullTextMinWordLength(array $words)
     {
         $length = $this->getFullTextMinWordLength();
 
-        return array_filter(
-            $this->getWords($value),
+        $words = array_filter(
+            $words,
             function ($value) use ($length) {
+                if (filter_var($value, FILTER_VALIDATE_INT)) {
+                    return true;
+                }
+
                 return mb_strlen($value) < $length;
             }
         );
+
+        return array_unique($words);
     }
 
     /**
@@ -117,7 +123,7 @@ class PdoMysql extends BaseDriver
         if (null === $this->fullTextMinWordLength) {
             $this->fullTextMinWordLength = (int) $this->em->getConnection()->fetchColumn(
                 "SHOW VARIABLES LIKE 'ft_min_word_len'",
-                array(),
+                [],
                 1
             );
         }
@@ -163,10 +169,10 @@ class PdoMysql extends BaseDriver
         if ($setOrderBy) {
             $rawValueParameter = "raw_$valueParameter";
             $qb->select(
-                array(
+                [
                     'search as item',
                     "MATCH_AGAINST($joinAlias.value, :$rawValueParameter) AS rankField"
-                )
+                ]
             )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
         }
 
