@@ -1,9 +1,7 @@
 oro:
     comment:
-        enabled: Enable comments
-
         entity_label: Comment
-        plural_label: Comments
+        entity_plural_label: Comments
         id.label: Id
         message.label: Message
         organization.label: Organization
@@ -12,5 +10,6 @@ oro:
         attachment.label: Attachment
 
         message.placeholder: Enter your comment...
+        enabled: Enable comments
 
 add_comment: Add Comment
