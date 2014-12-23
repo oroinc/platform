@@ -3,9 +3,9 @@ define(function (require) {
 
     var WysiwygEditorView,
         BaseView = require('oroui/js/app/views/base/view'),
-        $ = require('tinymce');
-    require('tinymce.textcolor');
-    require('tinymce.code');
+        $ = require('tinymce/jquery.tinymce.min');
+    require('tinymce/plugins/textcolor/plugin.min');
+    require('tinymce/plugins/code/plugin.min');
 
     WysiwygEditorView = BaseView.extend({
         autoRender: true,
