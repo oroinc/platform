@@ -123,7 +123,7 @@ class PdoMysql extends BaseDriver
         if (null === $this->fullTextMinWordLength) {
             $this->fullTextMinWordLength = (int) $this->em->getConnection()->fetchColumn(
                 "SHOW VARIABLES LIKE 'ft_min_word_len'",
-                array(),
+                [],
                 1
             );
         }
@@ -169,10 +169,10 @@ class PdoMysql extends BaseDriver
         if ($setOrderBy) {
             $rawValueParameter = "raw_$valueParameter";
             $qb->select(
-                array(
+                [
                     'search as item',
                     "MATCH_AGAINST($joinAlias.value, :$rawValueParameter) AS rankField"
-                )
+                ]
             )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
         }
 
@@ -203,9 +203,6 @@ class PdoMysql extends BaseDriver
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
             $result->add("$joinAlias.value LIKE :$valueParameter");
-            if (filter_var($value, FILTER_VALIDATE_INT)) {
-                $value = '%' . $value;
-            }
             $qb->setParameter($valueParameter, $value . '%');
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
