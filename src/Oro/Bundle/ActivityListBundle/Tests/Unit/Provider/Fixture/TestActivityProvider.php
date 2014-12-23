@@ -106,5 +106,6 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
      */
     public function hasComments(ConfigManager $configManager, $entity)
     {
+        return true;
     }
 }
