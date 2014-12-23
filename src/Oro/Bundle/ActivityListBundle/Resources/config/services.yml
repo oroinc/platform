@@ -31,6 +31,7 @@ services:
             - @oro_config.user
             - @oro_activity_list.provider.chain
             - @oro_activity_list.filter.helper
+            - @oro_comment.comment.api_manager
 
     oro_activity_list.collect_manager:
         class: %oro_activity_list.collect_manager.class%

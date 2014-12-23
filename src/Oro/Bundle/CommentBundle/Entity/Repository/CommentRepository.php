@@ -8,14 +8,31 @@ use Doctrine\ORM\QueryBuilder;
 class CommentRepository extends EntityRepository
 {
     /**
-     * @param string $orderField
-     * @param string $orderDirection
+     * @param string $fieldName
+     * @param string $entityId
      *
      * @return QueryBuilder
      */
-    public function getBaseQueryBuilder($orderField = 'updatedAt', $orderDirection = 'DESC')
+    public function getBaseQueryBuilder($fieldName, $entityId)
     {
-        return $this->createQueryBuilder('c')
-            ->orderBy('c.' . $orderField, $orderDirection);
+        $qb = $this->createQueryBuilder('c');
+        $qb->andWhere('c.' . $fieldName . ' = :param1');
+        $qb->setParameter('param1', (int)$entityId);
+
+        return $qb;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $entityId
+     *
+     * @return string
+     */
+    public function getNumberOfComment($fieldName, $entityId)
+    {
+        $qb = $this->getBaseQueryBuilder($fieldName, $entityId);
+        $qb->select($qb->expr()->count('c.id'));
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 }

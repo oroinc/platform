@@ -18,9 +18,12 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 
 class CommentApiManager extends ApiEntityManager
 {
+    const ITEMS_PER_PAGE = 10;
+
     /** @var ObjectManager */
     protected $em;
 
@@ -73,26 +76,54 @@ class CommentApiManager extends ApiEntityManager
     public function getCommentList($entityClass, $entityId, $page = 1)
     {
         $entityName = $this->convertRelationEntityClassName($entityClass);
-        $result     = [];
+        $result     = [
+            'count' => 0,
+            'data'  => [],
+        ];
 
         if ($this->isCorrectClassName($entityName)) {
             $fieldName = $this->getFieldName($entityName);
 
-            /** @var QueryBuilder $qb */
-            $qb = $this->getRepository()->getBaseQueryBuilder();
+            /** @var CommentRepository $repository */
+            $repository = $this->getRepository();
 
-            $qb->andWhere('c.' . $fieldName . ' = :param1');
-            $qb->setParameter('param1', (int)$entityId);
+            /** @var QueryBuilder $qb */
+            $qb = $repository->getBaseQueryBuilder($fieldName, $entityId);
+            $qb->orderBy('c.updatedAt', 'DESC');
 
             $pager = $this->pager;
             $pager->setQueryBuilder($qb);
             $pager->setPage($page);
-            $pager->setMaxPerPage(10);
+            $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
             $pager->init();
 
-            $result = $this->getEntityViewModels($pager->getResults(), $entityClass, $entityId);
+            $result['data']  = $this->getEntityViewModels($pager->getResults(), $entityClass, $entityId);
+            $result['count'] = $pager->getNbResults();
         }
 
+        return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $entityId
+     *
+     * @return int
+     */
+    public function getCommentCount($entityClass, $entityId)
+    {
+        $entityName = $this->convertRelationEntityClassName($entityClass);
+        $result     = 0;
+
+        try {
+            if ($this->isCorrectClassName($entityName)) {
+                /** @var CommentRepository $repository */
+                $fieldName  = $this->getFieldName($entityName);
+                $repository = $this->getRepository();
+                $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+            }
+        } catch (\Exception $e) {
+        }
         return $result;
     }
 
