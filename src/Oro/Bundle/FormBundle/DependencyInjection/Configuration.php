@@ -16,15 +16,12 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('oro_form');
 
-        $rootNode->children()
-        ->end();
-
-//        SettingsBuilder::append(
-//            $rootNode,
-//            [
-//                'wysiwyg_enabled' => ['value' => true, 'type' => 'bool'],
-//            ]
-//        );
+        SettingsBuilder::append(
+            $rootNode,
+            [
+                'wysiwyg_enabled' => ['value' => true, 'type' => 'bool'],
+            ]
+        );
 
         return $treeBuilder;
     }

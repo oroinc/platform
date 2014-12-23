@@ -256,4 +256,3 @@ oro:
             fields:
                 wysiwyg_enabled:
                     label: 'Enable WYSIWYG editor'
-                    tooltip: 'Enables WYSIWYG editor for all text fields'

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -17,6 +18,19 @@ class OroRichTextType extends AbstractType
     protected $assetHelper;
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
+
+    /**
      * @param PackageInterface $assetHelper
      */
     public function setAssetHelper(PackageInterface $assetHelper)
@@ -30,7 +44,7 @@ class OroRichTextType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $defaults = [
-            'wysiwyg_enabled' => true,
+            'wysiwyg_enabled' => (bool)$this->configManager->get('oro_form.wysiwyg_enabled'),
             'wysiwyg_options' => [
                 'plugins' => ['textcolor', 'code'],
                 'toolbar' => ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code'],
