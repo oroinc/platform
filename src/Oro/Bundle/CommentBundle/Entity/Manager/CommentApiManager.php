@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\NoResultException;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -18,6 +19,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 
 class CommentApiManager extends ApiEntityManager
 {
@@ -83,10 +85,12 @@ class CommentApiManager extends ApiEntityManager
         if ($this->isCorrectClassName($entityName)) {
             $fieldName = $this->getFieldName($entityName);
 
+            /** @var CommentRepository $repository */
+            $repository = $this->getRepository();
+
             /** @var QueryBuilder $qb */
-            $qb = $this->getRepository()->getBaseQueryBuilder();
-            $qb->andWhere('c.' . $fieldName . ' = :param1');
-            $qb->setParameter('param1', (int)$entityId);
+            $qb = $repository->getBaseQueryBuilder($fieldName, $entityId);
+            $qb->orderBy('c.updatedAt', 'DESC');
 
             $pager = $this->pager;
             $pager->setQueryBuilder($qb);
@@ -98,6 +102,29 @@ class CommentApiManager extends ApiEntityManager
             $result['count'] = $pager->getNbResults();
         }
 
+        return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $entityId
+     *
+     * @return int
+     */
+    public function getCommentCount($entityClass, $entityId)
+    {
+        $entityName = $this->convertRelationEntityClassName($entityClass);
+        $result     = 0;
+
+        try {
+            if ($this->isCorrectClassName($entityName)) {
+                /** @var CommentRepository $repository */
+                $fieldName  = $this->getFieldName($entityName);
+                $repository = $this->getRepository();
+                $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+            }
+        } catch (\Exception $e) {
+        }
         return $result;
     }
 
