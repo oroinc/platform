@@ -55,15 +55,11 @@ class OroRichTextType extends AbstractType
             'page-component' => [
                 'module' => 'oroui/js/app/components/view-component',
                 'options' => [
-                    'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view'
+                    'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
+                    'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
                 ]
-            ]
+            ],
         ];
-
-        if ($this->assetHelper) {
-            $defaults['page-component']['options']['content_css'] = $this->assetHelper
-                ->getUrl('bundles/oroform/css/wysiwyg-editor.css');
-        }
 
         $resolver->setDefaults($defaults);
         $resolver->setNormalizers(
@@ -71,6 +67,10 @@ class OroRichTextType extends AbstractType
                 'attr' => function (Options $options, $attr) {
                     $pageComponent = $options->get('page-component');
 
+                    if ($this->assetHelper && !empty($pageComponent['options']['content_css'])) {
+                        $pageComponent['options']['content_css'] = $this->assetHelper
+                            ->getUrl($pageComponent['options']['content_css']);
+                    }
                     $pageComponent['options'] = array_merge(
                         $pageComponent['options'],
                         (array)$options->get('wysiwyg_options')
