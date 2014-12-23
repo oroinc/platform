@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Templating\Asset\PackageInterface;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class OroRichTextType extends AbstractType
 {
