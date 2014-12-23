@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
-use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Symfony\Component\Validator\ExecutionContext;
 
+use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlank;
 use Oro\Bundle\FormBundle\Validator\Constraints\HtmlNotBlankValidator;
 
 class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
@@ -72,6 +72,7 @@ class HtmlNotBlankValidatorTest extends \PHPUnit_Framework_TestCase
             'false' => [false],
             'null' => [null],
             'empty html' => ['<p></p>'],
+            'empty html with attr' => ['<p class="empty"></p>'],
         );
     }
 }
