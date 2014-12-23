@@ -126,6 +126,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             });
             // subscribe to toggle context menu
             $el.on('click', '.context-menu-button', _.bind(function (e) {
+                e.stopPropagation();
                 var $currentTarget = $(e.currentTarget),
                     $contextMenu = $currentTarget.closest(this.selectors.item).find('.context-menu');
                 if ($contextMenu.length) {
@@ -228,9 +229,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         }, this));
                     }, this));
 
-                    $container.append($contextMenu)
-                        .find('.context-menu-button').css('display', 'block');
-                    $contextMenu.css(this._getContextMenuPos(posX, posY, $container.find('.context-menu')));
+                    $contextMenu.appendTo($container.find('.connection-menu-container'));
+                    $container.find('.context-menu-button').css('display', 'block');
 
                     $(document).on('click.' + this.cid, _.bind(function (event) {
                         if (!$(event.target).hasClass('context-menu') && !$(event.target).closest('.context-menu').length) {
@@ -297,15 +297,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
 
         _showError: function (message, err) {
             messenger.showErrorMessage(message, err);
-        },
-
-        _getContextMenuPos: function (posX, posY, $contextMenu) {
-            var y = posY + 5,
-                h = $contextMenu.outerHeight();
-            if ($(document).height() < y + h) {
-                y -= h + 10;
-            }
-            return {left: posX + 10, top: y};
         },
 
         _showItem: function (model, visible) {

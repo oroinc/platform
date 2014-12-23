@@ -92,7 +92,8 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
             this.changeColor(e.currentTarget.value);
         },
 
-        onOpen: function () {
+        onOpen: function (e) {
+            e.stopPropagation();
             this.$customColor.minicolors('show');
             this.$customColor.show();
         },

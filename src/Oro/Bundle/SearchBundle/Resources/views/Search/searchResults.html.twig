@@ -41,9 +41,9 @@
                         {% set iconClass = 'icon-file' %}
                     {% endif %}
 
-                    <li class="entity-type{% if selected %} selected{% endif %}">
+                    <li{% if selected %} class="selected"{% endif %}>
                         <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
-                            {% if selected %}<i class="icon-chevron-right arrow"></i>{% endif %}
+                            {% if selected %}<i class="icon-chevron-right pull-right"></i>{% endif %}
                             <i class="{{ iconClass }}"></i>
                             {{ label }} ({{ type.count }})
                         </a>
