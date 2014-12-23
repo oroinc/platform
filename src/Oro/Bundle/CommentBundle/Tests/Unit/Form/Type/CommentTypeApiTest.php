@@ -40,9 +40,13 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
                 ]
             )
             ->will($this->returnSelf());
-        $builder->expects($this->once())
+        $builder->expects($this->at(1))
             ->method('addEventSubscriber')
             ->with($this->isInstanceOf('Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber'))
+            ->will($this->returnSelf());
+        $builder->expects($this->at(2))
+            ->method('addEventSubscriber')
+            ->with($this->isInstanceOf('Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber'))
             ->will($this->returnSelf());
         $formType = new CommentTypeApi($this->configManager);
         $formType->buildForm($builder, []);
@@ -55,10 +59,9 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'data_class'              => Comment::ENTITY_NAME,
-                'intention'               => 'comment',
-                'csrf_protection'         => false,
-                'allow_add'               => true,
+                'data_class'      => Comment::ENTITY_NAME,
+                'intention'       => 'comment',
+                'csrf_protection' => false,
             ]);
 
         $formType = new CommentTypeApi($this->configManager);
