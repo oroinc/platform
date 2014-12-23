@@ -75,7 +75,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * @protected
          */
         decodeUriComponent: function(string) {
-            var result = string.replace('+', '%20');
+            var result = string.replace(/\+/g, '%20');
             result = decodeURIComponent(result);
             return result;
         },
