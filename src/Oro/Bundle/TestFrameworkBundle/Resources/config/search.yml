@@ -29,3 +29,7 @@ Oro\Bundle\TestFrameworkBundle\Entity\Item:
             name: blobValue
             target_type: text
             target_fields: [blobValue, all_data]
+        -
+            name: phone
+            target_type: text
+            target_fields: [phone]
