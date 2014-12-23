@@ -6,7 +6,6 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\NoResultException;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyAccess;
