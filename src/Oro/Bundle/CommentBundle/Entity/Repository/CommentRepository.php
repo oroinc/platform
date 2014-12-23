@@ -5,8 +5,6 @@ namespace Oro\Bundle\CommentBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
-use Doctrine\ORM\NonUniqueResultException;
-
 class CommentRepository extends EntityRepository
 {
     /**
@@ -28,7 +26,7 @@ class CommentRepository extends EntityRepository
      * @param string $fieldName
      * @param string $entityId
      *
-     * @return mixed
+     * @return string
      */
     public function getNumberOfComment($fieldName, $entityId)
     {
