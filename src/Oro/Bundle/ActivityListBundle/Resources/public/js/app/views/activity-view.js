@@ -81,18 +81,6 @@ define([
             this.model.collection.trigger('toView', this.model);
         },
 
-        /**
-        * Collapses/expands view elements
-        * @param {boolean=} collapse
-        */
-        toggle: function (collapse) {
-            if (_.isUndefined(collapse)) {
-                collapse = !this.isCollapsed();
-            }
-            this.$('.accordion-toggle').toggleClass('collapsed', collapse);
-            this.$('.collapse').toggleClass('in', !collapse);
-        },
-
         isCollapsed: function () {
             return this.$('.accordion-toggle').hasClass('collapsed');
         },

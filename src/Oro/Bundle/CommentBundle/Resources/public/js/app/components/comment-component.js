@@ -72,7 +72,7 @@ define(function (require) {
                 itemView = this.listView.getItemView(model);
                 itemView.render();
             } else {
-                model = this.collection.add(attrs);
+                model = this.collection.add(attrs, {at: 0});
                 model.save();
             }
         },
