@@ -2,8 +2,8 @@ parameters:
     oro_comment.migration.extension.comment.class:    Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension
     oro_comment.entity_generator.extension.class:     Oro\Bundle\CommentBundle\Tools\CommentEntityGeneratorExtension
     oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
-    oro_comment.form.type.comment.class:              Oro\Bundle\CommentBundle\Form\Type\CommentType
-    oro_comment.form.handler.comment.class:           Oro\Bundle\CommentBundle\Form\Handler\CommentHandler
+    oro_comment.comment.api_manager.class:            Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager
+    oro_comment.comment_lifecycle_listener.class:     Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener
 
 services:
     oro_comment.migration.extension.comment:
@@ -22,23 +22,19 @@ services:
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
-    oro_comment.form.type.comment:
-        class: %oro_comment.form.type.comment.class%
+    oro_comment.comment.api_manager:
+        class: %oro_comment.comment.api_manager.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_locale.formatter.name
+            - @oro_datagrid.extension.pager.orm.pager
+            - @oro_config.user
+            - @event_dispatcher
+
+    oro_comment.comment_lifecycle_listener:
+        class: %oro_comment.comment_lifecycle_listener.class%
+        arguments:
+            - @oro_security.security_facade.link
         tags:
-            - { name: form.type, alias: oro_comment }
-
-    oro_comment.form.handler.note:
-        class: %oro_comment.form.handler.comment.class%
-        scope: request
-        arguments:
-            - @oro_comment.form.type.comment
-            - @request
-            - @doctrine.orm.entity_manager
-
-    oro_comment.form.comment:
-        class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
-        arguments:
-            - 'oro_comment_form'
-            - 'oro_comment'
+            - { name: doctrine.event_listener, event: preUpdate }

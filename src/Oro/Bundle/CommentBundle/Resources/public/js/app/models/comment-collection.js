@@ -30,8 +30,8 @@ define(function (require) {
 
         url: function () {
             var options = {
-                entityId: this.relatedEntityId,
-                entityClass: this.relatedEntityClassName
+                relationId:    this.relatedEntityId,
+                relationClass: this.relatedEntityClassName
             };
             return routing.generate(this.route, options);
         }

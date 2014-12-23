@@ -2,11 +2,11 @@ oro_entity_config:
     comment:
         entity:
             items:
-                # indicates whether the entity can have notes or not
+                # indicates whether the entity can have comments or not
                 enabled: # boolean
                     options:
                         require_schema_update: true
-                        priority:              10 #todo подобрать на UI
+                        priority:              10
                         default_value:         false
                     form:
                         type: oro_entity_extend_association_choice

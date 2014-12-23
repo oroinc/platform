@@ -6,14 +6,32 @@ oro_comment_bundle:
 #
 # REST actions
 #
-oro_comment_list_api_get_concrete_list:
-    pattern: api/rest/{version}/commentlist/{entityClass}/{entityId}/{page}.{_format}
-    defaults: {_controller: OroCommentBundle:Api/Rest/Comment:cget, _format: json, version: latest, page: 1 }
+oro_api_comment_get_items:
+    pattern: api/rest/{version}/relation/{relationClass}/{relationId}/comment.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:cget, _format: json, version: latest }
     requirements:
          _method: GET
 
-oro_comment_list_api_get_list:
-    pattern: api/rest/{version}/commentlist/{entityClass}/{entityId}.{_format}
-    defaults: {_controller: OroCommentBundle:Api/Rest/Comment:cget, _format: json, version: latest}
+oro_api_comment_create_item:
+    pattern: api/rest/{version}/relation/{relationClass}/{relationId}/comment.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:post, _format: json, version: latest }
+    requirements:
+         _method: POST
+
+oro_api_comment_get_item:
+    pattern: api/rest/{version}/comment/{id}.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:get, _format: json, version: latest }
     requirements:
          _method: GET
+
+oro_api_comment_update_item:
+    pattern: api/rest/{version}/comment/{id}.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:put, _format: json, version: latest }
+    requirements:
+         _method: PUT
+
+oro_api_comment_delete_item:
+    pattern: api/rest/{version}/comment/{id}.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:delete, _format: json, version: latest }
+    requirements:
+         _method: DELETE

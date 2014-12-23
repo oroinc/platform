@@ -8,7 +8,7 @@ use Oro\Bundle\CommentBundle\Model\ExtendComment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Entity()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository")
  * @ORM\Table(name="oro_comment")
  * @ORM\InheritanceType("SINGLE_TABLE")
  * @ORM\DiscriminatorColumn(name="comments_type")

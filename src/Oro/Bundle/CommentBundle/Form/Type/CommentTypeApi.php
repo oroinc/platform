@@ -7,9 +7,25 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 
-class CommentType extends AbstractType
+class CommentTypeApi extends AbstractType
 {
+    const FORM_NAME = 'oro_comment_api';
+
+    /** @var  ConfigManager $configManager */
+    protected $configManager;
+
+    /**
+     * @param ConfigManager $configManager
+     */
+    public function __construct(ConfigManager $configManager)
+    {
+        $this->configManager = $configManager;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -21,14 +37,17 @@ class CommentType extends AbstractType
                 'textarea',
                 [
                     'required' => true,
-                    'label'    => 'oro.note.message.label',
+                    'label'    => 'oro.comment.message.label',
                     'attr'     => [
-                        'class' => 'comment-text-field',
+                        'class'       => 'comment-text-field',
                         'placeholder' => 'oro.comment.message.placeholder'
                     ],
                 ]
             )
             ->add('attachment', 'oro_image', ['label' => 'oro.comment.attachment.label', 'required' => false]);
+
+        $builder->addEventSubscriber(new PatchSubscriber());
+        $builder->addEventSubscriber(new CommentSubscriber());
     }
 
     /**
@@ -38,11 +57,9 @@ class CommentType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'              => Comment::ENTITY_NAME,
-                'intention'               => 'comment',
-                'ownership_disabled'      => true,
-                'csrf_protection'         => true,
-                'cascade_validation'      => true
+                'data_class'      => Comment::ENTITY_NAME,
+                'intention'       => 'comment',
+                'csrf_protection' => false,
             ]
         );
     }
@@ -52,6 +69,6 @@ class CommentType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_comment';
+        return self::FORM_NAME;
     }
 }

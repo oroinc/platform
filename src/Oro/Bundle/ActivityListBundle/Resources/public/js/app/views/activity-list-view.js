@@ -243,12 +243,9 @@ define(function (require) {
                         var response = $('<html />').html(data);
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
                         that._hideLoading();
-                        currentModelView.toggle();
                         that._initActionMenus();
                     })
                     .fail(_.bind(this._showLoadItemsError, this));
-            } else {
-                currentModelView.toggle();
             }
         },
 

@@ -42,6 +42,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $commentManager;
+
     public function setUp()
     {
         $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
@@ -63,6 +66,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
 
+        $this->commentManager = $this->getMockBuilder('Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager')
+            ->disableOriginalConstructor()->getMock();
+
         $this->doctrine->expects($this->any())->method('getManager')->willReturn($this->em);
 
         $this->activityListManager = new ActivityListManager(
@@ -73,7 +79,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             $this->config,
             $this->provider,
             $this->activityListFilterHelper,
-            $this->activityListManager
+            $this->commentManager
         );
     }
 
@@ -236,7 +242,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'createdAt'            => '2012-01-01T00:00:00+00:00',
                 'updatedAt'            => '2014-01-01T00:00:00+00:00',
                 'editable'             => true,
-                'removable'            => true
+                'removable'            => true,
+                'commentCount'         => ''
             ],
             $this->activityListManager->getItem(105)
         );

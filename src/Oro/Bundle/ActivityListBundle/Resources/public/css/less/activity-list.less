@@ -44,7 +44,7 @@
           .message-item {
             display: block;
             line-height: 12px;
-            padding: 0 0 1px 52px;
+            padding: 0 0 0 51px;
           }
         }
         .actions {
@@ -74,6 +74,9 @@
           }
           .message {
             .accordion-toggle {
+              &:not(.collapsed) {
+                display: none;
+              }
               &:before {
                 content: '';
               }
@@ -100,16 +103,6 @@
             content: '\f116';
           }
         }
-        .accordion-heading.collapse {
-          overflow: visible;
-        }
-        .accordion-heading.in .message {
-          display: none;
-        }
-        .accordion-body.collapse {
-          padding-left: 23px;
-          height: auto;
-        }
         .accordion-body {
           .message, .subject {
             display: none;
@@ -128,7 +121,7 @@
         }
         .accordion-body.in .subject {
           display: block;
-          padding: 0 0 4px 62px;
+          padding: 0 0 4px 61px;
           border-bottom: 1px solid #f0f0f0;
           margin-top: -3px;
         }
