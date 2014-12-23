@@ -42,6 +42,14 @@ define(function (require) {
             diff = Date.parse(model2.get('updatedAt')) - Date.parse(model1.get('updatedAt'));
             result = (diff === 0 || isNaN(diff)) ? diff : diff > 0 ? 1 : -1;
             return result;
+        },
+
+        parse: function(response) {
+            return response.data;
+        },
+
+        _setTotalRecords: function (quantity) {
+            this.totalRecords = parseInt(quantity, 10);
         }
 
        /* setFilter: function (filter) {
