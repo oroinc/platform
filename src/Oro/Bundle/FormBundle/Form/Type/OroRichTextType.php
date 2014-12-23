@@ -61,7 +61,7 @@ class OroRichTextType extends AbstractType
         ];
 
         if ($this->assetHelper) {
-            $defaults['attr']['data-page-component-options']['content_css'] = $this->assetHelper
+            $defaults['page-component']['options']['content_css'] = $this->assetHelper
                 ->getUrl('bundles/oroform/css/wysiwyg-editor.css');
         }
 
