@@ -266,11 +266,6 @@ oro_entity_config:
                             operator:       '!='
                             value:          true
 
-                is_inverse:
-                    options:
-                        default_value:      false
-                        auditable:          false
-
                 origin:
                     options:
                         auditable:          false
