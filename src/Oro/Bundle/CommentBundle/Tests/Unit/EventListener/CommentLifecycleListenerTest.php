@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CommentBundle\Tests\Unit\CommentLifecycleListener;
+namespace Oro\Bundle\CommentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
