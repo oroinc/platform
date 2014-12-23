@@ -51,6 +51,6 @@ class CommentType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_comment';
+        return 'oro_comment_api';
     }
 }

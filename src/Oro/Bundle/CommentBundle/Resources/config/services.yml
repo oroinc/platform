@@ -30,6 +30,7 @@ services:
             - @oro_locale.formatter.name
             - @oro_datagrid.extension.pager.orm.pager
             - @oro_config.user
+            - @event_dispatcher
 
     oro_comment.comment_lifecycle_listener:
         class: %oro_comment.comment_lifecycle_listener.class%

@@ -1,4 +1,16 @@
-<label>
-    <%- message %>
-</label>
-<a href="#" class="remove"><i class="icon icon-remove"></i></a>
+<div class="accordion-group">
+    <div class="accordion-heading collapse">
+        <div class="title-item">
+            <a href="#accordion-item-<%- cid %>" class="no-hash accordion-toggle collapsed"></a>
+            <!--<div class="message">
+                <%- message %>
+            </div>-->
+        </div>
+    </div>
+    <div class="accordion-body collapse" id="accordion-item-<%- cid %>">
+        <div class="message form-container">
+            <%- message %>
+        </div>
+        <a href="#" class="remove"><i class="icon icon-remove"></i></a>
+    </div>
+</div>

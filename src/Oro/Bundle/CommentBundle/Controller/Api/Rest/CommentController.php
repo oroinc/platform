@@ -190,4 +190,26 @@ class CommentController extends RestController
     {
         return $this->get('oro_comment.api.form.handler');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function fixFormData(array &$data, $entity)
+    {
+        parent::fixFormData($data, $entity);
+
+        unset($data['id']);
+        unset($data['owner']);
+        unset($data['owner_id']);
+        unset($data['editor']);
+        unset($data['editor_id']);
+        unset($data['relationClass']);
+        unset($data['relationId']);
+        unset($data['createdAt']);
+        unset($data['updatedAt']);
+        unset($data['editable']);
+        unset($data['removable']);
+
+        return true;
+    }
 }

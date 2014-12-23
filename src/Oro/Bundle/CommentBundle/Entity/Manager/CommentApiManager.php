@@ -7,6 +7,9 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -39,13 +42,15 @@ class CommentApiManager extends ApiEntityManager
      * @param NameFormatter     $nameFormatter
      * @param Pager             $pager
      * @param UserConfigManager $config
+     * @param EventDispatcher   $eventDispatcher
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config
+        UserConfigManager $config,
+        EventDispatcher $eventDispatcher
     ) {
         $this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
@@ -54,6 +59,8 @@ class CommentApiManager extends ApiEntityManager
         $this->config         = $config;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
+
+        $this->setEventDispatcher($eventDispatcher);
     }
 
     /**
@@ -102,10 +109,10 @@ class CommentApiManager extends ApiEntityManager
             throw new InvalidEntityException('Invalid entity name ' . $entityName);
         }
 
-        $setter        = $this->getFieldSetter($entityName);
         $relatedEntity = $this->getRelatedEntity($entityName, $entityId);
+        $accessor      = PropertyAccess::createPropertyAccessor();
 
-        call_user_func([$entity, $setter], $relatedEntity);
+        $accessor->setValue($entity, $this->getFieldName($entityName), $relatedEntity);
     }
 
     /**
@@ -153,16 +160,6 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param string $entityName
-     *
-     * @return string
-     */
-    protected function getFieldSetter($entityName)
-    {
-        return 'set' . $this->prepareFieldName($entityName);
-    }
-
-    /**
-     * @param string $entityName
      * @param int    $entityId
      *
      * @return Object Returns instance of $entityName
@@ -180,24 +177,6 @@ class CommentApiManager extends ApiEntityManager
         }
 
         return $relatedEntity;
-    }
-
-    /**
-     * @param string $entityName
-     *
-     * @return string
-     */
-    protected function prepareFieldName($entityName)
-    {
-        $fieldName   = $this->getFieldName($entityName);
-        $dividedName = explode('_', $fieldName);
-        $result      = '';
-
-        foreach ($dividedName as $row) {
-            $result .= ucfirst($row);
-        }
-
-        return $result;
     }
 
     /**

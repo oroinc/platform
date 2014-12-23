@@ -39,13 +39,14 @@ class CommentTypeApi extends AbstractType
                     'required' => true,
                     'label'    => 'oro.comment.message.label',
                     'attr'     => [
-                        'class' => 'comment-text-field',
+                        'class'       => 'comment-text-field',
                         'placeholder' => 'oro.comment.message.placeholder'
                     ],
                 ]
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());
+        $builder->addEventSubscriber(new CommentSubscriber());
     }
 
     /**
@@ -55,10 +56,9 @@ class CommentTypeApi extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'              => Comment::ENTITY_NAME,
-                'intention'               => 'comment',
-                'csrf_protection'         => false,
-                'allow_add'               => true,
+                'data_class'      => Comment::ENTITY_NAME,
+                'intention'       => 'comment',
+                'csrf_protection' => false,
             ]
         );
     }

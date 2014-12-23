@@ -1,5 +1,17 @@
-<script type="text/html" id="{{ id|e('html_attr')|raw }}">
+{# comments form template #}
+<script type="text/html" id="{{ (id ~ '-form')|e('html_attr')|raw }}">
     {{ render(path('oro_comment_form'))|oro_js_template_content|raw }}
-    <ul class="unstyled comments"></ul>
-    <div class="no-data"><span><%= _.__('oro.comment.comment_list.empty_collection') %></span></div>
+</script>
+
+{# comments list template #}
+<script type="text/html" id="{{ id|e('html_attr')|raw }}">
+    <div class="widget-content">
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5 class="user-fieldset">
+                <span>{{ 'oro.comment.plural_label'|trans }}</span>
+            </h5>
+        </fieldset>
+        <div class="form-container"></div>
+        <ul class="unstyled comments"></ul>
+    </div>
 </script>
