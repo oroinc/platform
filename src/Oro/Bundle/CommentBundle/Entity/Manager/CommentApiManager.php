@@ -21,6 +21,8 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 
 class CommentApiManager extends ApiEntityManager
 {
+    const ITEMS_PER_PAGE = 10;
+
     /** @var ObjectManager */
     protected $em;
 
@@ -73,24 +75,27 @@ class CommentApiManager extends ApiEntityManager
     public function getCommentList($entityClass, $entityId, $page = 1)
     {
         $entityName = $this->convertRelationEntityClassName($entityClass);
-        $result     = [];
+        $result     = [
+            'count' => 0,
+            'data'  => [],
+        ];
 
         if ($this->isCorrectClassName($entityName)) {
             $fieldName = $this->getFieldName($entityName);
 
             /** @var QueryBuilder $qb */
             $qb = $this->getRepository()->getBaseQueryBuilder();
-
             $qb->andWhere('c.' . $fieldName . ' = :param1');
             $qb->setParameter('param1', (int)$entityId);
 
             $pager = $this->pager;
             $pager->setQueryBuilder($qb);
             $pager->setPage($page);
-            $pager->setMaxPerPage(10);
+            $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
             $pager->init();
 
-            $result = $this->getEntityViewModels($pager->getResults(), $entityClass, $entityId);
+            $result['data']  = $this->getEntityViewModels($pager->getResults(), $entityClass, $entityId);
+            $result['count'] = $pager->getNbResults();
         }
 
         return $result;
