@@ -1,0 +1,38 @@
+assetic:
+    assets:
+        tinymce:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/tinymce.min.js
+            output: bundles/tinymce/tinymce.min.js
+        tinymce_jquery:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/jquery.tinymce.min.js
+            output: bundles/tinymce/jquery.tinymce.min.js
+        tinymce_textcolor:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/textcolor/plugin.min.js
+            output: bundles/tinymce/plugins/textcolor/plugin.min.js
+        tinymce_code:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/code/plugin.min.js
+            output: bundles/tinymce/plugins/code/plugin.min.js
+        tinymce_theme_modern:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/themes/modern/theme.min.js
+            output: bundles/tinymce/themes/modern/theme.min.js
+        tinymce_skin_lightgray_skin:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/skins/lightgray/skin.min.css
+            output: bundles/tinymce/skins/lightgray/skin.min.css
+        tinymce_skin_lightgray_content:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/skins/lightgray/content.min.css
+            output: bundles/tinymce/skins/lightgray/content.min.css
+        tinymce_skin_lightgray_fonts_woff:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/skins/lightgray/fonts/tinymce.woff
+            output: bundles/tinymce/skins/lightgray/fonts/tinymce.woff
+        tinymce_skin_lightgray_fonts_ttf:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/skins/lightgray/fonts/tinymce.ttf
+            output: bundles/tinymce/skins/lightgray/fonts/tinymce.ttf
