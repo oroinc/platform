@@ -55,10 +55,10 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
      * @dataProvider optionsDataProvider
      * @param array $options
      * @param bool $globalEnable
-     * @param bool $expectedEnable
      * @param array $viewData
+     * @param bool $expectedEnable
      */
-    public function testBuildForm(array $options, $globalEnable, $expectedEnable = true, array $viewData)
+    public function testBuildForm(array $options, $globalEnable, array $viewData, $expectedEnable = true)
     {
         $data = 'test';
 
@@ -109,7 +109,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'default options options' => [
                 [],
                 true,
-                true,
                 [
                     'attr' => $defaultAttrs
                 ]
@@ -117,18 +116,18 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'default options global disabled' => [
                 [],
                 false,
-                false,
                 [
                     'attr' => $defaultAttrs
-                ]
+                ],
+                false,
             ],
             'global enabled local disabled' => [
                 ['wysiwyg_enabled' => false],
                 true,
-                false,
                 [
                     'attr' => $defaultAttrs
-                ]
+                ],
+                false,
             ],
             'wysiwyg_options' => [
                 [
@@ -139,7 +138,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                         'statusbar' => false
                     ]
                 ],
-                true,
                 true,
                 [
                     'attr' => [
