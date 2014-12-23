@@ -52,9 +52,9 @@ class OroRichTextType extends AbstractType
                 'menubar' => false,
                 'statusbar' => false
             ],
-            'attr' => [
-                'data-page-component-module' => 'oroui/js/app/components/view-component',
-                'data-page-component-options' => [
+            'page-component' => [
+                'module' => 'oroui/js/app/components/view-component',
+                'options' => [
                     'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view'
                 ]
             ]
@@ -69,13 +69,16 @@ class OroRichTextType extends AbstractType
         $resolver->setNormalizers(
             [
                 'attr' => function (Options $options, $attr) {
-                    $attr['data-page-component-options']['enabled'] = (bool)$options->get('wysiwyg_enabled');
+                    $pageComponent = $options->get('page-component');
 
-                    $attr['data-page-component-options'] = array_merge(
-                        $attr['data-page-component-options'],
+                    $pageComponent['options'] = array_merge(
+                        $pageComponent['options'],
                         (array)$options->get('wysiwyg_options')
                     );
-                    $attr['data-page-component-options'] = json_encode($attr['data-page-component-options']);
+                    $pageComponent['options']['enabled'] = (bool)$options->get('wysiwyg_enabled');
+
+                    $attr['data-page-component-module'] = $pageComponent['module'];
+                    $attr['data-page-component-options'] = json_encode($pageComponent['options']);
 
                     return $attr;
                 }
