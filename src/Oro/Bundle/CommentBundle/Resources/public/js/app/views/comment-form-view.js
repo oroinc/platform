@@ -7,6 +7,7 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
+        mediator = require('oroui/js/mediator'),
         formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
         BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
@@ -44,6 +45,7 @@ define(function (require) {
             this.$('form')
                 .addClass(this.model ? 'edit-form' : 'add-form')
                 .validate();
+            mediator.execute('layout:init', this.$('form'));
             if (this.model) {
                 this.bindData();
             }

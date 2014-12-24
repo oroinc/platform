@@ -20,6 +20,7 @@ define(function (require) {
             relationId: null,
             createdAt: '',
             updatedAt: '',
+            attachmentURL: null,
             editable: true,
             removable: true
         },
