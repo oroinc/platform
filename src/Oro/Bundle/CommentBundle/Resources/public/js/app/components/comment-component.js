@@ -68,6 +68,7 @@ define(function (require) {
             if (attrs.id) {
                 model = this.collection.get(attrs.id);
                 model.set(attrs);
+                options.method = 'PUT';
                 options.url = model.url();
                 model.save(null, options);
                 itemView = this.listView.getItemView(model);
