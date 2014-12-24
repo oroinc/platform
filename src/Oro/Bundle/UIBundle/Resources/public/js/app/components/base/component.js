@@ -9,7 +9,7 @@ define([
 
     var BaseComponent, componentOptions;
 
-    componentOptions = ['model', 'collection'];
+    componentOptions = ['model', 'collection', '_sourceElement'];
 
     /**
      * Base component's constructor
@@ -19,6 +19,9 @@ define([
      */
     BaseComponent = function (options) {
         this.cid = _.uniqueId('component');
+        if (options._sourceElement) {
+            options._sourceElement.data('component', this);
+        }
         _.extend(this, _.pick(options, componentOptions));
         this.initialize(options);
         this.delegateListeners();

@@ -65,7 +65,8 @@ define(function (require) {
                 this._initModel();
             }
 
-            dialogOptions.close = _.bind(this.closeHandler, this, dialogOptions.close);
+            dialogOptions.beforeClose = _.bind(this.closeHandler, this, dialogOptions.close);
+            dialogOptions.close = undefined;
 
             this.initializeWidget(options);
         },
@@ -124,6 +125,9 @@ define(function (require) {
                 });
             }
             this._hideLoading();
+
+            // need to remove components in widget before DOM will be deleted
+            this._removeComponents();
             if (this.widget) {
                 this.widget.remove();
                 delete this.widget;
