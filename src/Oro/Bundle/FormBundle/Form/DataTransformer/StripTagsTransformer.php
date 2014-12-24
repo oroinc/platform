@@ -45,7 +45,7 @@ class StripTagsTransformer implements DataTransformerInterface
      * @param string $allowableTags
      * @return string
      */
-    public function prepareAllowedTagsList($allowableTags)
+    protected function prepareAllowedTagsList($allowableTags)
     {
         /** strip attributes */
         $allowableTags = preg_replace('(\[.*?\]|\s+)', '', $allowableTags);
@@ -53,7 +53,8 @@ class StripTagsTransformer implements DataTransformerInterface
         /** strip or condition */
         $allowableTags = preg_replace('(\/)', self::DELIMITER, $allowableTags);
 
-        if (empty($allowableTags)) {
+        $cleanTags = str_replace(self::DELIMITER, '', $allowableTags);
+        if (empty($cleanTags)) {
             return null;
         }
 

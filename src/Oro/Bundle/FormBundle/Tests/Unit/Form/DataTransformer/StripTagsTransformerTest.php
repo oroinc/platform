@@ -39,6 +39,13 @@ class StripTagsTransformerTest extends \PHPUnit_Framework_TestCase
                 'p',
                 '<p class="class">sometext</p>'
             ],
+            'prepare allowed' => ['<a>first text</a><c>second text</c>', 'a, b', '<a>first text</a>second text'],
+            'prepare not allowed' => ['<p>sometext</p>', 'a[class]', 'sometext'],
+            'prepare with allowed' => ['<p>sometext</p>', 'a, p[class]', '<p>sometext</p>'],
+            'prepare attribute' => ['<p>sometext</p>', 'a[class], p', '<p>sometext</p>'],
+            'prepare attributes' => ['<p>sometext</p>', 'p[href|target=_blank]', '<p>sometext</p>'],
+            'prepare or condition' => ['<p>sometext</p>', 'a[href|target=_blank], b/p', '<p>sometext</p>'],
+            'prepare empty' => ['<p>sometext</p>', '[href|target=_blank],/', 'sometext'],
         ];
     }
 
@@ -47,34 +54,5 @@ class StripTagsTransformerTest extends \PHPUnit_Framework_TestCase
         $transformer = new StripTagsTransformer();
 
         $this->assertEquals('value', $transformer->reverseTransform('value'));
-    }
-
-    /**
-     * @param string $allowableTags
-     * @param string $expected
-     *
-     * @dataProvider stripDataProvider
-     */
-    public function testPrepareAllowedTagsList($allowableTags, $expected)
-    {
-        $transformer = new StripTagsTransformer();
-
-        $this->assertEquals(
-            $expected,
-            $transformer->prepareAllowedTagsList($allowableTags)
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function stripDataProvider()
-    {
-        return [
-            'default' => ['a, b', '<a><b>'],
-            'attribute' => ['a[class], b', '<a><b>'],
-            'attributes' => ['a[href|target=_blank], b', '<a><b>'],
-            'tag or tag' => ['a[href|target=_blank], b/p', '<a><b><p>'],
-        ];
     }
 }
