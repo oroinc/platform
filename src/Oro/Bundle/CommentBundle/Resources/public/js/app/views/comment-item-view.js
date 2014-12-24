@@ -48,8 +48,9 @@ define(function (require) {
         collapsed: true,
 
         events: {
-            'click .remove': 'removeModel',
-            'click .form-container': 'edit',
+            'click .removeRow': 'removeModel',
+            'click .form-container': 'editModel',
+            'click .short-comment': 'editModel',
             'shown .accordion-body': 'onToggle',
             'hidden .accordion-body': 'onToggle'
         },
@@ -86,11 +87,12 @@ define(function (require) {
             return data;
         },
 
-        removeModel: function () {
+        removeModel: function (e) {
+            e.stopPropagation();
             this.model.destroy();
         },
 
-        edit: function () {
+        editModel: function () {
             if (!this.$('form').length) {
                 // if it's not edit mode yet
                 this.model.trigger('toEdit', this.model);

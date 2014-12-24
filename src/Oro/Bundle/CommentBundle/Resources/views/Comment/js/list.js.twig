@@ -7,9 +7,19 @@
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
     <fieldset class="form-horizontal form-horizontal-large comments-block">
         <h5 class="user-fieldset">
-            <span>{{ 'oro.comment.entity_plural_label'|trans }}</span>
+            <span><%= _.__('oro.comment.plural_label') %></span>
         </h5>
         <div class="form-container"></div>
-        <ul class="unstyled accordion comments-list" id="<%= accordionId %>"></ul>
+        <div class="grid-toolbar"></div>
+        <ul class="unstyled accordion comments-list" id="<%= accordionId %>">
+            <li class="loading-mask">
+                <div class="loading-wrapper"></div>
+                <div class="loading-frame">
+                    <div class="box well">
+                        <div class="loading-content"><%= _.__('Loading...') %></div>
+                    </div>
+                </div>
+            </li>
+        </ul>
     </fieldset>
 </script>

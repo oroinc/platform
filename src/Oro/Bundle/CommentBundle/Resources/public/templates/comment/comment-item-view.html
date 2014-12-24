@@ -1,4 +1,4 @@
-<div class="accordion-group">
+<div class="accordion-group oro-item-collection">
     <div class="accordion-heading">
         <div class="title-item">
             <a href="#accordion-item-<%= cid %>" data-parent="#<%- accordionId %>"
@@ -14,6 +14,9 @@
                 }) %>
             <% } %>
         </div>
+        <% if (removable) { %>
+        <button class="removeRow btn btn-action btn-link">×</button>
+        <%}%>
         <div data-target="#accordion-item-<%= cid %>" data-parent="#<%- accordionId %>"
              data-toggle="collapse" class="short-comment accordion-toggle<% if (collapsed) { %> collapsed<%}%>">
             <%- message %>
@@ -23,9 +26,6 @@
         <div class="accordion-inner">
             <div<% if (editable) { %> class="form-container"<%}%>>
                 <%- message %>
-                <% if (removable) { %>
-                <a href="#" class="remove"><i class="icon icon-remove"></i></a>
-                <%}%>
             </div>
         </div>
     </div>

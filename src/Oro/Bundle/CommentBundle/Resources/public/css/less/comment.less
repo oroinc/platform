@@ -10,8 +10,39 @@
   .comment-item {
     border-bottom: 1px solid #f0f0f0;
     min-height: 57px;
+    position: relative;
     &:last-child {
       border-bottom: none;
+    }
+    .removeRow {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: -3px;
+    }
+    &:hover {
+      .removeRow {
+        display: block;
+      }
+    }
+  }
+  .comments-list {
+    position: relative;
+    .loading-mask {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      .loading-wrapper {
+        height: 100% !important;
+      }
+      .loading-frame{
+        top: 50% !important;
+        left: 50% !important;
+        margin-top: -52px;
+        margin-left: -90px;
+      }
     }
   }
   .short-comment {
@@ -43,19 +74,5 @@
     padding-top: 0;
     padding-left: 30px;
     background-color: #fff;
-  }
-  .form-container {
-    position: relative;
-    .remove {
-      display: none;
-      position: absolute;
-      right: -16px;
-      top: -6px;
-    }
-  }
-  .comment-item:hover {
-    .remove {
-      display: block;
-    }
   }
 }

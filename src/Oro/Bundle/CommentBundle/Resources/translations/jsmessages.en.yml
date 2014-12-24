@@ -1,5 +1,9 @@
 oro:
+    pagination:
+        page: Page:
+        total: of {{ pages }} | Total of {{ records }} records
     comment:
+        plural_label: Comments
         from:
             button:
                 add_comment:

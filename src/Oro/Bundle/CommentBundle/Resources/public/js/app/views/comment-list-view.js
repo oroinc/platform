@@ -4,6 +4,7 @@ define(function (require) {
 
     var CommentListView,
         _ = require('underscore'),
+        PaginationView = require('orocomment/js/app/views/pagination-view'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
         CommentItemView = require('./comment-item-view');
 
@@ -12,7 +13,8 @@ define(function (require) {
         itemView: CommentItemView,
 
         listSelector: 'ul.comments-list',
-        itemSelector: 'li',
+        itemSelector: 'li.comment-item',
+        loadingSelector: '.loading-mask',
 
         listen: {
             // once collection is synced -- recheck items views
@@ -22,6 +24,27 @@ define(function (require) {
         initialize: function (options) {
             this.template = _.template($(options.template).html());
             CommentListView.__super__.initialize.apply(this, arguments);
+        },
+
+        render: function () {
+            CommentListView.__super__.render.call(this);
+            this.createPaginationView();
+            return this;
+        },
+
+        createPaginationView: function () {
+            var pager;
+            pager = this.subview('pager');
+            if (!pager) {
+                pager = new PaginationView({
+                    autoAttach: true,
+                    container: this.$('.grid-toolbar'),
+                    collection: this.collection
+                });
+                this.subview('pager', pager);
+            } else {
+                this.$('.grid-toolbar').append(pager.$el);
+            }
         },
 
         getTemplateData: function () {
