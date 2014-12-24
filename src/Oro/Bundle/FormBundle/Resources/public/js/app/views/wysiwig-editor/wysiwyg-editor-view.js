@@ -28,7 +28,7 @@ define(function (require) {
         },
 
         render: function () {
-            if (this.tinymceInstance){
+            if (this.tinymceInstance) {
                 this.tinymceInstance.remove();
                 this.tinymceInstance = null;
             }
@@ -42,7 +42,7 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
-            if (this.tinymceInstance){
+            if (this.tinymceInstance) {
                 this.tinymceInstance.remove();
                 this.tinymceInstance = null;
             }
