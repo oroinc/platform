@@ -9,7 +9,7 @@ oro_entity_config:
                         priority:              10 #todo подобрать на UI
                         default_value:         false
                     form:
-                        type: oro_entity_extend_association_choice
+                        type: oro_comment_association_choice
                         options:
                             block:             associations
                             required:          true
