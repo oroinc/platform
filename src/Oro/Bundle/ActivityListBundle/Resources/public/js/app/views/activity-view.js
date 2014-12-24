@@ -3,10 +3,11 @@
 define([
     'jquery',
     'underscore',
+    'backbone',
     'oroui/js/app/views/base/view',
     'routing',
     'orolocale/js/formatter/datetime'
-], function ($, _, BaseView, routing, dateTimeFormatter) {
+], function ($, _, Backbone, BaseView, routing, dateTimeFormatter) {
     'use strict';
 
     var ActivityView;
@@ -20,7 +21,8 @@ define([
                 deleteItem: null
             },
             infoBlock: '.accordion-body .message .info',
-            commentsBlock: '.accordion-body .message .comment'
+            commentsBlock: '.accordion-body .message .comment',
+            commentsCountBlock: '.comment-count .count'
         },
         attributes: {
             'class': 'list-item'
@@ -31,7 +33,8 @@ define([
             'click .accordion-toggle': 'onToggle'
         },
         listen: {
-            'change:contentHTML model': '_onContentChange'
+            'change:contentHTML model': '_onContentChange',
+            'change:commentCount model': '_onCommentCountChange'
         },
 
         initialize: function (options) {
@@ -89,8 +92,30 @@ define([
             this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
         },
 
+        _onCommentCountChange: function () {
+            var quantity = this.model.get('commentCount'),
+                $elem = this.$(this.options.commentsCountBlock);
+            $elem.html(quantity);
+            $elem.parent()[quantity > 0 ? 'show' : 'hide']();
+        },
+
         getCommentsBlock: function () {
             return this.$(this.options.commentsBlock);
+        },
+
+        setCommentComponent: function (comments) {
+            this.subview('comments', comments);
+            this.listenTo(comments.collection, 'sync', this.updateCommentsQuantity, this);
+        },
+
+        hasCommentComponent: function () {
+            return Boolean(this.subview('comments'));
+        },
+
+        updateCommentsQuantity: function (collection) {
+            if (collection instanceof Backbone.Collection) {
+                this.model.set('commentCount', collection.getRecordsQuantity());
+            }
         }
     });
 

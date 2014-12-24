@@ -12,54 +12,6 @@
     .no-data {
       margin: 20px;
     }
-    .list-box {
-      border: solid 1px #ddd;
-      border-radius: 4px;
-      &:empty {
-        display: none;
-      }
-      .list-item {
-        padding: 0;
-        border-bottom-color: #ddd;
-        &:hover {
-          background-color: transparent;
-        }
-        .visual {
-          position: relative;
-          top: -2px;
-        }
-        .user {
-          font-style: normal;
-        }
-        .date {
-          font-style: normal;
-          font-size: smaller;
-        }
-        .title-item {
-          white-space: nowrap;
-          .icon {
-            display: inline-block;
-            width: 27px;
-            font-size: 18px;
-            margin: 0;
-            color: #999;
-          }
-          .message-item {
-            display: block;
-            line-height: 12px;
-            padding: 0 0 0 51px;
-          }
-        }
-        .actions {
-          white-space: nowrap;
-          float: right;
-          margin: 0;
-        }
-      }
-      .list-item:last-child {
-        border-bottom: 0;
-      }
-    }
     .filter-box {
       float: left;
       margin: 0px;
@@ -71,6 +23,67 @@
     .filter-item {
       margin-bottom: 0px;
       margin-right: 2px;
+    }
+  }
+  .list-box {
+    border: solid 1px #ddd;
+    border-radius: 4px;
+    &:empty {
+      display: none;
+    }
+    .list-item {
+      padding: 0;
+      border-bottom-color: #ddd;
+      &:hover {
+        background-color: transparent;
+      }
+      .visual {
+        position: relative;
+        top: -2px;
+      }
+      .user {
+        font-style: normal;
+      }
+      .date {
+        font-style: normal;
+        font-size: smaller;
+      }
+      .actions {
+        white-space: nowrap;
+        float: right;
+        margin: 0;
+      }
+    }
+    .title-item {
+      white-space: nowrap;
+      .icon {
+        display: inline-block;
+        width: 27px;
+        font-size: 18px;
+        margin: 0;
+        color: #999;
+      }
+      .message-item {
+        display: block;
+        line-height: 12px;
+        padding: 0 0 0 51px;
+      }
+    }
+    .list-item:last-child {
+      border-bottom: 0;
+    }
+    .comment-count{
+      color: #999;
+      margin-left: 5px;
+      &:before {
+        content: "|";
+        font-size: 11px;
+      }
+      .icon {
+        width: auto;
+        padding: 0 3px;
+        font-size: 14px;
+      }
     }
   }
   .accordion {
