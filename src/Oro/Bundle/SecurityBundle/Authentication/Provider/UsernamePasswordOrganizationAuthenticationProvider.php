@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
@@ -44,17 +45,19 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
      */
     public function authenticate(TokenInterface $token)
     {
-        /**  @var UsernamePasswordOrganizationToken $token */
-        $usernamePasswordToken = parent::authenticate($token);
+        /**  @var TokenInterface $token */
+        $authenticatedToken = parent::authenticate($token);
 
-        $this->checkUserOrganization($usernamePasswordToken->getUser(), $token->getOrganizationContext());
+        $user = $authenticatedToken->getUser();
+        $organization = $this->getOrganization($user, $token);
+        $this->checkUserOrganization($user, $organization);
 
         $authenticatedToken = new UsernamePasswordOrganizationToken(
-            $usernamePasswordToken->getUser(),
-            $usernamePasswordToken->getCredentials(),
-            $usernamePasswordToken->getProviderKey(),
-            $token->getOrganizationContext(),
-            $usernamePasswordToken->getRoles()
+            $authenticatedToken->getUser(),
+            $authenticatedToken->getCredentials(),
+            $authenticatedToken->getProviderKey(),
+            $organization,
+            $authenticatedToken->getRoles()
         );
 
         return $authenticatedToken;
@@ -65,7 +68,9 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
      */
     public function supports(TokenInterface $token)
     {
-        return $token instanceof UsernamePasswordOrganizationToken && $this->providerKey === $token->getProviderKey();
+        $knownToken = $token instanceof UsernamePasswordOrganizationToken || $token instanceof UsernamePasswordToken;
+
+        return $knownToken && $this->providerKey === $token->getProviderKey();
     }
 
     /**
@@ -79,6 +84,18 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
             throw new BadCredentialsException(
                 sprintf("You don't have access to organization '%s'", $organization->getName())
             );
+        }
+    }
+
+    /**
+     * @param TokenInterface $token
+     *
+     * @return Organization
+     */
+    protected function getOrganization(TokenInterface $token)
+    {
+        if ($token instanceof UsernamePasswordOrganizationToken) {
+            return $token->getOrganizationContext();
         }
     }
 }
