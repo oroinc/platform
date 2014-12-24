@@ -38,6 +38,14 @@ define(function (require) {
             }
         },
 
+        disable: function() {
+
+        },
+
+        enable: function() {
+
+        },
+
         dispose: function () {
             if (this.disposed) {
                 return;
