@@ -4,12 +4,14 @@ define(function (require) {
     var WysiwygEditorView,
         BaseView = require('oroui/js/app/views/base/view'),
         $ = require('tinymce/jquery.tinymce.min'),
+        txtHtmlTransformer = require('./txt-html-transformer'),
         LoadingMask = require('oroui/js/loading-mask');
     require('tinymce/plugins/textcolor/plugin.min');
     require('tinymce/plugins/code/plugin.min');
 
     WysiwygEditorView = BaseView.extend({
         autoRender: true,
+        firstRender: true,
 
         tinymceConnected: false,
         tinymceInstance: null,
@@ -34,10 +36,18 @@ define(function (require) {
                 loadingMask,
                 loadingMaskContainer;
             if (this.tinymceConnected) {
-                if (this.tinymceInstance) {
-                    this.tinymceInstance.remove();
-                    this.tinymceInstance = null;
+                if (!this.tinymceInstance) {
+                    throw new Error('Cannot disable tinyMCE before its instance is created');
                 }
+                this.tinymceInstance.getContent();
+                this.tinymceInstance.remove();
+                this.tinymceInstance = null;
+
+                // strip tags when disable HTML editing mode
+                this.htmlValue = this.$el.val();
+                this.strippedValue = txtHtmlTransformer.html2text(this.htmlValue);
+                this.$el.val(this.strippedValue);
+
                 this.$el.show();
                 this.tinymceConnected = false;
             }
@@ -50,6 +60,14 @@ define(function (require) {
                 }
                 loadingMask.$el.prependTo(loadingMaskContainer);
                 loadingMask.show();
+                if (!this.firstRender) {
+                    if (this.htmlValue && this.$el.val() === this.strippedValue) {
+                        // if content is not modified, return html representation back
+                        this.$el.val(this.htmlValue);
+                    } else {
+                        this.$el.val(txtHtmlTransformer.text2html(this.$el.val()));
+                    }
+                }
                 this.$el.tinymce(_.extend({
                     init_instance_callback: function (editor) {
                         self.tinymceInstance = editor;
@@ -58,6 +76,7 @@ define(function (require) {
                 }, this.options));
                 this.tinymceConnected = true;
             }
+            this.firstRender = false;
         },
 
         setEnabled: function (enabled) {
