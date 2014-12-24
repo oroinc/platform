@@ -56,7 +56,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             // subscribe to connect new calendar event
             var container = this.$el.closest(this.selectors.container);
             container.find(this.selectors.newCalendarSelector).on('change', _.bind(function (e) {
-                this.addModel(e.val, $(e.target).select2('data').fullName);
+                var itemData = $(e.target).select2('data');
+                this.addModel(e.val, itemData.fullName, itemData.userId);
                 // clear autocomplete
                 $(e.target).select2('val', '');
             }, this));
@@ -242,7 +243,7 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             }
         },
 
-        addModel: function (calendarId, calendarName) {
+        addModel: function (calendarId, calendarName, userId) {
             var savingMsg, model,
                 calendarAlias = 'user',
                 calendarUid = calendarAlias + '_' + calendarId,
@@ -259,7 +260,8 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                         calendarName: calendarName,
                         calendarAlias: calendarAlias,
                         calendar: calendarId,
-                        calendarUid: calendarUid
+                        calendarUid: calendarUid,
+                        userId: userId
                     });
                     this.collection.create(model, {
                         wait: true,

@@ -65,13 +65,14 @@ class ActivityListChainProvider
     /**
      * Get array with all target classes (entities where activity can be assigned to)
      *
+     * @param bool $regenerateCaches
      * @return array
      */
-    public function getTargetEntityClasses()
+    public function getTargetEntityClasses($regenerateCaches = false)
     {
         if (empty($this->targetClasses)) {
             /** @var ConfigIdInterface[] $configIds */
-            $configIds = $this->configManager->getIds('entity');
+            $configIds = $this->configManager->getIds('entity', null, false, $regenerateCaches);
             foreach ($configIds as $configId) {
                 foreach ($this->providers as $provider) {
                     if ($provider->isApplicableTarget($configId, $this->configManager)

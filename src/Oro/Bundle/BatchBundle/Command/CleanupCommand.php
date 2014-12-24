@@ -106,26 +106,18 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
     {
         $iteration = 0;
         $em        = $this->getEntityManager();
-        try {
-            $em->beginTransaction();
 
-            foreach ($iterator as $row) {
-                $id = reset($row);
-                $em->remove($em->getReference($className, $id));
+        foreach ($iterator as $row) {
+            $id = reset($row);
+            $em->remove($em->getReference($className, $id));
 
-                $iteration++;
-                if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
-                    $this->finishBatch();
-                }
-            }
-            if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
+            $iteration++;
+            if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
                 $this->finishBatch();
             }
-
-            $em->commit();
-        } catch (\Exception $e) {
-            $em->rollback();
-            throw $e;
+        }
+        if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
+            $this->finishBatch();
         }
     }
 

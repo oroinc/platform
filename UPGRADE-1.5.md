@@ -51,6 +51,7 @@ fos_rest:
   entities with `type=Extend`(they actually doctrine `mappedSuperclass`es)
 - Added possibility to define **discriminator map** entries on child level using annotation `@Oro\Bundle\EntityExtendBundle\Annotation\ORM\DiscriminatorValue("VALUE")`.
   This is useful when auto-generated strategy fails due to duplication of short class names in the hierarchy.
+- Removed not used anymore `is_inverse` config node from `extend` scope in **entity config**
 
 ####OroEntityConfigBundle:
 - Added additional property to entity config class metadata `routeCreate` that should be used for **CRUD** routes configuration
