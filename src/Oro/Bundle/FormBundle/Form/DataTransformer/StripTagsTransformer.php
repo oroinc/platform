@@ -9,7 +9,7 @@ class StripTagsTransformer implements DataTransformerInterface
     const DELIMITER = ',';
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $allowableTags;
 
@@ -18,7 +18,9 @@ class StripTagsTransformer implements DataTransformerInterface
      */
     public function __construct($allowableTags = null)
     {
-        $this->allowableTags = $this->prepareAllowedTagsList($allowableTags);
+        if ($allowableTags) {
+            $this->allowableTags = $this->prepareAllowedTagsList($allowableTags);
+        }
     }
 
     /**
@@ -38,8 +40,10 @@ class StripTagsTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param $allowableTags
-     * @return mixed
+     * Prepare list of allowable tags based on tinymce allowable tags syntax.
+     *
+     * @param string $allowableTags
+     * @return string
      */
     public function prepareAllowedTagsList($allowableTags)
     {
