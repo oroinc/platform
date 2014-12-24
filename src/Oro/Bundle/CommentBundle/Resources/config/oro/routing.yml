@@ -28,7 +28,7 @@ oro_api_comment_update_item:
     pattern: api/rest/{version}/comment/{id}.{_format}
     defaults: { _controller: OroCommentBundle:Api/Rest/Comment:put, _format: json, version: latest }
     requirements:
-         _method: PUT
+         _method: POST
 
 oro_api_comment_delete_item:
     pattern: api/rest/{version}/comment/{id}.{_format}
