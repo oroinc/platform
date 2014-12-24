@@ -7,7 +7,6 @@ use Doctrine\DBAL\Schema\SchemaException;
 
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
-
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -46,7 +45,7 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
         self::addCommentToEmail($schema, $this->comment);
         self::addCommentToCalendarEvent($schema, $this->comment);
         self::addCommentToNote($schema, $this->comment);
-        self::addAttachment($schema, $this->attachmentExtension);
+        #self::addAttachment($schema, $this->attachmentExtension);
     }
 
     /**
