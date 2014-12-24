@@ -12,6 +12,10 @@ assetic:
             inputs:
                 - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/textcolor/plugin.min.js
             output: bundles/tinymce/plugins/textcolor/plugin.min.js
+        tinymce_link:
+            inputs:
+                - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/link/plugin.min.js
+            output: bundles/tinymce/plugins/link/plugin.min.js
         tinymce_code:
             inputs:
                 - %kernel.root_dir%/../vendor/tinymce/tinymce/plugins/code/plugin.min.js
