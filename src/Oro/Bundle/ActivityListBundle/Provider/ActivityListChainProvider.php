@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -161,13 +162,19 @@ class ActivityListChainProvider
 
         $templates = [];
         foreach ($this->providers as $provider) {
+            $hasComment = false;
+
+            if ($provider instanceof CommentProviderInterface) {
+                $hasComment = $provider->hasComments($this->configManager, $provider->getActivityClass());
+            }
+
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
                 'template'     => $provider->getTemplate(),
                 'routes'       => $provider->getRoutes(),
-                'has_comments' => $provider->hasComments($this->configManager, $provider->getActivityClass()),
+                'has_comments' => $hasComment,
             ];
         }
 
