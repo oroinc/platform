@@ -64,7 +64,7 @@ class EmailType extends AbstractType
                 [
                     'label'      => 'oro.email.type.label',
                     'required'   => true,
-                    'data'       => 'txt',
+                    'data'       => 'html',
                     'choices'  => [
                         'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
                         'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
