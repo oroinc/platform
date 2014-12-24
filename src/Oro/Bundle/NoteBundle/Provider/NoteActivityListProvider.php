@@ -63,7 +63,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface
      */
     public function getSubject($entity)
     {
-        return substr(strip_tags($entity->getMessage()), 0, 100);
+        return $this->truncate(strip_tags($entity->getMessage()), 100);
     }
 
     /**
@@ -117,5 +117,21 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     public function getTargetEntities($entity)
     {
         return $entity->getTargetEntities();
+    }
+
+    /**
+     * @param string $string
+     * @param int $length
+     * @param string $etc
+     * @return string
+     */
+    protected function truncate($string, $length, $etc = '...')
+    {
+        if (mb_strlen($string) > $length) {
+            $length -= min($length, mb_strlen($etc));
+        }
+        $string = preg_replace('/\s+?(\S+)?$/u', '', mb_substr($string, 0, $length + 1));
+
+        return mb_substr($string, 0, $length) . $etc;
     }
 }

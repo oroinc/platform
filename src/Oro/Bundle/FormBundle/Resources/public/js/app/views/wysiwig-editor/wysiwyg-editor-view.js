@@ -9,6 +9,9 @@ define(function (require) {
 
     WysiwygEditorView = BaseView.extend({
         autoRender: true,
+
+        tinymceInstance: null,
+
         defaults: {
             enabled: true,
             plugins: ['textcolor', 'code'],
@@ -25,8 +28,13 @@ define(function (require) {
         },
 
         render: function () {
+            if (this.tinymceInstance) {
+                this.tinymceInstance.remove();
+                this.tinymceInstance = null;
+            }
             if (this.enabled) {
                 this.$el.tinymce(this.options);
+                this.tinymceInstance = this.$el.tinymce();
             }
         },
 
@@ -34,7 +42,10 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
-            this.$el.tinymce().remove();
+            if (this.tinymceInstance) {
+                this.tinymceInstance.remove();
+                this.tinymceInstance = null;
+            }
             WysiwygEditorView.__super__.dispose.call(this);
         }
     });
