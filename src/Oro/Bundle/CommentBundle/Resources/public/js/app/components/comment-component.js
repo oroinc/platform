@@ -64,17 +64,17 @@ define(function (require) {
         },
 
         onCommentSave: function (attrs, options) {
-            var model, itemView, url;
+            var model, itemView;
             if (attrs.id) {
                 model = this.collection.get(attrs.id);
                 model.set(attrs);
-                model.save();
+                options.url = model.url();
+                model.save(null, options);
                 itemView = this.listView.getItemView(model);
                 itemView.render();
             } else {
                 model = this.collection.add(attrs, {at: 0});
-                url = model.url();
-                options.url = url;
+                options.url = model.url();
                 model.save(null, options);
             }
         },
