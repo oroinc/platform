@@ -67,17 +67,13 @@ define(function (require) {
             var model, itemView;
             if (attrs.id) {
                 model = this.collection.get(attrs.id);
-                model.set(attrs);
-                options.url = model.url();
-                //options.method = 'PUT';
-                model.save(null, options);
                 itemView = this.listView.getItemView(model);
                 itemView.render();
             } else {
-                model = this.collection.add(attrs, {at: 0});
-                options.url = model.url();
-                model.save(null, options);
+                model = this.collection.add({}, {at: 0});
             }
+            options.url = model.url();
+            model.save(null, options);
         },
 
         onCommentReset: function (model) {
