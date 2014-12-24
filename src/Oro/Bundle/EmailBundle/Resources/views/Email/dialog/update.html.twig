@@ -86,9 +86,9 @@
                             editorView = $emailBodyEl.data('component').view;
 
                         if (type === 'txt') {
-                            view.disable();
+                            editorView.setEnabled(false);
                         } else {
-                            view.enable();
+                            editorView.setEnabled(true);
                         }
                     });
                 });

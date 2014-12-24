@@ -3,13 +3,15 @@ define(function (require) {
 
     var WysiwygEditorView,
         BaseView = require('oroui/js/app/views/base/view'),
-        $ = require('tinymce/jquery.tinymce.min');
+        $ = require('tinymce/jquery.tinymce.min'),
+        LoadingMask = require('oroui/js/loading-mask');
     require('tinymce/plugins/textcolor/plugin.min');
     require('tinymce/plugins/code/plugin.min');
 
     WysiwygEditorView = BaseView.extend({
         autoRender: true,
 
+        tinymceConnected: false,
         tinymceInstance: null,
 
         defaults: {
@@ -28,22 +30,42 @@ define(function (require) {
         },
 
         render: function () {
-            if (this.tinymceInstance) {
-                this.tinymceInstance.remove();
-                this.tinymceInstance = null;
+            var self = this,
+                loadingMask,
+                loadingMaskContainer;
+            if (this.tinymceConnected) {
+                if (this.tinymceInstance) {
+                    this.tinymceInstance.remove();
+                    this.tinymceInstance = null;
+                }
+                this.$el.show();
+                this.tinymceConnected = false;
             }
             if (this.enabled) {
-                this.$el.tinymce(this.options);
-                this.tinymceInstance = this.$el.tinymce();
+                loadingMask = new LoadingMask();
+                loadingMask.render();
+                loadingMaskContainer = this.$el.parents('.ui-dialog');
+                if (!loadingMaskContainer.length) {
+                    loadingMaskContainer = this.$el.parent();
+                }
+                loadingMask.$el.prependTo(loadingMaskContainer);
+                loadingMask.show();
+                this.$el.tinymce(_.extend({
+                    init_instance_callback: function (editor) {
+                        self.tinymceInstance = editor;
+                        loadingMask.dispose();
+                    }
+                }, this.options));
+                this.tinymceConnected = true;
             }
         },
 
-        disable: function() {
-
-        },
-
-        enable: function() {
-
+        setEnabled: function (enabled) {
+            if (this.enabled === enabled) {
+                return;
+            }
+            this.enabled = enabled;
+            this.render();
         },
 
         dispose: function () {
