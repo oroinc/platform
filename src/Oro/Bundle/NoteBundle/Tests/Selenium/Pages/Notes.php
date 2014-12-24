@@ -16,11 +16,6 @@ class Notes extends AbstractPageEntity
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tagName;
 
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-    }
-
     /**
      * @return $this
      */
@@ -49,9 +44,12 @@ class Notes extends AbstractPageEntity
      */
     public function setNoteMessage($note)
     {
-        $this->$note = $this->test->byId('oro_note_form_message');
+        $this->waitPageToLoad();
+        $this->test->frame($this->test->byId('oro_note_form_message_ifr'));
+        $this->$note = $this->test->byId('tinymce');
         $this->$note->clear();
         $this->$note->value($note);
+        $this->test->frame(null);
 
         return $this;
     }

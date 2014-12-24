@@ -57,11 +57,13 @@ class NoteActivityListProvider implements ActivityListProviderInterface
     }
 
     /**
+     * @param Note $entity
+     *
      * {@inheritdoc}
      */
     public function getSubject($entity)
     {
-        return substr($entity->getMessage(), 0, 100);
+        return substr(strip_tags($entity->getMessage()), 0, 100);
     }
 
     /**
