@@ -96,6 +96,13 @@ class Item implements TestFrameworkEntityInterface
     protected $values;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="phone1", type="string", nullable=true)
+     */
+    protected $phone;
+
+    /**
      * @var Organization
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
