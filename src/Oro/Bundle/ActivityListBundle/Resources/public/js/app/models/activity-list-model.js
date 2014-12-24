@@ -21,6 +21,7 @@ define([
             subject: '',
             data: '',
             configuration: '',
+            commentCount: 0,
 
             activityEntityClass: '',
             activityEntityId: '',
