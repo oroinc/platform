@@ -105,7 +105,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
                 'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                'plugins' => ['textcolor', 'code'],
+                'plugins' => ['textcolor', 'code', 'link'],
                 'toolbar' => $toolbar,
                 'valid_elements' => $elements,
                 'menubar' => false,

@@ -66,7 +66,7 @@ class OroRichTextType extends AbstractType
         $defaults = [
             'wysiwyg_enabled' => (bool)$this->configManager->get('oro_form.wysiwyg_enabled'),
             'wysiwyg_options' => [
-                'plugins' => ['textcolor', 'code'],
+                'plugins' => ['textcolor', 'code', 'link'],
                 'toolbar' => $toolbar,
                 'valid_elements' => $elements,
                 'menubar' => false,
