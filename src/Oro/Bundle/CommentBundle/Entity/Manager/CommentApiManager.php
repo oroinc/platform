@@ -89,7 +89,7 @@ class CommentApiManager extends ApiEntityManager
 
             /** @var QueryBuilder $qb */
             $qb = $repository->getBaseQueryBuilder($fieldName, $entityId);
-            $qb->orderBy('c.updatedAt', 'DESC');
+            $qb->orderBy('c.createdAt', 'DESC');
 
             $pager = $this->pager;
             $pager->setQueryBuilder($qb);
