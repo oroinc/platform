@@ -4,6 +4,7 @@ parameters:
     oro_comment.entity_config_dumper.extension.class: Oro\Bundle\CommentBundle\Tools\CommentEntityConfigDumperExtension
     oro_comment.comment.api_manager.class:            Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager
     oro_comment.comment_lifecycle_listener.class:     Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener
+    oro_comment.placeholder.filter.class:             Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter
 
 services:
     oro_comment.migration.extension.comment:
@@ -38,3 +39,8 @@ services:
             - @oro_security.security_facade.link
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+    
+    oro_comment.placeholder.filter:
+        class: %oro_comment.placeholder.filter.class%
+        arguments:
+            - @oro_entity_config.config_manager
