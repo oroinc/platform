@@ -52,7 +52,12 @@
             require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger', 'oroui/js/mediator'],
             function ($, __, routing, messenger, mediator) {
                 $(function () {
-                    $('#{{ form.template.vars.id }}').change(function (e) {
+                    var $subject = $('#{{ form.subject.vars.id }}'),
+                        $body = $('#{{ form.body.vars.id }}'),
+                        $type = $('#{{ form.type.vars.id }}'),
+                        $template = $('#{{ form.template.vars.id }}');
+
+                    $template.change(function (e) {
                         if (!$(this).val()) {
                             return;
                         }
@@ -65,11 +70,11 @@
 
                         $.ajax(url, {
                             success: function (res) {
-                                $('#{{ form.subject.vars.id }}').val(res.subject);
-                                $('#{{ form.body.vars.id }}').val(res.body);
-                                $('#{{ form.type.vars.id }}')
-                                    .find('input[value='+res.type+']')
-                                    .prop('checked', true);
+                                $subject.val(res.subject);
+                                $body.val(res.body);
+                                $type.find('input[value='+res.type+']')
+                                    .prop('checked', true)
+                                    .trigger('change');
                             },
                             error: function () {
                                 messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
@@ -80,10 +85,9 @@
                         });
                     });
 
-                    var $emailBodyEl = $('[name$="[{{ form.body.vars.name }}]"]');
                     $('[name$="[{{ form.type.vars.name }}]"]').change(function() {
                         var type = $(this).val(),
-                            editorView = $emailBodyEl.data('component').view;
+                            editorView = $body.data('component').view;
 
                         if (type === 'txt') {
                             editorView.setEnabled(false);
