@@ -55,13 +55,13 @@ class StripTagsTransformerTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider stripDataProvider
      */
-    public function testStripAllowableTags($allowableTags, $expected)
+    public function testPrepareAllowedTagsList($allowableTags, $expected)
     {
         $transformer = new StripTagsTransformer();
 
         $this->assertEquals(
             $expected,
-            $transformer->stripAllowableTags($allowableTags)
+            $transformer->prepareAllowedTagsList($allowableTags)
         );
     }
 

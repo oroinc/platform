@@ -18,7 +18,7 @@ class StripTagsTransformer implements DataTransformerInterface
      */
     public function __construct($allowableTags = null)
     {
-        $this->allowableTags = $this->stripAllowableTags($allowableTags);
+        $this->allowableTags = $this->prepareAllowedTagsList($allowableTags);
     }
 
     /**
@@ -41,7 +41,7 @@ class StripTagsTransformer implements DataTransformerInterface
      * @param $allowableTags
      * @return mixed
      */
-    public function stripAllowableTags($allowableTags)
+    public function prepareAllowedTagsList($allowableTags)
     {
         /** strip attributes */
         $allowableTags = preg_replace('(\[.*?\]|\s+)', '', $allowableTags);
