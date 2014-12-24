@@ -81,13 +81,7 @@ class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePas
      */
     protected function attemptAuthentication(Request $request)
     {
-        $organization = $this->getOrganization(
-            $request->get(
-                $this->options['organization_parameter'],
-                null,
-                true
-            )
-        );
+        $organization = $this->entityManager->getRepository('OroOrganizationBundle:Organization')->getFirst();
 
         if (null !== $this->csrfProvider) {
             $csrfToken = $request->get($this->options['csrf_parameter'], null, true);
@@ -122,6 +116,7 @@ class UsernamePasswordOrganizationFormAuthenticationListener extends UsernamePas
      * @param int $id
      * @return Organization
      * @throws BadCredentialsException
+     * @deprecated since 1.6
      */
     protected function getOrganization($id)
     {
