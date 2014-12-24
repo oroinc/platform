@@ -4,6 +4,7 @@ define(function (require) {
     'use strict';
 
     var CommentCollection,
+        Chaplin = require('chaplin'),
         _ = require('underscore'),
         routing = require('routing'),
         BaseCollection = require('oroui/js/app/models/base/collection'),
@@ -12,80 +13,96 @@ define(function (require) {
     CommentCollection = BaseCollection.extend({
         model: CommentModel,
         route: 'oro_api_comment_get_items',
-        /*route: '',
-        formHTML: '',
-        routeParameters: {},
-        filter:   {},
-        pager: {
-            count:    1, //total activities count
-            current:  1, //current page
-            pagesize: 5, //items per page
-            total:    1  //total pages
+        state: {
+            page: 1,
+            itemPerPage: 10,
+            itemsQuantity: 0
         },
-*/
+
         initialize: function (models, options) {
             _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName']));
-            this.on('change:updatedAt', this.sort);
+
+            // create own state property
+            this.state = _.extend({}, this.state);
+
+            // handel collection size changes
+            this.on('add', this.onAddNewRecord, this);
+            this.on('remove', this.onRemoveRecord, this);
+
             CommentCollection.__super__.initialize.apply(this, arguments);
         },
 
         url: function () {
             var options = {
                 relationId:    this.relatedEntityId,
-                relationClass: this.relatedEntityClassName
+                relationClass: this.relatedEntityClassName,
+                page:          this.getPage()
             };
             return routing.generate(this.route, options);
         },
 
-        comparator: function (model1, model2) {
-            var diff, result;
-            diff = Date.parse(model2.get('updatedAt')) - Date.parse(model1.get('updatedAt'));
-            result = (diff === 0 || isNaN(diff)) ? diff : diff > 0 ? 1 : -1;
+        fetch: function () {
+            var result = CommentCollection.__super__.fetch.apply(this, arguments);
+            // hack, to show loader on collection view, it is shown only for empty collections
+            this._reset();
+            this.beginSync();
             return result;
         },
 
         parse: function(response) {
+            this.finishSync();
+            this.state.itemsQuantity = parseInt(response.count, 10) || 0;
             return response.data;
         },
 
-        _setTotalRecords: function (quantity) {
-            this.totalRecords = parseInt(quantity, 10);
-        }
+        onAddNewRecord: function (model, collection, options) {
+            if (model.isNew()) {
+                model.once('sync', function () {
+                    collection.setPage(1);
+                    collection.fetch();
+                });
+            }
+        },
 
-       /* setFilter: function (filter) {
-            this.filter = filter;
+        onRemoveRecord: function (model, collection, options) {
+            model.once('sync', function () {
+                collection.setRecordsQuantity(collection.getRecordsQuantity() - 1);
+                collection.setPage(collection.getPage());
+                collection.fetch();
+            });
         },
 
         getPage: function () {
-            return parseInt(this.pager.current);
+            return this.state.page;
         },
+
         setPage: function (page) {
-            this.pager.current = page;
+            var pages = this.getPagesQuantity();
+            if (page <= 0) {
+                page = 1;
+            } else if (page > pages) {
+                page = pages;
+            }
+            if (this.state.page !== page) {
+                this.state.page = page;
+                this.fetch();
+            }
         },
 
-        getPageSize: function () {
-            return parseInt(this.pager.pagesize);
-        },
-        setPageSize: function (pagesize) {
-            this.pager.pagesize = pagesize;
+        getPagesQuantity: function () {
+            return Math.ceil(this.state.itemsQuantity / this.state.itemPerPage) || 1;
         },
 
-        getCount: function () {
-            return parseInt(this.pager.count);
-        },
-        setCount: function (count) {
-            this.pager.count = count;
-            this.pager.total = count == 0 ? 1 : Math.ceil(count/this.pager.pagesize);
-
-            this.count = count;
+        setRecordsQuantity: function (quantity) {
+            return this.state.itemsQuantity = quantity;
         },
 
-        parse: function(response) {
-            this.setCount(parseInt(response.count));
-
-            return response.data;
-        },*/
+        getRecordsQuantity: function () {
+            return this.state.itemsQuantity;
+        }
     });
+
+    _.extend(CommentCollection.prototype, Chaplin.SyncMachine);
 
     return CommentCollection;
 

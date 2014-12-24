@@ -3,6 +3,7 @@ define(function (require) {
     'use strict';
 
     var CommentModel,
+        Chaplin = require('chaplin'),
         routing = require('routing'),
         BaseModel = require('oroui/js/app/models/base/model');
 
@@ -23,6 +24,13 @@ define(function (require) {
             removable: true
         },
 
+        initialize: function() {
+            CommentModel.__super__.initialize.apply(this, arguments);
+            this.on('request', this.beginSync);
+            this.on('sync', this.finishSync);
+            this.on('error', this.unsync);
+        },
+
         url: function () {
             var url, parameters;
             if (!this.isNew()) {
@@ -37,6 +45,8 @@ define(function (require) {
             return url;
         }
     });
+
+    _.extend(CommentModel.prototype, Chaplin.SyncMachine);
 
     return CommentModel;
 });
