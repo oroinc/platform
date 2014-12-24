@@ -89,11 +89,7 @@
                         var type = $(this).val(),
                             editorView = $body.data('component').view;
 
-                        if (type === 'txt') {
-                            editorView.setEnabled(false);
-                        } else {
-                            editorView.setEnabled(true);
-                        }
+                        editorView.setEnabled(type === 'html');
                     });
                 });
             });
