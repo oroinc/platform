@@ -39,7 +39,6 @@ define(function (require) {
                 if (!this.tinymceInstance) {
                     throw new Error('Cannot disable tinyMCE before its instance is created');
                 }
-                this.tinymceInstance.getContent();
                 this.tinymceInstance.remove();
                 this.tinymceInstance = null;
 
