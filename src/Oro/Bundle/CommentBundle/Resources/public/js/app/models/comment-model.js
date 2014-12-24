@@ -8,28 +8,20 @@ define(function (require) {
 
     CommentModel = BaseModel.extend({
         route: 'oro_api_comment_get_item',
-        idAttribute: 'id',
 
-        /*defaults: {
+        defaults: {
             owner: '',
-            owner_id: '',
-
+            owner_id: null,
             editor: '',
-            editor_id: '',
-
-            organization: '',
-            data: '',
-            configuration: '',
-
+            editor_id: null,
+            message: '',
+            relationClass: null,
+            relationId: null,
             createdAt: '',
             updatedAt: '',
-
-            is_loaded: false,
-            contentHTML: '',
-
             editable: true,
             removable: true
-        },*/
+        },
 
         url: function () {
             var url, parameters;

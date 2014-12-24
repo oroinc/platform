@@ -19,8 +19,11 @@
         display: none;
       }
       .list-item {
-        padding: 3px 10px 5px 10px;
+        padding: 0;
         border-bottom-color: #ddd;
+        &:hover {
+          background-color: transparent;
+        }
         .visual {
           position: relative;
           top: -2px;
@@ -57,76 +60,6 @@
         border-bottom: 0;
       }
     }
-    .accordion {
-      padding: 0;
-      margin: 0;
-      .accordion-group {
-        border: 0;
-        margin: 0;
-        .accordion-heading {
-          display: table;
-          width: 100%;
-          & > div {
-            display: table-cell;
-          }
-          .actions{
-            .horizontal-icon-menu;
-          }
-          .message {
-            .accordion-toggle {
-              &:not(.collapsed) {
-                display: none;
-              }
-              &:before {
-                content: '';
-              }
-            }
-            .accordion-toggle.collapsed:before {
-              content: '';
-            }
-          }
-          .accordion-toggle {
-            display: inline-block;
-            padding: 0;
-            min-width: 17px;
-            &:before {
-              content: '\f117';
-              font-family: FontAwesome;
-              font-size: 20px;
-              color: #999;
-            }
-            &:hover:before {
-              color: #444;
-            }
-          }
-          .accordion-toggle.collapsed:before {
-            content: '\f116';
-          }
-        }
-        .accordion-body {
-          .message, .subject {
-            display: none;
-          }
-          .control-group{
-            max-width: none;
-          }
-        }
-        .accordion-body.in {
-          padding: 0;
-          margin: 0 -10px;
-        }
-        .accordion-body.in .message {
-          display: block;
-          padding-right: 20px;
-        }
-        .accordion-body.in .subject {
-          display: block;
-          padding: 0 0 4px 61px;
-          border-bottom: 1px solid #f0f0f0;
-          margin-top: -3px;
-        }
-      }
-    }
     .filter-box {
       float: left;
       margin: 0px;
@@ -138,6 +71,60 @@
     .filter-item {
       margin-bottom: 0px;
       margin-right: 2px;
+    }
+  }
+  .accordion {
+    padding: 0;
+    margin: 0;
+    .accordion-group {
+      border: 0;
+      margin: 0;
+    }
+  }
+  .accordion-heading {
+    display: table;
+    width: 100%;
+    padding: 3px 10px 5px 10px;
+    &:hover {
+      background-color: #f8f8f8;
+    }
+    & > div {
+      display: table-cell;
+    }
+    .actions{
+      .horizontal-icon-menu;
+    }
+  }
+  .accordion-toggle {
+    display: inline-block;
+    padding: 0;
+    min-width: 17px;
+  }
+  .accordion-icon {
+    &:before {
+      content: '\f117';
+      font-family: FontAwesome;
+      font-size: 20px;
+      color: #999;
+    }
+    &:hover:before {
+      color: #444;
+    }
+    &.collapsed:before {
+      content: '\f116';
+    }
+  }
+  .accordion-body {
+    padding: 0;
+    .control-group{
+      max-width: none;
+    }
+    > .message {
+      border-top: 1px solid #f0f0f0;
+    }
+    .info.responsive-cell,
+    .comment.responsive-cell{
+      margin-bottom: 20px;
     }
   }
   .grid-toolbar {

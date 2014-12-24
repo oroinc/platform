@@ -25,6 +25,7 @@ define(function (require) {
 */
         initialize: function (models, options) {
             _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName']));
+            this.on('change:updatedAt', this.sort);
             CommentCollection.__super__.initialize.apply(this, arguments);
         },
 
@@ -34,6 +35,13 @@ define(function (require) {
                 relationClass: this.relatedEntityClassName
             };
             return routing.generate(this.route, options);
+        },
+
+        comparator: function (model1, model2) {
+            var diff, result;
+            diff = Date.parse(model2.get('updatedAt')) - Date.parse(model1.get('updatedAt'));
+            result = (diff === 0 || isNaN(diff)) ? diff : diff > 0 ? 1 : -1;
+            return result;
         }
 
        /* setFilter: function (filter) {

@@ -2,17 +2,20 @@
 
 <form method="post" class="comment-form well">
     <fieldset class="form-horizontal">
-        {{ form_widget(form.message) }}
-        {{ form_errors(form.message) }}
-        <button class="btn add-comment-button" type="submit">
-            <%= id ? _.__('oro.comment.from.button.edit_comment.label') : _.__('oro.comment.from.button.add_comment.label') %>
-        </button>
-        <% if (id) { %>
-        <button class="btn cancel-comment-button" type="reset">
-            <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
-        </button>
-        <% } %>
-        {{ form_widget(form.attachment) }}
-        {{ form_errors(form.attachment) }}
+        <label>
+            {{ form_widget(form.message) }}
+        </label>
+        <div class="pull-right">
+            <button class="btn add-comment-button" type="submit">
+                <%= id ? _.__('oro.comment.from.button.edit_comment.label') : _.__('oro.comment.from.button.add_comment.label') %>
+            </button>
+            <% if (id) { %>
+            <button class="btn cancel-comment-button" type="reset">
+                <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
+            </button>
+            <% } %>
+            {{ form_widget(form.attachment) }}
+            {{ form_errors(form.attachment) }}
+        </div>
     </fieldset>
 </form>

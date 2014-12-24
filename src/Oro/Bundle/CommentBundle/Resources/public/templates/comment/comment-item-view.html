@@ -2,16 +2,31 @@
     <div class="accordion-heading">
         <div class="title-item">
             <a href="#accordion-item-<%= cid %>" data-parent="#<%- accordionId %>"
-               data-toggle="collapse" class="no-hash accordion-toggle collapsed"></a>
-            <div class="short-comment">
-                <%- message %>
-            </div>
+               data-toggle="collapse" class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<%}%>"></a>
+            <% if (owner_id) {  %>
+                <%= _.__('oro.comment.item.added',{
+                    user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
+                    time: '<i class="date">' + createdTime + '</i>'
+                }) %><% } %><% if (editor_id) { %>,
+                <%= _.__('oro.comment.item.update',{
+                    user: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
+                    time: '<i class="date">' + updatedTime + '</i>'
+                }) %>
+            <% } %>
         </div>
-    </div>
-    <div class="accordion-body collapse" id="accordion-item-<%= cid %>">
-        <div class="form-container">
+        <div data-target="#accordion-item-<%= cid %>" data-parent="#<%- accordionId %>"
+             data-toggle="collapse" class="short-comment accordion-toggle<% if (collapsed) { %> collapsed<%}%>">
             <%- message %>
         </div>
-        <a href="#" class="remove"><i class="icon icon-remove"></i></a>
+    </div>
+    <div class="accordion-body collapse<% if (!collapsed) { %> in<%}%>" id="accordion-item-<%= cid %>">
+        <div class="accordion-inner">
+            <div<% if (editable) { %> class="form-container"<%}%>>
+                <%- message %>
+                <% if (removable) { %>
+                <a href="#" class="remove"><i class="icon icon-remove"></i></a>
+                <%}%>
+            </div>
+        </div>
     </div>
 </div>

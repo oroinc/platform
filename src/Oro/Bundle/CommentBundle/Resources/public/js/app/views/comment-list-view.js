@@ -11,7 +11,7 @@ define(function (require) {
         autoRender: true,
         itemView: CommentItemView,
 
-        listSelector: 'ul.comments',
+        listSelector: 'ul.comments-list',
         itemSelector: 'li',
 
         listen: {
