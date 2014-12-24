@@ -46,25 +46,16 @@ class Notes extends AbstractPageEntity
     {
         $this->test->waitUntil(
             function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
-                if ($testCase->byId('oro_note_form_message_ifr')) {
-                    return true;
-                }
-
-                return null;
+                return $testCase->execute(
+                    [
+                        'script' => 'return tinymce.editors.length > 0 && tinymce.editors[0].initialized',
+                        'args' => [],
+                    ]
+                );
             },
             intval(MAX_EXECUTION_TIME)
         );
         $this->test->frame($this->test->byId('oro_note_form_message_ifr'));
-        $this->test->waitUntil(
-            function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
-                if ($testCase->byId('tinymce')) {
-                    return true;
-                }
-
-                return null;
-            },
-            intval(MAX_EXECUTION_TIME)
-        );
         $this->$note = $this->test->byId('tinymce');
         $this->$note->clear();
         $this->$note->value($note);

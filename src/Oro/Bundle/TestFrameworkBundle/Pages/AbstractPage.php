@@ -173,7 +173,7 @@ abstract class AbstractPage
         PHPUnit_Framework_Assert::assertEquals(
             $title,
             $this->test->title(),
-            $message ?: $this->test->getResult()
+            $message ?: $this->test->source()
         );
         return $this;
     }
