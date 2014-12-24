@@ -8,6 +8,7 @@ define(function (require) {
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
         BaseView = require('oroui/js/app/views/base/view');
+    require('jquery.validate');
 
     function setValue($elem, value) {
         if ($elem.data('select2')) {
@@ -39,7 +40,9 @@ define(function (require) {
 
         render: function () {
             CommentFormView.__super__.render.call(this);
-            this.$('form').addClass(this.model ? 'edit-form' : 'add-form');
+            this.$('form')
+                .addClass(this.model ? 'edit-form' : 'add-form')
+                .validate();
             if (this.model) {
                 this.bindData();
             }
