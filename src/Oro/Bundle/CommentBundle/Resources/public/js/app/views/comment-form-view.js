@@ -7,6 +7,7 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
+        formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
         BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
 
@@ -61,16 +62,17 @@ define(function (require) {
         },
 
         onSubmit: function (e) {
-            var attrs;
+            var attrs, options;
             e.stopPropagation();
             e.preventDefault();
             attrs = tools.unpackFromQueryString(this.$('form').serialize());
+            options = formToAjaxOptions(this.$('form'));
             if (this.model) {
                 attrs.id = this.model.id;
             } else {
                 this._clearFrom();
             }
-            this.trigger('submit', attrs);
+            this.trigger('submit', attrs, options);
         },
 
         onReset: function (e) {

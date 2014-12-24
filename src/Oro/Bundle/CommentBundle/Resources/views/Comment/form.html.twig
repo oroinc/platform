@@ -5,6 +5,10 @@
         <label>
             {{ form_widget(form.message) }}
         </label>
+        <div class="pull-left">
+            {{ form_widget(form.attachment) }}
+            {{ form_errors(form.attachment) }}
+        </div>
         <div class="pull-right">
             <button class="btn add-comment-button" type="submit">
                 <%= id ? _.__('oro.comment.from.button.edit_comment.label') : _.__('oro.comment.from.button.add_comment.label') %>

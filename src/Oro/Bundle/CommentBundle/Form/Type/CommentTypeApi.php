@@ -50,7 +50,8 @@ class CommentTypeApi extends AbstractType
                         new Length(['min' => 3]),
                     ]
                 ]
-            );
+            )
+            ->add('attachment', 'oro_image', ['label' => 'oro.comment.attachment.label', 'required' => false]);
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventSubscriber(new CommentSubscriber());

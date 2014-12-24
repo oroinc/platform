@@ -63,17 +63,20 @@ define(function (require) {
             this.listenTo(formView, 'reset', this.onCommentReset, this)
         },
 
-        onCommentSave: function (attrs) {
+        onCommentSave: function (attrs, options) {
             var model, itemView;
             if (attrs.id) {
                 model = this.collection.get(attrs.id);
                 model.set(attrs);
-                model.save();
+                options.url = model.url();
+                //options.method = 'PUT';
+                model.save(null, options);
                 itemView = this.listView.getItemView(model);
                 itemView.render();
             } else {
                 model = this.collection.add(attrs, {at: 0});
-                model.save();
+                options.url = model.url();
+                model.save(null, options);
             }
         },
 
