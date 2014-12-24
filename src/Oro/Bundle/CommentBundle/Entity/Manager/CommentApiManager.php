@@ -9,8 +9,10 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -18,7 +20,6 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 
 class CommentApiManager extends ApiEntityManager
 {
@@ -39,6 +40,9 @@ class CommentApiManager extends ApiEntityManager
     /** @var UserConfigManager */
     protected $config;
 
+    /** @var  Router */
+    protected $router;
+
     /**
      * @param Registry          $doctrine
      * @param SecurityFacade    $securityFacade
@@ -46,6 +50,7 @@ class CommentApiManager extends ApiEntityManager
      * @param Pager             $pager
      * @param UserConfigManager $config
      * @param EventDispatcher   $eventDispatcher
+     * @param Router            $router
      */
     public function __construct(
         Registry $doctrine,
@@ -53,13 +58,15 @@ class CommentApiManager extends ApiEntityManager
         NameFormatter $nameFormatter,
         Pager $pager,
         UserConfigManager $config,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        Router $router
     ) {
         $this->em             = $doctrine->getManager();
         $this->securityFacade = $securityFacade;
         $this->nameFormatter  = $nameFormatter;
         $this->pager          = $pager;
         $this->config         = $config;
+        $this->router         = $router;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -178,6 +185,7 @@ class CommentApiManager extends ApiEntityManager
             'editor'        => $editorName,
             'editor_id'     => $editorId,
             'message'       => $entity->getMessage(),
+            'attachment'    => $this->getAttachment($entity),
             'relationClass' => $entityClass,
             'relationId'    => $entityId,
             'createdAt'     => $entity->getCreatedAt()->format('c'),
@@ -187,6 +195,29 @@ class CommentApiManager extends ApiEntityManager
         ];
 
         return $result;
+    }
+
+    /**
+     * @param Comment $entity
+     *
+     * @return string|null
+     */
+    protected function getAttachment($entity)
+    {
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $attachment = $accessor->getValue($entity, 'attachment');
+        if (!$attachment) {
+            return null;
+        }
+
+        return $this->router->generate(
+            'oro_filtered_attachment',
+            [
+                'id'       => $attachment->getId(),
+                'filename' => $attachment->getOriginalFilename(),
+                'filter'   => $attachment->getFilename()
+            ]
+        );
     }
 
     /**
