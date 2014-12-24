@@ -7,6 +7,7 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         BaseView = require('oroui/js/app/views/base/view'),
+        BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         LoadingMask = require('oroui/js/loading-mask'),
         __ = require('orotranslation/js/translator');
@@ -689,6 +690,7 @@ define(function (require) {
         _onContentLoad: function(content) {
             this.loading = false;
             this.trigger('contentLoad', content, this);
+            this._removeComponents();
             this.setContent(content, true);
             mediator.trigger('widget:contentLoad', this.widget);
             mediator.trigger('layout:adjustHeight');
@@ -722,6 +724,20 @@ define(function (require) {
             if (!this.containerFilled && this.options.container) {
                 $(this.options.container).append(this.widget);
                 this.containerFilled = true;
+            }
+        },
+
+        /**
+         * Removes all components attached during layout initialization
+         * @private
+         */
+        _removeComponents: function () {
+            for (var i = 0; i < this.subviews.length; i++) {
+                var subview = this.subviews[i];
+                if (subview instanceof BaseComponent) {
+                    this.removeSubview(subview);
+                    i--;
+                }
             }
         },
 
