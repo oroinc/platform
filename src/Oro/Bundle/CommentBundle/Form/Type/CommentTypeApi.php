@@ -11,6 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 use Oro\Bundle\CommentBundle\Form\EventListener\CommentSubscriber;
 
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
+
 class CommentTypeApi extends AbstractType
 {
     const FORM_NAME = 'oro_comment_api';
@@ -42,6 +45,10 @@ class CommentTypeApi extends AbstractType
                         'class'       => 'comment-text-field',
                         'placeholder' => 'oro.comment.message.placeholder'
                     ],
+                    'constraints' => [
+                        new NotBlank(),
+                        new Length(['min' => 3]),
+                    ]
                 ]
             )
             ->add('attachment', 'oro_image', ['label' => 'oro.comment.attachment.label', 'required' => false]);
