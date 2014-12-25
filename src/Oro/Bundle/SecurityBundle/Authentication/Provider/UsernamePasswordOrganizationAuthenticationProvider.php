@@ -48,9 +48,15 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
         /**  @var TokenInterface $token */
         $authenticatedToken = parent::authenticate($token);
 
-        $user = $authenticatedToken->getUser();
+        /** @var User $user */
+        $user         = $authenticatedToken->getUser();
         $organization = $this->getOrganization($user, $token);
-        $this->checkUserOrganization($user, $organization);
+
+        if (!($organization && $user->getOrganizations()->contains($organization))) {
+            throw new BadCredentialsException(
+                sprintf("You don't have access to organization '%s'", $organization->getName())
+            );
+        }
 
         $authenticatedToken = new UsernamePasswordOrganizationToken(
             $authenticatedToken->getUser(),
@@ -74,28 +80,21 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
     }
 
     /**
-     * @param User         $user
-     * @param Organization $organization
-     * @throws BadCredentialsException
-     */
-    protected function checkUserOrganization(User $user, Organization $organization)
-    {
-        if (!$user->getOrganizations()->contains($organization) || !$organization->isEnabled()) {
-            throw new BadCredentialsException(
-                sprintf("You don't have access to organization '%s'", $organization->getName())
-            );
-        }
-    }
-
-    /**
      * @param TokenInterface $token
      *
-     * @return Organization
+     * @return Organization|null
      */
-    protected function getOrganization(TokenInterface $token)
+    protected function getOrganization(User $user, TokenInterface $token)
     {
         if ($token instanceof UsernamePasswordOrganizationToken) {
             return $token->getOrganizationContext();
         }
+
+        return $this->guessPreferredOrganization($user);
+    }
+
+    protected function guessPreferredOrganization(User $user)
+    {
+
     }
 }
