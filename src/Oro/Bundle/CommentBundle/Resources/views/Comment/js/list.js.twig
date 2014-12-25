@@ -9,17 +9,18 @@
         <h5 class="user-fieldset">
             <span><%= _.__('oro.comment.entity_plural_label') %></span>
         </h5>
-        <div class="form-container"></div>
-        <div class="grid-toolbar"></div>
-        <ul class="unstyled accordion comments-list" id="<%= accordionId %>">
-            <li class="loading-mask">
+        <div class="comments-block-inner">
+            <div class="form-container"></div>
+            <div class="loading-mask">
                 <div class="loading-wrapper"></div>
                 <div class="loading-frame">
                     <div class="box well">
                         <div class="loading-content"><%= _.__('Loading...') %></div>
                     </div>
                 </div>
-            </li>
-        </ul>
+            </div>
+            <div class="grid-toolbar"></div>
+            <ul class="unstyled accordion comments-list" id="<%= accordionId %>"></ul>
+        </div>
     </fieldset>
 </script>

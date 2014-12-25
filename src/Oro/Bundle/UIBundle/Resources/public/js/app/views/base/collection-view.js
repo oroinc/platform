@@ -10,6 +10,13 @@ define([
     var BaseCollectionView;
 
     BaseCollectionView = Chaplin.CollectionView.extend({
+        /**
+         * Show loader indicator on sync action even for not empty collections
+         *
+         * @property {boolean}
+         * @default true
+         */
+        showLoadingForce: true,
 
         initialize: function (options) {
             _.extend(this, _.pick(options, ['fallbackSelector', 'loadingSelector', 'itemSelector', 'listSelector']));
@@ -30,6 +37,20 @@ define([
          */
         getItemView: function (model) {
             return this.subview("itemView:" + model.cid);
+        },
+
+        /**
+         * Toggles loading indicator
+         *
+         *  - added extra flag showLoadingForce that shows loader event for not empty collections
+         *
+         * @returns {jQuery}
+         * @override
+         */
+        toggleLoadingIndicator: function () {
+            var visible;
+            visible = (this.collection.length === 0 || this.showLoadingForce) && this.collection.isSyncing();
+            return this.$loading.toggle(visible);
         }
     });
 

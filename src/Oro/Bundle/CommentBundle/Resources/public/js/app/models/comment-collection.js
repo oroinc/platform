@@ -43,8 +43,6 @@ define(function (require) {
 
         fetch: function () {
             var result = CommentCollection.__super__.fetch.apply(this, arguments);
-            // hack, to show loader on collection view, it is shown only for empty collections
-            this._reset();
             this.beginSync();
             return result;
         },
