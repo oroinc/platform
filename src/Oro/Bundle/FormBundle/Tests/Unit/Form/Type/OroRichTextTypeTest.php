@@ -67,13 +67,20 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->with('oro_form.wysiwyg_enabled')
             ->will($this->returnValue($globalEnable));
 
-        $assetCss = 'some.css';
-        $this->assetsHelper->expects($this->once())
+        $this->assetsHelper->expects($this->exactly(2))
             ->method('getUrl')
-            ->with($viewData['attr']['data-page-component-options']['content_css'])
-            ->will($this->returnValue($assetCss));
+            ->will(
+                $this->returnCallback(
+                    function ($data) {
+                        return '/prefix/' . $data;
+                    }
+                )
+            );
 
-        $viewData['attr']['data-page-component-options']['content_css'] = $assetCss;
+        $viewData['attr']['data-page-component-options']['content_css']
+            = '/prefix/' . $viewData['attr']['data-page-component-options']['content_css'];
+        $viewData['attr']['data-page-component-options']['skin_url']
+            = '/prefix/' . $viewData['attr']['data-page-component-options']['skin_url'];
         $viewData['attr']['data-page-component-options']['enabled'] = $expectedEnable;
         $viewData['attr']['data-page-component-options'] = json_encode(
             $viewData['attr']['data-page-component-options']
@@ -98,17 +105,30 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     public function optionsDataProvider()
     {
         $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | link'];
-        $elements = 'a[href|target=_blank],ul,ol,li,em[style],strong,b,p,font[color],i,br[data-mce-bogus]';
+        $elements = [
+            'a[href|target=_blank]',
+            'ul',
+            'ol',
+            'li',
+            'em[style]',
+            'strong',
+            'b',
+            'p',
+            'font[color]',
+            'i',
+            'br[data-mce-bogus]',
+            'span[style|data-mce-style]'
+        ];
 
         $defaultAttrs = [
             'data-page-component-module' => 'oroui/js/app/components/view-component',
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
                 'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                'skin_url' => '/bundles/oroform/css/tinymce',
+                'skin_url' => 'bundles/oroform/css/tinymce',
                 'plugins' => ['textcolor', 'code', 'link'],
                 'toolbar' => $toolbar,
-                'valid_elements' => $elements,
+                'valid_elements' => implode(',', $elements),
                 'menubar' => false,
                 'statusbar' => false
             ]
@@ -142,7 +162,6 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 [
                     'wysiwyg_options' => [
                         'plugins' => ['textcolor'],
-                        'toolbar' => ['undo redo | bold italic underline | forecolor backcolor'],
                         'menubar' => true,
                         'statusbar' => false
                     ]
@@ -151,15 +170,23 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 [
                     'attr' => [
                         'data-page-component-module' => 'oroui/js/app/components/view-component',
-                        'data-page-component-options' => [
-                            'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
-                            'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
-                            'skin_url' => '/bundles/oroform/css/tinymce',
-                            'plugins' => ['textcolor'],
-                            'toolbar' => ['undo redo | bold italic underline | forecolor backcolor'],
-                            'menubar' => true,
-                            'statusbar' => false
-                        ]
+                        'data-page-component-options' => array_merge(
+                            [
+                                'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
+                                'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
+                                'skin_url' => 'bundles/oroform/css/tinymce',
+                                'plugins' => ['textcolor', 'code', 'link'],
+                                'toolbar' => $toolbar,
+                                'valid_elements' => implode(',', $elements),
+                                'menubar' => false,
+                                'statusbar' => false
+                            ],
+                            [
+                                'plugins' => ['textcolor'],
+                                'menubar' => true,
+                                'statusbar' => false
+                            ]
+                        )
                     ]
                 ]
             ],
