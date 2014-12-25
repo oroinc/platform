@@ -84,7 +84,11 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
 
         foreach ($viewData as $key => $value) {
             $this->assertArrayHasKey($key, $view->vars);
-            $this->assertEquals($value, $view->vars[$key]);
+            $this->assertEquals($value['data-page-component-module'], $view->vars[$key]['data-page-component-module']);
+            $this->assertEquals(
+                json_decode($value['data-page-component-options'], true),
+                json_decode($view->vars[$key]['data-page-component-options'], true)
+            );
         }
     }
 
@@ -93,14 +97,18 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
      */
     public function optionsDataProvider()
     {
+        $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | link'];
+        $elements = 'a[href|target=_blank],ul,ol,li,em[style],strong,b,p,font[color],i,br[data-mce-bogus]';
+
         $defaultAttrs = [
             'data-page-component-module' => 'oroui/js/app/components/view-component',
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
                 'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
                 'skin_url' => '/bundles/oroform/css/tinymce',
-                'plugins' => ['textcolor', 'code'],
-                'toolbar' => ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code'],
+                'plugins' => ['textcolor', 'code', 'link'],
+                'toolbar' => $toolbar,
+                'valid_elements' => $elements,
                 'menubar' => false,
                 'statusbar' => false
             ]

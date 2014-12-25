@@ -3,11 +3,13 @@
 namespace Oro\Bundle\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Templating\Asset\PackageInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\FormBundle\Form\DataTransformer\StripTagsTransformer;
 
 class OroRichTextType extends AbstractType
 {
@@ -42,14 +44,32 @@ class OroRichTextType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $allowableTags = null;
+        if (!empty($options['wysiwyg_options']['valid_elements'])) {
+            $allowableTags = $options['wysiwyg_options']['valid_elements'];
+        }
+
+        $transformer = new StripTagsTransformer($allowableTags);
+        $builder->addModelTransformer($transformer);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | link'];
+        $elements = 'a[href|target=_blank],ul,ol,li,em[style],strong,b,p,font[color],i,br[data-mce-bogus]';
+
         $defaults = [
             'wysiwyg_enabled' => (bool)$this->configManager->get('oro_form.wysiwyg_enabled'),
             'wysiwyg_options' => [
-                'plugins' => ['textcolor', 'code'],
-                'toolbar' => ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code'],
+                'plugins' => ['textcolor', 'code', 'link'],
+                'toolbar' => $toolbar,
                 'skin_url' => '/bundles/oroform/css/tinymce',
+                'valid_elements' => $elements,
                 'menubar' => false,
                 'statusbar' => false
             ],

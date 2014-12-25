@@ -3,19 +3,26 @@ config:
         'jquery.validate':
             deps:
                 - 'jquery'
-        'tinymce/jquery.tinymce.min':
-            deps:
-                - 'tinymce/themes/modern/theme.min'
         'tinymce/plugins/textcolor/plugin.min':
             deps:
-                - 'tinymce/jquery.tinymce.min'
+                - 'tinymce/tinymce.min'
         'tinymce/plugins/code/plugin.min':
             deps:
-                - 'tinymce/jquery.tinymce.min'
+                - 'tinymce/tinymce.min'
+        'tinymce/plugins/link/plugin.min':
+            deps:
+                - 'tinymce/tinymce.min'
+        'tinymce/themes/modern/theme.min':
+            deps:
+                - 'tinymce/tinymce.min'
         'tinymce/jquery.tinymce.min':
             deps:
                 - 'jquery'
                 - 'tinymce/tinymce.min'
+                - 'tinymce/plugins/textcolor/plugin.min'
+                - 'tinymce/plugins/code/plugin.min'
+                - 'tinymce/plugins/link/plugin.min'
+                - 'tinymce/themes/modern/theme.min'
             exports: 'jQuery'
     map:
         '*':
@@ -59,4 +66,5 @@ build:
         'tinymce/tinymce.jquery.min': 'empty:'
         'tinymce/plugins/textcolor/plugin.min': 'empty:'
         'tinymce/plugins/code/plugin.min': 'empty:'
+        'tinymce/plugins/link/plugin.min': 'empty:'
         'tinymce/themes/modern/theme.min': 'empty:'
