@@ -43,4 +43,12 @@ class OroKernelStub extends OroKernel
     {
         return $this->collectBundles();
     }
+
+    /**
+     * @param array $bundleMap
+     */
+    public function setBundleMap(array $bundleMap)
+    {
+        $this->bundleMap = $bundleMap;
+    }
 }
