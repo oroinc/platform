@@ -45,7 +45,7 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
         self::addCommentToEmail($schema, $this->comment);
         self::addCommentToCalendarEvent($schema, $this->comment);
         self::addCommentToNote($schema, $this->comment);
-        #self::addAttachment($schema, $this->attachmentExtension);
+        self::addAttachment($schema, $this->attachmentExtension);
     }
 
     /**
@@ -57,28 +57,27 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
     {
         $table = $schema->createTable('oro_comment');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_owner_id', 'integer', ['notnull' => false]);
-        $table->addColumn('updated_by_user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('owner_id', 'integer', ['notnull' => false]);
+        $table->addColumn('updated_by_id', 'integer', ['notnull' => false]);
         $table->addColumn('message', 'text');
         $table->addColumn('organization_id', 'integer', ['notnull' => true]);
         $table->addColumn('createdAt', 'datetime', []);
         $table->addColumn('updatedAt', 'datetime', []);
-        $table->addColumn('comments_type', 'string', ['length' => 255]);
 
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['user_owner_id']);
-        $table->addIndex(['updated_by_user_id'], 'IDX_30E6463D2793CC5E', []);
+        $table->addIndex(['owner_id']);
+        $table->addIndex(['updated_by_id'], 'IDX_30E6463D2793CC5E', []);
         $table->addIndex(['organization_id'], 'IDX_30E6463D32C8A3DE', []);
 
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
-            ['user_owner_id'],
+            ['owner_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),
-            ['updated_by_user_id'],
+            ['updated_by_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
