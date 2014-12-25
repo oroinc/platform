@@ -91,6 +91,17 @@ define(function (require) {
             return data;
         },
 
+        render: function () {
+            CommentItemView.__super__.render.apply(this, arguments);
+            this.$('.dropdown-toggle').on('mouseover', function () {
+                $(this).trigger('click');
+            });
+            this.$('.dropdown-menu').on('mouseleave', function () {
+                $(this).parent().find('a.dropdown-toggle').trigger('click');
+            });
+            return this;
+        },
+
         removeModel: function (e) {
             e.stopPropagation();
             this.model.destroy();

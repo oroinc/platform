@@ -89,7 +89,6 @@ define(function (require) {
         render: function () {
             ActivityListView.__super__.render.apply(this, arguments);
             this.$loadingMaskContainer = this.$('.loading-mask');
-            this._initActionMenus();
             return this;
         },
 
@@ -111,15 +110,6 @@ define(function (require) {
             this.collection.setPage(1);
             this._setPageNumber();
             this._reload();
-        },
-
-        _initActionMenus: function () {
-            $('.activity-list .dropdown-toggle').unbind('mouseover').bind('mouseover', function () {
-                $(this).trigger('click');
-            });
-            $('.activity-list .dropdown-menu').unbind('mouseleave').bind('mouseleave', function () {
-                $(this).parent().find('a.dropdown-toggle').trigger('click');
-            });
         },
 
         _initPager: function () {
@@ -225,7 +215,6 @@ define(function (require) {
                     reset: true,
                     success: _.bind(function () {
                         this._hideLoading();
-                        this._initActionMenus();
                         this._initPager();
                     }, this),
                     error: _.bind(function (collection, response) {
@@ -256,7 +245,6 @@ define(function (require) {
                         var response = $('<html />').html(data);
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
                         that._hideLoading();
-                        that._initActionMenus();
                     })
                     .fail(_.bind(this._showLoadItemsError, this));
             }
