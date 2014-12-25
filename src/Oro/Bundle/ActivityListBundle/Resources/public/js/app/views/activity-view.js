@@ -13,7 +13,9 @@ define([
     var ActivityView;
     ActivityView = BaseView.extend({
         options: {
-            configuration: {},
+            configuration: {
+                has_comments: false
+            },
             template: null,
             urls: {
                 viewItem: null,
@@ -52,7 +54,7 @@ define([
 
         getTemplateData: function () {
             var data = ActivityView.__super__.getTemplateData.call(this);
-
+            data.has_comments = this.options.configuration.has_comments;
             data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
             data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);

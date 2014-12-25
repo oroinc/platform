@@ -93,6 +93,20 @@ define(function (require) {
             return this;
         },
 
+        initItemView: function(model) {
+            var className = model.getRelatedActivityClass(),
+                configuration = this.options.configuration[className];
+            if (this.itemView) {
+                return new this.itemView({
+                    autoRender: false,
+                    model: model,
+                    configuration: configuration
+                });
+            } else {
+                ActivityListView.__super__.render.apply(this, arguments);
+            }
+        },
+
         refresh: function () {
             this.collection.setPage(1);
             this._setPageNumber();
@@ -226,7 +240,6 @@ define(function (require) {
         _viewItem: function (model) {
             var that = this,
                 currentModel = model,
-                currentModelView = this.getItemView(model),
                 options = {
                     url: this._getUrl('itemView', model),
                     type: 'get',
@@ -316,7 +329,7 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            var className = model.get('relatedActivityClass').replace(/\\/g, '_');
+            var className = model.getRelatedActivityClass();
             var route = this.options.configuration[className].routes[actionKey];
             return routing.generate(route, {'id': model.get('relatedActivityId')});
         },
