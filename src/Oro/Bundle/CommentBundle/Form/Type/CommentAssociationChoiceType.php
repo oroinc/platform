@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CommentBundle\Form\Type;
 
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
 
 class CommentAssociationChoiceType extends AssociationChoiceType
@@ -24,8 +25,8 @@ class CommentAssociationChoiceType extends AssociationChoiceType
         $className = $configId->getClassName();
 
         if (!empty($className)) {
-            $provider = $this->configManager->getProvider('comment');
-            if (!$provider->hasConfigById($configId) || !$provider->getConfig($className)->is('enabled')) {
+            $groups = $this->configManager->getProvider('grouping')->getConfig($className)->get('groups');
+            if (empty($groups) || !in_array(ActivityScope::GROUP_ACTIVITY, $groups)) {
                 return true;
             }
         }
