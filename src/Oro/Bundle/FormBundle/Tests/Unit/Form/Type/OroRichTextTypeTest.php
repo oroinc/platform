@@ -98,6 +98,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             'data-page-component-options' => [
                 'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
                 'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
+                'skin_url' => '/bundles/oroform/css/tinymce',
                 'plugins' => ['textcolor', 'code'],
                 'toolbar' => ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code'],
                 'menubar' => false,
@@ -145,6 +146,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                         'data-page-component-options' => [
                             'view' => 'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view',
                             'content_css' => 'bundles/oroform/css/wysiwyg-editor.css',
+                            'skin_url' => '/bundles/oroform/css/tinymce',
                             'plugins' => ['textcolor'],
                             'toolbar' => ['undo redo | bold italic underline | forecolor backcolor'],
                             'menubar' => true,

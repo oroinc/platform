@@ -49,6 +49,7 @@ class OroRichTextType extends AbstractType
             'wysiwyg_options' => [
                 'plugins' => ['textcolor', 'code'],
                 'toolbar' => ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code'],
+                'skin_url' => '/bundles/oroform/css/tinymce',
                 'menubar' => false,
                 'statusbar' => false
             ],
