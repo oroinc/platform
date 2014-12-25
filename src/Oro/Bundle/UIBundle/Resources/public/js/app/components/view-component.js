@@ -14,7 +14,7 @@ define(['underscore', 'oroui/js/app/components/base/component', 'oroui/js/tools'
          */
         initialize: function (options) {
             this._deferredInit();
-            tools.loadModules(options.view, function (viewConstructor) {
+            tools.loadModules(options.view, function initializeView(viewConstructor) {
                 var viewOptions = _.extend(
                         _.omit(options, ['_sourceElement', 'view']),
                         { el: options._sourceElement }

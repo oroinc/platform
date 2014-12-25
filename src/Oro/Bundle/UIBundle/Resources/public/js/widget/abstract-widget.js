@@ -10,6 +10,7 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         LoadingMask = require('oroui/js/loading-mask'),
+        layout = require('oroui/js/layout'),
         __ = require('orotranslation/js/translator');
     require('jquery.form');
 
@@ -32,11 +33,6 @@ define(function (require) {
             loadingMaskEnabled: true,
             loadingElement: null,
             container: null,
-            // set to true if 'layout:init' should be executed after a widget is shown
-            // e.g. if HTML content passed to a widget is rendered from JS template
-            // this option is ignored when content is retrieved by AJAX, in this case 'layout:init'
-            // is executed anyway
-            initLayout: false,
             submitHandler: function () {
                 this.trigger('adoptedFormSubmit', this.form, this);
             }
@@ -607,9 +603,7 @@ define(function (require) {
                 this.loadContent();
             } else {
                 this._show();
-                if (this.options.initLayout) {
-                    mediator.execute('layout:init', this.widget, this);
-                }
+                layout.init(this.widget, this);
             }
             this.firstRun = false;
         },
@@ -618,16 +612,13 @@ define(function (require) {
          * Updates content of a widget.
          *
          * @param {String} content
-         * @param {bool=}  initLayout
          */
-        setContent: function (content, initLayout) {
+        setContent: function (content) {
             this.actionsEl = null;
             this.actions = {};
             this.setElement($(content).filter('.widget-content:first'));
             this._show();
-            if (initLayout || (initLayout === undefined && this.options.initLayout)) {
-                mediator.execute('layout:init', this.widget, this);
-            }
+            layout.init(this.widget, this);
         },
 
         /**
@@ -693,6 +684,7 @@ define(function (require) {
             this._removeComponents();
             this.setContent(content, true);
             mediator.trigger('widget:contentLoad', this.widget);
+            layout.init(this.widget, this);
             mediator.trigger('layout:adjustHeight');
         },
 

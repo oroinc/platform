@@ -58,6 +58,7 @@ define(function (require) {
                 options = $elem.data('pageComponentOptions') || {};
                 options._sourceElement = $elem;
                 $elem
+                    .addClass('js-bound-component')
                     .removeData('pageComponentModule')
                     .removeData('pageComponentOptions')
                     .removeAttr('data-page-component-module')
@@ -70,8 +71,8 @@ define(function (require) {
                     } else {
                         loadDeferred.resolve(component(options));
                     }
-                }, function () {
-                    loadDeferred.resolve();
+                }, function (e) {
+                    throw e;
                 });
 
                 loadPromises.push(loadDeferred.promise());

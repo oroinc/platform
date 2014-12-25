@@ -60,7 +60,7 @@ class OroRichTextType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | code | link'];
+        $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code'];
         $elements = 'a[href|target=_blank],ul,ol,li,em[style],strong,b,p,font[color],i,br[data-mce-bogus]';
 
         $defaults = [
