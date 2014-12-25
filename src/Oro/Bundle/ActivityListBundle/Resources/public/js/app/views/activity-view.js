@@ -3,22 +3,28 @@
 define([
     'jquery',
     'underscore',
+    'backbone',
     'oroui/js/app/views/base/view',
     'routing',
     'orolocale/js/formatter/datetime'
-], function ($, _, BaseView, routing, dateTimeFormatter) {
+], function ($, _, Backbone, BaseView, routing, dateTimeFormatter) {
     'use strict';
 
     var ActivityView;
     ActivityView = BaseView.extend({
         options: {
-            configuration: {},
+            configuration: {
+                has_comments: false
+            },
             template: null,
             urls: {
                 viewItem: null,
                 updateItem: null,
                 deleteItem: null
-            }
+            },
+            infoBlock: '.accordion-body .message .info',
+            commentsBlock: '.accordion-body .message .comment',
+            commentsCountBlock: '.comment-count .count'
         },
         attributes: {
             'class': 'list-item'
@@ -29,7 +35,8 @@ define([
             'click .accordion-toggle': 'onToggle'
         },
         listen: {
-            'change model': '_onModelChanged'
+            'change:contentHTML model': '_onContentChange',
+            'change:commentCount model': '_onCommentCountChange'
         },
 
         initialize: function (options) {
@@ -47,7 +54,7 @@ define([
 
         getTemplateData: function () {
             var data = ActivityView.__super__.getTemplateData.call(this);
-
+            data.has_comments = this.options.configuration.has_comments;
             data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
             data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
@@ -76,29 +83,41 @@ define([
 
         onToggle: function (e) {
             e.preventDefault();
-            this.model.collection.trigger('toView', this.model, this);
-        },
-
-        /**
-        * Collapses/expands view elements
-        * @param {boolean=} collapse
-        */
-        toggle: function (collapse) {
-            if (_.isUndefined(collapse)) {
-                collapse = !this.isCollapsed();
-            }
-            this.$('.accordion-toggle').toggleClass('collapsed', collapse);
-            this.$('.collapse').toggleClass('in', !collapse);
-            this.$('.accordion-body .message').empty().html(this.model.get('contentHTML'));
+            this.model.collection.trigger('toView', this.model);
         },
 
         isCollapsed: function () {
             return this.$('.accordion-toggle').hasClass('collapsed');
         },
 
-        _onModelChanged: function () {
-            this.collapsed = this.isCollapsed();
-            this.render();
+        _onContentChange: function () {
+            this.$(this.options.infoBlock).html(this.model.get('contentHTML'));
+        },
+
+        _onCommentCountChange: function () {
+            var quantity = this.model.get('commentCount'),
+                $elem = this.$(this.options.commentsCountBlock);
+            $elem.html(quantity);
+            $elem.parent()[quantity > 0 ? 'show' : 'hide']();
+        },
+
+        getCommentsBlock: function () {
+            return this.$(this.options.commentsBlock);
+        },
+
+        setCommentComponent: function (comments) {
+            this.subview('comments', comments);
+            this.listenTo(comments.collection, 'sync', this.updateCommentsQuantity, this);
+        },
+
+        hasCommentComponent: function () {
+            return Boolean(this.subview('comments'));
+        },
+
+        updateCommentsQuantity: function (collection) {
+            if (collection instanceof Backbone.Collection) {
+                this.model.set('commentCount', collection.getRecordsQuantity());
+            }
         }
     });
 
