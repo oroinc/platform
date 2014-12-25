@@ -11,15 +11,15 @@ class StripTagsTransformer implements DataTransformerInterface
     /**
      * @var string|null
      */
-    protected $allowableTags;
+    protected $allowedTags;
 
     /**
-     * @param string|null $allowableTags
+     * @param string|null $allowedTags
      */
-    public function __construct($allowableTags = null)
+    public function __construct($allowedTags = null)
     {
-        if ($allowableTags) {
-            $this->allowableTags = $this->prepareAllowedTagsList($allowableTags);
+        if ($allowedTags) {
+            $this->allowedTags = $this->prepareAllowedTagsList($allowedTags);
         }
     }
 
@@ -28,7 +28,7 @@ class StripTagsTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        return strip_tags($value, $this->allowableTags);
+        return strip_tags($value, $this->allowedTags);
     }
 
     /**
@@ -40,20 +40,20 @@ class StripTagsTransformer implements DataTransformerInterface
     }
 
     /**
-     * Prepare list of allowable tags based on tinymce allowable tags syntax.
+     * Prepare list of allowable tags based on tinymce valid tags syntax.
      *
-     * @param string $allowableTags
+     * @param string $allowedTags
      * @return string
      */
-    protected function prepareAllowedTagsList($allowableTags)
+    protected function prepareAllowedTagsList($allowedTags)
     {
         /** strip attributes */
-        $allowableTags = preg_replace('(\[.*?\]|\s+)', '', $allowableTags);
+        $allowedTags = preg_replace('(\[.*?\]|\s+)', '', $allowedTags);
 
         /** strip or condition */
-        $allowableTags = preg_replace('(\/)', self::DELIMITER, $allowableTags);
+        $allowedTags = preg_replace('(\/)', self::DELIMITER, $allowedTags);
 
-        $cleanTags = str_replace(self::DELIMITER, '', $allowableTags);
+        $cleanTags = str_replace(self::DELIMITER, '', $allowedTags);
         if (empty($cleanTags)) {
             return null;
         }
@@ -62,7 +62,7 @@ class StripTagsTransformer implements DataTransformerInterface
             function ($tag) {
                 return sprintf('<%s>', $tag);
             },
-            explode(self::DELIMITER, $allowableTags)
+            explode(self::DELIMITER, $allowedTags)
         );
 
         return implode($tags);

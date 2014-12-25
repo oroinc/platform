@@ -14,6 +14,9 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\StripTagsTransformer;
 class OroRichTextType extends AbstractType
 {
     const NAME = 'oro_rich_text';
+    const TOOLBAR_DEFAULT = 'default';
+    const TOOLBAR_SMALL = 'small';
+    const TOOLBAR_LARGE = 'large';
 
     /**
      * @var PackageInterface
@@ -24,6 +27,55 @@ class OroRichTextType extends AbstractType
      * @var ConfigManager
      */
     protected $configManager;
+
+    /**
+     * List of allowed element.
+     *
+     * @url http://www.tinymce.com/wiki.php/Configuration:valid_elements
+     * @var array
+     */
+    protected $allowedElements = [
+        '@[style|class]',
+        'style[type="text/css"]',
+        'table[cellspacing|cellpadding|border|align|width|height|background|bgcolor]',
+        'thead[align|valign|bgcolor]',
+        'tbody[align|valign|bgcolor]',
+        'tr[align|valign|bordercolor|bgcolor]',
+        'td[align|valign|rowspan|colspan|bgcolor|background|nowrap|width|height]',
+        'a[!href|target=_blank|title]',
+        'dl',
+        'dt',
+        'div',
+        'ul',
+        'ol',
+        'li',
+        'em',
+        'strong/b',
+        'p',
+        'font[color]',
+        'i',
+        'br[data-mce-bogus]',
+        'span',
+        'img[src|width|height|alt]',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+    ];
+
+    /**
+     * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
+     * @var array
+     */
+    protected $toolbars = [
+        self::TOOLBAR_SMALL => ['undo redo | bold italic underline | bullist numlist link'],
+        self::TOOLBAR_DEFAULT
+            => ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code'],
+        self::TOOLBAR_LARGE
+            => ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code'],
+    ];
 
     /**
      * @param ConfigManager $configManager
@@ -60,26 +112,11 @@ class OroRichTextType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code'];
-        $elements = [
-            'a[href|target=_blank]',
-            'ul',
-            'ol',
-            'li',
-            'em[style]',
-            'strong',
-            'b',
-            'p',
-            'font[color]',
-            'i',
-            'br[data-mce-bogus]',
-            'span[style|data-mce-style]'
-        ];
         $defaultWysiwygOptions = [
             'plugins' => ['textcolor', 'code', 'link'],
-            'toolbar' => $toolbar,
+            'toolbar_type' => self::TOOLBAR_DEFAULT,
             'skin_url' => 'bundles/oroform/css/tinymce',
-            'valid_elements' => implode(',', $elements),
+            'valid_elements' => implode(',', $this->allowedElements),
             'menubar' => false,
             'statusbar' => false
         ];
@@ -100,7 +137,19 @@ class OroRichTextType extends AbstractType
         $resolver->setNormalizers(
             [
                 'wysiwyg_options' => function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
-                    return array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                    if (empty($wysiwygOptions['toolbar_type'])
+                        || !array_key_exists($wysiwygOptions['toolbar_type'], $this->toolbars)
+                    ) {
+                        $toolbarType = self::TOOLBAR_DEFAULT;
+                    } else {
+                        $toolbarType = $wysiwygOptions['toolbar_type'];
+                    }
+                    $wysiwygOptions['toolbar'] = $this->toolbars[$toolbarType];
+
+                    $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                    unset($wysiwygOptions['toolbar_type']);
+
+                    return $wysiwygOptions;
                 },
                 'attr' => function (Options $options, $attr) {
                     $pageComponent = $options->get('page-component');
