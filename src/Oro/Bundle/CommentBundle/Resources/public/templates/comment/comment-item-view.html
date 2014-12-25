@@ -22,13 +22,13 @@
         <% } %>
         <div data-target="#accordion-item-<%= cid %>" data-parent="#<%- accordionId %>"
              data-toggle="collapse" class="short-comment accordion-toggle<% if (collapsed) { %> collapsed<%}%>">
-            <%- message %>
+            <%= _.nl2br(_.escape(message)) %>
         </div>
     </div>
     <div class="accordion-body collapse<% if (!collapsed) { %> in<%}%>" id="accordion-item-<%= cid %>">
         <div class="accordion-inner">
             <div<% if (editable) { %> class="form-container"<% } %>>
-                <%- message %>
+                <%= _.nl2br(_.escape(message)) %>
             </div>
         </div>
     </div>
