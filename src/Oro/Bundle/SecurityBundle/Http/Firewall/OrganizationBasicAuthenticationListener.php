@@ -92,7 +92,7 @@ class OrganizationBasicAuthenticationListener
                     $this->providerKey,
                     $this->manager->getOrganizationById($organizationId)
                 );
-            }else {
+            } else {
                 $authToken = new UsernamePasswordToken(
                     $username,
                     $request->headers->get('PHP_AUTH_PW'),

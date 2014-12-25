@@ -27,11 +27,11 @@ class OrganizationRememberMeFactory extends RememberMeFactory
 
         // remember me services
         if (isset($config['token_provider'])) {
-            $templateId = 'security.authentication.rememberme.services.persistent';
-            $rememberMeServicesId = $templateId.'.'.$id;
+            $templateId           = 'security.authentication.rememberme.services.persistent';
+            $rememberMeServicesId = $templateId . '.' . $id;
         } else {
-            $templateId = 'security.authentication.rememberme.services.simplehash';
-            $rememberMeServicesId = $templateId.'.'.$id;
+            $templateId           = 'security.authentication.rememberme.services.simplehash';
+            $rememberMeServicesId = $templateId . '.' . $id;
         }
 
         if ($container->hasDefinition('security.logout_listener.' . $id)) {
@@ -45,22 +45,26 @@ class OrganizationRememberMeFactory extends RememberMeFactory
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {
-            $rememberMeServices->addMethodCall('setTokenProvider', array(
-                new Reference($config['token_provider']),
-            ));
+            $rememberMeServices->addMethodCall('setTokenProvider', [new Reference($config['token_provider'])]);
         }
 
         // remember-me options
         $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
         // attach to remember-me aware listeners
-        $rememberMeServices->replaceArgument(0, $this->getUserProviders($container, $config, $id, $rememberMeServicesId));
+        $rememberMeServices->replaceArgument(
+            0,
+            $this->getUserProviders($container, $config, $id, $rememberMeServicesId)
+        );
 
         // remember-me listener
-        $listenerId = 'security.authentication.listener.rememberme.'.$id;
-        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
+        $listenerId = 'security.authentication.listener.rememberme.' . $id;
+        $listener   = $container->setDefinition(
+            $listenerId,
+            new DefinitionDecorator('security.authentication.listener.rememberme')
+        );
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
 
-        return array($authProviderId, $listenerId, $defaultEntryPoint);
+        return [$authProviderId, $listenerId, $defaultEntryPoint];
     }
 
     /**
@@ -101,7 +105,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
             }
         }
         if ($config['user_providers']) {
-            $userProviders = array();
+            $userProviders = [];
             foreach ($config['user_providers'] as $providerName) {
                 $userProviders[] = new Reference('security.user.provider.concrete.' . $providerName);
             }
