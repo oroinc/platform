@@ -380,18 +380,18 @@ datagrid:
                 has_group:
                     type: boolean
                     data_name: has_group
-                username:
-                    type: string
-                    data_name: u.username
-                email:
-                    type: string
-                    data_name: u.email
                 firstName:
                     type: string
                     data_name: u.firstName
                 lastName:
                     type: string
                     data_name: u.lastName
+                username:
+                    type: string
+                    data_name: u.username
+                email:
+                    type: string
+                    data_name: u.email
         sorters:
             multiple_sorting: true
             columns:
