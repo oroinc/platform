@@ -3,7 +3,8 @@ oro:
         page: Page:
         total: of {{ pages }} | Total of {{ records }} records
     comment:
-        plural_label: Comments
+        plural_label: Comment
+        entity_plural_label: Comments
         from:
             button:
                 add_comment:
