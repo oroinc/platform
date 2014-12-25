@@ -49,7 +49,7 @@ class FixCalendarsQuery extends ParametrizedMigrationQuery
 
         // remove calendars
         // as long as calendar events are also duplicated in all calendars there is no need to take care about them
-        $batches = array_chunk($calendarsForDeletion, 5);
+        $batches = array_chunk($calendarsForDeletion, 1000);
         foreach ($batches as $batch) {
             $sql = 'DELETE FROM oro_calendar WHERE id IN (' . implode(',', array_fill(0, count($batch), '?')) . ')';
             $this->logQuery($logger, $sql, $batch);
