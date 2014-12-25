@@ -127,10 +127,12 @@ class NoteActivityListProvider implements ActivityListProviderInterface
      */
     protected function truncate($string, $length, $etc = '...')
     {
-        $length = strpos($string, ' ', $length);
-        if (false === $length) {
+        if (mb_strlen($string) <= $length) {
             return $string;
+        } else {
+            $length -= min($length, mb_strlen($etc));
         }
+        $string = preg_replace('/\s+?(\S+)?$/u', '', mb_substr($string, 0, $length + 1));
 
         return mb_substr($string, 0, $length) . $etc;
     }

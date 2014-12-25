@@ -61,18 +61,32 @@ class OroRichTextType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code'];
-        $elements = 'a[href|target=_blank],ul,ol,li,em[style],strong,b,p,font[color],i,br[data-mce-bogus]';
+        $elements = [
+            'a[href|target=_blank]',
+            'ul',
+            'ol',
+            'li',
+            'em[style]',
+            'strong',
+            'b',
+            'p',
+            'font[color]',
+            'i',
+            'br[data-mce-bogus]',
+            'span[style|data-mce-style]'
+        ];
+        $defaultWysiwygOptions = [
+            'plugins' => ['textcolor', 'code', 'link'],
+            'toolbar' => $toolbar,
+            'skin_url' => 'bundles/oroform/css/tinymce',
+            'valid_elements' => implode(',', $elements),
+            'menubar' => false,
+            'statusbar' => false
+        ];
 
         $defaults = [
             'wysiwyg_enabled' => (bool)$this->configManager->get('oro_form.wysiwyg_enabled'),
-            'wysiwyg_options' => [
-                'plugins' => ['textcolor', 'code', 'link'],
-                'toolbar' => $toolbar,
-                'skin_url' => '/bundles/oroform/css/tinymce',
-                'valid_elements' => $elements,
-                'menubar' => false,
-                'statusbar' => false
-            ],
+            'wysiwyg_options' => $defaultWysiwygOptions,
             'page-component' => [
                 'module' => 'oroui/js/app/components/view-component',
                 'options' => [
@@ -85,17 +99,23 @@ class OroRichTextType extends AbstractType
         $resolver->setDefaults($defaults);
         $resolver->setNormalizers(
             [
+                'wysiwyg_options' => function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
+                    return array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                },
                 'attr' => function (Options $options, $attr) {
                     $pageComponent = $options->get('page-component');
+                    $wysiwygOptions = (array)$options->get('wysiwyg_options');
 
-                    if ($this->assetHelper && !empty($pageComponent['options']['content_css'])) {
-                        $pageComponent['options']['content_css'] = $this->assetHelper
-                            ->getUrl($pageComponent['options']['content_css']);
+                    if ($this->assetHelper) {
+                        if (!empty($pageComponent['options']['content_css'])) {
+                            $pageComponent['options']['content_css'] = $this->assetHelper
+                                ->getUrl($pageComponent['options']['content_css']);
+                        }
+                        if (!empty($wysiwygOptions['skin_url'])) {
+                            $wysiwygOptions['skin_url'] = $this->assetHelper->getUrl($wysiwygOptions['skin_url']);
+                        }
                     }
-                    $pageComponent['options'] = array_merge(
-                        $pageComponent['options'],
-                        (array)$options->get('wysiwyg_options')
-                    );
+                    $pageComponent['options'] = array_merge($pageComponent['options'], $wysiwygOptions);
                     $pageComponent['options']['enabled'] = (bool)$options->get('wysiwyg_enabled');
 
                     $attr['data-page-component-module'] = $pageComponent['module'];
