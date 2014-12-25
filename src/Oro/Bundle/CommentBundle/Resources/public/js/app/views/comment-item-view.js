@@ -45,7 +45,6 @@ define(function (require) {
         template: template,
         tagName: 'li',
         className: 'comment-item',
-        collapsed: true,
 
         events: {
             'click .item-remove-button': 'removeModel',
@@ -58,8 +57,11 @@ define(function (require) {
             'change:updatedAt model': 'render'
         },
 
+        accordionId: null,
+        collapsed: true,
+
         initialize: function (options) {
-            _.extend(this, _.pick(options || {}, ['accordionId']));
+            _.extend(this, _.pick(options || {}, ['accordionId', 'collapsed']));
             CommentItemView.__super__.initialize.apply(this, arguments);
         },
 
@@ -89,6 +91,17 @@ define(function (require) {
                 data.editor_url = routing.generate('oro_user_view', {id: data.editor_id});
             }
             return data;
+        },
+
+        render: function () {
+            CommentItemView.__super__.render.apply(this, arguments);
+            this.$('.dropdown-toggle').on('mouseover', function () {
+                $(this).trigger('click');
+            });
+            this.$('.dropdown-menu').on('mouseleave', function () {
+                $(this).parent().find('a.dropdown-toggle').trigger('click');
+            });
+            return this;
         },
 
         removeModel: function (e) {

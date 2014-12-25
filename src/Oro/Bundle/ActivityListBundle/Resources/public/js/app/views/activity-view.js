@@ -50,6 +50,7 @@ define([
                 templateName = templateName.replace(/\\/g, '_');
                 this.template = _.template($(templateName).html());
             }
+            ActivityView.__super__.initialize.apply(this, arguments);
         },
 
         getTemplateData: function () {
@@ -71,6 +72,17 @@ define([
             }
 
             return data;
+        },
+
+        render: function () {
+            ActivityView.__super__.render.apply(this, arguments);
+            this.$('.dropdown-toggle.activity-item').on('mouseover', function () {
+                $(this).trigger('click');
+            });
+            this.$('.dropdown-menu.activity-item').on('mouseleave', function () {
+                $(this).parent().find('a.dropdown-toggle').trigger('click');
+            });
+            return this;
         },
 
         onEdit: function () {

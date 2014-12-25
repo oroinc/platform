@@ -21,7 +21,10 @@ define(function (require) {
             'sync collection': 'renderAllItems'
         },
 
+        firstExpandedItems: 5,
+
         initialize: function (options) {
+            _.extend(this, _.pick(options || {}, ['firstExpandedItems']));
             this.template = _.template($(options.template).html());
             CommentListView.__super__.initialize.apply(this, arguments);
         },
@@ -55,15 +58,21 @@ define(function (require) {
         },
 
         initItemView: function(model) {
-            if (this.itemView) {
-                return new this.itemView({
-                    autoRender: false,
-                    model: model,
-                    accordionId: this.getAccordionId()
-                });
-            } else {
+            var page, index, collapsed;
+            if (!this.itemView) {
                 return CommentListView.__super__.initItemView.call(this, model);
             }
+
+            page = this.collection.getPage();
+            index = this.collection.indexOf(model);
+            collapsed = isNaN(this.firstExpandedItems) || page !== 1 || index >= this.firstExpandedItems;
+
+            return new this.itemView({
+                autoRender: false,
+                model: model,
+                accordionId: this.getAccordionId(),
+                collapsed: collapsed
+            });
         },
 
         filterer: function (model) {
