@@ -106,18 +106,34 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     {
         $toolbar = ['undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code'];
         $elements = [
-            'a[href|target=_blank]',
+            '@[style|class]',
+            'style[type="text/css"]',
+            'table[cellspacing|cellpadding|border|align|width|height|background|bgcolor]',
+            'thead[align|valign|bgcolor]',
+            'tbody[align|valign|bgcolor]',
+            'tr[align|valign|bordercolor|bgcolor]',
+            'td[align|valign|rowspan|colspan|bgcolor|background|nowrap|width|height]',
+            'a[!href|target=_blank|title]',
+            'dl',
+            'dt',
+            'div',
             'ul',
             'ol',
             'li',
-            'em[style]',
-            'strong',
-            'b',
+            'em',
+            'strong/b',
             'p',
             'font[color]',
             'i',
             'br[data-mce-bogus]',
-            'span[style|data-mce-style]'
+            'span',
+            'img[src|width|height|alt]',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
         ];
 
         $defaultAttrs = [
@@ -163,7 +179,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                     'wysiwyg_options' => [
                         'plugins' => ['textcolor'],
                         'menubar' => true,
-                        'statusbar' => false
+                        'statusbar' => false,
+                        'toolbar_type' => OroRichTextType::TOOLBAR_SMALL
                     ]
                 ],
                 true,
@@ -184,7 +201,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                             [
                                 'plugins' => ['textcolor'],
                                 'menubar' => true,
-                                'statusbar' => false
+                                'statusbar' => false,
+                                'toolbar' => ['undo redo | bold italic underline | bullist numlist link']
                             ]
                         )
                     ]

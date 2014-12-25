@@ -46,6 +46,8 @@ class StripTagsTransformerTest extends \PHPUnit_Framework_TestCase
             'prepare attributes' => ['<p>sometext</p>', 'p[href|target=_blank]', '<p>sometext</p>'],
             'prepare or condition' => ['<p>sometext</p>', 'a[href|target=_blank], b/p', '<p>sometext</p>'],
             'prepare empty' => ['<p>sometext</p>', '[href|target=_blank],/', 'sometext'],
+            'default attributes set' => ['<p>sometext</p>', '@[style]', 'sometext'],
+            'default attributes set with allowed' => ['<p>sometext</p>', '@[style],p', '<p>sometext</p>']
         ];
     }
 
