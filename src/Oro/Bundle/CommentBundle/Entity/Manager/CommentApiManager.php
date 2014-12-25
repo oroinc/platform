@@ -9,8 +9,8 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
@@ -40,8 +40,8 @@ class CommentApiManager extends ApiEntityManager
     /** @var UserConfigManager */
     protected $config;
 
-    /** @var  Router */
-    protected $router;
+    /** @var AttachmentManager */
+    protected $attachmentManager;
 
     /**
      * @param Registry          $doctrine
@@ -50,7 +50,7 @@ class CommentApiManager extends ApiEntityManager
      * @param Pager             $pager
      * @param UserConfigManager $config
      * @param EventDispatcher   $eventDispatcher
-     * @param Router            $router
+     * @param AttachmentManager $attachmentManager
      */
     public function __construct(
         Registry $doctrine,
@@ -59,14 +59,14 @@ class CommentApiManager extends ApiEntityManager
         Pager $pager,
         UserConfigManager $config,
         EventDispatcher $eventDispatcher,
-        Router $router
+        AttachmentManager $attachmentManager
     ) {
-        $this->em             = $doctrine->getManager();
-        $this->securityFacade = $securityFacade;
-        $this->nameFormatter  = $nameFormatter;
-        $this->pager          = $pager;
-        $this->config         = $config;
-        $this->router         = $router;
+        $this->em                = $doctrine->getManager();
+        $this->securityFacade    = $securityFacade;
+        $this->nameFormatter     = $nameFormatter;
+        $this->pager             = $pager;
+        $this->config            = $config;
+        $this->attachmentManager = $attachmentManager;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -185,7 +185,7 @@ class CommentApiManager extends ApiEntityManager
             'editor'        => $editorName,
             'editor_id'     => $editorId,
             'message'       => $entity->getMessage(),
-            'attachment'    => $this->getAttachment($entity),
+            'attachmentURL' => $this->getAttachmentURL($entity),
             'relationClass' => $entityClass,
             'relationId'    => $entityId,
             'createdAt'     => $entity->getCreatedAt()->format('c'),
@@ -202,7 +202,7 @@ class CommentApiManager extends ApiEntityManager
      *
      * @return string|null
      */
-    protected function getAttachment($entity)
+    protected function getAttachmentURL($entity)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($entity, 'attachment');
@@ -210,14 +210,7 @@ class CommentApiManager extends ApiEntityManager
             return null;
         }
 
-        return $this->router->generate(
-            'oro_filtered_attachment',
-            [
-                'id'       => $attachment->getId(),
-                'filename' => $attachment->getOriginalFilename(),
-                'filter'   => $attachment->getFilename()
-            ]
-        );
+        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download', true);
     }
 
     /**

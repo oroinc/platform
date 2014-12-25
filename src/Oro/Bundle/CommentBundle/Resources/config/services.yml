@@ -32,7 +32,7 @@ services:
             - @oro_datagrid.extension.pager.orm.pager
             - @oro_config.user
             - @event_dispatcher
-            - @router
+            - @oro_attachment.manager
 
     oro_comment.comment_lifecycle_listener:
         class: %oro_comment.comment_lifecycle_listener.class%
