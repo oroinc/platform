@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-
-class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implements VirtualFieldProviderInterface
+class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implements VirtualRelationProviderInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function isVirtualField($className, $fieldName)
+    public function isVirtualRelation($className, $fieldName)
     {
         $this->ensureVirtualFieldsInitialized();
 
@@ -18,7 +17,7 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
     /**
      * {@inheritdoc}
      */
-    public function getVirtualFieldQuery($className, $fieldName)
+    public function getVirtualRelationQuery($className, $fieldName)
     {
         $this->ensureVirtualFieldsInitialized();
 
@@ -28,10 +27,14 @@ class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implement
     /**
      * {@inheritdoc}
      */
-    public function getVirtualFields($className)
+    public function getVirtualRelations($className)
     {
         $this->ensureVirtualFieldsInitialized();
 
-        return isset($this->items[$className]) ? array_keys($this->items[$className]) : [];
+        if (!isset($this->items[$className])) {
+            return [];
+        }
+
+        return $this->items[$className];
     }
 }

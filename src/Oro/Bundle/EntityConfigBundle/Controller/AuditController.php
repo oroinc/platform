@@ -35,7 +35,7 @@ class AuditController extends Controller
     {
         return [
             'gridName'    => 'audit-log-grid',
-            'entityClass' => str_replace('_', '\\', $entity),
+            'entityClass' => $this->get('oro_entity.routing_helper')->decodeClassName($entity),
             'entityId'    => $id,
         ];
     }
@@ -59,11 +59,11 @@ class AuditController extends Controller
         /** @var FieldConfigModel $fieldName */
         $fieldName = $this->getDoctrine()
             ->getRepository(FieldConfigModel::ENTITY_NAME)
-            ->findOneBy(array('id' => $id));
+            ->findOneBy(['id' => $id]);
 
         return [
             'gridName'    => 'auditfield-log-grid',
-            'entityClass' => str_replace('_', '\\', $entity),
+            'entityClass' => $this->get('oro_entity.routing_helper')->decodeClassName($entity),
             'fieldName'   => $fieldName->getFieldName(),
             'entityId'    => $id,
         ];

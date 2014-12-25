@@ -38,6 +38,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->markTestSkipped('CRM-2237');
+
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -524,6 +526,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @param array $config
      */
     protected function prepare($config)
     {
@@ -758,6 +762,8 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                         if (isset($config[$className])) {
                             return $this->getExtendEntityConfig($className, $config[$className]['config']);
                         }
+
+                        return null;
                     }
                 )
             );
@@ -960,6 +966,11 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->prepare($config);
     }
 
+    /**
+     * @param string $entityClassName
+     * @param mixed $values
+     * @return Config
+     */
     protected function getEntityConfig($entityClassName, $values)
     {
         $entityConfigId = new EntityConfigId('entity', $entityClassName);
@@ -969,6 +980,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         return $entityConfig;
     }
 
+    /**
+     * @param string $entityClassName
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param mixed $values
+     * @return Config
+     */
     protected function getEntityFieldConfig($entityClassName, $fieldName, $fieldType, $values)
     {
         $entityFieldConfigId = new FieldConfigId('entity', $entityClassName, $fieldName, $fieldType);
@@ -978,6 +996,11 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         return $entityFieldConfig;
     }
 
+    /**
+     * @param string $entityClassName
+     * @param string $values
+     * @return Config
+     */
     protected function getExtendEntityConfig($entityClassName, $values)
     {
         $entityConfigId = new EntityConfigId('extend', $entityClassName);
@@ -987,6 +1010,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         return $entityConfig;
     }
 
+    /**
+     * @param string $entityClassName
+     * @param string $fieldName
+     * @param string $fieldType
+     * @param mixed $values
+     * @return Config
+     */
     protected function getExtendFieldConfig($entityClassName, $fieldName, $fieldType, $values)
     {
         $extendFieldConfigId = new FieldConfigId('extend', $entityClassName, $fieldName, $fieldType);
@@ -996,6 +1026,11 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         return $extendFieldConfig;
     }
 
+    /**
+     * @param string $entityClassName
+     * @param array $config
+     * @return array
+     */
     protected function getEntityIds($entityClassName, $config)
     {
         $result = [];

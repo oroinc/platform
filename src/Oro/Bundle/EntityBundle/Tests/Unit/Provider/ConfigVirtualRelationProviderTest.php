@@ -1,13 +1,13 @@
 <?php
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 
-class ConfigVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
+class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ConfigVirtualFieldProvider */
-    private $configVirtualFieldProvider;
+    /** @var ConfigVirtualRelationProvider */
+    private $configVirtualRelationProvider;
 
     /** @var array configuration */
     private $configurationVirtualFields;
@@ -36,7 +36,7 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $this->configVirtualFieldProvider = new ConfigVirtualFieldProvider(
+        $this->configVirtualRelationProvider = new ConfigVirtualRelationProvider(
             $entityHierarchyProvider,
             $this->configurationVirtualFields
         );
@@ -46,25 +46,25 @@ class ConfigVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(
             ['virtual_field'],
-            $this->configVirtualFieldProvider->getVirtualFields('TestEntity')
+            $this->configVirtualRelationProvider->getVirtualRelations('TestEntity')
         );
         $this->assertEquals(
             [],
-            $this->configVirtualFieldProvider->getVirtualFields('EntityWithoutVirtualFields')
+            $this->configVirtualRelationProvider->getVirtualRelations('EntityWithoutVirtualFields')
         );
     }
 
     public function testIsVirtualField()
     {
-        $this->assertTrue($this->configVirtualFieldProvider->isVirtualField('TestEntity', 'virtual_field'));
-        $this->assertFalse($this->configVirtualFieldProvider->isVirtualField('TestEntity', 'non_virtual_field'));
+        $this->assertTrue($this->configVirtualRelationProvider->isVirtualRelation('TestEntity', 'virtual_field'));
+        $this->assertFalse($this->configVirtualRelationProvider->isVirtualRelation('TestEntity', 'non_virtual_field'));
     }
 
     public function testGetVirtualFieldQuery()
     {
         $this->assertEquals(
             $this->configurationVirtualFields['AbstractEntity']['virtual_field']['query'],
-            $this->configVirtualFieldProvider->getVirtualFieldQuery('TestEntity', 'virtual_field')
+            $this->configVirtualRelationProvider->getVirtualRelationQuery('TestEntity', 'virtual_field')
         );
     }
 }

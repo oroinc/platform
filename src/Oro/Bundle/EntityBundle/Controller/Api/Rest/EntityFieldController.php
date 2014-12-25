@@ -28,6 +28,8 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *
+     * @Get(requirements={"entityName"="((\w+)_)+(\w+)"})
+     *
      * @QueryParam(
      *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether association fields should be returned as well.")
@@ -40,10 +42,12 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      * @QueryParam(
      *      name="with-unidirectional", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether Unidirectional association fields should be returned.")
-     * @Get(requirements={"entityName"="((\w+)_)+(\w+)"})
      * @QueryParam(
      *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")
+     * @QueryParam(
+     *      name="with-virtual-relations", requirements="(1)|(0)", nullable=true, strict=true, default="1",
+     *      description="Indicates whether virtual relations should be returned as well.")
      * @ApiDoc(
      *      description="Get entity fields",
      *      resource=true
@@ -53,12 +57,13 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      */
     public function getFieldsAction($entityName)
     {
-        $entityName         = str_replace('_', '\\', $entityName);
-        $withRelations      = filter_var($this->getRequest()->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
-        $withEntityDetails  = filter_var($this->getRequest()->get('with-entity-details'), FILTER_VALIDATE_BOOLEAN);
+        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
+        $withRelations = filter_var($this->getRequest()->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
+        $withEntityDetails = filter_var($this->getRequest()->get('with-entity-details'), FILTER_VALIDATE_BOOLEAN);
         $withUnidirectional = filter_var($this->getRequest()->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
-        $withVirtualFields  = filter_var($this->getRequest()->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
-        $applyExclusions    = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
+        $withVirtualFields = filter_var($this->getRequest()->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
+        $applyExclusions = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
+        $withVirtualRelations = filter_var($this->getRequest()->get('with-virtual-relations'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
@@ -71,11 +76,13 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
                 $withVirtualFields,
                 $withEntityDetails,
                 $withUnidirectional,
-                $applyExclusions
+                $applyExclusions,
+                true,
+                $withVirtualRelations
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
-            $result     = array('message' => $ex->getMessage());
+            $result = ['message' => $ex->getMessage()];
         }
 
         return $this->handleView($this->view($result, $statusCode));
