@@ -6,8 +6,6 @@ define(function (require) {
         $ = require('tinymce/jquery.tinymce.min'),
         txtHtmlTransformer = require('./txt-html-transformer'),
         LoadingMask = require('oroui/js/loading-mask');
-    require('tinymce/plugins/textcolor/plugin.min');
-    require('tinymce/plugins/code/plugin.min');
 
     WysiwygEditorView = BaseView.extend({
         autoRender: true,
