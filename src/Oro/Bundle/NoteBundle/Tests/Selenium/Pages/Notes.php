@@ -44,18 +44,8 @@ class Notes extends AbstractPageEntity
      */
     public function setNoteMessage($note)
     {
-        $this->test->waitUntil(
-            function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
-                return $testCase->execute(
-                    [
-                        'script' => 'return tinymce.editors.length > 0 && tinymce.editors[0].initialized',
-                        'args' => [],
-                    ]
-                );
-            },
-            intval(MAX_EXECUTION_TIME)
-        );
-        $this->test->frame($this->test->byId('oro_note_form_message_ifr'));
+        $this->test->timeouts()->implicitWait(1000);
+        $this->test->frame('oro_note_form_message_ifr');
         $this->$note = $this->test->byId('tinymce');
         $this->$note->clear();
         $this->$note->value($note);
