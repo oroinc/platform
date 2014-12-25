@@ -48,9 +48,8 @@ define(function (require) {
         collapsed: true,
 
         events: {
-            'click .removeRow': 'removeModel',
-            'click .form-container': 'editModel',
-            'click .short-comment': 'editModel',
+            'click .item-remove-button': 'removeModel',
+            'click .item-edit-button': 'editModel',
             'shown .accordion-body': 'onToggle',
             'hidden .accordion-body': 'onToggle'
         },
@@ -69,6 +68,11 @@ define(function (require) {
                 data = CommentItemView.__super__.getTemplateData.call(this);
             data.cid = this.cid;
             data.accordionId = this.accordionId;
+            data.accordionTargetId = this.getAccordionTargetId();
+            data.hasActions = data.removable || data.editable;
+            data.message = this.prepareMessage();
+            data.shortMessage = this.prepareShortMessage();
+            data.isCollapsible = data.message !== data.shortMessage;
             data.collapsed = this.collapsed;
             if (data.createdAt) {
                 diff = timeDiff(data.createdAt);
@@ -92,15 +96,40 @@ define(function (require) {
             this.model.destroy();
         },
 
-        editModel: function () {
+        editModel: function (e) {
+            e.stopPropagation();
             if (!this.$('form').length) {
                 // if it's not edit mode yet
                 this.model.trigger('toEdit', this.model);
             }
+            this.$('#' + this.getAccordionTargetId()).collapse({
+                toggle: false
+            }).collapse('show');
+            this.$('form :input:first').click().focus();
         },
 
         onToggle: function (e) {
             this.collapsed = e.type === 'hidden';
+        },
+
+        getAccordionTargetId: function () {
+            return 'accordion-item-' + this.cid;
+        },
+
+        prepareShortMessage: function () {
+            var shortMessage = this.prepareMessage(),
+                lineBreak = shortMessage.indexOf('<br />');
+            if (lineBreak > 0) {
+                shortMessage = shortMessage.substr(0, shortMessage.indexOf('<br />'));
+            }
+            shortMessage = _.trunc(shortMessage, 70, true);
+            return shortMessage;
+        },
+
+        prepareMessage: function () {
+            var message = this.model.get('message');
+            message = _.nl2br(_.escape(message));
+            return message;
         }
     });
 

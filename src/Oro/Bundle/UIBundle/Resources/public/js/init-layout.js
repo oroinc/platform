@@ -197,7 +197,11 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             var target, $toggle = $(this);
             target = $toggle.attr('data-target') || $toggle.attr('href');
             $toggle = $toggle.add('[data-target="' + target + '"]').add('[href="' + target + '"]');
-            $toggle[$(target).hasClass('in') ? 'removeClass' : 'addClass']('collapsed');
+            $toggle.toggleClass('collapsed', !$(target).hasClass('in'));
+        });
+        $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.collapse', function (e) {
+            var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
+            $toggle.toggleClass('collapsed', e.type !== 'shown');
         });
     });
 
