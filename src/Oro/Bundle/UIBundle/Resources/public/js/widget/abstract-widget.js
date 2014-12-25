@@ -684,7 +684,6 @@ define(function (require) {
             this._removeComponents();
             this.setContent(content, true);
             mediator.trigger('widget:contentLoad', this.widget);
-            layout.init(this.widget, this);
             mediator.trigger('layout:adjustHeight');
         },
 
