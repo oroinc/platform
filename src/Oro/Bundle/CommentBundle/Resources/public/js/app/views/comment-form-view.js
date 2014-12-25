@@ -44,7 +44,9 @@ define(function (require) {
             CommentFormView.__super__.render.call(this);
             this.$('form')
                 .addClass(this.model ? 'edit-form' : 'add-form')
-                .validate();
+                .validate({invalidHandler: function(event, validator) {
+                    _.delay(_.bind(validator.resetForm, validator), 3000);
+                }});
             mediator.execute('layout:init', this.$('form'));
             if (this.model) {
                 this.bindData();
