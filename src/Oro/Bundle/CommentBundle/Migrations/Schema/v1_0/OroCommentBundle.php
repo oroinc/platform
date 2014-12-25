@@ -122,7 +122,7 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
      */
     public static function addAttachment(Schema $schema, AttachmentExtension $attachmentExtension)
     {
-        $attachmentExtension->addImageRelation(
+        $attachmentExtension->addFileRelation(
             $schema,
             'oro_comment',
             'attachment'
