@@ -85,12 +85,14 @@
                         });
                     });
 
+                    {% if oro_config_value('oro_form.wysiwyg_enabled') %}
                     $('[name$="[{{ form.type.vars.name }}]"]').change(function() {
                         var type = $(this).val(),
                             editorView = $body.data('component').view;
 
                         editorView.setEnabled(type === 'html');
                     });
+                    {% endif %}
                 });
             });
         </script>
