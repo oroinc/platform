@@ -58,11 +58,20 @@ class StripTagsTransformer implements DataTransformerInterface
             return null;
         }
 
+        $tags = explode(self::DELIMITER, $allowedTags);
+
+        $tags = array_filter(
+            $tags,
+            function ($tag) {
+                return !empty($tag) && $tag !== '@';
+            }
+        );
+
         $tags = array_map(
             function ($tag) {
                 return sprintf('<%s>', $tag);
             },
-            explode(self::DELIMITER, $allowedTags)
+            $tags
         );
 
         return implode($tags);
