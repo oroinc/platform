@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Security\Factory;
 
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 
 class OrganizationRememberMeFactory extends RememberMeFactory
 {
@@ -25,8 +25,14 @@ class OrganizationRememberMeFactory extends RememberMeFactory
             ->addArgument($id);
 
 
-        $templateId = 'oro_security.authentication.organization_rememberme.services.simplehash';
-        $rememberMeServicesId = $templateId . '.' . $id;
+        // remember me services
+        if (isset($config['token_provider'])) {
+            $templateId = 'security.authentication.rememberme.services.persistent';
+            $rememberMeServicesId = $templateId.'.'.$id;
+        } else {
+            $templateId = 'security.authentication.rememberme.services.simplehash';
+            $rememberMeServicesId = $templateId.'.'.$id;
+        }
 
         if ($container->hasDefinition('security.logout_listener.' . $id)) {
             $container
@@ -39,29 +45,19 @@ class OrganizationRememberMeFactory extends RememberMeFactory
         $rememberMeServices->replaceArgument(2, $id);
 
         if (isset($config['token_provider'])) {
-            $rememberMeServices->addMethodCall(
-                'setTokenProvider',
-                array(
-                    new Reference($config['token_provider'])
-                )
-            );
+            $rememberMeServices->addMethodCall('setTokenProvider', array(
+                new Reference($config['token_provider']),
+            ));
         }
 
         // remember-me options
         $rememberMeServices->replaceArgument(3, array_intersect_key($config, $this->options));
-
         // attach to remember-me aware listeners
-        $rememberMeServices->replaceArgument(
-            0,
-            $this->getUserProviders($container, $config, $id, $rememberMeServicesId)
-        );
+        $rememberMeServices->replaceArgument(0, $this->getUserProviders($container, $config, $id, $rememberMeServicesId));
 
         // remember-me listener
-        $listenerId = 'oro_security.authentication.listener.organization_rememberme.' . $id;
-        $listener = $container->setDefinition(
-            $listenerId,
-            new DefinitionDecorator('oro_security.authentication.listener.organization_rememberme')
-        );
+        $listenerId = 'security.authentication.listener.rememberme.'.$id;
+        $listener = $container->setDefinition($listenerId, new DefinitionDecorator('security.authentication.listener.rememberme'));
         $listener->replaceArgument(1, new Reference($rememberMeServicesId));
 
         return array($authProviderId, $listenerId, $defaultEntryPoint);
