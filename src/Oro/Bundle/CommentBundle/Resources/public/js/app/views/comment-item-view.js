@@ -45,7 +45,6 @@ define(function (require) {
         template: template,
         tagName: 'li',
         className: 'comment-item',
-        collapsed: true,
 
         events: {
             'click .item-remove-button': 'removeModel',
@@ -58,8 +57,11 @@ define(function (require) {
             'change:updatedAt model': 'render'
         },
 
+        accordionId: null,
+        collapsed: true,
+
         initialize: function (options) {
-            _.extend(this, _.pick(options || {}, ['accordionId']));
+            _.extend(this, _.pick(options || {}, ['accordionId', 'collapsed']));
             CommentItemView.__super__.initialize.apply(this, arguments);
         },
 
