@@ -3,33 +3,34 @@ define(function (require) {
     'use strict';
 
     var CommentModel,
+        Chaplin = require('chaplin'),
         routing = require('routing'),
         BaseModel = require('oroui/js/app/models/base/model');
 
     CommentModel = BaseModel.extend({
         route: 'oro_api_comment_get_item',
-        idAttribute: 'id',
 
-        /*defaults: {
+        defaults: {
             owner: '',
-            owner_id: '',
-
+            owner_id: null,
             editor: '',
-            editor_id: '',
-
-            organization: '',
-            data: '',
-            configuration: '',
-
+            editor_id: null,
+            message: '',
+            relationClass: null,
+            relationId: null,
             createdAt: '',
             updatedAt: '',
-
-            is_loaded: false,
-            contentHTML: '',
-
+            attachmentURL: null,
             editable: true,
             removable: true
-        },*/
+        },
+
+        initialize: function() {
+            CommentModel.__super__.initialize.apply(this, arguments);
+            this.on('request', this.beginSync);
+            this.on('sync', this.finishSync);
+            this.on('error', this.unsync);
+        },
 
         url: function () {
             var url, parameters;
@@ -45,6 +46,8 @@ define(function (require) {
             return url;
         }
     });
+
+    _.extend(CommentModel.prototype, Chaplin.SyncMachine);
 
     return CommentModel;
 });

@@ -1,0 +1,79 @@
+.comments-block {
+  padding: 5px 20px 0 0;
+  min-width: initial;
+  .comment-form {
+    .comment-text-field {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+  .comment-item {
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 57px;
+    position: relative;
+    &:last-child {
+      border-bottom: none;
+    }
+    .removeRow {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: -3px;
+    }
+    &:hover {
+      .removeRow {
+        display: block;
+      }
+    }
+  }
+  .comments-block-inner{
+    position: relative;
+    .loading-mask {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      .loading-wrapper {
+        height: 100% !important;
+      }
+      .loading-frame{
+        top: 50% !important;
+        left: 50% !important;
+        margin-top: -52px;
+        margin-left: -90px;
+      }
+    }
+  }
+  .short-comment {
+    padding-top: 2px;
+    padding-left: 20px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 22px;
+  }
+  .accordion-icon:before {
+    vertical-align: top;
+  }
+  .accordion-heading {
+    padding: 5px 10px 9px 10px;
+    display: block;
+    > div {
+      display: block;
+    }
+    &:hover {
+      background-color: transparent;
+    }
+  }
+  .accordion-body {
+    margin-top: -29px;
+  }
+  .accordion-inner {
+    border-top: none;
+    padding-top: 0;
+    padding-left: 30px;
+    background-color: #fff;
+  }
+}

@@ -152,9 +152,10 @@ define(function (require) {
          * @param {ActivityModel} model
          */
         initComments: function (model) {
-            var itemView, commentOptions, commentList;
+            var itemView, commentOptions, comments;
             itemView = this.listView.getItemView(model);
-            if (itemView.subview('comments')) {
+
+            if (itemView.hasCommentComponent()) {
                 // comments block already initialized
                 return;
             }
@@ -165,9 +166,9 @@ define(function (require) {
                 relatedEntityId: model.get('relatedActivityId'),
                 relatedEntityClassName: model.getRelatedActivityClass()
             });
-            commentList = new CommentComponent(commentOptions);
+            comments = new CommentComponent(commentOptions);
 
-            itemView.subview('comments', commentList);
+            itemView.setCommentComponent(comments);
         },
 
         /**

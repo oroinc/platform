@@ -7,7 +7,10 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
+        mediator = require('oroui/js/mediator'),
+        formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
         BaseView = require('oroui/js/app/views/base/view');
+    require('jquery.validate');
 
     function setValue($elem, value) {
         if ($elem.data('select2')) {
@@ -39,7 +42,12 @@ define(function (require) {
 
         render: function () {
             CommentFormView.__super__.render.call(this);
-            this.$('form').addClass(this.model ? 'edit-form' : 'add-form');
+            this.$('form')
+                .addClass(this.model ? 'edit-form' : 'add-form')
+                .validate({invalidHandler: function(event, validator) {
+                    _.delay(_.bind(validator.resetForm, validator), 3000);
+                }});
+            mediator.execute('layout:init', this.$('form'));
             if (this.model) {
                 this.bindData();
             }
@@ -58,16 +66,17 @@ define(function (require) {
         },
 
         onSubmit: function (e) {
-            var attrs;
+            var attrs, options;
             e.stopPropagation();
             e.preventDefault();
             attrs = tools.unpackFromQueryString(this.$('form').serialize());
+            options = formToAjaxOptions(this.$('form'));
             if (this.model) {
                 attrs.id = this.model.id;
             } else {
                 this._clearFrom();
             }
-            this.trigger('submit', attrs);
+            this.trigger('submit', attrs, options);
         },
 
         onReset: function (e) {

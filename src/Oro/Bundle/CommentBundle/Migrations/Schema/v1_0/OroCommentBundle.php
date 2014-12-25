@@ -5,15 +5,20 @@ namespace Oro\Bundle\CommentBundle\Migrations\Schema\v1_0;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
+use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtension;
 use Oro\Bundle\CommentBundle\Migration\Extension\CommentExtensionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroCommentBundle implements Migration, CommentExtensionAwareInterface
+class OroCommentBundle implements Migration, CommentExtensionAwareInterface, AttachmentExtensionAwareInterface
 {
     /** @var CommentExtension */
     protected $comment;
+
+    /** @var AttachmentExtension */
+    protected $attachmentExtension;
 
     /**
      * @param CommentExtension $commentExtension
@@ -26,12 +31,21 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface
     /**
      * {@inheritdoc}
      */
+    public function setAttachmentExtension(AttachmentExtension $attachmentExtension)
+    {
+        $this->attachmentExtension = $attachmentExtension;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function up(Schema $schema, QueryBag $queries)
     {
         self::createCommentTable($schema);
         self::addCommentToEmail($schema, $this->comment);
         self::addCommentToCalendarEvent($schema, $this->comment);
         self::addCommentToNote($schema, $this->comment);
+        #self::addAttachment($schema, $this->attachmentExtension);
     }
 
     /**
@@ -101,5 +115,18 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface
     public static function addCommentToNote(Schema $schema, CommentExtension $commentExtension)
     {
         $commentExtension->addCommentAssociation($schema, 'oro_note');
+    }
+
+    /**
+     * @param Schema              $schema
+     * @param AttachmentExtension $attachmentExtension
+     */
+    public static function addAttachment(Schema $schema, AttachmentExtension $attachmentExtension)
+    {
+        $attachmentExtension->addImageRelation(
+            $schema,
+            'oro_comment',
+            'attachment'
+        );
     }
 }

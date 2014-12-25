@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -64,13 +65,14 @@ class ActivityListChainProvider
     /**
      * Get array with all target classes (entities where activity can be assigned to)
      *
+     * @param bool $regenerateCaches
      * @return array
      */
-    public function getTargetEntityClasses()
+    public function getTargetEntityClasses($regenerateCaches = false)
     {
         if (empty($this->targetClasses)) {
             /** @var ConfigIdInterface[] $configIds */
-            $configIds = $this->configManager->getIds('entity');
+            $configIds = $this->configManager->getIds('entity', null, false, $regenerateCaches);
             foreach ($configIds as $configId) {
                 foreach ($this->providers as $provider) {
                     if ($provider->isApplicableTarget($configId, $this->configManager)
@@ -161,13 +163,19 @@ class ActivityListChainProvider
 
         $templates = [];
         foreach ($this->providers as $provider) {
+            $hasComment = false;
+
+            if ($provider instanceof CommentProviderInterface) {
+                $hasComment = $provider->hasComments($this->configManager, $provider->getActivityClass());
+            }
+
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
                 'template'     => $provider->getTemplate(),
                 'routes'       => $provider->getRoutes(),
-                'has_comments' => $provider->hasComments($this->configManager, $provider->getActivityClass()),
+                'has_comments' => $hasComment,
             ];
         }
 

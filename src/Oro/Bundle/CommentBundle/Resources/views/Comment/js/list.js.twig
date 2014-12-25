@@ -5,13 +5,22 @@
 
 {# comments list template #}
 <script type="text/html" id="{{ id|e('html_attr')|raw }}">
-    <div class="widget-content">
-        <fieldset class="form-horizontal form-horizontal-large">
-            <h5 class="user-fieldset">
-                <span>{{ 'oro.comment.plural_label'|trans }}</span>
-            </h5>
-        </fieldset>
-        <div class="form-container"></div>
-        <ul class="unstyled comments accordion" id="<%= accordionId %>"></ul>
-    </div>
+    <fieldset class="form-horizontal form-horizontal-large comments-block">
+        <h5 class="user-fieldset">
+            <span><%= _.__('oro.comment.entity_plural_label') %></span>
+        </h5>
+        <div class="comments-block-inner">
+            <div class="form-container"></div>
+            <div class="loading-mask">
+                <div class="loading-wrapper"></div>
+                <div class="loading-frame">
+                    <div class="box well">
+                        <div class="loading-content"><%= _.__('Loading...') %></div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid-toolbar"></div>
+            <ul class="unstyled accordion comments-list" id="<%= accordionId %>"></ul>
+        </div>
+    </fieldset>
 </script>

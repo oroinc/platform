@@ -5,6 +5,7 @@ namespace Oro\Bundle\CommentBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -42,8 +43,11 @@ class CommentTypeApi extends AbstractType
                         'class'       => 'comment-text-field',
                         'placeholder' => 'oro.comment.message.placeholder'
                     ],
+                    'constraints' => [ new NotBlank() ]
                 ]
-            );
+            )
+            #->add('attachment', 'oro_image', ['label' => 'oro.comment.attachment.label', 'required' => false])
+            ;
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventSubscriber(new CommentSubscriber());
