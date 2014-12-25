@@ -26,28 +26,34 @@ class FixCalendarsQuery extends ParametrizedMigrationQuery
         $this->logQuery($logger, $sql);
         $this->connection->executeQuery($sql);
 
-        // find and remove duplicated calendars
-        // as long as calendar events are also duplicated in all calendars there is no need to take care about them
+        // find duplicated calendars
         $sql = 'SELECT * FROM oro_calendar ORDER BY id';
         $this->logQuery($logger, $sql);
         $calendars = $this->connection->fetchAll($sql);
 
         $existingCalendars = [];
+        $calendarsForDeletion = [];
         foreach ($calendars as $calendar) {
-            // skip system calendars
+            // skip calendars with empty organization (organization was removed)
             if (!$calendar['organization_id']) {
                 continue;
             }
 
             $identifier = $calendar['user_owner_id'] . '_' . $calendar['organization_id'];
             if (in_array($identifier, $existingCalendars)) {
-                $sql = 'DELETE FROM oro_calendar WHERE id = ?';
-                $parameters = [$calendar['id']];
-                $this->logQuery($logger, $sql, $parameters);
-                $this->connection->executeQuery($sql, $parameters);
+                $calendarsForDeletion[] = $calendar['id'];
             } else {
                 $existingCalendars[] = $identifier;
             }
+        }
+
+        // remove calendars
+        // as long as calendar events are also duplicated in all calendars there is no need to take care about them
+        $batches = array_chunk($calendarsForDeletion, 5);
+        foreach ($batches as $batch) {
+            $sql = 'DELETE FROM oro_calendar WHERE id IN (' . implode(',', array_fill(0, count($batch), '?')) . ')';
+            $this->logQuery($logger, $sql, $batch);
+            $this->connection->executeQuery($sql, $batch);
         }
     }
 }
