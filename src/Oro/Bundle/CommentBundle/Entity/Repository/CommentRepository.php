@@ -26,13 +26,13 @@ class CommentRepository extends EntityRepository
      * @param string $fieldName
      * @param string $entityId
      *
-     * @return string
+     * @return QueryBuilder
      */
     public function getNumberOfComment($fieldName, $entityId)
     {
         $qb = $this->getBaseQueryBuilder($fieldName, $entityId);
         $qb->select($qb->expr()->count('c.id'));
 
-        return $qb->getQuery()->getSingleScalarResult();
+        return $qb;
     }
 }

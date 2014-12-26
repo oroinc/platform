@@ -21,6 +21,7 @@ use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class CommentApiManager extends ApiEntityManager
 {
@@ -44,6 +45,9 @@ class CommentApiManager extends ApiEntityManager
     /** @var AttachmentManager */
     protected $attachmentManager;
 
+    /** @var aclHelper */
+    protected $aclHelper;
+
     /**
      * @param Registry          $doctrine
      * @param SecurityFacade    $securityFacade
@@ -52,6 +56,7 @@ class CommentApiManager extends ApiEntityManager
      * @param UserConfigManager $config
      * @param EventDispatcher   $eventDispatcher
      * @param AttachmentManager $attachmentManager
+     * @param AclHelper         $aclHelper
      */
     public function __construct(
         Registry $doctrine,
@@ -60,7 +65,8 @@ class CommentApiManager extends ApiEntityManager
         Pager $pager,
         UserConfigManager $config,
         EventDispatcher $eventDispatcher,
-        AttachmentManager $attachmentManager
+        AttachmentManager $attachmentManager,
+        AclHelper $aclHelper
     ) {
         $this->em                = $doctrine->getManager();
         $this->securityFacade    = $securityFacade;
@@ -68,6 +74,7 @@ class CommentApiManager extends ApiEntityManager
         $this->pager             = $pager;
         $this->config            = $config;
         $this->attachmentManager = $attachmentManager;
+        $this->aclHelper         = $aclHelper;
 
         parent::__construct(Comment::ENTITY_NAME, $this->em);
 
@@ -105,7 +112,7 @@ class CommentApiManager extends ApiEntityManager
             $pager->setMaxPerPage(self::ITEMS_PER_PAGE);
             $pager->init();
 
-            $result['data']  = $this->getEntityViewModels($pager->getResults(), $entityClass, $entityId);
+            $result['data']  = $this->getEntityViewModels($pager->getAppliedResult(), $entityClass, $entityId);
             $result['count'] = $pager->getNbResults();
         }
 
@@ -126,10 +133,7 @@ class CommentApiManager extends ApiEntityManager
             $entityName = $this->convertRelationEntityClassName($entityClass);
             try {
                 if ($this->isCorrectClassName($entityName)) {
-                    /** @var CommentRepository $repository */
-                    $fieldName  = $this->getFieldName($entityName);
-                    $repository = $this->getRepository();
-                    $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+                    $result = $this->getBuildCommentCount($entityName, $entityId);
                 }
             } catch (\Exception $e) {
             }
@@ -165,8 +169,8 @@ class CommentApiManager extends ApiEntityManager
      */
     public function getEntityViewModel(Comment $entity, $entityClass = '', $entityId = '')
     {
-        $ownerName  = '';
-        $ownerId    = '';
+        $ownerName = '';
+        $ownerId   = '';
 
         if ($entity->getOwner()) {
             $ownerName = $this->nameFormatter->format($entity->getOwner());
@@ -320,9 +324,26 @@ class CommentApiManager extends ApiEntityManager
             $result = [
                 'attachmentURL'      => $this->getAttachmentURL($entity, $attachment),
                 'attachmentSize'     => $this->attachmentManager->getFileSize($attachment->getFileSize()),
-                'attachmentFileName' =>  $attachment->getOriginalFilename(),
+                'attachmentFileName' => $attachment->getOriginalFilename(),
             ];
         }
         return $result;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $entityId
+     *
+     * @return int important to return int
+     */
+    protected function getBuildCommentCount($entityName, $entityId)
+    {
+        /** @var CommentRepository $repository */
+        $fieldName  = $this->getFieldName($entityName);
+        $repository = $this->getRepository();
+        $qb         = $repository->getNumberOfComment($fieldName, $entityId);
+        $query      = $this->aclHelper->apply($qb);
+
+        return  (int) $query->getSingleScalarResult();
     }
 }
