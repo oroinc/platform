@@ -4,6 +4,7 @@ namespace Oro\Bundle\CommentBundle\Form\Type;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class CommentAssociationChoiceType extends AssociationChoiceType
 {
