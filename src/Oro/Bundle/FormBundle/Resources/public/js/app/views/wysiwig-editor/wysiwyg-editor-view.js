@@ -71,6 +71,7 @@ define(function (require) {
                         loadingMask.dispose();
                         self.tinymceInstance = editor;
                         self.renderCompleteDeffered.resolve();
+                        delete self.renderCompleteDeffered;
                     }
                 }, this.options));
                 this.tinymceConnected = true;
