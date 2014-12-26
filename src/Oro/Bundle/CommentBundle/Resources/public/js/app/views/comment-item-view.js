@@ -6,6 +6,7 @@ define(function (require) {
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
         moment = require('moment'),
         routing = require('routing'),
+        mediator = require('oroui/js/mediator'),
         BaseView = require('oroui/js/app/views/base/view'),
         template = require('text!../../../templates/comment/comment-item-view.html');
 
@@ -17,6 +18,7 @@ define(function (require) {
         events: {
             'click .item-remove-button': 'removeModel',
             'click .item-edit-button': 'editModel',
+            'click .item-remove-attachment': 'removeAttachment',
             'shown .accordion-body': 'onToggle',
             'hidden .accordion-body': 'onToggle'
         },
@@ -41,7 +43,7 @@ define(function (require) {
             data.hasActions = data.removable || data.editable;
             data.message = this.prepareMessage();
             data.shortMessage = this.prepareShortMessage();
-            data.isCollapsible = data.message !== data.shortMessage;
+            data.isCollapsible = data.message !== data.shortMessage || data.attachmentURL;
             data.collapsed = this.collapsed;
             if (data.createdAt) {
                 data.createdTime = dateTimeFormatter.formatDateTime(data.createdAt);
@@ -72,6 +74,15 @@ define(function (require) {
         removeModel: function (e) {
             e.stopPropagation();
             this.model.destroy();
+        },
+
+        removeAttachment: function(e) {
+            var itemView = this;
+            e.stopPropagation();
+            this.model.removeAttachment().then(function () {
+                itemView.$('.attachment-item').remove();
+                mediator.execute('showFlashMessage', 'success', __('oro.comment.attachment.delete_message'));
+            });
         },
 
         editModel: function (e) {
