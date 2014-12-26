@@ -33,7 +33,8 @@ define([
             contentHTML: '',
 
             editable: true,
-            removable: true
+            removable: true,
+            commentable: false
         },
 
         initialize: function () {

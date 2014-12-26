@@ -55,7 +55,7 @@ class CommentController extends RestController
      */
     public function cgetAction($relationClass, $relationId)
     {
-        $page = $this->getRequest()->get('page', 1);
+        $page   = $this->getRequest()->get('page', 1);
         $result = $this->getManager()->getCommentList($relationClass, $relationId, $page);
 
         return new JsonResponse($result);
