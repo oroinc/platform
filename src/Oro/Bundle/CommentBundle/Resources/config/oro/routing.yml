@@ -30,6 +30,12 @@ oro_api_comment_update_item:
     requirements:
          _method: POST
 
+oro_api_comment_remove_attachment_item:
+    pattern: api/rest/{version}/comment/{id}/removeAttachment.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:removeAttachment, _format: json, version: latest }
+    requirements:
+         _method: POST
+
 oro_api_comment_delete_item:
     pattern: api/rest/{version}/comment/{id}.{_format}
     defaults: { _controller: OroCommentBundle:Api/Rest/Comment:delete, _format: json, version: latest }

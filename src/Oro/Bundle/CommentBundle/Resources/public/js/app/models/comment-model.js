@@ -21,6 +21,8 @@ define(function (require) {
             createdAt: '',
             updatedAt: '',
             attachmentURL: null,
+            attachmentFileName: null,
+            attachmentSize: null,
             editable: true,
             removable: true
         },

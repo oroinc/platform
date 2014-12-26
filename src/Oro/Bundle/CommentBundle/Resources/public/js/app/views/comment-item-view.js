@@ -49,6 +49,7 @@ define(function (require) {
         events: {
             'click .item-remove-button': 'removeModel',
             'click .item-edit-button': 'editModel',
+            'click .item-remove-attachment': 'removeAttachment',
             'shown .accordion-body': 'onToggle',
             'hidden .accordion-body': 'onToggle'
         },
@@ -107,6 +108,23 @@ define(function (require) {
         removeModel: function (e) {
             e.stopPropagation();
             this.model.destroy();
+        },
+
+        removeAttachment: function(e) {
+            e.stopPropagation();
+            this.model.trigger('removeAttachment', this.model);
+            var model = this.model;
+            var url = routing.generate('oro_api_comment_remove_attachment_item', {id: this.model.get('id')});
+            $.ajax({
+                url: url,
+                type: 'POST',
+                success: function () {
+                    model.set('attachmentURL', '');
+                    model.set('updatedAt', new Date());
+                },
+                error: function (jqXHR) {
+                }
+            });
         },
 
         editModel: function (e) {

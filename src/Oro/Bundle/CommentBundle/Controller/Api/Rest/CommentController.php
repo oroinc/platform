@@ -146,6 +146,37 @@ class CommentController extends RestController
     }
 
     /**
+     * Remove Attachment
+     *
+     * @param int $id Comment item id
+     *
+     * @ApiDoc(
+     *      description="Remove Attachment",
+     *      resource=true
+     * )
+     * @AclAncestor("oro_comment_update")
+     *
+     * @return Response
+     */
+    public function removeAttachmentAction($id)
+    {
+        $entity = $this->getManager()->find($id);
+
+        if ($entity) {
+            $entity->setAttachment(null);
+            if ($this->processForm($entity)) {
+                $view = $this->view($this->getManager()->getEntityViewModel($entity), Codes::HTTP_OK);
+            } else {
+                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+            }
+        } else {
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
+        }
+
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
+    }
+
+    /**
      * Delete Comment
      *
      * @param int $id comment id
