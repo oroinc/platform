@@ -76,7 +76,7 @@ define(function (require) {
             data.hasActions = data.removable || data.editable;
             data.message = this.prepareMessage();
             data.shortMessage = this.prepareShortMessage();
-            data.isCollapsible = data.message !== data.shortMessage;
+            data.isCollapsible = data.message !== data.shortMessage || data.attachmentURL;
             data.collapsed = this.collapsed;
             if (data.createdAt) {
                 diff = timeDiff(data.createdAt);
