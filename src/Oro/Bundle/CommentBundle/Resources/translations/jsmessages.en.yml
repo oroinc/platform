@@ -17,10 +17,5 @@ oro:
                 cancel_comment:
                     label: Cancel
         item:
-            minutes_ago: '{0}now|{1}{{ number }} minute ago|[2,+Inf]{{ number }} minutes ago'
-            hours_ago: '{1}{{ number }} hour ago|[2,+Inf]{{ number }} hours ago'
-            days_ago: '{1}{{ number }} day ago|[2,+Inf]{{ number }} days ago'
-            months_ago: '{1}{{ number }} month ago|[2,+Inf]{{ number }} months ago'
-            years_ago: '{1}over {{ number }} year ago|[2,+Inf]over {{ number }} years ago'
-            added: '{{ user }} added {{ time }}'
-            update: 'last edited by {{ user }} {{ time }}'
+            added: '{{ user }} added at {{ time }}'
+            update: 'updated by {{ user }} at {{ time }}'

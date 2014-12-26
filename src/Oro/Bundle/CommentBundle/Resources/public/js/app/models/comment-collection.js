@@ -77,7 +77,8 @@ define(function (require) {
             this.finishSync();
             if (jqxhr.status === 403) {
                 mediator.execute('showMessage', 'error', __('oro.ui.forbidden_error'));
-            } else {
+            } else if (jqxhr.status !== 400) {
+                // 400 response is handled by form view
                 mediator.execute('showMessage', 'error', __('oro.ui.unexpected_error'));
             }
         },
