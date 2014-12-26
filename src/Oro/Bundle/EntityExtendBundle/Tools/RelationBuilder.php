@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class RelationBuilder
 {
@@ -43,13 +44,13 @@ class RelationBuilder
         array $targetDetailedFieldNames,
         array $targetGridFieldNames,
         $options = [],
-        $fieldType = 'manyToMany'
+        $fieldType = RelationType::MANY_TO_MANY
     ) {
         $sourceEntityName = $sourceEntityConfig->getId()->getClassName();
         $relationKey      = ExtendHelper::buildRelationKey(
             $sourceEntityName,
             $relationName,
-            'manyToMany',
+            RelationType::MANY_TO_MANY,
             $targetEntityName
         );
 
@@ -74,9 +75,11 @@ class RelationBuilder
         // add relation to config
         $relations = $sourceEntityConfig->get('relation', false, []);
         if (!isset($relations[$relationKey])) {
+            $fieldId = new FieldConfigId('extend', $sourceEntityName, $relationName, RelationType::MANY_TO_MANY);
+
             $relations[$relationKey] = [
                 'assign'          => false,
-                'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToMany'),
+                'field_id'        => $fieldId,
                 'owner'           => true,
                 'target_entity'   => $targetEntityName,
                 'target_field_id' => false,
@@ -112,13 +115,13 @@ class RelationBuilder
         $relationName,
         $targetFieldName,
         $options = [],
-        $fieldType = 'manyToOne'
+        $fieldType = RelationType::MANY_TO_ONE
     ) {
         $sourceEntityName = $sourceEntityConfig->getId()->getClassName();
         $relationKey      = ExtendHelper::buildRelationKey(
             $sourceEntityName,
             $relationName,
-            'manyToOne',
+            RelationType::MANY_TO_ONE,
             $targetEntityName
         );
 
@@ -141,9 +144,11 @@ class RelationBuilder
         // add relation to config
         $relations = $sourceEntityConfig->get('relation', false, []);
         if (!isset($relations[$relationKey])) {
+            $fieldId = new FieldConfigId('extend', $sourceEntityName, $relationName, RelationType::MANY_TO_ONE);
+
             $relations[$relationKey] = [
                 'assign'          => false,
-                'field_id'        => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne'),
+                'field_id'        => $fieldId,
                 'owner'           => true,
                 'target_entity'   => $targetEntityName,
                 'target_field_id' => false
@@ -176,13 +181,16 @@ class RelationBuilder
         $extendConfig         = $extendConfigProvider->getConfig($targetEntityName);
 
         // add relation to config
-        $relations               = $extendConfig->get('relation', false, []);
+        $relations = $extendConfig->get('relation', false, []);
+
+        $targetFieldId = new FieldConfigId('extend', $sourceEntityName, $relationName, RelationType::MANY_TO_ONE);
+
         $relations[$relationKey] = [
             'assign'          => false,
             'field_id'        => false,
             'owner'           => false,
             'target_entity'   => $sourceEntityName,
-            'target_field_id' => new FieldConfigId('extend', $sourceEntityName, $relationName, 'manyToOne')
+            'target_field_id' => $targetFieldId
         ];
         $extendConfig->set('relation', $relations);
 

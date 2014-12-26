@@ -17,6 +17,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
@@ -127,7 +128,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
             $view->children[$fieldName]->vars['extra_field'] = true;
 
-            if (!in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToMany'])) {
+            if (!in_array($fieldConfigId->getFieldType(), RelationType::$toManyRelations)) {
                 continue;
             }
 
@@ -207,7 +208,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
             !$extendConfig->is('is_deleted')
             && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
             && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-            && !in_array($extendConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
+            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations)
             && (
                 !$extendConfig->has('target_entity')
                 || !$extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')

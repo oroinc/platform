@@ -34,28 +34,10 @@ class AbstractConfigVirtualProvider
     }
 
     /**
-     * Ensure virtual items are initialized
+     * Ensure virtual items are initialized.
      *
-     * e.g. OroSomeBundle:SomeEntity extends OroAddressBundle:AbstractAddress
-     * and AbstractAddress has configured virtual item
-     *
-     * virtual_fields:
-     *   Oro\Bundle\AddressBundle\Entity\AbstractAddress:
-     *     country_virtual_field:
-     *       query:
-     *         select:
-     *           expr: country.name
-     *           return_type: string
-     *         join:
-     *           left:
-     *             - { join: entity.country, alias: country }
-     *
-     * So, result for OroSomeBundle:SomeEntity will be:
-     * OroSomeBundle:SomeEntity:
-     *      ...
-     *      own virtual fields
-     *      ...
-     *      country_virtual_field
+     * When OroSomeBundle:SomeEntity extends OroAddressBundle:AbstractAddress and AbstractAddress has configured
+     * virtual item all AbstractAddress virtual fields will be available in scope of OroSomeBundle:SomeEntity
      */
     protected function ensureVirtualFieldsInitialized()
     {

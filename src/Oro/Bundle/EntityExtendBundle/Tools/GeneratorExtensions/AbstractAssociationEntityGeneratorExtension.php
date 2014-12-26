@@ -7,6 +7,7 @@ use Doctrine\Common\Util\Inflector;
 use CG\Generator\PhpClass;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -59,7 +60,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
      */
     protected function getAssociationType()
     {
-        return 'manyToOne';
+        return RelationType::MANY_TO_ONE;
     }
 
     /**
@@ -90,10 +91,10 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
     protected function generateAssociationMethods(array $schema, PhpClass $class)
     {
         switch ($this->getAssociationType()) {
-            case 'manyToOne':
+            case RelationType::MANY_TO_ONE:
                 $this->generateManyToOneAssociationMethods($schema, $class);
                 break;
-            case 'manyToMany':
+            case RelationType::MANY_TO_MANY:
                 $this->generateManyToManyAssociationMethods($schema, $class);
                 break;
             default:

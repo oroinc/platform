@@ -276,7 +276,7 @@ oro_entity_config:
                 #
                 relation:
                     options:
-                        allowed_type:       [oneToMany, manyToOne, manyToMany]
+                        allowed_type:       [oneToOne, oneToMany, manyToOne, manyToMany]
                         auditable:          false
                         required_property:
                             config_id:
