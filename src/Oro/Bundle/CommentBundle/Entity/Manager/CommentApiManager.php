@@ -20,6 +20,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 
 class CommentApiManager extends ApiEntityManager
 {
@@ -164,8 +165,8 @@ class CommentApiManager extends ApiEntityManager
      */
     public function getEntityViewModel(Comment $entity, $entityClass = '', $entityId = '')
     {
-        $ownerName = '';
-        $ownerId   = '';
+        $ownerName  = '';
+        $ownerId    = '';
 
         if ($entity->getOwner()) {
             $ownerName = $this->nameFormatter->format($entity->getOwner());
@@ -187,7 +188,6 @@ class CommentApiManager extends ApiEntityManager
             'editor'        => $editorName,
             'editor_id'     => $editorId,
             'message'       => $entity->getMessage(),
-            'attachmentURL' => $this->getAttachmentURL($entity),
             'relationClass' => $entityClass,
             'relationId'    => $entityId,
             'createdAt'     => $entity->getCreatedAt()->format('c'),
@@ -195,6 +195,7 @@ class CommentApiManager extends ApiEntityManager
             'editable'      => $this->securityFacade->isGranted('EDIT', $entity),
             'removable'     => $this->securityFacade->isGranted('DELETE', $entity),
         ];
+        $result = array_merge($result, $this->getAttachmentInfo($entity));
 
         return $result;
     }
@@ -205,22 +206,6 @@ class CommentApiManager extends ApiEntityManager
     public function isCommentable()
     {
         return $this->securityFacade->isGranted('oro_comment_view');
-    }
-
-    /**
-     * @param Comment $entity
-     *
-     * @return string|null
-     */
-    protected function getAttachmentURL($entity)
-    {
-        $accessor   = PropertyAccess::createPropertyAccessor();
-        $attachment = $accessor->getValue($entity, 'attachment');
-        if (!$attachment) {
-            return null;
-        }
-
-        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download', true);
     }
 
     /**
@@ -296,5 +281,48 @@ class CommentApiManager extends ApiEntityManager
         }
 
         return true;
+    }
+
+    /**
+     * @param Comment $entity
+     * @param File    $attachment
+     *
+     * @return string
+     */
+    protected function getAttachmentURL($entity, $attachment)
+    {
+        return $this->attachmentManager->getFileUrl($entity, 'attachment', $attachment, 'download', true);
+    }
+
+    /**
+     * @param $entity
+     *
+     * @return File
+     */
+    protected function getAttachment($entity)
+    {
+        $accessor   = PropertyAccess::createPropertyAccessor();
+        $attachment = $accessor->getValue($entity, 'attachment');
+
+        return $attachment;
+    }
+
+    /**
+     * @param Comment $entity
+     *
+     * @return array
+     */
+    protected function getAttachmentInfo(Comment $entity)
+    {
+        $result     = [];
+        $attachment = $this->getAttachment($entity);
+        if ($attachment) {
+            $result = [
+                'attachmentURL'      => $this->getAttachmentURL($entity, $attachment),
+                'attachmentSize'     => $attachment->getFileSize(),
+                'attachmentFileName' => $attachment->getFilename(),
+            ];
+        }
+        return $result;
     }
 }

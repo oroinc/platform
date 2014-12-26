@@ -18,34 +18,40 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->filter = new CommentPlaceholderFilter($this->configManager);
+        $this->filter        = new CommentPlaceholderFilter($this->configManager);
     }
 
     /**
      * @param mixed $entity
-     * @param int $callsCount
-     * @param bool $isApplicable
-     * @param bool $expected
+     * @param int   $callsCount
+     * @param int   $callsProviderCount
+     * @param bool  $isApplicable
+     * @param bool  $expected
+     *
      * @dataProvider commentProvider
      */
-    public function testIsApplicable($entity, $callsCount, $isApplicable, $expected)
+    public function testIsApplicable($entity, $callsCount, $callsProviderCount, $isApplicable, $expected)
     {
-        $config =  $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
-        $config->expects($this->exactly($callsCount))
+        $config->expects($this->exactly($callsProviderCount))
             ->method('is')
-            ->with('enabled')
             ->will($this->returnValue($isApplicable));
+
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $provider->expects($this->exactly($callsCount))
+        $provider->expects($this->exactly($callsProviderCount))
             ->method('getConfig')
             ->will($this->returnValue($config));
-        $this->configManager->expects($this->exactly($callsCount))
+
+        $this->configManager->expects($this->exactly($callsProviderCount))
             ->method('getProvider')
             ->will($this->returnValue($provider));
+        $this->configManager->expects($this->exactly($callsCount))
+            ->method('hasConfig')
+            ->will($this->returnValue(true));
 
         $this->assertEquals($expected, $this->filter->isApplicable($entity));
     }
@@ -57,10 +63,10 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new ItemStub();
         return [
-            'is null' => [null, 0, false, false],
-            'is null with enabled on' => [null, 0, true, false],
-            'applicable entity' => [$entity, 1, true, true],
-            'not applicable entity' => [$entity, 1, false, false],
+            'is null'                 => [null, 0, 0, false, false],
+            'is null with enabled on' => [null, 0, 0, true, false],
+            'applicable entity'       => [$entity, 1, 2, true, true],
+            'not applicable entity'   => [$entity, 1, 1, false, false],
         ];
     }
 }
