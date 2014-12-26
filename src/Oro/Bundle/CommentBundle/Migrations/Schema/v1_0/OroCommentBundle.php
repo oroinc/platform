@@ -60,7 +60,7 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
         $table->addColumn('owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('updated_by_id', 'integer', ['notnull' => false]);
         $table->addColumn('message', 'text');
-        $table->addColumn('organization_id', 'integer', ['notnull' => true]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('createdAt', 'datetime', []);
         $table->addColumn('updatedAt', 'datetime', []);
 
@@ -85,7 +85,7 @@ class OroCommentBundle implements Migration, CommentExtensionAwareInterface, Att
             $schema->getTable('oro_organization'),
             ['organization_id'],
             ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
         );
     }
 
