@@ -28,7 +28,18 @@ class FieldTypeHelper
      */
     public static function isRelation($type)
     {
-        return in_array($type, ['ref-one', 'ref-many', 'oneToMany', 'manyToOne', 'manyToMany', 'optionSet']);
+        return in_array(
+            $type,
+            [
+                RelationType::TO_ONE,
+                RelationType::TO_MANY,
+                RelationType::ONE_TO_ONE,
+                RelationType::ONE_TO_MANY,
+                RelationType::MANY_TO_ONE,
+                RelationType::MANY_TO_MANY,
+                'optionSet'
+            ]
+        );
     }
 
     /**

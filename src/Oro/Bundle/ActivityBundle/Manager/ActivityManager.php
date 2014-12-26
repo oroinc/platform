@@ -10,6 +10,7 @@ use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ActivityManager
@@ -356,7 +357,7 @@ class ActivityManager
         $relationKey  = ExtendHelper::buildRelationKey(
             $activityClassName,
             ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND),
-            'manyToMany',
+            RelationType::MANY_TO_MANY,
             $entityClass
         );
 

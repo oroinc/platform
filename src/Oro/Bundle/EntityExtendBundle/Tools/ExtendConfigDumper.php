@@ -11,6 +11,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -210,9 +211,9 @@ class ExtendConfigDumper
             $fieldType     = $fieldConfigId->getFieldType();
 
             $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-            if (in_array($underlyingFieldType, ['oneToMany', 'manyToOne', 'manyToMany', 'optionSet'])) {
+            if (in_array($underlyingFieldType, array_merge(RelationType::$anyToAnyRelations, ['optionSet']))) {
                 $relationProperties[$fieldName] = $fieldName;
-                if ($underlyingFieldType != 'manyToOne' && !$fieldConfig->is('without_default')) {
+                if ($underlyingFieldType !== RelationType::MANY_TO_ONE && !$fieldConfig->is('without_default')) {
                     $defaultName = self::DEFAULT_PREFIX . $fieldName;
 
                     $defaultProperties[$defaultName] = $defaultName;
@@ -305,7 +306,7 @@ class ExtendConfigDumper
             }
 
             $relation['assign'] = true;
-            if ($relation['field_id']->getFieldType() != 'manyToOne') {
+            if ($relation['field_id']->getFieldType() !== RelationType::MANY_TO_ONE) {
                 $fieldName = $relation['field_id']->getFieldName();
 
                 $addRemoveMethods[$fieldName]['self'] = $fieldName;
@@ -313,7 +314,7 @@ class ExtendConfigDumper
                     $addRemoveMethods[$fieldName]['target']              =
                         $relation['target_field_id']->getFieldName();
                     $addRemoveMethods[$fieldName]['is_target_addremove'] =
-                        $relation['field_id']->getFieldType() === 'manyToMany';
+                        $relation['field_id']->getFieldType() === RelationType::MANY_TO_MANY;
                 }
             }
 

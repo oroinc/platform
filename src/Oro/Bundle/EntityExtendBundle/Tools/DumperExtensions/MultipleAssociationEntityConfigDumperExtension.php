@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 abstract class MultipleAssociationEntityConfigDumperExtension extends AbstractAssociationEntityConfigDumperExtension
 {
@@ -11,7 +12,7 @@ abstract class MultipleAssociationEntityConfigDumperExtension extends AbstractAs
      */
     protected function getAssociationType()
     {
-        return 'manyToMany';
+        return RelationType::MANY_TO_MANY;
     }
 
     /**

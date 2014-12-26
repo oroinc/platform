@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -116,7 +117,7 @@ class RenameExtendTablesAndColumns implements
                 /** @var FieldConfigId[] $fieldConfigIds */
                 $fieldConfigIds = $configManager->getIds('extend', $entityConfigId->getClassName());
                 foreach ($fieldConfigIds as $fieldConfigId) {
-                    if ($fieldConfigId->getFieldType() === 'manyToMany') {
+                    if ($fieldConfigId->getFieldType() === RelationType::MANY_TO_MANY) {
                         $fieldConfig = $configManager->getConfig($fieldConfigId);
                         $targetClassName = $fieldConfig->get('target_entity');
                         $oldTableName = $this->generateOldManyToManyJoinTableName(
@@ -188,7 +189,7 @@ class RenameExtendTablesAndColumns implements
         EntityMetadataHelper $entityMetadataHelper
     ) {
         switch ($fieldConfigId->getFieldType()) {
-            case 'manyToOne':
+            case RelationType::MANY_TO_ONE:
                 $this->renameManyToOneExtendField(
                     $schema,
                     $queries,
@@ -196,7 +197,7 @@ class RenameExtendTablesAndColumns implements
                     $fieldConfigId->getFieldName()
                 );
                 break;
-            case 'oneToMany':
+            case RelationType::ONE_TO_MANY:
                 $config = $configManager->getConfig($fieldConfigId);
                 $targetEntityClassName = $config->get('target_entity');
                 $this->renameOneToManyExtendField(
@@ -208,7 +209,7 @@ class RenameExtendTablesAndColumns implements
                     $entityMetadataHelper
                 );
                 break;
-            case 'manyToMany':
+            case RelationType::MANY_TO_MANY:
             case 'optionSet':
                 break;
             default:
