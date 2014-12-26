@@ -7,6 +7,13 @@
         </label>
         <div class="pull-left">
             {{ form_widget(form.attachment) }}
+            <% if (attachmentURL) { %>
+            <div class="attachment-item">
+                <i class="icon-paper-clip"></i>
+                <a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %></a> (<%= attachmentSize %>)
+                <button class="btn btn-link icon-trash item-remove-attachment" type="button"></button>
+            </div>
+            <% } %>
         </div>
         <div class="pull-right">
             <button class="btn add-comment-button" type="submit">

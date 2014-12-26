@@ -204,6 +204,20 @@ class AttachmentManager
     }
 
     /**
+     * Get human readable file size
+     *
+     * @param integer $bytes
+     * @return string
+     */
+    public function getFileSize($bytes)
+    {
+        $sz = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        $factor = floor((strlen($bytes) - 1) / 3);
+
+        return isset($sz[$factor]) ? sprintf("%.2f", $bytes / pow(1000, $factor)) . ' ' . $sz[(int)$factor] : $bytes;
+    }
+
+    /**
      * Get attachment url
      *
      * @param string $parentClass

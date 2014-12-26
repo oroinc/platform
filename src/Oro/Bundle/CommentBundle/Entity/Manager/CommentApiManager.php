@@ -319,8 +319,8 @@ class CommentApiManager extends ApiEntityManager
         if ($attachment) {
             $result = [
                 'attachmentURL'      => $this->getAttachmentURL($entity, $attachment),
-                'attachmentSize'     => $attachment->getFileSize(),
-                'attachmentFileName' => $attachment->getFilename(),
+                'attachmentSize'     => $this->attachmentManager->getFileSize($attachment->getFileSize()),
+                'attachmentFileName' =>  $attachment->getOriginalFilename(),
             ];
         }
         return $result;
