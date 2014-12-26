@@ -121,6 +121,20 @@
 {% endmacro %}
 
 {#
+    Render html property block. HTML rendering may be switched off with system config.
+    Parameters:
+        title - property title
+        data  - property data
+#}
+{% macro renderSwitchableHtmlProperty(title, data) %}
+    {% if not oro_config_value('oro_form.wysiwyg_enabled') %}
+        {% set data = data|striptags('<a>')|raw|nl2br %}
+    {% endif %}
+
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+{% endmacro %}
+
+{#
     Render color property block
     Parameters:
         title - property title
