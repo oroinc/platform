@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityBundle;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\ExclusionProviderPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass;
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
-use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\ExclusionProviderPass;
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineSqlFiltersConfigurationPass;
 
 class OroEntityBundle extends Bundle
 {
