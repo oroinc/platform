@@ -11,18 +11,11 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
     {
         $this->ensureVirtualFieldsInitialized();
 
-        $relations = array_filter(
-            $this->items,
-            function($item) use ($className, $fieldName) {
-                if (empty($item[$fieldName])) {
-                    return false;
-                }
+        if (empty($this->items[$className])) {
+            return [];
+        }
 
-                return $item['related_entity_name'] === $className;
-            }
-        );
-
-        return !empty($relations);
+        return isset($this->items[$className][$fieldName]);
     }
 
     /**

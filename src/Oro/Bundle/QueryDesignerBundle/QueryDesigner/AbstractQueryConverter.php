@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Doctrine\ORM\Query\Expr\Join;
+
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
@@ -288,9 +290,14 @@ abstract class AbstractQueryConverter
      *
      * @param array $tableAliases
      */
-    protected function saveTableAliases($tableAliases)
-    {
-    }
+    abstract protected function saveTableAliases($tableAliases);
+
+    /**
+     * Stores all column aliases in the query
+     *
+     * @param array $columnAliases
+     */
+    abstract protected function saveColumnAliases($columnAliases);
 
     /**
      * Prepares aliases for columns should be returned by a query
@@ -300,15 +307,6 @@ abstract class AbstractQueryConverter
         foreach ($this->definition['columns'] as $column) {
             $this->columnAliases[$this->buildColumnAliasKey($column)] = $this->generateColumnAlias();
         }
-    }
-
-    /**
-     * Stores all column aliases in the query
-     *
-     * @param array $columnAliases
-     */
-    protected function saveColumnAliases($columnAliases)
-    {
     }
 
     /**
@@ -405,7 +403,7 @@ abstract class AbstractQueryConverter
                         $this->getJoinType($joinId),
                         $entityClassName,
                         $joinAlias,
-                        $this->getUnidirectionalJoinConditionType($joinId),
+                        Join::WITH,
                         $this->getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias)
                     );
                 } elseif ($this->joinIdHelper->isUnidirectionalJoinWithCondition($joinId)) {
@@ -697,6 +695,9 @@ abstract class AbstractQueryConverter
         $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
         $this->addTableAliasesForVirtualItem($columnName, $query);
 
+        if (empty($query['select'])) {
+            return;
+        }
         $key = sprintf('%s::%s', $className, $fieldName);
         if (!isset($this->virtualColumnOptions[$key])) {
             $options = $query['select'];
@@ -714,8 +715,8 @@ abstract class AbstractQueryConverter
             return;
         }
 
-        $className = $this->getEntityClassName($columnName);
-        $fieldName = $this->getFieldName($columnName);
+        $className = $this->getRootEntity();
+        $fieldName = $this->getParentJoinIdentifier($columnName);
         if (!$this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
             // non virtual column
             return;
@@ -724,6 +725,9 @@ abstract class AbstractQueryConverter
         $query = $this->virtualRelationProvider->getVirtualRelationQuery($className, $fieldName);
         $this->addTableAliasesForVirtualItem($columnName, $query);
 
+        if (empty($query['select'])) {
+            return;
+        }
         $key = sprintf('%s::%s', $className, $fieldName);
         if (!isset($this->virtualColumnOptions[$key])) {
             $options = $query['select'];
@@ -767,10 +771,13 @@ abstract class AbstractQueryConverter
             }
         }
 
-        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect(
-            $query['select']['expr'],
-            $aliases
-        );
+        if (empty($query['select']['expr'])) {
+            $expr = sprintf('%s.%s', $this->getTableAliasForColumn($columnName), $this->getFieldName($columnName));
+        } else {
+            $expr = $query['select']['expr'];
+        }
+
+        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect($expr, $aliases);
         $this->virtualColumnExpressions[$columnName] = $columnExpr;
     }
 
@@ -1116,6 +1123,26 @@ abstract class AbstractQueryConverter
      */
     protected function getJoinType($joinId)
     {
+        $fieldName = $this->getFieldName($joinId);
+        $className = $this->getEntityClassName($joinId);
+        if ($className && $fieldName && $this->virtualFieldProvider
+            && $this->virtualFieldProvider->isVirtualField($className, $fieldName)
+        ) {
+            $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+
+            return $query['select']['return_type'];
+        }
+
+        if ($className && $fieldName && $this->virtualRelationProvider
+            && $this->virtualRelationProvider->isVirtualRelation($this->getRootEntity(), $fieldName)
+        ) {
+            $relations = $this->virtualRelationProvider->getVirtualRelations($this->getRootEntity());
+
+            if (!empty($relations[$fieldName])) {
+                return $relations[$fieldName]['relation_type'];
+            }
+        }
+
         return $this->joinIdHelper->getJoinType($joinId);
     }
 
@@ -1129,18 +1156,6 @@ abstract class AbstractQueryConverter
     protected function getJoinConditionType($joinId)
     {
         return $this->joinIdHelper->getJoinConditionType($joinId);
-    }
-
-    /**
-     * Gets the join condition type for the given join identifier
-     *
-     * @param string $joinId
-     *
-     * @return string
-     */
-    protected function getUnidirectionalJoinConditionType($joinId)
-    {
-        return 'WITH';
     }
 
     /**
