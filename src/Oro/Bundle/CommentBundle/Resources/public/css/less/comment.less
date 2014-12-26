@@ -5,6 +5,9 @@
       width: 100%;
       box-sizing: border-box;
     }
+    .attachment-item {
+      margin-top: 5px;
+    }
   }
   .comment-item {
     border-bottom: 1px solid #f0f0f0;
@@ -69,5 +72,16 @@
     padding-top: 0;
     padding-left: 30px;
     background-color: #fff;
+  }
+  .attachment-icon.accordion-toggle {
+    display: none;
+    &.collapsed {
+      display: inline-block;
+    }
+  }
+  .attachment-item {
+    .item-remove-attachment {
+      text-decoration: none;
+    }
   }
 }

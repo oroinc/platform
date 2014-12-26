@@ -76,10 +76,10 @@ define(function (require) {
         onErrorResponse: function (collection, jqxhr, options) {
             this.finishSync();
             if (jqxhr.status === 403) {
-                mediator.execute('showMessage', 'error', __('oro.ui.forbidden_error'));
+                mediator.execute('showFlashMessage', 'error', __('oro.ui.forbidden_error'));
             } else if (jqxhr.status !== 400) {
                 // 400 response is handled by form view
-                mediator.execute('showMessage', 'error', __('oro.ui.unexpected_error'));
+                mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
             }
         },
 

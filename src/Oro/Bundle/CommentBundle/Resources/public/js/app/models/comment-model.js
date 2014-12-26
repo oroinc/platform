@@ -9,6 +9,7 @@ define(function (require) {
 
     CommentModel = BaseModel.extend({
         route: 'oro_api_comment_get_item',
+        routeRemoveAttachment: 'oro_api_comment_remove_attachment_item',
 
         defaults: {
             owner: '',
@@ -21,6 +22,8 @@ define(function (require) {
             createdAt: '',
             updatedAt: '',
             attachmentURL: null,
+            attachmentFileName: null,
+            attachmentSize: null,
             editable: true,
             removable: true
         },
@@ -44,6 +47,23 @@ define(function (require) {
                 url = CommentModel.__super__.url.call(this);
             }
             return url;
+        },
+
+        removeAttachment: function() {
+            var model = this,
+                url = routing.generate(this.routeRemoveAttachment, {id: model.id});
+            return $.ajax({
+                url: url,
+                type: 'POST',
+                success: function () {
+                    model.set('attachmentURL', null);
+                    model.set('attachmentFileName', null);
+                    model.set('attachmentSize', null);
+                },
+                error: function (jqxhr) {
+                    model.trigger('error', model, jqxhr);
+                }
+            });
         }
     });
 

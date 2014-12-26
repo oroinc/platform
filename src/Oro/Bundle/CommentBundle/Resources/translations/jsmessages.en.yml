@@ -16,6 +16,9 @@ oro:
                     label: Save Comment
                 cancel_comment:
                     label: Cancel
+        attachment:
+            tooltip: Attached file {{ filename }}
+            delete_message: The comment attachment is successfully removed
         item:
             added: '{{ user }} added at {{ time }}'
             update: 'updated by {{ user }} at {{ time }}'
