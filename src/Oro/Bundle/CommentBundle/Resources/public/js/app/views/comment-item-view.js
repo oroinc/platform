@@ -7,6 +7,7 @@ define(function (require) {
         moment = require('moment'),
         routing = require('routing'),
         mediator = require('oroui/js/mediator'),
+        __ = require('orotranslation/js/translator'),
         BaseView = require('oroui/js/app/views/base/view'),
         template = require('text!../../../templates/comment/comment-item-view.html');
 
