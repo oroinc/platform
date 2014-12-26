@@ -60,9 +60,6 @@ class EntityFieldProvider
     /** @var array */
     protected $hiddenFields;
 
-    /** @var EntityManager[] */
-    protected $managers = [];
-
     /**
      * Constructor
      *
@@ -133,14 +130,13 @@ class EntityFieldProvider
     /**
      * Returns fields for the given entity
      *
-     * @param string $entityName           Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations        Indicates whether association fields should be returned as well.
-     * @param bool   $withVirtualFields    Indicates whether virtual fields should be returned as well.
-     * @param bool   $withEntityDetails    Indicates whether details of related entity should be returned as well.
-     * @param bool   $withUnidirectional   Indicates whether Unidirectional association fields should be returned.
-     * @param bool   $applyExclusions      Indicates whether exclusion logic should be applied.
-     * @param bool   $translate            Flag means that label, plural label should be translated
-     * @param bool   $withVirtualRelations Indicates whether virtual relations should be returned as well.
+     * @param string $entityName         Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations      Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields  Indicates whether virtual fields should be returned as well.
+     * @param bool   $withEntityDetails  Indicates whether details of related entity should be returned as well.
+     * @param bool   $withUnidirectional Indicates whether Unidirectional association fields should be returned.
+     * @param bool   $applyExclusions    Indicates whether exclusion logic should be applied.
+     * @param bool   $translate          Flag means that label, plural label should be translated
      *
      * @return array of fields sorted by field label (relations follows fields)
      *                                   .       'name'          - field name
@@ -167,8 +163,7 @@ class EntityFieldProvider
         $withEntityDetails = false,
         $withUnidirectional = false,
         $applyExclusions = true,
-        $translate = true,
-        $withVirtualRelations = false
+        $translate = true
     ) {
         $className = $this->entityClassResolver->getEntityClass($entityName);
         if (!$this->entityConfigProvider->hasConfig($className)) {
@@ -187,7 +182,7 @@ class EntityFieldProvider
         if ($withRelations) {
             $this->addRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
 
-            if ($withVirtualRelations) {
+            if ($withVirtualFields) {
                 $this->addVirtualRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
             }
 
@@ -462,7 +457,7 @@ class EntityFieldProvider
             $metadata         = $this->getMetadataFor($relatedClassName);
             $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
-            if (!$this->entityConfigProvider->hasConfig($className, $fieldName)) {
+            if (!$this->entityConfigProvider->hasConfig($relatedClassName, $fieldName)) {
                 // skip non configurable relation
                 continue;
             }
@@ -648,18 +643,12 @@ class EntityFieldProvider
      */
     protected function getManagerForClass($className)
     {
-        if (!empty($this->managers[$className])) {
-            return $this->managers[$className];
-        }
-
         $manager = null;
         try {
             $manager = $this->doctrine->getManagerForClass($className);
         } catch (\ReflectionException $ex) {
             throw new InvalidEntityException(sprintf('The "%s" entity was not found.', $className));
         }
-
-        $this->managers[$className] = $manager;
 
         return $manager;
     }

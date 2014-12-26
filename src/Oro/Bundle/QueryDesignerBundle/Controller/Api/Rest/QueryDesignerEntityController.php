@@ -34,15 +34,6 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
      *      description="Indicates whether association fields should be returned as well."
      * )
      *
-     * @QueryParam(
-     *      name="with-virtual-relations",
-     *      requirements="(1)|(0)",
-     *      nullable=true,
-     *      strict=true,
-     *      default="1",
-     *      description="Indicates whether virtual relations should be returned as well."
-     * )
-     *
      * @ApiDoc(
      *      description="Get entities with fields",
      *      resource=true
@@ -55,14 +46,10 @@ class QueryDesignerEntityController extends FOSRestController implements ClassRe
         /** @var EntityWithFieldsProvider $provider */
         $provider = $this->get('oro_query_designer.entity_field_list_provider');
         $withRelations = filter_var($this->getRequest()->get('with-relations', true), FILTER_VALIDATE_BOOLEAN);
-        $withVirtualRelations = filter_var(
-            $this->getRequest()->get('with-virtual-relations', true),
-            FILTER_VALIDATE_BOOLEAN
-        );
         $statusCode = Codes::HTTP_OK;
 
         try {
-            $result = $provider->getFields(true, true, $withRelations, true, true, $withVirtualRelations);
+            $result = $provider->getFields(true, true, $withRelations);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
             $result = ['message' => $ex->getMessage()];

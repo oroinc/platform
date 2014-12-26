@@ -52,7 +52,6 @@ class FieldHelper
      * @param bool   $withUnidirectional
      * @param bool   $applyExclusions
      * @param bool   $translate
-     * @param bool   $withVirtualRelations
      * @return array
      */
     public function getFields(
@@ -62,8 +61,7 @@ class FieldHelper
         $withEntityDetails = false,
         $withUnidirectional = false,
         $applyExclusions = false,
-        $translate = true,
-        $withVirtualRelations = false
+        $translate = true
     ) {
         $args = func_get_args();
         $cacheKey = implode(':', $args);
@@ -75,8 +73,7 @@ class FieldHelper
                 $withEntityDetails,
                 $withUnidirectional,
                 $applyExclusions,
-                $translate,
-                $withVirtualRelations
+                $translate
             );
         }
 

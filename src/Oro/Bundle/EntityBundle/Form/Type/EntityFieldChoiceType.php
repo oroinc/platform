@@ -140,11 +140,10 @@ class EntityFieldChoiceType extends AbstractType
      * @param string $entityName           Entity name. Can be full class name or short form: Bundle:Entity.
      * @param bool   $withRelations        Indicates whether association fields should be returned as well.
      * @param bool   $withVirtualFields    Indicates whether virtual fields should be returned as well.
-     * @param bool   $withVirtualRelations Indicates whether virtual relations should be returned as well.
      * @return array of entity fields
      *                                  key = field name, value = ChoiceListItem
      */
-    protected function getChoices($entityName, $withRelations, $withVirtualFields, $withVirtualRelations = false)
+    protected function getChoices($entityName, $withRelations, $withVirtualFields)
     {
         $choiceFields    = [];
         $choiceRelations = [];
@@ -152,11 +151,7 @@ class EntityFieldChoiceType extends AbstractType
             $entityName,
             $withRelations,
             $withVirtualFields,
-            true,
-            false,
-            true,
-            true,
-            $withVirtualRelations
+            true
         );
         foreach ($fields as $field) {
             $attributes = [];

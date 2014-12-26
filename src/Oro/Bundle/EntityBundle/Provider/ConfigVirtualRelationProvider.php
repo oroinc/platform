@@ -11,6 +11,10 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
     {
         $this->ensureVirtualFieldsInitialized();
 
+        if (empty($this->items[$className])) {
+            return [];
+        }
+
         return isset($this->items[$className][$fieldName]);
     }
 
@@ -20,6 +24,10 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
     public function getVirtualRelationQuery($className, $fieldName)
     {
         $this->ensureVirtualFieldsInitialized();
+
+        if (empty($this->items[$className][$fieldName]['query'])) {
+            return [];
+        }
 
         return $this->items[$className][$fieldName]['query'];
     }
@@ -31,7 +39,7 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
     {
         $this->ensureVirtualFieldsInitialized();
 
-        if (!isset($this->items[$className])) {
+        if (empty($this->items[$className])) {
             return [];
         }
 

@@ -45,9 +45,6 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      * @QueryParam(
      *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")
-     * @QueryParam(
-     *      name="with-virtual-relations", requirements="(1)|(0)", nullable=true, strict=true, default="1",
-     *      description="Indicates whether virtual relations should be returned as well.")
      * @ApiDoc(
      *      description="Get entity fields",
      *      resource=true
@@ -63,7 +60,6 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
         $withUnidirectional = filter_var($this->getRequest()->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
         $withVirtualFields = filter_var($this->getRequest()->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
         $applyExclusions = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
-        $withVirtualRelations = filter_var($this->getRequest()->get('with-virtual-relations'), FILTER_VALIDATE_BOOLEAN);
 
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
@@ -76,9 +72,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
                 $withVirtualFields,
                 $withEntityDetails,
                 $withUnidirectional,
-                $applyExclusions,
-                true,
-                $withVirtualRelations
+                $applyExclusions
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;

@@ -10,7 +10,7 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
     private $configVirtualRelationProvider;
 
     /** @var array configuration */
-    private $configurationVirtualFields;
+    private $configurationVirtualRelation;
 
     protected function setUp()
     {
@@ -25,12 +25,14 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getHierarchy')
             ->will($this->returnValue($hierarchy));
 
-        $this->configurationVirtualFields = [
+        $this->configurationVirtualRelation = [
             'AbstractEntity' => [
-                'virtual_field' => [
+                'virtual_relation' => [
+                    'relation_type' => 'oneToMany',
+                    'related_entity_name' => 'OtherEntity',
                     'query' => [
-                        'select' => ['select expression config ...'],
-                        'join' => ['join expression config ...']
+                        'select' => ['select expression'],
+                        'join' => ['join expression']
                     ]
                 ]
             ]
@@ -38,14 +40,14 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->configVirtualRelationProvider = new ConfigVirtualRelationProvider(
             $entityHierarchyProvider,
-            $this->configurationVirtualFields
+            $this->configurationVirtualRelation
         );
     }
 
     public function testGetVirtualFields()
     {
         $this->assertEquals(
-            ['virtual_field'],
+            $this->configurationVirtualRelation['AbstractEntity'],
             $this->configVirtualRelationProvider->getVirtualRelations('TestEntity')
         );
         $this->assertEquals(
@@ -56,15 +58,15 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsVirtualField()
     {
-        $this->assertTrue($this->configVirtualRelationProvider->isVirtualRelation('TestEntity', 'virtual_field'));
+        $this->assertTrue($this->configVirtualRelationProvider->isVirtualRelation('TestEntity', 'virtual_relation'));
         $this->assertFalse($this->configVirtualRelationProvider->isVirtualRelation('TestEntity', 'non_virtual_field'));
     }
 
     public function testGetVirtualFieldQuery()
     {
         $this->assertEquals(
-            $this->configurationVirtualFields['AbstractEntity']['virtual_field']['query'],
-            $this->configVirtualRelationProvider->getVirtualRelationQuery('TestEntity', 'virtual_field')
+            $this->configurationVirtualRelation['AbstractEntity']['virtual_relation']['query'],
+            $this->configVirtualRelationProvider->getVirtualRelationQuery('TestEntity', 'virtual_relation')
         );
     }
 }

@@ -29,7 +29,6 @@ class EntityWithFieldsProvider
      * @param bool $withRelations
      * @param bool $applyExclusions
      * @param bool $translate
-     * @param bool $withVirtualRelations
      *
      * @return array
      */
@@ -38,8 +37,7 @@ class EntityWithFieldsProvider
         $withUnidirectional = false,
         $withRelations = true,
         $applyExclusions = true,
-        $translate = true,
-        $withVirtualRelations = false
+        $translate = true
     ) {
         $result   = [];
         $entities = $this->entityProvider->getEntities(true, $applyExclusions, $translate);
@@ -53,8 +51,7 @@ class EntityWithFieldsProvider
                 false,
                 $withUnidirectional,
                 $applyExclusions,
-                $translate,
-                $withVirtualRelations
+                $translate
             );
 
             $entityData['fields']      = $fields;

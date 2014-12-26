@@ -5,8 +5,6 @@ UPGRADE FROM 1.5 to 1.6
 
 ##`Oro\Bundle\EntityBundle\Provider\EntityFieldProvider`
 - `setVirtualRelationProvider` was added
-- `getFields` method signature changed
-    `$withVirtualRelations` added
 - `addFields` method signature changed
     `EntityManager $em` removed
     `$withVirtualFields` removed

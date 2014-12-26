@@ -2,12 +2,19 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Translation\Translator;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider;
+use Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 /**
@@ -15,19 +22,22 @@ use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
  */
 class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     private $entityConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     private $extendConfigProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
     private $entityClassResolver;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigVirtualFieldProvider */
     private $virtualFieldProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigVirtualRelationProvider */
+    private $virtualRelationProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
     private $doctrine;
 
     /** @var EntityFieldProvider */
@@ -38,8 +48,6 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->markTestSkipped('CRM-2237');
-
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -59,6 +67,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        /* @var \PHPUnit_Framework_MockObject_MockObject|Translator $translator */
         $translator = $this->getMockBuilder('Symfony\Component\Translation\Translator')
             ->disableOriginalConstructor()
             ->getMock();
@@ -85,6 +94,12 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
 
+
+        $this->virtualRelationProvider =
+            $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider')
+                ->disableOriginalConstructor()
+                ->getMock();
+
         $this->provider = new EntityFieldProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
@@ -96,6 +111,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         );
         $this->provider->setEntityProvider($entityProvider);
         $this->provider->setVirtualFieldProvider($this->virtualFieldProvider);
+        $this->provider->setVirtualRelationProvider($this->virtualRelationProvider);
         $this->provider->setExclusionProvider($this->exclusionProvider);
     }
 
@@ -424,7 +440,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetFieldsWithEnums()
+    public function testGetFieldsWithVirtualRelationsAndEnums()
     {
         $className = 'Acme\Entity\Test';
 
@@ -468,6 +484,24 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getVirtualFields')
             ->with($className)
             ->will($this->returnValue(['rel1', 'rel2']));
+
+        $this->virtualRelationProvider->expects($this->once())
+            ->method('getVirtualRelations')
+            ->with($className)
+            ->will(
+                $this->returnValue(
+                    [
+                        'virtual_relation' => [
+                            'relation_type' => 'oneToMany',
+                            'related_entity_name' => 'OtherEntity',
+                            'query' => [
+                                'select' => ['select expression'],
+                                'join' => ['join expression']
+                            ]
+                        ]
+                    ]
+                )
+            );
         $this->virtualFieldProvider->expects($this->exactly(2))
             ->method('getVirtualFieldQuery')
             ->will(
@@ -517,6 +551,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                 'label'               => 'Multi Enum Field',
                 'related_entity_name' => 'Acme\EnumValue2'
             ],
+            [
+                'name' => 'virtual_relation',
+                'type' => 'oneToMany',
+                'label' => 'acme.entity.test.virtual_relation.label',
+                'relation_type' => 'oneToMany',
+                'related_entity_name' => 'OtherEntity'
+            ]
         ];
 
         $this->assertEquals($expected, $result);
@@ -602,8 +643,13 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $metadataFactory = $this->getMock('Doctrine\ORM\Mapping\ClassMetadataFactory');
         $em->expects($this->any())
-            ->method('getClassMetadata')
+            ->method('getMetadataFactory')
+            ->will($this->returnValue($metadataFactory));
+        $metadataFactory->expects($this->any())
+            ->method('getMetadataFor')
             ->will(
                 $this->returnCallback(
                     function ($entityClassName) use (&$metadata) {
@@ -611,8 +657,10 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+
         $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
+            ->with($this->isType('string'))
             ->will($this->returnValue($em));
 
         $this->extendConfigProvider->expects($this->any())

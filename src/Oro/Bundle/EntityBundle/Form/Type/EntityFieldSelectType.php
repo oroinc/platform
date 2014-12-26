@@ -149,25 +149,16 @@ class EntityFieldSelectType extends AbstractType
      * @param bool   $withVirtualFields      Indicates whether virtual fields should be returned as well.
      * @param bool   $withUnidirectional     Indicates whether Unidirectional association fields should be returned.
      *                                       should be returned.
-     * @param bool   $withVirtualRelations   Indicates whether virtual relations should be returned as well.
      * @return array
      */
-    protected function getData(
-        $entityName,
-        $withRelations,
-        $withVirtualFields,
-        $withUnidirectional,
-        $withVirtualRelations = false
-    ) {
+    protected function getData($entityName, $withRelations, $withVirtualFields, $withUnidirectional)
+    {
         $fields = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
             $withVirtualFields,
             true,
-            $withUnidirectional,
-            true,
-            false,
-            $withVirtualRelations
+            $withUnidirectional
         );
 
         return $this->convertData($fields, $entityName, null);
