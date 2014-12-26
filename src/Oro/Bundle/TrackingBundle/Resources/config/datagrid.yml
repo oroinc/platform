@@ -1,5 +1,6 @@
 datagrid:
     website-grid:
+        extended_entity_name: %oro_tracking.tracking_website.class%
         source:
             type: orm
             acl_resource: oro_tracking_website_view
@@ -113,6 +114,7 @@ datagrid:
             entity_pagination: true
 
     tracking-events-grid:
+        extended_entity_name: %oro_tracking.tracking_event.class%
         source:
             type: orm
             acl_resource: oro_tracking_website_view

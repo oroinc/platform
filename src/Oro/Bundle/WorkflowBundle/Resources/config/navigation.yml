@@ -34,3 +34,10 @@ oro_titles:
     oro_workflow_definition_view:       '%%workflow_definition.label%%'
     oro_workflow_start_transition_form: '%%workflow_title%%'
     oro_workflow_transition_form:       '%%workflow_title%%'
+
+oro_navigation_elements:
+    pinButton:
+        routes:
+            oro_workflow_definition_update: false
+            oro_workflow_definition_create: false
+            oro_workflow_definition_clone:  false

@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
+use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
@@ -35,6 +36,7 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
 
         $container->setParameter('oro_entity.exclusions', $config['exclusions']);
         $container->setParameter('oro_entity.virtual_fields', $config['virtual_fields']);
+        $container->setParameter('oro_entity.virtual_relations', $config['virtual_relations']);
     }
 
     /**
@@ -46,20 +48,20 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
     {
         $dbDriver = $container->getParameter('database_driver');
         if ($dbDriver == DatabaseDriverInterface::DRIVER_POSTGRESQL) {
-            $doctrineConfig            = $container->getExtensionConfig('doctrine');
-            $doctrineConnectionOptions = array();
+            $doctrineConfig = $container->getExtensionConfig('doctrine');
+            $doctrineConnectionOptions = [];
             foreach ($doctrineConfig as $config) {
                 if (isset($config['dbal']['connections'])) {
                     foreach (array_keys($config['dbal']['connections']) as $connectionName) {
                         // Enable ATTR_EMULATE_PREPARES for PostgreSQL
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = array(
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
                             \PDO::ATTR_EMULATE_PREPARES => true
-                        );
+                        ];
                         // Add support of "oid" and "name" Db types for EnterpriseDB
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = array(
-                            'oid'  => 'integer',
+                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
+                            'oid' => 'integer',
                             'name' => 'string'
-                        );
+                        ];
                     }
                 }
             }
@@ -80,29 +82,40 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
             'oro_entity',
             new YamlCumulativeFileLoader('Resources/config/oro/entity.yml')
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load($container);
 
         $virtualFields = [];
-        $exclusions    = [];
+        $virtualRelations = [];
+        $exclusions = [];
         foreach ($resources as $resource) {
-            if (!empty($resource->data['oro_entity']['virtual_fields'])) {
-                $virtualFields = array_merge(
-                    $virtualFields,
-                    $resource->data['oro_entity']['virtual_fields']
-                );
-            }
-            if (!empty($resource->data['oro_entity']['exclusions'])) {
-                $exclusions = array_merge(
-                    $exclusions,
-                    $resource->data['oro_entity']['exclusions']
-                );
-            }
+            $virtualFields = $this->mergeEntityConfiguration($resource, 'virtual_fields', $virtualFields);
+            $virtualRelations = $this->mergeEntityConfiguration($resource, 'virtual_relations', $virtualRelations);
+            $exclusions = $this->mergeEntityConfiguration($resource, 'exclusions', $exclusions);
         }
 
         return [
-            'exclusions'     => $exclusions,
-            'virtual_fields' => $virtualFields
+            'exclusions' => $exclusions,
+            'virtual_fields' => $virtualFields,
+            'virtual_relations' => $virtualRelations,
         ];
+    }
+
+    /**
+     * @param CumulativeResourceInfo $resource
+     * @param string $section
+     * @param array $data
+     * @return array
+     */
+    protected function mergeEntityConfiguration(CumulativeResourceInfo $resource, $section, array $data)
+    {
+        if (!empty($resource->data['oro_entity'][$section])) {
+            $data = array_merge(
+                $data,
+                $resource->data['oro_entity'][$section]
+            );
+        }
+
+        return $data;
     }
 
     /**
@@ -120,7 +133,7 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
             'oro_entity_hidden_fields',
             new YamlCumulativeFileLoader('Resources/config/oro/entity_hidden_fields.yml')
         );
-        $resources    = $configLoader->load($container);
+        $resources = $configLoader->load($container);
         foreach ($resources as $resource) {
             $hiddenFieldConfigs = array_merge(
                 $hiddenFieldConfigs,

@@ -45,9 +45,9 @@
 
                     <li class="entity-type{% if selected %} selected{% endif %}">
                         <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
+                            {% if selected %}<i class="icon-chevron-right arrow"></i>{% endif %}
                             <i class="{{ iconClass }}"></i>
                             {{ label }} ({{ type.count }})
-                            {% if selected %}<div class="arrow"><i class="icon-chevron-right"></i></div>{% endif %}
                         </a>
                     </li>
                 {% endfor %}

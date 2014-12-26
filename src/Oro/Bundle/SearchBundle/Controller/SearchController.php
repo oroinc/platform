@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 
 class SearchController extends Controller
 {
@@ -53,7 +54,35 @@ class SearchController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @return array
+     *
+     * @Route("/suggestion", name="oro_search_suggestion")
+     * @AclAncestor("oro_search")
+     * @Template("OroSearchBundle:Search:searchSuggestion.html.twig")
+     */
+    public function searchSuggestionAction(Request $request)
+    {
+        $searchResults = $this->get('oro_search.index')->simpleSearch(
+            $request->get('search'),
+            (int) $request->get('offset'),
+            (int) $request->get('max_results'),
+            $request->get('from')
+        );
+
+        $dispatcher = $this->get('event_dispatcher');
+        foreach ($searchResults->getElements() as $item) {
+            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+        }
+
+        return $searchResults->toSearchResultData();
+    }
+
+    /**
      * Show search results
+     *
+     * @param Request $request
+     * @return array
      *
      * @Route("/", name="oro_search_results")
      * @Template("OroSearchBundle:Search:searchResults.html.twig")

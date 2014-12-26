@@ -14,7 +14,7 @@ class OroCalendarBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -64,7 +64,7 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 7]);
-        $table->addcolumn('is_public', 'boolean', ['default' => false]);
+        $table->addcolumn('is_public', 'boolean', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addIndex(['organization_id'], 'IDX_1DE3E2F032C8A3DE', []);
@@ -91,6 +91,8 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 7]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('invitation_status', 'string', ['default' => null, 'notnull' => false, 'length' => 32]);
+        $table->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
         $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_sys_calendar_event_idx', []);
@@ -151,12 +153,17 @@ class OroCalendarBundleInstaller implements Installation
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
-
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_system_calendar'),
             ['system_calendar_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $table,
+            ['parent_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
         );
     }
 

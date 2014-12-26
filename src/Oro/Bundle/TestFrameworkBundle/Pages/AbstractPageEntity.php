@@ -223,8 +223,11 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function checkEntityFieldData($fieldName, $value)
     {
-        $this->assertElementPresent("//div[@class='control-group']/label[contains(., '{$fieldName}')]".
-        "/following-sibling::div[contains(., '{$value}')]", "Field '{$fieldName}' data are not equals '{$value}'");
+        $this->assertElementPresent(
+            "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
+            "/following-sibling::div[contains(., '{$value}')]",
+            "Field '{$fieldName}' data are not equals '{$value}'"
+        );
 
         return $this;
     }

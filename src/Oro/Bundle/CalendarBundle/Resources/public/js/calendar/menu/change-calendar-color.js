@@ -13,7 +13,7 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
     return BaseView.extend({
         /** @property */
         customColorPickerActionsTemplate: _.template('<div class="form-actions">' +
-                '<button class="btn btn-primary pull-right" data-action="ok" type="button"><%= __("Ok") %></button>' +
+                '<button class="btn btn-primary pull-right" data-action="ok" type="button"><%= __("OK") %></button>' +
                 '<button class="btn pull-right" data-action="cancel" type="button"><%= __("Cancel") %></button>' +
             '</div>'),
 
@@ -131,7 +131,9 @@ define(['jquery', 'underscore', 'oroui/js/app/views/base/view', 'orotranslation/
                         wait: true,
                         success: _.bind(function () {
                             savingMsg.close();
-                            messenger.notificationFlashMessage('success', __('The calendar was updated.'));
+                            messenger.notificationFlashMessage('success', __('The calendar was updated.'), {
+                                namespace: 'calendar-ns'
+                            });
                             this.colorManager.setCalendarColors(this.model.get('calendarUid'), color);
                             this.connectionsView._actionSyncObject.resolve();
                         }, this),

@@ -41,7 +41,7 @@ class Configuration implements ConfigurationInterface
                         'The "enabled_system_calendar" must be boolean, "organization" or "system", given %s.'
                     )
                 ->end()
-                ->defaultTrue()
+                ->defaultValue('system')
             ->end()
         ->end();
 
@@ -80,6 +80,7 @@ class Configuration implements ConfigurationInterface
                     'value' => [
                         '#5484ED',
                         '#A4BDFC',
+                        '#46D6DB',
                         '#7AE7BF',
                         '#51B749',
                         '#FBD75B',

@@ -39,9 +39,15 @@ class Executor extends JobExecutor
                     $jobResult->addFailureException($failureException);
                 }
             }
+
+            // trigger save of JobExecution and JobInstance
+            $this->batchJobRepository->getJobManager()->flush();
+            $this->batchJobRepository->getJobManager()->clear();
         } catch (\Exception $exception) {
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
+
+            $this->saveFailedJobExecution($jobExecution);
         }
 
         return $jobResult;

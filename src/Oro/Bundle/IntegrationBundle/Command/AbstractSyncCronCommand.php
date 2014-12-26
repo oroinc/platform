@@ -37,11 +37,17 @@ abstract class AbstractSyncCronCommand extends ContainerAwareCommand implements 
             $qb->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->like('j.args', ':integrationIdType1'),
-                    $qb->expr()->like('j.args', ':integrationIdType2')
+                    $qb->expr()->like('j.args', ':integrationIdType2'),
+                    $qb->expr()->andX(
+                        $qb->expr()->notLike('j.args', ':noIntegrationIdType1'),
+                        $qb->expr()->notLike('j.args', ':noIntegrationIdType2')
+                    )
                 )
             )
                 ->setParameter('integrationIdType1', '%--integration-id=' . $integrationId . '%')
-                ->setParameter('integrationIdType2', '%-i=' . $integrationId . '%');
+                ->setParameter('noIntegrationIdType1', '%--integration-id=%')
+                ->setParameter('integrationIdType2', '%-i=' . $integrationId . '%')
+                ->setParameter('noIntegrationIdType2', '%-i=%');
         }
 
         $running = $qb->getQuery()

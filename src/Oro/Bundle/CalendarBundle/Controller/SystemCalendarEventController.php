@@ -66,8 +66,10 @@ class SystemCalendarEventController extends Controller
         $entity = new CalendarEvent();
 
         $startTime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $endTime   = new \DateTime('now', new \DateTimeZone('UTC'));
+        $endTime->add(new \DateInterval('PT1H'));
         $entity->setStart($startTime);
-        $entity->setEnd($startTime->add(new \DateInterval('PT1H')));
+        $entity->setEnd($endTime);
         $entity->setSystemCalendar($calendar);
 
         return $this->update(

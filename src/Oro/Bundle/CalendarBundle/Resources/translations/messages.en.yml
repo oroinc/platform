@@ -79,10 +79,10 @@ oro:
             entity_description:   Represent system calendar
             id.label:             Id
             name.label:           Calendar Name
-            backgroundColor.label: Color
             public.label:         Scope
             events.label:         Events
             organization.label:   Organization
+            background_color.label: Color
 
             scope.system:         System
             scope.organization:   Organization
@@ -102,13 +102,29 @@ oro:
             end.label:            End
             calendar.label:       Calendar
             all_day.label:        All-day event
-            backgroundColor.label: Color
+            child_events.label:   Child events
+            parent.label:         Parent
+            background_color.label:  Color
+            system_calendar.label:   System Calendar
+            invitation.label:        Guests
+            invitation_status.label: Invitation status
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}
             added_by:             added by {{ user }} at {{ date }}
             update_event:         Update {{ entity }}
             delete_event:         Delete {{ entity }}
+
+            statuses:
+                not_responded:        Not responded
+                tentatively_accepted: Tentatively accepted
+                accepted:             Accepted
+                declined:             Declined
+
+            actions:
+                tentatively_accepted: Tentative
+                accepted:             Accept
+                declined:             Decline
 
         #
         # Oro/Bundle/CalendarBundle/Entity/CalendarProperty

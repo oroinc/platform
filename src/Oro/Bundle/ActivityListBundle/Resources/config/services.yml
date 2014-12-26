@@ -48,6 +48,8 @@ services:
         class: %oro_activity_list.placeholder.filter.class%
         arguments:
             - @oro_activity_list.provider.chain
+            - @doctrine
+            - @oro_entity.doctrine_helper
 
     oro_activity_list.event_listener.actitity_list_listener:
         class:  %oro_activity_list.event_listener.actitity_list_listener.class%

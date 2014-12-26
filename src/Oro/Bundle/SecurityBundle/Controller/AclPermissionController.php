@@ -7,7 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -24,18 +24,22 @@ class AclPermissionController extends Controller
      *  defaults={"_format"="json"}
      * )
      * @Template
+     *
+     * @param string $oid
+     *
+     * @return array
      */
     public function aclAccessLevelsAction($oid)
     {
         if (strpos($oid, 'entity:') === 0) {
-            $oid = str_replace('_', '\\', $oid);
+            $oid = $this->get('oro_entity.routing_helper')->decodeClassName($oid);
         }
 
         $levels = $this
             ->get('oro_security.acl.manager')
             ->getAccessLevels($oid);
 
-        return array('levels' => $levels);
+        return ['levels' => $levels];
     }
 
     /**
@@ -44,7 +48,10 @@ class AclPermissionController extends Controller
      *      name="oro_security_switch_organization", defaults={"id"=0}
      * )
      * @ParamConverter("organization", class="OroOrganizationBundle:Organization")
-     * @throws NotFoundHttpException, AccessDeniedException
+     *
+     * @param Organization $organization
+     *
+     * @return RedirectResponse , AccessDeniedException
      */
     public function switchOrganizationAction(Organization $organization)
     {
@@ -58,7 +65,7 @@ class AclPermissionController extends Controller
             throw new AccessDeniedException(
                 $this->get('translator')->trans(
                     'oro.security.organization.access_denied',
-                    array('%organization_name%' => $organization->getName())
+                    ['%organization_name%' => $organization->getName()]
                 )
             );
         }

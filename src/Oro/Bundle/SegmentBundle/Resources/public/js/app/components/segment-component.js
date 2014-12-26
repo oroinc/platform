@@ -91,7 +91,7 @@ define(function (require) {
                 title: __('oro.segment.confirm.unsaved_changes.title'),
                 content: __('oro.segment.confirm.unsaved_changes.message', {components: unsavedComponents.join(', ')}),
                 okCloses: true,
-                okText: __('Ok')
+                okText: __('OK')
             });
 
             modal.open(_.bind(function () {
