@@ -177,18 +177,18 @@ class CommentApiManager extends ApiEntityManager
             $editorId   = $entity->getUpdatedBy()->getId();
         }
         $result = [
-            'id'                => $entity->getId(),
-            'owner'             => $ownerName,
-            'owner_id'          => $ownerId,
-            'editor'            => $editorName,
-            'editor_id'         => $editorId,
-            'message'           => $entity->getMessage(),
-            'relationClass'     => $entityClass,
-            'relationId'        => $entityId,
-            'createdAt'         => $entity->getCreatedAt()->format('c'),
-            'updatedAt'         => $entity->getUpdatedAt()->format('c'),
-            'editable'          => $this->securityFacade->isGranted('EDIT', $entity),
-            'removable'         => $this->securityFacade->isGranted('DELETE', $entity),
+            'id'            => $entity->getId(),
+            'owner'         => $ownerName,
+            'owner_id'      => $ownerId,
+            'editor'        => $editorName,
+            'editor_id'     => $editorId,
+            'message'       => $entity->getMessage(),
+            'relationClass' => $entityClass,
+            'relationId'    => $entityId,
+            'createdAt'     => $entity->getCreatedAt()->format('c'),
+            'updatedAt'     => $entity->getUpdatedAt()->format('c'),
+            'editable'      => $this->securityFacade->isGranted('EDIT', $entity),
+            'removable'     => $this->securityFacade->isGranted('DELETE', $entity),
         ];
         $result = array_merge($result, $this->getAttachmentInfo($entity));
 
