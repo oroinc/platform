@@ -6,6 +6,7 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         moment = require('moment'),
         routing = require('routing'),
+        mediator = require('oroui/js/mediator'),
         BaseView = require('oroui/js/app/views/base/view'),
         template = require('text!../../../templates/comment/comment-item-view.html');
 
@@ -111,19 +112,11 @@ define(function (require) {
         },
 
         removeAttachment: function(e) {
+            var itemView = this;
             e.stopPropagation();
-            this.model.trigger('removeAttachment', this.model);
-            var model = this.model;
-            var url = routing.generate('oro_api_comment_remove_attachment_item', {id: this.model.get('id')});
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function () {
-                    model.set('attachmentURL', '');
-                    model.set('updatedAt', new Date());
-                },
-                error: function (jqXHR) {
-                }
+            this.model.removeAttachment().then(function () {
+                itemView.$('.attachment-item').remove();
+                mediator.execute('showFlashMessage', 'success', __('oro.comment.attachment.delete_message'));
             });
         },
 

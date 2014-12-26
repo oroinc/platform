@@ -15,6 +15,11 @@
                     time: '<i class="date">' + updatedTime + '</i>'
                 }) %>
             <% } %>
+            <% if (attachmentURL) { %>
+            <span data-target="#<%= accordionTargetId %>" data-parent="#<%- accordionId %>"
+               data-toggle="collapse" class="attachment-icon accordion-toggle<% if (collapsed) { %> collapsed<%}%>"
+               title="<%= _.__('oro.comment.attachment.tooltip', {filename: attachmentFileName}) %>"><i class="icon-paper-clip"></i></span>
+            <% } %>
         </div>
         <% if (hasActions) { %>
         <div class="actions">
@@ -53,15 +58,13 @@
         <div class="accordion-inner">
             <div<% if (editable) { %> class="form-container"<% } %>>
                 <%= message %>
+                <% if (attachmentURL) { %>
+                <div class="attachment-item">
+                    <i class="icon-paper-clip"></i>
+                    <a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %></a> (<%= attachmentSize %>)
+                </div>
+                <% } %>
             </div>
-        <% if (attachmentURL) { %>
-        <div class="title-item oro_attachment_file">
-                <span class="filename">
-                    <i class="icon-file"></i><a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %> (<%= attachmentSize %>)</a>
-                </span>
-            <button href="#" class="btn btn-action btn-link delete item-remove-attachment" type="button"></button>
-        </div>
-        <% } %>
         </div>
     </div>
 </div>

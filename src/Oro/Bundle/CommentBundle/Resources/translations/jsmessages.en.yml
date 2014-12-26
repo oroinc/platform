@@ -16,6 +16,9 @@ oro:
                     label: Save Comment
                 cancel_comment:
                     label: Cancel
+        attachment:
+            tooltip: Attached file {{ filename }}
+            delete_message: The comment attachment is successfully removed
         item:
             minutes_ago: '{0}now|{1}{{ number }} minute ago|[2,+Inf]{{ number }} minutes ago'
             hours_ago: '{1}{{ number }} hour ago|[2,+Inf]{{ number }} hours ago'

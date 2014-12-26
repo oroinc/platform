@@ -28,6 +28,12 @@ define(function (require) {
             'reset': 'onReset'
         },
 
+        defaultData: {
+            attachmentURL: null,
+            attachmentFileName: null,
+            attachmentSize: null
+        },
+
         initialize: function (options) {
             this.template = _.template($(options.template ).html());
             CommentFormView.__super__.initialize.apply(this, arguments);
@@ -35,6 +41,7 @@ define(function (require) {
 
         getTemplateData: function () {
             var data = CommentFormView.__super__.getTemplateData.call(this);
+            _.defaults(data, this.defaultData);
             // id is required for template
             data.id = this.model ? this.model.get('id') : null;
             return data;
