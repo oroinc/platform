@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 
 class DatagridConfigurationBuilder
 {
@@ -57,6 +58,16 @@ class DatagridConfigurationBuilder
             $doctrine,
             $datagridGuesser
         );
+    }
+
+    /**
+     * @todo: bc break, move to constructor
+     *
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     */
+    public function setVirtualRelationProvider($virtualRelationProvider)
+    {
+        $this->converter->setVirtualRelationProvider($virtualRelationProvider);
     }
 
     /**

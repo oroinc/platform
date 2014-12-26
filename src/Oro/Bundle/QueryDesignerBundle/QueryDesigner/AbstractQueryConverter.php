@@ -3,6 +3,7 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 
@@ -32,6 +33,11 @@ abstract class AbstractQueryConverter
      * @var VirtualFieldProviderInterface
      */
     protected $virtualFieldProvider;
+
+    /**
+     * @var VirtualRelationProviderInterface
+     */
+    protected $virtualRelationProvider;
 
     /**
      * @var string
@@ -195,6 +201,14 @@ abstract class AbstractQueryConverter
     public function getParentJoinIdentifier($joinId)
     {
         return $this->joinIdHelper->getParentJoinIdentifier($joinId);
+    }
+
+    /**
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     */
+    public function setVirtualRelationProvider($virtualRelationProvider)
+    {
+        $this->virtualRelationProvider = $virtualRelationProvider;
     }
 
     /**
@@ -645,6 +659,7 @@ abstract class AbstractQueryConverter
             $this->joinIdHelper->explodeColumnName($columnName)
         );
         $this->addTableAliasesForVirtualColumn($columnName);
+        $this->addTableAliasesForVirtualRelation($columnName);
     }
 
     /**
@@ -672,11 +687,6 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasesForVirtualColumn($columnName)
     {
-        if (isset($this->virtualColumnExpressions[$columnName])) {
-            // already added
-            return;
-        }
-
         $className = $this->getEntityClassName($columnName);
         $fieldName = $this->getFieldName($columnName);
         if (!$this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
@@ -684,12 +694,60 @@ abstract class AbstractQueryConverter
             return;
         }
 
-        $mainEntityJoinId    = $this->getParentJoinIdentifier(
+        $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
+        $this->addTableAliasesForVirtualItem($columnName, $query);
+
+        $key = sprintf('%s::%s', $className, $fieldName);
+        if (!isset($this->virtualColumnOptions[$key])) {
+            $options = $query['select'];
+            unset($options['expr']);
+            $this->virtualColumnOptions[$key] = $options;
+        }
+    }
+
+    /**
+     * @param string $columnName
+     */
+    protected function addTableAliasesForVirtualRelation($columnName)
+    {
+        if (!$this->virtualRelationProvider) {
+            return;
+        }
+
+        $className = $this->getEntityClassName($columnName);
+        $fieldName = $this->getFieldName($columnName);
+        if (!$this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
+            // non virtual column
+            return;
+        }
+
+        $query = $this->virtualRelationProvider->getVirtualRelationQuery($className, $fieldName);
+        $this->addTableAliasesForVirtualItem($columnName, $query);
+
+        $key = sprintf('%s::%s', $className, $fieldName);
+        if (!isset($this->virtualColumnOptions[$key])) {
+            $options = $query['select'];
+            unset($options['expr']);
+            $this->virtualColumnOptions[$key] = $options;
+        }
+    }
+
+    /**
+     * @param string $columnName
+     * @param array  $query
+     */
+    protected function addTableAliasesForVirtualItem($columnName, &$query)
+    {
+        if (isset($this->virtualColumnExpressions[$columnName])) {
+            // already added
+            return;
+        }
+
+        $mainEntityJoinId = $this->getParentJoinIdentifier(
             $this->joinIdHelper->buildColumnJoinIdentifier($columnName)
         );
         $mainEntityJoinAlias = $this->tableAliases[$mainEntityJoinId];
 
-        $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
         $joins = [];
         /** @var array $aliasMap
          *      key   = local alias (defined in virtual column query definition)
@@ -709,18 +767,11 @@ abstract class AbstractQueryConverter
             }
         }
 
-        $columnExpr                                  = $this->replaceTableAliasesInVirtualColumnSelect(
+        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect(
             $query['select']['expr'],
             $aliases
         );
         $this->virtualColumnExpressions[$columnName] = $columnExpr;
-
-        $key = sprintf('%s::%s', $className, $fieldName);
-        if (!isset($this->virtualColumnOptions[$key])) {
-            $options = $query['select'];
-            unset($options['expr']);
-            $this->virtualColumnOptions[$key] = $options;
-        }
     }
 
     /**
