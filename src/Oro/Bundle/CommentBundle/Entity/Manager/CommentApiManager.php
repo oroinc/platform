@@ -119,17 +119,19 @@ class CommentApiManager extends ApiEntityManager
      */
     public function getCommentCount($entityClass, $entityId)
     {
-        $entityName = $this->convertRelationEntityClassName($entityClass);
-        $result     = 0;
+        $result = 0;
 
-        try {
-            if ($this->isCorrectClassName($entityName)) {
-                /** @var CommentRepository $repository */
-                $fieldName  = $this->getFieldName($entityName);
-                $repository = $this->getRepository();
-                $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+        if ($this->isCommentable()) {
+            $entityName = $this->convertRelationEntityClassName($entityClass);
+            try {
+                if ($this->isCorrectClassName($entityName)) {
+                    /** @var CommentRepository $repository */
+                    $fieldName  = $this->getFieldName($entityName);
+                    $repository = $this->getRepository();
+                    $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+                }
+            } catch (\Exception $e) {
             }
-        } catch (\Exception $e) {
         }
         return $result;
     }
@@ -195,6 +197,14 @@ class CommentApiManager extends ApiEntityManager
         ];
 
         return $result;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCommentable()
+    {
+        return $this->securityFacade->isGranted('oro_comment_view');
     }
 
     /**
