@@ -120,17 +120,19 @@ class CommentApiManager extends ApiEntityManager
      */
     public function getCommentCount($entityClass, $entityId)
     {
-        $entityName = $this->convertRelationEntityClassName($entityClass);
-        $result     = 0;
+        $result = 0;
 
-        try {
-            if ($this->isCorrectClassName($entityName)) {
-                /** @var CommentRepository $repository */
-                $fieldName  = $this->getFieldName($entityName);
-                $repository = $this->getRepository();
-                $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+        if ($this->isCommentable()) {
+            $entityName = $this->convertRelationEntityClassName($entityClass);
+            try {
+                if ($this->isCorrectClassName($entityName)) {
+                    /** @var CommentRepository $repository */
+                    $fieldName  = $this->getFieldName($entityName);
+                    $repository = $this->getRepository();
+                    $result     = (int)$repository->getNumberOfComment($fieldName, $entityId);
+                }
+            } catch (\Exception $e) {
             }
-        } catch (\Exception $e) {
         }
         return $result;
     }
@@ -163,8 +165,9 @@ class CommentApiManager extends ApiEntityManager
      */
     public function getEntityViewModel(Comment $entity, $entityClass = '', $entityId = '')
     {
-        $ownerName = '';
-        $ownerId   = '';
+        $ownerName  = '';
+        $ownerId    = '';
+
         if ($entity->getOwner()) {
             $ownerName = $this->nameFormatter->format($entity->getOwner());
             $ownerId   = $entity->getOwner()->getId();
@@ -172,10 +175,12 @@ class CommentApiManager extends ApiEntityManager
 
         $editorName = '';
         $editorId   = '';
+
         if ($entity->getUpdatedBy()) {
             $editorName = $this->nameFormatter->format($entity->getUpdatedBy());
             $editorId   = $entity->getUpdatedBy()->getId();
         }
+
         $result = [
             'id'            => $entity->getId(),
             'owner'         => $ownerName,
@@ -196,6 +201,14 @@ class CommentApiManager extends ApiEntityManager
     }
 
     /**
+     * @return bool
+     */
+    public function isCommentable()
+    {
+        return $this->securityFacade->isGranted('oro_comment_view');
+    }
+
+    /**
      * @param string $entityName
      * @param int    $entityId
      *
@@ -205,8 +218,7 @@ class CommentApiManager extends ApiEntityManager
      */
     protected function getRelatedEntity($entityName, $entityId)
     {
-        $repository = $this->getObjectManager()->getRepository($entityName);
-
+        $repository    = $this->getObjectManager()->getRepository($entityName);
         $relatedEntity = $repository->findOneById($entityId);
 
         if (empty($relatedEntity)) {
@@ -273,7 +285,7 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param Comment $entity
-     * @param File $attachment
+     * @param File    $attachment
      *
      * @return string
      */
@@ -284,11 +296,12 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param $entity
+     *
      * @return File
      */
     protected function getAttachment($entity)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $accessor   = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($entity, 'attachment');
 
         return $attachment;
@@ -296,17 +309,18 @@ class CommentApiManager extends ApiEntityManager
 
     /**
      * @param Comment $entity
+     *
      * @return array
      */
     protected function getAttachmentInfo(Comment $entity)
     {
-        $result = [];
+        $result     = [];
         $attachment = $this->getAttachment($entity);
         if ($attachment) {
             $result = [
-                'attachmentURL' => $this->getAttachmentURL($entity, $attachment),
-                'attachmentSize' => $attachment->getFileSize(),
-                'attachmentFileName' =>  $attachment->getFilename(),
+                'attachmentURL'      => $this->getAttachmentURL($entity, $attachment),
+                'attachmentSize'     => $attachment->getFileSize(),
+                'attachmentFileName' => $attachment->getFilename(),
             ];
         }
         return $result;
