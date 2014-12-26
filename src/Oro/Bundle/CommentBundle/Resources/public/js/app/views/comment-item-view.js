@@ -3,43 +3,11 @@ define(function (require) {
     'use strict';
 
     var CommentItemView,
-        __ = require('orotranslation/js/translator'),
+        dateTimeFormatter = require('orolocale/js/formatter/datetime'),
         moment = require('moment'),
         routing = require('routing'),
         BaseView = require('oroui/js/app/views/base/view'),
         template = require('text!../../../templates/comment/comment-item-view.html');
-
-
-    function timeDiff(time) {
-        var diff, unit, scale = {},
-            minute = scale.minute = 1000 * 60,
-            hour = scale.hour = minute * 60,
-            day = scale.day = hour * 24,
-            month = scale.month = day * 30,
-            year = scale.year = day * 365;
-
-        time = moment(time).valueOf();
-        diff = moment().valueOf() - time;
-
-        if (diff > year) {
-            unit = 'year';
-        } else if (diff > month) {
-            unit = 'month';
-        } else if (diff > day) {
-            unit = 'day';
-        } else if (diff > hour) {
-            unit = 'hour';
-        } else {
-            unit = 'minute';
-        }
-
-        diff = {
-            number: Math.floor(diff / scale[unit]),
-            unit: unit
-        };
-
-        return diff;
-    }
 
     CommentItemView = BaseView.extend({
         template: template,
@@ -66,8 +34,7 @@ define(function (require) {
         },
 
         getTemplateData: function () {
-            var diff,
-                data = CommentItemView.__super__.getTemplateData.call(this);
+            var data = CommentItemView.__super__.getTemplateData.call(this);
             data.cid = this.cid;
             data.accordionId = this.accordionId;
             data.accordionTargetId = this.getAccordionTargetId();
@@ -77,12 +44,10 @@ define(function (require) {
             data.isCollapsible = data.message !== data.shortMessage;
             data.collapsed = this.collapsed;
             if (data.createdAt) {
-                diff = timeDiff(data.createdAt);
-                data.createdTime = __('oro.comment.item.' + diff.unit + 's_ago', {number: diff.number}, diff.number);
+                data.createdTime = dateTimeFormatter.formatDateTime(data.createdAt);
             }
             if (data.updatedAt) {
-                diff = timeDiff(data.updatedAt);
-                data.updatedTime = __('oro.comment.item.' + diff.unit + 's_ago', {number: diff.number}, diff.number);
+                data.updatedTime = dateTimeFormatter.formatDateTime(data.updatedAt);
             }
             if (data.owner_id) {
                 data.owner_url = routing.generate('oro_user_view', {id: data.owner_id});

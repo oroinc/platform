@@ -7,6 +7,8 @@ define(function (require) {
         Chaplin = require('chaplin'),
         _ = require('underscore'),
         routing = require('routing'),
+        mediator = require('oroui/js/mediator'),
+        __ = require('orotranslation/js/translator'),
         BaseCollection = require('oroui/js/app/models/base/collection'),
         CommentModel = require('orocomment/js/app/models/comment-model');
 
@@ -28,6 +30,7 @@ define(function (require) {
             // handel collection size changes
             this.on('add', this.onAddNewRecord, this);
             this.on('remove', this.onRemoveRecord, this);
+            this.on('error', this.onErrorResponse, this);
 
             CommentCollection.__super__.initialize.apply(this, arguments);
         },
@@ -68,6 +71,16 @@ define(function (require) {
                 collection.setPage(collection.getPage());
                 collection.fetch();
             });
+        },
+
+        onErrorResponse: function (collection, jqxhr, options) {
+            this.finishSync();
+            if (jqxhr.status === 403) {
+                mediator.execute('showMessage', 'error', __('oro.ui.forbidden_error'));
+            } else if (jqxhr.status !== 400) {
+                // 400 response is handled by form view
+                mediator.execute('showMessage', 'error', __('oro.ui.unexpected_error'));
+            }
         },
 
         getPage: function () {
