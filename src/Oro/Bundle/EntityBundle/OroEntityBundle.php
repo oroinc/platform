@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle;
 
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualFieldProvidersCompilerPass;
+use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\VirtualRelationProvidersCompilerPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -18,5 +20,7 @@ class OroEntityBundle extends Bundle
         parent::build($container);
         $container->addCompilerPass(new DoctrineSqlFiltersConfigurationPass());
         $container->addCompilerPass(new ExclusionProviderPass());
+        $container->addCompilerPass(new VirtualFieldProvidersCompilerPass());
+        $container->addCompilerPass(new VirtualRelationProvidersCompilerPass());
     }
 }
