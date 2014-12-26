@@ -63,13 +63,13 @@ class EntityFieldChoiceType extends AbstractType
                 );
         };
 
-        $defaultConfigs = array(
+        $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity_field',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection.html.twig',
             'extra_config'            => 'entity_field_choice',
             'extra_modules'           => ['EntityFieldUtil' => 'oroentity/js/entity-field-choice-util']
-        );
+        ];
 
         $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
             return $that->configsNormalizer($options, $configs, $defaultConfigs);
@@ -79,7 +79,7 @@ class EntityFieldChoiceType extends AbstractType
         };
 
         $resolver->setDefaults(
-            array(
+            [
                 'entity'              => null,
                 'with_relations'      => false,
                 'with_virtual_fields' => false,
@@ -88,14 +88,14 @@ class EntityFieldChoiceType extends AbstractType
                 'skip_load_entities'  => false,
                 'skip_load_data'      => false,
                 'configs'             => $defaultConfigs,
-                'translatable_options' => false
-            )
+                'translatable_options' => false,
+            ]
         );
         $resolver->setNormalizers(
-            array(
+            [
                 'configs' => $configsNormalizer,
-                'attr'    => $attrNormalizer
-            )
+                'attr'    => $attrNormalizer,
+            ]
         );
     }
 
@@ -137,9 +137,9 @@ class EntityFieldChoiceType extends AbstractType
     /**
      * Returns a list of choices
      *
-     * @param string $entityName        Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations     Indicates whether association fields should be returned as well.
-     * @param bool   $withVirtualFields Indicates whether virtual fields should be returned as well.
+     * @param string $entityName           Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations        Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields    Indicates whether virtual fields should be returned as well.
      * @return array of entity fields
      *                                  key = field name, value = ChoiceListItem
      */

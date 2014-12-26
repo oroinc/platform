@@ -53,13 +53,13 @@ class EntityFieldSelectType extends AbstractType
     {
         $that = $this;
 
-        $defaultConfigs = array(
+        $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity_field',
             'result_template_twig'    => 'OroEntityBundle:Select:entity_field/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Select:entity_field/selection%s.html.twig',
             'extra_config'            => 'entity_field_select',
             'extra_modules'           => ['EntityFieldUtil' => 'oroentity/js/entity-field-select-util']
-        );
+        ];
 
         $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
             return $that->configsNormalizer($options, $configs, $defaultConfigs);
@@ -69,7 +69,7 @@ class EntityFieldSelectType extends AbstractType
         };
 
         $resolver->setDefaults(
-            array(
+            [
                 'entity'                    => null,
                 'with_relations'            => false,
                 'with_unidirectional'       => false,
@@ -78,14 +78,14 @@ class EntityFieldSelectType extends AbstractType
                 'skip_load_entities'        => false,
                 'skip_load_data'            => false,
                 'multiple'                  => false,
-                'configs'                   => $defaultConfigs
-            )
+                'configs'                   => $defaultConfigs,
+            ]
         );
         $resolver->setNormalizers(
-            array(
+            [
                 'configs' => $configsNormalizer,
-                'attr'    => $attrNormalizer
-            )
+                'attr'    => $attrNormalizer,
+            ]
         );
     }
 

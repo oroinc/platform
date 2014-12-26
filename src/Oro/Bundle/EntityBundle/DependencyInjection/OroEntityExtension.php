@@ -95,7 +95,8 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
 
         return [
             'exclusions' => $exclusions,
-            'virtual_fields' => $virtualFields
+            'virtual_fields' => $virtualFields,
+            'virtual_relations' => $virtualRelations,
         ];
     }
 

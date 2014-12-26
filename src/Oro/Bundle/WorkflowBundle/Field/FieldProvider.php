@@ -12,10 +12,10 @@ class FieldProvider extends EntityFieldProvider
     /**
      * @var array
      */
-    protected $workflowFields = array(
+    protected $workflowFields = [
         FieldGenerator::PROPERTY_WORKFLOW_ITEM,
         FieldGenerator::PROPERTY_WORKFLOW_STEP,
-    );
+    ];
 
     /**
      * @param string $field
@@ -41,7 +41,7 @@ class FieldProvider extends EntityFieldProvider
         $applyExclusions = false;
         parent::addFields($result, $className, $em, $withVirtualFields, $applyExclusions, $translate);
 
-        $metadata = $em->getClassMetadata($className);
+        $metadata = $this->getMetadataFor($className);
 
         // add single association fields
         foreach ($metadata->getAssociationNames() as $associationName) {
