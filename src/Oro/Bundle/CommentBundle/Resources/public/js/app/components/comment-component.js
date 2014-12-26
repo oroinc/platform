@@ -67,8 +67,6 @@ define(function (require) {
             var model, itemView;
             if (attrs.id) {
                 model = this.collection.get(attrs.id);
-                itemView = this.listView.getItemView(model);
-                itemView.render();
             } else {
                 model = this.collection.add({}, {at: 0});
             }
