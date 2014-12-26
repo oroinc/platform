@@ -204,6 +204,7 @@ class ActivityListManager
             'editable'             => $this->securityFacade->isGranted('EDIT', $entity),
             'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
             'commentCount'         => $numberOfComments,
+            'commentable'          => $this->commentManager->isCommentable(),
         ];
 
         return $result;

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CommentBundle\Form\Type;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 

@@ -102,6 +102,7 @@ abstract class BaseComment
      * Sets message
      *
      * @param string $message
+     *
      * @return self
      */
     public function setMessage($message)
@@ -125,6 +126,7 @@ abstract class BaseComment
      * Sets user who have updated this comment
      *
      * @param User $updatedBy
+     *
      * @return self
      */
     public function setUpdatedBy(User $updatedBy)
@@ -148,6 +150,7 @@ abstract class BaseComment
      * Set the owner comment
      *
      * @param User $owner
+     *
      * @return self
      */
     public function setOwner(User $owner)
@@ -171,6 +174,7 @@ abstract class BaseComment
      * Sets organization
      *
      * @param Organization $organization
+     *
      * @return self
      */
     public function setOrganization(Organization $organization)
@@ -194,6 +198,7 @@ abstract class BaseComment
      * Sets creation date
      *
      * @param \DateTime $createdAt
+     *
      * @return self
      */
     public function setCreatedAt(\DateTime $createdAt)
@@ -217,6 +222,7 @@ abstract class BaseComment
      * Sets a date update
      *
      * @param \DateTime $updatedAt
+     *
      * @return self
      */
     public function setUpdatedAt(\DateTime $updatedAt)

@@ -18,20 +18,21 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->filter = new CommentPlaceholderFilter($this->configManager);
+        $this->filter        = new CommentPlaceholderFilter($this->configManager);
     }
 
     /**
      * @param mixed $entity
-     * @param int $callsCount
-     * @param int $callsProviderCount
-     * @param bool $isApplicable
-     * @param bool $expected
+     * @param int   $callsCount
+     * @param int   $callsProviderCount
+     * @param bool  $isApplicable
+     * @param bool  $expected
+     *
      * @dataProvider commentProvider
      */
     public function testIsApplicable($entity, $callsCount, $callsProviderCount, $isApplicable, $expected)
     {
-        $config =  $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
             ->getMock();
         $config->expects($this->exactly($callsProviderCount))
@@ -62,10 +63,10 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new ItemStub();
         return [
-            'is null' => [null, 0, 0, false, false],
+            'is null'                 => [null, 0, 0, false, false],
             'is null with enabled on' => [null, 0, 0, true, false],
-            'applicable entity' => [$entity, 1, 2, true, true],
-            'not applicable entity' => [$entity, 1, 1, false, false],
+            'applicable entity'       => [$entity, 1, 2, true, true],
+            'not applicable entity'   => [$entity, 1, 1, false, false],
         ];
     }
 }

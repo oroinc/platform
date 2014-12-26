@@ -47,25 +47,27 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->doctrine = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
+        $this->doctrine       = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()->getMock();
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
-        $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
+        $this->nameFormatter  = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
             ->disableOriginalConstructor()->getMock();
-        $this->pager = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
+        $this->pager          = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
             ->disableOriginalConstructor()->getMock();
-        $this->config = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+        $this->config         = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
             ->disableOriginalConstructor()->getMock();
+
         $this->provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
             ->disableOriginalConstructor()->getMock();
+
         $this->activityListFilterHelper = $this
             ->getMockBuilder('Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()->getMock();
 
+        $this->em             = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()->getMock();
         $this->commentManager = $this->getMockBuilder('Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager')
             ->disableOriginalConstructor()->getMock();
 
@@ -243,7 +245,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'updatedAt'            => '2014-01-01T00:00:00+00:00',
                 'editable'             => true,
                 'removable'            => true,
-                'commentCount'         => ''
+                'commentCount'         => '',
+                'commentable'          => ''
             ],
             $this->activityListManager->getItem(105)
         );

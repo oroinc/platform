@@ -142,13 +142,12 @@ define(function (require) {
             var activityClass = model.getRelatedActivityClass(),
                 configuration = this.options.activityListOptions.configuration[activityClass];
 
-            if (configuration && configuration.has_comments) {
+            if (configuration && configuration.has_comments && model.get('commentable')) {
                 this.initComments(model);
             }
         },
 
         /**
-         *
          * @param {ActivityModel} model
          */
         initComments: function (model) {

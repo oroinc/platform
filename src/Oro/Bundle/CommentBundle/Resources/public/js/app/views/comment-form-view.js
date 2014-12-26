@@ -80,9 +80,9 @@ define(function (require) {
             options = formToAjaxOptions(this.$('form'));
             if (this.model) {
                 attrs.id = this.model.id;
-            } else {
-                this._clearFrom();
             }
+            options.success = _.bind(this.onSuccessResponse, this);
+            options.error = _.bind(this.onErrorResponse, this);
             this.trigger('submit', attrs, options);
         },
 
@@ -104,6 +104,19 @@ define(function (require) {
             this._elements().each(function () {
                 setValue($(this), '');
             });
+        },
+
+        onSuccessResponse: function () {
+            if (!this.model) {
+                this._clearFrom();
+            }
+        },
+
+        onErrorResponse: function (model, jqxhr, options) {
+            if (jqxhr.status === 400 &&
+                jqxhr.responseJSON && jqxhr.responseJSON.errors) {
+                this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
+            }
         }
     });
 
