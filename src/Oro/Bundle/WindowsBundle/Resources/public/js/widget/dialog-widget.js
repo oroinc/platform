@@ -237,7 +237,7 @@ define(function (require) {
                     this.options.dialogOptions.position = this._getWindowPlacement();
                 }
                 this.options.dialogOptions.stateChange = _.bind(this.handleStateChange, this);
-                this.widget = $('<div/>').append(this.$el).dialog(this.options.dialogOptions);
+                this.widget = $('<div/>').append(this.$el).dialog(_.extend({dialogClass: 'invisible'},this.options.dialogOptions));
             } else {
                 this.widget.html(this.$el);
             }
@@ -256,6 +256,12 @@ define(function (require) {
             }, this));
 
             this.widget.on("dialogresizestop", _.bind(this._fixBorderShifting, this));
+        },
+
+        _afterLayoutInit: function () {
+            this.widget.closest('.invisible').removeClass('invisible');
+            this.renderCompleteDeffered.resolve();
+            delete this.renderCompleteDeffered;
         },
 
         _initAdjustHeight: function(content) {

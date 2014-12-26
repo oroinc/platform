@@ -155,7 +155,7 @@ define(function (require) {
                     if (loadingElement[0].tagName.toLowerCase() !== 'body' && loadingElement.css('position') == 'static') {
                         loadingElement.css('position', 'relative');
                     }
-                    this.loadingMask = new LoadingMask();
+                    this.loadingMask = new LoadingMask({loadingElement: loadingElement});
                     loadingElement.data('loading-mask-visible', true);
                     loadingElement.append(this.loadingMask.render().$el);
                     this.loadingMask.show();
@@ -171,7 +171,7 @@ define(function (require) {
         _hideLoading: function() {
             if (this.loadingMask) {
                 this._getLoadingElement().data('loading-mask-visible', false);
-                this.loadingMask.remove();
+                this.loadingMask.dispose();
                 this.loadingMask = null;
             }
         },
@@ -603,7 +603,6 @@ define(function (require) {
                 this.loadContent();
             } else {
                 this._show();
-                layout.init(this.widget, this);
             }
             this.firstRun = false;
         },
@@ -618,7 +617,6 @@ define(function (require) {
             this.actions = {};
             this.setElement($(content).filter('.widget-content:first'));
             this._show();
-            layout.init(this.widget, this);
         },
 
         /**
@@ -680,9 +678,21 @@ define(function (require) {
          */
         _onContentLoad: function(content) {
             this.loading = false;
-            this.trigger('contentLoad', content, this);
             this._removeComponents();
             this.setContent(content, true);
+            if (this.renderCompleteDeffered) {
+                this.renderCompleteDeffered
+                    .done(_.bind(this._triggerContentLoadEvents, this, content))
+                    .fail(function () {
+                        throw new Error("Widget rendering failed");
+                    });
+            } else {
+                this._triggerContentLoadEvents();
+            }
+        },
+
+        _triggerContentLoadEvents: function (content) {
+            this.trigger('contentLoad', content, this);
             mediator.trigger('widget:contentLoad', this.widget);
             mediator.trigger('layout:adjustHeight');
         },
@@ -698,6 +708,15 @@ define(function (require) {
             this.show();
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
+            this.renderCompleteDeffered = $.Deferred();
+            layout.init(this.widget, this)
+                .done(_.bind(this._afterLayoutInit, this));
+        },
+
+        _afterLayoutInit: function () {
+            this.widget.removeClass('invisible');
+            this.renderCompleteDeffered.resolve();
+            delete this.renderCompleteDeffered;
         },
 
         /**
@@ -713,6 +732,7 @@ define(function (require) {
 
         _renderInContainer: function() {
             if (!this.containerFilled && this.options.container) {
+                this.widget.addClass('invisible');
                 $(this.options.container).append(this.widget);
                 this.containerFilled = true;
             }

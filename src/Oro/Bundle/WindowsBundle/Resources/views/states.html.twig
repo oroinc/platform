@@ -12,10 +12,10 @@
         function($, DialogWidget, StateModel) {
             $(function(){
                 {% for windowState in windowStates if windowState.renderedSuccessfully %}
-                var widget = new DialogWidget({
+                new DialogWidget({
+                    autoRender: true,
                     model: new StateModel({{ {'data': windowState.data, 'id': windowState.id}|json_encode|raw }})
                 });
-                widget.render();
                 {% endfor %}
             });
         });

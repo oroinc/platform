@@ -353,7 +353,7 @@ define(function (require) {
         _hideLoading: function () {
             if (this.loadingMask) {
                 this.$loadingMaskContainer.data('loading-mask-visible', false);
-                this.loadingMask.remove();
+                this.loadingMask.dispose();
                 this.loadingMask = null;
             }
         },
