@@ -214,7 +214,7 @@ class CommentApiManager extends ApiEntityManager
      */
     protected function getAttachmentURL($entity)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $accessor   = PropertyAccess::createPropertyAccessor();
         $attachment = $accessor->getValue($entity, 'attachment');
         if (!$attachment) {
             return null;
@@ -233,8 +233,7 @@ class CommentApiManager extends ApiEntityManager
      */
     protected function getRelatedEntity($entityName, $entityId)
     {
-        $repository = $this->getObjectManager()->getRepository($entityName);
-
+        $repository    = $this->getObjectManager()->getRepository($entityName);
         $relatedEntity = $repository->findOneById($entityId);
 
         if (empty($relatedEntity)) {

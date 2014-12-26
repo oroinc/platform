@@ -160,8 +160,8 @@ class ActivityListChainProvider
     public function getActivityListOption()
     {
         $entityConfigProvider = $this->configManager->getProvider('entity');
+        $templates            = [];
 
-        $templates = [];
         foreach ($this->providers as $provider) {
             $hasComment = false;
 
