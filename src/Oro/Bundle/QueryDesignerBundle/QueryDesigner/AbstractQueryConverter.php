@@ -15,6 +15,7 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
  * @todo: need to think how to reduce the complexity of this class
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodCount)
  */
 abstract class AbstractQueryConverter
 {
@@ -785,8 +786,8 @@ abstract class AbstractQueryConverter
         ];
 
         if (isset($query['join'])) {
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'inner', $mainEntityJoinId);
-            $this->processVirtualColumnJoins($joins, $aliases, $query, 'left', $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $aliases);
 
             foreach ($joins as &$item) {
@@ -795,7 +796,11 @@ abstract class AbstractQueryConverter
         }
 
         if (empty($query['select']['expr'])) {
-            $expr = sprintf('%s.%s', $this->getTableAliasForColumn($columnName), $this->getFieldName($columnName));
+            $expr = sprintf(
+                '%s.%s',
+                $aliases[$this->getParentJoinIdentifier($columnName)],
+                $this->getFieldName($columnName)
+            );
         } else {
             $expr = $query['select']['expr'];
         }
@@ -875,6 +880,8 @@ abstract class AbstractQueryConverter
      */
     protected function processVirtualColumnJoins(&$joins, &$aliases, &$query, $joinType, $parentJoinId)
     {
+        $joinType = strtolower($joinType);
+
         if (isset($query['join'][$joinType])) {
             foreach ($query['join'][$joinType] as $item) {
                 $item['type'] = $joinType;
