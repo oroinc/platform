@@ -232,12 +232,17 @@ define(function (require) {
          * Show dialog
          */
         show: function() {
+            var dialogOptions;
             if (!this.widget) {
                 if (typeof this.options.dialogOptions.position === 'undefined') {
                     this.options.dialogOptions.position = this._getWindowPlacement();
                 }
                 this.options.dialogOptions.stateChange = _.bind(this.handleStateChange, this);
-                this.widget = $('<div/>').append(this.$el).dialog(_.extend({dialogClass: 'invisible'},this.options.dialogOptions));
+                dialogOptions = _.extend(
+                    {dialogClass: 'invisible'},
+                    this.options.dialogOptions
+                );
+                this.widget = $('<div/>').append(this.$el).dialog(dialogOptions);
             } else {
                 this.widget.html(this.$el);
             }
@@ -260,8 +265,8 @@ define(function (require) {
 
         _afterLayoutInit: function () {
             this.widget.closest('.invisible').removeClass('invisible');
-            this.renderCompleteDeffered.resolve();
-            delete this.renderCompleteDeffered;
+            this.renderDeffered.resolve();
+            delete this.renderDeffered;
         },
 
         _initAdjustHeight: function(content) {

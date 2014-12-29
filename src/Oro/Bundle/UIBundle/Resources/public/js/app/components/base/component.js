@@ -3,13 +3,14 @@
 define([
     'underscore',
     'backbone',
-    'chaplin'
-], function (_, Backbone, Chaplin) {
+    'chaplin',
+    './component-container-mixin'
+], function (_, Backbone, Chaplin, componentContainerMixin) {
     'use strict';
 
     var BaseComponent, componentOptions;
 
-    componentOptions = ['model', 'collection', '_sourceElement'];
+    componentOptions = ['model', 'collection', 'parent', 'name'];
 
     /**
      * Base component's constructor
@@ -19,10 +20,10 @@ define([
      */
     BaseComponent = function (options) {
         this.cid = _.uniqueId('component');
-        if (options._sourceElement) {
-            options._sourceElement.data('component', this);
-        }
         _.extend(this, _.pick(options, componentOptions));
+        if (this.parent) {
+            this.parent.pageComponent(this.name || this.cid, this);
+        }
         this.initialize(options);
         this.delegateListeners();
     };
@@ -55,6 +56,9 @@ define([
 
     _.extend(
         BaseComponent.prototype,
+
+        // component can hold other components
+        componentContainerMixin,
 
         // extends BaseComponent.prototype with some Backbone's and Chaplin's functionality
         /** @lends {Backbone.Events} */ Backbone.Events,
@@ -90,16 +94,11 @@ define([
             if (this.disposed) {
                 return;
             }
+            this.disposePageComponents();
             this.trigger('dispose', this);
             this.unsubscribeAllEvents();
             this.stopListening();
             this.off();
-            // disposes registered sub-components
-            _.each(this.subComponents || [], function (component) {
-                if (component && typeof component.dispose === 'function') {
-                    component.dispose();
-                }
-            });
             // dispose and remove all own properties
             _.each(this, function (item, name) {
                 if (item && typeof item.dispose === "function") {
@@ -108,6 +107,10 @@ define([
                 delete this[name];
             }, this);
             this.disposed = true;
+
+            // remove link to parent
+            delete this.parent;
+
             return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
         },
 

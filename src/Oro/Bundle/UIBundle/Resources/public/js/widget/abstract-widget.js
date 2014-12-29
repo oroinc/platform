@@ -680,8 +680,8 @@ define(function (require) {
             this.loading = false;
             this._removeComponents();
             this.setContent(content, true);
-            if (this.renderCompleteDeffered) {
-                this.renderCompleteDeffered
+            if (this.renderDeffered) {
+                this.renderDeffered
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
                     .fail(function () {
                         throw new Error("Widget rendering failed");
@@ -708,15 +708,15 @@ define(function (require) {
             this.show();
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
-            this.renderCompleteDeffered = $.Deferred();
+            this.renderDeffered = $.Deferred();
             layout.init(this.widget, this)
                 .done(_.bind(this._afterLayoutInit, this));
         },
 
         _afterLayoutInit: function () {
             this.widget.removeClass('invisible');
-            this.renderCompleteDeffered.resolve();
-            delete this.renderCompleteDeffered;
+            this.renderDeffered.resolve();
+            delete this.renderDeffered;
         },
 
         /**

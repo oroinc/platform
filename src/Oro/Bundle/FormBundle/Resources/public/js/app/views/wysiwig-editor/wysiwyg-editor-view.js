@@ -65,13 +65,13 @@ define(function (require) {
                         this.$el.val(txtHtmlTransformer.text2html(this.$el.val()));
                     }
                 }
-                this.renderCompleteDeffered = $.Deferred();
+                this.renderDeffered = $.Deferred();
                 this.$el.tinymce(_.extend({
                     init_instance_callback: function (editor) {
                         loadingMask.dispose();
                         self.tinymceInstance = editor;
-                        self.renderCompleteDeffered.resolve();
-                        delete self.renderCompleteDeffered;
+                        self.renderDeffered.resolve();
+                        delete self.renderDeffered;
                     }
                 }, this.options));
                 this.tinymceConnected = true;
