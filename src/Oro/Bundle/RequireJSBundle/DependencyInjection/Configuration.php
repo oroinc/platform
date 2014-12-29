@@ -4,6 +4,7 @@ namespace Oro\Bundle\RequireJSBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * This is the class that validates and merges configuration from your app/config files
@@ -34,7 +35,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('web_root')->defaultValue('%kernel.root_dir%/../web')->end()
-                ->scalarNode('js_engine')->defaultValue('node')->end()
+                ->scalarNode('js_engine')->defaultValue(null)->end()
                 ->scalarNode('build_path')->defaultValue('js/app.min.js')->end()
                 ->integerNode('building_timeout')->min(1)->defaultValue(60)->end()
                 ->arrayNode('build')
@@ -50,8 +51,41 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('paths')->addDefaultsIfNotSet()->end()
                     ->end()
                 ->end()
+            ->end()
+            ->validate()
+                ->always(
+                    function ($value) {
+                        if (array_key_exists('js_engine', $value) && $value['js_engine'] == null) {
+                            $value['js_engine'] = self::checkDefaultJsEngine();
+                        }
+                        return $value;
+                    }
+                )
             ->end();
 
         return $treeBuilder;
+    }
+
+    /**
+     * @return string|null
+     */
+    public static function checkDefaultJsEngine()
+    {
+        $jsEngines = ['node', 'nodejs', 'rhino'];
+        $availableJsEngines = [];
+
+        foreach ($jsEngines as $engine) {
+            $jsExists = new ProcessBuilder(array($engine, '-help'));
+            $jsExists = $jsExists->getProcess();
+            if (isset($_SERVER['PATH'])) {
+                $jsExists->setEnv(array('PATH' => $_SERVER['PATH']));
+            }
+            $jsExists->run();
+            if ($jsExists->getErrorOutput() === null) {
+                $availableJsEngines[] = $engine;
+            }
+        }
+
+        return !empty($availableJsEngines) ? reset($availableJsEngines) : null;
     }
 }
