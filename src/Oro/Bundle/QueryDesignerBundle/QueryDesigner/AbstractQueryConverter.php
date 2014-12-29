@@ -610,7 +610,7 @@ abstract class AbstractQueryConverter
     protected function addOrderByStatement()
     {
         foreach ($this->definition['columns'] as $column) {
-            if (isset($column['sorting']) && $column['sorting'] !== self::ROOT_ALIAS_KEY) {
+            if (!empty($column['sorting'])) {
                 $this->addOrderByColumn(
                     $this->columnAliases[$this->buildColumnAliasKey($column)],
                     $column['sorting']
@@ -738,7 +738,7 @@ abstract class AbstractQueryConverter
     }
 
     /**
-     * @param array$query
+     * @param array $query
      * @param string $className
      * @param string $fieldName
      */
@@ -1146,27 +1146,76 @@ abstract class AbstractQueryConverter
      */
     protected function getJoinType($joinId)
     {
+        $returnType = $this->getVirtualFieldReturnType($joinId);
+        if ($returnType) {
+            return $returnType;
+        }
+
+        $relationType = $this->getVirtualRelationType($joinId);
+        if ($relationType) {
+            return $relationType;
+        }
+
+        return $this->joinIdHelper->getJoinType($joinId);
+    }
+
+    /**
+     * @param string $joinId
+     *
+     * @return string|null
+     */
+    protected function getVirtualFieldReturnType($joinId)
+    {
+        if (!$this->virtualFieldProvider) {
+            return null;
+        }
+
         $fieldName = $this->getFieldName($joinId);
+        if (!$fieldName) {
+            return null;
+        }
+
         $className = $this->getEntityClassName($joinId);
-        if ($className && $fieldName && $this->virtualFieldProvider
-            && $this->virtualFieldProvider->isVirtualField($className, $fieldName)
-        ) {
+        if (!$className) {
+            return null;
+        }
+
+        if ($this->virtualFieldProvider->isVirtualField($className, $fieldName)) {
             $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
 
             return $query['select']['return_type'];
         }
 
-        if ($fieldName && $this->virtualRelationProvider
-            && $this->virtualRelationProvider->isVirtualRelation($this->getRootEntity(), $fieldName)
-        ) {
-            $relations = $this->virtualRelationProvider->getVirtualRelations($this->getRootEntity());
+        return null;
+    }
 
-            if (!empty($relations[$fieldName])) {
-                return $relations[$fieldName]['relation_type'];
-            }
+    /**
+     * @param string $joinId
+     *
+     * @return string|null
+     */
+    protected function getVirtualRelationType($joinId)
+    {
+        if (!$this->virtualRelationProvider) {
+            return null;
         }
 
-        return $this->joinIdHelper->getJoinType($joinId);
+        $fieldName = $this->getFieldName($joinId);
+        if (!$fieldName) {
+            return null;
+        }
+
+        if ($this->virtualRelationProvider->isVirtualRelation($this->getRootEntity(), $fieldName)) {
+            $relations = $this->virtualRelationProvider->getVirtualRelations($this->getRootEntity());
+
+            if (empty($relations[$fieldName])) {
+                return null;
+            }
+
+            return $relations[$fieldName]['relation_type'];
+        }
+
+        return null;
     }
 
     /**
