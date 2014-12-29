@@ -7,6 +7,7 @@
 {% endspaceless %}
 {% endset %}
 
+<div id="organization-switcher">
 {% if isDesktopVersion() %}
     {% if organizations|length > 1 %}
         <div class="nav top-search fix_logo">
@@ -99,3 +100,4 @@
         <span class="logo-placeholder"></span>
     {% endif %}
 {% endmacro %}
+</div>
