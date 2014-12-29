@@ -3,8 +3,8 @@
  */
 define({
     load: function (name, req, onLoad) {
-        req(['oroui/js/mediator'], function (mediator) {
-            mediator.once(name, function () {
+        req(['oroui/js/mediator', 'oroui/js/app/ready-state-tracker'], function (mediator, readyStateTracker) {
+            readyStateTracker.whenReady(name, function () {
                 onLoad();
             });
         });

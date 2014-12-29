@@ -34,7 +34,6 @@ define([
                 for (i = 0; i < reuses.length; i += 1) {
                     self.reuse.apply(self, reuses[i]);
                 }
-                mediator.trigger('controller:ready');
             });
         },
 
