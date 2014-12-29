@@ -208,6 +208,8 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * @todo: bc break, move to constructor
+     *
      * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
     public function setVirtualRelationProvider($virtualRelationProvider)
