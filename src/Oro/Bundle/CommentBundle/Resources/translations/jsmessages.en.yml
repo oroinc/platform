@@ -20,5 +20,5 @@ oro:
             tooltip: Attached file {{ filename }}
             delete_message: The comment attachment is successfully removed
         item:
-            added: '{{ user }} added at {{ time }}'
-            update: 'updated by {{ user }} at {{ time }}'
+            added: '{{ user }} added on {{ time }}'
+            update: 'updated by {{ user }} on {{ time }}'

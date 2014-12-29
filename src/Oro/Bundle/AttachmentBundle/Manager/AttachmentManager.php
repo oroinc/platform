@@ -213,8 +213,9 @@ class AttachmentManager
     {
         $sz = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
         $factor = floor((strlen($bytes) - 1) / 3);
+        $key = (int)$factor;
 
-        return isset($sz[$factor]) ? sprintf("%.2f", $bytes / pow(1000, $factor)) . ' ' . $sz[(int)$factor] : $bytes;
+        return isset($sz[$key]) ? sprintf("%.2f", $bytes / pow(1000, $factor)) . ' ' . $sz[$key] : $bytes;
     }
 
     /**
