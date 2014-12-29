@@ -47,6 +47,22 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function saveTableAliases($tableAliases)
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function saveColumnAliases($columnAliases)
+    {
+        // nothing to do
+    }
+
+    /**
      * Process convert
      *
      * @param AbstractQueryDesigner $source
