@@ -110,7 +110,7 @@
                                                 'entity': entity|default(form.vars.value),
                                                 'entity_class': audit_entity_class|default(null),
                                                 'id': audit_entity_id,
-                                                'title': audit_title|default(form.vars.value),
+                                                'title': audit_title|default(form.vars.value.__toString is defined ? form.vars.value : null),
                                                 'audit_path': audit_path|default('oro_dataaudit_history'),
                                                 'audit_show_change_history': audit_show_change_history|default(false)
                                             } %}
