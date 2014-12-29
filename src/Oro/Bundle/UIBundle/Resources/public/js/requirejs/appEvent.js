@@ -1,5 +1,5 @@
 /**
- *
+ * Allow to subscribe to application mediator events through requireJS
  */
 define({
     load: function (name, req, onLoad) {
