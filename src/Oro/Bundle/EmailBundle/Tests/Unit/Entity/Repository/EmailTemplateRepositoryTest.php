@@ -3,7 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Entity\Repository;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -17,7 +18,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
      */
     protected $entityManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -29,7 +30,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entityManager);
         unset($this->repository);
@@ -59,10 +60,10 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
 
-        $this->repository->getTemplateByEntityName('Oro\Bundle\UserBundle\Entity\User');
+        $this->repository->getTemplateByEntityName('Oro\Bundle\UserBundle\Entity\User', new Organization());
     }
 
-    public function testGetEntityQueryBuilder()
+    public function testGetEntityQueryBuilderWithSystemTemplates()
     {
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
             ->disableOriginalConstructor()
@@ -77,9 +78,15 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('where')
             ->will($this->returnSelf());
         $qb->expects($this->once())
-            ->method('orderBy')
+            ->method('orWhere')
             ->will($this->returnSelf());
         $qb->expects($this->once())
+            ->method('andWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('orderBy')
+            ->will($this->returnSelf());
+        $qb->expects($this->exactly(2))
             ->method('setParameter')
             ->will($this->returnSelf());
 
@@ -87,6 +94,47 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('createQueryBuilder')
             ->will($this->returnValue($qb));
 
-        $this->repository->getEntityTemplatesQueryBuilder('Oro\Bundle\UserBundle\Entity\User');
+        $this->repository->getEntityTemplatesQueryBuilder(
+            'Oro\Bundle\UserBundle\Entity\User',
+            new Organization(),
+            true
+        );
+    }
+
+    public function testGetEntityQueryBuilderWithoutSystemTemplates()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $qb->expects($this->once())
+            ->method('select')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('from')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('where')
+            ->will($this->returnSelf());
+        $qb->expects($this->never())
+            ->method('orWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('andWhere')
+            ->will($this->returnSelf());
+        $qb->expects($this->once())
+            ->method('orderBy')
+            ->will($this->returnSelf());
+        $qb->expects($this->exactly(2))
+            ->method('setParameter')
+            ->will($this->returnSelf());
+
+        $this->entityManager->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb));
+
+        $this->repository->getEntityTemplatesQueryBuilder(
+            'Oro\Bundle\UserBundle\Entity\User',
+            new Organization()
+        );
     }
 }

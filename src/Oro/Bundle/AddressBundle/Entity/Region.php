@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Translatable\Translatable;
@@ -11,6 +10,7 @@ use Gedmo\Translatable\Translatable;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Region
@@ -20,7 +20,13 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\AddressBundle\Entity\Repository\RegionRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\AddressBundle\Entity\RegionTranslation")
- * @Config()
+ * @Config(
+ *      defaultValues={
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          }
+ *      }
+ * )
  * @JMS\ExclusionPolicy("ALL")
  */
 class Region implements Translatable
@@ -35,6 +41,13 @@ class Region implements Translatable
      * @JMS\Type("string")
      * @JMS\SerializedName("combinedCode")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $combinedCode;
 

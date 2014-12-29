@@ -8,8 +8,8 @@
     {% set breadcrumbs = {
         entity:      entity,
         indexPath:   path('oro_cron_job_index'),
-        indexLabel:  'Jobs',
-        entityTitle: 'Job "' ~ entity.command ~ '"'
+        indexLabel:  'oro.cron.header.jobs'|trans,
+        entityTitle: 'oro.cron.header.job'|trans({'%name%': entity.command})
     }
     %}
     {{ parent() }}
@@ -31,8 +31,8 @@
                     <td>{{ macros.state(entity) }}</td>
                 </tr>
                 <tr>
-                    <th>{{ 'oro.cron.header.created'|trans }}</th>
-                    <td>{{ macros.ago(entity.createdAt) }}</td>
+                    <th>{{ 'oro.ui.created_at'|trans }}</th>
+                    <td>{{ entity.createdAt|oro_format_datetime }}</td>
                 </tr>
 
                 {% if entity.isRetryJob() %}
@@ -90,7 +90,7 @@
                 <thead>
                     <tr>
                         <th>{{ 'oro.cron.header.id'|trans }}</th>
-                        <th>{{ 'oro.cron.header.created'|trans }}</th>
+                        <th>{{ 'oro.ui.created_at'|trans }}</th>
                         <th>{{ 'oro.cron.header.state'|trans }}</th>
                     </tr>
                 </thead>

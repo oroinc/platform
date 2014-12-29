@@ -5,12 +5,10 @@ namespace Oro\Bundle\EntityConfigBundle\Config;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
@@ -51,11 +49,11 @@ class ConfigModelManager
      */
     protected $proxyEm;
 
-    private $requiredTables = array(
+    private $requiredTables = [
         'oro_entity_config',
         'oro_entity_config_field',
         'oro_entity_config_index_value',
-    );
+    ];
 
     /**
      * @param ServiceLink $proxyEm
@@ -302,35 +300,28 @@ class ConfigModelManager
     }
 
     /**
-     * @param ConfigIdInterface $configId
-     * @return AbstractConfigModel
-     */
-    public function getModelByConfigId(ConfigIdInterface $configId)
-    {
-        return $configId instanceof FieldConfigId
-            ? $this->getFieldModel($configId->getClassName(), $configId->getFieldName())
-            : $this->getEntityModel($configId->getClassName());
-    }
-
-    /**
      * @param string|null $className
+     * @param bool        $withHidden Determines whether models with mode="hidden" is returned or not
+     *
      * @return AbstractConfigModel[]
      */
-    public function getModels($className = null)
+    public function getModels($className = null, $withHidden = false)
     {
         $result = [];
 
         if ($className) {
             $this->ensureFieldLocalCacheWarmed($className);
+            /** @var FieldConfigModel $model */
             foreach ($this->fieldLocalCache[$className] as $model) {
-                if ($model) {
+                if ($model && ($withHidden || $model->getMode() !== ConfigModelManager::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }
         } else {
             $this->ensureEntityLocalCacheWarmed();
+            /** @var EntityConfigModel $model */
             foreach ($this->entityLocalCache as $model) {
-                if ($model) {
+                if ($model && ($withHidden || $model->getMode() !== ConfigModelManager::MODE_HIDDEN)) {
                     $result[] = $model;
                 }
             }
@@ -347,7 +338,7 @@ class ConfigModelManager
      */
     public function createEntityModel($className = null, $mode = self::MODE_DEFAULT)
     {
-        if (!in_array($mode, array(self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY))) {
+        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY])) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 
@@ -375,7 +366,7 @@ class ConfigModelManager
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty');
         }
-        if (!in_array($mode, array(self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY))) {
+        if (!in_array($mode, [self::MODE_DEFAULT, self::MODE_HIDDEN, self::MODE_READONLY])) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
         }
 

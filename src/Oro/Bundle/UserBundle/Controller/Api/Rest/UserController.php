@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -293,7 +292,7 @@ class UserController extends RestController implements ClassResourceInterface
     /**
      * {@inheritdoc}
      */
-    protected function getPreparedItem($entity)
+    protected function getPreparedItem($entity, $resultFields = [])
     {
         $result = parent::getPreparedItem($entity);
 
@@ -306,11 +305,12 @@ class UserController extends RestController implements ClassResourceInterface
         unset($result['statuses']);
         unset($result['api']);
 
-        $result['imagePath'] = null;
+        //todo: Add user avatar to api
+        /*$result['imagePath'] = null;
         if (isset($result['image'])) {
             $result['imagePath'] = $this->getRequest()->getBasePath() . '/' . $entity->getImagePath();
         }
-        unset($result['image']);
+        unset($result['image']);*/
 
         return $result;
     }

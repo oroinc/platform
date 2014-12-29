@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -30,10 +31,10 @@ class TagListener implements ContainerAwareInterface
             $this->manager = $this->container->get('oro_tag.tag.manager');
         }
 
-        if (($resource = $args->getEntity()) and $resource instanceof Taggable) {
+        if (($resource = $args->getEntity()) && $resource instanceof Taggable) {
             $this->manager->deleteTaggingByParams(
                 null,
-                get_class($resource),
+                ClassUtils::getClass($resource),
                 $resource->getTaggableId()
             );
         }

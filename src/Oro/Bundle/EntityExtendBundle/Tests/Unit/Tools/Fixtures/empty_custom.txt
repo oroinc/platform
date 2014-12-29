@@ -1,0 +1,20 @@
+namespace Test;
+
+class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
+{
+    protected $id;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function __toString()
+    {
+        return (string) $this->getId();
+    }
+
+    public function __construct()
+    {
+    }
+}

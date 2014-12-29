@@ -5,7 +5,11 @@
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no">
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
+            <meta http-equiv="cache-control" content="max-age=0" />
+            <meta http-equiv="cache-control" content="no-cache" />
+            <meta http-equiv="expires" content="0" />
+            <meta http-equiv="pragma" content="no-cache" />
             {% block head_style %}
                 {% if oro_theme_icon() %}
                     <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
@@ -17,19 +21,27 @@
                 {% block scripts_before %}
                     {% placeholder scripts_before %}
                 {% endblock %}
-                {% include 'OroRequireJSBundle::scripts.html.twig' with {compressed: not app.debug} %}
+                {% set requirejs_config_extend %}
+                    {%- placeholder requirejs_config_extend -%}
+                {% endset %}
+                {% include 'OroRequireJSBundle::scripts.html.twig' with {
+                    compressed: not app.debug,
+                    config_extend: requirejs_config_extend
+                } %}
+                {% block application %}
                 <script type="text/javascript">
-                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager', 'jquery.uniform']);
+                    require(['oroui/js/app']);
+                </script>
+                {% endblock %}
+                <script type="text/javascript">
+                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
                 {% if isMobileVersion() %}
                     require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
                 {% endif %}
                 {% if app.debug %}
-                    require(['oroui/js/app'], function(app){app.debug = true;});
+                    require(['oroui/js/tools'], function (tools) {tools.debug = true;});
                 {% endif %}
                 </script>
-                {% block hash_nav %}
-                    {% placeholder hash_nav %}
-                {% endblock %}
                 {% placeholder scripts_after %}
                 {% block head_script %}
                 {% endblock %}
@@ -39,7 +51,7 @@
     <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
     {% placeholder after_body_start %}
     <div id="progressbar">
-        <h3>{% trans %}Loading ...{% endtrans %}</h3>
+        <h3>{% trans %}Loading...{% endtrans %}</h3>
         <div class="progress progress-striped active">
             <div class="bar" style="width: 90%;"></div>
         </div>
@@ -52,41 +64,29 @@
                     <div class="navbar-inner">
                         <div class="container">
                             {% placeholder header_logo %}
-                            {% block navbar %}
-                            <div class="nav pull-left top-search shortcuts">
-                                {% placeholder navbar %}
-                            </div>
-                            {% endblock navbar %}
-                            <div class="divider-vertical small-divider"></div>
-                            <div id="main-menu">
-                                {% block application_menu %}
-                                    {% placeholder application_menu %}
-                                {% endblock application_menu %}
-                            </div>
                             <ul class="nav pull-right user-menu">
-                            {% block user_menu %}
-                                {% placeholder user_menu %}
-                                {# Disabled notification icon till it will be implemented
-                                {% block notifications %}
-                                <li class="divider-vertical small-divider"></li>
-                                <li><a class="notifications" href="#"><i class="icon-bullhorn"></i><span class="badge badge-important">1</span></a></li>
-                                {% endblock notifications %}
-                                #}
-                            {% endblock %}
+                                {{ block('user_menu') }}
                             </ul>
+                            {% placeholder dots_menu %}
+                            <div class="nav top-search shortcuts">
+                                {{ block('navbar') }}
+                            </div>
+                            {% placeholder pin_tabs_list %}
                         </div>
                     </div>
+                    {% include 'OroUIBundle:Default/navbar:top.html.twig' %}
                     {% placeholder after_navigation %}
                 </header>
             {% endblock header %}
-            {% block main %}
-                <div id="main" >
-                    {% block right_panel %}
-                        {% placeholder right_panel with {placement: 'right'} %}
-                    {% endblock right_panel %}
-                    {% block left_panel %}
+            {% if isDesktopVersion() %}
+                {% block left_panel %}
+                    <div id="left-panel">
                         {% placeholder left_panel with {placement: 'left'} %}
-                    {% endblock left_panel %}
+                    </div>
+                {% endblock left_panel %}
+            {% endif %}
+            {% block main %}
+                <div id="main">
                     {% block before_content %}
                     <div class="breadcrumb-pin">
                         <div id="breadcrumb">
@@ -95,6 +95,9 @@
                             {% endblock breadcrumb %}
                         </div>
                         {% placeholder pin_button %}
+                        <div id="before-content-addition">
+                            {% block before_content_addition %}{% endblock before_content_addition %}
+                        </div>
                         <div id="flash-messages">
                             {% block messages %}
                                 <div class="flash-messages-frame">
@@ -181,12 +184,17 @@
                     </div>
                 </div>
             {% endblock main %}
+            {% if isDesktopVersion() %}
+                {% block right_panel %}
+                    <div id="right-panel">
+                        {% placeholder right_panel with {placement: 'right'} %}
+                    </div>
+                {% endblock right_panel %}
+            {% endif %}
             {% block footer %}
                 <div id="dialog-extend-fixed-container"></div>
                 <footer id="footer" class="footer">
-                      <div class="alert">
-                          {% placeholder footer_inner %}
-                      </div>
+                    {% placeholder footer_inner %}
                 </footer>
             {% endblock footer %}
         </div>
@@ -195,14 +203,18 @@
     </body>
     </html>
 {% else %}
-{# Template for hash tag navigation#}
-{% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
-    with {
-        'script': block('head_script'),
-        'content': block('page_container'),
-        'menu': block('application_menu'),
-        'breadcrumb': block('breadcrumb'),
-        'userMenu': block('user_menu')
-    }
+    {# Title should be generated as least once in order to pass data to title service #}
+    {% set title = oro_title_render() %}
+    {# Template for hash tag navigation#}
+    {% use 'OroUIBundle:Default/navbar:blocks.html.twig' %}
+    {% include 'OroNavigationBundle:HashNav:hashNavAjax.html.twig'
+        with {
+            'data': {
+                'scripts': block('head_script'),
+                'content': block('page_container'),
+                'breadcrumb': block('breadcrumb')|trim,
+                'beforeContentAddition': block('before_content_addition')
+            }
+        }
     %}
 {% endif %}

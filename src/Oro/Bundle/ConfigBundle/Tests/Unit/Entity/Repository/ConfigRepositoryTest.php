@@ -4,6 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Entity\Repository;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
 
 class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -20,7 +21,7 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * prepare mocks
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->om = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -56,8 +57,8 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testLoadSettings($isScope)
     {
         $criteria = array(
+            'recordId'     => 1,
             'scopedEntity' => 'user',
-            'recordId' => 1,
         );
 
         if ($isScope) {
@@ -71,13 +72,20 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
             $value->expects($this->once())
                 ->method('getValue')
                 ->will($this->returnValue('test'));
+            $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
+            $value->expects($this->once())
+                ->method('getCreatedAt')
+                ->will($this->returnValue($datetime));
+            $value->expects($this->once())
+                ->method('getUpdatedAt')
+                ->will($this->returnValue($datetime));
 
             $scope = $this->getMock('Oro\Bundle\ConfigBundle\Entity\Config');
             $scope->expects($this->once())
                 ->method('getValues')
                 ->will($this->returnValue(array($value)));
             $scope->expects($this->once())
-                ->method('getEntity')
+                ->method('getScopedEntity')
                 ->will($this->returnValue('user'));
 
             $this->repository
@@ -101,6 +109,8 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
         if ($isScope) {
             $this->assertArrayHasKey('oro_user', $settings);
             $this->assertEquals('test', $settings['oro_user']['level']['value']);
+            $this->assertEquals($datetime, $settings['oro_user']['level']['createdAt']);
+            $this->assertEquals($datetime, $settings['oro_user']['level']['updatedAt']);
         } else {
             $this->assertEmpty($settings);
         }

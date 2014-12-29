@@ -7,3 +7,8 @@ Resource Types
 --------------
 
  - [Cumulative Resources](./Resources/doc/cumulative_resources.md) provides a way to configure a bundle from other bundles.
+
+System Aware Resolver
+---------------------
+
+The [System Aware Resolver](./Resources/doc/system_aware_resolver.md) allows to make your configuration files more dynamic. For example you can call service's methods, static methods, constants, context variables etc.

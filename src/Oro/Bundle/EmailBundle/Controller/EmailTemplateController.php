@@ -12,7 +12,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Datagrid\EmailTemplateDatagridManager;
 
 /**
  * @Route("/emailtemplate")
@@ -35,7 +34,9 @@ class EmailTemplateController extends Controller
      */
     public function indexAction()
     {
-        return [];
+        return [
+            'entity_class' => $this->container->getParameter('oro_email.emailtemplate.entity.class')
+        ];
     }
 
     /**
@@ -87,17 +88,17 @@ class EmailTemplateController extends Controller
      *      permission="VIEW"
      * )
      * @Template("OroEmailBundle:EmailTemplate:preview.html.twig")
-     * @param bool|int $emailTemplateId
+     * @param bool|int $id
      * @return array
      */
-    public function previewAction($emailTemplateId = false)
+    public function previewAction($id = false)
     {
-        if (!$emailTemplateId) {
+        if (!$id) {
             $emailTemplate = new EmailTemplate();
         } else {
             /** @var EntityManager $em */
             $em = $this->get('doctrine.orm.entity_manager');
-            $em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')->find($emailTemplateId);
+            $emailTemplate = $em->getRepository('Oro\Bundle\EmailBundle\Entity\EmailTemplate')->find($id);
         }
 
         /** @var FormInterface $form */
@@ -113,7 +114,8 @@ class EmailTemplateController extends Controller
             ->compilePreview($emailTemplate);
 
         return array(
-            'content' => $templateRendered,
+            'content'     => $templateRendered,
+            'contentType' => $emailTemplate->getType()
         );
     }
 

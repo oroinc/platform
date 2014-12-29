@@ -10,9 +10,28 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class LazyServicesCompilerPass implements CompilerPassInterface
 {
     /**
+     * @var array
+     */
+    protected $lazyServicesTags = array(
+        'doctrine.event_listener'
+    );
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
+    {
+        $this->setLazyServicesByConfig($container);
+
+        foreach ($this->lazyServicesTags as $tagName) {
+            $this->setLazyServicesByTag($container, $tagName);
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    protected function setLazyServicesByConfig(ContainerBuilder $container)
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_lazy_services',
@@ -25,6 +44,21 @@ class LazyServicesCompilerPass implements CompilerPassInterface
                 $lazyServices = array_merge($lazyServices, $resource->data['lazy_services']);
             }
         }
+
+        foreach ($lazyServices as $serviceId) {
+            if ($container->hasDefinition($serviceId)) {
+                $container->getDefinition($serviceId)->setLazy(true);
+            }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string $tagName
+     */
+    protected function setLazyServicesByTag(ContainerBuilder $container, $tagName)
+    {
+        $lazyServices = array_keys($container->findTaggedServiceIds($tagName));
 
         foreach ($lazyServices as $serviceId) {
             if ($container->hasDefinition($serviceId)) {

@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\SidebarBundle\Controller\Api\Rest;
 
-use FOS\Rest\Util\Codes;
-use FOS\RestBundle\Controller\FOSRestController;
-use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
-use Oro\Bundle\SidebarBundle\Entity\Widget;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
+use Oro\Bundle\SidebarBundle\Entity\Widget;
 
 /**
  * @RouteResource("sidebarwidgets")
@@ -32,10 +34,14 @@ class WidgetController extends FOSRestController
     {
         /** @var WidgetRepository $widgetRepository */
         $widgetRepository = $this->getDoctrine()->getRepository('OroSidebarBundle:Widget');
-        $items = $widgetRepository->getWidgets($this->getUser(), $placement);
+        $items = $widgetRepository->getWidgets(
+            $this->getUser(),
+            $placement,
+            $this->container->get('security.context')->getToken()->getOrganizationContext()
+        );
 
         if (!$items) {
-            $items = array();
+            $items = [];
         }
 
         return $this->handleView(
@@ -61,13 +67,16 @@ class WidgetController extends FOSRestController
         $entity->setPlacement($this->getRequest()->get('placement'));
         $entity->setState($this->getRequest()->get('state'));
         $entity->setUser($this->getUser());
+        $entity->setOrganization(
+            $this->container->get('security.context')->getToken()->getOrganizationContext()
+        );
 
         $manager = $this->getManager();
         $manager->persist($entity);
         $manager->flush();
 
         return $this->handleView(
-            $this->view(array('id' => $entity->getId()), Codes::HTTP_CREATED)
+            $this->view(['id' => $entity->getId()], Codes::HTTP_CREATED)
         );
     }
 
@@ -87,7 +96,7 @@ class WidgetController extends FOSRestController
         /** @var \Oro\Bundle\SidebarBundle\Entity\Widget $entity */
         $entity = $this->getManager()->find('OroSidebarBundle:Widget', (int)$widgetId);
         if (!$entity) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
@@ -102,7 +111,7 @@ class WidgetController extends FOSRestController
         $em->persist($entity);
         $em->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_OK));
+        return $this->handleView($this->view([], Codes::HTTP_OK));
     }
 
     /**
@@ -121,7 +130,7 @@ class WidgetController extends FOSRestController
         /** @var \Oro\Bundle\SidebarBundle\Entity\Widget $entity */
         $entity = $this->getManager()->find('OroSidebarBundle:Widget', (int)$widgetId);
         if (!$entity) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
@@ -131,7 +140,7 @@ class WidgetController extends FOSRestController
         $em->remove($entity);
         $em->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view([], Codes::HTTP_NO_CONTENT));
     }
 
     /**

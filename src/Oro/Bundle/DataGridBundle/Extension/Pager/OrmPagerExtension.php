@@ -5,8 +5,8 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -21,23 +21,15 @@ use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
  */
 class OrmPagerExtension extends AbstractExtension
 {
-    /**
-     * Query params
-     */
-    const PAGER_ROOT_PARAM = '_pager';
-    const PAGE_PARAM       = '_page';
-    const PER_PAGE_PARAM   = '_per_page';
-    const DISABLED_PARAM   = '_disabled';
-
-    const TOTAL_PATH_PARAM = '[options][totalRecords]';
-
     /** @var Pager */
     protected $pager;
 
-    public function __construct(Pager $pager, RequestParameters $requestParams)
+    /**
+     * @param Pager $pager
+     */
+    public function __construct(Pager $pager)
     {
         $this->pager = $pager;
-        parent::__construct($requestParams);
     }
 
     /**
@@ -53,10 +45,11 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        /** @TODO disabled when hidden on toolbar */
         // enabled by default for ORM datasource
-        return !(bool)$this->getOr(self::DISABLED_PARAM, false)
-            && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        $disabled = $this->getOr(PagerInterface::DISABLED_PARAM, false)
+            || $config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
+
+        return !$disabled && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
     }
 
     /**
@@ -66,9 +59,17 @@ class OrmPagerExtension extends AbstractExtension
     {
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
-        $this->pager->setQueryBuilder($datasource->getQueryBuilder());
-        $this->pager->setPage($this->getOr(self::PAGE_PARAM, 1));
-        $this->pager->setMaxPerPage($this->getOr(self::PER_PAGE_PARAM, $defaultPerPage));
+        if ($datasource instanceof OrmDatasource) {
+            $this->pager->setQueryBuilder($datasource->getQueryBuilder());
+            $this->pager->setSkipAclCheck(
+                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
+            );
+            $this->pager->setSkipCountWalker(
+                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH)
+            );
+        }
+        $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
+        $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
         $this->pager->init();
     }
 
@@ -77,7 +78,7 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $result->offsetSetByPath(self::TOTAL_PATH_PARAM, $this->pager->getNbResults());
+        $result->offsetSetByPath(PagerInterface::TOTAL_PATH_PARAM, $this->pager->getNbResults());
     }
 
     /**
@@ -85,13 +86,19 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
+        $defaultPage = 1;
         $defaultPerPage = $config->offsetGetByPath(ToolbarExtension::PAGER_DEFAULT_PER_PAGE_OPTION_PATH, 10);
 
+        $initialState = [
+            'currentPage' => $defaultPage,
+            'pageSize' => $defaultPerPage
+        ];
         $state = [
-            'currentPage' => $this->getOr(self::PAGE_PARAM, 1),
-            'pageSize'    => $this->getOr(self::PER_PAGE_PARAM, $defaultPerPage)
+            'currentPage' => $this->getOr(PagerInterface::PAGE_PARAM, $defaultPage),
+            'pageSize' => $this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage)
         ];
 
+        $data->offsetAddToArray('initialState', $initialState);
         $data->offsetAddToArray('state', $state);
     }
 
@@ -105,16 +112,38 @@ class OrmPagerExtension extends AbstractExtension
     }
 
     /**
+     * @param ParameterBag $parameters
+     */
+    public function setParameters(ParameterBag $parameters)
+    {
+        if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
+            $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
+            $pager = [];
+
+            if (array_key_exists(PagerInterface::MINIFIED_PAGE_PARAM, $minifiedParameters)) {
+                $pager[PagerInterface::PAGE_PARAM] = $minifiedParameters[PagerInterface::MINIFIED_PAGE_PARAM];
+            }
+            if (array_key_exists(PagerInterface::MINIFIED_PER_PAGE_PARAM, $minifiedParameters)) {
+                $pager[PagerInterface::PER_PAGE_PARAM] = $minifiedParameters[PagerInterface::MINIFIED_PER_PAGE_PARAM];
+            }
+
+            $parameters->set(PagerInterface::PAGER_ROOT_PARAM, $pager);
+        }
+
+        parent::setParameters($parameters);
+    }
+
+    /**
      * Get param or return specified default value
      *
      * @param string $paramName
-     * @param null   $default
+     * @param mixed $default
      *
      * @return mixed
      */
     protected function getOr($paramName, $default = null)
     {
-        $pagerParameters = $this->requestParams->get(self::PAGER_ROOT_PARAM);
+        $pagerParameters = $this->getParameters()->get(PagerInterface::PAGER_ROOT_PARAM, []);
 
         return isset($pagerParameters[$paramName]) ? $pagerParameters[$paramName] : $default;
     }

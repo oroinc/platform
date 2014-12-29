@@ -21,7 +21,7 @@ class UrlProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $router;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()

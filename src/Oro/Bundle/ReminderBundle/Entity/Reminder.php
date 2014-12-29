@@ -7,9 +7,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\ReminderBundle\Model\ReminderDataInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Reminder
@@ -20,11 +20,20 @@ use Oro\Bundle\ReminderBundle\Model\ReminderInterval;
  * @ORM\Entity(repositoryClass="Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "entity"={
- *          "icon"="icon-bell"
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-bell"
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Reminder
@@ -122,6 +131,13 @@ class Reminder
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=false)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -129,6 +145,13 @@ class Reminder
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

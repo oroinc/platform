@@ -19,7 +19,7 @@ class UserMultiSelectTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * Setup test env
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

@@ -1,7 +1,7 @@
 /* jshint devel:true */
 /*global define*/
-define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
-    ], function (_, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
+define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multiple-entity/model', 'oro/dialog-widget'
+    ], function (_, routing, Backbone, EntityView, MultipleEntityModel, DialogWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -23,6 +23,8 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
             name:                      null,
             removedElement:            null,
             selectionUrl:              null,
+            selectionRouteName:        null,
+            selectionRouteParams:      {},
             selectorWindowTitle:       null,
             template:                  null
         },
@@ -31,7 +33,8 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
             'click .add-btn': 'addEntities'
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.template = _.template(this.options.template);
             this.listenTo(this.getCollection(), 'add', this.addEntity);
             this.listenTo(this.getCollection(), 'reset', this._onCollectionReset);
@@ -42,6 +45,8 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
             if (this.options.defaultElement) {
                 this.listenTo(this.getCollection(), 'defaultChange', this.updateDefault);
                 this.$defaultEl = this.$el.closest('form').find('[name$="[' + this.options.defaultElement + ']"]');
+            } else {
+                this.$defaultEl = $();
             }
 
             this.initialCollectionItems = [];
@@ -75,6 +80,15 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
 
             this.$addedEl.val(added.join(','));
             this.$removedEl.val(removed.join(','));
+        },
+
+        removeAll: function() {
+            this.addedCollectionItems   = [];
+            this.$addedEl.val('');
+
+            this.removedCollectionItems = _.clone(this.initialCollectionItems);
+            this.$removedEl.val(this.removedCollectionItems.join(','));
+            this.getCollection().reset([]);
         },
 
         removeDefault: function(item) {
@@ -153,13 +167,8 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
 
         addEntities: function() {
             if (!this.selectorDialog) {
-                var url = this.options.selectionUrl;
-                var separator = url.indexOf('?') > -1 ? '&' : '?';
                 this.selectorDialog = new DialogWidget({
-                    url: url + separator
-                        + 'added=' + this.$addedEl.val()
-                        + '&removed=' + this.$removedEl.val()
-                        + '&default=' + this.$defaultEl.val(),
+                    url:   this._getSelectionWidgetUrl(),
                     title: this.options.selectorWindowTitle,
                     stateEnabled: false,
                     dialogOptions: {
@@ -174,6 +183,20 @@ define(['underscore', 'backbone', './multiple-entity/view', './multiple-entity/m
                 this.selectorDialog.on('completeSelection', _.bind(this.processSelectedEntities, this));
                 this.selectorDialog.render();
             }
+        },
+
+        _getSelectionWidgetUrl: function() {
+            var url = this.options.selectionUrl
+                || routing.generate(this.options.selectionRouteName, this.options.selectionRouteParams),
+                separator = url.indexOf('?') > -1 ? '&' : '?',
+                added = this.$addedEl.val(),
+                removed = this.$removedEl.val(),
+                defaultEl = this.$defaultEl.val();
+
+            return url + separator
+                + 'added=' + (added || '')
+                + '&removed=' + (removed || '')
+                + '&default=' + (defaultEl || '') ;
         },
 
         processSelectedEntities: function (added, addedModels, removed) {

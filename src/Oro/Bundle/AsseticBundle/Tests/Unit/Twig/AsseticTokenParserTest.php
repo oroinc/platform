@@ -34,7 +34,7 @@ class AsseticTokenParserTest extends \PHPUnit_Framework_TestCase
      */
     private $output = 'css/*.css';
 
-    public function setUp()
+    protected function setUp()
     {
         $this->assetsConfiguration = $this->getMockBuilder('Oro\Bundle\AsseticBundle\AssetsConfiguration')
             ->disableOriginalConstructor()

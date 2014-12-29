@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Schema\TableWithNameGenerator;
 
 class ExtendTable extends TableWithNameGenerator
@@ -36,11 +37,17 @@ class ExtendTable extends TableWithNameGenerator
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $name
+     * @param mixed  $value Can be scalar type, array or OroOptions object
+     *
+     * @return \Doctrine\DBAL\Schema\Table
      */
     public function addOption($name, $value)
     {
-        if ($name === ExtendColumn::ORO_OPTIONS_NAME) {
+        if ($name === OroOptions::KEY) {
+            if ($value instanceof OroOptions) {
+                $value = $value->toArray();
+            }
             $this->extendOptionsManager->setTableOptions($this->getName(), $value);
 
             return $this;
@@ -55,14 +62,17 @@ class ExtendTable extends TableWithNameGenerator
     public function addColumn($columnName, $typeName, array $options = [])
     {
         $oroOptions = null;
-        if (isset($options[ExtendColumn::ORO_OPTIONS_NAME])) {
-            $oroOptions = $options[ExtendColumn::ORO_OPTIONS_NAME];
-            unset($options[ExtendColumn::ORO_OPTIONS_NAME]);
+        if (isset($options[OroOptions::KEY])) {
+            $oroOptions = $options[OroOptions::KEY];
+            if ($oroOptions instanceof OroOptions) {
+                $oroOptions = $oroOptions->toArray();
+            }
+            unset($options[OroOptions::KEY]);
         }
 
         if (null !== $oroOptions && isset($oroOptions['extend'])) {
-            if (!isset($oroOptions['extend']['extend'])) {
-                $oroOptions['extend']['extend'] = true;
+            if (!isset($oroOptions['extend']['is_extend'])) {
+                $oroOptions['extend']['is_extend'] = true;
             }
             $options['notnull'] = false;
         }
@@ -70,8 +80,10 @@ class ExtendTable extends TableWithNameGenerator
         $column = parent::addColumn($columnName, $typeName, $options);
 
         if (null !== $oroOptions) {
-            $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
-            $column->setOptions([ExtendColumn::ORO_OPTIONS_NAME => $oroOptions]);
+            if (empty($oroOptions[ExtendOptionsManager::TYPE_OPTION])) {
+                $oroOptions[ExtendOptionsManager::TYPE_OPTION] = $column->getType()->getName();
+            }
+            $column->setOptions([OroOptions::KEY => $oroOptions]);
         }
 
         return $column;

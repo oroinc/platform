@@ -3,9 +3,15 @@ oro_entity_config:
         entity:
             form:
                 block_config:
-                    entity:
-                        title:              'General'
-                        priority:           20
+                    general:
+                        title:              oro.entity_config.block_titles.general.label
+                        priority:           100
+                    associations:
+                        title:              oro.entity_config.block_titles.associations.label
+                        priority:           50
+                    other:
+                        title:              oro.entity_config.block_titles.other.label
+                        priority:           -255
 
             items:
                 icon:
@@ -14,7 +20,8 @@ oro_entity_config:
                     form:
                         type:               oro_icon_select
                         options:
-                            block:          entity
+                            label:          oro.entity.entity_config.entity.entity.items.icon
+                            block:          general
                 label:
                     options:
                         translatable:       true
@@ -27,14 +34,15 @@ oro_entity_config:
                             max:            50
                     grid:
                         type:               html
-                        label:              'Label'
+                        label:              oro.entity.entity_config.entity.entity.items.label
                         filter_type:        string
                         required:           true
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
                         type:               text
                         options:
-                            block:          entity
+                            label:          oro.entity.entity_config.entity.entity.items.label
+                            block:          general
                             required:       true
 
                 plural_label:
@@ -42,13 +50,15 @@ oro_entity_config:
                         translatable:       true
                         priority:           35
                     constraints:
+                        - NotBlank:         ~
                         - Length:
                             min:            2
                             max:            50
                     form:
                         type:               text
                         options:
-                            block:          entity
+                            label:          oro.entity.entity_config.entity.entity.items.plural_label
+                            block:          general
                             required:       true
 
                 description:
@@ -61,14 +71,19 @@ oro_entity_config:
                     form:
                         type:               textarea
                         options:
-                            block:          entity
+                            label:          oro.entity.entity_config.entity.entity.items.description
+                            block:          general
                             required:       false
         field:
             form:
                 block_config:
-                    entity:
-                        title:              'General'
-                        priority:           20
+                    general:
+                        title:              oro.entity_config.block_titles.general.label
+                        priority:           100
+                    other:
+                        title:              oro.entity_config.block_titles.other.label
+                        priority:           -255
+
             items:
                 label:
                     options:
@@ -82,17 +97,18 @@ oro_entity_config:
                             max:            50
                     grid:
                         type:               html
-                        label:              'Label'
+                        label:              oro.entity.entity_config.entity.field.items.label
                         filter_type:        string
                         required:           true
-                        sortable:           true
+                        sortable:           false
                         filterable:         false
                         show_filter:        false
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
                         type:               text
                         options:
-                            block:          entity
+                            label:          oro.entity.entity_config.entity.field.items.label
+                            block:          general
                             required:       true
 
                 description:
@@ -105,7 +121,8 @@ oro_entity_config:
                     form:
                         type:               textarea
                         options:
-                            block:          entity
+                            label:          oro.entity.entity_config.entity.field.items.description
+                            block:          general
                             required:       false
 
     datagrid:
@@ -113,21 +130,37 @@ oro_entity_config:
             items:
                 is_visible:
                     options:
+                        require_schema_update: true
                         default_value:      true
-                        allowed_type:       [string,integer,smallint,bigint,boolean,decimal,date,text,float,money,percent]
+                        allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
                             config_id:
                                 scope:      extend
                             code:           owner
                             value:          Custom
+                    form:
+                        type:               oro_entity_extend_choice
+                        options:
+                            choices:        ['No', 'Yes']
+                            empty_value:    false
+                            block:          other
+                            label:          oro.entity.entity_config.datagrid.field.items.is_visible
 
+                show_filter:
+                    options:
+                        allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
                     form:
                         type:               choice
                         options:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Show on grid'
+                            label:          oro.entity.entity_config.datagrid.field.items.show_filter
 
     form:
         entity:
@@ -164,7 +197,7 @@ oro_entity_config:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Show on form'
+                            label:          oro.entity.entity_config.form.field.items.is_enabled
 
     view:
         field:
@@ -184,4 +217,33 @@ oro_entity_config:
                             choices:        ['No', 'Yes']
                             empty_value:    false
                             block:          other
-                            label:          'Show on view'
+                            label:          oro.entity.entity_config.view.field.items.is_displayable
+                priority:
+                    options:
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
+                    form:
+                        type:               integer
+                        options:
+                            block:          other
+                            label:          oro.entity.entity_config.view.field.items.priority
+                            required:       false
+
+    grouping:
+        entity:
+            items:
+                # it allows to group entities. An entity can be included in several groups
+                groups: # array of strings
+                    options: []
+
+    dictionary:
+        entity:
+            items:
+                # specify the list of fields for which the virtual fields can be created
+                # if not specified the virtual fields are created for all fields, except identifier ones
+                virtual_fields: # array of strings
+                    options:
+                        auditable:          false

@@ -1,0 +1,61 @@
+{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+
+{% block list_wrapper %}
+    {{ block('list') }}
+{% endblock %}
+
+{% block item %}
+    {% if item.hasChildren and item.displayChildren %}
+        {%- set classes = classes|merge(['dropdown']) %}
+        {%- if item.level != 1 %}
+        {%- set childrenClasses = childrenClasses|merge(['dropdown-menu']) %}
+        {% endif -%}
+    {% endif %}
+    {% if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined %}
+        {% if item.extras.routes|length > 1 %}
+            {% set itemAttributes = itemAttributes|merge({'data-routes': item.extras.routes|slice(1)|json_encode })%}
+        {% endif %}
+        {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}
+    {% endif %}
+    {{ block('item_renderer') }}
+{% endblock %}
+
+{% block linkElement %}
+    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+
+    {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
+        {% set linkAttributes = linkAttributes|merge({
+            'class':       oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
+            'data-toggle': 'dropdown'
+        }) %}
+    {% endif %}
+
+    {% if item.uri is empty or item.uri=='#' %}
+        {% set linkAttributes = linkAttributes|merge({
+            'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['unclickable'])
+        }) %}
+    {% endif %}
+
+    <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}><span class="title">{{ block('label') }}</span></a>
+{% endblock %}
+
+{% block item_content %}
+   {% if item.level == 1 %}
+       {% set linkAttributes = item.linkAttributes %}
+       {{ block('linkElement') }}
+       <div class="dropdown-menu">
+           {{ parent() }}
+       </div>
+   {% else %}
+       {{ parent() }}
+   {% endif %}
+{% endblock %}
+
+{% block label %}
+    {%- if item.level == 1 and not item.getExtra('icon') %}
+        <i class="icon-th"></i> {{ parent() }}
+    {% else %}
+        {{ parent() }}
+    {% endif -%}
+{% endblock %}
+

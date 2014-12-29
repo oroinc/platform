@@ -2,198 +2,234 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
+use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
 
-class SyncProcessor
+class SyncProcessor extends AbstractSyncProcessor
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var ProcessorRegistry */
-    protected $processorRegistry;
-
-    /** @var Executor */
-    protected $jobExecutor;
-
-    /** @var TypesRegistry */
-    protected $registry;
-
-    /** @var LoggerStrategy */
-    protected $logger;
+    /** @var ManagerRegistry */
+    protected $doctrineRegistry;
 
     /**
-     * @param EntityManager     $em
-     * @param ProcessorRegistry $processorRegistry
-     * @param Executor          $jobExecutor
-     * @param TypesRegistry     $registry
-     * @param LoggerStrategy    $logger
+     * @param ManagerRegistry          $doctrineRegistry
+     * @param ProcessorRegistry        $processorRegistry
+     * @param Executor                 $jobExecutor
+     * @param TypesRegistry            $registry
+     * @param LoggerStrategy           $logger
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrineRegistry,
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
         TypesRegistry $registry,
-        LoggerStrategy $logger
+        EventDispatcherInterface $eventDispatcher,
+        LoggerStrategy $logger = null
     ) {
-        $this->em                = $em;
-        $this->processorRegistry = $processorRegistry;
-        $this->jobExecutor       = $jobExecutor;
-        $this->registry          = $registry;
-        $this->logger            = $logger;
+        $this->doctrineRegistry = $doctrineRegistry;
+
+        parent::__construct($processorRegistry, $jobExecutor, $registry, $eventDispatcher, $logger);
     }
 
     /**
-     * Process channel synchronization
-     * By default, if $connector is empty, will process all connectors of given channel
+     * Process integration synchronization
+     * By default, if $connector is empty, will process all connectors of given integration
      *
-     * @param Channel $channel    Channel object
-     * @param string  $connector  Connector name
-     * @param array   $parameters Connector additional parameters
+     * @param Integration $integration Integration object
+     * @param string      $connector   Connector name
+     * @param array       $parameters  Connector additional parameters
+     *
+     * @return boolean
      */
-    public function process(Channel $channel, $connector = '', array $parameters = [])
+    public function process(Integration $integration, $connector = null, array $parameters = [])
     {
+        $callback = null;
+
         if ($connector) {
-            $this->processChannelConnector($channel, $connector, $parameters, false);
-        } else {
-            $connectors = $channel->getConnectors();
-            foreach ((array)$connectors as $connector) {
-                $this->processChannelConnector($channel, $connector);
+            $callback = function ($integrationConnector) use ($connector) {
+                return $integrationConnector === $connector;
+            };
+        }
+
+        return $this->processConnectors($integration, $parameters, $callback);
+    }
+
+    /**
+     * Process integration synchronization
+     * By default, if $connector is empty, will process all connectors of given integration
+     *
+     * @param Integration $integration Integration object
+     * @param array       $parameters  Connector additional parameters
+     * @param callable    $callback    Callback to filter connectors
+     *
+     * @return boolean
+     */
+    protected function processConnectors(Integration $integration, array $parameters = [], callable $callback = null)
+    {
+        $isSuccess = true;
+
+        $connectors = $integration->getConnectors();
+
+        if ($callback) {
+            $connectors = array_filter($connectors, $callback);
+        }
+
+        foreach ((array)$connectors as $connector) {
+            try {
+                $result = $this->processIntegrationConnector(
+                    $integration,
+                    $connector,
+                    $parameters
+                );
+
+                $isSuccess = $isSuccess && $result;
+            } catch (\Exception $e) {
+                $isSuccess = false;
+
+                $this->logger->critical($e->getMessage());
             }
         }
+
+        return $isSuccess;
     }
 
     /**
-     * Get logger strategy
+     * Process integration connector
      *
-     * @return LoggerStrategy
+     * @param Integration $integration Integration object
+     * @param string      $connector   Connector name
+     * @param array       $parameters  Connector additional parameters
+     * @param boolean     $saveStatus  Do we need to save new status to bd
+     *
+     * @return boolean
      */
-    public function getLoggerStrategy()
-    {
-        return $this->logger;
-    }
+    protected function processIntegrationConnector(
+        Integration $integration,
+        $connector,
+        array $parameters = [],
+        $saveStatus = true
+    ) {
+        if (!$integration->isEnabled()) {
+            return false;
+        }
 
-    /**
-     * Process channel connector
-     *
-     * @param Channel $channel    Channel object
-     * @param string  $connector  Connector name
-     * @param array   $parameters Connector additional parameters
-     * @param boolean $saveStatus Do we need to save new status to bd
-     */
-    protected function processChannelConnector(Channel $channel, $connector, array $parameters = [], $saveStatus = true)
-    {
         try {
             $this->logger->info(sprintf('Start processing "%s" connector', $connector));
-            /**
-             * Clone object here because it will be modified and changes should not be shared between
-             */
-            $realConnector = clone $this->registry->getConnectorType($channel->getType(), $connector);
+            // Clone object here because it will be modified and changes should not be shared between
+            $realConnector = clone $this->registry->getConnectorType($integration->getType(), $connector);
+
+            $jobName          = $realConnector->getImportJobName();
+            $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
+                ProcessorRegistry::TYPE_IMPORT,
+                $realConnector->getImportEntityFQCN()
+            );
         } catch (\Exception $e) {
             // log and continue
             $this->logger->error($e->getMessage());
             $status = new Status();
-            $status->setCode(Status::STATUS_FAILED)
+            $status
+                ->setCode(Status::STATUS_FAILED)
                 ->setMessage($e->getMessage())
                 ->setConnector($connector);
 
-            $this->em->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($channel, $status);
-            return;
-        }
-        $jobName = $realConnector->getImportJobName();
+            $this->doctrineRegistry
+                ->getRepository('OroIntegrationBundle:Channel')
+                ->addStatus($integration, $status);
 
-        $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
-            ProcessorRegistry::TYPE_IMPORT,
-            $realConnector->getImportEntityFQCN()
-        );
-        $configuration    = [
+            return false;
+        }
+
+        $configuration = [
             ProcessorRegistry::TYPE_IMPORT =>
                 array_merge(
                     [
                         'processorAlias' => reset($processorAliases),
                         'entityName'     => $realConnector->getImportEntityFQCN(),
-                        'channel'        => $channel->getId()
+                        'channel'        => $integration->getId(),
+                        'channelType'    => $integration->getType(),
                     ],
                     $parameters
                 ),
         ];
-        $this->processImport($connector, $jobName, $configuration, $channel, $saveStatus);
+
+        return $this->processImport($connector, $jobName, $configuration, $integration, $saveStatus);
     }
 
     /**
-     * @param string  $connector
-     * @param string  $jobName
-     * @param array   $configuration
-     * @param Channel $channel
-     * @param boolean $saveStatus
+     * @param string      $connector
+     * @param string      $jobName
+     * @param array       $configuration
+     * @param Integration $integration
+     * @param boolean     $saveStatus
+     *
+     * @return boolean
      */
-    protected function processImport($connector, $jobName, $configuration, Channel $channel, $saveStatus)
+    protected function processImport($connector, $jobName, $configuration, Integration $integration, $saveStatus)
     {
+        $event = new SyncEvent($jobName, $configuration);
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
+        $configuration = $event->getConfiguration();
+
         $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
+
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_AFTER, new SyncEvent($jobName, $configuration, $jobResult));
 
         /** @var ContextInterface $contexts */
         $context = $jobResult->getContext();
 
-        $counts           = [];
-        $counts['errors'] = count($jobResult->getFailureExceptions());
+        $connectorData = $errors = [];
         if ($context) {
-            $counts['process'] = 0;
-            $counts['read']    = $context->getReadCount();
-            $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['replace'] = $context->getReplaceCount();
-            $counts['process'] += $counts['update'] = $context->getUpdateCount();
-            $counts['process'] += $counts['delete'] = $context->getDeleteCount();
-            $counts['process'] -= $counts['error_entries'] = $context->getErrorEntriesCount();
-            $counts['errors'] += count($context->getErrors());
+            $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
+            $errors        = $context->getErrors();
         }
-
-        $errorsAndExceptions = [];
-        if (!empty($counts['errors'])) {
-            $errorsAndExceptions = array_slice(
-                array_merge(
-                    $jobResult->getFailureExceptions(),
-                    $context ? $context->getErrors() : []
-                ),
-                0,
-                100
-            );
-        }
-        $isSuccess = $jobResult->isSuccessful() && empty($counts['errors']);
+        $exceptions = $jobResult->getFailureExceptions();
+        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
         $status = new Status();
         $status->setConnector($connector);
-        if (!$isSuccess) {
-            $this->logger->error('Errors were occurred:');
-            $exceptions = implode(PHP_EOL, $errorsAndExceptions);
-            $this->logger->error(
-                $exceptions,
-                ['exceptions' => $jobResult->getFailureExceptions()]
-            );
-            $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
-        } else {
-            $message = sprintf(
-                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d]",
-                $counts['read'],
-                $counts['process'],
-                $counts['update'],
-                $counts['add'],
-                $counts['delete']
-            );
-            $this->logger->info($message);
+        $status->setData(is_array($connectorData) ? $connectorData : []);
+
+        $message = $this->formatResultMessage($context);
+        $this->logger->info($message);
+
+        if ($isSuccess) {
+            if ($errors) {
+                $warningsText = 'Some entities were skipped due to warnings:' . PHP_EOL;
+                $warningsText .= implode($errors, PHP_EOL);
+                $this->logger->warning($warningsText);
+
+                $message .= PHP_EOL . $warningsText;
+            }
 
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
+        } else {
+            $this->logger->error('Errors were occurred:');
+            $exceptions = implode(PHP_EOL, $exceptions);
+
+            $this->logger->error($exceptions);
+            $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         }
+
         if ($saveStatus) {
-            $this->em->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($channel, $status);
+            $this->doctrineRegistry
+                ->getRepository('OroIntegrationBundle:Channel')
+                ->addStatus($integration, $status);
+
+            if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
+                $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
+            }
         }
+
+        return $isSuccess;
     }
 }

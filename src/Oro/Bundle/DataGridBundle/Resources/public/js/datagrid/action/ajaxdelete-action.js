@@ -1,16 +1,21 @@
 /*global define*/
-define(['./model-action', 'oroui/js/delete-confirmation', 'orotranslation/js/translator'
-    ], function (ModelAction, DeleteConfirmation, __) {
+define([
+    './model-action',
+    'oroui/js/delete-confirmation',
+    'oroui/js/mediator'
+], function (ModelAction, DeleteConfirmation, mediator) {
     'use strict';
+
+    var AjaxdeleteAction;
 
     /**
      * Ajax delete action, triggers REST AJAX request
      *
-     * @export  orodatagrid/js/datagrid/action/ajaxdelete-action
-     * @class   orodatagrid.datagrid.action.AjaxdeleteAction
-     * @extends orodatagrid.datagrid.action.ModelAction
+     * @export  oro/datagrid/action/ajaxdelete-action
+     * @class   oro.datagrid.action.AjaxdeleteAction
+     * @extends oro.datagrid.action.ModelAction
      */
-    return ModelAction.extend({
+    AjaxdeleteAction = ModelAction.extend({
         confirmation: true,
 
         /** @property {Function} */
@@ -20,9 +25,24 @@ define(['./model-action', 'oroui/js/delete-confirmation', 'orotranslation/js/tra
             confirm_title: 'Delete Confirmation',
             confirm_content: 'Are you sure you want to remove this item?',
             confirm_ok: 'Yes',
+            confirm_cancel: 'Cancel',
             success: 'Removed.',
             error: 'Not removed.',
             empty_selection: 'Please, select item to remove.'
+        },
+
+        _doAjaxRequest: function () {
+            mediator.trigger('datagrid:beforeRemoveRow:' + this.datagrid.name, this.model);
+
+            AjaxdeleteAction.__super__._doAjaxRequest.apply(this, arguments);
+        },
+
+        _onAjaxSuccess: function (data) {
+            mediator.trigger('datagrid:afterRemoveRow:' + this.datagrid.name);
+
+            AjaxdeleteAction.__super__._onAjaxSuccess.apply(this, arguments);
         }
     });
+
+    return AjaxdeleteAction;
 });

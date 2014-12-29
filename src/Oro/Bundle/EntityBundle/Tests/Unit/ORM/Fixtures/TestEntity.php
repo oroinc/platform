@@ -28,4 +28,14 @@ class TestEntity
      * @ORM\Column(type="text")
      */
     protected $description;
+
+    public function __construct($id = null)
+    {
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

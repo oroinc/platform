@@ -3,13 +3,13 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration\Schema;
 
 use Doctrine\DBAL\Types\Type;
+
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\MigrationBundle\Migration\Schema\Column;
 
 class ExtendColumn extends Column
 {
-    const ORO_OPTIONS_NAME = 'oro_options';
-
     /**
      * @var ExtendOptionsManager
      */
@@ -43,13 +43,13 @@ class ExtendColumn extends Column
      */
     public function setOptions(array $options)
     {
-        if (isset($options[ExtendColumn::ORO_OPTIONS_NAME])) {
-            $this->extendOptionsManager->setColumnOptions(
-                $this->tableName,
-                $this->getName(),
-                $options[ExtendColumn::ORO_OPTIONS_NAME]
-            );
-            unset($options[ExtendColumn::ORO_OPTIONS_NAME]);
+        if (isset($options[OroOptions::KEY])) {
+            $oroOptions = $options[OroOptions::KEY];
+            if ($oroOptions instanceof OroOptions) {
+                $oroOptions = $oroOptions->toArray();
+            }
+            $this->extendOptionsManager->setColumnOptions($this->tableName, $this->getName(), $oroOptions);
+            unset($options[OroOptions::KEY]);
         }
 
         if (!empty($options)) {
@@ -67,7 +67,7 @@ class ExtendColumn extends Column
         if ($this->constructed) {
             $this->setOptions(
                 [
-                    ExtendColumn::ORO_OPTIONS_NAME => [
+                    OroOptions::KEY => [
                         ExtendOptionsManager::TYPE_OPTION => $type->getName()
                     ]
                 ]
@@ -83,7 +83,7 @@ class ExtendColumn extends Column
     public function setLength($length)
     {
         if ($this->constructed) {
-            $this->setOptions([ExtendColumn::ORO_OPTIONS_NAME => ['extend' => ['length' => $length]]]);
+            $this->setOptions([OroOptions::KEY => ['extend' => ['length' => $length]]]);
         }
 
         return parent::setLength($length);
@@ -95,7 +95,7 @@ class ExtendColumn extends Column
     public function setPrecision($precision)
     {
         if ($this->constructed) {
-            $this->setOptions([ExtendColumn::ORO_OPTIONS_NAME => ['extend' => ['precision' => $precision]]]);
+            $this->setOptions([OroOptions::KEY => ['extend' => ['precision' => $precision]]]);
         }
 
         return parent::setPrecision($precision);
@@ -107,7 +107,7 @@ class ExtendColumn extends Column
     public function setScale($scale)
     {
         if ($this->constructed) {
-            $this->setOptions([ExtendColumn::ORO_OPTIONS_NAME => ['extend' => ['scale' => $scale]]]);
+            $this->setOptions([OroOptions::KEY => ['extend' => ['scale' => $scale]]]);
         }
 
         return parent::setScale($scale);

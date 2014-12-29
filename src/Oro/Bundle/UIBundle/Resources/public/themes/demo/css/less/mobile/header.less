@@ -1,0 +1,22 @@
+#oroplatform-header {
+  .navbar-inner .logo a{
+    background-color: transparent;
+    color: @headerTextColor;
+  }
+  #main-menu-toggle {
+    &:hover [class^='icon-'] {
+      border:1px solid darken(#2a5ab1,10%);
+      #gradient > .vertical(@baseGradientColorStart, darken(@baseGradientColorStart,20%));
+    }
+    &:active [class^='icon-'],
+    &:focus [class^='icon-'] {
+      border:1px solid darken(#2a5ab1,10%);
+      #gradient > .vertical(darken(@baseGradientColorStart,10%), darken(@baseGradientColorStart,20%));
+    }
+    &.open > .dropdown-toggle [class^='icon-'] {
+      border:1px solid darken(#2a5ab1,10%);
+      #gradient > .vertical(@baseGradientColorStart, darken(@baseGradientColorStart,20%));
+    }
+  }
+}
+

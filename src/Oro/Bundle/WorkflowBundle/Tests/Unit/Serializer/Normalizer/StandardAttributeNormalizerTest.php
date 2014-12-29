@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\StandardAttributeNormalizer;
 
 class StandardAttributeNormalizerTest extends \PHPUnit_Framework_TestCase

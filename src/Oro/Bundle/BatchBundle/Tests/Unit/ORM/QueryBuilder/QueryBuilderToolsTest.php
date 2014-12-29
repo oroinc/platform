@@ -15,8 +15,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
             $this->getSelectMock(array('someTable.field2 AS alias2')),
         );
 
-        $tools = new QueryBuilderTools();
-        $tools->prepareFieldAliases($selects);
+        $tools = new QueryBuilderTools($selects);
         $expected = array(
             'eData' => 'e.data',
             'alias' => 'someTable.field',
@@ -248,7 +247,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1')
+                array('t2', 't1', 'e')
             ),
             array(
                 array(
@@ -259,7 +258,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1', 't3')
+                array('t2', 't3', 't1', 'e')
             ),
             array(
                 array(
@@ -270,62 +269,7 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
                     )
                 ),
                 array('t2'),
-                array('t2', 't1', 't3')
-            )
-        );
-    }
-
-    /**
-     * @dataProvider havingDataProvider
-     * @param string $condition
-     * @param string $expected
-     */
-    public function testFixHavingAliases($condition, $expected)
-    {
-        $selects = array(
-            $this->getSelectMock(array('e.data as eData')),
-            $this->getSelectMock(array('someTable.field aS alias1')),
-            $this->getSelectMock(array('someTable.field2 AS alias2')),
-        );
-
-        $tools = new QueryBuilderTools($selects);
-        $this->assertEquals($expected, $tools->fixHavingAliases($condition));
-    }
-
-    public function havingDataProvider()
-    {
-        return array(
-            array(
-                'eData LIKE :test',
-                'e.data LIKE :test'
-            ),
-            array(
-                'eData NOT LIKE :test',
-                'e.data NOT LIKE :test'
-            ),
-            array(
-                'eData IS NULL',
-                'e.data IS NULL'
-            ),
-            array(
-                'eData IS NOT NULL',
-                'e.data IS NOT NULL'
-            ),
-            array(
-                'eData = :test1 AND eData NOT LIKE :test',
-                'eData = :test1 AND e.data NOT LIKE :test'
-            ),
-            array(
-                'eData = :test1 AND eData LIKE :test',
-                'eData = :test1 AND e.data LIKE :test'
-            ),
-            array(
-                'eData = :test1 AND eData IS NULL',
-                'eData = :test1 AND e.data IS NULL'
-            ),
-            array(
-                'eData = :test1 AND eData IS NOT NULL',
-                'eData = :test1 AND e.data IS NOT NULL'
+                array('t2', 't3', 't1', 'e')
             )
         );
     }

@@ -10,14 +10,14 @@ class LexerTest extends \PHPUnit_Framework_TestCase
     /** @var Lexer */
     protected $lexer;
 
-    public function setUp()
+    protected function setUp()
     {
         $translatorMock = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $providerMock   = $this->getMock('Oro\Bundle\FilterBundle\Provider\DateModifierProvider');
         $this->lexer    = new Lexer($translatorMock, $providerMock);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->lexer);
     }

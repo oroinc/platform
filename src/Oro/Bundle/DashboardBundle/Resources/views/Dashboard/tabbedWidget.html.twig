@@ -6,7 +6,7 @@
             {% for tab in tabs %}
                 <li{% if activeTab == tab.name %} class="active"{% endif %}><a
                     href="javascript:void(0);" class="no-hash tab-button"
-                    data-name="{{ tab.name }}" data-url="{{ tab.url }}">{{ tab.label|trans }}</a></li>
+                    data-name="{{ tab.name }}" data-url="{{ tab.url }}">{{ tab.label }}</a></li>
             {% endfor %}
         </ul>
         <div class="tab-content">
@@ -19,8 +19,8 @@
         </div>
     </div>
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oroui/js/error', 'oroui/js/loading-mask'],
-        function($, _, error, LoadingMask){
+        require(['jquery', 'underscore', 'oroui/js/mediator', 'oroui/js/error', 'oroui/js/loading-mask'],
+        function($, _, mediator, error, LoadingMask){
             var loadingMask = null;
             $(document).on('click', '#{{ widgetContentId }} .tab-button', function (e) {
                 var $el = $(this);
@@ -46,8 +46,10 @@
                         error.handle({}, jqXHR, {enforce: true});
                     },
                     success: function(data) {
+                        var content = $tabContent.find('.content');
                         loadingMask.hide();
-                        $tabContent.find('.content').html(data);
+                        content.html(data);
+                        mediator.execute('layout:init', content);
                     }
                 });
             });

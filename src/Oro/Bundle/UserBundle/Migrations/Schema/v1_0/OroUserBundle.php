@@ -97,8 +97,9 @@ class OroUserBundle implements Migration
      *
      * @param Schema $schema
      * @param bool   $addImapConfigurationId
+     * @param bool   $addImageField
      */
-    public static function oroUserTable(Schema $schema, $addImapConfigurationId = true)
+    public static function oroUserTable(Schema $schema, $addImapConfigurationId = true, $addImageField = true)
     {
         /** Generate table oro_user **/
         $table = $schema->createTable('oro_user');
@@ -116,7 +117,9 @@ class OroUserBundle implements Migration
         $table->addColumn('last_name', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('name_suffix', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('birthday', 'date', ['notnull' => false]);
-        $table->addColumn('image', 'string', ['notnull' => false, 'length' => 255]);
+        if ($addImageField) {
+            $table->addColumn('image', 'string', ['notnull' => false, 'length' => 255]);
+        }
         $table->addColumn('enabled', 'boolean', []);
         $table->addColumn('salt', 'string', ['length' => 255]);
         $table->addColumn('password', 'string', ['length' => 255]);

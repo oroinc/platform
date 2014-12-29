@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Query\Result;
 
+use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
 use Doctrine\Common\Persistence\ObjectManager;
+
 use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\Exclude;
-use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 class Item
 {
@@ -46,7 +48,7 @@ class Item
     protected $entityConfig;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var ObjectManager
      * @Exclude
      */
     protected $em;
@@ -54,30 +56,26 @@ class Item
     public function __construct(
         ObjectManager $em,
         $entityName = null,
-        $recordId = 0,
+        $recordId = null,
         $recordTitle = null,
         $recordUrl = null,
         $recordText = '',
         $entityConfig = array()
     ) {
-        $this->em = $em;
-        if ($entityName) {
-            $this->setEntityName($entityName);
-        }
-        if ($recordId) {
-            $this->setRecordId($recordId);
-        }
-        $this->recordTitle = $recordTitle;
-        $this->recordUrl = $recordUrl;
-        $this->recordText = $recordText;
-        $this->entityConfig = $entityConfig;
+        $this->em           = $em;
+        $this->entityName   = $entityName;
+        $this->recordId     = empty($recordId) ? 0 : $recordId;
+        $this->recordTitle  = $recordTitle;
+        $this->recordUrl    = $recordUrl;
+        $this->recordText   = empty($recordText) ? '' : $recordText;
+        $this->entityConfig = empty($entityConfig) ? array() : $entityConfig;
     }
 
     /**
      * Set entity name
      *
-     * @param  string                                     $entityName
-     * @return \Oro\Bundle\SearchBundle\Query\Result\Item
+     * @param string $entityName
+     * @return Item
      */
     public function setEntityName($entityName)
     {
@@ -90,7 +88,7 @@ class Item
      * Set record id
      *
      * @param $recordId
-     * @return \Oro\Bundle\SearchBundle\Query\Result\Item
+     * @return Item
      */
     public function setRecordId($recordId)
     {
@@ -125,7 +123,7 @@ class Item
      */
     public function getEntity()
     {
-        return $this->em->getRepository($this->getEntityName())->find($this->getRecordId());
+        return $this->em->getRepository($this->entityName)->find($this->recordId);
     }
 
     /**
@@ -218,8 +216,8 @@ class Item
         return array(
             'entity_name'   => $this->entityName,
             'record_id'     => $this->recordId,
-            'record_string' => $this->getRecordTitle(),
-            'record_url'    => $this->getRecordUrl(),
+            'record_string' => $this->recordTitle,
+            'record_url'    => $this->recordUrl,
         );
     }
 }

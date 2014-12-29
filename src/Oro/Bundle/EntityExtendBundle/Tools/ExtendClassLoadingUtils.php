@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
-use Symfony\Component\Yaml\Yaml;
-
 class ExtendClassLoadingUtils
 {
     /**
@@ -37,7 +34,7 @@ class ExtendClassLoadingUtils
      */
     public static function getAliasesPath($cacheDir)
     {
-        return self::getEntityCacheDir($cacheDir) . '/alias.yml';
+        return self::getEntityCacheDir($cacheDir) . '/alias.data';
     }
 
     /**
@@ -47,10 +44,13 @@ class ExtendClassLoadingUtils
      */
     public static function registerClassLoader($cacheDir)
     {
-        $loader = new UniversalClassLoader();
-        $loader->registerNamespaces(
-            array('Extend\\' => $cacheDir . '/oro_entities')
-        );
+        // we have to use a loader that extends Doctrine's ClassLoader here rather than
+        // Symfony's UniversalClassLoader because in other case Doctrine cannot find our proxies
+        // if a class name does not conform Doctrine's conventions for entity class names,
+        // for example if a class name contains underscore characters
+        // the problem is in Doctrine\Common\ClassLoader::classExists; this method known nothing
+        // about Symfony's UniversalClassLoader
+        $loader = new ExtendClassLoader('Extend\Entity', $cacheDir . '/oro_entities');
         $loader->register();
     }
 
@@ -61,22 +61,10 @@ class ExtendClassLoadingUtils
      */
     public static function setAliases($cacheDir)
     {
-        $aliasesPath = self::getAliasesPath($cacheDir);
-        if (file_exists($aliasesPath)) {
-            $aliases = Yaml::parse(
-                file_get_contents($aliasesPath, FILE_USE_INCLUDE_PATH)
-            );
-
-            if (is_array($aliases)) {
-                foreach ($aliases as $className => $alias) {
-                    if (class_exists($className) && !class_exists($alias, false)) {
-                        $aliasArr   = explode('\\', $alias);
-                        $shortAlias = array_pop($aliasArr);
-
-                        class_alias($className, $shortAlias);
-                        class_alias($className, $alias);
-                    }
-                }
+        $aliases = self::getAliases($cacheDir);
+        foreach ($aliases as $className => $alias) {
+            if (class_exists($className) && !class_exists($alias, false)) {
+                class_alias($className, $alias);
             }
         }
     }
@@ -91,7 +79,7 @@ class ExtendClassLoadingUtils
     {
         $aliasesPath = self::getAliasesPath($cacheDir);
         if (file_exists($aliasesPath)) {
-            $aliases = Yaml::parse(
+            $aliases = unserialize(
                 file_get_contents($aliasesPath, FILE_USE_INCLUDE_PATH)
             );
             if (is_array($aliases)) {

@@ -2,50 +2,63 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Doctrine\Common\Cache\Cache;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\UserBundle\Entity\User;
-
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
 class EmailRenderer extends \Twig_Environment
 {
+    const VARIABLE_NOT_FOUND = 'oro.email.variable.not.found';
+
+    /** @var VariablesProvider */
+    protected $variablesProvider;
+
     /** @var  Cache|null */
     protected $sandBoxConfigCache;
-
-    /** @var  ConfigProvider */
-    protected $configProvider;
 
     /** @var  string */
     protected $cacheKey;
 
-    /** @var User */
-    protected $user;
+    /** @var TranslatorInterface */
+    protected $translator;
 
+    /** @var PropertyAccessor */
+    protected $accessor;
+
+    /**
+     * @param \Twig_LoaderInterface   $loader
+     * @param array                   $options
+     * @param VariablesProvider       $variablesProvider
+     * @param Cache                   $cache
+     * @param                         $cacheKey
+     * @param \Twig_Extension_Sandbox $sandbox
+     * @param TranslatorInterface     $translator
+     */
     public function __construct(
         \Twig_LoaderInterface $loader,
         $options,
-        ConfigProvider $configProvider,
+        VariablesProvider $variablesProvider,
         Cache $cache,
         $cacheKey,
-        SecurityContextInterface $securityContext,
-        \Twig_Extension_Sandbox $sandbox
+        \Twig_Extension_Sandbox $sandbox,
+        TranslatorInterface $translator
     ) {
         parent::__construct($loader, $options);
 
-        $this->configProvider = $configProvider;
+        $this->variablesProvider  = $variablesProvider;
         $this->sandBoxConfigCache = $cache;
-        $this->cacheKey = $cacheKey;
-        $this->user = $securityContext->getToken() && !is_string($securityContext->getToken()->getUser())
-            ? $securityContext->getToken()->getUser() : false;
+        $this->cacheKey           = $cacheKey;
 
         $this->addExtension($sandbox);
         $this->configureSandbox();
+
+        $this->translator = $translator;
     }
 
     /**
@@ -67,7 +80,8 @@ class EmailRenderer extends \Twig_Environment
         $sandbox = $this->getExtension('sandbox');
         /** @var \Twig_Sandbox_SecurityPolicy $security */
         $security = $sandbox->getSecurityPolicy();
-        $security->setAllowedMethods($allowedData);
+        $security->setAllowedProperties($allowedData['properties']);
+        $security->setAllowedMethods($allowedData['methods']);
     }
 
     /**
@@ -79,21 +93,20 @@ class EmailRenderer extends \Twig_Environment
     {
         $configuration = array();
 
-        foreach ($this->configProvider->getIds() as $entityConfigId) {
-            $className = $entityConfigId->getClassName();
-            $fields    = $this->configProvider->filter(
-                function (ConfigInterface $fieldConfig) {
-                    return $fieldConfig->is('available_in_template');
-                },
-                $className
-            );
-
-            if (count($fields)) {
-                $configuration[$className] = array();
-                foreach ($fields as $fieldConfig) {
-                    $configuration[$className][] = 'get' . strtolower($fieldConfig->getId()->getFieldName());
+        $allGetters = $this->variablesProvider->getEntityVariableGetters();
+        foreach ($allGetters as $className => $getters) {
+            $properties = [];
+            $methods    = [];
+            foreach ($getters as $varName => $getter) {
+                if (empty($getter)) {
+                    $properties[] = $varName;
+                } else {
+                    $methods[] = $getter;
                 }
             }
+
+            $configuration['properties'][$className] = $properties;
+            $configuration['methods'][$className]    = $methods;
         }
 
         return $configuration;
@@ -109,14 +122,18 @@ class EmailRenderer extends \Twig_Environment
      */
     public function compileMessage(EmailTemplateInterface $template, array $templateParams = array())
     {
-        // ensure we have no html tags in txt template
-        $content = $template->getContent();
-        $content = $template->getType() == 'txt' ? strip_tags($content) : $content;
+        $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
 
-        $templateParams['user'] = $this->user;
+        $subject = $template->getSubject();
+        $content = $template->getContent();
+
+        if (isset($templateParams['entity'])) {
+            $subject = $this->processDateTimeVariables($subject, $templateParams['entity']);
+            $content = $this->processDateTimeVariables($content, $templateParams['entity']);
+        }
 
         $templateRendered = $this->render($content, $templateParams);
-        $subjectRendered  = $this->render($template->getSubject(), $templateParams);
+        $subjectRendered  = $this->render($subject, $templateParams);
 
         return array($subjectRendered, $templateRendered);
     }
@@ -130,14 +147,76 @@ class EmailRenderer extends \Twig_Environment
      */
     public function compilePreview(EmailTemplate $entity)
     {
-        // ensure we have no html tags in txt template
-        $content = $entity->getContent();
-        $content = $entity->getType() == 'txt' ? strip_tags($content) : $content;
+        return $this->render('{% verbatim %}' . $entity->getContent() . '{% endverbatim %}', []);
+    }
 
-        $templateParams['user'] = $this->user;
+    /**
+     * Process entity variables of dateTime type
+     *   -- datetime variables with formatting will be skipped, e.g. {{ entity.createdAt|date('F j, Y, g:i A') }}
+     *   -- processes ONLY variables that passed without formatting, e.g. {{ entity.createdAt }}
+     *
+     * Note:
+     *  - add oro_format_datetime filter to all items which implement \DateTimeInterface
+     *  - if value does not exists and PropertyAccess::getValue throw an error
+     *    it will change on self::VARIABLE_NOT_FOUND
+     *  - all tags that do not start with `entity` will be ignored
+     *
+     * TODO find a common way for processing formatter
+     * @param string $template
+     * @param object $entity
+     *
+     * @return EmailTemplate
+     */
+    protected function processDateTimeVariables($template, $entity)
+    {
+        $that     = $this;
+        $callback = function ($match) use ($entity, $that) {
+            $result = $match[0];
+            $path   = $match[1];
+            $split  = explode('.', $path);
 
-        $templateRendered = $this->render('{% verbatim %}' . $content . '{% endverbatim %}', $templateParams);
+            if ($split[0] && 'entity' === $split[0]) {
+                unset($split[0]);
 
-        return $templateRendered;
+                try {
+                    $value = $that->getValue($entity, implode('.', $split));
+
+                    if ($value instanceof \DateTime || $value instanceof \DateTimeInterface) {
+                        $result = sprintf('{{ %s|oro_format_datetime }}', $path);
+                    }
+                } catch (\Exception $e) {
+                    $result = $that->translator->trans(self::VARIABLE_NOT_FOUND);
+                }
+            }
+
+            return $result;
+        };
+
+        return preg_replace_callback('/{{\s([\w\d\.\_\-]*?)\s}}/u', $callback, $template);
+    }
+
+    /**
+     * @param Object $entity
+     * @param string $path
+     *
+     * @return mixed
+     */
+    protected function getValue($entity, $path)
+    {
+        $propertyAccess = $this->getPropertyAccess();
+
+        return $propertyAccess->getValue($entity, $path);
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccess()
+    {
+        if (!$this->accessor instanceof PropertyAccessor) {
+            $this->accessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->accessor;
     }
 }

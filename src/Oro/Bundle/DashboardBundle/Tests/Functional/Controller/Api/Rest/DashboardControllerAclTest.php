@@ -5,60 +5,36 @@ namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 use Oro\Bundle\DashboardBundle\Model\Manager;
 use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class DashboardControllerAclTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
     /**
      * @var Manager
      */
     protected $dashboardManager;
 
-    /**
-     * @var bool
-     */
-    protected static $hasLoaded = false;
-
     protected function setUp()
     {
-        $this->client = static::createClient(
-            [],
-            ToolsAPI::generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
-        );
+        $this->initClient();
+        $this->loadFixtures(array('Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData'));
 
-        $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
-
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(
-                __DIR__ . implode('..', array_fill(0, 3, DIRECTORY_SEPARATOR)) . 'DataFixtures'
-            );
-        }
-
-        self::$hasLoaded = true;
+        $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
     }
 
     public function testDelete()
     {
-        $dashboard = $this
-            ->dashboardManager
-            ->findOneDashboardModelBy(['name' => 'main']);
+        $dashboard = $this->dashboardManager->findOneDashboardModelBy(['name' => 'main']);
 
         $this->assertNotNull($dashboard);
 
         $this->client->request(
             'DELETE',
-            $this->client->generate(
+            $this->getUrl(
                 'oro_api_delete_dashboard',
                 [
                     'id' => $dashboard->getId()
@@ -66,10 +42,10 @@ class DashboardControllerAclTest extends WebTestCase
             ),
             [],
             [],
-            ToolsAPI::generateWsseHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 403);
+        $this->assertJsonResponseStatusCodeEquals($result, 403);
 
         $this->assertNotNull($dashboard);
     }

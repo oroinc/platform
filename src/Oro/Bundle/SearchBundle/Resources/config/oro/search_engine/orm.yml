@@ -1,0 +1,14 @@
+parameters:
+    oro_search.engine.class:         Oro\Bundle\SearchBundle\Engine\Orm
+
+services:
+    oro_search.search.engine:
+        class: %oro_search.engine.class%
+        arguments:
+            - @doctrine
+            - @event_dispatcher
+            - @oro_entity.doctrine_helper
+            - @oro_search.mapper
+        calls:
+            - [setLogQueries, [%oro_search.log_queries%]]
+            - [setDrivers, [%oro_search.drivers%]]

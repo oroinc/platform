@@ -51,8 +51,8 @@ class {{ className }} extends EmailAddress
     public function beforeSave()
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->setCreatedAt($date);
-        $this->setUpdatedAt($date);
+        $this->setCreated($date);
+        $this->setUpdated($date);
     }
 
     /**
@@ -60,6 +60,6 @@ class {{ className }} extends EmailAddress
      */
     public function beforeUpdate()
     {
-        $this->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $this->setUpdated(new \DateTime('now', new \DateTimeZone('UTC')));
     }
 }

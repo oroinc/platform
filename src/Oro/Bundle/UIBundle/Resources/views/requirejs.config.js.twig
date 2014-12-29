@@ -1,3 +1,21 @@
+{%- set userName = null -%}
+{%- if app.security.getToken() and app.security.getToken().getUser() -%}
+    {%- set userName = app.security.getToken().getUser().getUserName() -%}
+{%- endif -%}
 require({
-    baseUrl: {{ asset('bundles')|json_encode|raw }}
+    config: {
+        'oroui/js/app': {
+            baseUrl: {{ app.request.getSchemeAndHttpHost()|json_encode|raw }},
+            headerId: {{ oro_hash_navigation_header()|json_encode|raw }},
+            userName: {{ userName|json_encode|raw }},
+            root: {{ app.request.getBaseURL()|json_encode|raw }} + '\/',
+            startRouteName: {{ app.request.attributes.get('_master_request_route')|json_encode|raw }},
+            debug: Boolean({{ app.debug }}),
+            skipRouting: '[data-nohash=true], .no-hash',
+            controllerPath: 'controllers/',
+            controllerSuffix: '-controller',
+            // preserves url path as it is (does not add/remove trailing slash)
+            trailing: null
+        }
+    }
 });

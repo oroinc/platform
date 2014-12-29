@@ -11,15 +11,16 @@ define(function (require) {
     var WidgetContainerModel = require('./model');
 
     var Modal = require('oroui/js/modal');
-    var DialogWidget = require('oro/dialog-widget');
     var constants = require('../constants');
+
+    var __ = require('orotranslation/js/translator');
 
     /**
      * @export  orosidebar/js/widget-container/widget-add-view
      * @class   orosidebar.widgetContainer.WidgetAddView
      * @extends oro.Modal
      */
-    var WidgetAddView = Modal.extend({
+    return Modal.extend({
         /** @property {String} */
         className: 'modal oro-modal-normal',
 
@@ -28,10 +29,11 @@ define(function (require) {
         },
 
         initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             options.content = _.template(widgetAddTemplate, {
                 'availableWidgets': options.sidebar.getAvailableWidgets()
             });
-            options.title = 'Select widget to add';
+            options.title = __('oro.sidebar.widget.add.dialog.title');
 
             Modal.prototype.initialize.apply(this, arguments);
         },
@@ -74,7 +76,7 @@ define(function (require) {
                     placement: placement
                 });
                 widget.update(widgetData);
-                widget.set('settings', widgetData.settings);
+                widget.set('settings', $.extend(true, {}, widgetData.settings));
 
                 widgets.push(widget);
 
@@ -84,6 +86,4 @@ define(function (require) {
             });
         }
     });
-
-    return WidgetAddView;
 });

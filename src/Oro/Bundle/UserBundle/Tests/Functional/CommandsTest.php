@@ -2,31 +2,25 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpKernel\Kernel;
 
 use Symfony\Component\Console\Application;
+
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Command\GenerateWSSEHeaderCommand;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class CommandsTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient();
+        $this->initClient();
     }
 
     public function testGenerateWsse()
@@ -38,6 +32,20 @@ class CommandsTest extends WebTestCase
         $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
         $application->setAutoExit(false);
 
+        $doctrine =$this->client
+            ->getContainer()
+            ->get('doctrine');
+        /** @var Organization $organization */
+        $organization = $doctrine->getRepository('OroOrganizationBundle:Organization')
+            ->getFirst();
+        $user = $this->client
+            ->getContainer()
+            ->get('oro_user.manager')
+            ->findUserByUsername('admin');
+        $apiKey = $doctrine->getRepository('OroUserBundle:UserApi')->findOneBy(
+            ['user' => $user, 'organization' => $organization]
+        );
+
         $command = new GenerateWSSEHeaderCommand();
         $command->setApplication($application);
         $commandTester = new CommandTester($command);
@@ -45,7 +53,7 @@ class CommandsTest extends WebTestCase
             array(
                 'command' => $command->getName(),
                 '--env' => $kernel->getEnvironment(),
-                'username' => 'admin'
+                'apiKey' => $apiKey->getApiKey(),
             )
         );
 
@@ -65,7 +73,7 @@ class CommandsTest extends WebTestCase
         $request = $this->prepareData();
         $this->client->request(
             'POST',
-            $this->client->generate('oro_api_post_user'),
+            $this->getUrl('oro_api_post_user'),
             $request,
             array(),
             array(
@@ -75,7 +83,7 @@ class CommandsTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 201);
+        $this->assertJsonResponseStatusCodeEquals($result, 201);
     }
 
     protected function prepareData()

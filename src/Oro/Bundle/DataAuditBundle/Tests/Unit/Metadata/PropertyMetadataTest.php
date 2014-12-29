@@ -11,7 +11,7 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
      */
     protected $propertyMetadata;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->propertyMetadata = new PropertyMetadata(
             'Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture\LoggableClass',
@@ -27,7 +27,7 @@ class PropertyMetadataTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->propertyMetadata, unserialize(serialize($this->propertyMetadata)));
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $this->propertyMetadata = null;
     }

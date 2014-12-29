@@ -1,0 +1,23 @@
+#oroplatform-header {
+  .logo {
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+  }
+  .nav.user-menu {
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+    border-left-color: @baseGradientColorBorder;
+    a.help:before{
+      background-color: @baseGradientColorBorder;
+    }
+  }
+  .nav.top-search {
+    #gradient > .vertical(@baseGradientColorStart, @baseGradientColorEnd);
+    padding: 0 10px 0 5px;
+  }
+  .navbar-inner{
+    .nav {
+      > li > a {
+        color: @headerTextColor;
+      }
+    }
+  }
+}

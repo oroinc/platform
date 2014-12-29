@@ -62,7 +62,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         if ($data instanceof Collection && !$data->isEmpty()) {
             foreach ($data as $item) {
@@ -78,7 +78,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         $itemType = $this->getItemType($type);
         if ($itemType && class_exists($itemType)) {

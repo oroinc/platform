@@ -1,4 +1,5 @@
 parameters:
+    oro_ui.twig.sort_by.class:           Oro\Bundle\UIBundle\Twig\SortByExtension
     oro_ui.twig.ceil.class:              Oro\Bundle\UIBundle\Twig\CeilExtension
     oro_ui.twig.extension.class:         Oro\Bundle\UIBundle\Twig\UiExtension
     oro_ui.twig.mobile.class:            Oro\Bundle\UIBundle\Twig\MobileExtension
@@ -8,11 +9,20 @@ parameters:
     oro_ui.twig.form.class:              Oro\Bundle\UIBundle\Twig\FormExtension
     oro_ui.twig.placeholder.class:       Oro\Bundle\UIBundle\Twig\PlaceholderExtension
     oro_ui.twig.tab.class:               Oro\Bundle\UIBundle\Twig\TabExtension
+    oro_ui.twig.content.class:           Oro\Bundle\UIBundle\Twig\ContentExtension
+    oro_ui.twig.url.class:               Oro\Bundle\UIBundle\Twig\UrlExtension
+    oro_ui.twig.js_template.class:       Oro\Bundle\UIBundle\Twig\JsTemplateExtension
+    oro_ui.twig.merge_recursive.class:   Oro\Bundle\UIBundle\Twig\MergeRecursiveExtension
 
     twig.class:                          Oro\Bundle\UIBundle\Twig\Environment
     twig.cache_warmer.class:             Oro\Bundle\UIBundle\Cache\TemplateCacheCacheWarmer
 
 services:
+    oro_ui.twig.sort_by_extension:
+        class: %oro_ui.twig.sort_by.class%
+        tags:
+            - { name: twig.extension }
+
     oro_ui.twig.ceil_extension:
         class: %oro_ui.twig.ceil.class%
         tags:
@@ -20,7 +30,6 @@ services:
 
     oro_ui.twig.ui_extension:
         class: %oro_ui.twig.extension.class%
-        arguments: [%oro_ui.placeholders%, %oro_ui.wrap_class%]
         tags:
             - { name: twig.extension }
 
@@ -40,6 +49,8 @@ services:
 
     oro_ui.twig.widget_extension:
         class: %oro_ui.twig.widget.class%
+        calls:
+            - [setRequest, [@?request=]]
         tags:
             - { name: twig.extension }
 
@@ -61,6 +72,7 @@ services:
             - @oro_menu.twig.extension
             - @router
             - @oro_security.security_facade
+            - @translator
         tags:
             - { name: twig.extension }
 
@@ -70,5 +82,36 @@ services:
             - @twig
             - @oro_ui.placeholder.provider
             - @twig.extension.httpkernel
+        calls:
+            - [setRequest, [@?request=]]
         tags:
             - { name: twig.extension }
+
+    twig.extension.text:
+        class: Twig_Extensions_Extension_Text
+        tags:
+           - { name: twig.extension }
+
+    oro_ui.twig.content_extension:
+        class: %oro_ui.twig.content.class%
+        arguments:
+            - @oro_ui.content_provider.manager
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.url_extension:
+        class: %oro_ui.twig.url.class%
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: twig.extension }
+
+    oro_ui.twig.js_template:
+        class: %oro_ui.twig.js_template.class%
+        tags:
+           - { name: twig.extension }
+
+    oro_ui.twig.merge_recursive:
+        class: %oro_ui.twig.merge_recursive.class%
+        tags:
+           - { name: twig.extension }

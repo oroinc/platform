@@ -27,6 +27,11 @@ class MigrationExtensionManager
     protected $nameGenerator;
 
     /**
+     * @var bool
+     */
+    private $isDependenciesUpToDate = false;
+
+    /**
      * Sets a database platform
      *
      * @param AbstractPlatform $platform
@@ -79,6 +84,8 @@ class MigrationExtensionManager
             $extensionAwareInterfaceName,
             $this->getSetExtensionMethodName($extensionAwareInterfaceName)
         ];
+
+        $this->isDependenciesUpToDate = false;
     }
 
     /**
@@ -94,10 +101,34 @@ class MigrationExtensionManager
         if ($this->nameGenerator && $migration instanceof NameGeneratorAwareInterface) {
             $migration->setNameGenerator($this->nameGenerator);
         }
+        $this->ensureExtensionDependenciesApplied();
+        $this->applyExtensionDependencies($migration);
+    }
+
+    /**
+     * Makes sure that links on depended each other extensions set
+     */
+    protected function ensureExtensionDependenciesApplied()
+    {
+        if (!$this->isDependenciesUpToDate) {
+            foreach ($this->extensions as $extension) {
+                $this->applyExtensionDependencies($extension[0]);
+            }
+            $this->isDependenciesUpToDate = true;
+        }
+    }
+
+    /**
+     * Sets extensions to the given object
+     *
+     * @param object $obj
+     */
+    protected function applyExtensionDependencies($obj)
+    {
         foreach ($this->extensions as $extension) {
-            if (is_a($migration, $extension[1])) {
+            if (is_a($obj, $extension[1])) {
                 $setMethod = $extension[2];
-                $migration->$setMethod($extension[0]);
+                $obj->$setMethod($extension[0]);
             }
         }
     }

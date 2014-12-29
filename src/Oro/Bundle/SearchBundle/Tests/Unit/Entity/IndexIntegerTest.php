@@ -11,7 +11,7 @@ class IndexIntegerTest extends \PHPUnit_Framework_TestCase
      */
     private $index;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->index = new IndexInteger();
     }

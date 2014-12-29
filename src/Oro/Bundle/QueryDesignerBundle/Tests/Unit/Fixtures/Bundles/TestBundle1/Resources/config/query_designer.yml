@@ -16,6 +16,14 @@ query_designer:
             applicable: [{type: boolean}]
             type:       boolean
             query_type: [type1]
+        filter5:
+            applicable: [{type: other}]
+            type:       string
+            options:
+                option1: true
+                option2: val1
+            init_module: 'module1'
+            query_type: [all]
 
     grouping:
         exclude: [{type: text}]

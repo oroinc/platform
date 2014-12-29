@@ -1,71 +1,75 @@
 parameters:
     oro_entity.listener.navigation_listener.class:                 Oro\Bundle\EntityBundle\EventListener\NavigationListener
     oro_entity.owner.entity_config_subscriber.class:               Oro\Bundle\EntityBundle\EventListener\EntityConfigSubscriber
-    oro_entity.datagrid.extension.class:                           Oro\Bundle\EntityBundle\Grid\ExtendExtension
     oro_entity.datagrid_helper.class:                              Oro\Bundle\EntityBundle\Grid\GridHelper
-    oro_entity.event_listener.custom_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
-    oro_entity.event_listener.relation_entity_grid_subscriber.class: Oro\Bundle\EntityBundle\EventListener\RelationEntityGridListener
+    oro_entity.event_listener.custom_entity_grid_listener.class:   Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
+    oro_entity.event_listener.entity_relation_grid_listener.class: Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
+    oro_entity.entity_hierarchy_provider.class:                    Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
+    oro_entity.exclusion_provider.config.class:                    Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
+    oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+    oro_entity.exclusion_provider.dictionary.class:                Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
+    oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
+    oro_entity.virtual_field_provider.chain.class:                 Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
+    oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
+    oro_entity.virtual_field_provider.enum.class:                  Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
-    oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
-    oro_entity.doctrine_helper.class:                              Oro\Bundle\EntityBundle\ORM\DoctrineHelper
+    oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
+    oro_entity.twig.extension.entity.class:                        Oro\Bundle\EntityBundle\Twig\EntityExtension
+    oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
+    oro_entity.extension.unique_entity_extension.class:            Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
 
+    # override default Doctrine event manager class
+    doctrine.dbal.connection.event_manager.class:                  Oro\Bundle\EntityBundle\Event\OroEventManager
+
+    oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
+
+    oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
 services:
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
         arguments:
             - @oro_security.security_facade
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.extend
+            - @oro_entity_config.config_manager
             - @translator
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
-    oro_entity.doctrine_helper:
-        class: %oro_entity.doctrine_helper.class%
+    oro_entity.extension.unique_entity_extension:
+        class: %oro_entity.extension.unique_entity_extension.class%
         arguments:
-            - @doctrine
+            - @validator
+            - @translator
+            - @oro_entity_config.provider.entity
+        tags:
+            - { name: form.type_extension, alias: form }
 
     oro_entity.owner.entity_config_subscriber:
         class: %oro_entity.owner.entity_config_subscriber.class%
         tags:
             - { name: kernel.event_subscriber }
 
-    oro_entity.datagrid.extension:
-        class: %oro_entity.datagrid.extension.class%
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: oro_datagrid.extension }
-
     oro_entity.datagrid_helper:
         class: %oro_entity.datagrid_helper.class%
         arguments:
             - @oro_entity.entity_provider
 
-    oro_entity.event_listener.custom_entity_grid_subscriber:
-        class: %oro_entity.event_listener.custom_entity_grid_subscriber.class%
+    oro_entity.event_listener.custom_entity_grid_listener:
+        class: %oro_entity.event_listener.custom_entity_grid_listener.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_datagrid.provider.resolver
-            - @oro_datagrid.datagrid.request_params
             - @router
-        calls:
-            - [setRequest, [@?request=]]
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.custom-entity-grid, method: onBuildBefore }
 
-    oro_entity.event_listener.relation_entity_grid_subscriber:
-        class: %oro_entity.event_listener.relation_entity_grid_subscriber.class%
+    oro_entity.event_listener.entity_relation_grid_listener:
+        class: %oro_entity.event_listener.entity_relation_grid_listener.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_datagrid.provider.resolver
-            - @oro_datagrid.datagrid.request_params
-            - @router
         calls:
             - [setRequest, [@?request=]]
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.entity-relation-grid, method: onBuildBefore }
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entity-relation-grid, method: onBuildAfter }
 
     oro_entity.entity_provider.abstract:
         abstract: true
@@ -74,6 +78,8 @@ services:
             - @oro_entity_config.provider.extend
             - @oro_entity.orm.entity_class_resolver
             - @translator
+        calls:
+            - [setExclusionProvider, [@oro_entity.exclusion_provider]]
 
     oro_entity.entity_provider:
         class: %oro_entity.entity_provider.class%
@@ -85,16 +91,88 @@ services:
             - @oro_entity_config.provider.entity
             - @oro_entity_config.provider.extend
             - @oro_entity.orm.entity_class_resolver
+            - @oro_entity_extend.extend.field_type_helper
             - @doctrine
             - @translator
+            - %oro_entity.hidden_fields%
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
+            - [setVirtualFieldProvider, [@oro_entity.virtual_field_provider]]
+            - [setExclusionProvider, [@oro_entity.exclusion_provider]]
+
+    oro_entity.exclusion_provider:
+        class: %oro_entity.exclusion_provider.chain.class%
+
+    oro_entity.exclusion_provider.config:
+        class: %oro_entity.exclusion_provider.config.class%
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - %oro_entity.exclusions%
+        tags:
+            - { name: oro_entity.exclusion_provider.default }
+
+    oro_entity.exclusion_provider.dictionary:
+        class: %oro_entity.exclusion_provider.dictionary.class%
+        arguments:
+            - @oro_entity_config.provider.grouping
+
+    oro_entity.virtual_field_provider:
+        class: %oro_entity.virtual_field_provider.class%
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - %oro_entity.virtual_fields%
+
+    oro_entity.virtual_field_provider.dictionary:
+        class: %oro_entity.virtual_field_provider.dictionary.class%
+        arguments:
+            - @oro_entity_config.provider.grouping
+            - @oro_entity_config.provider.dictionary
+            - @doctrine
+
+    oro_entity.virtual_field_provider.enum:
+        class: %oro_entity.virtual_field_provider.enum.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @doctrine
+
+    oro_entity.entity_hierarchy_provider:
+        class: %oro_entity.entity_hierarchy_provider.class%
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @doctrine
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%
         parent: oro_entity.entity_field_provider.abstract
 
-    oro_entiy.twig.extension.class_name:
-        class: %oro_entity.twig.extension.class_name.class%
+    oro_entity.entity_field_list_provider:
+        class: %oro_entity.entity_field_list_provider.class%
+        arguments:
+            - @oro_entity.entity_field_provider
+            - @oro_entity.entity_provider
+
+    oro_entity.twig.extension.entity:
+        class: %oro_entity.twig.extension.entity.class%
+        arguments:
+            - @oro_entity.entity_identifier_accessor
+            - @oro_entity.routing_helper
         tags:
             - { name: twig.extension }
+
+    oro_entity.routing_helper:
+        class: %oro_entity.routing_helper.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @router
+
+    oro_entity.listener.orm.generated_value_strategy_listener:
+        class: %oro_entity.listener.orm.generated_value_strategy_listener.class%
+        arguments:
+            - %database_driver%
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }
+
+    oro_entity.migration.extension.change_type:
+        class: %oro_entity.migration.extension.change_type.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: change_type }

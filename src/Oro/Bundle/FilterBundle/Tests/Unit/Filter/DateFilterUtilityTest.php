@@ -11,7 +11,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
     /** @var DateFilterUtility */
     protected $utility;
 
-    public function setUp()
+    protected function setUp()
     {
         $localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
@@ -19,12 +19,12 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $localeSettings->expects($this->any())
             ->method('getTimezone')
-            ->will($this->returnValue('Europe/Moscow'));
+            ->will($this->returnValue('Asia/Tbilisi'));
 
         $this->utility = new DateFilterUtility($localeSettings);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->utility);
     }

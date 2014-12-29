@@ -235,7 +235,9 @@ a:hover {
     padding: 25px;
     text-align: center;
     background-color: #f1f1f1;
-    border-bottom: 1px solid #dadada
+    border-bottom: 1px solid #dadada;
+    -webkit-border-radius: 4px 4px 0 0;
+    border-radius: 4px 4px 0 0
 }
 
 .progress-bar ul {
@@ -546,7 +548,6 @@ a.button:hover {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     height: 32px;
-    line-height: 32px;
     padding: 0 5px;
     -webkit-border-radius: 3px;
     border-radius: 3px
@@ -729,4 +730,14 @@ html, body {
 
 td.progress span {
     display: none
+}
+
+td pre.output {
+    background-color: #232125;
+    overflow: auto;
+    line-height: 1.3em;
+    color: #fff;
+    font-size: 14px;
+    padding: .7em;
+    margin-top: 10px;
 }

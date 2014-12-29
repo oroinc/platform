@@ -2,25 +2,60 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Data\ORM;
 
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
-abstract class AbstractEmailFixture extends AbstractFixture
+abstract class AbstractEmailFixture extends AbstractFixture implements
+    DependentFixtureInterface,
+    ContainerAwareInterface
 {
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return [
+            'Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData',
+        ];
+    }
+
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
+        $adminUser = $this->getAdminUser($manager);
+        $organization = $this->getOrganization($manager);
+
         $emailTemplates = $this->getEmailTemplatesList($this->getEmailsDir());
 
         foreach ($emailTemplates as $fileName => $file) {
             $template = file_get_contents($file['path']);
             $emailTemplate = new EmailTemplate($fileName, $template, $file['format']);
+            $emailTemplate->setOwner($adminUser);
+            $emailTemplate->setOrganization($organization);
             $manager->persist($emailTemplate);
         }
 
@@ -60,6 +95,44 @@ abstract class AbstractEmailFixture extends AbstractFixture
         }
 
         return $templates;
+    }
+
+    /**
+     * @param ObjectManager $manager
+     * @return Organization
+     */
+    protected function getOrganization(ObjectManager $manager)
+    {
+        return $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+    }
+
+    /**
+     * Get administrator user
+     *
+     * @param ObjectManager $manager
+     *
+     * @return User
+     *
+     * @throws \RuntimeException
+     */
+    protected function getAdminUser(ObjectManager $manager)
+    {
+        $repository = $manager->getRepository('OroUserBundle:Role');
+        $role       = $repository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
+
+        if (!$role) {
+            throw new \RuntimeException('Administrator role should exist.');
+        }
+
+        $user = $repository->getFirstMatchedUser($role);
+
+        if (!$user) {
+            throw new \RuntimeException(
+                'Administrator user should exist to load email templates.'
+            );
+        }
+
+        return $user;
     }
 
     /**

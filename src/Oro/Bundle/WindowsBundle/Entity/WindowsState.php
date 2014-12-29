@@ -54,9 +54,14 @@ class WindowsState
     protected $updatedAt;
 
     /**
+     * @var boolean
+     */
+    protected $renderedSuccessfully = false;
+
+    /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -105,14 +110,14 @@ class WindowsState
     public function setCreatedAt($createdAt)
     {
         $this->createdAt = $createdAt;
-    
+
         return $this;
     }
 
     /**
      * Get createdAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -128,14 +133,14 @@ class WindowsState
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
-    
+
         return $this;
     }
 
     /**
      * Get updatedAt
      *
-     * @return \DateTime 
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {
@@ -184,5 +189,25 @@ class WindowsState
     public function doPreUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Returns flag that window was rendered successfully
+     *
+     * @return bool
+     */
+    public function isRenderedSuccessfully()
+    {
+        return $this->renderedSuccessfully;
+    }
+
+    /**
+     * Sets flag that window was rendered successfully
+     *
+     * @param bool $renderedSuccessfully
+     */
+    public function setRenderedSuccessfully($renderedSuccessfully)
+    {
+        $this->renderedSuccessfully = (bool)$renderedSuccessfully;
     }
 }

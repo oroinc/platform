@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\UserBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class UpdateUserCommand extends ContainerAwareCommand
+use Oro\Bundle\UserBundle\Exception\InvalidArgumentException;
+
+class UpdateUserCommand extends CreateUserCommand
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function configure()
     {
         $this
@@ -28,28 +32,22 @@ class UpdateUserCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @throws \InvalidArgumentException
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $username = $input->getArgument('user-name');
-        $userManager = $this->getContainer()->get('oro_user.manager');
-        $user = $userManager->findUserByUsername($username);
+        $user     = $this->getUserManager()->findUserByUsername($username);
+        $options  = $input->getOptions();
 
         if (!$user) {
             throw new \InvalidArgumentException(sprintf('User "%s" not found.', $username));
         }
 
-        $options = $input->getOptions();
-        $user
-            ->setUsername($options['user-name'])
-            ->setEmail($options['user-email'])
-            ->setFirstName($options['user-firstname'])
-            ->setLastName($options['user-lastname'])
-            ->setPlainPassword($options['user-password']);
-
-        $userManager->updateUser($user);
+        try {
+            $this->updateUser($user, $options);
+        } catch (InvalidArgumentException $exception) {
+            $output->writeln($exception->getMessage());
+        }
     }
 }

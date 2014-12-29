@@ -22,32 +22,6 @@ class ColumnType extends AbstractType
             ->add('label', 'text', array('required' => true))
             ->add('func', 'oro_function_choice', array('required' => false))
             ->add('sorting', 'oro_sorting_choice', array('required' => false));
-
-        /*
-        $factory = $builder->getFormFactory();
-        $builder->addEventListener(
-            FormEvents::PRE_SET_DATA,
-            function (FormEvent $event) use ($factory) {
-                $form = $event->getForm();
-
-                $form->add(
-                    $factory->createNamed(
-                        'name',
-                        $form->getConfig()->getOption('column_choice_type'),
-                        null,
-                        array(
-                            'required'           => true,
-                            'auto_initialize'    => false,
-                            'entity'             => $form->getConfig()->getOption('entity'),
-                            'skip_load_entities' => true,
-                            'skip_load_data'     => true,
-                            'with_relations'     => true,
-                        )
-                    )
-                );
-            }
-        );
-        */
     }
 
     /**

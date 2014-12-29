@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Form\Model\Email;
+use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class Processor
@@ -18,42 +22,59 @@ class Processor
     /** @var EntityManager */
     protected $em;
 
-    /** @var EmailEntityBuilder */
-    protected $emailEntityBuilder;
+    /** @var  DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var \Swift_Mailer */
     protected $mailer;
 
+    /** @var EmailAddressHelper */
+    protected $emailAddressHelper;
+
+    /** @var EmailEntityBuilder */
+    protected $emailEntityBuilder;
+
     /** @var  EmailOwnerProvider */
     protected $emailOwnerProvider;
 
+    /** @var  EmailActivityManager */
+    protected $emailActivityManager;
+
+    /** @var array */
+    protected $origins = array();
+
     /**
-     * @param EntityManager      $em
-     * @param EmailEntityBuilder $emailEntityBuilder
-     * @param \Swift_Mailer      $mailer
-     * @param EmailOwnerProvider $emailOwnerProvider
+     * @param DoctrineHelper       $doctrineHelper
+     * @param \Swift_Mailer        $mailer
+     * @param EmailAddressHelper   $emailAddressHelper
+     * @param EmailEntityBuilder   $emailEntityBuilder
+     * @param EmailOwnerProvider   $emailOwnerProvider
+     * @param EmailActivityManager $emailActivityManager
      */
     public function __construct(
-        EntityManager $em,
-        EmailEntityBuilder $emailEntityBuilder,
+        DoctrineHelper $doctrineHelper,
         \Swift_Mailer $mailer,
-        EmailOwnerProvider $emailOwnerProvider
+        EmailAddressHelper $emailAddressHelper,
+        EmailEntityBuilder $emailEntityBuilder,
+        EmailOwnerProvider $emailOwnerProvider,
+        EmailActivityManager $emailActivityManager
     ) {
-        $this->em                 = $em;
-        $this->emailEntityBuilder = $emailEntityBuilder;
-        $this->mailer             = $mailer;
-        $this->emailOwnerProvider = $emailOwnerProvider;
+        $this->doctrineHelper       = $doctrineHelper;
+        $this->mailer               = $mailer;
+        $this->emailAddressHelper   = $emailAddressHelper;
+        $this->emailEntityBuilder   = $emailEntityBuilder;
+        $this->emailOwnerProvider   = $emailOwnerProvider;
+        $this->emailActivityManager = $emailActivityManager;
     }
 
     /**
      * Process email model sending.
      *
-     * @param Email  $model
-     * @param string $originName
-     * @return \Oro\Bundle\EmailBundle\Entity\Email
+     * @param EmailModel $model
+     * @return Email
      * @throws \Swift_SwiftException
      */
-    public function process(Email $model, $originName = InternalEmailOrigin::BAP)
+    public function process(EmailModel $model)
     {
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -64,7 +85,7 @@ class Processor
         $message->setFrom($this->getAddresses($model->getFrom()));
         $message->setTo($this->getAddresses($model->getTo()));
         $message->setSubject($model->getSubject());
-        $message->setBody($model->getBody(), 'text/plain');
+        $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
         $messageId = $message->generateId();
 
@@ -72,28 +93,7 @@ class Processor
             throw new \Swift_SwiftException('An email was not delivered.');
         }
 
-        $emailOwner = $this->emailOwnerProvider->findEmailOwner(
-            $this->em,
-            EmailUtil::extractPureEmailAddress($model->getFrom())
-        );
-
-        if ($emailOwner instanceof User) {
-            $origins = $emailOwner->getEmailOrigins()->filter(
-                function ($item) {
-                    return $item instanceof InternalEmailOrigin;
-                }
-            );
-
-            $origin = $origins->isEmpty() ? null : $origins->first();
-            if ($origin == null) {
-                $origin = $this->createUserInternalOrigin($emailOwner);
-            }
-        } else {
-            $origin = $this->em
-                ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                ->findOneBy(array('internalName' => $originName));
-        }
-
+        $origin = $this->getEmailOrigin($model->getFrom());
         $this->emailEntityBuilder->setOrigin($origin);
 
         $email = $this->emailEntityBuilder->email(
@@ -105,14 +105,63 @@ class Processor
             $messageDate
         );
 
-        $email->addFolder($origin->getFolder(EmailFolder::SENT));
-        $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), false, true));
+        $email->addFolder($origin->getFolder(FolderType::SENT));
+        $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
 
-        $this->emailEntityBuilder->getBatch()->persist($this->em);
-        $this->em->flush();
+        // persist the email and all related entities such as folders, email addresses etc.
+        $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
+
+        // associate the email with the target entity if exist
+        if ($model->hasEntity()) {
+            $targetEntity = $this->doctrineHelper->getEntity($model->getEntityClass(), $model->getEntityId());
+            if ($targetEntity) {
+                $this->emailActivityManager->addAssociation($email, $targetEntity);
+            }
+        }
+
+        // flush all changes to the database
+        $this->getEntityManager()->flush();
 
         return $email;
+    }
+
+    /**
+     * Find existing email origin entity by email string or create and persist new one.
+     *
+     * @param string $email
+     * @param string $originName
+     * @return EmailOrigin
+     */
+    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
+    {
+        $originKey = $originName . $email;
+        if (!array_key_exists($originKey, $this->origins)) {
+            $emailOwner = $this->emailOwnerProvider->findEmailOwner(
+                $this->getEntityManager(),
+                $this->emailAddressHelper->extractPureEmailAddress($email)
+            );
+
+            if ($emailOwner instanceof User) {
+                $origins = $emailOwner->getEmailOrigins()->filter(
+                    function ($item) {
+                        return $item instanceof InternalEmailOrigin;
+                    }
+                );
+
+                $origin = $origins->isEmpty() ? null : $origins->first();
+                if ($origin == null) {
+                    $origin = $this->createUserInternalOrigin($emailOwner);
+                }
+            } else {
+                $origin = $this->getEntityManager()
+                    ->getRepository('OroEmailBundle:InternalEmailOrigin')
+                    ->findOneBy(array('internalName' => $originName));
+            }
+            $this->origins[$originKey] = $origin;
+        }
+
+        return $this->origins[$originKey];
     }
 
     /**
@@ -125,9 +174,9 @@ class Processor
 
         $outboxFolder = new EmailFolder();
         $outboxFolder
-            ->setType(EmailFolder::SENT)
-            ->setName(EmailFolder::SENT)
-            ->setFullName(EmailFolder::SENT);
+            ->setType(FolderType::SENT)
+            ->setName(FolderType::SENT)
+            ->setFullName(FolderType::SENT);
 
         $origin = new InternalEmailOrigin();
         $origin
@@ -136,17 +185,17 @@ class Processor
 
         $emailOwner->addEmailOrigin($origin);
 
-        $this->em->persist($origin);
-        $this->em->persist($emailOwner);
+        $this->getEntityManager()->persist($origin);
+        $this->getEntityManager()->persist($emailOwner);
 
         return $origin;
     }
 
     /**
-     * @param Email $model
+     * @param EmailModel $model
      * @throws \InvalidArgumentException
      */
-    protected function assertModel(Email $model)
+    protected function assertModel(EmailModel $model)
     {
         if (!$model->getFrom()) {
             throw new \InvalidArgumentException('Sender can not be empty');
@@ -178,14 +227,26 @@ class Processor
         }
 
         foreach ($addresses as $address) {
-            $name = EmailUtil::extractEmailAddressName($address);
+            $name = $this->emailAddressHelper->extractEmailAddressName($address);
             if (empty($name)) {
-                $result[] = EmailUtil::extractPureEmailAddress($address);
+                $result[] = $this->emailAddressHelper->extractPureEmailAddress($address);
             } else {
-                $result[EmailUtil::extractPureEmailAddress($address)] = $name;
+                $result[$this->emailAddressHelper->extractPureEmailAddress($address)] = $name;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        if (null === $this->em) {
+            $this->em = $this->doctrineHelper->getEntityManager('OroEmailBundle:Email');
+        }
+
+        return $this->em;
     }
 }

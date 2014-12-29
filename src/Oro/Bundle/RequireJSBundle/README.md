@@ -13,7 +13,7 @@ For details of build options see [example.build.js].
 Common options for require.js config are placed in ```app/config.yml```:
 
     oro_require_js:
-        config:                                 # common options which will eventually get into require.js config file
+        config: # common options which will eventually get into require.js config file
             waitSeconds: 0
             enforceDefine: true
             scriptType: 'text/javascript'
@@ -40,55 +40,50 @@ Each bundle's javascript module have to be defined in ```paths``` section, where
 ### Generation
 Main require.js config is generated automatically and embedded in HTML-page. The config is stored in application cache. So if you want, for some reason, renew a require.js configuration, then just clean a cache.
 
-## Runtime main require.js config extension
+### Usage
+To get `require.js` script with its configuration on your page, just include `scripts.html.twig` template from `OroRequireJSBundle` to `<head/>` tag of your `index.html.twig` template.
 
-Sometimes it is necessary to modify require.js configuration on a fly (e.g. to set ```baseUrl``` for all JS-resources or define module with dynamic URL).
-It is possible to do over Twig extension ```placeholder``` (provided by OroUIBundle).
-In ```%BundleName%\Resources\config\placeholders.yml``` define a twig template for placeholder ```requirejs_config_extend```:
-
-    placeholders:
-        requirejs_config_extend:
-            items:
-                ui_requirejs_config:
-                    order: 100
-
-    items:
-        ui_requirejs_config:
-            template: OroUIBundle::requirejs.config.js.twig
-
-In that template you can write piece of custom configuration which will be applied after general configuration is loaded and before any module get utilized.
-The template produces JS-code which is actually ```require();``` function call with a single argument - JS-object with a piece of configuration.
-
-E.g. dynamically defines ```baseUrl``` option, depending on what the original request was (OroUIBundle):
-
-    require({
-        baseUrl: '{{ asset('bundles') }}'
-    });
+    <head>
+        <!-- -->
+        {% include 'OroRequireJSBundle::scripts.html.twig' %}
+        <!-- -->
+    </head>
 
 
-Or dynamically defines path to translations dictionary (depending on what locale is currently used) and prevents any translations calls before the dictionary is loaded (OroTranslationBundle):
 
-    require({
-        shim: {
-            'oro/translations': {
-                deps: ['orotranslation/js/translator', 'translator'],
-                init: function(__) {
-                    return __;
-                }
+
+The template `scripts.html.twig` accepts two optional parameters `compressed` and `config_extend`.
+
+- `compressed` is boolean (`true` by default), determines whether to use minified js-file or not. Usually it's opposite to `app.dev` flag.
+- `config_extend` is a string with javascript code, allows to extend requirejs configuration in runtime mode (see [runtime require.js config](#runtime-requirejs-main-config-extension)).
+
+
+    {% set requirejs_config_extend %}
+        // custom javascript code
+    {% endset %}
+    {% include 'OroRequireJSBundle::scripts.html.twig' with {
+        compressed: not app.debug,
+        config_extend: requirejs_config_extend
+    } %}
+
+
+## Runtime require.js main config extension
+
+Sometimes it is necessary to modify require.js configuration on a fly (e.g. to set dynamic path in depends of request parameters etc.).
+It is possible to do over `config_extend` parameter for `OroRequireJSBundle::scripts.html.twig` template.
+That variable can contain piece of custom configuration which will be applied after general configuration is loaded and before any module get utilized.
+
+E.g. to dynamically define path to translation dictionary (depending on what locale is currently used):
+
+    {% set requirejs_config_extend %}
+        require({
+            paths: {
+                'oro/translations':
+                    '{{ url('oro_translation_jstranslation')[0:-3] }}'
             }
-        },
-        map: {
-            '*': {
-                'orotranslation/js/translator': 'oro/translations'
-            },
-            'oro/translations': {
-                'orotranslation/js/translator': 'orotranslation/js/translator'
-            }
-        },
-        paths: {
-            'oro/translations': '{{ url('oro_translation_jstranslation')[0:-3] }}'
-        }
-    });
+        });
+    {% endset %}
+
 
 In terms of sequence of code execution it looks:
 
@@ -97,8 +92,8 @@ In terms of sequence of code execution it looks:
     ```require(/* ... */); require(/* ... */); require(/* ... */);```
     - load single minified js-resource (with ```require-config.js``` + ```require.js``` and rest of modules)
  1. Dev mode (or built resource does not exist)
-    - load ```js/require-config.js```
     - load ```require.js```
+    - load ```js/require-config.js```
     - execute all custom configurations<br />
     ```require(/* ... */); require(/* ... */); require(/* ... */);```
 

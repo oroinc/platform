@@ -41,13 +41,15 @@ class RegionType extends AbstractType
                 array(
                     'label'         => 'oro.address.region.entity_label',
                     'class'         => 'OroAddressBundle:Region',
+                    'random_id'     => true,
                     'property'      => 'name',
                     'query_builder' => null,
                     'choices'       => $choices,
                     'country'       => null,
                     'country_field' => null,
                     'configs' => array(
-                        'placeholder' => 'oro.address.form.choose_region'
+                        'placeholder' => 'oro.address.form.choose_region',
+                        'allowClear' => true
                     ),
                     'empty_value' => '',
                     'empty_data'  => null

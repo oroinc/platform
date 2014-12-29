@@ -23,12 +23,78 @@ oro_dashboard_config:
     # Configuration of dashboards
     dashboards:                                              # dashboard configuration section
         main:                                                # dashboard name
-            label: oro.dashboard.title.main                  # label of dashboard
             twig: OroDashboardBundle:Index:default.html.twig # dashboard template (used by default)
 ```
 To view all configuration options you can launch `config:dump-reference` command:
 ```bash
 php app/console config:dump-reference OroDashboardBundle
+```
+
+How to add new dashboard
+------------------------
+
+To add new dashboard you need to create new data migration:
+
+```php
+<?php
+
+namespace Oro\Bundle\DashboardBundle\Migrations\Data\ORM;
+
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+
+class LoadDashboardData extends AbstractDashboardFixture implements DependentFixtureInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        // we need admin user as a dashboard owner
+        return ['Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function load(ObjectManager $manager)
+    {
+        // create new dashboard
+        $dashboard = $this->createAdminDashboardModel(
+            $manager,      // pass ObjectManager
+            'new_dashoard' // dashboard name
+        );
+        
+        // to update existing one
+        $dashboard = $this->findAdminDashboardModel(
+            $manager,      // pass ObjectManager
+            'existing_one' // dashboard name
+        );
+                
+        $dashboard
+            // if user doesn't have active dashboard this one will be used
+            ->setIsDefault(true)
+            
+            // dashboard label
+            ->setLabel(
+                $this->container->get('translator')->trans('oro.dashboard.title.main')
+            )
+            
+            // add widgets one by one
+            ->addWidget(
+                $this->createWidgetModel(
+                    'quick_launchpad',  // widget name from yml configuration
+                    [
+                        0, // column, starting from left
+                        10 // position, starting from top
+                    ]
+                )
+            );
+
+        $manager->flush();
+    }
+}
+
 ```
  
 How to make a dashboard a first page of your application
@@ -57,20 +123,14 @@ datagrid:
             query:
                 select:
                     - call.id
-                    - CONCAT(contact.firstName, CONCAT(' ', contact.lastName)) as contactName
-                    - contact.id as contactId
-                    - account.name as accountName
                     - call.subject
-                    - CONCAT(CASE WHEN call.phoneNumber IS NOT NULL THEN call.phoneNumber ELSE contactPhone.phone END, '') as phone
+                    - call.phoneNumber as phone
                     - call.callDateTime as dateTime
                     - directionType.name as callDirection
                 from:
                     - { table: %orocrm_call.call.entity.class%, alias: call }
                 join:
                     left:
-                        - { join: call.relatedContact, alias: contact }
-                        - { join: call.contactPhoneNumber, alias: contactPhone }
-                        - { join: call.relatedAccount, alias: account }
                         - { join: call.direction, alias: directionType }
                     inner:
                         - { join: call.owner, alias: ownerUser }
@@ -86,11 +146,6 @@ datagrid:
             dateTime:
                 label: orocrm.call.datagrid.date_time
                 frontend_type: datetime
-            contactName:
-                type: twig
-                label: orocrm.call.datagrid.contact_name
-                frontend_type: html
-                template: OroCRMCallBundle:Datagrid:Column/contactName.html.twig
             subject:
                 type: twig
                 label: orocrm.call.subject.label

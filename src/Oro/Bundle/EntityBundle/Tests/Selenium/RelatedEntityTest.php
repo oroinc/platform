@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Selenium;
 
+use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
 
 class RelatedEntityTest extends Selenium2TestCase
 {
@@ -18,9 +20,11 @@ class RelatedEntityTest extends Selenium2TestCase
         );
 
         $login = $this->login();
+
+        /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->add()
-            ->assertTitle('New Entity - Entities - System')
+            ->assertTitle('New Entity - Entity Management - Entities - System')
             ->setName($entityData['entityName'])
             ->setLabel($entityData['entityName'])
             ->setPluralLabel($entityData['entityName'])
@@ -28,15 +32,17 @@ class RelatedEntityTest extends Selenium2TestCase
             ->assertMessage('Entity saved')
             ->createField()
             ->setFieldName($entityData['stringField'])
+            ->setStorageType('Table column')
             ->setType('String')
             ->proceed()
             ->save()
             ->assertMessage('Field saved')
             ->createField()
             ->setFieldName($entityData['relationField'])
-            ->setType('Relation one to many')
+            ->setStorageType('Table column')
+            ->setType('One to many')
             ->proceed()
-            ->setTargetEntity('OroUserBundle:User')
+            ->setTargetEntity('User')
             ->setRelation('Related entity data fields', array('First name', 'Last name'))
             ->setRelation('Related entity info title', array('First name', 'Last name'))
             ->setRelation('Related entity detailed', array('First name', 'Last name'))
@@ -56,6 +62,8 @@ class RelatedEntityTest extends Selenium2TestCase
     public function testCreateNewEntityRecord($entityData)
     {
         $login = $this->login();
+
+        /** @var Navigation $login */
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')

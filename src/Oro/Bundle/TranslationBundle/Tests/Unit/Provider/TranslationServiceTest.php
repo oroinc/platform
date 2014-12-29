@@ -23,7 +23,10 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     /** @var string */
     protected $className = 'Oro\Bundle\TranslationBundle\Provider\TranslationServiceProvider';
 
-    public function setUp()
+    /** @var string */
+    protected $testPath;
+
+    protected function setUp()
     {
         $this->adapter = $this->getMock('Oro\Bundle\TranslationBundle\Provider\CrowdinAdapter', [], [], '', false);
         $this->dumper  = $this->getMock('Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper', [], [], '', false);
@@ -32,18 +35,45 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->testPath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '/oro_trans_dir';
+        $this->removeTestDir($this->testPath);
+        mkdir($this->testPath);
         $this->service = new TranslationServiceProvider(
             $this->adapter,
             $this->dumper,
             new TranslationLoader(),
             $this->databasePersister,
-            'someTestRootDir'
+            $this->testPath
         );
     }
 
-    public function tearDown()
+    /**
+     * @param string $dir
+     */
+    protected function removeTestDir($dir)
+    {
+        if (is_dir($dir)) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            );
+
+            foreach ($files as $fileInfo) {
+                if ($fileInfo->isDir()) {
+                    rmdir($fileInfo->getRealPath());
+                } else {
+                    unlink($fileInfo->getRealPath());
+                }
+            }
+
+            rmdir($dir);
+        }
+    }
+
+    protected function tearDown()
     {
         unset($this->adapter, $this->dumper, $this->service);
+        $this->removeTestDir($this->testPath);
     }
 
     /**
@@ -70,7 +100,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['download', 'upload', 'cleanup'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
         );
 
         $dir = $this->getLangFixturesDir();
@@ -112,18 +142,18 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $service->expects($this->once())
             ->method('cleanup');
 
-        $service->update($dir);
+        $service->update([$dir]);
     }
 
     public function testDownload()
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
         );
 
-        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $path = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zip';
+        $tempDir = $this->testPath . DIRECTORY_SEPARATOR . ltrim(uniqid(), DIRECTORY_SEPARATOR);
+        $path = $tempDir . DIRECTORY_SEPARATOR . 'zip';
         mkdir(dirname($path), 0777, true);
         touch($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
 
@@ -159,10 +189,10 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
     {
         $service = $this->getServiceMock(
             ['cleanup', 'renameFiles', 'apply', 'unzip'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
         );
 
-        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path = $this->testPath . DIRECTORY_SEPARATOR;
         $path = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'zip';
         mkdir(dirname($path), 0777, true);
         touch($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
@@ -179,16 +209,12 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
             ->method('unzip')
             ->will($this->throwException($ex));
 
-        $this->adapter->expects($this->once())
-            ->method('parseResponse');
-
         $service->download($path, ['Oro'], 'en');
-        unlink($path . TranslationServiceProvider::FILE_NAME_SUFFIX);
     }
 
     public function testCleanUp()
     {
-        $path     = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $path     = $this->testPath . DIRECTORY_SEPARATOR;
         $dir      = $path . ltrim(uniqid(), DIRECTORY_SEPARATOR);
         $path     = $dir . DIRECTORY_SEPARATOR . 'zip';
         $fileName = $path . TranslationServiceProvider::FILE_NAME_SUFFIX;
@@ -197,15 +223,14 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         }
         touch($fileName);
 
-        $this->assertTrue(file_exists($fileName));
+        $this->assertFileExists($fileName);
 
         $method = new \ReflectionMethod($this->className, 'cleanup');
         $method->setAccessible(true);
         $method->invoke($this->service, $dir);
         $method->invoke($this->service, $dir . '1');
 
-        $this->assertFalse(file_exists($fileName));
-
+        $this->assertFileNotExists($fileName);
     }
 
     public function testApply()
@@ -213,7 +238,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $apply = new \ReflectionMethod($this->className, 'apply');
         $apply->setAccessible(true);
 
-        $basePath = $target = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR
+        $basePath = $target = $this->testPath . DIRECTORY_SEPARATOR
             . ltrim(uniqid(), DIRECTORY_SEPARATOR);
         $target   = $basePath . DIRECTORY_SEPARATOR . 'target';
         $source   = $basePath . DIRECTORY_SEPARATOR . 'source';
@@ -243,7 +268,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testRenameFiles()
     {
-        $targetPath = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $targetPath = $this->testPath . DIRECTORY_SEPARATOR;
         $targetPath = $targetPath . ltrim(uniqid('download_'), DIRECTORY_SEPARATOR);
         mkdir($targetPath, 0777, true);
 
@@ -263,7 +288,7 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
 
         $service = $this->getServiceMock(
             ['__construct'],
-            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, 'someTestRootDir']
+            [$this->adapter, $this->dumper, new TranslationLoader(), $this->databasePersister, $this->testPath]
         );
 
         $method = new \ReflectionMethod(
@@ -275,13 +300,9 @@ class TranslationServiceTest extends \PHPUnit_Framework_TestCase
         $method->invoke($service, '.en.', '.en_US.', $targetPath);
 
         foreach ($files as $k => $file) {
-            $this->assertFalse(file_exists($file));
-            $this->assertTrue(file_exists($filesExpected[$k]));
-
-            unlink($filesExpected[$k]);
+            $this->assertFileNotExists($file);
+            $this->assertFileExists($filesExpected[$k]);
         }
-
-        rmdir($targetPath);
     }
 
     /**

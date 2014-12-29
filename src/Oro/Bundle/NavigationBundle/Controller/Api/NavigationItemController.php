@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\HttpFoundation\Response;
 
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @RouteResource("navigationitems")
@@ -39,8 +39,9 @@ class NavigationItemController extends FOSRestController
         $entity = $this->getFactory()->createItem($type, array());
 
         /** @var $repo NavigationRepositoryInterface */
-        $repo = $this->getDoctrine()->getRepository(get_class($entity));
-        $items = $repo->getNavigationItems($this->getUser(), $type);
+        $repo = $this->getDoctrine()->getRepository(ClassUtils::getClass($entity));
+        $organization = $this->container->get('security.context')->getToken()->getOrganizationContext();
+        $items = $repo->getNavigationItems($this->getUser(), $organization, $type);
 
         return $this->handleView(
             $this->view($items, is_array($items) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
@@ -73,6 +74,7 @@ class NavigationItemController extends FOSRestController
 
         $params['user'] = $this->getUser();
         $params['url']  = $this->getStateUrl($params['url']);
+        $params['organization'] = $this->container->get('security.context')->getToken()->getOrganizationContext();
 
         /** @var $entity \Oro\Bundle\NavigationBundle\Entity\NavigationItemInterface */
         $entity = $this->getFactory()->createItem($type, $params);

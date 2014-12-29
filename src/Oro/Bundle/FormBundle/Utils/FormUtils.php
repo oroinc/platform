@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Utils;
 
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 
 class FormUtils
@@ -23,14 +24,33 @@ class FormUtils
         array $modifyOptions = [],
         array $unsetOptions = []
     ) {
-        $field = $form->get($fieldName);
-        $config = $field->getConfig()->getOptions();
+        $config  = $form->get($fieldName)->getConfig();
+        $options = $config->getOptions();
 
-        if (array_key_exists('auto_initialize', $config)) {
-            $config['auto_initialize'] = false;
+        if (array_key_exists('auto_initialize', $options)) {
+            $options['auto_initialize'] = false;
         }
-        $config = array_merge($config, $modifyOptions);
-        $config = array_diff_key($config, array_flip($unsetOptions));
-        $form->add($fieldName, $field->getConfig()->getType()->getName(), $config);
+        $options = array_merge($options, $modifyOptions);
+        $options = array_diff_key($options, array_flip($unsetOptions));
+        $form->add($fieldName, $config->getType()->getName(), $options);
+    }
+
+    /**
+     * Appends CSS class(es) to given form view
+     *
+     * @param FormView $view
+     * @param string|[]   $cssClass
+     */
+    public static function appendClass(FormView $view, $cssClasses)
+    {
+        $vars       = $view->vars;
+        $cssClasses = is_array($cssClasses) ? $cssClasses : [$cssClasses];
+
+        $vars['attr']          = isset($vars['attr']) ? $vars['attr'] : [];
+        $vars['attr']['class'] = isset($vars['attr']['class']) ? $vars['attr']['class'] : '';
+
+        $vars['attr']['class'] = trim(implode(' ', array_merge([$vars['attr']['class']], $cssClasses)));
+
+        $view->vars = $vars;
     }
 }

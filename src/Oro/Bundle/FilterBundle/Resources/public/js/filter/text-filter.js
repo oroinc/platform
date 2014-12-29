@@ -1,7 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filter'
-    ], function ($, _, __, AbstractFilter) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './empty-filter'
+], function ($, _, __, EmptyFilter) {
     'use strict';
+
+    var TextFilter;
 
     /**
      * Text grid filter.
@@ -10,11 +17,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
      *  - "disable" when filter is disabled
      *  - "update" when filter criteria is changed
      *
-     * @export  orofilter/js/filter/text-filter
-     * @class   orofilter.filter.TextFilter
-     * @extends orofilter.filter.AbstractFilter
+     * @export  oro/filter/text-filter
+     * @class   oro.filter.TextFilter
+     * @extends oro.filter.EmptyFilter
      */
-    return AbstractFilter.extend({
+    TextFilter = EmptyFilter.extend({
         wrappable: true,
 
         wrapperTemplate: '',
@@ -89,7 +96,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
                 };
             }
 
-            AbstractFilter.prototype.initialize.apply(this, arguments);
+            TextFilter.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -124,22 +131,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
         _onClickUpdateCriteria: function (e) {
             this._hideCriteria();
             this.applyValue();
-        },
-
-        /**
-         * Handle click on criteria selector
-         *
-         * @param {Event} e
-         * @protected
-         */
-        _onClickCriteriaSelector: function (e) {
-            e.stopPropagation();
-            $('body').trigger('click');
-            if (!this.popupCriteriaShowed) {
-                this._showCriteria();
-            } else {
-                this._hideCriteria();
-            }
         },
 
         /**
@@ -189,19 +180,24 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
             return this;
         },
 
+        /**
+         * Renders filter's wrapper, (a button and a dropdown container e.g.)
+         *
+         * @param {Element|jQuery|string}  $filter
+         * @private
+         */
         _wrap: function ($filter) {
-            this.$el.append($filter);
+            this._appendFilter($filter);
         },
 
         /**
-         * Unsubscribe from click on body event
+         * Append filter to its place
          *
-         * @return {*}
+         * @param {Element|jQuery|string} $filter
+         * @private
          */
-        remove: function () {
-            $('body').off('click', this._clickOutsideCriteriaCallback);
-            AbstractFilter.prototype.remove.call(this);
-            return this;
+        _appendFilter: function ($filter) {
+            this.$el.append($filter);
         },
 
         /**
@@ -275,7 +271,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          * @inheritDoc
          */
         _onValueUpdated: function (newValue, oldValue) {
-            AbstractFilter.prototype._onValueUpdated.apply(this, arguments);
+            TextFilter.__super__._onValueUpdated.apply(this, arguments);
             this._updateCriteriaHint();
         },
 
@@ -301,7 +297,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './abstract-filt
          */
         _getCriteriaHint: function () {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            return value.value ? '"' + value.value + '"' : this.placeholder;
+
+            if (!value.value) {
+                return this.placeholder;
+            }
+
+            return '"' + value.value + '"';
         }
     });
+
+    return TextFilter;
 });

@@ -2,7 +2,7 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
 {% set gridName = 'entityconfig-grid' %}
-{% set pageTitle = 'Entities' %}
+{% set pageTitle = 'oro.entity_config.menu.entities_list.label'|trans %}
 
 {% block content %}
     {% if require_js|length %}
@@ -18,8 +18,8 @@
         {% for button in buttonConfig %}
             {{ UI.addButton({
                 'path': path(button.route, button.args|default({})),
-                'title': button.title|default(button.name),
-                'label': button.name,
+                'title': button.title|default(button.name)|trans,
+                'label': button.name|trans,
                 'aCss': button.aCss|default('')
             }) }}
         {% endfor %}

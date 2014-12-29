@@ -1,0 +1,36 @@
+.list-bar-wrapper {
+  background-color: @logoBackgroundColor;
+}
+.pin-bar {
+  .pin-menus {
+    .oro-dropdown-toggle[class^='icon-ellipsis'] {
+      border-left-color: @baseGradientColorBorder;
+    }
+  }
+}
+.list-bar{
+  li {
+    color: @headerTextColor;
+    .pin-holder {
+      border-right-color: @baseGradientColorBorder;
+      a {
+        color: @headerTextColor;
+        &.icon-remove {
+          &:before {
+            color:@headerTextColor;
+          }
+        }
+      }
+      &:hover {
+        a {
+          color: lighten(@headerTextColor, 10%);
+        }
+      }
+    }
+    &.active {
+      .pin-holder {
+        background-color: darken(@logoBackgroundColor, 5%);
+      }
+    }
+  }
+}

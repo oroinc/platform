@@ -11,10 +11,14 @@
   overflow: hidden;
   height: 100%;
   padding-bottom: @headerHeight;
-  & > ul {
+  > ul {
     overflow: auto;
     height: 100%;
     margin-bottom: 0;
+    > .accordion-group > .accordion-heading [class^=icon-] {
+      // hide first level icons
+      display: none !important;
+    }
   }
   ul {
     margin-left: 0;
@@ -51,6 +55,10 @@
       padding-left: 32px;
       background: lighten(@mainMenuBackgroundColor, 3%);
       border-bottom-color: lighten(@mainMenuBorderColor, 3%);
+    }
+    > .dropdown-menu-title,
+    > .dropdown-menu-title + .divider {
+      display: none;
     }
   }
   .menu_level_2 {

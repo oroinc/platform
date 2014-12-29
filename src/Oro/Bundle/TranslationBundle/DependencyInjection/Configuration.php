@@ -54,6 +54,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('default_api_adapter')->defaultValue(self::DEFAULT_ADAPTER)->end()
+                ->scalarNode('debug_translator')->defaultFalse()->end()
             ->end();
 
         SettingsBuilder::append(

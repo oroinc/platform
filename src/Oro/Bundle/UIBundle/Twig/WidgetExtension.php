@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Twig_Environment;
 
 class WidgetExtension extends \Twig_Extension
@@ -14,6 +16,11 @@ class WidgetExtension extends \Twig_Extension
      * @var bool
      */
     protected $rendered = array();
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * Returns a list of functions to add to the existing list.
@@ -46,14 +53,17 @@ class WidgetExtension extends \Twig_Extension
     public function render(Twig_Environment $environment, array $options = array())
     {
         $optionsHash = md5(json_encode($options));
+
         if (!empty($this->rendered[$optionsHash])) {
             return '';
         }
+
         $this->rendered[$optionsHash] = true;
 
         if (!array_key_exists('url', $options)) {
             throw new \InvalidArgumentException('Option url is required');
         }
+
         if (!array_key_exists('widgetType', $options)) {
             throw new \InvalidArgumentException('Option widgetType is required');
         } else {
@@ -64,23 +74,31 @@ class WidgetExtension extends \Twig_Extension
         if (!isset($options['wid'])) {
             $options['wid'] = $this->getUniqueIdentifier();
         }
+
         $elementId = 'widget-container-' . $options['wid'];
+
         if (!array_key_exists('elementFirst', $options)) {
             $options['elementFirst'] = true;
         }
+
         if ($options['elementFirst']) {
             $options['el'] = '#' . $elementId . ' .widget-content:first';
         } else {
             $options['container'] = '#' . $elementId;
         }
+
         $options['url'] = $this->getUrlWithContainer($options['url'], $widgetType, $options['wid']);
 
+        if ($this->request) {
+            $options['url'] = $this->addRequestParameters($options['url']);
+        }
+
         return $environment->render(
-            "OroUIBundle::widget_loader.html.twig",
+            'OroUIBundle::widget_loader.html.twig',
             array(
-                "widgetType" => $widgetType,
-                "elementId" => $elementId,
-                "options" => $options
+                'elementId'  => $elementId,
+                'options'    => $options,
+                'widgetType' => $widgetType,
             )
         );
     }
@@ -108,11 +126,43 @@ class WidgetExtension extends \Twig_Extension
     }
 
     /**
+     * @param string $url
+     * @return string
+     */
+    protected function addRequestParameters($url)
+    {
+        $urlParts = parse_url($url);
+
+        $urlPath = !empty($urlParts['path']) ? $urlParts['path'] : '';
+        $urlParams = array();
+        if (!empty($urlParts['query'])) {
+            parse_str($urlParts['query'], $urlParams);
+        }
+
+        $requestParams = $this->request->query->all();
+
+        $mergedParams = array_merge($requestParams, $urlParams);
+        if (empty($mergedParams)) {
+            return $urlPath;
+        }
+
+        return $urlPath . '?' . http_build_query($mergedParams);
+    }
+
+    /**
      * @return string
      */
     protected function getUniqueIdentifier()
     {
         return str_replace('.', '-', uniqid('', true));
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**

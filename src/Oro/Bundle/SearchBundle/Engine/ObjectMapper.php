@@ -1,16 +1,23 @@
 <?php
+
 namespace Oro\Bundle\SearchBundle\Engine;
 
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\SearchBundle\Query\Mode;
+use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 
 class ObjectMapper extends AbstractMapper
 {
-    public function __construct(ContainerInterface $container, $mappingConfig)
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     * @param $mappingConfig
+     */
+    public function __construct(EventDispatcherInterface $dispatcher, $mappingConfig)
     {
+        $this->dispatcher    = $dispatcher;
         $this->mappingConfig = $mappingConfig;
-        $this->container     = $container;
     }
 
     /**
@@ -42,11 +49,26 @@ class ObjectMapper extends AbstractMapper
     /**
      * Get search entities list
      *
+     * @param null|string|string[] $modeFilter Filter entities by "mode"
+     *
      * @return array
      */
-    public function getEntities()
+    public function getEntities($modeFilter = null)
     {
-        return array_keys($this->mappingConfig);
+        $entities = array_keys($this->mappingConfig);
+        if (null == $modeFilter) {
+            return $entities;
+        }
+
+        $self = $this;
+        return array_filter(
+            $entities,
+            function ($entityName) use ($modeFilter, $self) {
+                $mode = $self->getEntityModeConfig($entityName);
+
+                return is_array($modeFilter) ? in_array($mode, $modeFilter, true) : $mode === $modeFilter;
+            }
+        );
     }
 
     /**
@@ -91,7 +113,8 @@ class ObjectMapper extends AbstractMapper
                                 $objectData,
                                 $field['relation_fields'],
                                 $relationObject,
-                                $field['name']
+                                $field['name'],
+                                true
                             );
                         }
                         break;
@@ -99,8 +122,34 @@ class ObjectMapper extends AbstractMapper
                         $objectData = $this->setDataValue($alias, $objectData, $field, $value);
                 }
             }
+
+            $event = new PrepareEntityMapEvent($object, $objectClass, $objectData);
+            $this->dispatcher->dispatch(PrepareEntityMapEvent::EVENT_NAME, $event);
+            $objectData = $event->getData();
         }
 
         return $objectData;
+    }
+
+    /**
+     * Find descendants for class from list of known classes
+     *
+     * @param string $entityName
+     *
+     * @return array|false Returns descendants FQCN array or FALSE if "mode" is equals to "normal"
+     */
+    public function getRegisteredDescendants($entityName)
+    {
+        $config = $this->getEntityConfig($entityName);
+        if ($config['mode'] !== Mode::NORMAL) {
+            return array_filter(
+                $this->getEntities(),
+                function ($className) use ($entityName) {
+                    return is_subclass_of($className, $entityName);
+                }
+            );
+        }
+
+        return false;
     }
 }

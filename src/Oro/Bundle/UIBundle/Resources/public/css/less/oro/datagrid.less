@@ -1,8 +1,9 @@
 // moved out from oro.less
+@import "../mixins.less";
 .grid-toolbar {
   /* FE */
   position: relative;
-  margin: 0 0 -15px;
+  margin: 5px 0 -15px;
   padding: 9px 20px;
   .actions-panel {
     margin-left: 5px;
@@ -101,6 +102,15 @@
   }
   .caret { margin-top:11px; }
 }
+.grid-container-parent {
+  position: relative;
+  .loading-wrapper {
+    width: auto;
+    left: @verticalPadding;
+    right: @verticalPadding;
+    top: @topPadding/2;
+  }
+}
 .grid-container {
   width: 100%;
   position: relative;
@@ -117,17 +127,31 @@
     }
   }
 }
+.grid-without-header {
+  .grid-container {
+    thead, tfoot {
+      display: none;
+    }
+    table.grid {
+      border-top: 0px;
+    }
+  }
+}
 #header-cell-dropdown {
   >.dropdown {
     margin-left: -5px;
     >.dropdown-toggle {
-      padding-left: 4px;
-      padding-right: 4px;
+      padding: 4px;
+      line-height: 12px;
+      height: 22px;
     }
     .dropdown-menu {
       min-width: 60px;
       padding-bottom: 5px;
     }
+  }
+  .btn .caret {
+    margin-top: 5px;
   }
 }
 .grid {
@@ -140,8 +164,9 @@
     }
   }
   .action-cell {
-    vertical-align: bottom;
+    vertical-align: top;
     width: 50px;
+    .horizontal-icon-menu;
   }
   .action-column {
     width: 50px;

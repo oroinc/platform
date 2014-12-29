@@ -8,8 +8,8 @@ define(['underscore', 'jquery', 'backbone', 'oroworkflow/js/workflow-management/
     'oroworkflow/js/workflow-management/step/model',
     'oroworkflow/js/workflow-management/transition/model',
     'oroworkflow/js/workflow-management/transition-definition/model',
-    'oroworkflow/js/workflow-management/attribute/model'
-
+    'oroworkflow/js/workflow-management/attribute/model',
+    'oroentity/js/entity-fields-util'
 ],
 function(_, $, Backbone, Helper, __,
      StepCollection,
@@ -19,7 +19,8 @@ function(_, $, Backbone, Helper, __,
      StepModel,
      TransitionModel,
      TransitionDefinitionModel,
-     AttributeModel
+     AttributeModel,
+     EntityFieldsUtil
 ) {
     'use strict';
 
@@ -42,8 +43,8 @@ function(_, $, Backbone, Helper, __,
             attributes: null
         },
 
-        propertyPathToFieldIdMapping: {},
-        pathMappingInitialized: false,
+        entityFieldUtil: null,
+        entityFieldsInitialized: false,
 
         initialize: function() {
             if (this.get('steps') === null) {
@@ -134,16 +135,25 @@ function(_, $, Backbone, Helper, __,
             return cloned;
         },
 
-        setPropertyPathToFieldIdMapping: function(mapping) {
-            this.propertyPathToFieldIdMapping = mapping;
-            this.pathMappingInitialized = true;
-            this.trigger('pathMappingInit', mapping);
+        setEntityFieldsData: function(fields) {
+            this.entityFieldsInitialized = true;
+            this.entityFieldUtil = new EntityFieldsUtil(this.get('entity'), fields);
+            this.trigger('entityFieldsInitialize');
         },
 
         getFieldIdByPropertyPath: function(propertyPath) {
-            return this.pathMappingInitialized && this.propertyPathToFieldIdMapping.hasOwnProperty(propertyPath)
-                ? this.propertyPathToFieldIdMapping[propertyPath]
-                : '';
+            var pathData = propertyPath.split('.');
+
+            if (pathData.length > 1 && pathData[0] == this.get('entity_attribute')) {
+                pathData.splice(0, 1);
+                return this.entityFieldUtil.getPathByPropertyPath(pathData);
+            } else {
+                return null;
+            }
+        },
+
+        getPropertyPathByFieldId: function(fieldId) {
+            return this.get('entity_attribute') + '.' + this.entityFieldUtil.getPropertyPathByPath(fieldId);
         },
 
         getSystemEntities: function() {

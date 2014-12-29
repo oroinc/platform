@@ -8,28 +8,30 @@ use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 
 class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $em;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $formBuilder;
+    /** @var BuildTemplateFormSubscriber */
+    protected $listener;
 
     /**
-     * @var BuildTemplateFormSubscriber
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $listener;
+    protected $securityContext;
 
     /**
      * SetUp test environment
      */
-    public function setUp()
+    protected function setUp()
     {
-        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->formBuilder = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
+        $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->listener = new BuildTemplateFormSubscriber($this->securityContext);
+    }
 
-        $this->listener = new BuildTemplateFormSubscriber($this->em, $this->formBuilder);
+    /**
+     * {@inheritdoc}
+     */
+    protected function tearDown()
+    {
+        unset($this->securityContext);
+        unset($this->listener);
     }
 
     public function testGetSubscribedEvents()
@@ -50,7 +52,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $eventMock->expects($this->once())
             ->method('getData')
             ->will($this->returnValue(null));
-        $eventMock->expects($this->once())
+        $eventMock->expects($this->never())
             ->method('getForm');
 
         $this->listener->preSetData($eventMock);
@@ -70,20 +72,33 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $eventMock->expects($this->once())
             ->method('getData')
             ->will($this->returnValue($notificationMock));
-        $eventMock->expects($this->once())
-            ->method('getForm');
 
         $this->listener->preSetData($eventMock);
     }
 
     public function testPreSetDataHasTemplates()
     {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
             ->getMock();
 
         $notificationMock = $this->getMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
-        $notificationMock->expects($this->once())
+        $notificationMock->expects($this->exactly(2))
             ->method('getEntityName')
             ->will($this->returnValue('testEntity'));
 
@@ -92,6 +107,12 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getOptions')
             ->will($this->returnValue(array('auto_initialize' => true)));
 
+        $formType   = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $formType->expects($this->once())->method('getName')
+            ->will($this->returnValue('template'));
+        $configMock->expects($this->once())->method('getType')
+            ->will($this->returnValue($formType));
+
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
@@ -99,10 +120,6 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $formMock->expects($this->once())
-            ->method('has')
-            ->with($this->equalTo('template'))
-            ->will($this->returnValue(true));
         $formMock->expects($this->once())
             ->method('get')
             ->with($this->equalTo('template'))
@@ -113,69 +130,6 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $fieldMock->expects($this->once())
             ->method('getConfig')
             ->will($this->returnValue($configMock));
-
-        $newFieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $phpUnit = $this;
-        $this->formBuilder->expects($this->once())
-            ->method('createNamed')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $type, $data, $config) use ($phpUnit, $newFieldMock) {
-                        $phpUnit->assertEquals('oro_email_template_list', $type);
-                        $phpUnit->assertEquals('template', $name);
-                        $phpUnit->assertNull($data);
-                        $phpUnit->assertArrayHasKey('selectedEntity', $config);
-                        $phpUnit->assertArrayHasKey('auto_initialize', $config);
-                        $phpUnit->assertArrayHasKey('query_builder', $config);
-
-                        return $newFieldMock;
-                    }
-                )
-            );
-
-        $eventMock->expects($this->once())
-            ->method('getData')
-            ->will($this->returnValue($notificationMock));
-        $eventMock->expects($this->once())
-            ->method('getForm')
-            ->will($this->returnValue($formMock));
-
-        $this->listener->preSetData($eventMock);
-    }
-
-    public function testPreSetDataNoTemplates()
-    {
-        $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $notificationMock = $this->getMock('Oro\Bundle\NotificationBundle\Entity\EmailNotification');
-        $notificationMock->expects($this->once())
-            ->method('getEntityName')
-            ->will($this->returnValue('testEntity'));
-
-        $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $formMock->expects($this->once())
-            ->method('has')
-            ->with($this->equalTo('template'))
-            ->will($this->returnValue(false));
-        $formMock->expects($this->never())
-            ->method('get');
-        $formMock->expects($this->once())
-            ->method('add');
-
-        $newFieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->formBuilder->expects($this->once())
-            ->method('createNamed')
-            ->will($this->returnValue($newFieldMock));
 
         $eventMock->expects($this->once())
             ->method('getData')
@@ -189,6 +143,21 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPreSubmitData()
     {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $token = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->will($this->returnValue($token));
+
+        $token->expects($this->once())
+            ->method('getOrganizationContext')
+            ->will($this->returnValue($organization));
+
         $eventMock = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
             ->disableOriginalConstructor()
             ->getMock();
@@ -196,6 +165,12 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $configMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
         $configMock->expects($this->once())->method('getOptions')
             ->will($this->returnValue(array('auto_initialize' => true)));
+
+        $formType   = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $formType->expects($this->once())->method('getName')
+            ->will($this->returnValue('template'));
+        $configMock->expects($this->once())->method('getType')
+            ->will($this->returnValue($formType));
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
@@ -212,27 +187,6 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fieldMock));
         $formMock->expects($this->once())
             ->method('add');
-
-        $newFieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $phpUnit = $this;
-        $this->formBuilder->expects($this->once())->method('createNamed')
-            ->will(
-                $this->returnCallback(
-                    function ($name, $type, $data, $config) use ($phpUnit, $newFieldMock) {
-                        $phpUnit->assertEquals('template', $name);
-                        $phpUnit->assertEquals('oro_email_template_list', $type);
-                        $phpUnit->assertNull($data);
-                        $phpUnit->assertArrayHasKey('query_builder', $config);
-                        $phpUnit->assertArrayHasKey('selectedEntity', $config);
-                        $phpUnit->assertArrayHasKey('auto_initialize', $config);
-
-                        return $newFieldMock;
-                    }
-                )
-            );
 
         $eventMock->expects($this->once())
             ->method('getData')

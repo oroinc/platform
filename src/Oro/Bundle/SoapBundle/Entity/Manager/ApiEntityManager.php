@@ -2,9 +2,16 @@
 
 namespace Oro\Bundle\SoapBundle\Entity\Manager;
 
-use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+use Oro\Bundle\SoapBundle\Event\FindAfter;
+use Oro\Bundle\SoapBundle\Event\GetListBefore;
 
 class ApiEntityManager
 {
@@ -19,27 +26,42 @@ class ApiEntityManager
     protected $om;
 
     /**
-     * @var ClassMetadata
+     * @var ClassMetadata|ClassMetadataInfo
      */
     protected $metadata;
 
     /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
+    /**
      * Constructor
      *
-     * @param string        $class Entity name
-     * @param ObjectManager $om    Object manager
+     * @param string          $class Entity name
+     * @param ObjectManager   $om Object manager
      */
     public function __construct($class, ObjectManager $om)
     {
-        $this->om = $om;
+        $this->om       = $om;
         $this->metadata = $this->om->getClassMetadata($class);
-        $this->class = $this->metadata->getName();
+        $this->class    = $this->metadata->getName();
+    }
+
+    /**
+     * Sets a event dispatcher
+     *
+     * @param EventDispatcher $eventDispatcher
+     */
+    public function setEventDispatcher(EventDispatcher $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Get entity metadata
      *
-     * @return ClassMetadata
+     * @return ClassMetadata|ClassMetadataInfo
      */
     public function getMetadata()
     {
@@ -64,7 +86,13 @@ class ApiEntityManager
      */
     public function find($id)
     {
-        return $this->getRepository()->find($id);
+        $object = $this->getRepository()->find($id);
+
+        // dispatch oro_api.request.find.after event
+        $event = new FindAfter($object);
+        $this->eventDispatcher->dispatch(FindAfter::NAME, $event);
+
+        return $object;
     }
 
     /**
@@ -79,8 +107,7 @@ class ApiEntityManager
             throw new \InvalidArgumentException('Expected instance of ' . $this->class);
         }
 
-        $idFields = $this->metadata->getIdentifierFieldNames();
-        $idField = current($idFields);
+        $idField   = $this->metadata->getSingleIdentifierFieldName();
         $entityIds = $this->metadata->getIdentifierValues($entity);
 
         return $entityIds[$idField];
@@ -89,7 +116,7 @@ class ApiEntityManager
     /**
      * Return related repository
      *
-     * @return ObjectRepository
+     * @return EntityRepository
      */
     public function getRepository()
     {
@@ -107,21 +134,80 @@ class ApiEntityManager
     }
 
     /**
-     * Returns Paginator to paginate throw items.
+     * Returns array of item matching filtering criteria
      *
      * In case when limit and offset set to null QueryBuilder instance will be returned.
      *
-     * @param  int          $limit
-     * @param  int          $page
-     * @param  null         $orderBy
+     * @deprecated since 1.4.1 use getListQueryBuilder instead
+     * @param int        $limit
+     * @param int        $page
+     * @param array      $criteria
+     * @param array|null $orderBy
+     *
      * @return \Traversable
      */
-    public function getList($limit = 10, $page = 1, $orderBy = null)
+    public function getList($limit = 10, $page = 1, $criteria = [], $orderBy = null)
     {
-        $page = $page > 0 ? $page : 1;
+        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
+
+        return $this->getRepository()
+            ->matching($criteria)
+            ->toArray();
+    }
+
+    /**
+     * Returns query builder that could be used for fetching data based on given filtering criteria
+     *
+     * @param int   $limit
+     * @param int   $page
+     * @param array $criteria
+     * @param null  $orderBy
+     *
+     * @return \Doctrine\ORM\QueryBuilder
+     */
+    public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null)
+    {
+        $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
+
+        $qb = $this->getRepository()->createQueryBuilder('e');
+        $qb->addCriteria($criteria);
+
+        return $qb;
+    }
+
+    /**
+     * @param int   $limit
+     * @param int   $page
+     * @param array $criteria
+     * @param null  $orderBy
+     *
+     * @return array|Criteria
+     */
+    protected function prepareQueryCriteria($limit = 10, $page = 1, $criteria = [], $orderBy = null)
+    {
+        $page    = $page > 0 ? $page : 1;
         $orderBy = $orderBy ? $orderBy : $this->getDefaultOrderBy();
 
-        return $this->getRepository()->findBy(array(), $this->getOrderBy($orderBy), $limit, $this->getOffset($page));
+        if (is_array($criteria)) {
+            $newCriteria = new Criteria();
+            foreach ($criteria as $fieldName => $value) {
+                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
+            }
+
+            $criteria = $newCriteria;
+        }
+
+        // dispatch oro_api.request.get_list.before event
+        $event = new GetListBefore($criteria, $this->class);
+        $this->eventDispatcher->dispatch(GetListBefore::NAME, $event);
+        $criteria = $event->getCriteria();
+
+        $criteria
+            ->setMaxResults($limit)
+            ->orderBy($this->getOrderBy($orderBy))
+            ->setFirstResult($this->getOffset($page, $limit));
+
+        return $criteria;
     }
 
     /**
@@ -139,12 +225,15 @@ class ApiEntityManager
      * Get offset by page
      *
      * @param  int|null $page
+     * @param  int      $limit
      * @return int
      */
-    protected function getOffset($page)
+    protected function getOffset($page, $limit)
     {
         if (!$page !== null) {
-            $page = $page > 0 ? $page - 1 : 0;
+            $page = $page > 0
+                ? ($page - 1) * $limit
+                : 0;
         }
 
         return $page;

@@ -1,17 +1,20 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['./abstract-action'
-    ], function (AbstractAction) {
+define([
+    './abstract-action'
+], function (AbstractAction) {
     'use strict';
+
+    var ResetCollectionAction;
 
     /**
      * Resets collection to initial state
      *
-     * @export  orodatagrid/js/datagrid/action/reset-collection-action
-     * @class   orodatagrid.datagrid.action.ResetCollectionAction
-     * @extends orodatagrid.datagrid.action.AbstractAction
+     * @export  oro/datagrid/action/reset-collection-action
+     * @class   oro.datagrid.action.ResetCollectionAction
+     * @extends oro.datagrid.action.AbstractAction
      */
-    return AbstractAction.extend({
-
+    ResetCollectionAction =  AbstractAction.extend({
         /** @property oro.PageableCollection */
         collection: undefined,
 
@@ -30,7 +33,7 @@ define(['./abstract-action'
             }
             this.collection = opts.datagrid.collection;
 
-            AbstractAction.prototype.initialize.apply(this, arguments);
+            ResetCollectionAction.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -38,7 +41,9 @@ define(['./abstract-action'
          */
         execute: function () {
             this.collection.updateState(this.collection.initialState);
-            this.collection.fetch();
+            this.collection.fetch({reset: true});
         }
     });
+
+    return ResetCollectionAction;
 });

@@ -41,6 +41,8 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             'form_type' => array('formType', 'custom_workflow_transition'),
             'display_type' => array('displayType', 'page'),
             'form_options' => array('formOptions', array('one', 'two')),
+            'page_template' => array('pageTemplate', 'Workflow:Test:page_template.html.twig'),
+            'dialog_template' => array('dialogTemplate', 'Workflow:Test:dialog_template.html.twig'),
             'pre_condition' => array(
                 'preCondition',
                 $this->getMock('Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface')

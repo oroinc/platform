@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\ImportExportBundle\File\FileSystemOperator;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\MimeType\MimeTypeGuesser;
 
@@ -20,38 +19,41 @@ class ExportHandler extends AbstractHandler
     protected $mimeTypeGuesser;
 
     /**
-     * Constructor
-     *
-     * @param JobExecutor        $jobExecutor
-     * @param ProcessorRegistry  $processorRegistry
-     * @param FileSystemOperator $fileSystemOperator
-     * @param MimeTypeGuesser    $mimeTypeGuesser
-     * @param Router             $router
+     * @var RouterInterface
      */
-    public function __construct(
-        JobExecutor $jobExecutor,
-        ProcessorRegistry $processorRegistry,
-        FileSystemOperator $fileSystemOperator,
-        MimeTypeGuesser $mimeTypeGuesser,
-        Router $router
-    ) {
-        parent::__construct($jobExecutor, $processorRegistry, $fileSystemOperator, $router);
+    protected $router;
+
+    /**
+     * @param MimeTypeGuesser $mimeTypeGuesser
+     */
+    public function setMimeTypeGuesser(MimeTypeGuesser $mimeTypeGuesser)
+    {
         $this->mimeTypeGuesser = $mimeTypeGuesser;
     }
 
     /**
-     * Handles export action
+     * @param RouterInterface $router
+     */
+    public function setRouter(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
+
+    /**
+     * Get export result
      *
      * @param string $jobName
      * @param string $processorAlias
+     * @param string $processorType
      * @param string $outputFormat
      * @param string $outputFilePrefix
-     * @param array  $options
-     * @return Response
+     * @param array $options
+     * @return array
      */
-    public function handleExport(
+    public function getExportResult(
         $jobName,
         $processorAlias,
+        $processorType = ProcessorRegistry::TYPE_EXPORT,
         $outputFormat = 'csv',
         $outputFilePrefix = null,
         array $options = []
@@ -61,28 +63,28 @@ class ExportHandler extends AbstractHandler
         }
         $fileName   = $this->generateExportFileName($outputFilePrefix, $outputFormat);
         $entityName = $this->processorRegistry->getProcessorEntityName(
-            ProcessorRegistry::TYPE_EXPORT,
+            $processorType,
             $processorAlias
         );
 
-        $configuration = array(
-            'export' =>
+        $configuration = [
+            $processorType =>
                 array_merge(
-                    array(
+                    [
                         'processorAlias' => $processorAlias,
                         'entityName'     => $entityName,
                         'filePath'       => $fileName
-                    ),
+                    ],
                     $options
                 )
-        );
+        ];
 
         $url         = null;
         $errorsCount = 0;
         $readsCount  = 0;
 
         $jobResult = $this->jobExecutor->executeJob(
-            ProcessorRegistry::TYPE_EXPORT,
+            $processorType,
             $jobName,
             $configuration
         );
@@ -90,7 +92,7 @@ class ExportHandler extends AbstractHandler
         if ($jobResult->isSuccessful()) {
             $url     = $this->router->generate(
                 'oro_importexport_export_download',
-                array('fileName' => basename($fileName))
+                ['fileName' => basename($fileName)]
             );
             $context = $jobResult->getContext();
             if ($context) {
@@ -99,17 +101,46 @@ class ExportHandler extends AbstractHandler
         } else {
             $url         = $this->router->generate(
                 'oro_importexport_error_log',
-                array('jobCode' => $jobResult->getJobCode())
+                ['jobCode' => $jobResult->getJobCode()]
             );
             $errorsCount = count($jobResult->getFailureExceptions());
         }
 
+        return [
+            'success'     => $jobResult->isSuccessful(),
+            'url'         => $url,
+            'readsCount'  => $readsCount,
+            'errorsCount' => $errorsCount,
+        ];
+    }
+
+    /**
+     * Handles export action
+     *
+     * @param string $jobName
+     * @param string $processorAlias
+     * @param string $exportType
+     * @param string $outputFormat
+     * @param string $outputFilePrefix
+     * @param array $options
+     * @return JsonResponse
+     */
+    public function handleExport(
+        $jobName,
+        $processorAlias,
+        $exportType = 'export',
+        $outputFormat = 'csv',
+        $outputFilePrefix = null,
+        array $options = []
+    ) {
         return new JsonResponse(
-            array(
-                'success'     => $jobResult->isSuccessful(),
-                'url'         => $url,
-                'readsCount'  => $readsCount,
-                'errorsCount' => $errorsCount,
+            $this->getExportResult(
+                $jobName,
+                $processorAlias,
+                $exportType,
+                $outputFormat,
+                $outputFilePrefix,
+                $options
             )
         );
     }
@@ -146,24 +177,9 @@ class ExportHandler extends AbstractHandler
      */
     protected function getFileContentType($fileName)
     {
-        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
-        return $this->mimeTypeGuesser->guessByFileExtension($ext);
-    }
-
-    /**
-     * Get a mimetype value from a file extension
-     *
-     * @param string $extension File extension
-     *
-     * @return string|null
-     *
-     */
-    protected function guessMimetypeByFileExtension($extension)
-    {
-        $extension = strtolower($extension);
-
-        return isset($this->mimetypes[$extension]) ? $this->mimetypes[$extension] : null;
+        return $this->mimeTypeGuesser->guessByFileExtension($extension);
     }
 
     /**

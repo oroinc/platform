@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
+use Symfony\Component\Translation\Translator;
+
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
-use Symfony\Component\Translation\Translator;
 
 class Manager implements FunctionProviderInterface
 {
@@ -14,26 +16,30 @@ class Manager implements FunctionProviderInterface
     /** @var FilterInterface[] */
     protected $filters = [];
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
+
+    /** @var EntityHierarchyProvider */
+    protected $entityHierarchyProvider;
 
     /**
      * Constructor
      *
-     * @param array                 $config
-     * @param ConfigurationResolver $resolver
-     * @param Translator            $translator
+     * @param array                   $config
+     * @param ConfigurationResolver   $resolver
+     * @param EntityHierarchyProvider $entityHierarchyProvider
+     * @param Translator              $translator
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
+        EntityHierarchyProvider $entityHierarchyProvider,
         Translator $translator
     ) {
         $resolver->resolve($config);
-        $this->config     = ConfigurationObject::create($config);
-        $this->translator = $translator;
+        $this->config                  = ConfigurationObject::create($config);
+        $this->entityHierarchyProvider = $entityHierarchyProvider;
+        $this->translator              = $translator;
     }
 
     /**
@@ -54,7 +60,8 @@ class Manager implements FunctionProviderInterface
             'filters'    => $filtersMetadata,
             'grouping'   => $this->getMetadataForGrouping(),
             'converters' => $this->getMetadataForFunctions('converters', $queryType),
-            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType)
+            'aggregates' => $this->getMetadataForFunctions('aggregates', $queryType),
+            'hierarchy'  => $this->entityHierarchyProvider->getHierarchy()
         ];
     }
 
@@ -115,6 +122,31 @@ class Manager implements FunctionProviderInterface
         }
 
         return $result;
+    }
+
+    /**
+     * Returns filters types
+     *
+     * @param array $filterNames
+     * @return array
+     */
+    public function getExcludedProperties(array $filterNames)
+    {
+        $types   = [];
+        $filters = $this->config->offsetGet('filters');
+        foreach ($filterNames as $filterName) {
+            unset($filters[$filterName]);
+        }
+
+        foreach ($filters as $filter) {
+            if (isset($filter['applicable'])) {
+                foreach ($filter['applicable'] as $type) {
+                    $types[] = $type;
+                }
+            }
+        }
+
+        return $types;
     }
 
     /**

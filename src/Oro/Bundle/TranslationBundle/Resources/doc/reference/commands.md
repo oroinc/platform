@@ -13,10 +13,9 @@ Overview
 ----------
 
 These are console commands that allows to generate, download and update translations data in system with third-party translation provider service. They can be run with app/console command_name as usual.
-Two supported translation service adapters available:
+Supported translation service adapters:
 
 - Crowdin translation adapter
-- [Oro translation service proxy](https://github.com/laboro/translation-proxy)
 
 oro:translation:dump
 -------------
@@ -51,6 +50,8 @@ Command used to dump, upload, download and update translations data on third-par
 - `upload` - another action flag, perform upload to third party service
 
 - `download` - perform download to third party service, downloads all language packs from project at translation service for specified `locale`
+
+- `skipCheck` - Skip checking for the presence of the dump files of keywords without translation before upload/update.
 
 Examples
 ------------------

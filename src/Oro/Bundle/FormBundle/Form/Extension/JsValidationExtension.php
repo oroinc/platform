@@ -96,6 +96,10 @@ class JsValidationExtension extends AbstractTypeExtension
         $data = $this->getConstraintsDataAsArray($form);
 
         if ($data) {
+            if (!empty($data['NotBlank'])) {
+                $view->vars['attr']['data-required'] = true;
+                $view->vars['label_attr']['data-required'] = true;
+            }
             if (isset($view->vars['attr']['data-validation'])) {
                 $originalData = $view->vars['attr']['data-validation'];
                 if (is_array($originalData)) {

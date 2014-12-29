@@ -1,0 +1,4 @@
+bundles:
+    - { name: Acme\Bundle\TestBundle\AcmeFirstExcludedBundle, priority: 50 }
+    - { name: Acme\Bundle\TestBundle\AcmeSecondExcludedBundle, priority: 50 }
+    - { name: Acme\Bundle\TestBundle\AcmeThirdExcludedBundle, priority: 50 }

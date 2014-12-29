@@ -8,13 +8,13 @@ class OroSyncExtensionTest extends \PHPUnit_Framework_TestCase
 {
     private $extension;
 
-    public function setUp()
+    protected function setUp()
     {
         $topicPublisher = $this->getMock('Oro\Bundle\SyncBundle\Wamp\TopicPublisher');
         $this->extension = new OroSyncExtension($topicPublisher);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->extension);
     }

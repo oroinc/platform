@@ -7,40 +7,32 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
 
-class ConfigurationProvider implements ConfigurationProviderInterface
+class ConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
-    const GRID_PREFIX = 'oro_segment_grid_';
-
-    /** @var FunctionProviderInterface */
-    protected $functionProvider;
+    /** @var SegmentDatagridConfigurationBuilder */
+    protected $builder;
 
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var DatagridConfiguration */
-    private $configuration = null;
+    /** @var DatagridConfiguration[] */
+    private $configuration = [];
 
     /**
      * Constructor
      *
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
-     * @param ConfigManager             $configManager
+     * @param SegmentDatagridConfigurationBuilder $builder
+     * @param ManagerRegistry                     $doctrine
      */
     public function __construct(
-        FunctionProviderInterface $functionProvider,
-        ManagerRegistry $doctrine,
-        ConfigManager $configManager
+        SegmentDatagridConfigurationBuilder $builder,
+        ManagerRegistry $doctrine
     ) {
-        $this->functionProvider = $functionProvider;
-        $this->doctrine         = $doctrine;
-        $this->configManager    = $configManager;
+        $this->builder  = $builder;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -48,7 +40,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function isApplicable($gridName)
     {
-        return (strpos($gridName, self::GRID_PREFIX) === 0);
+        return $this->builder->isApplicable($gridName);
     }
 
     /**
@@ -56,22 +48,18 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function getConfiguration($gridName)
     {
-        if (null === $this->configuration) {
-            $id                = intval(substr($gridName, strlen(self::GRID_PREFIX)));
+        if (empty($this->configuration[$gridName])) {
+            $id                = intval(substr($gridName, strlen(Segment::GRID_PREFIX)));
             $segmentRepository = $this->doctrine->getRepository('OroSegmentBundle:Segment');
             $segment           = $segmentRepository->find($id);
-            $builder           = new SegmentDatagridConfigurationBuilder(
-                $gridName,
-                $segment,
-                $this->functionProvider,
-                $this->doctrine,
-                $this->configManager
-            );
 
-            $this->configuration = $builder->getConfiguration();
+            $this->builder->setGridName($gridName);
+            $this->builder->setSource($segment);
+
+            $this->configuration[$gridName] = $this->builder->getConfiguration();
         }
 
-        return $this->configuration;
+        return $this->configuration[$gridName];
     }
 
     /**
@@ -90,5 +78,13 @@ class ConfigurationProvider implements ConfigurationProviderInterface
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBuilder()
+    {
+        return $this->builder;
     }
 }

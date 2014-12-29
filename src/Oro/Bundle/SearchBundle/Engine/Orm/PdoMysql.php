@@ -1,16 +1,19 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
-use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoMysql extends BaseDriver
 {
+    const ENGINE_MYISAM = 'MyISAM';
+
     /**
      * The value of ft_min_word_len
      *
@@ -56,12 +59,12 @@ class PdoMysql extends BaseDriver
      */
     protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
-        $words = $this->getWords($searchCondition['fieldValue']);
+        $words = $this->getWords($this->filterTextFieldValue($searchCondition['fieldValue']));
 
         // TODO Need to clarify search requirements in scope of CRM-214
         if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
             $whereExpr = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
-            $shortWords = $this->getWordsLessThanFullTextMinWordLength($searchCondition['fieldValue']);
+            $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
             if ($shortWords) {
                 $whereExpr = $qb->expr()->orX(
                     $whereExpr,
@@ -91,19 +94,25 @@ class PdoMysql extends BaseDriver
     /**
      * Get words that have length less than $this->fullTextMinWordLength
      *
-     * @param  string $value
+     * @param  array $words
      * @return array
      */
-    protected function getWordsLessThanFullTextMinWordLength($value)
+    protected function getWordsLessThanFullTextMinWordLength(array $words)
     {
         $length = $this->getFullTextMinWordLength();
 
-        return array_filter(
-            $this->getWords($value),
+        $words = array_filter(
+            $words,
             function ($value) use ($length) {
+                if (filter_var($value, FILTER_VALIDATE_INT)) {
+                    return true;
+                }
+
                 return mb_strlen($value) < $length;
             }
         );
+
+        return array_unique($words);
     }
 
     /**
@@ -114,7 +123,7 @@ class PdoMysql extends BaseDriver
         if (null === $this->fullTextMinWordLength) {
             $this->fullTextMinWordLength = (int) $this->em->getConnection()->fetchColumn(
                 "SHOW VARIABLES LIKE 'ft_min_word_len'",
-                array(),
+                [],
                 1
             );
         }
@@ -140,18 +149,19 @@ class PdoMysql extends BaseDriver
         array $searchCondition,
         $setOrderBy = true
     ) {
+        $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
         $fieldValue     = $searchCondition['fieldValue'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
 
-        $result = "MATCH_AGAINST(textField.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
+        $result = "MATCH_AGAINST($joinAlias.value, :$valueParameter 'IN BOOLEAN MODE') > 0";
         $qb->setParameter($valueParameter, implode('* ', $words) . '*');
 
         if ($this->isConcreteField($fieldName)) {
             $result = $qb->expr()->andX(
                 $result,
-                "textField.field = :$fieldParameter"
+                "$joinAlias.field = :$fieldParameter"
             );
             $qb->setParameter($fieldParameter, $fieldName);
         }
@@ -159,11 +169,10 @@ class PdoMysql extends BaseDriver
         if ($setOrderBy) {
             $rawValueParameter = "raw_$valueParameter";
             $qb->select(
-                array(
+                [
                     'search as item',
-                    'text',
-                    "MATCH_AGAINST(textField.value, :$rawValueParameter) AS rankField"
-                )
+                    "MATCH_AGAINST($joinAlias.value, :$rawValueParameter) AS rankField"
+                ]
             )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
         }
 
@@ -186,18 +195,19 @@ class PdoMysql extends BaseDriver
         $index,
         array $searchCondition
     ) {
-        $fieldName       = $searchCondition['fieldName'];
-        $fieldValue      = $searchCondition['fieldValue'];
+        $joinAlias  = $this->getJoinAlias($searchCondition['fieldType'], $index);
+        $fieldName  = $searchCondition['fieldName'];
+        $fieldValue = $searchCondition['fieldValue'];
 
         $result = $qb->expr()->orX();
         foreach (array_values($words) as $key => $value) {
             $valueParameter = 'value' . $index . '_w' . $key;
-            $result->add("textField.value LIKE :$valueParameter");
+            $result->add("$joinAlias.value LIKE :$valueParameter");
             $qb->setParameter($valueParameter, $value . '%');
         }
         if ($this->isConcreteField($fieldName) && !$this->isAllDataField($fieldName)) {
             $fieldParameter = 'field' . $index;
-            $result = $qb->expr()->andX($result, "textField.field = :$fieldParameter");
+            $result = $qb->expr()->andX($result, "$joinAlias.field = :$fieldParameter");
             $qb->setParameter($fieldParameter, $fieldValue);
         }
 
@@ -217,6 +227,7 @@ class PdoMysql extends BaseDriver
         $index,
         array $searchCondition
     ) {
+        $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
@@ -224,9 +235,9 @@ class PdoMysql extends BaseDriver
         // TODO Need to clarify requirements for "not contains" in scope of CRM-215
         $qb->setParameter($valueParameter, '%' . implode('%', $words) . '%');
 
-        $whereExpr = 'textField.value NOT LIKE :' . $valueParameter;
+        $whereExpr = "$joinAlias.value NOT LIKE :$valueParameter";
         if ($this->isConcreteField($fieldName)) {
-            $whereExpr .= ' AND textField.field = :' . $fieldParameter;
+            $whereExpr .= " AND $joinAlias.field = :$fieldParameter";
             $qb->setParameter($fieldParameter, $fieldName);
 
             return $whereExpr;
@@ -251,5 +262,17 @@ class PdoMysql extends BaseDriver
     protected function isAllDataField($fieldName)
     {
         return $fieldName == Indexer::TEXT_ALL_DATA_FIELD;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
+    {
+        $connection->query('SET FOREIGN_KEY_CHECKS=0');
+
+        parent::truncateEntities($dbPlatform, $connection);
+
+        $connection->query('SET FOREIGN_KEY_CHECKS=1');
     }
 }

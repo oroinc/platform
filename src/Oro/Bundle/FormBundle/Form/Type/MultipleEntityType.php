@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\Common\Inflector\Inflector;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -10,6 +9,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -40,18 +40,18 @@ class MultipleEntityType extends AbstractType
             ->add(
                 'added',
                 'oro_entity_identifier',
-                array(
+                [
                     'class'    => $options['class'],
                     'multiple' => true
-                )
+                ]
             )
             ->add(
                 'removed',
                 'oro_entity_identifier',
-                array(
+                [
                     'class'    => $options['class'],
                     'multiple' => true
-                )
+                ]
             );
 
         if ($options['extend']) {
@@ -66,17 +66,21 @@ class MultipleEntityType extends AbstractType
                     $targetData = $event->getForm()->getParent()->getData();
                     $fieldName  = $event->getForm()->getName();
 
-                    foreach (explode(',', $data['added']) as $id) {
-                        $entity = $repository->find($id);
-                        if ($entity) {
-                            $targetData->{Inflector::camelize('add_' . $fieldName)}($entity);
+                    if (!empty($data['added'])) {
+                        foreach (explode(',', $data['added']) as $id) {
+                            $entity = $repository->find($id);
+                            if ($entity) {
+                                FieldAccessor::addValue($targetData, $fieldName, $entity);
+                            }
                         }
                     }
 
-                    foreach (explode(',', $data['removed']) as $id) {
-                        $entity = $repository->find($id);
-                        if ($entity) {
-                            $targetData->{Inflector::camelize('remove_' . $fieldName)}($entity);
+                    if (!empty($data['removed'])) {
+                        foreach (explode(',', $data['removed']) as $id) {
+                            $entity = $repository->find($id);
+                            if ($entity) {
+                                FieldAccessor::removeValue($targetData, $fieldName, $entity);
+                            }
                         }
                     }
                 }
@@ -89,18 +93,22 @@ class MultipleEntityType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setRequired(array('class'));
+        $resolver->setRequired(['class']);
         $resolver->setDefaults(
-            array(
-                'add_acl_resource'      => null,
-                'class'                 => null,
-                'default_element'       => null,
-                'extend'                => false,
-                'grid_url'              => null,
-                'initial_elements'      => null,
-                'mapped'                => false,
-                'selector_window_title' => null,
-            )
+            [
+                'add_acl_resource'           => null,
+                'class'                      => null,
+                'default_element'            => null,
+                'extend'                     => false,
+                'initial_elements'           => null,
+                'mapped'                     => false,
+                'selector_window_title'      => null,
+                'extra_config'               => null,
+                'grid_url'                   => null, // deprecated
+                'selection_url'              => null,
+                'selection_route'            => null,
+                'selection_route_parameters' => [],
+            ]
         );
     }
 
@@ -109,7 +117,11 @@ class MultipleEntityType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $this->setOptionToView($view, $options, 'grid_url');
+        $this->setOptionToView($view, $options, 'extra_config');
+        $this->setOptionToView($view, $options, 'grid_url'); // deprecated
+        $this->setOptionToView($view, $options, 'selection_url');
+        $this->setOptionToView($view, $options, 'selection_route');
+        $this->setOptionToView($view, $options, 'selection_route_parameters');
         $this->setOptionToView($view, $options, 'initial_elements');
         $this->setOptionToView($view, $options, 'selector_window_title');
         $this->setOptionToView($view, $options, 'default_element');

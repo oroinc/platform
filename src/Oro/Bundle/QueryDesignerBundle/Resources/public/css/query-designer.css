@@ -1,5 +1,6 @@
 .form-horizontal .query-designer-form .control-group {
     float: left;
+    min-height: 30px;/* @TODO temporary solution, will be fixed in CRM-2025 */
 }
 /*.form-horizontal .query-designer-grouping-form .control-group {
     float: none;
@@ -8,6 +9,7 @@
 .form-horizontal .query-designer-form .control-group label.control-label {
     width: auto;
     margin-left: 10px;
+    min-width: 63px;/* @TODO temporary solution, will be fixed in CRM-2025 */
 }
 .form-horizontal .query-designer-form .control-group .controls {
     margin-left: 10px;

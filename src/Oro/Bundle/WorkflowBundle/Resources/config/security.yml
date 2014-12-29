@@ -12,8 +12,6 @@ services:
     oro_workflow.security.acl.voter.entity:
         class: %oro_workflow.security.acl.voter.entity.class%
         arguments:
-            - @doctrine
             - @oro_entity.doctrine_helper
-            - @oro_workflow.manager
         tags:
             - { name: security.voter, priority: 500 }

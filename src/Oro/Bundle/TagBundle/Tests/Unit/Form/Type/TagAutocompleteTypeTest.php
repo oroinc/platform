@@ -17,7 +17,7 @@ class TagAutocompleteTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new TagAutocompleteType();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->type);
     }

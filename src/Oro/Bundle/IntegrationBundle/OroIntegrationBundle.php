@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\IntegrationBundle;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\TypesPass;
-use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\DeleteChannelProvidersPass;
+use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\SettingsPass;
+use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\DeleteIntegrationProvidersPass;
 
 class OroIntegrationBundle extends Bundle
 {
@@ -18,6 +19,7 @@ class OroIntegrationBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new TypesPass());
-        $container->addCompilerPass(new DeleteChannelProvidersPass());
+        $container->addCompilerPass(new DeleteIntegrationProvidersPass());
+        $container->addCompilerPass(new SettingsPass());
     }
 }

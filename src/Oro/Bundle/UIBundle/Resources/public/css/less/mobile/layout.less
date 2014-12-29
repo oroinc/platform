@@ -21,7 +21,15 @@
   height: @headerHeight;
   top: 0;
 }
+/**
+ * Fixes issue when header with position fixed loses its place after blur event on some input
+ * @see fixStickyHeader() in oroui/js/mobile/layout.js
+ */
+&.input-focused #oroplatform-header {
+  position: absolute;
+}
 #main {
+  float: none;
   height: 100%;
   #container {
     overflow: auto;
@@ -66,53 +74,6 @@
     margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }
-.controls{
-  .selector{
-    width: 100% !important;
-    span{
-      width: 100% !important;
-    }
-    select{
-      width: 100% !important;
-      box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      -webkit-box-sizing: border-box;
-    }
-  }
-
-  input[type="text"],
-  input[type="search"],
-  input[type="email"]{
-    width: 100% !important;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    height: 30px;
-  }
-  textarea{
-    width: 100% !important;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-  }
-}
-.form-horizontal{
-  .controls{
-    .control-label{
-      padding-top: 0;
-    }  
-  }
-  .select2-container{
-    width: 100%;
-    max-width: 100%;
-  }
-}
-.oro-multiselect-holder{
-  input[type="email"],
-  input[type="text"]{
-    width: 225px !important;
-  }
-}
 #magento-without-border-tabs{
   min-width: 280px;
   padding-right: 0;
@@ -142,6 +103,7 @@
   }
 }
 .responsive-cell{
+  margin-bottom: 15px;
   .tab-content{
     .box-type1{
       margin-bottom: 0;
@@ -176,15 +138,55 @@
     }
   }
 }
-.chart-container {
-  &>.clearfix {
-    .pie-chart-legend {
-      height: auto !important;
-      float: none;
-      padding-bottom: 20px;
-      & > table{
+
+.oro-page {
+  &.collapsible-sidebar {
+    @media only screen and (min-width : 820px) {
+      .oro-page-sidebar {
+        .dropdown-menu {
+          display: block !important;
+          z-index: inherit;
+        }
+      }
+    }
+    @media only screen and (max-width : 820px) {
+      overflow: visible;
+      .oro-page-sidebar {
+        overflow: visible;
+        clear: both;
         width: 100%;
-        position: relative;
+        > .dropdown-toggle:focus {
+          font-weight: normal;
+        }
+        > .dropdown-toggle {
+          display: block;
+          background: #fff;
+          line-height: 30px;
+          margin: 0 10px;
+        }
+        > .dropdown-menu {
+          z-index: 900;
+          position: absolute;
+          padding: 5px 0;
+          margin: 2px 0 0;
+          background-color: #ffffff;
+          border: 1px solid #ccc;
+          border: 1px solid rgba(0, 0, 0, 0.2);
+          *border-right-width: 2px;
+          *border-bottom-width: 2px;
+          -webkit-border-radius: 6px;
+          -moz-border-radius: 6px;
+          border-radius: 6px;
+          -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          .entity-type {
+            width: auto;
+          }
+        }
+      }
+      .oro-page-body {
+        width: 100%;
       }
     }
   }

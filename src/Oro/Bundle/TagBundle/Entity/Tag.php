@@ -6,8 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * Tag
@@ -16,22 +18,31 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\TagBundle\Entity\Repository\TagRepository")
  * @Config(
- *  defaultValues={
- *      "entity"={
- *          "label"="Tag",
- *          "plural_label"="Tags",
- *          "icon"="icon-tag"
- *      },
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="user_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-tag"
+ *          },
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Tag
@@ -55,6 +66,13 @@ class Tag
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $created;
 
@@ -62,6 +80,13 @@ class Tag
      * @var \Datetime $updated
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updated;
 
@@ -76,6 +101,14 @@ class Tag
      * @ORM\JoinColumn(name="user_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * Constructor
@@ -127,7 +160,7 @@ class Tag
      * @param \DateTime $date
      * @return $this
      */
-    public function setCreatedAt(\DateTime $date)
+    public function setCreated(\DateTime $date)
     {
         $this->created = $date;
 
@@ -139,7 +172,7 @@ class Tag
      *
      * @return \Datetime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }
@@ -150,7 +183,7 @@ class Tag
      * @param \DateTime $date
      * @return $this
      */
-    public function setUpdatedAt(\DateTime $date)
+    public function setUpdated(\DateTime $date)
     {
         $this->updated = $date;
 
@@ -162,7 +195,7 @@ class Tag
      *
      * @return \Datetime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
         return $this->updated;
     }
@@ -224,5 +257,28 @@ class Tag
         $this->owner = $owningUser;
 
         return $this;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return Tag
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

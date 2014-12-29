@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\DistributionBundle;
 
+use OroRequirements;
+
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Yaml\Yaml;
@@ -13,6 +15,10 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
+/**
+ * This class should work on PHP 5.3
+ * Keep old array syntax
+ */
 abstract class OroKernel extends Kernel
 {
     /**
@@ -23,7 +29,7 @@ abstract class OroKernel extends Kernel
         parent::initializeBundles();
 
         // pass bundles to CumulativeResourceManager
-        $bundles       = [];
+        $bundles = array();
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
@@ -49,7 +55,7 @@ abstract class OroKernel extends Kernel
                     : new $class;
             }
         } else {
-            $file = $this->getCacheDir() . '/bundles.php';
+            $file  = $this->getCacheDir() . '/bundles.php';
             $cache = new ConfigCache($file, false);
 
             if (!$cache->isFresh($file)) {
@@ -69,11 +75,12 @@ abstract class OroKernel extends Kernel
      * Finds all .../Resource/config/oro/bundles.yml in given root folders
      *
      * @param array $roots
+     *
      * @return array
      */
-    protected function findBundles($roots = [])
+    protected function findBundles($roots = array())
     {
-        $paths = [];
+        $paths = array();
         foreach ($roots as $root) {
             if (!is_dir($root)) {
                 continue;
@@ -98,6 +105,7 @@ abstract class OroKernel extends Kernel
                         if (is_file($file)) {
                             $paths[] = $file;
                         }
+
                         return false;
                     }
                 }
@@ -110,44 +118,71 @@ abstract class OroKernel extends Kernel
         return $paths;
     }
 
+    /**
+     * @return array
+     */
     protected function collectBundles()
     {
         $files = $this->findBundles(
-            [
+            array(
                 $this->getRootDir() . '/../src',
                 $this->getRootDir() . '/../vendor'
-            ]
+            )
         );
+
+        $bundles    = array();
+        $exclusions = array();
         foreach ($files as $file) {
-            $import = Yaml::parse($file);
-
-            foreach ($import['bundles'] as $bundle) {
-                $kernel = false;
-                $priority = 0;
-
-                if (is_array($bundle)) {
-                    $class = $bundle['name'];
-                    $kernel = isset($bundle['kernel']) && true == $bundle['kernel'];
-                    $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
-                } else {
-                    $class = $bundle;
-                }
-
-                if (!isset($bundles[$class])) {
-                    $bundles[$class] = array(
-                        'name' => $class,
-                        'kernel' => $kernel,
-                        'priority' => $priority,
-                    );
-                }
+            $import  = Yaml::parse($file);
+            $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
+            if (!empty($import['exclusions'])) {
+                $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
             }
         }
+
+        $bundles = array_diff_key($bundles, $exclusions);
 
         uasort($bundles, array($this, 'compareBundles'));
 
         return $bundles;
     }
 
+    /**
+     * @param $bundles
+     *
+     * @return array
+     */
+    protected function getBundlesMapping(array $bundles)
+    {
+        $result = array();
+        foreach ($bundles as $bundle) {
+            $kernel   = false;
+            $priority = 0;
+
+            if (is_array($bundle)) {
+                $class    = $bundle['name'];
+                $kernel   = isset($bundle['kernel']) && true == $bundle['kernel'];
+                $priority = isset($bundle['priority']) ? (int)$bundle['priority'] : 0;
+            } else {
+                $class = $bundle;
+            }
+
+            $result[$class] = array(
+                'name'     => $class,
+                'kernel'   => $kernel,
+                'priority' => $priority,
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $a
+     * @param array $b
+     *
+     * @return int
+     */
     public function compareBundles($a, $b)
     {
         // @todo: this is preliminary algorithm. we need to implement more sophisticated one,
@@ -182,6 +217,30 @@ abstract class OroKernel extends Kernel
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.ExitExpression)
+     */
+    public function boot()
+    {
+        $phpVersion = phpversion();
+
+        include_once $this->getRootDir() . '/OroRequirements.php';
+
+        if (!version_compare($phpVersion, OroRequirements::REQUIRED_PHP_VERSION, '>=')) {
+            throw new \Exception(
+                sprintf(
+                    'PHP version must be at least %s (%s is installed)',
+                    OroRequirements::REQUIRED_PHP_VERSION,
+                    $phpVersion
+                )
+            );
+        }
+
+        parent::boot();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function dumpContainer(ConfigCache $cache, ContainerBuilder $container, $class, $baseClass)
     {
@@ -209,5 +268,23 @@ abstract class OroKernel extends Kernel
         $handler->registerHandlers();
 
         parent::initializeContainer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBundle($name, $first = true)
+    {
+        // if need to get this precise bundle
+        if (strpos($name, '!') === 0) {
+            $name = substr($name, 1);
+            if (isset($this->bundleMap[$name])) {
+                // current bundle is always the last
+                $bundle = end($this->bundleMap[$name]);
+                return $first ? $bundle : [$bundle];
+            }
+        }
+
+        return parent::getBundle($name, $first);
     }
 }

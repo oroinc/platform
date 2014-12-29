@@ -49,7 +49,7 @@ class SeleniumContext extends BehatSeleniumContext
         $createUser = new Navigation($this);
         $createUser->openUsers('Oro\Bundle\UserBundle')
             ->add()
-            ->assertTitle('Create User - Users - Users Management - System');
+            ->assertTitle('Create User - Users - User Management - System');
     }
 
     /**
@@ -118,6 +118,6 @@ class SeleniumContext extends BehatSeleniumContext
         $users = new User($this, false);
         $users->assertMessage($message)
             ->toGrid()
-            ->assertTitle('Users - Users Management - System');
+            ->assertTitle('Users - User Management - System');
     }
 }

@@ -1,7 +1,16 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/modal', './abstract-listener'
-    ], function ($, _, __, mediator, Modal, AbstractListener) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oroui/js/modal',
+    './abstract-listener'
+], function ($, _, __, mediator, Modal, AbstractListener) {
     'use strict';
+
+    var ColumnFormListener;
 
     /**
      * Listener for entity edit form and datagrid
@@ -10,7 +19,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
      * @class   orodatagrid.datagrid.listener.ColumnFormListener
      * @extends orodatagrid.datagrid.listener.AbstractListener
      */
-    var ColumnFormListener = AbstractListener.extend({
+    ColumnFormListener = AbstractListener.extend({
 
         /** @param {Object} */
         selectors: {
@@ -28,18 +37,30 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
                 throw new Error('Field selectors is not specified');
             }
             this.selectors = options.selectors;
+            this.confirmModal = {};
 
-            AbstractListener.prototype.initialize.apply(this, arguments);
+            ColumnFormListener.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            _.each(this.confirmModal, function (modal) {
+                modal.dispose();
+            });
+            delete this.confirmModal;
+            ColumnFormListener.__super__.dispose.call(this);
         },
 
         /**
          * Set datagrid instance
          */
         setDatagridAndSubscribe: function () {
-            AbstractListener.prototype.setDatagridAndSubscribe.apply(this, arguments);
-
-            this.$gridContainer.on('preExecute:refresh:' + this.gridName, _.bind(this._onExecuteRefreshAction, this));
-            this.$gridContainer.on('preExecute:reset:' + this.gridName, _.bind(this._onExecuteResetAction, this));
+            ColumnFormListener.__super__.setDatagridAndSubscribe.apply(this, arguments);
 
             this._clearState();
             this._restoreState();
@@ -50,6 +71,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
             mediator.bind("pagestate_restored", function () {
                 this._restoreState();
             }, this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        getGridEvents: function () {
+            var events = ColumnFormListener.__super__.getGridEvents.call(this);
+            events['preExecute:refresh:' + this.gridName] = _.bind(this._onExecuteRefreshAction, this);
+            events['preExecute:reset:' + this.gridName] = _.bind(this._onExecuteResetAction, this);
+            return events;
         },
 
         /**
@@ -165,7 +196,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Confirms refresh action that before it will be executed
          *
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {$.Event} e
+         * @param {oro.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
          */
@@ -179,7 +211,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Confirms reset action that before it will be executed
          *
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {$.Event} e
+         * @param {oro.datagrid.action.AbstractAction} action
          * @param {Object} options
          * @private
          */
@@ -193,7 +226,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         /**
          * Asks user a confirmation if there are local changes, if user confirms then clears state and runs action
          *
-         * @param {orodatagrid.datagrid.action.AbstractAction} action
+         * @param {oro.datagrid.action.AbstractAction} action
          * @param {Object} actionOptions
          * @param {String} type "reset" or "refresh"
          * @param {Object} confirmModalOptions Options for confirm dialog
@@ -228,11 +261,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
          * Opens confirm modal dialog
          */
         _openConfirmDialog: function (type, options, callback) {
-            this.confirmModal = this.confirmModal || {};
             if (!this.confirmModal[type]) {
                 this.confirmModal[type] = new Modal(_.extend({
                     title: __('Confirmation'),
-                    okText: __('Ok, got it.'),
+                    okText: __('OK, got it.'),
                     className: 'modal modal-primary',
                     okButtonClass: 'btn-primary btn-large'
                 }, options));
@@ -242,11 +274,39 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/mediat
         }
     });
 
-    ColumnFormListener.init = function ($gridContainer, gridName) {
-        var metadata = $gridContainer.data('metadata');
-        var options = metadata.options || {};
-        if (options.columnListener) {
-            new ColumnFormListener(_.extend({ $gridContainer: $gridContainer, gridName: gridName }, options.columnListener));
+    /**
+     * Builder interface implementation
+     *
+     * @param {jQuery.Deferred} deferred
+     * @param {Object} options
+     * @param {jQuery} [options.$el] container for the grid
+     * @param {string} [options.gridName] grid name
+     * @param {Object} [options.gridPromise] grid builder's promise
+     * @param {Object} [options.data] data for grid's collection
+     * @param {Object} [options.metadata] configuration for the grid
+     */
+    ColumnFormListener.init = function (deferred, options) {
+        var gridOptions, gridInitialization;
+        gridOptions = options.metadata.options || {};
+        gridInitialization = options.gridPromise;
+
+        var gridListenerOptions = gridOptions.rowSelection || gridOptions.columnListener; // for BC
+
+        if (gridListenerOptions) {
+            gridInitialization.done(function (grid) {
+                var listener, listenerOptions;
+                listenerOptions = _.defaults({
+                    $gridContainer: grid.$el,
+                    gridName: grid.name
+                }, gridListenerOptions);
+
+                listener = new ColumnFormListener(listenerOptions);
+                deferred.resolve(listener);
+            }).fail(function () {
+                deferred.reject();
+            });
+        } else {
+            deferred.reject();
         }
     };
 

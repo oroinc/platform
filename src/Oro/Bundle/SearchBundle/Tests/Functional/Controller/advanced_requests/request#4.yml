@@ -1,0 +1,18 @@
+# common test case
+request:
+    query: "from oro_test_item where decimal decimalValue >= 0.90 max_results 1"
+response:
+    records_count: 1
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item9@mail.com
+                record_url: http://localhost/search/
+    soap:
+        data:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item9@mail.com
+                recordUrl: http://localhost/search/

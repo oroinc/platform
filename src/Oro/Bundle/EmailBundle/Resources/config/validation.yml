@@ -1,7 +1,9 @@
 Oro\Bundle\EmailBundle\Entity\EmailTemplate:
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: [ name, entityName ]
-        - Oro\Bundle\EmailBundle\Validator\Constraints\VariablesConstraint: ~
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+              fields:     [ name, entityName ]
+              ignoreNull: false
+        - Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax: ~
     properties:
         name:
             - NotBlank:     ~
@@ -10,8 +12,8 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
                 max:        255
         type:
             - NotBlank:     ~
-        entityName:
-            - NotBlank:     ~
+        organization:
+            - NotBlank: ~
 
 Oro\Bundle\EmailBundle\Form\Model\Email:
     properties:

@@ -5,21 +5,22 @@ namespace Oro\Bundle\EmailBundle\Sync;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
+use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Model\EmailHeader;
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
-abstract class AbstractEmailSynchronizationProcessor
+abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
-    const DB_BATCH_SIZE = 30;
+    use LoggerAwareTrait;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $log;
+    /** Determines how many emails can be stored in a database at once */
+    const DB_BATCH_SIZE = 30;
 
     /**
      * @var EntityManager
@@ -32,30 +33,19 @@ abstract class AbstractEmailSynchronizationProcessor
     protected $emailEntityBuilder;
 
     /**
-     * @var EmailAddressManager
-     */
-    protected $emailAddressManager;
-
-    /**
      * Constructor
      *
-     * @param LoggerInterface          $log
-     * @param EntityManager            $em
-     * @param EmailEntityBuilder       $emailEntityBuilder
-     * @param EmailAddressManager      $emailAddressManager
-     * @param KnownEmailAddressChecker $knownEmailAddressChecker
+     * @param EntityManager                     $em
+     * @param EmailEntityBuilder                $emailEntityBuilder
+     * @param KnownEmailAddressCheckerInterface $knownEmailAddressChecker
      */
     protected function __construct(
-        LoggerInterface $log,
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager,
-        KnownEmailAddressChecker $knownEmailAddressChecker
+        KnownEmailAddressCheckerInterface $knownEmailAddressChecker
     ) {
-        $this->log                      = $log;
         $this->em                       = $em;
         $this->emailEntityBuilder       = $emailEntityBuilder;
-        $this->emailAddressManager      = $emailAddressManager;
         $this->knownEmailAddressChecker = $knownEmailAddressChecker;
     }
 
@@ -68,26 +58,100 @@ abstract class AbstractEmailSynchronizationProcessor
     abstract public function process(EmailOrigin $origin, $syncStartTime);
 
     /**
-     * Gets a list of email addresses which have an owner
-     * Email addresses are sorted by modification date; newest at the top
+     * @param EmailHeader $email
+     * @param string      $folderType
      *
-     * @return EmailAddress[]
+     * @return bool
      */
-    protected function getKnownEmailAddresses()
+    protected function isApplicableEmail(EmailHeader $email, $folderType)
     {
-        $this->log->notice('Loading known email addresses ...');
+        if ($folderType === FolderType::SENT) {
+            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+                $email->getToRecipients(),
+                $email->getCcRecipients(),
+                $email->getBccRecipients()
+            );
+        } else {
+            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+                $email->getFrom()
+            );
+        }
+    }
 
-        $repo           = $this->emailAddressManager->getEmailAddressRepository($this->em);
-        $query          = $repo->createQueryBuilder('a')
-            ->select('partial a.{id, email, updated}')
-            ->where('a.hasOwner = ?1')
-            ->orderBy('a.updated', 'DESC')
-            ->setParameter(1, true)
-            ->getQuery();
-        $emailAddresses = $query->getResult();
+    /**
+     * @param EmailHeader[] $emails
+     * @param string        $folderType
+     */
+    protected function registerEmailsInKnownEmailAddressChecker(array $emails, $folderType)
+    {
+        $addresses = [];
+        foreach ($emails as $email) {
+            if ($folderType === FolderType::SENT) {
+                $addresses[] = $email->getToRecipients();
+                $addresses[] = $email->getCcRecipients();
+                $addresses[] = $email->getBccRecipients();
+            } else {
+                $addresses[] = $email->getFrom();
+            }
+        }
+        $this->knownEmailAddressChecker->preLoadEmailAddresses($addresses);
+    }
 
-        $this->log->notice(sprintf('Loaded %d email address(es).', count($emailAddresses)));
+    /**
+     * Creates email entity and register it in the email entity batch processor
+     *
+     * @param EmailHeader       $email
+     * @param EmailFolder $folder
+     *
+     * @return EmailEntity
+     */
+    protected function addEmail(EmailHeader $email, EmailFolder $folder)
+    {
+        $emailEntity = $this->emailEntityBuilder->email(
+            $email->getSubject(),
+            $email->getFrom(),
+            $email->getToRecipients(),
+            $email->getSentAt(),
+            $email->getReceivedAt(),
+            $email->getInternalDate(),
+            $email->getImportance(),
+            $email->getCcRecipients(),
+            $email->getBccRecipients()
+        );
+        $emailEntity
+            ->addFolder($folder)
+            ->setMessageId($email->getMessageId())
+            ->setXMessageId($email->getXMessageId())
+            ->setXThreadId($email->getXThreadId());
 
-        return $emailAddresses;
+        return $emailEntity;
+    }
+
+    /**
+     * Checks if the given folders types are comparable.
+     * For example two "Sent" folders are comparable, "Inbox" and "Other" folders
+     * are comparable as well, but "Inbox" and "Sent" folders are not comparable
+     *
+     * @param string $folderType1
+     * @param string $folderType2
+     *
+     * @return bool
+     */
+    protected function isComparableFolders($folderType1, $folderType2)
+    {
+        if ($folderType1 === $folderType2) {
+            return true;
+        }
+        if ($folderType1 === FolderType::OTHER) {
+            $folderType1 = FolderType::INBOX;
+        }
+        if ($folderType2 === FolderType::OTHER) {
+            $folderType2 = FolderType::INBOX;
+        }
+        if ($folderType1 === $folderType2) {
+            return true;
+        }
+
+        return false;
     }
 }

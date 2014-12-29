@@ -85,19 +85,23 @@
         {# displaying the item #}
         {% import _self as oro_menu %}
         <li{{ oro_menu.attributes(itemAttributes) }}>
-            {%- set linkAttributes = item.linkAttributes %}
-            {%- set labelAttributes = item.labelAttributes %}
-            {%- if item.uri is not empty and (not matcher.isCurrent(item) or options.currentAsLink) %}
-                {{ block('linkElement') }}
-            {%- else %}
-                {{ block('spanElement') }}
-            {%- endif %}
-            {# render the list of children#}
-            {%- set childrenClasses = childrenClasses|merge(['menu_level_' ~ item.level]) %}
-            {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
-            {{ block('list_wrapper') }}
+            {{ block('item_content') }}
         </li>
     {% endif %}
+{% endblock %}
+
+{% block item_content %}
+    {%- set linkAttributes = item.linkAttributes %}
+    {%- set labelAttributes = item.labelAttributes %}
+    {%- if item.uri is not empty and (not matcher.isCurrent(item) or options.currentAsLink) %}
+        {{ block('linkElement') }}
+    {%- else %}
+        {{ block('spanElement') }}
+    {%- endif %}
+    {# render the list of children#}
+    {%- set childrenClasses = childrenClasses|merge(['menu_level_' ~ item.level]) %}
+    {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
+    {{ block('list_wrapper') }}
 {% endblock %}
 
 {# list wrapper block is used to allow modification of execution context in child templates #}

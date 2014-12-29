@@ -1,8 +1,7 @@
 /*global define*/
 define(
-    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore', 'oronavigation/js/navigation',
-    'oroui/js/mediator'],
-    function ($, sync, messenger, routing, _, Navigation, mediator) {
+    ['jquery', 'orosync/js/sync', 'oroui/js/messenger', 'routing', 'underscore', 'oroui/js/mediator'],
+    function ($, sync, messenger, routing, _, mediator) {
         /**
          * @export ororeminder/js/reminder-handler
          * @class ororeminder.ReminderHandler
@@ -21,7 +20,7 @@ define(
             init: function (id, wampEnable) {
                 var self = this;
 
-                mediator.on('page-rendered hash_navigation_request:complete', function () {
+                mediator.on('page-rendered page:afterChange', function () {
                     self.showReminders();
                 });
 
@@ -140,8 +139,6 @@ define(
 
                 }, this);
 
-                var navigation = Navigation.getInstance();
-
                 $('.alert-reminder .close').unbind('click').bind('click', function () {
                     $(this).parents('.alert-reminder').find('.reminders_dismiss_link').click();
                 });
@@ -149,7 +146,7 @@ define(
                 $('.alert-reminder .hash-navigation-link').unbind('click').bind('click', function (event) {
                     event.preventDefault();
                     var url = $(this).attr('href');
-                    navigation.setLocation(url);
+                    mediator.execute('redirectTo', {url: url});
                 });
             },
 

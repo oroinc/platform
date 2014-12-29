@@ -7,7 +7,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\ReportBundle\Entity\Report;
+use Oro\Bundle\ReportBundle\Entity\ReportType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -24,7 +26,8 @@ class ReportController extends Controller
      */
     public function viewAction(Report $entity)
     {
-        $reportType = strtolower($entity->getType()->getName());
+        $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
+
         $reportGroup = $this->get('oro_entity_config.provider.entity')
             ->getConfig($entity->getEntity())
             ->get('plural_label');
@@ -33,15 +36,37 @@ class ReportController extends Controller
             'reportGroup' => $reportGroup
         ];
 
-        if ($reportType === 'table') {
-            $gridName = sprintf('oro_report_table_%d', $entity->getId());
+        $reportType = $entity->getType()->getName();
+        if ($reportType === ReportType::TYPE_TABLE) {
+            $gridName = $entity::GRID_PREFIX . $entity->getId();
+
             if ($this->get('oro_report.datagrid.configuration.provider')->isReportValid($gridName)) {
                 $parameters['gridName'] = $gridName;
+
+                $datagrid = $this->get('oro_datagrid.datagrid.manager')
+                    ->getDatagrid(
+                        $gridName,
+                        [PagerInterface::PAGER_ROOT_PARAM => [PagerInterface::DISABLED_PARAM => true]]
+                    );
+
+                $chartOptions = $this
+                    ->get('oro_chart.options_builder')
+                    ->buildOptions(
+                        $entity->getChartOptions(),
+                        $datagrid->getConfig()->toArray()
+                    );
+
+                if (!empty($chartOptions)) {
+                    $parameters['chartView'] = $this->get('oro_chart.view_builder')
+                        ->setDataGrid($datagrid)
+                        ->setOptions($chartOptions)
+                        ->getView();
+                }
             }
         }
 
         return $this->render(
-            sprintf('OroReportBundle:Report:%s/view.html.twig', $reportType),
+            sprintf('OroReportBundle:Report:%s/view.html.twig', strtolower($reportType)),
             $parameters
         );
     }
@@ -93,6 +118,10 @@ class ReportController extends Controller
         return array();
     }
 
+    /**
+     * @param Report $entity
+     * @return array
+     */
     protected function update(Report $entity)
     {
         $this->get('oro_segment.entity_name_provider')->setCurrentItem($entity);
@@ -103,8 +132,20 @@ class ReportController extends Controller
             );
 
             return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_report_update', 'parameters' => ['id' => $entity->getId()]],
-                ['route' => 'oro_report_view', 'parameters' => ['id' => $entity->getId()]],
+                [
+                    'route' => 'oro_report_update',
+                    'parameters' => [
+                        'id' => $entity->getId(),
+                        '_enableContentProviders' => 'mainMenu'
+                    ]
+                ],
+                [
+                    'route' => 'oro_report_view',
+                    'parameters' => [
+                        'id' => $entity->getId(),
+                        '_enableContentProviders' => 'mainMenu'
+                    ]
+                ],
                 $entity
             );
         }

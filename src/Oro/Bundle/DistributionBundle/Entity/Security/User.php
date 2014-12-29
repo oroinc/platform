@@ -75,8 +75,8 @@ class User implements AdvancedUserInterface, \Serializable
 
     public function __construct()
     {
-        $this->roles           = new ArrayCollection();
-        $this->groups          = new ArrayCollection();
+        $this->roles  = new ArrayCollection();
+        $this->groups = new ArrayCollection();
     }
 
     /**
@@ -177,7 +177,7 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * Unserializes the user
+     * Unserialized the user
      *
      * @param string $serialized
      */

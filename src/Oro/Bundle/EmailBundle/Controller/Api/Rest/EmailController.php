@@ -96,7 +96,7 @@ class EmailController extends RestGetController
                 if ($value) {
                     /** @var EmailBody $value */
                     $value = array(
-                        'content' => $value->getContent(),
+                        'content' => $value->getBodyContent(),
                         'isText' => $value->getBodyIsText(),
                         'hasAttachments' => $value->getHasAttachments(),
                     );

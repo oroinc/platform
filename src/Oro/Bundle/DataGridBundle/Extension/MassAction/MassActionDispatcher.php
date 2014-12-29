@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
@@ -29,14 +29,10 @@ class MassActionDispatcher
      */
     protected $manager;
 
-    /** @var RequestParameters */
-    protected $requestParams;
-
-    public function __construct(ContainerInterface $container, Manager $manager, RequestParameters $requestParams)
+    public function __construct(ContainerInterface $container, Manager $manager)
     {
-        $this->container     = $container;
-        $this->manager       = $manager;
-        $this->requestParams = $requestParams;
+        $this->container = $container;
+        $this->manager   = $manager;
     }
 
     /**
@@ -63,7 +59,7 @@ class MassActionDispatcher
      * @param array  $parameters
      * @param array  $data
      *
-     * @throws \LogicException
+     * @throws LogicException
      *
      * @return MassActionResponseInterface
      */
@@ -85,14 +81,14 @@ class MassActionDispatcher
         }
 
         if ($inset && empty($values)) {
-            throw new \LogicException(sprintf('There is nothing to do in mass action "%s"', $actionName));
+            throw new LogicException(sprintf('There is nothing to do in mass action "%s"', $actionName));
         }
 
         // create datagrid
-        $datagrid = $this->manager->getDatagrid($datagridName);
+        $datagrid = $this->manager->getDatagridByRequestParams($datagridName);
 
         // set filter data
-        $this->requestParams->set(OrmFilterExtension::FILTER_ROOT_PARAM, $filters);
+        $datagrid->getParameters()->mergeKey(OrmFilterExtension::FILTER_ROOT_PARAM, $filters);
 
         // create mediator
         $massAction     = $this->getMassActionByName($actionName, $datagrid);
@@ -119,7 +115,7 @@ class MassActionDispatcher
      * @param array             $values
      *
      * @return QueryBuilder
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function getDatagridQuery(
         DatagridInterface $datagrid,
@@ -129,7 +125,7 @@ class MassActionDispatcher
     ) {
         $datasource = $datagrid->getDatasource();
         if (!$datasource instanceof OrmDatasource) {
-            throw new \LogicException("Mass actions applicable only for datagrids with ORM datasource.");
+            throw new LogicException("Mass actions applicable only for datagrids with ORM datasource.");
         }
 
         /** @var QueryBuilder $qb */
@@ -150,7 +146,7 @@ class MassActionDispatcher
      * @param DatagridInterface $datagrid
      *
      * @return \Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function getMassActionByName($massActionName, DatagridInterface $datagrid)
     {
@@ -165,13 +161,13 @@ class MassActionDispatcher
         /** @var MassActionExtension|bool $extension */
         $extension = reset($extensions);
         if ($extension === false) {
-            throw new \LogicException("MassAction extension is not applied to datagrid.");
+            throw new LogicException("MassAction extension is not applied to datagrid.");
         }
 
         $massAction = $extension->getMassAction($massActionName, $datagrid);
 
         if (!$massAction) {
-            throw new \LogicException(sprintf('Can\'t find mass action "%s"', $massActionName));
+            throw new LogicException(sprintf('Can\'t find mass action "%s"', $massActionName));
         }
 
         return $massAction;
@@ -198,17 +194,17 @@ class MassActionDispatcher
      * @param MassActionInterface $massAction
      *
      * @return MassActionHandlerInterface
-     * @throws \LogicException
+     * @throws LogicException
      * @throws UnexpectedTypeException
      */
     protected function getMassActionHandler(MassActionInterface $massAction)
     {
         $handlerServiceId = $massAction->getOptions()->offsetGet('handler');
         if (!$handlerServiceId) {
-            throw new \LogicException(sprintf('There is no handler for mass action "%s"', $massAction->getName()));
+            throw new LogicException(sprintf('There is no handler for mass action "%s"', $massAction->getName()));
         }
         if (!$this->container->has($handlerServiceId)) {
-            throw new \LogicException(sprintf('Mass action handler service "%s" not exist', $handlerServiceId));
+            throw new LogicException(sprintf('Mass action handler service "%s" not exist', $handlerServiceId));
         }
 
         $handler = $this->container->get($handlerServiceId);
@@ -222,7 +218,7 @@ class MassActionDispatcher
     /**
      * @param Actions\MassActionInterface $massAction
      *
-     * @throws \LogicException
+     * @throws LogicException
      *
      * @return string
      */
@@ -230,7 +226,7 @@ class MassActionDispatcher
     {
         $identifier = $massAction->getOptions()->offsetGet('data_identifier');
         if (!$identifier) {
-            throw new \LogicException(sprintf('Mass action "%s" must define identifier name', $massAction->getName()));
+            throw new LogicException(sprintf('Mass action "%s" must define identifier name', $massAction->getName()));
         }
 
         return $identifier;

@@ -20,15 +20,15 @@ datagrid:
             label:
                 label: oro.dashboard.label.label
             ownerName:
-                type: twig
-                label: oro.dashboard.owner.label
+                type:          twig
+                label:         oro.dashboard.owner.label
                 frontend_type: html
-                template: OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
+                template:      OroDashboardBundle:Dashboard:Datagrid/Property/owner.html.twig
             createdAt:
-                label:   oro.dashboard.created_at.label
+                label:         oro.ui.created_at
                 frontend_type: datetime
             updatedAt:
-                label:   oro.dashboard.updated_at.label
+                label:         oro.ui.updated_at
                 frontend_type: datetime
         sorters:
             columns:
@@ -74,19 +74,19 @@ datagrid:
             view:
                 type:          navigate
                 acl_resource:  oro_dashboard_view
-                label:         View
-                icon:          user
+                label:         oro.grid.action.view
+                icon:          eye-open
                 link:          view_link
                 rowAction:     true
             update:
                 type:          navigate
                 acl_resource:  oro_dashboard_edit
-                label:         Update
+                label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
             delete:
                 type:          delete
                 acl_resource:  oro_dashboard_delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link

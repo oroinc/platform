@@ -1,0 +1,73 @@
+parameters:
+    oro_entity_pagination.datagrid.extension.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension
+    oro_entity_pagination.event_listener.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\EventListener\EntityPaginationListener
+    oro_entity_pagination.storage.class: Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage
+    oro_entity_pagination.storage.data_collector.class: Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector
+    oro_entity_pagination.manager.class: Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager
+    oro_entity_pagination.message_manager.class: Oro\Bundle\EntityPaginationBundle\Manager\MessageManager
+    oro_entity_pagination.navigation.class: Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation
+    oro_entity_pagination.twig_extension.entity_pagination.class: Oro\Bundle\EntityPaginationBundle\Twig\EntityPaginationExtension
+
+services:
+    oro_entity_pagination.datagrid.extension.orm_entity_pagination:
+        class: %oro_entity_pagination.datagrid.extension.entity_pagination.class%
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_entity_pagination.storage:
+        class: %oro_entity_pagination.storage.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity_pagination.manager
+        calls:
+            - [ setRequest, [@?request=] ]
+
+    oro_entity_pagination.storage.data_collector:
+        class: %oro_entity_pagination.storage.data_collector.class%
+        arguments:
+            - @oro_datagrid.datagrid.manager
+            - @oro_entity.doctrine_helper
+            - @oro_security.acl_helper
+            - @oro_datagrid.extension.pager.orm.pager
+            - @oro_entity_pagination.storage
+            - @oro_entity_pagination.manager
+
+    oro_entity_pagination.manager:
+        class: %oro_entity_pagination.manager.class%
+        arguments:
+            - @oro_config.global
+
+    oro_entity_pagination.message_manager:
+        class: %oro_entity_pagination.message_manager.class%
+        arguments:
+            - @session
+            - @translator
+            - @oro_entity_pagination.navigation
+            - @oro_entity_pagination.storage
+
+    oro_entity_pagination.navigation:
+        class: %oro_entity_pagination.navigation.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_security.security_facade
+            - @oro_entity_pagination.storage
+
+    oro_entity_pagination.event_listener.entity_pagination:
+        class: %oro_entity_pagination.event_listener.entity_pagination.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity_pagination.storage
+            - @oro_entity_pagination.manager
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }
+
+    oro_entity_pagination.twig_extension.entity_pagination:
+        class: %oro_entity_pagination.twig_extension.entity_pagination.class%
+        arguments:
+            - @oro_entity_pagination.navigation
+            - @oro_entity_pagination.storage.data_collector
+            - @oro_entity_pagination.message_manager
+        calls:
+            - [ setRequest, [@?request=] ]
+        tags:
+            - { name: twig.extension }

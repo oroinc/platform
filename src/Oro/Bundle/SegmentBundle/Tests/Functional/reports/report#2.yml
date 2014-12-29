@@ -18,3 +18,5 @@ response:
         - [admin,1,/user/view/1]
 export:
         - [admin]
+export_filter:
+        - []

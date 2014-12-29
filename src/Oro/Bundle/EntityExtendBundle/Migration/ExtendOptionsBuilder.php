@@ -2,31 +2,33 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendOptionsBuilder
 {
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $entityMetadataHelper;
 
-    /**
-     * @var array
-     */
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
+
+    /** @var array */
     protected $tableToEntityMap = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $result = [];
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
+     * @param FieldTypeHelper      $fieldTypeHelper
      */
-    public function __construct(EntityMetadataHelper $entityMetadataHelper)
-    {
+    public function __construct(
+        EntityMetadataHelper $entityMetadataHelper,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
+        $this->fieldTypeHelper      = $fieldTypeHelper;
     }
 
     /**
@@ -51,9 +53,6 @@ class ExtendOptionsBuilder
 
         $tableMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
 
-        if (!isset($this->result[$entityClassName])) {
-            $this->result[$entityClassName] = [];
-        }
         if (!empty($options)) {
             $this->result[$entityClassName]['configs'] = $options;
         }
@@ -79,23 +78,21 @@ class ExtendOptionsBuilder
 
         $newColumnName = $this->getAndRemoveOption($options, ExtendOptionsManager::NEW_NAME_OPTION);
         if ($newColumnName) {
-            if (!isset($this->result[ExtendConfigProcessor::RENAME_CONFIGS])) {
-                $this->result[ExtendConfigProcessor::RENAME_CONFIGS] = [];
-            }
-            if (!isset($this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName])) {
-                $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName] = [];
-            }
             $this->result[ExtendConfigProcessor::RENAME_CONFIGS][$entityClassName][$columnName] = $newColumnName;
             if (empty($options)) {
                 return;
             };
         }
 
-        $fieldName  = $this->getFieldName($tableName, $columnName);
-        $columnType = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
-        $columnMode = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
+        $fieldName = $this->getAndRemoveOption($options, ExtendOptionsManager::FIELD_NAME_OPTION);
+        if (!$fieldName) {
+            $fieldName = $this->getFieldName($tableName, $columnName);
+        }
+        $columnType           = $this->getAndRemoveOption($options, ExtendOptionsManager::TYPE_OPTION);
+        $columnMode           = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
+        $columnUnderlyingType = $this->fieldTypeHelper->getUnderlyingType($columnType);
 
-        if (in_array($columnType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
+        if (in_array($columnUnderlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }
@@ -123,17 +120,11 @@ class ExtendOptionsBuilder
             $options['extend']['relation_key'] = ExtendHelper::buildRelationKey(
                 $entityClassName,
                 $fieldName,
-                $columnType,
+                $columnUnderlyingType,
                 $options['extend']['target_entity']
             );
         }
 
-        if (!isset($this->result[$entityClassName])) {
-            $this->result[$entityClassName] = [];
-        }
-        if (!isset($this->result[$entityClassName]['fields'])) {
-            $this->result[$entityClassName]['fields'] = [];
-        }
         $this->result[$entityClassName]['fields'][$fieldName] = [];
         if (!empty($options)) {
             $this->result[$entityClassName]['fields'][$fieldName]['configs'] = $options;
@@ -143,6 +134,54 @@ class ExtendOptionsBuilder
         }
         if ($columnMode) {
             $this->result[$entityClassName]['fields'][$fieldName]['mode'] = $columnMode;
+        }
+    }
+
+    /**
+     * @param string $configType
+     * @param string $tableName
+     * @param array  $options
+     */
+    public function addTableAuxiliaryOptions($configType, $tableName, $options)
+    {
+        $entityClassName = $this->getEntityClassName($tableName, null, false);
+        if (!$entityClassName) {
+            return;
+        }
+
+        $this->result[$configType][$entityClassName]['configs'] = $options;
+    }
+
+    /**
+     * @param string $configType
+     * @param string $tableName
+     * @param string $columnName
+     * @param array  $options
+     */
+    public function addColumnAuxiliaryOptions($configType, $tableName, $columnName, $options)
+    {
+        $entityClassName = $this->getEntityClassName($tableName, null, false);
+        if (!$entityClassName) {
+            return;
+        }
+
+        $fieldName = $this->getFieldName($tableName, $columnName);
+
+        $this->result[$configType][$entityClassName]['fields'][$fieldName] = $options;
+    }
+
+    /**
+     * @param string $sectionName
+     * @return string
+     * @throws \RuntimeException if unknown section name specified
+     */
+    public function getAuxiliaryConfigType($sectionName)
+    {
+        switch ($sectionName) {
+            case ExtendOptionsManager::APPEND_SECTION:
+                return ExtendConfigProcessor::APPEND_CONFIGS;
+            default:
+                throw new \RuntimeException(sprintf('Unknown auxiliary section: %s.', $sectionName));
         }
     }
 

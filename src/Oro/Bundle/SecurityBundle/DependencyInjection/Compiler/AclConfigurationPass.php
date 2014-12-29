@@ -29,7 +29,8 @@ class AclConfigurationPass implements CompilerPassInterface
     const DOCTRINE_CONVERTER = 'sensio_framework_extra.converter.doctrine.orm';
     const DOCTRINE_CONVERTER_CLASS = 'Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter';
     const SECURITY_FACADE_SERVICE = 'oro_security.security_facade';
-    const ENTITY_CLASS_RESOLVER = 'oro_entity.orm.entity_class_resolver';
+
+    const OWNERSHIP_CONFIG_PROVIDER = 'oro_entity_config.provider.ownership';
 
     /**
      * {@inheritDoc}
@@ -54,7 +55,6 @@ class AclConfigurationPass implements CompilerPassInterface
             $paramConverterDef = $container->getDefinition(self::DOCTRINE_CONVERTER);
             $paramConverterDef->setClass(self::DOCTRINE_CONVERTER_CLASS);
             $paramConverterDef->addArgument(new Reference(self::SECURITY_FACADE_SERVICE));
-            $paramConverterDef->addArgument(new Reference(self::ENTITY_CLASS_RESOLVER));
         }
     }
 
@@ -89,6 +89,8 @@ class AclConfigurationPass implements CompilerPassInterface
         }
         if ($container->hasDefinition(self::DEFAULT_ACL_PROVIDER)) {
             $providerDef = $container->getDefinition(self::DEFAULT_ACL_PROVIDER);
+            // make ACL DBAL provider public because it can be used as standalone service, for example in migrations
+            $providerDef->setPublic(true);
             // substitute the ACL Permission Granting Strategy
             if ($container->hasDefinition(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY)) {
                 $providerDef->replaceArgument(1, new Reference(self::NEW_ACL_PERMISSION_GRANTING_STRATEGY));
@@ -135,6 +137,12 @@ class AclConfigurationPass implements CompilerPassInterface
                         array(new Reference(self::ACL_EXTENSION_SELECTOR))
                     );
                 }
+
+                //set owner config provider in voter
+                $voterDef->addMethodCall(
+                    'setConfigProvider',
+                    array(new Reference(self::OWNERSHIP_CONFIG_PROVIDER))
+                );
             }
             // substitute the ACL Provider and set the default ACL Provider as a base provider for new ACL Provider
             if ($container->hasDefinition(self::NEW_ACL_PROVIDER)) {

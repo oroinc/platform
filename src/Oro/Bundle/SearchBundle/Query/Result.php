@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Query;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use JMS\Serializer\Annotation\Type;
-use JMS\Serializer\Annotation\Exclude;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Oro\Bundle\SearchBundle\Query\Query;
+use Doctrine\Common\Collections\ArrayCollection;
+
+use JMS\Serializer\Annotation\Type;
+use JMS\Serializer\Annotation\Exclude;
 
 class Result extends ArrayCollection
 {
@@ -33,7 +33,7 @@ class Result extends ArrayCollection
 
     /**
      * @Soap\ComplexType("Oro\Bundle\SearchBundle\Query\Result\Item[]")
-     * @var \Oro\Bundle\SearchBundle\Query\Result\Item[]
+     * @var Result\Item[]
      */
     protected $elements;
 
@@ -46,10 +46,12 @@ class Result extends ArrayCollection
      */
     public function __construct(Query $query, array $elements = array(), $recordsCount = 0)
     {
-        $this->query = $query;
+        $this->query        = $query;
         $this->recordsCount = $recordsCount;
+
         parent::__construct($elements);
-        $this->count = $this->count();
+
+        $this->count    = $this->count();
         $this->elements = $elements;
     }
 
@@ -80,8 +82,11 @@ class Result extends ArrayCollection
     public function toSearchResultData()
     {
         $resultData['records_count'] = $this->recordsCount;
+
         if ($this->count()) {
             $resultData['count'] = $this->count();
+
+            /** @var Result\Item $resultRecord */
             foreach ($this as $resultRecord) {
                 $resultData['data'][] = $resultRecord->toArray();
             }

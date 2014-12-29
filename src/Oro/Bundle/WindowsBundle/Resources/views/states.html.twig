@@ -1,12 +1,9 @@
-{% if states %}
+{% if windowStates|length %}
     <div style="display: none" id="widget-states-container">
-        {% for stateId, state in states %}
-            {% if state.url %}
-                <div id="widget-restored-state-{{ stateId|default("none") }}">
-
-                    {% render state.cleanUrl %}
-                </div>
-            {% endif %}
+        {% for windowState in windowStates %}
+            <div id="widget-restored-state-{{ windowState.id|default("none") }}">
+                {{ oro_window_render_fragment(windowState) }}
+            </div>
         {% endfor %}
     </div>
 
@@ -14,9 +11,9 @@
         require(['jquery', 'oro/dialog-widget', 'orowindows/js/dialog/state/model'],
         function($, DialogWidget, StateModel) {
             $(function(){
-                {% for stateId, state in states %}
+                {% for windowState in windowStates if windowState.renderedSuccessfully %}
                 var widget = new DialogWidget({
-                    model: new StateModel({{ {'data': state, 'id': stateId}|json_encode|raw }})
+                    model: new StateModel({{ {'data': windowState.data, 'id': windowState.id}|json_encode|raw }})
                 });
                 widget.render();
                 {% endfor %}

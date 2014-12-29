@@ -5,13 +5,12 @@
 
 {% set entityId = form.vars.value.id %}
 {% oro_title_set({params : { "%business_unit.name%": form.vars.value.name } }) %}
-{% set audit_entity_class = 'Oro_Bundle_OrganizationBundle_Entity_BusinessUnit' %}
+
 {% set gridName = 'bu-update-users-grid' %}
 {% set formAction = entityId ? path('oro_business_unit_update', { 'id': entityId}) : path('oro_business_unit_create') %}
 
 {% block head_script %}
     {{ parent() }}
-
     {% set listenerParameters = {
         'columnName': 'has_business_unit',
         'selectors': {
@@ -60,46 +59,38 @@
 {% block content_data %}
     {% set id = 'business_unit-profile' %}
     {% set dataBlocks = [{
-            'title': 'General',
-            'class': 'active',
-            'subblocks': [
-                {
-                    'title': '',
-                    'data': [
-                        form_widget(form.appendUsers, {'id': 'businessUnitAppendUsers'}),
-                        form_widget(form.removeUsers, {'id': 'businessUnitRemoveUsers'}),
-                        form_row(form.name),
-                        form_row(form.organization),
-                        form_row(form.phone),
-                        form_row(form.website),
-                        form_row(form.email),
-                        form_row(form.fax),
-                    ]
-                }
+        'title': 'General'|trans,
+        'class': 'active',
+        'subblocks': [{
+            'title': '',
+            'data': [
+                form_widget(form.appendUsers, {'id': 'businessUnitAppendUsers'}),
+                form_widget(form.removeUsers, {'id': 'businessUnitRemoveUsers'}),
+                form_row(form.name),
+
+                form_row(form.businessUnit),
+
+                form_row(form.phone),
+                form_row(form.website),
+                form_row(form.email),
+                form_row(form.fax),
             ]
         }]
-    %}
+    }] %}
 
-    {% set dataBlocks = dataBlocks|merge(
-        [{
-            'title' : 'oro.organization.businessunit.users.label',
-            'subblocks':
-            [
-                {
-                    'title' : null,
-                    'useSpan': false,
-                    'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]
-                }
-            ]
+    {% set dataBlocks = dataBlocks|merge([{
+        'title' : 'oro.organization.businessunit.users.label'|trans,
+        'subblocks': [{
+            'title' : null,
+            'useSpan': false,
+            'data' : [dataGrid.renderGrid(gridName, {business_unit_id: entityId}, { cssClass: 'inner-grid' })]
         }]
-    )
-    %}
+    }] ) %}
 
-    {% set data =
-        {
-            'formErrors': form_errors(form)? form_errors(form) : null,
-            'dataBlocks': dataBlocks
-        }
-    %}
+    {% set data = {
+        'formErrors': form_errors(form)? form_errors(form) : null,
+        'dataBlocks': dataBlocks
+    } %}
+
     {{ parent() }}
 {% endblock content_data %}

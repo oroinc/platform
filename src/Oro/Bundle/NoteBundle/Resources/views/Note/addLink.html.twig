@@ -1,0 +1,27 @@
+{{ UI.clientLink({
+    'dataUrl': path(
+        'oro_note_create', {
+            entityClass: oro_class_name(entity, true),
+            entityId: entity.id
+    }),
+    'aCss': 'no-hash',
+    'iCss': 'icon-comment-alt',
+    'dataId': entity.id,
+    'label': 'oro.note.action.add'|trans,
+    'widget': {
+        'type': 'dialog',
+        'multiple': false,
+        'refresh-widget-alias': 'activity-list-widget',
+        'options': {
+            'alias': 'note-dialog',
+            'dialogOptions': {
+                'title': 'oro.note.action.add'|trans,
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 1000
+            }
+        }
+    }
+}) }}

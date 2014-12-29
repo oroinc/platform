@@ -20,7 +20,8 @@ define(['underscore', 'backbone'
         /** @property {Object} */
         util: null,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.util = this.$el.data('entity-field-util');
             this.util.fieldsLabel = this.options.fieldsLabel;
             this.util.relatedLabel = this.options.relatedLabel;
@@ -63,11 +64,11 @@ define(['underscore', 'backbone'
             if (_.size(chain) > 1) {
                 var pair = _.last(chain).split('::');
                 result.parent_entity = result.entity;
-                result.entity = _.first(pair);
+                result.entity = pair[_.size(pair) - 2];
                 result.field = _.last(pair);
                 if (_.size(chain) > 2) {
                     var parentField = chain[_.size(chain) - 2].split('::');
-                    result.parent_entity = _.first(parentField);
+                    result.parent_entity = parentField[_.size(parentField) - 2];
                 }
             }
             _.extend(result, _.pick(this.getFieldData(fieldId), ['type', 'identifier']));

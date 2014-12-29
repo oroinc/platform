@@ -58,7 +58,6 @@ class RoleHandler
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();
                 $removeUsers = $this->form->get('removeUsers')->getData();
-                $entity->setRole(strtoupper(trim(preg_replace('/[^\w\-]/i', '_', $entity->getLabel()))));
                 $this->onSuccess($entity, $appendUsers, $removeUsers);
 
                 return true;

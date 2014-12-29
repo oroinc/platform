@@ -6,6 +6,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
 abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
@@ -22,12 +23,16 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
     /**
      * Constructor
      *
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
      */
-    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
-    {
-        parent::__construct($functionProvider, $doctrine);
+    public function __construct(
+        FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        ManagerRegistry $doctrine
+    ) {
+        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
         $this->accessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -83,12 +88,13 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
         $entityClassName,
         $tableAlias,
         $fieldName,
+        $columnExpr,
         $columnAlias,
         $filterName,
         array $filterData
     ) {
         $filter = [
-            'column'     => sprintf('%s.%s', $tableAlias, $fieldName),
+            'column'     => $this->getFilterByExpr($entityClassName, $tableAlias, $fieldName, $columnExpr),
             'filter'     => $filterName,
             'filterData' => $filterData
         ];
@@ -118,30 +124,31 @@ abstract class GroupingOrmQueryConverter extends AbstractOrmQueryConverter
     }
 
     /**
-     * Get filter type for given field type
+     * @param string $entityClassName
+     * @param string $tableAlias
+     * @param string $fieldName
+     * @param string $columnExpr
      *
-     * @param string $fieldType
      * @return string
      */
-    protected function getFilterType($fieldType)
-    {
-        switch ($fieldType) {
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
-            case 'decimal':
-            case 'float':
-            case 'money':
-                return 'number';
-            case 'percent':
-                return 'percent';
-            case 'boolean':
-                return 'boolean';
-            case 'date':
-            case 'datetime':
-                return 'datetime';
+    protected function getFilterByExpr(
+        $entityClassName,
+        $tableAlias,
+        $fieldName,
+        $columnExpr
+    ) {
+        $filterById = false;
+        if ($this->virtualFieldProvider->isVirtualField($entityClassName, $fieldName)) {
+            $key = sprintf('%s::%s', $entityClassName, $fieldName);
+            if (isset($this->virtualColumnOptions[$key]['filter_by_id'])) {
+                if ($this->virtualColumnOptions[$key]['filter_by_id']) {
+                    $filterById = true;
+                };
+            }
         }
 
-        return 'string';
+        return $filterById
+            ? sprintf('%s.%s', $tableAlias, $fieldName)
+            : $columnExpr;
     }
 }

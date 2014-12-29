@@ -35,3 +35,10 @@ oro:
             event.label:          Event name
             template.label:       Template
             recipient_list.label: Recipient list
+            email.label:          Email
+            owner.label:          Owner
+
+        system_configuration:
+            email_notification_sender_email: Sender Email
+            email_notification_sender_name: Sender Name
+            title: Notification Configuration

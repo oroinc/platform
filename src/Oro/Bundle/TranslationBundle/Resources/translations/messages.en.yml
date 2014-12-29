@@ -1,0 +1,13 @@
+oro.translation:
+    download:
+        error: 'Error while downloading package'
+
+    system_configuration:
+        fields:
+            available_translations.label: 'Available translations'
+
+    action:
+        download: 'Download'
+        enable: 'Enable'
+        disable: 'Disable'
+        update: 'Update'

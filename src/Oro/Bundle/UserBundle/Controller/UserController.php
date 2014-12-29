@@ -7,15 +7,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class UserController extends Controller
 {
@@ -45,37 +46,34 @@ class UserController extends Controller
 
     /**
      * @Route("/profile/edit", name="oro_user_profile_update")
-     * @Template("OroUserBundle:User:update.html.twig")
+     * @Template("OroUserBundle:User/Profile:update.html.twig")
      */
     public function updateProfileAction()
     {
         return $this->update(
             $this->getUser(),
             'oro_user_profile_update',
-            array('route' => 'oro_user_profile_view')
+            array('route' => 'oro_user_profile_view'),
+            'oro_user_profile_view'
         );
     }
 
     /**
      * @Route("/apigen/{id}", name="oro_user_apigen", requirements={"id"="\d+"})
-     * @AclAncestor("oro_user_user_update")
      */
     public function apigenAction(User $user)
     {
-        if (!$api = $user->getApi()) {
-            $api = new UserApi();
-        }
+        $em      = $this->getDoctrine()->getManager();
+        $userApi = $this->getUserApi($user);
+        $userApi->setApiKey($userApi->generateKey())
+            ->setUser($user)
+            ->setOrganization($this->getOrganization());
 
-        $api->setApiKey($api->generateKey())
-            ->setUser($user);
-
-        $em = $this->getDoctrine()->getManager();
-
-        $em->persist($api);
+        $em->persist($userApi);
         $em->flush();
 
         return $this->getRequest()->isXmlHttpRequest()
-            ? new JsonResponse($api->getApiKey())
+            ? new JsonResponse($userApi->getApiKey())
             : $this->forward('OroUserBundle:User:view', array('user' => $user));
     }
 
@@ -102,7 +100,7 @@ class UserController extends Controller
      * Edit user form
      *
      * @Route("/update/{id}", name="oro_user_update", requirements={"id"="\d+"}, defaults={"id"=0})
-     * @Template
+     * @Template("OroUserBundle:User:update.html.twig")
      * @Acl(
      *      id="oro_user_user_update",
      *      type="entity",
@@ -127,16 +125,19 @@ class UserController extends Controller
      */
     public function indexAction()
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_user.entity.class')
+        );
     }
 
     /**
-     * @param User $entity
+     * @param User   $entity
      * @param string $updateRoute
-     * @param array $viewRoute
-     * @return array
+     * @param array  $viewRoute
+     * @param string $cancelRoute
+     * @return mixed
      */
-    protected function update(User $entity, $updateRoute = '', $viewRoute = array())
+    protected function update(User $entity, $updateRoute = '', $viewRoute = array(), $cancelRoute = 'oro_user_index')
     {
         if ($this->get('oro_user.form.handler.user')->process($entity)) {
             $this->get('session')->getFlashBag()->add(
@@ -163,6 +164,7 @@ class UserController extends Controller
             'entity'        => $entity,
             'form'          => $this->get('oro_user.form.user')->createView(),
             'editRoute'     => $updateRoute,
+            'cancelRoute'   => $cancelRoute,
             // TODO: it is a temporary solution. In a future it is planned to give an user a choose what to do:
             // completely delete an owner and related entities or reassign related entities to another owner before
             'allow_delete' =>
@@ -191,7 +193,6 @@ class UserController extends Controller
         if ($editRoute) {
             $output = array_merge($output, array('editRoute' => $editRoute));
         }
-
         return $output;
     }
 
@@ -204,23 +205,44 @@ class UserController extends Controller
     }
 
     /**
-     * @Route("/widget/emails/{id}", name="oro_user_widget_emails", requirements={"id"="\d+"})
-     * @Template
-     * @AclAncestor("oro_email_view")
-     */
-    public function emailsAction(User $user)
-    {
-        return array('entity' => $user);
-    }
-
-    /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
      * @Template
      */
     public function infoAction(User $user)
     {
         return array(
-            'entity'  => $user
+            'entity'      => $user,
+            'userApi'     => $this->getUserApi($user),
+            'viewProfile' => true
         );
+    }
+
+    /**
+     * Returns current UserApi or creates new one
+     *
+     * @param User $user
+     *
+     * @return UserApi
+     */
+    protected function getUserApi(User $user)
+    {
+        $userManager  = $this->get('oro_user.manager');
+        if (!$userApi = $userManager->getApi($user, $this->getOrganization())) {
+            $userApi = new UserApi();
+        }
+
+        return $userApi;
+    }
+
+    /**
+     * Returns current organization
+     *
+     * @return Organization
+     */
+    protected function getOrganization()
+    {
+        /** @var UsernamePasswordOrganizationToken $token */
+        $token = $this->get('security.context')->getToken();
+        return $token->getOrganizationContext();
     }
 }

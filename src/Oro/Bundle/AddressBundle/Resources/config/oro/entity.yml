@@ -1,0 +1,14 @@
+oro_entity:
+    exclusions:
+        - { entity: Oro\Bundle\AddressBundle\Entity\AbstractAddress, field: regionText }
+
+    virtual_fields:
+        Oro\Bundle\AddressBundle\Entity\AbstractAddress:
+            region_name:
+                query:
+                    select:
+                        expr: COALESCE(entity.regionText, region.name)
+                        return_type: string
+                    join:
+                        left:
+                            - { join: entity.region, alias: region }

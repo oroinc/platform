@@ -1,0 +1,18 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% for groupName, group in data -%}
+    {% if groupName is empty or group.widgets|length <= 2 -%}
+        {% for widget in group.widgets -%}
+            {% include widget.button.template with { data: widget.button.data|default([]) } %}
+        {%- endfor -%}
+    {% else -%}
+        {% set items = [] -%}
+        {% for widget in group.widgets -%}
+            {% set items = items|merge(['<li>' ~ include(widget.link.template, { data: widget.button.data|default([]) }) ~ '</li>']) -%}
+        {% endfor -%}
+        {{ UI.dropdownButton({
+            'label': group.label,
+            'aCss': 'pull-left',
+            'html': items|join
+        }) }}
+    {%- endif -%}
+{% endfor %}

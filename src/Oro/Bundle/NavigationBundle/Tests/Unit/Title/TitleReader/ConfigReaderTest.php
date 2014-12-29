@@ -13,7 +13,7 @@ class ConfigReaderTest extends \PHPUnit_Framework_TestCase
      */
     private $reader;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->reader = new ConfigReader();
         $this->reader->setConfigData(array(self::TEST_ROUTE => 'Test title template'));

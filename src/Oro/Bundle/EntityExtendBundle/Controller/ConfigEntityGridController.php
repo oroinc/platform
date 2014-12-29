@@ -2,31 +2,23 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
-
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
-use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
-
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
 /**
- * Class ConfigGridController
+ * Class ConfigEntityGridController
  * @package Oro\Bundle\EntityExtendBundle\Controller
  * @Route("/entity/extend/entity")
  * TODO: Discuss ACL impl., currently acl is disabled
@@ -35,6 +27,9 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 class ConfigEntityGridController extends Controller
 {
     /**
+     * @param EntityConfigModel $entity
+     * @return array
+     *
      * @Route(
      *      "/unique-key/{id}",
      *      name="oro_entityextend_entity_unique_key",
@@ -51,75 +46,37 @@ class ConfigEntityGridController extends Controller
      */
     public function uniqueAction(EntityConfigModel $entity)
     {
-        /** @var ConfigProvider $configProvider */
-        $configProvider = $this->get('oro_entity_config.provider.extend');
-        $entityConfig   = $configProvider->getConfig($entity->getClassName());
-        $fieldConfigIds = $configProvider->getIds($entity->getClassName());
-
-        $data = $entityConfig->has('unique_key') ? $entityConfig->get('unique_key') : array();
-
-        $request = $this->getRequest();
+        $className      = $entity->getClassName();
+        $entityProvider = $this->get('oro_entity_config.provider.entity');
+        $entityConfig   = $entityProvider->getConfig($className);
 
         $form = $this->createForm(
-            new UniqueKeyCollectionType(
-                array_filter(
-                    $fieldConfigIds,
-                    function (FieldConfigId $fieldConfigId) {
-                        return $fieldConfigId->getFieldType() != 'ref-many';
-                    }
-                )
-            ),
-            $data
+            'oro_entity_extend_unique_key_collection_type',
+            $entityConfig->get('unique_key', false, []),
+            [
+                'className' => $className
+            ]
         );
 
+        $request = $this->getRequest();
         if ($request->getMethod() == 'POST') {
             $form->submit($request);
 
             if ($form->isValid()) {
-                $data = $form->getData();
+                $entityConfig->set('unique_key', $form->getData());
+                $entityProvider->persist($entityConfig);
+                $entityProvider->flush();
 
-                $error = false;
-                $names = array();
-                foreach ($data['keys'] as $key) {
-                    if (in_array($key['name'], $names)) {
-                        $error = true;
-                        $this->get('session')->getFlashBag()->add(
-                            'error',
-                            sprintf('Name for key should be unique, key "%s" is not unique.', $key['name'])
-                        );
-
-                        break;
-                    }
-
-                    if (empty($key['name'])) {
-                        $error = true;
-                        $this->get('session')->getFlashBag()->add('error', 'Name of key can\'t be empty.');
-
-                        break;
-                    }
-
-                    $names[] = $key['name'];
-                }
-
-                if (!$error) {
-                    $entityConfig->set('unique_key', $data);
-                    $configProvider->persist($entityConfig);
-                    $configProvider->flush();
-
-                    return $this->redirect(
-                        $this->generateUrl('oro_entityconfig_view', array('id' => $entity->getId()))
-                    );
-                }
+                return $this->redirect(
+                    $this->generateUrl('oro_entityconfig_view', array('id' => $entity->getId()))
+                );
             }
         }
-
-        /** @var ConfigProvider $entityConfigProvider */
-        $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
 
         return array(
             'form'          => $form->createView(),
             'entity_id'     => $entity->getId(),
-            'entity_config' => $entityConfigProvider->getConfig($entity->getClassName())
+            'entity_config' => $entityConfig
         );
     }
 
@@ -141,7 +98,7 @@ class ConfigEntityGridController extends Controller
         $configManager = $this->get('oro_entity_config.config_manager');
 
         if ($request->getMethod() == 'POST') {
-            $className = ExtendConfigDumper::ENTITY . $request->request->get(
+            $className = ExtendHelper::ENTITY_NAMESPACE . $request->request->get(
                 'oro_entity_config_type[model][className]',
                 null,
                 true
@@ -152,6 +109,7 @@ class ConfigEntityGridController extends Controller
             $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
             $extendConfig->set('state', ExtendScope::STATE_NEW);
             $extendConfig->set('upgradeable', false);
+            $extendConfig->set('origin', ExtendScope::ORIGIN_CUSTOM);
             $extendConfig->set('is_extend', true);
 
             $config = $configManager->getProvider('security')->getConfig($className);
@@ -159,7 +117,7 @@ class ConfigEntityGridController extends Controller
 
             $configManager->persist($extendConfig);
         } else {
-            $entityModel  = $configManager->createConfigEntityModel();
+            $entityModel = $configManager->createConfigEntityModel();
         }
 
         $form = $this->createForm(
@@ -174,7 +132,7 @@ class ConfigEntityGridController extends Controller
         $cloneEntityModel->setClassName('');
         $form->add(
             'model',
-            new EntityType(),
+            'oro_entity_extend_entity_type',
             array(
                 'data' => $cloneEntityModel,
             )
@@ -231,12 +189,12 @@ class ConfigEntityGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
-        $entityConfig->set('state', ExtendScope::STATE_DELETED);
+        $entityConfig->set('state', ExtendScope::STATE_DELETE);
 
         $configManager->persist($entityConfig);
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item was removed', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(array('message' => 'Item deleted', 'successful' => true), Codes::HTTP_OK);
     }
 
     /**
@@ -270,7 +228,7 @@ class ConfigEntityGridController extends Controller
 
         $entityConfig->set(
             'state',
-            class_exists($entity->getClassName()) ? ExtendScope::STATE_UPDATED : ExtendScope::STATE_NEW
+            class_exists($entity->getClassName()) ? ExtendScope::STATE_UPDATE : ExtendScope::STATE_NEW
         );
 
         $configManager->persist($entityConfig);

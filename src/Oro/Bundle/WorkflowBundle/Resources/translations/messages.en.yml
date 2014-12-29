@@ -25,7 +25,7 @@ View form: View form
 Popup window: Popup window
 Separate page: Separate page
 Cancel: Cancel
-Ok: Ok
+OK: OK
 This value should be {{ limit }} or more.: This value should be {{ limit }} or more.
 This value should be {{ limit }} or less.: This value should be {{ limit }} or less.
 This value should be a valid number.: This value should be a valid number.
@@ -73,54 +73,91 @@ Reset workflow data: Reset workflow data
 
 oro:
     workflow:
+        action:
+            process:
+                activate:   Activate
+                deactivate: Deactivate
+
+            workflow:
+                general: Workflow manipulations
+                reset_data: Reset workflow data
+
+        block:
+            title:
+                process_info: Process Information
+            view:
+                process:
+                    trigger:
+                        description: %when% after the %after% has been %event%
+                        when:
+                            immediately: Immediately
+                        after:
+                            property: property
+                            entity:   entity
+                        event:
+                            create:  created
+                            delete:  deleted
+                            update:  updated
+                workflow:
+                    default_step: Default step
+
+        entity_config:
+            active_workflow:
+                label: 'Active workflow'
+                none:  'none'
+
+            show_step_in_grid.choice:
+                hide: 'Hide'
+                show: 'Show'
+
+            show_step_in_grid.label: 'Workflow step in grid'
+
         menu:
+            process_definition_list.description:  Process management UI
             workflow_definition_list.description: Workflow management UI
-        workflowitem:
-            entity_label:             Workflow Item
-            entity_plural_label:      Workflow Items
-            entity_description:       Represents workflow item
-            id.label:                 ID
-            acl_identities.label:     ACL identities
-            current_step.label:       Current step
-            definition.label:         Workflow definition
-            entity_id.label:          Entity identifier
-            serialized_data.label:    Serialized data
-            transition_records.label: Transition records
-            workflow_name.label:      Workflow name
-            created.label:            Created
-            updated.label:            Updated
 
-            related_entity.label:       Workflow Item
-            related_entity.description: Related field for Workflow Item
+        notification:
+            process:
+                activated:   Process has been activated successfully
+                deactivated: Process has been deactivated successfully
 
-        workflowstep:
-            entity_label:         Workflow Step
-            entity_plural_label:  Workflow Steps
-            entity_description:   Represents workflow step
+        processdefinition:
+            entity_label:                 Process
+            entity_plural_label:          Processes
+            actions_configuration.label:  Actions configuration
+            enabled.label:                Enabled
+            execution_order.label:        Execution order
+            name.label:                   Code
+            label.label:                  Name
+            related_entity.label:         Related entity
+            datagrid.view:                View
+            exclude_definitions.label:    Exclude Definitions
+
+        processtrigger:
+            entity_label:         Process Trigger
+            entity_plural_label:  Process Triggers
             id.label:             ID
-            definition.label:     Workflow definition
-            final.label:          Is final
-            label.label:          Label
-            name.label:           Name
-            step_order.label:     Step order
+            definition.label:     Process definition
+            event.label:          Event
+            field.label:          Field
+            priority.label:       Priority
+            queued.label:         Queued
+            time_shift.label:     Time shift
 
-            related_entity.label:       Workflow Step
-            related_entity.description: Related field for Workflow Step
-            grid.label:                 Step
+        transition:
+            start: "Start %workflow%"
 
         workflowdefinition:
             entity_label:                 Workflow
             entity_plural_label:          Workflows
-            created_at.label:             Created
-            updated_at.label:             Updated
-            label.label:                  Label
+            label.label:                  Name # this translation has been chosen because it doesn't confuse users
             system.label:                 System
             configuration.label:          Configuration
             entity_acls.label:            Entity ACLs
             entity_attribute_name.label:  Entity attribute name
-            name.label:                   Name
+            name.label:                   Code # this translation has been chosen because it doesn't confuse users
             related_entity.label:         Related entity
-            start_step.label:             Start step
+            start_step.label:             Default step
             steps.label:                  Steps
             steps_display_ordered.label:  Display steps ordered
             active.label:                 Active
@@ -133,16 +170,51 @@ oro:
                 delete: Delete
                 activate: Activate
                 deactivate: Deactivate
-        action:
-            general: "Workflow manipulations"
 
-        transition:
-            start: "Start %workflow%"
+        workflowitem:
+            entity_label:             Workflow Item
+            entity_plural_label:      Workflow Items
+            entity_description:       Represents workflow item
+            id.label:                 ID
+            acl_identities.label:     ACL identities
+            current_step.label:       Current step
+            definition.label:         Workflow definition
+            entity_id.label:          Entity identifier
+            serialized_data.label:    Serialized data
+            transition_records.label: Transition records
+            workflow_name.label:      Workflow name
 
-        entity_config:
-            active_workflow.label:        'Active workflow'
-            active_workflow.none:         'none'
-            show_step_in_grid.label:      'Workflow step in grid'
-            show_step_in_grid.choice:
-                hide:                     'Hide'
-                show:                     'Show'
+            related_entity.label:       Workflow Item
+            related_entity.description: Related field for Workflow Item
+
+        workflowstep:
+            entity_label:         Workflow Step
+            entity_plural_label:  Workflow Steps
+            entity_description:   Represents workflow step
+            id.label:             ID
+            definition.label:     Workflow definition
+            final.label:          Is final
+            label.label:          Name # this translation has been chosen because it doesn't confuse users
+            name.label:           Code # this translation has been chosen because it doesn't confuse users
+            step_order.label:     Step order
+
+            related_entity.label:       Workflow Step
+            related_entity.description: Related field for Workflow Step
+            grid.label:                 Step
+
+        form:
+            name.label: Name
+            from_step.label: From step
+            to_step.label: To step
+            view_form.label: View form
+            warning_message.label: Warning message
+            button_icon.label: Button icon
+            button_style.label: Button style
+            button_preview.label: Button preview
+            entity_field.label: Entity field
+            label.label: Label
+            required.label: Required
+            name.label: Name
+            position.label: Position
+            final.label: Final
+

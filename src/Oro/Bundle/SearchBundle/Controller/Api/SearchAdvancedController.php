@@ -9,6 +9,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 
+use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
@@ -61,13 +62,15 @@ class SearchAdvancedController extends FOSRestController
      *
      *  !in Used for search records where field not in the specified set of data
      *
+     *  replace spaces with _ underscore for fulltext search
+     *
      * Examples:
      *
      *  from demo_product where name ~ samsung and double price > 100
      *
      *  integer count != 10
      *
-     *  all_text !~ "test string"
+     *  all_text !~ test_string
      *
      *  from (demo_products, demo_categories) where description ~ test order_by name offset 5 max_results 10
      *
@@ -86,12 +89,17 @@ class SearchAdvancedController extends FOSRestController
     {
         $view = new View();
 
+        $result = $this->get('oro_search.index')->advancedSearch(
+            $this->getRequest()->get('query')
+        );
+
+        $dispatcher = $this->container->get('event_dispatcher');
+        foreach ($result->getElements() as $item) {
+            $dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+        }
+
         return $this->get('fos_rest.view_handler')->handle(
-            $view->setData(
-                $this->get('oro_search.index')->advancedSearch(
-                    $this->getRequest()->get('query')
-                )->toSearchResultData()
-            )
+            $view->setData($result->toSearchResultData())
         );
     }
 }

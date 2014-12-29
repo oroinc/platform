@@ -3,20 +3,15 @@
 namespace Oro\Bundle\ReportBundle\Grid;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
-use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
+use Oro\Bundle\ReportBundle\Entity\Report;
 
-class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface
+class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
-    const GRID_PREFIX = 'oro_report_table_';
-
-    /**
-     * @var FunctionProviderInterface
-     */
-    protected $functionProvider;
-
     /**
      * @var ManagerRegistry
      */
@@ -28,15 +23,20 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     private $configuration = null;
 
     /**
-     * Constructor
-     *
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
+     * @var ReportDatagridConfigurationBuilder
      */
-    public function __construct(FunctionProviderInterface $functionProvider, ManagerRegistry $doctrine)
-    {
-        $this->functionProvider = $functionProvider;
-        $this->doctrine         = $doctrine;
+    protected $builder;
+
+    /**
+     * @param ReportDatagridConfigurationBuilder $builder
+     * @param ManagerRegistry                    $doctrine
+     */
+    public function __construct(
+        ReportDatagridConfigurationBuilder $builder,
+        ManagerRegistry $doctrine
+    ) {
+        $this->builder  = $builder;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -44,7 +44,7 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
      */
     public function isApplicable($gridName)
     {
-        return (strpos($gridName, self::GRID_PREFIX) === 0);
+        return $this->builder->isApplicable($gridName);
     }
 
     /**
@@ -53,17 +53,14 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
     public function getConfiguration($gridName)
     {
         if ($this->configuration === null) {
-            $id      = intval(substr($gridName, strlen(self::GRID_PREFIX)));
-            $repo    = $this->doctrine->getRepository('OroReportBundle:Report');
-            $report  = $repo->find($id);
-            $builder = new ReportDatagridConfigurationBuilder(
-                $gridName,
-                $report,
-                $this->functionProvider,
-                $this->doctrine
-            );
+            $id     = intval(substr($gridName, strlen(Report::GRID_PREFIX)));
+            $repo   = $this->doctrine->getRepository('OroReportBundle:Report');
+            $report = $repo->find($id);
 
-            $this->configuration = $builder->getConfiguration();
+            $this->builder->setGridName($gridName);
+            $this->builder->setSource($report);
+
+            $this->configuration = $this->builder->getConfiguration();
         }
 
         return $this->configuration;
@@ -84,5 +81,13 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBuilder()
+    {
+        return $this->builder;
     }
 }

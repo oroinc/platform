@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SegmentBundle\Filter;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Parameter;
 
 use Symfony\Component\Form\FormFactoryInterface;
@@ -87,7 +88,7 @@ class SegmentFilter extends EntityFilter
             $className = $configId->getClassName();
             if ($this->extendConfigProvider->getConfig($className)->in(
                 'state',
-                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
             )
             ) {
                 $classMetadata         = $em->getClassMetadata($className);
@@ -120,9 +121,15 @@ class SegmentFilter extends EntityFilter
                         'property'      => 'name',
                         'required'      => true,
                         'query_builder' => function (EntityRepository $repo) use ($entityName) {
-                            return $repo->createQueryBuilder('s')
-                                ->where('s.entity = :entity')
-                                ->setParameter('entity', $entityName);
+                            $qb = $repo->createQueryBuilder('s');
+
+                            if ($entityName) {
+                                $qb
+                                    ->where('s.entity = :entity')
+                                    ->setParameter('entity', $entityName);
+                            }
+
+                            return $qb;
                         }
                     ]
                 ]
@@ -143,6 +150,7 @@ class SegmentFilter extends EntityFilter
 
         /** @var Segment $segment */
         $segment = $data['value'];
+        /** @var Query $query */
         if ($segment->getType()->getName() === SegmentType::TYPE_DYNAMIC) {
             $query = $this->dynamicSegmentQueryBuilderLink->getService()->build($segment);
         } else {
@@ -157,5 +165,7 @@ class SegmentFilter extends EntityFilter
         foreach ($params as $param) {
             $ds->setParameter($param->getName(), $param->getValue(), $param->getType());
         }
+
+        return true;
     }
 }

@@ -14,7 +14,7 @@ class CeilExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * Set up test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->extension = new CeilExtension();
     }

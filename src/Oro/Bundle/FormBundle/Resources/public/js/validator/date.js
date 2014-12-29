@@ -15,9 +15,12 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/da
         function (value, element) {
             return this.optional(element) || datetimeFormatter.isDateValid(String(value));
         },
-        function (param) {
+        function (param, element) {
+            var value = String(this.elementValue(element)),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return __(param.message);
+            placeholders.value = value;
+            return __(param.message, placeholders);
         }
     ];
 });

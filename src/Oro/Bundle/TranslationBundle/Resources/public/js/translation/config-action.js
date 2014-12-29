@@ -1,7 +1,13 @@
 /* jshint devel:true */
 /* global define */
-define(['backbone', 'underscore', 'routing', 'orotranslation/js/translator', 'oronavigation/js/navigation', 'oroui/js/messenger'],
-function (Backbone, _, routing, __, Navigation, messenger) {
+define([
+    'backbone',
+    'underscore',
+    'routing',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oroui/js/messenger'],
+function (Backbone, _, routing, __, mediator, messenger) {
     var $ = Backbone.$;
 
     /**
@@ -76,10 +82,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
          */
         performAction: function (actionMediator) {
             if (actionMediator.action == 'download' || actionMediator.action == 'update') {
-                var navigation = Navigation.getInstance();
-                if (navigation) {
-                    navigation.loadingMask.show();
-                }
+                mediator.execute('showLoading');
 
                 var url = routing.generate(this.route, { code: actionMediator.code });
                 $.getJSON(url, _.bind(function (response) {
@@ -91,9 +94,7 @@ function (Backbone, _, routing, __, Navigation, messenger) {
                     .always(_.bind(function (response, status) {
                         var message;
 
-                        if (navigation) {
-                            navigation.loadingMask.hide();
-                        }
+                        mediator.execute('hideLoading');
 
                         if (status !== 'success' || response.success !== true) {
                             response = response.responseJSON ? response.responseJSON : (response || {});

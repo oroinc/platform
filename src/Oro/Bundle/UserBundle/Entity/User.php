@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
-
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Doctrine\ORM\Mapping as ORM;
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -17,19 +15,24 @@ use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Entity\Taggable;
+
 use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+
+use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 
 /**
@@ -50,7 +53,9 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id"
+ *              "owner_column_name"="business_unit_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "dataaudit"={"auditable"=true},
  *          "security"={
@@ -58,7 +63,8 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
  *              "group_name"=""
  *          },
  *          "form"={
- *              "form_type"="oro_user_select"
+ *              "form_type"="oro_user_select",
+ *              "grid_name"="users-select-grid"
  *          }
  *      }
  * )
@@ -67,17 +73,17 @@ use Oro\Bundle\UserBundle\Model\ExtendUser;
 class User extends ExtendUser implements
     AdvancedUserInterface,
     \Serializable,
-    EntityUploadedImageInterface,
     Taggable,
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
     NotificationEmailInterface,
-    AdvancedApiUserInterface
+    AdvancedApiUserInterface,
+    OrganizationAwareInterface
 {
-    const ROLE_DEFAULT       = 'ROLE_USER';
+    const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
-    const ROLE_ANONYMOUS     = 'IS_AUTHENTICATED_ANONYMOUSLY';
+    const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
     /**
      * @ORM\Id
@@ -95,7 +101,16 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          },
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $username;
 
@@ -106,7 +121,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $email;
 
@@ -119,7 +140,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $namePrefix;
 
@@ -132,7 +159,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $firstName;
 
@@ -145,7 +178,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $middleName;
 
@@ -158,7 +197,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $lastName;
 
@@ -171,7 +216,13 @@ class User extends ExtendUser implements
      * @JMS\Type("string")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $nameSuffix;
 
@@ -182,25 +233,15 @@ class User extends ExtendUser implements
      * @JMS\Type("DateTime")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $birthday;
-
-    /**
-     * Image filename
-     *
-     * @var string
-     *
-     * @ORM\Column(name="image", type="string", length=255, nullable=true)
-     */
-    protected $image;
-
-    /**
-     * Image filename
-     *
-     * @var UploadedFile
-     */
-    protected $imageFile;
 
     /**
      * @var boolean
@@ -209,7 +250,13 @@ class User extends ExtendUser implements
      * @JMS\Type("boolean")
      * @JMS\Expose
      * @Oro\Versioned
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $enabled = true;
 
@@ -219,6 +266,16 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
+     *          }
+     *      }
+     * )
      */
     protected $salt;
 
@@ -228,6 +285,16 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(type="string")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
+     *          }
+     *      }
+     * )
      */
     protected $password;
 
@@ -244,6 +311,13 @@ class User extends ExtendUser implements
      * @var string
      *
      * @ORM\Column(name="confirmation_token", type="string", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $confirmationToken;
 
@@ -251,6 +325,13 @@ class User extends ExtendUser implements
      * @var \DateTime
      *
      * @ORM\Column(name="password_requested", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $passwordRequestedAt;
 
@@ -260,6 +341,13 @@ class User extends ExtendUser implements
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
      * @JMS\Type("DateTime")
      * @JMS\Expose
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $lastLogin;
 
@@ -274,11 +362,18 @@ class User extends ExtendUser implements
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit", cascade={"persist"})
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $owner;
 
     /**
-     * @var Role[]
+     * @var Role[]|Collection
      *
      * @ORM\ManyToMany(targetEntity="Role")
      * @ORM\JoinTable(name="oro_user_access_role",
@@ -286,12 +381,19 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getLabel")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={"auditable"=true},
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
      */
     protected $roles;
 
     /**
-     * @var Group[]
+     * @var Group[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Group")
      * @ORM\JoinTable(name="oro_user_access_group",
@@ -299,19 +401,37 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getName")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $groups;
 
     /**
-     * @ORM\OneToOne(
+     * @var UserApi[]|ArrayCollection
+     *
+     * @ORM\OneToMany(
      *  targetEntity="UserApi", mappedBy="user", cascade={"persist", "remove"}, orphanRemoval=true, fetch="EXTRA_LAZY"
      * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          },
+     *          "email"={
+     *              "available_in_template"=false
+     *          }
+     *      }
+     * )
      */
-    protected $api;
+    protected $apiKeys;
 
     /**
-     * @var Status[]
+     * @var Status[]|ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Status", mappedBy="user")
      * @ORM\OrderBy({"createdAt" = "DESC"})
@@ -327,7 +447,7 @@ class User extends ExtendUser implements
     protected $currentStatus;
 
     /**
-     * @var Email[]
+     * @var Email[]|ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="Email", mappedBy="user", orphanRemoval=true, cascade={"persist"})
      */
@@ -340,7 +460,7 @@ class User extends ExtendUser implements
     protected $tags;
 
     /**
-     * @var BusinessUnit[]
+     * @var BusinessUnit[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit", inversedBy="users")
      * @ORM\JoinTable(name="oro_user_business_unit",
@@ -348,12 +468,36 @@ class User extends ExtendUser implements
      *      inverseJoinColumns={@ORM\JoinColumn(name="business_unit_id", referencedColumnName="id", onDelete="CASCADE")}
      * )
      * @Oro\Versioned("getName")
-     * @ConfigField(defaultValues={"dataaudit"={"auditable"=true}})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $businessUnits;
 
     /**
-     * @var EmailOrigin[]
+     * @var ArrayCollection Organization[]
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization", inversedBy="users")
+     * @ORM\JoinTable(name="oro_user_organization",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")}
+     * )
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $organizations;
+
+    /**
+     * @var EmailOrigin[]|ArrayCollection
      *
      * @ORM\ManyToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", cascade={"all"})
      * @ORM\JoinTable(name="oro_user_email_origin",
@@ -367,6 +511,13 @@ class User extends ExtendUser implements
      * @var \DateTime $createdAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -374,18 +525,37 @@ class User extends ExtendUser implements
      * @var \DateTime $updatedAt
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
     public function __construct()
     {
-        $this->salt            = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
-        $this->roles           = new ArrayCollection();
-        $this->groups          = new ArrayCollection();
-        $this->statuses        = new ArrayCollection();
-        $this->emails          = new ArrayCollection();
-        $this->businessUnits   = new ArrayCollection();
-        $this->emailOrigins    = new ArrayCollection();
+        parent::__construct();
+
+        $this->salt          = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
+        $this->roles         = new ArrayCollection();
+        $this->groups        = new ArrayCollection();
+        $this->statuses      = new ArrayCollection();
+        $this->emails        = new ArrayCollection();
+        $this->businessUnits = new ArrayCollection();
+        $this->emailOrigins  = new ArrayCollection();
+        $this->organizations = new ArrayCollection();
+        $this->apiKeys       = new ArrayCollection();
     }
 
     /**
@@ -397,14 +567,14 @@ class User extends ExtendUser implements
     public function serialize()
     {
         return serialize(
-            array(
+            [
                 $this->password,
                 $this->salt,
                 $this->username,
                 $this->enabled,
                 $this->confirmationToken,
                 $this->id,
-            )
+            ]
         );
     }
 
@@ -422,7 +592,7 @@ class User extends ExtendUser implements
             $this->enabled,
             $this->confirmationToken,
             $this->id
-        ) = unserialize($serialized);
+            ) = unserialize($serialized);
     }
 
     /**
@@ -540,26 +710,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * Return image filename
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Return image file
-     *
-     * @return UploadedFile
-     */
-    public function getImageFile()
-    {
-        return $this->imageFile;
-    }
-
-    /**
      * {@inheritDoc}
      */
     public function getSalt()
@@ -644,19 +794,41 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @return UserApi
+     * @return UserApi[]
      */
-    public function getApi()
+    public function getApiKeys()
     {
-        return $this->api;
+        return $this->apiKeys->count() ? $this->apiKeys : uniqid('undefined');
     }
 
     /**
-     * {@inheritDoc}
+     * Add UserApi to User
+     *
+     * @param  UserApi $api
+     *
+     * @return User
      */
-    public function getApiKey()
+    public function addApiKey(UserApi $api)
     {
-        return $this->api ? $this->getApi()->getApiKey() : uniqid('undefined');
+        $this->apiKeys[] = $api;
+
+        $api->setUser($this);
+
+        return $this;
+    }
+
+    /**
+     * Delete UserApi from User
+     *
+     * @param  UserApi $api
+     *
+     * @return User
+     */
+    public function removeApiKey(UserApi $api)
+    {
+        $this->apiKeys->removeElement($api);
+
+        return $this;
     }
 
     /**
@@ -680,11 +852,12 @@ class User extends ExtendUser implements
     public function isPasswordRequestNonExpired($ttl)
     {
         return $this->getPasswordRequestedAt() instanceof \DateTime
-            && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function setId($id)
@@ -696,6 +869,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $username New username
+     *
      * @return User
      */
     public function setUsername($username)
@@ -707,6 +881,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $email New email value
+     *
      * @return User
      */
     public function setEmail($email)
@@ -718,6 +893,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $firstName [optional] New first name value. Null by default.
+     *
      * @return User
      */
     public function setFirstName($firstName = null)
@@ -729,6 +905,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $lastName [optional] New last name value. Null by default.
+     *
      * @return User
      */
     public function setLastName($lastName = null)
@@ -742,35 +919,48 @@ class User extends ExtendUser implements
      * Set middle name
      *
      * @param string $middleName
+     *
+     * @return User
      */
     public function setMiddleName($middleName)
     {
         $this->middleName = $middleName;
+
+        return $this;
     }
 
     /**
      * Set name prefix
      *
      * @param string $namePrefix
+     *
+     * @return User
      */
     public function setNamePrefix($namePrefix)
     {
         $this->namePrefix = $namePrefix;
+
+        return $this;
     }
 
     /**
      * Set name suffix
      *
      * @param string $nameSuffix
+     *
+     * @return User
      */
     public function setNameSuffix($nameSuffix)
     {
         $this->nameSuffix = $nameSuffix;
+
+        return $this;
     }
 
     /**
      *
      * @param  \DateTime $birthday [optional] New birthday value. Null by default.
+     *
      * @return User
      */
     public function setBirthday(\DateTime $birthday = null)
@@ -781,54 +971,20 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  string $image [optional] New image file name. Null by default.
-     * @return User
-     */
-    public function setImage($image = null)
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    /**
-     * @param  UploadedFile $imageFile
-     * @return User
-     */
-    public function setImageFile(UploadedFile $imageFile)
-    {
-        $this->imageFile = $imageFile;
-        // this will trigger PreUpdate callback even if only image has been changed
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        return $this;
-    }
-
-    /**
-     * Unset image file.
-     *
-     * @return User
-     */
-    public function unsetImageFile()
-    {
-        $this->imageFile = null;
-
-        return $this;
-    }
-
-    /**
      * @param  bool $enabled User state
+     *
      * @return User
      */
     public function setEnabled($enabled)
     {
-        $this->enabled = (boolean) $enabled;
+        $this->enabled = (boolean)$enabled;
 
         return $this;
     }
 
     /**
      * @param string $salt
+     *
      * @return User
      */
     public function setSalt($salt)
@@ -840,6 +996,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $password New encoded password
+     *
      * @return User
      */
     public function setPassword($password)
@@ -851,6 +1008,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $password New password as plain string
+     *
      * @return User
      */
     public function setPlainPassword($password)
@@ -864,6 +1022,7 @@ class User extends ExtendUser implements
      * Set confirmation token.
      *
      * @param  string $token
+     *
      * @return User
      */
     public function setConfirmationToken($token)
@@ -875,6 +1034,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  \DateTime $time [optional] New password request time. Null by default.
+     *
      * @return User
      */
     public function setPasswordRequestedAt(\DateTime $time = null)
@@ -886,6 +1046,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  \DateTime $time New login time
+     *
      * @return User
      */
     public function setLastLogin(\DateTime $time)
@@ -896,7 +1057,8 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  int  $count New login count value
+     * @param  int $count New login count value
+     *
      * @return User
      */
     public function setLoginCount($count)
@@ -907,18 +1069,8 @@ class User extends ExtendUser implements
     }
 
     /**
-     * @param  UserApi $api
-     * @return User
-     */
-    public function setApi(UserApi $api)
-    {
-        $this->api = $api;
-
-        return $this;
-    }
-
-    /**
      * @param \DateTime $createdAt
+     *
      * @return $this
      */
     public function setCreatedAt($createdAt)
@@ -930,6 +1082,7 @@ class User extends ExtendUser implements
 
     /**
      * @param \DateTime $updatedAt
+     *
      * @return $this
      */
     public function setUpdatedAt($updatedAt)
@@ -946,7 +1099,7 @@ class User extends ExtendUser implements
      */
     public function getRoles()
     {
-        $roles = $this->roles->toArray();
+        $roles = $this->getRolesCollection()->toArray();
 
         /** @var Group $group */
         foreach ($this->getGroups() as $group) {
@@ -969,7 +1122,8 @@ class User extends ExtendUser implements
     /**
      * Pass a string, get the desired Role object or null
      *
-     * @param  string    $roleName Role name
+     * @param  string $roleName Role name
+     *
      * @return Role|null
      */
     public function getRole($roleName)
@@ -991,7 +1145,8 @@ class User extends ExtendUser implements
      *
      *         $securityContext->isGranted('ROLE_USER');
      *
-     * @param  Role|string               $role
+     * @param  Role|string $role
+     *
      * @return boolean
      * @throws \InvalidArgumentException
      */
@@ -1007,13 +1162,14 @@ class User extends ExtendUser implements
             );
         }
 
-        return (bool) $this->getRole($roleName);
+        return (bool)$this->getRole($roleName);
     }
 
     /**
      * Adds a Role to the Collection.
      *
      * @param  Role $role
+     *
      * @return User
      */
     public function addRole(Role $role)
@@ -1028,7 +1184,8 @@ class User extends ExtendUser implements
     /**
      * Remove the Role object from collection
      *
-     * @param  Role|string               $role
+     * @param  Role|string $role
+     *
      * @throws \InvalidArgumentException
      */
     public function removeRole($role)
@@ -1051,7 +1208,8 @@ class User extends ExtendUser implements
      * Pass an array or Collection of Role objects and re-set roles collection with new Roles.
      * Type hinted array due to interface.
      *
-     * @param  array|Collection          $roles Array of Role objects
+     * @param  array|Collection $roles Array of Role objects
+     *
      * @return User
      * @throws \InvalidArgumentException
      */
@@ -1075,7 +1233,8 @@ class User extends ExtendUser implements
     /**
      * Directly set the Collection of Roles.
      *
-     * @param  Collection                $collection
+     * @param  Collection $collection
+     *
      * @return User
      * @throws \InvalidArgumentException
      */
@@ -1106,7 +1265,7 @@ class User extends ExtendUser implements
      */
     public function getGroupNames()
     {
-        $names = array();
+        $names = [];
 
         /** @var Group $group */
         foreach ($this->getGroups() as $group) {
@@ -1118,6 +1277,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  string $name
+     *
      * @return bool
      */
     public function hasGroup($name)
@@ -1127,6 +1287,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  Group $group
+     *
      * @return User
      */
     public function addGroup(Group $group)
@@ -1140,6 +1301,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  Group $group
+     *
      * @return User
      */
     public function removeGroup(Group $group)
@@ -1149,18 +1311,6 @@ class User extends ExtendUser implements
         }
 
         return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getImagePath()
-    {
-        if ($this->image) {
-            return $this->getUploadDir(true) . '/' . $this->image;
-        }
-
-        return null;
     }
 
     /**
@@ -1175,7 +1325,7 @@ class User extends ExtendUser implements
 
     public function __toString()
     {
-        return (string) $this->getUsername();
+        return (string)$this->getUsername();
     }
 
     /**
@@ -1185,8 +1335,8 @@ class User extends ExtendUser implements
      */
     public function beforeSave()
     {
-        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->createdAt  = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt  = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->loginCount = 0;
     }
 
@@ -1222,6 +1372,7 @@ class User extends ExtendUser implements
      * Add Status to User
      *
      * @param  Status $status
+     *
      * @return User
      */
     public function addStatus(Status $status)
@@ -1245,6 +1396,7 @@ class User extends ExtendUser implements
      * Set User Current Status
      *
      * @param  Status $status
+     *
      * @return User
      */
     public function setCurrentStatus(Status $status = null)
@@ -1268,6 +1420,7 @@ class User extends ExtendUser implements
      * Add Email to User
      *
      * @param  Email $email
+     *
      * @return User
      */
     public function addEmail(Email $email)
@@ -1283,6 +1436,7 @@ class User extends ExtendUser implements
      * Delete Email from User
      *
      * @param  Email $email
+     *
      * @return User
      */
     public function removeEmail(Email $email)
@@ -1290,25 +1444,6 @@ class User extends ExtendUser implements
         $this->emails->removeElement($email);
 
         return $this;
-    }
-
-    /**
-     * Get the relative directory path to user avatar
-     *
-     * @param  bool   $forWeb
-     * @return string
-     */
-    public function getUploadDir($forWeb = false)
-    {
-        $ds = DIRECTORY_SEPARATOR;
-
-        if ($forWeb) {
-            $ds = '/';
-        }
-
-        $suffix = $this->getCreatedAt() ? $this->getCreatedAt()->format('Y-m') : date('Y-m');
-
-        return 'uploads' . $ds . 'users' . $ds . $suffix;
     }
 
     /**
@@ -1351,6 +1486,7 @@ class User extends ExtendUser implements
 
     /**
      * @param ArrayCollection $businessUnits
+     *
      * @return User
      */
     public function setBusinessUnits($businessUnits)
@@ -1362,6 +1498,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  BusinessUnit $businessUnit
+     *
      * @return User
      */
     public function addBusinessUnit(BusinessUnit $businessUnit)
@@ -1375,6 +1512,7 @@ class User extends ExtendUser implements
 
     /**
      * @param  BusinessUnit $businessUnit
+     *
      * @return User
      */
     public function removeBusinessUnit(BusinessUnit $businessUnit)
@@ -1387,6 +1525,75 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Get User Organizations
+     *
+     * @param  bool $onlyActive Returns enabled organizations only
+     * @return ArrayCollection Organization[]
+     */
+    public function getOrganizations($onlyActive = false)
+    {
+        if ($onlyActive) {
+            return $this->organizations->filter(
+                function (Organization $organization) {
+                    return $organization->isEnabled() === true;
+                }
+            );
+        }
+        return $this->organizations;
+    }
+
+    /**
+     * @param ArrayCollection $organizations
+     * @return User
+     */
+    public function setOrganizations($organizations)
+    {
+        $this->organizations = $organizations;
+
+        return $this;
+    }
+
+
+    /**
+     * Add Organization to User
+     *
+     * @param  Organization $organization
+     * @return User
+     */
+    public function addOrganization(Organization $organization)
+    {
+        $this->organizations[] = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Delete Organization from User
+     *
+     * @param  Organization $organization
+     * @return User
+     */
+    public function removeOrganization(Organization $organization)
+    {
+        if ($this->hasOrganization($organization)) {
+            $this->getOrganizations()->removeElement($organization);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Whether user in specified organization
+     *
+     * @param Organization $organization
+     * @return bool
+     */
+    public function hasOrganization(Organization $organization)
+    {
+        return $this->getOrganizations()->contains($organization);
+    }
+
+    /**
      * @return BusinessUnit
      */
     public function getOwner()
@@ -1396,6 +1603,7 @@ class User extends ExtendUser implements
 
     /**
      * @param BusinessUnit $owningBusinessUnit
+     *
      * @return User
      */
     public function setOwner($owningBusinessUnit)
@@ -1469,6 +1677,7 @@ class User extends ExtendUser implements
      * Add email origin
      *
      * @param EmailOrigin $emailOrigin
+     *
      * @return User
      */
     public function addEmailOrigin(EmailOrigin $emailOrigin)
@@ -1482,6 +1691,7 @@ class User extends ExtendUser implements
      * Delete email origin
      *
      * @param EmailOrigin $emailOrigin
+     *
      * @return User
      */
     public function removeEmailOrigin(EmailOrigin $emailOrigin)
@@ -1489,5 +1699,28 @@ class User extends ExtendUser implements
         $this->emailOrigins->removeElement($emailOrigin);
 
         return $this;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param OrganizationInterface $organization
+     * @return User
+     */
+    public function setOrganization(OrganizationInterface $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return OrganizationInterface
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

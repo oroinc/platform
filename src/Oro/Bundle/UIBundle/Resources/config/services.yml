@@ -1,11 +1,21 @@
 parameters:
     oro_ui.placeholder.provider.class:                     Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider
-    oro_ui.placeholder.filter.sorter.class:                Oro\Bundle\UIBundle\Placeholder\Filter\Sorter
-    oro_ui.placeholder.filter.attribute_instance_of.class: Oro\Bundle\UIBundle\Placeholder\Filter\AttributeInstanceOf
-    
+    oro_ui.placeholder.resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
+    oro_ui.placeholder.filter.class:                       Oro\Bundle\UIBundle\Placeholder\PlaceholderFilter
+
     oro_ui.router.class:                                   Oro\Bundle\UIBundle\Route\Router
     oro_ui.view.listener.class:                            Oro\Bundle\UIBundle\EventListener\TemplateListener
     oro_ui.format_converter.date_time.jquery_ui.class:     Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
+
+    oro_ui.label_provider.action_button.class:             Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider
+    oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
+    oro_ui.widget_provider.action_button.class:            Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
+    oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
+    oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
+
+    oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
+
+    oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
 services:
     # Placeholder services
@@ -13,19 +23,16 @@ services:
         class: %oro_ui.placeholder.provider.class%
         arguments:
             - %oro_ui.placeholders%
-            - []
+            - @oro_ui.placeholder.resolver
+            - @oro_security.security_facade
 
-    oro_ui.placeholder.filter.sorter:
-        class: %oro_ui.placeholder.filter.sorter.class%
-        tags:
-            - { name: oro_ui_placeholder.filter }
-
-    oro_ui.placeholder.filter.attribute_instance_of:
-        class: %oro_ui.placeholder.filter.attribute_instance_of.class%
+    oro_ui.placeholder.resolver:
+        class: %oro_ui.placeholder.resolver.class%
         arguments:
             - @service_container
-        tags:
-            - { name: oro_ui_placeholder.filter }
+
+    oro_ui.placeholder.filter:
+        class: %oro_ui.placeholder.filter.class%
 
     # Other services
     oro_ui.router:
@@ -40,9 +47,46 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.view, method: onKernelView }
 
+    oro_ui.view.content_provider.listener:
+        class: %oro_ui.view.content_provider.listener.class%
+        arguments:
+            - @oro_ui.content_provider.manager
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     oro_ui.format_converter.date_time.jquery_ui:
         class: %oro_ui.format_converter.date_time.jquery_ui.class%
         arguments:
             - @oro_locale.formatter.date_time
         tags:
             - { name: oro_locale.format_converter.date_time, alias: jquery_ui }
+
+    oro_ui.label_provider.action_button.abstract:
+        abstract: true
+        class: %oro_ui.label_provider.action_button.class%
+        arguments:
+            - @translator
+
+    oro_ui.label_provider.action_button_group:
+        class: %oro_ui.label_provider.action_button_group.class%
+        arguments:
+            - @translator
+
+    oro_ui.widget_provider.action_button.abstract:
+        abstract: true
+        class: %oro_ui.widget_provider.action_button.class%
+        arguments:
+            - @oro_ui.placeholder.provider
+
+    oro_ui.widget_provider.view_actions:
+        class: %oro_ui.widget_provider.view_actions.class%
+        arguments:
+            - @oro_ui.label_provider.action_button_group
+
+    oro_ui.content_provider.manager:
+        class: %oro_ui.content_provider.manager.class%
+
+    oro_ui.provider.widget_context:
+        class: %oro_ui.provider.widget_context.class%
+        calls:
+            - [setRequest, ["@?request="]]

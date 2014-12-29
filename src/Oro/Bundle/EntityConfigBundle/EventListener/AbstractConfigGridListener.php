@@ -158,6 +158,20 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     );
                 }
 
+                if (isset($item['options']['indexed_type']) && $item['options']['indexed_type'] !== 'scalar') {
+                    if ($item['grid']['type'] !== 'html' || !isset($item['grid']['template'])) {
+                        throw new LogicException(
+                            sprintf(
+                                'If the value of option "indexed_type" not "scalar" grid type should ' .
+                                'be set to "html" and grid template for rendering such value should be defined ' .
+                                'for property "%s" in scope "%s".',
+                                $code,
+                                $provider->getScope()
+                            )
+                        );
+                    }
+                }
+
                 $fieldName    = $provider->getScope() . '_' . $code;
                 $item['grid'] = $provider->getPropertyConfig()->initConfig($item['grid']);
                 $item['grid'] = $this->mapEntityConfigTypes($item['grid']);
@@ -192,19 +206,22 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     }
 
     /**
-     * @param array $orderedFields
+     * @param array  $orderedFields
+     * @param string $alias
      *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function getDynamicSortersAndFilters(array $orderedFields)
+    public function getDynamicSortersAndFilters(array $orderedFields, $alias = '')
     {
         $filters = $sorters = [];
 
         // add sorters and filters if needed
         foreach ($orderedFields as $fieldName => $field) {
             if (isset($field['sortable']) && $field['sortable']) {
-                $sorters['columns'][$fieldName] = ['data_name' => $field['expression']];
+                $sorters['columns'][$fieldName] = [
+                    'data_name' =>  isset($field['expression']) ? $field['expression'] : $alias . $fieldName
+                ];
             }
 
             if (isset($field['filterable']) && $field['filterable']) {
@@ -243,7 +260,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
 
             foreach ($gridActions as $config) {
                 $configItem = array(
-                    'label'        => ucfirst($config['name']),
+                    'label'        => $config['name'],
                     'icon'         => isset($config['icon']) ? $config['icon'] : 'question-sign',
                     'link'         => strtolower($config['name']) . '_link',
                     'type'         => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,
@@ -330,35 +347,23 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     public function getActionConfigurationClosure($filters, $actions)
     {
         return function (ResultRecord $record) use ($filters, $actions) {
-            if ($record->getValue('mode') == ConfigModelManager::MODE_READONLY) {
-                $actions = array_map(
-                    function () {
-                        return false;
-                    },
-                    $actions
-                );
-
-                $actions['update']   = false;
-                $actions['rowClick'] = false;
-            } else {
-                foreach ($filters as $action => $filter) {
-                    foreach ($filter as $key => $value) {
-                        if (is_array($value)) {
-                            $error = true;
-                            foreach ($value as $v) {
-                                if ($record->getValue($key) == $v) {
-                                    $error = false;
-                                }
+            foreach ($filters as $action => $filter) {
+                foreach ($filter as $key => $value) {
+                    if (is_array($value)) {
+                        $error = true;
+                        foreach ($value as $v) {
+                            if ($record->getValue($key) == $v) {
+                                $error = false;
                             }
-                            if ($error) {
-                                $actions[$action] = false;
-                                break;
-                            }
-                        } else {
-                            if ($record->getValue($key) != $value) {
-                                $actions[$action] = false;
-                                break;
-                            }
+                        }
+                        if ($error) {
+                            $actions[$action] = false;
+                            break;
+                        }
+                    } else {
+                        if ($record->getValue($key) != $value) {
+                            $actions[$action] = false;
+                            break;
                         }
                     }
                 }
@@ -382,12 +387,16 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         foreach ($providers as $provider) {
             $configItems = $provider->getPropertyConfig()->getItems($itemsType);
             foreach ($configItems as $code => $item) {
+                if (!isset($item['grid'])) {
+                    continue;
+                }
+
                 $alias     = $joinAlias . $provider->getScope() . '_' . $code;
                 $fieldName = $provider->getScope() . '_' . $code;
 
                 if (isset($item['grid']['query'])) {
                     $query->andWhere($alias . '.value ' . $item['grid']['query']['operator'] . ' :' . $alias);
-                    $query->setParameter($alias, $item['grid']['query']['value']);
+                    $query->setParameter($alias, (string)$item['grid']['query']['value']);
                 }
 
                 $query->leftJoin(

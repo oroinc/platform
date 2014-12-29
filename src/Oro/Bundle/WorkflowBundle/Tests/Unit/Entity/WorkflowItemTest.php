@@ -173,20 +173,20 @@ class WorkflowItemTest extends \PHPUnit_Framework_TestCase
 
     public function testCreatedAtAndPrePersist()
     {
-        $this->assertNull($this->workflowItem->getCreatedAt());
+        $this->assertNull($this->workflowItem->getCreated());
         $this->workflowItem->prePersist();
-        $this->assertInstanceOf('DateTime', $this->workflowItem->getCreatedAt());
+        $this->assertInstanceOf('DateTime', $this->workflowItem->getCreated());
 
-        $this->assertEquals(time(), $this->workflowItem->getCreatedAt()->getTimestamp(), '', 5);
+        $this->assertEquals(time(), $this->workflowItem->getCreated()->getTimestamp(), '', 5);
     }
 
     public function testUpdatedAndPreUpdate()
     {
-        $this->assertNull($this->workflowItem->getUpdatedAt());
+        $this->assertNull($this->workflowItem->getUpdated());
         $this->workflowItem->preUpdate();
-        $this->assertInstanceOf('DateTime', $this->workflowItem->getUpdatedAt());
+        $this->assertInstanceOf('DateTime', $this->workflowItem->getUpdated());
 
-        $this->assertEquals(time(), $this->workflowItem->getUpdatedAt()->getTimestamp(), '', 5);
+        $this->assertEquals(time(), $this->workflowItem->getUpdated()->getTimestamp(), '', 5);
     }
 
     public function testGetAddTransitionRecords()

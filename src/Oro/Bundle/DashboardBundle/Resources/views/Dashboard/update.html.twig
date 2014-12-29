@@ -1,6 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 
-{% oro_title_set({params : {'%entityName%': 'oro.dashboard.entity_label'|trans} }) %}
+{% oro_title_set({params : {'%entityName%': 'oro.dashboard.entity_label'|trans, "%label%": entity.label} }) %}
 
 {% form_theme form with ['OroFormBundle:Form:fields.html.twig'] %}
 {% set formAction = form.vars.value.id
@@ -39,11 +39,13 @@
         {% if form.startDashboard is defined %}
             {{ form_row(form.startDashboard) }}
         {% endif %}
+    {% if form.owner is defined %}
         {{ form_row(form.owner) }}
+    {% endif %}
     {% endset %}
 
     {% set dataBlocks = [{
-        'title': 'orocrm.task.block.general'|trans,
+        'title': 'General Information'|trans,
         'class': 'active',
         'subblocks': [
             {

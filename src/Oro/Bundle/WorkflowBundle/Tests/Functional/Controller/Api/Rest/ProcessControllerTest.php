@@ -1,0 +1,90 @@
+<?php
+
+namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
+
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+
+/**
+ * @dbIsolation
+ * @dbReindex
+ */
+class ProcessControllerTest extends WebTestCase
+{
+    /**
+     * @var EntityManager
+     */
+    protected $entityManager;
+
+    protected function setUp()
+    {
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->entityManager = $this->client->getContainer()->get('doctrine')
+            ->getManagerForClass('OroWorkflowBundle:ProcessDefinition');
+    }
+
+    public function testActivateDeactivate()
+    {
+        $definition = $this->createNewEnabledProcessDefinition();
+        $definitionName = $definition->getName();
+        $this->assertTrue($definition->isEnabled());
+
+        // deactivate process
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_workflow_api_rest_process_deactivate',
+                array('processDefinition' => $definitionName)
+            )
+        );
+
+        $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        // assert that process definition item was deactivated
+        $this->entityManager->refresh($definition);
+        $this->assertFalse($definition->isEnabled());
+
+        // activate process
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_workflow_api_rest_process_activate',
+                array('processDefinition' => $definitionName)
+            )
+        );
+
+        $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        // assert that process definition item was activated
+        $this->entityManager->refresh($definition);
+        $this->assertTrue($definition->isEnabled());
+    }
+
+    /**
+     * @param array $result
+     */
+    protected function assertResult($result)
+    {
+        $this->assertArrayHasKey('successful', $result);
+        $this->assertArrayHasKey('message', $result);
+        $this->assertTrue($result['successful']);
+        $this->assertNotEmpty($result['message']);
+    }
+
+    protected function createNewEnabledProcessDefinition()
+    {
+        $testEntity = new ProcessDefinition();
+        $testEntity
+            ->setName('test_' . uniqid())
+            ->setLabel('Test ' . uniqid())
+            ->setEnabled(true)
+            ->setRelatedEntity('My/Test/Entity');
+
+        $this->entityManager->persist($testEntity);
+        $this->entityManager->flush($testEntity);
+
+        return $testEntity;
+    }
+}

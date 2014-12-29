@@ -22,7 +22,7 @@ class ConfigValueRepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * prepare mocks
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->om = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,7 +15,7 @@ class BusinessUnitTest extends \PHPUnit_Framework_TestCase
      */
     protected $unit;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->unit = new BusinessUnit();
     }

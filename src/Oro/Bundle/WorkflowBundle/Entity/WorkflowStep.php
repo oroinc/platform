@@ -11,10 +11,25 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      name="oro_workflow_step",
  *      uniqueConstraints={
  *          @ORM\UniqueConstraint(name="oro_workflow_step_unique_idx", columns={"workflow_name", "name"})
+ *      },
+ *      indexes={
+ *          @ORM\Index(name="oro_workflow_step_name_idx", columns={"name"})
  *      }
  * )
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowStepRepository")
- * @Config()
+ * @ORM\Entity
+ * @Config(
+ *      defaultValues={
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
+ *      }
+ * )
  */
 class WorkflowStep
 {
@@ -51,7 +66,7 @@ class WorkflowStep
     /**
      * @var boolean
      *
-     * @ORM\Column(name="final", type="boolean")
+     * @ORM\Column(name="is_final", type="boolean")
      */
     protected $final = false;
 

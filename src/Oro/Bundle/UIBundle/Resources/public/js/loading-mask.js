@@ -1,16 +1,22 @@
+/*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './app/views/base/view'
+], function ($, _, __, BaseView) {
     'use strict';
+
+    var LoadingMaskView;
 
     /**
      * Loading mask widget
      *
-     * @export  oroui/js/loading-mask
-     * @class   oroui.LoadingMask
-     * @extends Backbone.View
+     * @export oroui/js/loading-mask
+     * @name   oroui.LoadingMask
      */
-    return Backbone.View.extend({
+    LoadingMaskView = BaseView.extend({
 
         /** @property {Boolean} */
         displayed: false,
@@ -22,10 +28,10 @@ define(['jquery', 'underscore', 'backbone'
         className: 'loading-mask',
 
         /** @property {String} */
-        loadingHint: 'Loading...',
+        loadingHint: __('Loading...'),
 
         /** @property */
-        template:_.template(
+        template: _.template(
             '<div class="loading-wrapper"></div>' +
             '<div class="loading-frame">' +
                 '<div class="box well">' +
@@ -52,9 +58,19 @@ define(['jquery', 'underscore', 'backbone'
 
             if (this.liveUpdate) {
                 updateProxy = $.proxy(this.updatePos, this);
-                $(window).resize(updateProxy).scroll(updateProxy);
+                $(window)
+                    .on('resize.' + this.cid, updateProxy)
+                    .on('scroll.' + this.cid, updateProxy);
             }
-            Backbone.View.prototype.initialize.apply(this, arguments);
+            LoadingMaskView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            $(window).off('.' + this.cid);
+            LoadingMaskView.__super__.dispose.call(this);
         },
 
         /**
@@ -148,4 +164,6 @@ define(['jquery', 'underscore', 'backbone'
             return this;
         }
     });
+
+    return LoadingMaskView;
 });

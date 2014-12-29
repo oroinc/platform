@@ -32,7 +32,7 @@
                     target: $('#{{ id }}'),
                     simpleEl: $('#{{ region_text_field.vars.id }}'),
                     collection: new RegionCollection(),
-                    showSelect: {{ showSelect|json_encode }}
+                    showSelect: {{ showSelect|json_encode|raw }}
                 });
             });
         });
@@ -60,7 +60,7 @@
 {% endblock oro_region_widget %}
 
 {% block oro_email_widget %}
-    <div class="email-holder {% if form.email.vars.errors|length > 0 %} validation-error{% endif %}">
+    <div class="float-holder {% if form.email.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
             {{ form_widget(form.email) }}
             <label class="add-on" title="{{ 'Primary'|trans }}">
@@ -68,12 +68,18 @@
             </label>
         </div>
         {{ form_errors(form.email) }}
+        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+            <div class="collection-element-other clearfix">
+                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+            </div>
+            {{ form_errors(child) }}
+        {% endfor %}
     </div>
     {{ form_rest(form) }}
 {%  endblock %}
 
 {% block oro_phone_widget %}
-    <div class="email-holder {% if form.phone.vars.errors|length > 0 %} validation-error{% endif %}">
+    <div class="float-holder {% if form.phone.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append collection-element-primary">
             {{ form_widget(form.phone) }}
             <label class="add-on" title="{{ 'Primary'|trans }}">
@@ -81,6 +87,12 @@
             </label>
         </div>
         {{ form_errors(form.phone) }}
+        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+            <div class="collection-element-other clearfix">
+                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+            </div>
+            {{ form_errors(child) }}
+        {% endfor %}
     </div>
     {{ form_rest(form) }}
 {%  endblock %}
@@ -125,6 +137,7 @@
 {%  endblock %}
 
 {% block oro_address_collection_widget %}
+    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-address-collection' }) %}
     {{ block('oro_collection_widget') }}
     {% set id = id ~ '_collection' %}
     {{ _self.oro_collection_validate_types_js(_context) }}

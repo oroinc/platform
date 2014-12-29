@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Selenium;
 
+use Oro\Bundle\OrganizationBundle\Tests\Selenium\Pages\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Tests\Selenium\Pages\BusinessUnits;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
@@ -19,15 +21,18 @@ class BusinessUnitsTest extends Selenium2TestCase
         $unitName = 'Unit_'.mt_rand();
 
         $login = $this->login();
-        $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
+        /* @var BusinessUnits $login */
+        $login = $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
+            ->assertTitle('Business Units - User Management - System')
             ->add()
-            ->assertTitle('Create Business Unit - Business Units - Users Management - System')
-            ->setBusinessUnitName($unitName)
-            ->setOwner('Main')
+            ->assertTitle('Create Business Unit - Business Units - User Management - System');
+        /* @var BusinessUnit $login */
+        $login->setBusinessUnitName($unitName)
+            ->setOrganization('OroCRM')
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
-            ->assertTitle('Business Units - Users Management - System')
+            ->assertTitle('Business Units - User Management - System')
             ->close();
 
         return $unitName;
@@ -42,15 +47,17 @@ class BusinessUnitsTest extends Selenium2TestCase
     {
         $newUnitName = 'Update_' . $unitName;
         $login = $this->login();
+        /* @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
             ->open(array($unitName))
+            ->assertTitle("{$unitName} - Business Units - User Management - System")
             ->edit()
             ->setBusinessUnitName($newUnitName)
             ->save()
             ->assertMessage('Business Unit saved')
             ->toGrid()
-            ->assertTitle('Business Units - Users Management - System');
+            ->assertTitle('Business Units - User Management - System');
 
         return $newUnitName;
     }
@@ -62,11 +69,13 @@ class BusinessUnitsTest extends Selenium2TestCase
     public function testDeleteBusinessUnit($unitName)
     {
         $login = $this->login();
+        /* @var BusinessUnits $login */
         $login->openBusinessUnits('Oro\Bundle\OrganizationBundle')
             ->filterBy('Name', $unitName)
             ->open(array($unitName))
+            ->assertTitle("{$unitName} - Business Units - User Management - System")
             ->delete()
-            ->assertTitle('Business Units - Users Management - System')
+            ->assertTitle('Business Units - User Management - System')
             ->assertMessage('Business Unit deleted');
     }
 }

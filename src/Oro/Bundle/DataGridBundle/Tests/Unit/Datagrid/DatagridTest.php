@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
 
 class DatagridTest extends \PHPUnit_Framework_TestCase
@@ -14,14 +15,21 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $acceptor;
 
-    public function setUp()
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $parameters;
+
+    protected function setUp()
     {
         $this->acceptor = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Acceptor')
             ->disableOriginalConstructor()->getMock();
-        $this->grid     = new Datagrid(self::TEST_NAME, $this->acceptor);
+
+        $this->parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+
+        $this->grid = new Datagrid(self::TEST_NAME, DatagridConfiguration::create([]), $this->parameters);
+        $this->grid->setAcceptor($this->acceptor);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->acceptor);
         unset($this->grid);
@@ -110,5 +118,10 @@ class DatagridTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->grid->getMetadata();
         $this->assertInstanceOf($resultFQCN, $result);
+    }
+
+    public function testGetParameters()
+    {
+        $this->assertSame($this->parameters, $this->grid->getParameters());
     }
 }

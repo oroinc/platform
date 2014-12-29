@@ -19,7 +19,8 @@ function(_, Backbone, TransitionRowView) {
             stepFrom: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#transition-list-template').html();
             this.template = _.template(template);
             this.rowViews = [];

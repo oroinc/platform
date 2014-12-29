@@ -1,0 +1,12 @@
+liip_imagine:
+    filter_sets:
+        avatar_med:
+            quality:          95
+            filters:
+                thumbnail:    { size: [58, 58], mode: outbound }
+                strip:        ~
+        avatar_xsmall:
+            quality:          95
+            filters:
+                thumbnail:    { size: [16, 16], mode: outbound }
+                strip:        ~

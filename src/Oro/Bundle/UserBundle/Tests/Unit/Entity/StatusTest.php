@@ -8,9 +8,12 @@ class StatusTest extends \PHPUnit_Framework_TestCase
 {
     private $user;
 
+    /**
+     * @var Status
+     */
     private $status;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->user = $this->getMockForAbstractClass('Oro\Bundle\UserBundle\Entity\User');
         $this->status = new Status();

@@ -3,37 +3,55 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Guzzle\Http\Url;
+use Guzzle\Parser\ParserRegistry;
+
+use FOS\RestBundle\Util\Codes;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerAwareInterface;
 
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
+use Oro\Bundle\IntegrationBundle\Exception\SoapConnectionException;
+use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 
 /**
  * @package Oro\Bundle\IntegrationBundle
  */
-abstract class SOAPTransport implements TransportInterface
+abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /** @var ParameterBag */
     protected $settings;
 
     /** @var \SoapClient */
     protected $client;
 
+    /** @var int */
+    protected $attempted;
+
+    /** @var bool */
+    protected $multipleAttemptsEnabled = true;
+
+    /** @var array */
+    protected $sleepBetweenAttempt = [5, 10, 20, 40];
+
     /**
      * {@inheritdoc}
      */
     public function init(Transport $transportEntity)
     {
+        $this->resetAttemptCount();
         $this->settings = $transportEntity->getSettingsBag();
+        $wsdlUrl        = $this->settings->get('wsdl_url');
 
-        $wsdlUrl = $this->settings->get('wsdl_url');
         if (!$wsdlUrl) {
             throw new InvalidConfigurationException("SOAP Transport require 'wsdl_url' option to be defined.");
         }
 
-        $isDebug      = $this->settings->get('debug', false);
-        $this->client = $this->getSoapClient($wsdlUrl, $isDebug);
+        $this->client = $this->getSoapClient($wsdlUrl);
     }
 
     /**
@@ -44,7 +62,25 @@ abstract class SOAPTransport implements TransportInterface
         if (!$this->client) {
             throw new InvalidConfigurationException("SOAP Transport does not configured properly.");
         }
-        $result = $this->client->__soapCall($action, $params);
+
+        try {
+            $result = $this->client->__soapCall($action, $params);
+        } catch (\Exception $e) {
+            if ($this->isAttemptNecessary()) {
+                $result = $this->makeNewAttempt($action, $params);
+            } else {
+                $this->resetAttemptCount();
+
+                throw SoapConnectionException::createFromResponse(
+                    $this->getLastResponse(),
+                    $e,
+                    $this->getLastRequest(),
+                    $this->getLastResponseHeaders()
+                );
+            }
+        }
+
+        $this->resetAttemptCount();
 
         return $result;
     }
@@ -85,18 +121,24 @@ abstract class SOAPTransport implements TransportInterface
     }
 
     /**
+     * @param boolean $multipleAttemptsEnabled
+     */
+    public function setMultipleAttemptsEnabled($multipleAttemptsEnabled)
+    {
+        $this->multipleAttemptsEnabled = $multipleAttemptsEnabled;
+    }
+
+    /**
      * @param string $wsdlUrl
-     * @param bool   $isDebug
      *
      * @return \SoapClient
      */
-    protected function getSoapClient($wsdlUrl, $isDebug = false)
+    protected function getSoapClient($wsdlUrl)
     {
-        $options = [];
-        if ($isDebug) {
-            $options['trace'] = true;
-        }
-        $urlParts = parse_url($wsdlUrl);
+        $options          = [];
+        $options['trace'] = true;
+        $urlParts         = parse_url($wsdlUrl);
+
         if (isset($urlParts['user'], $urlParts['pass'])) {
             $options['login']    = $urlParts['user'];
             $options['password'] = $urlParts['pass'];
@@ -105,5 +147,126 @@ abstract class SOAPTransport implements TransportInterface
         $wsdlUrl = Url::buildUrl($urlParts);
 
         return new \SoapClient($wsdlUrl, $options);
+    }
+
+    /**
+     * Reset count attempt into 0
+     */
+    protected function resetAttemptCount()
+    {
+        $this->attempted = 0;
+    }
+
+    /**
+     * Make new attempt
+     */
+    protected function makeNewAttempt($action, $params)
+    {
+        $this->logAttempt();
+        sleep($this->getSleepBetweenAttempt());
+        ++$this->attempted;
+
+        return $this->call($action, $params);
+    }
+
+    /**
+     * Get last request headers as array
+     *
+     * @return array
+     */
+    protected function getLastResponseHeaders()
+    {
+        return ParserRegistry::getInstance()->getParser('message')
+            ->parseResponse($this->client->__getLastResponseHeaders());
+    }
+
+    /**
+     * @param array $headers
+     *
+     * @return bool
+     */
+    protected function isResultOk(array $headers = [])
+    {
+        if (Codes::HTTP_OK === $this->getHttpStatusCode($headers)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array $headers
+     *
+     * @return int
+     */
+    protected function getHttpStatusCode(array $headers = [])
+    {
+        return (!empty($headers['code'])) ? (int)$headers['code'] : 0;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isAttemptNecessary()
+    {
+        $couldPerform = $this->multipleAttemptsEnabled && ($this->attempted < count($this->sleepBetweenAttempt) - 1);
+
+        if ($couldPerform) {
+            $headers  = $this->getLastResponseHeaders();
+            $response = $this->getLastResponse();
+
+            if (!empty($headers) && !$this->isResultOk($headers)) {
+                $statusCode = $this->getHttpStatusCode($headers);
+
+                if (in_array($statusCode, $this->getHttpStatusesForAttempt())) {
+                    return true;
+                }
+            } elseif (!empty($headers) && $this->isResultOk($headers) && strpos($response, '<?xml') !== 0) {
+                return true;
+            } elseif (empty($headers)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getHttpStatusesForAttempt()
+    {
+        return [
+            Codes::HTTP_BAD_GATEWAY,
+            Codes::HTTP_SERVICE_UNAVAILABLE,
+            Codes::HTTP_GATEWAY_TIMEOUT,
+        ];
+    }
+
+    /**
+     * Returns the current item by $attempted or the last of them
+     *
+     * @return int
+     */
+    protected function getSleepBetweenAttempt()
+    {
+        if (!empty($this->sleepBetweenAttempt[$this->attempted])) {
+            return (int)$this->sleepBetweenAttempt[$this->attempted];
+        }
+
+        return (int)end($this->sleepBetweenAttempt);
+    }
+
+    /**
+     * Log attempt
+     */
+    protected function logAttempt()
+    {
+        if (!empty($this->logger)) {
+            $this->logger->warning(
+                '[Warning] Attempt number ' . ($this->attempted + 1)
+                . ' with ' . $this->getSleepBetweenAttempt() . ' sec delay.'
+            );
+        }
     }
 }

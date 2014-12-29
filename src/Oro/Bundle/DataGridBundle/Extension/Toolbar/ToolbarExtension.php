@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Toolbar;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -21,17 +21,16 @@ class ToolbarExtension extends AbstractExtension
     const PAGER_ITEMS_OPTION_PATH              = '[options][toolbarOptions][pageSize][items]';
     const PAGER_DEFAULT_PER_PAGE_OPTION_PATH   = '[options][toolbarOptions][pageSize][default_per_page]';
     const TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH = '[options][toolbarOptions][turnOffToolbarRecordsNumber]';
+    const TOOLBAR_PAGINATION_HIDE_OPTION_PATH  = '[options][toolbarOptions][pagination][hide]';
 
     /** @var ConfigManager */
     private $cm;
 
     /**
-     * @param ConfigManager     $cm
-     * @param RequestParameters $requestParams
+     * @param ConfigManager $cm
      */
-    public function __construct(ConfigManager $cm, RequestParameters $requestParams = null)
+    public function __construct(ConfigManager $cm)
     {
-        parent::__construct($requestParams);
         $this->cm = $cm;
     }
 
@@ -103,7 +102,7 @@ class ToolbarExtension extends AbstractExtension
         );
 
         if (empty($exist)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf('Default page size "%d" must present in size items array', $perPageDefault)
             );
         }

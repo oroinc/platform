@@ -1,17 +1,3 @@
 {% spaceless %}
-    {% set data = {
-        'title': oro_title_render(),
-        'titleSerialized': oro_title_render_serialized(),
-        'titleShort': oro_title_render_short(),
-        'scripts': script,
-        'mainMenu': menu,
-        'userMenu': userMenu,
-        'breadcrumb': breadcrumb,
-        'flashMessages': app.session.flashbag.all,
-        'history': oro_menu_render('history'),
-        'mostviewed': oro_menu_render('mostviewed'),
-        'content': content,
-        'showPinButton': (app.request.attributes.get('_route') != 'oro_default' or show_pin_button_on_start_page)
-    } %}
-    {{ data|json_encode|raw }}
+    {{ oro_get_content(data|default({}))|json_encode|raw }}
 {% endspaceless %}

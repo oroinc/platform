@@ -8,10 +8,10 @@ define(function (require) {
 
     /**
      * @export  oro/sidebar/widget-controller/widget-setup-view
-     * @class oro.sidebar.widget-controller.WidgetSetupView
+     * @class   oro.sidebar.widgetController.WidgetSetupView
      * @extends oro.Modal
      */
-    var WidgetSetupView = Modal.extend({
+    return Modal.extend({
         /** @property {String} */
         className: 'modal oro-modal-normal widget-setup',
 
@@ -19,7 +19,7 @@ define(function (require) {
             var view = this;
             var model = view.model;
 
-            options.content = '<div class="sidebar-widgetsetup"></div>';
+            options.content = '<div class="sidebar-widget-setup"></div>';
             options.snapshot = options.snapshot || {};
 
             var moduleId = model.get('module');
@@ -29,7 +29,7 @@ define(function (require) {
                     model: model
                 });
                 view.setupView.render();
-                view.$el.find('.sidebar-widgetsetup').append(view.setupView.$el);
+                view.$el.find('.sidebar-widget-setup').append(view.setupView.$el);
 
                 view.once('ok', function () {
                     view.setupView.trigger('ok');
@@ -58,6 +58,4 @@ define(function (require) {
             Modal.prototype.initialize.apply(this, arguments);
         }
     });
-
-    return WidgetSetupView;
 });

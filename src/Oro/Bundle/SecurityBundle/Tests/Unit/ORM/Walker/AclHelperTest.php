@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\AST\SelectStatement;
@@ -34,10 +35,51 @@ class AclHelperTest extends OrmTestCase
      */
     protected $walker;
 
+    public function testApplyAclToCriteria()
+    {
+        $conditionBuilder = $this->getMockBuilder(
+            'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+        $conditionBuilder->expects($this->any())
+            ->method('getAclConditionData')
+            ->will(
+                $this->returnValue(
+                    [
+                        'owner',
+                        1,
+                        4,
+                        'organization',
+                        10,
+                        false
+                    ]
+                )
+            );
+        $criteria = new Criteria();
+        $helper = new AclHelper($conditionBuilder);
+
+        $result = $helper->applyAclToCriteria('oroTestClass', $criteria, 'TEST_PERMISSION');
+        $whereExpression = $result->getWhereExpression();
+        $this->assertEquals('AND', $whereExpression->getType());
+        $expressions = $whereExpression->getExpressionList();
+        $this->assertEquals(2, count($expressions));
+
+        $firstExpr = $expressions[0];
+        $this->assertEquals('organization', $firstExpr->getField());
+        $this->assertEquals('IN', $firstExpr->getOperator());
+        $this->assertEquals([10], $firstExpr->getValue()->getValue());
+
+        $secondExpr = $expressions[1];
+        $this->assertEquals('owner', $secondExpr->getField());
+        $this->assertEquals('IN', $secondExpr->getOperator());
+        $this->assertEquals([1], $secondExpr->getValue()->getValue());
+    }
+
     /**
      * @dataProvider dataProvider
      */
-    public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult)
+    public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult, $exception)
     {
         $this->conditionBuilder = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
@@ -73,8 +115,19 @@ class AclHelperTest extends OrmTestCase
         $resultAst    = $this->walker->walkSelectStatement($query->getAST());
 
         $this->$walkerResult($resultAst);
+
+        if ($exception) {
+            list($class, $message) = $exception;
+            $this->setExpectedException($class, $message);
+        }
+        $this->assertNotEmpty($query->getSQL());
     }
 
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function dataProvider()
     {
         return [
@@ -82,7 +135,8 @@ class AclHelperTest extends OrmTestCase
                 $this->getRequest0(),
                 [],
                 'resultHelper0',
-                'resultWalker0'
+                'resultWalker0',
+                []
             ],
             [
                 $this->getRequest1(),
@@ -90,74 +144,105 @@ class AclHelperTest extends OrmTestCase
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [1, 2, 3],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_STATE_FIELD,
+                        null,
+                        null,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
-                        'id',
+                        'user',
                         [1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1,
+                        false
                     ]
                 ],
                 'resultHelper1',
-                'resultWalker1'
+                'resultWalker1',
+                []
             ],
             [
                 $this->getRequest2(),
                 [
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
-                        'id',
+                        'user',
                         [1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1,
+                        true
                     ]
                 ],
                 'resultHelper2',
-                'resultWalker2'
+                'resultWalker2',
+                []
             ],
             [
                 $this->getRequest3(),
                 [
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
-                        'id',
-                        [10],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
-                    ],
-                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => [
-                        'id',
-                        [100],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
-                    ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [3, 2, 1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_STATE_FIELD,
+                        null,
+                        null,
+                        false
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
+                        'user',
+                        [10],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1,
+                        false
+                    ],
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsComment' => [
+                        'article',
+                        [100],
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress' => [
-                        'id',
+                        'user',
                         [150],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1,
+                        false
                     ]
                 ],
                 'resultHelper3',
-                'resultWalker3'
+                'resultWalker3',
+                []
             ]
             ,
             [
                 $this->getRequest4(),
                 [
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsArticle' => [
-                        'id',
+                        'user',
                         [10],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                        'organization',
+                        1,
+                        false
                     ],
                     'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser'    => [
                         'id',
                         [3, 2, 1],
-                        PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION
+                        PathExpression::TYPE_STATE_FIELD,
+                        null,
+                        null,
+                        false
                     ],
                 ],
                 'resultHelper4',
-                'resultWalker4'
+                'resultWalker4',
+                []
             ]
         ];
     }
@@ -226,11 +311,16 @@ class AclHelperTest extends OrmTestCase
         $this->assertEquals([1, 2, 3], $this->collectLiterals($expression->literals));
         $this->assertEquals('u', $expression->expression->simpleArithmeticExpression->identificationVariable);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
-        $this->assertEquals(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-            $join->joinAssociationDeclaration->abstractSchemaName
-        );
-        $this->assertEquals('address', $join->joinAssociationDeclaration->aliasIdentificationVariable);
+        $conditionalFactors = $join->conditionalExpression->conditionalFactors;
+        $this->assertCount(2, $conditionalFactors);
+        $expression = $conditionalFactors[0]->simpleConditionalExpression;
+        $this->assertEquals([1], $this->collectLiterals($expression->literals));
+        $this->assertEquals('user', $expression->expression->simpleArithmeticExpression->field);
+        $this->assertEquals('address', $expression->expression->simpleArithmeticExpression->identificationVariable);
+        $expression = $conditionalFactors[1]->simpleConditionalExpression;
+        $this->assertEquals(1, $expression->rightExpression->simpleArithmeticExpression->value);
+        $this->assertEquals('organization', $expression->leftExpression->simpleArithmeticExpression->field);
+        $this->assertEquals('address', $expression->leftExpression->simpleArithmeticExpression->identificationVariable);
     }
 
     protected function getRequest2()
@@ -253,19 +343,12 @@ class AclHelperTest extends OrmTestCase
     {
         $this->assertNull($resultAst->whereClause);
         $join = $resultAst->fromClause->identificationVariableDeclarations[0]->joins[0];
-        $this->assertEquals(
-            'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-            $join->joinAssociationDeclaration->abstractSchemaName
-        );
-        $this->assertEquals(
-            [1],
-            $this->collectLiterals(
-                $join->conditionalExpression
-                    ->conditionalFactors[0]
-                    ->simpleConditionalExpression
-                    ->literals
-            )
-        );
+        $conditionalFactors = $join->conditionalExpression->conditionalFactors;
+        $this->assertCount(1, $conditionalFactors);
+        $expression = $conditionalFactors[0]->simpleConditionalExpression;
+        $this->assertEquals(1, $expression->rightExpression->simpleArithmeticExpression->value);
+        $this->assertEquals('organization', $expression->leftExpression->simpleArithmeticExpression->field);
+        $this->assertEquals('address', $expression->leftExpression->simpleArithmeticExpression->identificationVariable);
     }
 
     protected function getRequest3()

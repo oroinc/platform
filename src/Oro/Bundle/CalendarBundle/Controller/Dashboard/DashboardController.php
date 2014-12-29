@@ -30,7 +30,7 @@ class DashboardController extends Controller
 
         $calendar    = $this->getDoctrine()->getManager()
             ->getRepository('OroCalendarBundle:Calendar')
-            ->findByUser($this->getUser()->getId());
+            ->findDefaultCalendar($this->getUser()->getId(), $securityFacade->getOrganization()->getId());
         $currentDate = new \DateTime('now', new \DateTimeZone($localeSettings->getTimeZone()));
         $startDate   = clone $currentDate;
         $startDate->setTime(0, 0, 0);
@@ -42,7 +42,7 @@ class DashboardController extends Controller
         }
 
         $result = array(
-            'event_form' => $this->get('oro_calendar.calendar_event.form')->createView(),
+            'event_form' => $this->get('oro_calendar.calendar_event.form.template')->createView(),
             'entity'     => $calendar,
             'calendar'   => array(
                 'selectable'     => $securityFacade->isGranted('oro_calendar_event_create'),
@@ -56,7 +56,7 @@ class DashboardController extends Controller
         );
         $result = array_merge(
             $result,
-            $this->get('oro_dashboard.widget_attributes')->getWidgetAttributesForTwig($widget)
+            $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
         );
 
         return $result;

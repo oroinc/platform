@@ -12,10 +12,6 @@ parameters:
 services:
     oro_entity.form.type.custom_entity:
         class: %oro_entity.form.type.custom_entity.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @router
-            - @translator
         tags:
             - { name: form.type, alias: custom_entity_type }
 
@@ -45,7 +41,7 @@ services:
             - { name: form.type, alias: oro_entity_field_select }
 
     oro_entity.form.type.option_select:
-        class:                                                %oro_entity.form.type.option_select.class%
+        class: %oro_entity.form.type.option_select.class%
         arguments:
             - @oro_entity_config.config_manager
         tags:
@@ -54,14 +50,15 @@ services:
     oro_entity.form.type.entity_select:
         class: %oro_entity.form.type.entity_select.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_select }
 
     oro_entity.form.handler.entity_select:
         class: %oro_entity.form.handler.entity_select.class%
-        arguments:
-            - @doctrine.orm.entity_manager
+        calls:
+            - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
+            - [setAclHelper, ["@oro_security.acl_helper"]]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: entity_select, acl_resource: oro_search }
 
@@ -74,7 +71,7 @@ services:
         tags:
             - { name: form.type_guesser, priority: 20 }
 
-    oro_entityg.form.guesser.doctrine_type:
+    oro_entity.form.guesser.doctrine_type:
         class: %oro_entity.form.guesser.doctrine_type.class%
         arguments:
             - @doctrine
@@ -82,7 +79,7 @@ services:
         calls:
             # default types
             - [addDoctrineTypeMapping, ["string", "text"]]
-            - [addDoctrineTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["integer", "text"]] # to be able validate numbers properly, we need text input
             - [addDoctrineTypeMapping, ["smallint", "integer", { precision: 0 }]]
             - [addDoctrineTypeMapping, ["bigint", "integer", { precision: 0 }]]
             - [addDoctrineTypeMapping, ["boolean", "checkbox"]]

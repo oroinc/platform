@@ -10,10 +10,15 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  */
 abstract class AbstractPageEntity extends AbstractPage
 {
-    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
+    /** @var string */
     protected $owner;
+
+    /** @var string */
+    protected $organization;
+
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tags;
+
     /**
      * Save entity
      *
@@ -22,10 +27,9 @@ abstract class AbstractPageEntity extends AbstractPage
     public function save()
     {
         $this->test->byXpath("//button[normalize-space(.) = 'Save and Close']")->click();
-        sleep(1);
         $this->waitPageToLoad();
+        sleep(1);
         $this->waitForAjax();
-
         return $this;
     }
 
@@ -70,8 +74,9 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function verifyTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']")) {
-            $tagsPath = $this->test->byXpath("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]")) {
+            $tagsPath = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
             $tagsPath->click();
             $tagsPath->value(substr($tag, 0, (strlen($tag)-1)));
             $this->waitForAjax();
@@ -102,8 +107,9 @@ abstract class AbstractPageEntity extends AbstractPage
      */
     public function setTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']")) {
-            $tagsPath = $this->test->byXpath("//div[@id='s2id_orocrm_contact_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]")) {
+            $tagsPath = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_orocrm_contact_form_tags_autocomplete')]//input");
             $tagsPath->click();
             $tagsPath->value($tag);
             $this->waitForAjax();
@@ -127,8 +133,8 @@ abstract class AbstractPageEntity extends AbstractPage
     public function getParam($paramName)
     {
         $url = $this->test->url();
-        $fragment = parse_url($url)['fragment'];
-        $str = explode('/', $fragment);
+        $path = parse_url($url)['path'];
+        $str = explode('/', $path);
 
         $found_index = array_search($paramName, $str);
         if ($found_index !== false) {
@@ -141,5 +147,88 @@ abstract class AbstractPageEntity extends AbstractPage
     public function getId($paramName = 'view')
     {
         return $this->getParam($paramName);
+    }
+
+    /**
+     * @param $owner
+     *
+     * @return $this
+     */
+    public function setOwner($owner)
+    {
+        if (isset($this->owner)) {
+            $ownerObject = $this->test->byXPath($this->owner);
+            $ownerObject->click();
+            $this->waitForAjax();
+            $this->test->byXpath("//div[@id='select2-drop']/div/input")->value($owner);
+            $this->waitForAjax();
+            $this->assertElementPresent(
+                "//div[@id='select2-drop']//div[contains(., '{$owner}')]",
+                "Owner autocomplete doesn't return search value"
+            );
+            $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$owner}')]")->click();
+        }
+        return $this;
+    }
+
+    /**
+     * @param $organization
+     *
+     * @return $this
+     */
+    public function setOrganization($organization)
+    {
+        if (isset($this->organization)) {
+            $element = $this->test->select($this->test->byXPath($this->organization));
+            $this->test->moveto($element);
+            $element->selectOptionByLabel($organization);
+        }
+        return $this;
+    }
+
+    public function getOrganization()
+    {
+        $element = $this->test->select($this->test->byXPath($this->organization));
+        return trim($element->selectedLabel());
+    }
+
+    public function checkActionInGroup($action, $false = true)
+    {
+        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+        $this->waitForAjax();
+        if (!$false) {
+            $this->assertElementNotPresent("//div[@class='pull-right']//a[@title='{$action}']");
+        } else {
+            $this->assertElementPresent("//div[@class='pull-right']//a[@title='{$action}']");
+        }
+
+        return $this;
+    }
+
+    public function runActionInGroup($action)
+    {
+        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@class='pull-right']//a[@title='{$action}']")->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
+
+        return $this;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $value
+     * @return $this
+     */
+    public function checkEntityFieldData($fieldName, $value)
+    {
+        $this->assertElementPresent(
+            "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
+            "/following-sibling::div[contains(., '{$value}')]",
+            "Field '{$fieldName}' data are not equals '{$value}'"
+        );
+
+        return $this;
     }
 }

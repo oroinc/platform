@@ -1,15 +1,20 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
-{% form_theme form with ['OroFormBundle:Form:fields.html.twig', 'OroEntityConfigBundle:Include:fields.html.twig'] %}
+{% form_theme form with [
+    'OroFormBundle:Form:fields.html.twig',
+    'OroEntityConfigBundle:Include:fields.html.twig',
+    'OroEntityBundle:Form:fields.html.twig'
+] %}
 
 {% oro_title_set({params : {
-    "%entityName%": (entity_config.get('label')|trans)|default('N/A'),
-    "%fieldName%": (field_config.get('label')|trans)|default('N/A')|trans,
+    "%entityName%": entity_config.get('label')|default('N/A')|trans,
+    "%fieldName%": field.fieldName|default('N/A')|trans,
 }}) %}
 
 {% set audit_entity_class = field.entity.className|replace('\\', '_') %}
 {% set audit_title = entity_config.get('label') %}
 {% set audit_path = 'oro_entityconfig_audit_field' %}
 {% set audit_entity_id = field.id %}
+{% set audit_show_change_history = true %}
 
 {% block navButtons %}
     {% if resource_granted('oro_entityconfig_manage') %}
@@ -21,15 +26,20 @@
 {% endblock navButtons %}
 
 {% block pageHeader %}
+    {% set entityTitle = field.id ?
+        (field_config.get('label')|trans) | default(field.fieldName|capitalize) :
+        'oro.entity_config.info.new_field.label'|trans
+    %}
+
     {% set breadcrumbs = {
         'entity'      : 'entity',
         'indexPath'   : path('oro_entityconfig_index'),
-        'indexLabel'  : 'Entities',
-        'entityTitle' : field.id ? (field_config.get('label')|trans)|default(field.fieldName|capitalize) : 'New Field'|trans,
+        'indexLabel'  : 'oro.entity_config.entity.plural_label'|trans,
+        'entityTitle' : entityTitle,
         'additional'  : [
             {
                 'indexPath'  : path('oro_entityconfig_view', {id: field.entity.id}),
-                'indexLabel' : entity_config.get('label')|default('N/A'),
+                'indexLabel' : entity_config.get('label')|default('N/A')|trans,
             },
         ]
     }%}

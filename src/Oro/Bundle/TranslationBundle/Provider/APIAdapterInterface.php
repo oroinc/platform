@@ -4,18 +4,20 @@ namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Psr\Log\LoggerAwareInterface;
 
+use Guzzle\Http\Message\Response;
+
 interface APIAdapterInterface extends LoggerAwareInterface
 {
     /**
      * Download translations
      *
      * @param string $path save downloaded file to this path
-     * @param array  $projects project names, some adapters may need it
+     * @param array  $projects project names
      * @param string $package package or locale (e.g. for crowdin)
      *
      * @return mixed
      */
-    public function download($path, array $projects, $package = null);
+    public function download($path, array $projects = [], $package = null);
 
     /**
      * Perform request
@@ -24,17 +26,11 @@ interface APIAdapterInterface extends LoggerAwareInterface
      * @param array  $data
      * @param string $method
      * @param array  $options
+     * @param array  $headers
      *
      * @throws \RuntimeException
-     * @return mixed
-     */
-    public function request($uri, $data = array(), $method = 'GET', $options = []);
-
-    /**
-     * @param $response
      *
-     * @return \stdClass
-     * @throws \RuntimeException
+     * @return Response
      */
-    public function parseResponse($response);
+    public function request($uri, $data = array(), $method = 'GET', $options = [], $headers = []);
 }

@@ -55,9 +55,12 @@ class FormOptionsAssembler extends AbstractAssembler
             );
         }
 
-        foreach (array_keys($attributeFields) as $attributeName) {
+        $attributeFieldKeys = array_keys($attributeFields);
+        foreach ($attributeFieldKeys as $attributeName) {
             $this->assertAttributeExists($attributeName, $owner, $ownerName);
         }
+
+        $options['attribute_fields'] = $this->passConfiguration($attributeFields);
 
         if (!empty($options['attribute_default_values'])) {
             $value = $options['attribute_default_values'];
@@ -70,7 +73,9 @@ class FormOptionsAssembler extends AbstractAssembler
                     )
                 );
             }
-            foreach (array_keys($value) as $attributeName) {
+
+            $arrayKeys = array_keys($value);
+            foreach ($arrayKeys as $attributeName) {
                 $this->assertAttributeExists($attributeName, $owner, $ownerName);
                 if (!array_key_exists($attributeName, $attributeFields)) {
                     throw new InvalidParameterException(

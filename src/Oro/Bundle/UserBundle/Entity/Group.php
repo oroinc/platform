@@ -9,8 +9,10 @@ use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\GroupRepository")
@@ -21,11 +23,22 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
- *              "owner_column_name"="business_unit_owner_id"
+ *              "owner_column_name"="business_unit_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
  *          }
  *      }
  * )
@@ -35,7 +48,7 @@ class Group
 {
     /**
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      * @JMS\Expose
@@ -46,6 +59,13 @@ class Group
      * @ORM\Column(type="string", unique=true, length=30, nullable=false)
      * @JMS\Type("string")
      * @JMS\Expose
+     * @ConfigField(
+     *  defaultValues={
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $name;
 
@@ -64,6 +84,14 @@ class Group
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $owner;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     /**
      * @param string $name [optional] Group name
@@ -248,5 +276,28 @@ class Group
     public function __toString()
     {
         return (string) $this->name;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return Group
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

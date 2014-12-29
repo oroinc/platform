@@ -41,19 +41,36 @@
     <span> <%= _.__('oro.filter.embedded.date.field_to_value') %> </span>
     <%= parts.join('') %>:
     <div />
-    <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="from">
+    <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
     <span class="filter-separator">-</span>
-    <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="to">
+    <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
 </script>
 
 <script type="text/template" id="select-filter-template-embedded">
     <div class="filter-item">
-        <span> <%= _.__('oro.filter.embedded.date.field_to_value') %> </span>
+        <span> <%= _.__('oro.filter.embedded.select.field_to_value') %> </span>
         <div class="filter-select filter-criteria-selector">
             <select>
                 <% _.each(options, function (option) { %>
-                <option title="<%- option.label %>" value="<%= option.value %>"
+                <option value="<%= option.value %>" title="<%- option.label %>"
                     <% if (option.value == selected.value) { %> selected="selected"<% } %>>
+                    <%- option.label %>
+                </option>
+                <% }); %>
+            </select>
+        </div>
+    </div>
+</script>
+
+<script type="text/template" id="multiselect-filter-template-embedded">
+    <div class="filter-item">
+        <span> <%= _.__('oro.filter.embedded.select.field_to_value') %> </span>
+        <div class="filter-select filter-criteria-selector">
+            <select multiple>
+                <% _.each(options, function (option) { %>
+                <option value="<%= option.value %>" title="<%- option.label %>"
+                    <% if (_.isArray(selected.value)) { %><% if (_.indexOf(selected.value, option.value) !== -1) { %> selected="selected"<% } %>
+                    <% } else if (option.value == selected.value) { %> selected="selected"<% } %>>
                     <%- option.label %>
                 </option>
                 <% }); %>

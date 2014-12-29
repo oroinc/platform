@@ -7,7 +7,7 @@
     "license": "MIT",
     "require": {
         "php": ">=5.3.3",
-        "symfony/symfony": "2.1.*",
+        "symfony/symfony": "2.3.*",
         "besimple/soap-common": "dev-master",
         "besimple/soap-server": "dev-master",
         "besimple/soap-bundle": "dev-master",

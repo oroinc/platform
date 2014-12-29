@@ -92,7 +92,7 @@ abstract class EmailAddress
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }
@@ -100,12 +100,12 @@ abstract class EmailAddress
     /**
      * Set entity created date/time
      *
-     * @param \DateTime $createdAt
+     * @param \DateTime $created
      * @return EmailAddress
      */
-    protected function setCreatedAt($createdAt)
+    protected function setCreated($created)
     {
-        $this->created = $createdAt;
+        $this->created = $created;
 
         return $this;
     }
@@ -115,7 +115,7 @@ abstract class EmailAddress
      *
      * @return \DateTime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
         return $this->updated;
     }
@@ -123,12 +123,12 @@ abstract class EmailAddress
     /**
      * Set entity updated date/time
      *
-     * @param \DateTime $updatedAt
+     * @param \DateTime $updated
      * @return EmailAddress
      */
-    protected function setUpdatedAt($updatedAt)
+    protected function setUpdated($updated)
     {
-        $this->updated = $updatedAt;
+        $this->updated = $updated;
 
         return $this;
     }

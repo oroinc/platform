@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\SearchBundle\Query\Query;
-use Oro\Bundle\SearchBundle\Engine\Indexer;
 
 abstract class BaseDriver
 {
@@ -67,7 +68,8 @@ abstract class BaseDriver
             $qb->setFirstResult($query->getFirstResult());
         }
 
-        return $qb->getQuery()
+        return $qb
+            ->getQuery()
             ->getResult();
     }
 
@@ -87,6 +89,64 @@ abstract class BaseDriver
     }
 
     /**
+     * Truncate all entities
+     *
+     * @throws \Exception
+     */
+    public function truncateIndex()
+    {
+        /** @var Connection $connection */
+        $connection = $this->em->getConnection();
+        $dbPlatform = $connection->getDatabasePlatform();
+        $connection->beginTransaction();
+        try {
+            $this->truncateEntities($dbPlatform, $connection);
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * @param AbstractPlatform $dbPlatform
+     * @param Connection $connection
+     */
+    protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
+    {
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:Item');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDecimal');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexText');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexInteger');
+        $this->truncateTable($dbPlatform, $connection, 'OroSearchBundle:IndexDatetime');
+    }
+
+    /**
+     * Truncate query for table
+     *
+     * @param AbstractPlatform $dbPlatform
+     * @param Connection $connection
+     * @param string $entityName
+     */
+    protected function truncateTable(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
+    {
+        /** @var ClassMetadata $metadata */
+        $metadata = $this->em->getClassMetadata($entityName);
+        $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName()) ;
+        $connection->executeUpdate($query);
+    }
+
+    /**
+     * @param AbstractPlatform $dbPlatform
+     * @param string $tableName
+     * @return string
+     */
+    protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
+    {
+        return $dbPlatform->getTruncateTableSql($tableName);
+    }
+
+    /**
      * Add text search to qb
      *
      * @param \Doctrine\ORM\QueryBuilder $qb
@@ -99,6 +159,7 @@ abstract class BaseDriver
     protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
+        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
 
         // TODO Need to clarify search requirements in scope of CRM-214
         if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
@@ -108,7 +169,7 @@ abstract class BaseDriver
         }
         $whereExpr = $searchCondition['type'] . ' (' . $searchString . ')';
 
-        $this->setFieldValueStringParameter($qb, $index, $searchCondition['fieldValue'], $searchCondition['condition']);
+        $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
 
         if ($useFieldName) {
             $qb->setParameter('field' . $index, $searchCondition['fieldName']);
@@ -122,6 +183,23 @@ abstract class BaseDriver
     }
 
     /**
+     * @param array|string $fieldValue
+     * @return array|string
+     */
+    protected function filterTextFieldValue($fieldValue)
+    {
+        if (is_string($fieldValue)) {
+            $fieldValue = Query::clearString($fieldValue);
+        } elseif (is_array($fieldValue)) {
+            foreach ($fieldValue as $key => $value) {
+                $fieldValue[$key] = Query::clearString($value);
+            }
+        }
+
+        return $fieldValue;
+    }
+
+    /**
      * Create search string for string parameters (contains)
      *
      * @param integer $index
@@ -131,12 +209,14 @@ abstract class BaseDriver
      */
     protected function createContainsStringQuery($index, $useFieldName = true)
     {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
         $stringQuery = '';
         if ($useFieldName) {
-            $stringQuery = 'textField.field = :field' . $index . ' AND ';
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . 'textField.value LIKE :value' . $index;
+        return $stringQuery . $joinAlias . '.value LIKE :value' . $index;
     }
 
     /**
@@ -149,12 +229,14 @@ abstract class BaseDriver
      */
     protected function createNotContainsStringQuery($index, $useFieldName = true)
     {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
         $stringQuery = '';
         if ($useFieldName) {
-            $stringQuery = 'textField.field = :field' . $index . ' AND ';
+            $stringQuery = $joinAlias . '.field = :field' . $index . ' AND ';
         }
 
-        return $stringQuery . 'textField.value NOT LIKE :value' . $index;
+        return $stringQuery . $joinAlias . '.value NOT LIKE :value' . $index;
     }
 
     /**
@@ -181,7 +263,7 @@ abstract class BaseDriver
      */
     protected function addNonTextField(QueryBuilder $qb, $index, $searchCondition)
     {
-        $joinAlias = $searchCondition['fieldType'] . 'Field';
+        $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $qb->setParameter('field' . $index, $searchCondition['fieldName']);
         $qb->setParameter('value' . $index, $searchCondition['fieldValue']);
 
@@ -229,21 +311,24 @@ abstract class BaseDriver
     protected function getRequestQB(Query $query, $setOrderBy = true)
     {
         $qb = $this->createQueryBuilder('search')
-            ->select(array('search as item', 'text'))
-            ->leftJoin('search.textFields', 'text', 'WITH', 'text.field = :allTextField')
-            ->leftJoin('search.textFields', 'textField')
-            ->leftJoin('search.integerFields', 'integerField')
-            ->leftJoin('search.decimalFields', 'decimalField')
-            ->leftJoin('search.datetimeFields', 'datetimeField')
-            ->setParameter('allTextField', Indexer::TEXT_ALL_DATA_FIELD);
+            ->select('search as item');
 
         $this->setFrom($query, $qb);
 
         $whereExpr = array();
         if (count($query->getOptions())) {
             foreach ($query->getOptions() as $index => $searchCondition) {
+                $joinField = sprintf('search.%sFields', $searchCondition['fieldType']);
+                $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
+                $qb->leftJoin($joinField, $joinAlias);
+
                 if ($searchCondition['fieldType'] == Query::TYPE_TEXT) {
-                    $whereExpr[] = $this->addTextField($qb, $index, $searchCondition, $setOrderBy);
+                    if ($searchCondition['fieldValue'] === '') {
+                        $whereExpr[] = $joinAlias . '.field = :field' . $index;
+                        $qb->setParameter('field' . $index, $searchCondition['fieldName']);
+                    } else {
+                        $whereExpr[] = $this->addTextField($qb, $index, $searchCondition, $setOrderBy);
+                    }
                 } else {
                     $whereExpr[] = $this->addNonTextField($qb, $index, $searchCondition);
                 }
@@ -260,6 +345,16 @@ abstract class BaseDriver
         }
 
         return $qb;
+    }
+
+    /**
+     * @param string $fieldType
+     * @param int $index
+     * @return string
+     */
+    protected function getJoinAlias($fieldType, $index)
+    {
+        return sprintf('%sField%s', $fieldType, $index);
     }
 
     /**

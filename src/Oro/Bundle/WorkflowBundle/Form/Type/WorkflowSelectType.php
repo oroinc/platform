@@ -5,21 +5,25 @@ namespace Oro\Bundle\WorkflowBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class WorkflowSelectType extends AbstractType
 {
     /**
-     * @var WorkflowRegistry
+     * @var ManagerRegistry
      */
-    protected $workflowRegistry;
+    protected $registry;
 
-    public function __construct(WorkflowRegistry $workflowRegistry)
+    /**
+     * @param ManagerRegistry $registry
+     */
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->workflowRegistry = $workflowRegistry;
+        $this->registry = $registry;
     }
 
     /**
@@ -67,10 +71,13 @@ class WorkflowSelectType extends AbstractType
 
                     $choices = array();
                     if ($entityClass) {
-                        $workflows = $this->workflowRegistry->getWorkflowsByEntityClass($entityClass);
-                        foreach ($workflows as $workflow) {
-                            $name = $workflow->getName();
-                            $label = $workflow->getLabel();
+                        /** @var WorkflowDefinition[] $definitions */
+                        $definitions = $this->registry->getRepository('OroWorkflowBundle:WorkflowDefinition')
+                            ->findBy(array('relatedEntity' => $entityClass));
+
+                        foreach ($definitions as $definition) {
+                            $name = $definition->getName();
+                            $label = $definition->getLabel();
                             $choices[$name] = $label;
                         }
                     }

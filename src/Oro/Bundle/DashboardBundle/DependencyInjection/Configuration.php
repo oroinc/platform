@@ -7,8 +7,6 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const UNSPECIFIED_POSITION = 9999;
-
     /**
      * {@inheritDoc}
      *
@@ -50,6 +48,10 @@ class Configuration implements ConfigurationInterface
                                 ->info('The ACL ancestor')
                                 ->cannotBeEmpty()
                             ->end()
+                            ->scalarNode('applicable')
+                                ->info('Is widget applicable (expression for config resolver)')
+                                ->cannotBeEmpty()
+                            ->end()
                             ->arrayNode('items')
                                 ->info('A list of additional items for "itemized" widgets')
                                 ->useAttributeAsKey('name')
@@ -80,10 +82,14 @@ class Configuration implements ConfigurationInterface
                                             ->info('The ACL ancestor')
                                             ->cannotBeEmpty()
                                         ->end()
+                                        ->scalarNode('applicable')
+                                            ->info('Is item applicable (expression for config resolver)')
+                                            ->cannotBeEmpty()
+                                        ->end()
                                         ->integerNode('position')
                                             ->info('The position in which an item is rendered')
                                             ->cannotBeEmpty()
-                                            ->defaultValue(self::UNSPECIFIED_POSITION)
+                                            ->defaultValue(0)
                                         ->end()
                                     ->end()
                                 ->end()

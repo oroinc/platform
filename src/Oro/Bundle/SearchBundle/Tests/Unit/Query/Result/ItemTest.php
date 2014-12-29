@@ -11,7 +11,7 @@ class ItemTest extends \PHPUnit_Framework_TestCase
     protected $item;
     protected $product;
 
-    public function setUp()
+    protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
 

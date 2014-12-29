@@ -3,13 +3,10 @@
 namespace Oro\Bundle\DataAudit\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
-use Symfony\Component\DomCrawler\Form;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class ControllersTest extends WebTestCase
 {
@@ -28,22 +25,26 @@ class ControllersTest extends WebTestCase
         'company' => 'company',
         'gender' => 'Male'
     );
-    /**
-     * @var Client
-     */
-    protected $client;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(
+        $this->initClient(
             array(),
-            array_merge(ToolsAPI::generateBasicHeader(), array('HTTP_X-CSRF-Header' => 1))
+            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
+
+        $organization = $this->client->getContainer()
+            ->get('doctrine')
+            ->getRepository('OroOrganizationBundle:Organization')
+            ->findOneBy([], ['id' => 'asc']);
+        if ($organization) {
+            $this->userData['organizations'] = $organization->getName();
+        }
     }
 
     public function prepareFixture()
     {
-        $crawler = $this->client->request('GET', $this->client->generate('oro_user_create'));
+        $crawler = $this->client->request('GET', $this->getUrl('oro_user_create'));
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_user_user_form[enabled]'] = $this->userData['enabled'];
         $form['oro_user_user_form[username]'] = $this->userData['username'];
@@ -61,15 +62,15 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains("User saved", $crawler->html());
     }
 
     public function testIndex()
     {
-        $this->client->request('GET', $this->client->generate('oro_dataaudit_index'));
+        $this->client->request('GET', $this->getUrl('oro_dataaudit_index'));
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
     /**
@@ -79,8 +80,7 @@ class ControllersTest extends WebTestCase
     {
         $this->prepareFixture();
 
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'audit-grid',
             array(
                 'audit-grid[_filter][objectName][type]' => 1,
@@ -89,8 +89,7 @@ class ControllersTest extends WebTestCase
             )
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         return $result;
@@ -102,8 +101,7 @@ class ControllersTest extends WebTestCase
      */
     public function testAuditHistory($result)
     {
-        $result = ToolsAPI::getEntityGrid(
-            $this->client,
+        $response = $this->client->requestGrid(
             'audit-history-grid',
             array(
                 'audit-history-grid[object_class]' => str_replace('\\', '_', $result['objectClass']),
@@ -111,8 +109,7 @@ class ControllersTest extends WebTestCase
             )
         );
 
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $result = $this->getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $result['old'] = $this->clearResult($result['old']);
@@ -134,7 +131,6 @@ class ControllersTest extends WebTestCase
         }
 
         $this->assertEquals('John Doe  - admin@example.com', $result['author']);
-
     }
 
     protected function clearResult($result)
@@ -154,8 +150,7 @@ class ControllersTest extends WebTestCase
      */
     protected function getFormattedDate($date)
     {
-        $dateObject = new \DateTime($date);
-        $dateObject->setTimezone(new \DateTimeZone('UTC'));
+        $dateObject = new \DateTime($date, new \DateTimeZone('UTC'));
         return $dateObject->format('Y-m-d');
     }
 }

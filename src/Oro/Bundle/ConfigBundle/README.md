@@ -6,5 +6,4 @@ configuration trees.
 
 ## Usage ##
 - [Config management](./Resources/doc/config_management.md)
-- [Entity output config](./Resources/doc/entity_output_config.md)
 - [System configuration UIX](./Resources/doc/system_configuration.md)

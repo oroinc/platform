@@ -1,6 +1,6 @@
 {% block oro_entity_option_set_widget %}
-    <div class="email-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
-        <div class="input-append collection-element-primary">
+    <div class="float-holder{% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
+        <div class="input-append input-append-sortable collection-element-primary">
             {{ form_widget(form.label) }}
             <label class="add-on" title="{{ 'Default'|trans }}">
                 {{ form_widget(form.is_default) }}
@@ -14,7 +14,7 @@
     </div>
     {{ form_rest(form) }}
     <script type="text/javascript">
-        require(['jquery'],
+        require(['jquery', 'jquery-ui'],
         function($){
             $('#oro_entity_config_type_extend_set_options_collection').sortable({
                 cursor: 'move',
@@ -51,11 +51,11 @@
             </div>
             <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
         </div>
-        {{ _self.oro_item_collection_validate_default_js(_context) }}
+        {{ _self.oro_entity_option_set_collection_js(_context, 'oro_entity_config_type_extend_set_expanded') }}
     {% endspaceless %}
 {% endblock %}
 
-{% macro oro_item_collection_validate_default_js(context) %}
+{% macro oro_entity_option_set_collection_js(context, expandedId) %}
     {% set form = context.form %}
     {% set id = context.id %}
     {% set show_form_when_empty = context.show_form_when_empty %}
@@ -64,48 +64,48 @@
     {% if has_default or show_form_when_empty %}
         <script type="text/javascript">
             require(['jquery'],
-            function($){
-                $(function() {
-                    var container = $('#{{ context.id }}');
+                    function($){
+                        $(function() {
+                            var container = $('#{{ id }}');
 
-                    {% if has_default %}
-                    container.on('click', '[name$="[is_default]"]', function() {
-                        var is_expanded = $('form select#oro_entity_config_type_extend_set_expanded option:selected').attr('value');
-                        if (is_expanded == 0) {
-                            container.find('[name$="[is_default]"]').each(function (idx, el) {
-                                el.checked = false;
+                            {% if has_default %}
+                            container.on('click', '[name$="[is_default]"]', function() {
+                                var is_expanded = $('form select#{{ expandedId }} option:selected').attr('value');
+                                if (is_expanded == 0) {
+                                    container.find('[name$="[is_default]"]').each(function (idx, el) {
+                                        el.checked = false;
+                                    });
+                                    this.checked = true;
+                                }
                             });
-                            this.checked = true;
-                        }
+                            {% endif %}
+
+                            var change_defaults_type = function() {
+                                var el = $(this),
+                                        is_expanded = el.find('option:selected').attr('value');
+
+                                container.find('[name$="[is_default]"]').each(function (idx, el) {
+                                    el.type = (is_expanded == 1) ? 'checkbox' : 'radio';
+                                    el.checked = false;
+                                });
+                            };
+
+                            var set_default_type = function() {
+                                var is_expanded = $('form select#{{ expandedId }} option:selected').attr('value');
+                                container.find('[name$="[is_default]"]').each(function (idx, el) {
+                                    el.type = (is_expanded == 1) ? 'checkbox' : 'radio';
+                                });
+                                var index = 1;
+                                $('#{{ id }} input.priority').each(function(i, el){
+                                    $(el).val(index++);
+                                })
+                            };
+
+                            $(document).ready(set_default_type);
+                            $(document).on('change', 'form select#{{ expandedId }}', change_defaults_type);
+                            $(document).on('click', 'a.add-list-item', set_default_type);
+                        });
                     });
-                    {% endif %}
-
-                    var change_defaults_type = function() {
-                        var el = $(this),
-                            is_expanded = el.find('option:selected').attr('value');
-
-                        container.find('[name$="[is_default]"]').each(function (idx, el) {
-                            el.type = (is_expanded == 1) ? 'checkbox' : 'radio';
-                            el.checked = false;
-                        });
-                    };
-
-                    var set_default_type = function() {
-                        var is_expanded = $('form select#oro_entity_config_type_extend_set_expanded option:selected').attr('value');
-                        container.find('[name$="[is_default]"]').each(function (idx, el) {
-                            el.type = (is_expanded == 1) ? 'checkbox' : 'radio';
-                        });
-                        var index = 1;
-                        $('#oro_entity_config_type_extend_set_options_collection input.priority').each(function(i, el){
-                            $(el).val(index++);
-                        })
-                    };
-
-                    $(document).ready(set_default_type);
-                    $(document).on('change', 'form select#oro_entity_config_type_extend_set_expanded', change_defaults_type);
-                    $(document).on('click', 'a.add-list-item', set_default_type);
-                });
-            });
         </script>
     {% endif %}
 {% endmacro %}

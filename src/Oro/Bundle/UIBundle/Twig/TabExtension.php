@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 use Knp\Menu\MenuItem;
 
 use Oro\Bundle\NavigationBundle\Twig\MenuExtension;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class TabExtension extends \Twig_Extension
 {
@@ -30,11 +31,21 @@ class TabExtension extends \Twig_Extension
      */
     protected $securityFacade;
 
-    public function __construct(MenuExtension $menuExtension, RouterInterface $router, SecurityFacade $securityFacade)
-    {
-        $this->menuExtension = $menuExtension;
-        $this->router = $router;
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    public function __construct(
+        MenuExtension $menuExtension,
+        RouterInterface $router,
+        SecurityFacade $securityFacade,
+        TranslatorInterface $translator
+    ) {
+        $this->menuExtension  = $menuExtension;
+        $this->router         = $router;
         $this->securityFacade = $securityFacade;
+        $this->translator     = $translator;
     }
 
     /**
@@ -66,16 +77,18 @@ class TabExtension extends \Twig_Extension
      * @param \Twig_Environment $environment
      * @param string $menuName
      * @param array $options
+     *
      * @return string
      */
     public function menuTabPanel(\Twig_Environment $environment, $menuName, $options = [])
     {
-        return $environment->render(
-            self::TEMPLATE,
-            [
-                'tabs' => $this->getTabs($menuName, $options)
-            ]
-        );
+        $tabs = $this->getTabs($menuName, $options);
+
+        if (empty($tabs)) {
+            return '';
+        }
+
+        return $environment->render(self::TEMPLATE, ['tabs' => $tabs]);
     }
 
     /**
@@ -92,6 +105,10 @@ class TabExtension extends \Twig_Extension
 
         $tabs = [];
         foreach ($menu->getChildren() as $child) {
+            if (!$child->isDisplayed()) {
+                continue;
+            }
+
             if (!$url = $child->getUri()) {
                 if ($route = $child->getExtra('widgetRoute')) {
                     $routeParameters = array_merge(
@@ -117,13 +134,21 @@ class TabExtension extends \Twig_Extension
             }
 
             if ($this->securityFacade->isGranted($child->getExtra('widgetAcl'))) {
+                $label = $child->getLabel();
+                if (!empty($label)) {
+                    $label = $this->translator->trans($label);
+                }
                 $tabs[] = [
                     'alias'      => $child->getName(),
-                    'label'      => $child->getLabel(),
+                    'label'      => $label,
                     'widgetType' => $child->getExtra('widgetType', self::DEFAULT_WIDGET_TYPE),
                     'url'        => $url
                 ];
             }
+        }
+
+        if (empty($tabs)) {
+            $menu->setDisplay(false);
         }
 
         return $tabs;

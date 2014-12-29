@@ -3,10 +3,11 @@
 namespace Oro\Bundle\DataGridBundle\ImportExport;
 
 use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
+
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -19,11 +20,6 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
      * @var ServiceLink
      */
     protected $gridManagerLink;
-
-    /**
-     * @var RequestParameters
-     */
-    protected $requestParameters;
 
     /**
      * @var ContextInterface
@@ -61,15 +57,11 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
     protected $sourceData;
 
     /**
-     * @param ServiceLink       $gridManagerLink
-     * @param RequestParameters $requestParameters
+     * @param ServiceLink $gridManagerLink
      */
-    public function __construct(
-        ServiceLink $gridManagerLink,
-        RequestParameters $requestParameters
-    ) {
+    public function __construct(ServiceLink $gridManagerLink)
+    {
         $this->gridManagerLink   = $gridManagerLink;
-        $this->requestParameters = $requestParameters;
         $this->pageSize          = BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE;
     }
 
@@ -95,13 +87,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         if ($context->getReadCount() < $this->totalCount) {
             if ($this->offset === $this->pageSize && $this->page * $this->pageSize < $this->totalCount) {
                 $this->page++;
-                $this->requestParameters->set(
-                    OrmPagerExtension::PAGER_ROOT_PARAM,
-                    [
-                        OrmPagerExtension::PAGE_PARAM => $this->page
-                    ]
-                );
-                $gridData         = $this->grid->getData();
+                $gridData         = $this->getGridData();
                 $this->sourceData = $gridData->offsetGet('data');
                 $this->offset     = 0;
             }
@@ -125,7 +111,13 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         $this->context = $context;
 
         if ($context->hasOption('gridName')) {
-            $this->grid = $this->gridManagerLink->getService()->getDatagrid($context->getOption('gridName'));
+            $this->grid = $this->gridManagerLink
+                ->getService()
+                ->getDatagrid(
+                    $context->getOption('gridName'),
+                    $context->getOption('gridParameters')
+                );
+            $context->setValue('columns', $this->grid->getConfig()->offsetGet('columns'));
         } else {
             throw new InvalidConfigurationException(
                 'Configuration of datagrid export reader must contain "gridName".'
@@ -135,7 +127,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
 
     /**
      * @return ContextInterface
-     * @throws \LogicException If context is not set
+     * @throws LogicException If context is not set
      */
     protected function getContext()
     {
@@ -156,18 +148,27 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
                 throw new LogicException('Reader must be configured with a grid');
             }
 
-            $this->page = 1;
-            $this->requestParameters->set(
-                OrmPagerExtension::PAGER_ROOT_PARAM,
-                [
-                    OrmPagerExtension::PAGE_PARAM     => $this->page,
-                    OrmPagerExtension::PER_PAGE_PARAM => $this->pageSize
-                ]
-            );
-            $gridData         = $this->grid->getData();
-            $this->totalCount = $gridData->offsetGetByPath(OrmPagerExtension::TOTAL_PATH_PARAM);
+            $this->page       = 1;
+            $gridData         = $this->getGridData();
+            $this->totalCount = $gridData->offsetGetByPath(PagerInterface::TOTAL_PATH_PARAM);
             $this->sourceData = $gridData->offsetGet('data');
             $this->offset     = 0;
         }
+    }
+
+    /**
+     * @return ResultsObject
+     */
+    protected function getGridData()
+    {
+        $this->grid->getParameters()->set(
+            PagerInterface::PAGER_ROOT_PARAM,
+            [
+                PagerInterface::PAGE_PARAM     => $this->page,
+                PagerInterface::PER_PAGE_PARAM => $this->pageSize
+            ]
+        );
+
+        return $this->grid->getData();
     }
 }

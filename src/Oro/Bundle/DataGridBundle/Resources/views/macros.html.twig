@@ -8,19 +8,26 @@
 #}
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
     {% set datagrid = oro_datagrid_build(name, params) %}
-    {% set metaData = oro_datagrid_metadata(datagrid, params) %}
-    {% set data     = oro_datagrid_data(datagrid) %}
+    {% if datagrid %}
+        {% set metaData = oro_datagrid_metadata(datagrid, params) %}
+        {% if renderParams.routerEnabled is defined %}
+            {% set metadataOptions = metaData.options is defined ? metaData.options : {} %}
+            {% set metadataOptions = metadataOptions|merge({'routerEnabled': renderParams.routerEnabled}) %}
+            {% set metaData = metaData|merge({'options': metadataOptions}) %}
+        {% endif %}
+        {% set data     = oro_datagrid_data(datagrid) %}
+        {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
+        {% set options  = {
+            el: '#' ~ gridId,
+            gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
+            builders: metaData.requireJSModules,
+            metadata: metaData,
+            data: data
+        } %}
 
-    <div id="grid-{{ name }}" data-type="datagrid" data-data="{{ data|json_encode|raw|escape }}"
-         {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}
-         data-metadata="{{ metaData|json_encode|raw|escape }}"></div>
-    <script type="text/javascript">
-        require(['jquery', 'orodatagrid/js/datagrid-builder'].concat({{ metaData.requireJSModules|json_encode|raw }}),
-        function ($, datagridBuilder) {
-            var builders = _.toArray(arguments).slice(2);
-            $(function () {
-                datagridBuilder(builders, '#grid-{{ name }}');
-            });
-        });
-    </script>
+        <div id="{{ gridId }}"
+             data-page-component-module="orodatagrid/js/app/components/datagrid-component"
+             data-page-component-options="{{ options|json_encode }}"
+             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}></div>
+    {% endif %}
 {% endmacro %}

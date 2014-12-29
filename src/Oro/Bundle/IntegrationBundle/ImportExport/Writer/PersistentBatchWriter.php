@@ -2,28 +2,123 @@
 
 namespace Oro\Bundle\IntegrationBundle\ImportExport\Writer;
 
+use Psr\Log\LoggerInterface;
+
+use Symfony\Bridge\Doctrine\RegistryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Doctrine\ORM\EntityManager;
+
+use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\IntegrationBundle\Event\WriterErrorEvent;
+use Oro\Bundle\IntegrationBundle\Event\WriterAfterFlushEvent;
 use Oro\Bundle\ImportExportBundle\Writer\EntityWriter;
 
-class PersistentBatchWriter extends EntityWriter
+use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
+use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
+use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+
+class PersistentBatchWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
+    /** @var RegistryInterface */
+    protected $registry;
+
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
+    /** @var StepExecution */
+    protected $stepExecution;
+
+    /** @var ContextRegistry */
+    protected $contextRegistry;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
+    /**
+     * @param RegistryInterface        $registry
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param ContextRegistry          $contextRegistry
+     * @param LoggerInterface          $logger
+     */
+    public function __construct(
+        RegistryInterface $registry,
+        EventDispatcherInterface $eventDispatcher,
+        ContextRegistry $contextRegistry,
+        LoggerInterface $logger
+    ) {
+        $this->registry        = $registry;
+        $this->eventDispatcher = $eventDispatcher;
+        $this->contextRegistry = $contextRegistry;
+        $this->logger          = $logger;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function write(array $items)
     {
-        try {
-            $this->entityManager->beginTransaction();
-            foreach ($items as $item) {
-                $this->entityManager->persist($item);
-                $this->detachFixer->fixEntityAssociationFields($item, 1);
-            }
-            $this->entityManager->commit();
-        } catch (\Exception $exception) {
-            $this->entityManager->rollback();
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
 
-            throw $exception;
+        try {
+            $em->beginTransaction();
+
+            foreach ($items as $item) {
+                $em->persist($item);
+            }
+
+            $em->flush();
+            $em->commit();
+
+            $configuration = $this->contextRegistry
+                ->getByStepExecution($this->stepExecution)
+                ->getConfiguration();
+
+            if (empty($configuration[EntityWriter::SKIP_CLEAR])) {
+                $em->clear();
+            }
+        } catch (\Exception $exception) {
+            $em->rollback();
+            if (!$em->isOpen()) {
+                $this->registry->resetManager();
+            }
+
+            $jobName = $this->stepExecution->getJobExecution()->getJobInstance()->getAlias();
+
+            $event = new WriterErrorEvent($items, $jobName, $exception);
+            $this->eventDispatcher->dispatch(WriterErrorEvent::NAME, $event);
+
+            if ($event->getCouldBeSkipped()) {
+                $importContext = $this->contextRegistry->getByStepExecution($this->stepExecution);
+                $importContext->setValue(
+                    'error_entries_count',
+                    (int)$importContext->getValue('error_entries_count') + count($items)
+                );
+
+                $this->logger->warning($event->getWarning());
+
+                if ($event->getException() === $exception) {
+                    // exception are already handled and job can move forward
+                    throw new InvalidItemException($event->getWarning(), []);
+                } else {
+                    // exception are already created and ready to be rethrown
+                    throw $event->getException();
+                }
+            } else {
+                throw $exception;
+            }
         }
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+
+        $this->eventDispatcher->dispatch(WriterAfterFlushEvent::NAME, new WriterAfterFlushEvent($em));
+    }
+
+    /**
+     * @param StepExecution $stepExecution
+     */
+    public function setStepExecution(StepExecution $stepExecution)
+    {
+        $this->stepExecution = $stepExecution;
     }
 }

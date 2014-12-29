@@ -1,9 +1,10 @@
 placeholders:
     change_history_block:
-        label: Change history block
         items:
             change_history_link: ~
 
 items:
     change_history_link:
         template: OroDataAuditBundle::change_history_link.html.twig
+        applicable: @oro_dataaudit.placeholder.filter->isEntityAuditable($entity$, $entity_class$, $audit_show_change_history$)
+        acl: oro_dataaudit_history

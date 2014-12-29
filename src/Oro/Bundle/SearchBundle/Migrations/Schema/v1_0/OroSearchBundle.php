@@ -116,13 +116,10 @@ class OroSearchBundle implements Migration, ContainerAwareInterface
 
         // @codingStandardsIgnoreEnd
 
-        // add search fulltext index query
-        $connection = $this->container->get('doctrine')->getConnection();
-        $config = $connection->getParams();
-        $configClasses = $this->container->getParameter('oro_search.engine_orm');
-        if (isset($configClasses[$config['driver']])) {
-            $className = $configClasses[$config['driver']];
-            $queries->addQuery($className::getPlainSql());
+        // add search fulltext index query (only for ORM search engine)
+        if ($this->container->has('oro_search.fulltext_index_manager')) {
+            $query = $this->container->get('oro_search.fulltext_index_manager')->getQuery();
+            $queries->addQuery($query);
         }
     }
 }

@@ -1,0 +1,7 @@
+<a href="{{ record.getValue('url') }}">
+    {% if record.getValue('title') %}
+        {{ record.getValue('title') }}
+    {% else %}
+        {{ value }}
+    {% endif %}
+</a>

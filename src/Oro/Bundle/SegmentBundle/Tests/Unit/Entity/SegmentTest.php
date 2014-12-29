@@ -8,12 +8,12 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
     /** @var Segment */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new Segment();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entity);
     }
@@ -30,6 +30,7 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->entity->getCreatedAt());
         $this->assertNull($this->entity->getUpdatedAt());
         $this->assertNull($this->entity->getLastRun());
+        $this->assertNull($this->entity->getOrganization());
 
         $testData = uniqid('name');
         $this->entity->setName($testData);
@@ -66,6 +67,10 @@ class SegmentTest extends \PHPUnit_Framework_TestCase
         $testData = new \DateTime();
         $this->entity->setLastRun($testData);
         $this->assertSame($testData, $this->entity->getLastRun());
+
+        $testData = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->entity->setOrganization($testData);
+        $this->assertSame($testData, $this->entity->getOrganization());
     }
 
     public function testLifecycleCallbacks()

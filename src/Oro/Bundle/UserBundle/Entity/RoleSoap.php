@@ -26,10 +26,6 @@ class RoleSoap extends Role implements SoapEntityInterface
      */
     protected $label;
 
-    /**
-     * @Soap\ComplexType("int", nillable=true)
-     */
-    protected $owner;
 
     /**
      * @param Role $role
@@ -39,6 +35,5 @@ class RoleSoap extends Role implements SoapEntityInterface
         $this->id = $role->id;
         $this->role = $role->role;
         $this->label = $role->label;
-        $this->owner = $role->owner ? $role->owner->getId() : null;
     }
 }

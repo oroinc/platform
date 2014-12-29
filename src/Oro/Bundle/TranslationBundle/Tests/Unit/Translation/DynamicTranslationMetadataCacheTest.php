@@ -12,7 +12,7 @@ class DynamicTranslationMetadataCacheTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $cacheImpl;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->cacheImpl = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
             ->setMethods(['fetch', 'save'])

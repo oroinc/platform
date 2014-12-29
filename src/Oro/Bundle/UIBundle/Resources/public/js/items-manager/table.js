@@ -1,6 +1,6 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
+define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function ($, _, mediator) {
     'use strict';
 
     /**
@@ -16,7 +16,8 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
      */
     $.widget('oroui.itemsManagerTable', {
         options: {
-            itemTemplate: null
+            itemTemplate: null,
+            sorting: true
         },
 
         _create: function () {
@@ -49,7 +50,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             this._initSorting();
             this._onResetCollection();
 
-            this.element.on('click', '[data-collection-action]',  _.bind(this._onAction, this));
+            this._on({
+                'click [data-collection-action]': '_onAction'
+            });
         },
 
         reset: function () {
@@ -57,14 +60,19 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
         },
 
         _initSorting: function () {
+            if (!this.options.sorting) {
+                return;
+            }
+
             this.element.sortable({
                 cursor: 'move',
-                delay : 100,
+                delay : 25,
                 opacity: 0.7,
                 revert: 10,
                 axis: 'y',
-                containment: this.element.closest('.grid'),
+                containment: this.element.closest('.grid tbody'),
                 items: 'tr',
+                tolerance: 'pointer',
                 helper: function (e, ui) {
                     ui.children().each(function () {
                         $(this).width($(this).width());
@@ -108,19 +116,49 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
 
         _onModelAdded: function (model) {
             this.element.append(this._renderModel(model));
+            if (this.options.sorting) {
+                this.element.sortable('refresh');
+            }
+
+            mediator.trigger(
+                'items-manager:table:add:' + this._getIdentifier(),
+                this.options.collection,
+                model,
+                this.element
+            );
         },
 
         _onModelChanged: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').replaceWith(this._renderModel(model));
+
+            mediator.trigger(
+                'items-manager:table:change:' + this._getIdentifier(),
+                this.options.collection,
+                model,
+                this.element
+            );
         },
 
         _onModelDeleted: function (model) {
             this.element.find('[data-cid="' + model.cid + '"]').remove();
+
+            mediator.trigger(
+                'items-manager:table:remove:' + this._getIdentifier(),
+                this.options.collection,
+                model,
+                this.element
+            );
         },
 
         _onResetCollection: function () {
             this.element.empty();
             this.options.collection.each(this._onModelAdded, this);
+
+            mediator.trigger(
+                'items-manager:table:reset:' + this._getIdentifier(),
+                this.options.collection,
+                this.element
+            );
         },
 
         _renderModel: function (model) {
@@ -150,6 +188,11 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             } else {
                 model.trigger('action:' + action, model, data);
             }
+        },
+
+        _getIdentifier: function()
+        {
+            return _.first(_.first(this.element).className.split(' '));
         }
     });
 

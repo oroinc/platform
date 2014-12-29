@@ -32,7 +32,9 @@ class TagController extends Controller
      */
     public function indexAction()
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_tag.tag.entity.class')
+        );
     }
 
     /**
@@ -77,11 +79,21 @@ class TagController extends Controller
 
         /** @var \Oro\Bundle\TagBundle\Provider\SearchProvider $provider */
         $provider = $this->get('oro_tag.provider.search_provider');
+        $groupedResults = $provider->getGroupedResults($entity->getId());
+        $selectedResult = null;
+
+        foreach ($groupedResults as $alias => $type) {
+            if ($alias == $from) {
+                $selectedResult = $type;
+            }
+        }
+
 
         return array(
             'tag'            => $entity,
             'from'           => $from,
-            'groupedResults' => $provider->getGroupedResults($entity->getId()),
+            'groupedResults' => $groupedResults,
+            'selectedResult' => $selectedResult
         );
     }
 

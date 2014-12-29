@@ -1,7 +1,14 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', './pagination', 'jquery.numeric'
-    ], function ($, _, Pagination) {
+define([
+    'jquery',
+    'underscore',
+    './pagination',
+    'jquery.numeric'
+], function ($, _, Pagination) {
     'use strict';
+
+    var PaginationInput;
 
     /**
      * Datagrid pagination with input field
@@ -10,7 +17,7 @@ define(['jquery', 'underscore', './pagination', 'jquery.numeric'
      * @class   orodatagrid.datagrid.PaginationInput
      * @extends orodatagrid.datagrid.Pagination
      */
-    return Pagination.extend({
+    PaginationInput = Pagination.extend({
         /** @property */
         template: '#template-datagrid-toolbar-pagination-input',
 
@@ -74,15 +81,17 @@ define(['jquery', 'underscore', './pagination', 'jquery.numeric'
                 type: 'input'
             });
 
-            return Pagination.prototype.makeHandles.call(this, handles);
+            return PaginationInput.__super__.makeHandles.call(this, handles);
         },
         /**
          * Render pagination view and add validation for input with positive integer value
          */
         render: function () {
-            Pagination.prototype.render.apply(this, arguments);
+            PaginationInput.__super__.render.apply(this, arguments);
             this.$('input').numeric({ decimal: false, negative: false });
             return this;
         }
     });
+
+    return PaginationInput;
 });

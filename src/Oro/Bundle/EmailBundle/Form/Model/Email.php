@@ -2,31 +2,35 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Model;
 
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+
 class Email
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $gridName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
+    protected $entityClass;
+
+    /** @var mixed */
+    protected $entityId;
+
+    /** @var string */
     protected $from;
 
-    /**
-     * @var string[]
-     */
+    /** @var string[] */
     protected $to;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $subject;
 
-    /**
-     * @var string
-     */
+    /** @var EmailTemplate */
+    protected $template;
+
+    /** @var string text or html */
+    protected $type;
+
+    /** @var string */
     protected $body;
 
     /**
@@ -51,6 +55,7 @@ class Email
      * Set id of emails datagrid
      *
      * @param string $gridName
+     *
      * @return $this
      */
     public function setGridName($gridName)
@@ -58,6 +63,64 @@ class Email
         $this->gridName = $gridName;
 
         return $this;
+    }
+
+    /**
+     * Get class name of the target entity
+     *
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    /**
+     * Set class name of the target entity
+     *
+     * @param string $entityClass
+     *
+     * @return $this
+     */
+    public function setEntityClass($entityClass)
+    {
+        $this->entityClass = $entityClass;
+
+        return $this;
+    }
+
+    /**
+     * Get id of the target entity
+     *
+     * @return string
+     */
+    public function getEntityId()
+    {
+        return $this->entityId;
+    }
+
+    /**
+     * Set id of the target entity
+     *
+     * @param string $entityId
+     *
+     * @return $this
+     */
+    public function setEntityId($entityId)
+    {
+        $this->entityId = $entityId;
+
+        return $this;
+    }
+
+    /**
+     * Indicates whether entity class and entity id is set
+     *
+     * @return bool
+     */
+    public function hasEntity()
+    {
+        return !empty($this->entityClass) && !empty($this->entityId);
     }
 
     /**
@@ -74,6 +137,7 @@ class Email
      * Set FROM email address
      *
      * @param string $from
+     *
      * @return $this
      */
     public function setFrom($from)
@@ -97,6 +161,7 @@ class Email
      * Set TO email addresses
      *
      * @param string[] $to
+     *
      * @return $this
      */
     public function setTo(array $to)
@@ -120,6 +185,7 @@ class Email
      * Set email subject
      *
      * @param string $subject
+     *
      * @return $this
      */
     public function setSubject($subject)
@@ -127,6 +193,46 @@ class Email
         $this->subject = $subject;
 
         return $this;
+    }
+
+    /**
+     * @param EmailTemplate $template
+     *
+     * @return $this
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+
+        return $this;
+    }
+
+    /**
+     * @return EmailTemplate
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
@@ -143,6 +249,7 @@ class Email
      * Set email body
      *
      * @param string $body
+     *
      * @return $this
      */
     public function setBody($body)

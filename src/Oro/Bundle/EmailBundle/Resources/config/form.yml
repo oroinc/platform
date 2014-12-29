@@ -13,8 +13,7 @@ services:
     oro_email.form.subscriber.emailtemplate:
         class: %oro_email.form.subscriber.emailtemplate.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @form.factory
+            - @security.context
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
@@ -82,9 +81,11 @@ services:
             - @translator
             - @security.context
             - @oro_email.email.address.manager
+            - @oro_email.email.address.helper
             - @oro_email.mailer.processor
             - @logger
             - @oro_locale.formatter.name
+            - @oro_entity.routing_helper
 
     oro_email.form.email:
         class: Symfony\Component\Form\Form
@@ -94,6 +95,8 @@ services:
 
     oro_email.form.type.email:
         class: %oro_email.form.type.email.class%
+        arguments:
+            - @security.context
         tags:
             - { name: form.type, alias: oro_email_email }
 

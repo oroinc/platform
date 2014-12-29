@@ -1,7 +1,11 @@
-/*global define, require, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
-define(['jquery', 'text!./Fixture/field-condition/markup.html', 'oroquerydesigner/js/field-condition'],
-function ($, markup) {
+/*global define, describe, it, expect, beforeEach, afterEach, spyOn, jasmine*/
+define(function (require) {
     'use strict';
+
+    var $ = require('jquery'),
+        markup = require('text!./Fixture/field-condition/markup.html'),
+        data = JSON.parse(require('text!./Fixture/field-condition/entities.json'));
+    require('oroquerydesigner/js/field-condition');
 
     describe('oroquerydesigner/js/field-condition', function () {
         var $el = null;
@@ -10,6 +14,14 @@ function ($, markup) {
             $el = $('<div>');
             $el.append($(markup));
             $('body').append($el);
+            $.each(data, function () {
+                var entity = this;
+                entity.fieldsIndex = {};
+                $.each(entity.fields, function () {
+                    entity.fieldsIndex[this.name] = this;
+                    this.entity = entity;
+                });
+            });
         });
 
         afterEach(function () {
@@ -44,10 +56,19 @@ function ($, markup) {
         });
 
         it('renders empty filter', function (done) {
+            var $fieldsLoader = $('<input id="fields_loader"></input>');
+            $el.append($fieldsLoader);
+            $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
+            $fieldsLoader.data('fields', data);
+
             $el.data('value', {
                 "columnName":"name"
             });
-            $el.fieldCondition();
+            $el.fieldCondition({
+                "fieldChoice": {
+                    "fieldsLoaderSelector": "#fields_loader"
+                }
+            });
             waitForFilter(function (timeout) {
                 expect($el.find('.active-filter')).toContainHtml('<div></div>');
                 done();
@@ -58,18 +79,8 @@ function ($, markup) {
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
-            $fieldsLoader.data('fields', [
-                {
-                    "name": "name",
-                    "type": "string",
-                    "label": "Account name"
-                },
-                {
-                    "name": "createdAt",
-                    "type": "datetime",
-                    "label": "Created"
-                }
-            ]);
+            $fieldsLoader.data('fields', data);
+
             $el.data('value', {
                 "columnName":"name",
                 "criterion": {
@@ -81,9 +92,8 @@ function ($, markup) {
                 "fieldChoice": {
                     "select2": {
                         "placeholder": "Choose a field...",
-                        "formatSelectionTemplate": "<% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b><% if (index < list.length - 1) { %>&nbsp;><% } %><% }) %>"
+                        "formatSelectionTemplate": "<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>"
                     },
-                    "util": {},
                     "fieldsLoaderSelector": "#fields_loader"
                 },
                 "filters": []
@@ -98,18 +108,8 @@ function ($, markup) {
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
-            $fieldsLoader.data('fields', [
-                {
-                    "name": "name",
-                    "type": "string",
-                    "label": "Account name"
-                },
-                {
-                    "name": "createdAt",
-                    "type": "datetime",
-                    "label": "Created"
-                }
-            ]);
+            $fieldsLoader.data('fields', data);
+
             $el.data('value', {
                 "columnName": "name",
                 "criterion": {
@@ -124,9 +124,8 @@ function ($, markup) {
                 "fieldChoice": {
                     "select2": {
                         "placeholder": "Choose a field...",
-                        "formatSelectionTemplate": "<% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b><% if (index < list.length - 1) { %>&nbsp;><% } %><% }) %>"
+                        "formatSelectionTemplate": "<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>"
                     },
-                    "util": {},
                     "fieldsLoaderSelector": "#fields_loader"
                 },
                 "filters": [
@@ -200,18 +199,8 @@ function ($, markup) {
             var $fieldsLoader = $('<input id="fields_loader"></input>');
             $el.append($fieldsLoader);
             $fieldsLoader.val('OroCRM\\Bundle\\AccountBundle\\Entity\\Account');
-            $fieldsLoader.data('fields', [
-                {
-                    "name": "name",
-                    "type": "string",
-                    "label": "Account name"
-                },
-                {
-                    "name": "createdAt",
-                    "type": "datetime",
-                    "label": "Created"
-                }
-            ]);
+            $fieldsLoader.data('fields', data);
+
             $el.data('value', {
                 "columnName": "name",
                 "criterion": {
@@ -226,9 +215,8 @@ function ($, markup) {
                 "fieldChoice": {
                     "select2": {
                         "placeholder": "Choose a field...",
-                        "formatSelectionTemplate": "<% _.each(obj, function (column, index, list) { %>&#32;<%= column.entity.label %>&nbsp;<b><%= column.label %></b><% if (index < list.length - 1) { %>&nbsp;><% } %><% }) %>"
+                        "formatSelectionTemplate": "<% _.each(obj, function (item, index, list) { %><%= item.label %><% }) %>"
                     },
-                    "util": {},
                     "fieldsLoaderSelector": "#fields_loader"
                 },
                 "filters": [

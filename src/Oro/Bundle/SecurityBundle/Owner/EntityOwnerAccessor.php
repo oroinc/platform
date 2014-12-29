@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+
+use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 
@@ -13,11 +15,6 @@ use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 class EntityOwnerAccessor
 {
     /**
-     * @var EntityClassAccessor
-     */
-    protected $entityClassAccessor;
-
-    /**
      * @var OwnershipMetadataProvider
      */
     protected $metadataProvider;
@@ -25,14 +22,10 @@ class EntityOwnerAccessor
     /**
      * Constructor
      *
-     * @param EntityClassAccessor $entityClassAccessor
      * @param OwnershipMetadataProvider $metadataProvider
      */
-    public function __construct(
-        EntityClassAccessor $entityClassAccessor,
-        OwnershipMetadataProvider $metadataProvider
-    ) {
-        $this->entityClassAccessor = $entityClassAccessor;
+    public function __construct(OwnershipMetadataProvider $metadataProvider)
+    {
         $this->metadataProvider = $metadataProvider;
     }
 
@@ -50,7 +43,7 @@ class EntityOwnerAccessor
         }
 
         $result = null;
-        $metadata = $this->metadataProvider->getMetadata($this->entityClassAccessor->getClass($object));
+        $metadata = $this->metadataProvider->getMetadata(ClassUtils::getClass($object));
         if ($metadata->hasOwner()) {
             // at first try to use getOwner method to get the owner
             if (method_exists($object, 'getOwner')) {
@@ -75,6 +68,29 @@ class EntityOwnerAccessor
                     );
                 }
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets organization of the given entity
+     *
+     * @param $object
+     * @return object|null
+     * @throws InvalidEntityException
+     */
+    public function getOrganization($object)
+    {
+        if (!is_object($object)) {
+            throw new InvalidEntityException('$object must be an object.');
+        }
+
+        $result = null;
+        $metadata = $this->metadataProvider->getMetadata(ClassUtils::getClass($object));
+        if ($metadata->getOrganizationFieldName()) {
+            $accessor = PropertyAccess::createPropertyAccessor();
+            $result = $accessor->getValue($object, $metadata->getOrganizationFieldName());
         }
 
         return $result;

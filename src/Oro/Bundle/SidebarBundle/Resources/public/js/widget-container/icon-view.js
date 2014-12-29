@@ -3,8 +3,7 @@
 define(function (require) {
     'use strict';
 
-    var $ = require('jquery'),
-        _ = require('underscore'),
+    var _ = require('underscore'),
         Backbone = require('backbone'),
 
         iconTemplate = require('text!./templates/icon-template.html'),
@@ -15,7 +14,7 @@ define(function (require) {
      * @class   orosidebar.widgetContainer.IconView
      * @extends Backbone.View
      */
-    var IconView = Backbone.View.extend({
+    return Backbone.View.extend({
         className: 'sidebar-icon',
 
         events: {
@@ -57,6 +56,4 @@ define(function (require) {
             Backbone.trigger('showWidgetHover', this.model.cid, cord);
         }
     });
-
-    return IconView;
 });

@@ -82,6 +82,7 @@ services:
     # Email notification API
     oro_notification.email_notification.manager.api:
         class: %oro_notification.email_notification.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_notification.emailnotification.entity.class%
             - @doctrine.orm.entity_manager

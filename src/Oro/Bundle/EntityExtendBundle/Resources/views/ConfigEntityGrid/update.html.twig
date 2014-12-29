@@ -1,11 +1,11 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% form_theme form with 'OroFormBundle:Form:fields.html.twig' %}
-{% oro_title_set({params : {"%entityName%": (entity_config.get('label')|trans)|default('N/A') }}) %}
+{% oro_title_set({params : {"%entityName%": entity_config.get('label')|default('N/A')|trans }}) %}
 
 {% set formAction = path('oro_entityextend_entity_update') %}
 
 {% set audit_entity_class = entity.classname|replace('\\', '_') %}
-{% set audit_title = entity_config.get('label')|default('N/A') %}
+{% set audit_title = entity_config.get('label')|default('N/A')|trans %}
 {% set audit_path = 'oro_entityconfig_audit' %}
 
 {% block navButtons %}
@@ -19,8 +19,8 @@
     {% set breadcrumbs = {
         'entity':      'entity',
         'indexPath':   path('oro_entityconfig_index'),
-        'indexLabel': 'Entities',
-        'entityTitle': (entity_config.get('label')|trans)|default('N/A'),
+        'indexLabel': 'oro.entity_extend.config_grid.entities'|trans,
+        'entityTitle': entity_config.get('label')|default('N/A')|trans,
     } %}
 
     {{ parent() }}

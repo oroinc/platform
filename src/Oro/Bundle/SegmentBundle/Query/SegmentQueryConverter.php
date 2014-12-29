@@ -3,9 +3,10 @@
 namespace Oro\Bundle\SegmentBundle\Query;
 
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
@@ -30,17 +31,19 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * Constructor
      *
-     * @param FunctionProviderInterface $functionProvider
-     * @param ManagerRegistry           $doctrine
-     * @param RestrictionBuilder        $restrictionBuilder
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
+     * @param RestrictionBuilder            $restrictionBuilder
      */
     public function __construct(
         FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
         ManagerRegistry $doctrine,
         RestrictionBuilder $restrictionBuilder
     ) {
         $this->restrictionBuilder = $restrictionBuilder;
-        parent::__construct($functionProvider, $doctrine);
+        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
     }
 
     /**
@@ -59,17 +62,11 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     }
 
     /**
-     * Generates and saves aliases for the given joins
-     *
-     * @param string[] $joinIds
+     * {@inheritdoc}
      */
-    protected function addTableAliasesForJoinIdentifiers(array $joinIds)
+    protected function generateTableAlias()
     {
-        foreach ($joinIds as $joinId) {
-            if (!isset($this->tableAliases[$joinId])) {
-                $this->tableAliases[$joinId] = sprintf(static::TABLE_ALIAS_TEMPLATE, mt_rand());
-            }
-        }
+        return sprintf(static::TABLE_ALIAS_TEMPLATE, mt_rand());
     }
 
     /**
@@ -79,25 +76,30 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
         $entityClassName,
         $tableAlias,
         $fieldName,
+        $columnExpr,
         $columnAlias,
         $columnLabel,
         $functionExpr,
-        $functionReturnType
+        $functionReturnType,
+        $isDistinct = false
     ) {
-        $columnName = sprintf('%s.%s', $tableAlias, $fieldName);
+        if ($isDistinct) {
+            $columnExpr = 'DISTINCT ' . $columnExpr;
+        }
+
         if ($functionExpr !== null) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,
                 $tableAlias,
                 $fieldName,
-                $columnName,
+                $columnExpr,
                 $columnAlias
             );
         }
 
         // @TODO find solution for aliases before generalizing this converter
         // column aliases are not used here, because of parser error
-        $select = $functionExpr !== null ? $functionExpr : $columnName;
+        $select = $functionExpr !== null ? $functionExpr : $columnExpr;
         $this->qb->addSelect($select);
     }
 
@@ -112,12 +114,12 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    protected function addJoinStatement($joinType, $join, $joinAlias, $joinConditionType, $joinCondition)
     {
-        if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
-            $this->qb->innerJoin(sprintf('%s.%s', $joinTableAlias, $joinFieldName), $joinAlias);
+        if ('left' === $joinType) {
+            $this->qb->leftJoin($join, $joinAlias, $joinConditionType, $joinCondition);
         } else {
-            $this->qb->leftJoin(sprintf('%s.%s', $joinTableAlias, $joinFieldName), $joinAlias);
+            $this->qb->innerJoin($join, $joinAlias, $joinConditionType, $joinCondition);
         }
     }
 
@@ -138,7 +140,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addGroupByColumn($tableAlias, $fieldName)
+    protected function addGroupByColumn($columnAlias)
     {
         // do nothing, grouping is not allowed
     }

@@ -17,7 +17,8 @@ function(_, Backbone, StepRowView) {
             workflow: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-list-template').html();
             this.template = _.template(template);
             this.rowViews = [];

@@ -71,8 +71,8 @@ class FieldGenerator
             $this->addRelationField(
                 $entityClass,
                 self::PROPERTY_WORKFLOW_ITEM,
-                ConfigHelper::getTranslationKey('label', $workflowItemClass, 'related_entity'),
-                ConfigHelper::getTranslationKey('description', $workflowItemClass, 'related_entity'),
+                ConfigHelper::getTranslationKey('entity', 'label', $workflowItemClass, 'related_entity'),
+                ConfigHelper::getTranslationKey('entity', 'description', $workflowItemClass, 'related_entity'),
                 $workflowItemClass,
                 'id'
             );
@@ -82,15 +82,15 @@ class FieldGenerator
             $this->addRelationField(
                 $entityClass,
                 self::PROPERTY_WORKFLOW_STEP,
-                ConfigHelper::getTranslationKey('label', $workflowStepClass, 'related_entity'),
-                ConfigHelper::getTranslationKey('description', $workflowStepClass, 'related_entity'),
+                ConfigHelper::getTranslationKey('entity', 'label', $workflowStepClass, 'related_entity'),
+                ConfigHelper::getTranslationKey('entity', 'description', $workflowStepClass, 'related_entity'),
                 $workflowStepClass,
                 'label'
             );
         }
 
         // update entity config
-        $entityConfig->set('state', ExtendScope::STATE_UPDATED);
+        $entityConfig->set('state', ExtendScope::STATE_UPDATE);
         $entityConfig->set('upgradeable', true);
         $this->configManager->persist($entityConfig);
         $this->configManager->flush();
@@ -135,7 +135,7 @@ class FieldGenerator
         $extendFieldConfig = $extendConfigProvider->getConfig($entityClass, $fieldName);
         $extendFieldConfig->set('owner', ExtendScope::OWNER_CUSTOM);
         $extendFieldConfig->set('state', ExtendScope::STATE_NEW);
-        $extendFieldConfig->set('extend', true);
+        $extendFieldConfig->set('is_extend', true);
         $extendFieldConfig->set('target_entity', $targetEntity);
         $extendFieldConfig->set('target_field', $targetField);
         $extendFieldConfig->set(
@@ -150,6 +150,10 @@ class FieldGenerator
         $viewConfigProvider = $this->configManager->getProvider('view');
         $viewFieldConfig = $viewConfigProvider->getConfig($entityClass, $fieldName);
         $viewFieldConfig->set('is_displayable', false);
+
+        $importExportConfigProvider = $this->configManager->getProvider('importexport');
+        $importExportFieldConfig = $importExportConfigProvider->getConfig($entityClass, $fieldName);
+        $importExportFieldConfig->set('excluded', true);
     }
 
     /**

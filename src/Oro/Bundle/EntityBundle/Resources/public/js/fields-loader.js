@@ -1,7 +1,13 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger', 'oroui/js/app', 'jquery-ui'
-    ], function ($, routing, __, messenger, app) {
+define([
+    'jquery',
+    'routing',
+    'orotranslation/js/translator',
+    'oroui/js/messenger',
+    'oroui/js/tools',
+    'jquery-ui'
+], function ($, routing, __, messenger, tools) {
     'use strict';
 
     /**
@@ -9,12 +15,8 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
      */
     $.widget('oroentity.fieldsLoader', {
         options: {
-            router: 'oro_api_get_entity_fields',
-            routingParams: {
-                'with-relations': 1,
-                'with-entity-details': 1,
-                'deep-level': 1
-            },
+            router: null,
+            routingParams: {},
             afterRevertCallback: null,
             // supports 'oroui/js/modal' confirmation dialog
             confirm: null,
@@ -29,11 +31,6 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
             });
         },
 
-        generateURL: function (entityName) {
-            var opts = $.extend({}, this.options.routingParams, {entityName: entityName.replace(/\\/g, "_")});
-            return routing.generate(this.options.router, opts);
-        },
-
         _onChange: function (e) {
             var oldVal, confirm = this.options.confirm;
             if (confirm && this.options.requireConfirm()) {
@@ -46,9 +43,8 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
         },
 
         loadFields: function () {
-            var entityName = this.element.val();
             $.ajax({
-                url: this.generateURL(entityName),
+                url: routing.generate(this.options.router, this.options.routingParams),
                 success: $.proxy(this._onLoaded, this),
                 error: this._onError,
                 beforeSend: $.proxy(this._trigger, this, 'start'),
@@ -56,18 +52,28 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
             });
         },
 
+        getEntityName: function () {
+            return this.element.val();
+        },
+
         setFieldsData: function (data) {
-            var fields = this._convertFields(data);
+            var fields = this._convertData(data);
             this.element.data('fields', fields);
             this._trigger('update', null, [fields]);
         },
 
+        getFieldsData: function () {
+            return this.element.data('fields');
+        },
+
         _confirm: function (confirm, newVal, oldVal) {
+            if (!oldVal) {
+                return;
+            }
             var $el = this.element,
                 load = $.proxy(this.loadFields, this),
                 revert = function () {
-                    $el.val(oldVal);
-                    $el.change();
+                    $el.val(oldVal).change();
                     if ($.isFunction(this.options.afterRevertCallback)) {
                         this.options.afterRevertCallback.call(this, $el);
                     }
@@ -88,7 +94,7 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
         _onError: function (jqXHR) {
             var err = jqXHR.responseJSON,
                 msg = __('Sorry, unexpected error was occurred');
-            if (app.debug) {
+            if (tools.debug) {
                 if (err.message) {
                     msg += ': ' + err.message;
                 } else if (err.errors && $.isArray(err.errors)) {
@@ -104,12 +110,23 @@ define(['jquery', 'routing', 'orotranslation/js/translator', 'oroui/js/messenger
          * Converts data in proper array of fields hierarchy
          *
          * @param {Array} data
-         * @param {Object?} parent
          * @returns {Array}
          * @private
          */
-        _convertFields: function (data, parent) {
-            // @todo data converter from 'entity-field-*-util' should be implemented here
+        _convertData: function (data) {
+            $.each(data, function () {
+                var entity = this;
+                entity.fieldsIndex = {};
+                $.each(entity.fields, function () {
+                    var field = this;
+                    if (field.relation_type && field.related_entity_name) {
+                        field.related_entity = data[field.related_entity_name];
+                        delete field.related_entity_name;
+                    }
+                    field.entity = entity;
+                    entity.fieldsIndex[field.name] = field;
+                });
+            });
             return data;
         }
     });

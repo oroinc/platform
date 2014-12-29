@@ -2,82 +2,65 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\StreamOutput;
+use Doctrine\DBAL\Connection;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class UpdateSchemaListenerTest extends WebTestCase
 {
-    /**
-     * @var Application
-     */
-    protected $application;
-
-    public function setUp()
+    protected function setUp()
     {
-        static::createClient();
-        $this->application = new Application(self::$kernel);
-        $this->application->setAutoExit(false);
+        $this->initClient();
+
+        if ($this->getContainer()->getParameter('oro_search.engine') != 'orm') {
+            $this->markTestSkipped('Should be tested only with ORM search engine');
+        }
     }
 
     /**
-     * @dataProvider commandOptionsProvider
+     * @dataProvider commandDataProvider
      */
-    public function testCommand($commandName, $options, $method, $expectedExitCode)
+    public function testCommand($commandName, array $params, $expectedContent, $postgreSQLContent)
     {
-        $command = new $commandName();
-        $this->application->add($command);
+        $result = $this->runCommand($commandName, $params);
 
-        $arguments = array_merge(
-            array(
-                'command' => $command->getName(),
-                '--env'   => self::$kernel->getEnvironment()
-            ),
-            $options
-        );
-
-        $input  = new ArrayInput($arguments);
-        $output = new StreamOutput(fopen('php://memory', 'w', false));
-
-        $exitCode = $this->application->run($input, $output);
-
-        $this->assertEquals($expectedExitCode, $exitCode);
-
-        rewind($output->getStream());
-        $this->$method(
-            'Schema update and create index completed',
-            stream_get_contents($output->getStream())
-        );
+        /** @var Connection $connection */
+        $connection = $this->getContainer()->get('doctrine')->getConnection();
+        if ($connection->getParams()['driver'] === 'pdo_pgsql') {
+            $expectedContent = $postgreSQLContent;
+        }
+        $this->assertContains($expectedContent, $result);
     }
 
-    public function commandOptionsProvider()
+    public function commandDataProvider()
     {
+        // when we use PostgreSQL, during doctrine:schema:update, doctrine does not delete search index.
+        $postgreSQLContent = 'Nothing to update - your database is already in sync with the current entity metadata.';
+
         return [
-            'otherCommand'             => [
-                'commandName'      => 'Doctrine\Bundle\DoctrineBundle\Command\Proxy\InfoDoctrineCommand',
-                'options'          => [],
-                'method'           => 'assertNotContains',
-                'expectedExitCode' => 0
+            'otherCommand' => [
+                'commandName'     => 'doctrine:mapping:info',
+                'params'          => [],
+                'expectedContent' => 'OK',
+                'postgreSQLContent' => 'OK'
             ],
-            'commandWithoutOption'     => [
-                'commandName'      => 'Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand',
-                'options'          => [],
-                'method'           => 'assertNotContains',
-                'expectedExitCode' => 0
+            'commandWithoutOption' => [
+                'commandName'     => 'doctrine:schema:update',
+                'params'          => [],
+                'expectedContent' => 'Please run the operation by passing one - or both - of the following options:',
+                'postgreSQLContent' => $postgreSQLContent
             ],
             'commandWithAnotherOption' => [
-                'commandName'      => 'Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand',
-                'options'          => ['--dump-sql' => true],
-                'method'           => 'assertNotContains',
-                'expectedExitCode' => 0
+                'commandName'     => 'doctrine:schema:update',
+                'params'          => ['--dump-sql' => true],
+                'expectedContent' => 'ALTER TABLE',
+                'postgreSQLContent' => $postgreSQLContent
             ],
-            'commandWithForceOption'   => [
-                'commandName'      => 'Doctrine\Bundle\DoctrineBundle\Command\Proxy\UpdateSchemaDoctrineCommand',
-                'options'          => ['--force' => true],
-                'method'           => 'assertContains',
-                'expectedExitCode' => 0
+            'commandWithForceOption' => [
+                'commandName'     => 'doctrine:schema:update',
+                'params'          => ['--force' => true],
+                'expectedContent' => "Schema update and create index completed.",
+                'postgreSQLContent' => $postgreSQLContent
             ]
         ];
     }

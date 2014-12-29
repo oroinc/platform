@@ -1,6 +1,11 @@
 /* global require */
-require(['jquery', 'underscore', 'routing', 'oroui/js/mediator'],
-function($, _, routing, mediator) {
+require([
+    'jquery',
+    'underscore',
+    'routing',
+    'oroui/js/mediator',
+    'orotranslation/js/translator'
+], function($, _, routing, mediator, __) {
   'use strict';
       $(function() {
           var _searchFlag = false,
@@ -12,32 +17,24 @@ function($, _, routing, mediator) {
               searchBarButton = searchBarContainer.find('#search-bar-button'),
               searchBarForm = $('#search-bar-from'),
               searchDropdown = searchBarContainer.find('#search-dropdown');
-          mediator.bind(
-              'hash_navigation_request:complete',
-              searchByTagClose,
-              this
-          );
 
-          mediator.bind('hash_navigation_request:form-start', function (form, settings) {
-              if ($(form).hasClass('search-form')) {
-                  var $searchString = $.trim($(form).find('.search').val());
-                  settings.form_validate = $searchString.length > 0;
-              }
-          }, this);
+          mediator.bind('page:beforeChange', function () {
+              searchBarContainer.removeClass('header-search-focused');
+              $('#oroplatform-header .search-form .search').val('');
+          });
+
+          mediator.bind('page:afterChange', searchByTagClose);
 
           $(document).on('click', '.search-view-more-link', function(evt) {
               $('#top-search-form').submit();
               return false;
           });
 
-
           $('.search-form').submit(function(){
               var $searchString = $.trim($(this).find('.search').val());
               if ($searchString.length === 0) {
                   return false;
               }
-              // clear value after search
-              //$(this).find('.search').val('').blur();
               searchByTagClose();
           });
 
@@ -65,34 +62,29 @@ function($, _, routing, mediator) {
                   searchDropdown.empty();
               } else {
                   $.ajax({
-                      url: routing.generate('oro_api_get_search', { _format: 'html' }),
+                      url: routing.generate('oro_search_suggestion'),
                       data: {
                           search: queryString,
                           from: searchBarForm.val(),
                           max_results: 5
                       },
                       success: function(data) {
+                          var noResults;
                           searchBarContainer.removeClass('header-search-focused');
                           searchDropdown.html(data);
 
                           var countAll = searchDropdown.find('ul').attr('data-count');
                           var count = searchDropdown.find('li').length;
 
-                          if (countAll > count) {
+                          if (count === 0) {
+                              noResults = __('oro.search.quick_search.noresults');
+                              searchDropdown.html('<li><span>' + noResults + '</span></li>');
+                          } else if (countAll > count) {
                               searchDropdown.append($('.search-more').html());
                           }
 
                           $('#recordsCount').val(count);
-
-                          if (count > 0) {
-                              searchBarContainer.addClass('header-search-focused');
-
-                              /**
-                               * Backbone event. Fired when search ajax request is complete
-                               * @event top_search_request:complete
-                               */
-                              mediator.trigger('top_search_request:complete');
-                          }
+                          searchBarContainer.addClass('header-search-focused');
                       }
                   });
               }
@@ -109,7 +101,8 @@ function($, _, routing, mediator) {
           }
 
           function updateSearchBar() {
-              searchBarFrame.css('margin-left', searchBarContainer.find('div.btn-group.btn-block').outerWidth());
+              searchBarFrame.css('margin-left', searchBarButton.outerWidth());
+              searchBarFrame.css('margin-right', searchBarFrame.find('.btn-search').outerWidth());
           }
 
           searchBarInput.keydown(function(event) {
@@ -209,6 +202,7 @@ function($, _, routing, mediator) {
 
           searchBarInput.focusin(function() {
               searchBarContainer.addClass('search-focus');
+              updateSearchBar();
           });
       });
 });

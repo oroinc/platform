@@ -1,16 +1,24 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', './text-filter'
-    ], function ($, _, __, app, TextFilter) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/tools',
+    './text-filter'
+], function ($, _, __, tools, TextFilter) {
     'use strict';
+
+    var ChoiceFilter;
 
     /**
      * Choice filter: filter type as option + filter value as string
      *
-     * @export  orofilter/js/filter/choice-filter
-     * @class   orofilter.filter.ChoiceFilter
-     * @extends orofilter.filter.TextFilter
+     * @export  oro/filter/choice-filter
+     * @class   oro.filter.ChoiceFilter
+     * @extends oro.filter.TextFilter
      */
-    return TextFilter.extend({
+    ChoiceFilter = TextFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -27,6 +35,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
             value: 'input[name="value"]',
             type: 'input[type="hidden"]'
         },
+
+        /**
+         * @property {boolean}
+         */
+        wrapHintValue: true,
 
         /**
          * Filter events
@@ -49,9 +62,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
          *
          * @param {Object} options
          */
-        initialize: function(options) {
-            options = _.pick(options || {}, 'choices');
-            _.extend(this, options);
+        initialize: function (options) {
+            var opts = _.pick(options || {}, 'choices');
+            _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
             if (_.isUndefined(this.choices)) {
@@ -59,7 +72,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
             }
             // temp code to keep backward compatible
             if ($.isPlainObject(this.choices)) {
-                this.choices = _.map(this.choices, function(option, i) {
+                this.choices = _.map(this.choices, function (option, i) {
                     return {value: i.toString(), label: option};
                 });
             }
@@ -72,19 +85,41 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
                 };
             }
 
-            TextFilter.prototype.initialize.apply(this, arguments);
+            ChoiceFilter.__super__.initialize.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.choices;
+            delete this.emptyValue;
+            ChoiceFilter.__super__.dispose.call(this);
+        },
+
         render: function () {
+            // render only wrapper (a button and a dropdown container e.g.)
+            this._wrap('');
+            // if there's no any wrapper, means it's embedded filter
+            if (this.$el.html() === '') {
+                this._renderCriteria();
+            }
+            return this;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _renderCriteria: function () {
             var value = _.extend({}, this.emptyValue, this.value);
             var selectedChoiceLabel = '';
             if (!_.isEmpty(this.choices)) {
-                var foundChoice = _.find(this.choices, function(choice) {
-                        return (choice.value == value.type);
-                    });
+                var foundChoice = _.find(this.choices, function (choice) {
+                    return (choice.value == value.type);
+                });
                 selectedChoiceLabel = foundChoice.label;
             }
             var $filter = $(this.template({
@@ -94,23 +129,40 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
                 selectedChoiceLabel: selectedChoiceLabel,
                 value: value.value
             }));
-            this._wrap($filter);
-            return this;
+            this._appendFilter($filter);
+            this._criteriaRenderd = true;
+        },
+
+        _showCriteria: function () {
+            if (!this._criteriaRenderd) {
+                this._renderCriteria();
+            }
+            ChoiceFilter.__super__._showCriteria.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
-        _getCriteriaHint: function() {
-            var option, hint,
-                value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            if (!value.value) {
-                hint = this.placeholder;
-            } else {
-                option = this._getChoiceOption(value.type);
-                hint = (option ? option.label + ' ' : '') + '"' + value.value + '"';
+        _getCriteriaHint: function () {
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var option = null;
+
+            if (!_.isUndefined(value.type)) {
+                var type = value.type;
+                option = this._getChoiceOption(type);
+
+                if (this.isEmptyType(type)) {
+                    return option ? option.label : this.placeholder;
+                }
             }
-            return hint;
+
+            if (!value.value) {
+                return this.placeholder;
+            }
+
+            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+
+            return (option ? option.label + ' ' : '') + hintValue;
         },
 
         /**
@@ -120,14 +172,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
          * @returns {{value: string, label: string}}
          * @private
          */
-        _getChoiceOption: function(valueType) {
+        _getChoiceOption: function (valueType) {
             return _.findWhere(this.choices, {value: valueType.toString()});
         },
 
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function(value) {
+        _writeDOMValue: function (value) {
             this._setInputValue(this.criteriaValueSelectors.value, value.value);
             this._setInputValue(this.criteriaValueSelectors.type, value.type);
             return this;
@@ -137,7 +189,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
+        _readDOMValue: function () {
             return {
                 value: this._getInputValue(this.criteriaValueSelectors.value),
                 type: this._getInputValue(this.criteriaValueSelectors.type)
@@ -147,8 +199,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
         /**
          * @inheritDoc
          */
-        _triggerUpdate: function(newValue, oldValue) {
-            if (!app.isEqualsLoosely(newValue, oldValue)) {
+        _triggerUpdate: function (newValue, oldValue) {
+            if (!tools.isEqualsLoosely(newValue, oldValue)) {
                 this.trigger('update');
             }
         },
@@ -156,10 +208,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
         /**
          * @inheritDoc
          */
-        _onValueUpdated: function(newValue, oldValue) {
+        _onValueUpdated: function (newValue, oldValue) {
             // synchronize choice selector with new value
-            var menu = this.$('.choicefilter .dropdown-menu');
-            menu.find('li a').each(function() {
+            var menu = this.$('.choice-filter .dropdown-menu');
+            menu.find('li a').each(function () {
                 var item = $(this);
                 if (item.data('value') == oldValue.type && item.parent().hasClass('active')) {
                     item.parent().removeClass('active');
@@ -169,26 +221,9 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app', 
                 }
             });
 
-            TextFilter.prototype._onValueUpdated.apply(this, arguments);
-        },
-
-        /**
-         * Open/close select dropdown
-         *
-         * @param {Event} e
-         * @protected
-         */
-        _onClickChoiceValue: function(e) {
-            $(e.currentTarget).parent().parent().find('li').each(function() {
-                $(this).removeClass('active');
-            });
-            $(e.currentTarget).parent().addClass('active');
-            var parentDiv = $(e.currentTarget).parent().parent().parent();
-            parentDiv.find('.name_input').val($(e.currentTarget).attr('data-value')).trigger('change');
-            var choiceName = $(e.currentTarget).html();
-            choiceName += '<span class="caret"></span>';
-            parentDiv.find('.dropdown-toggle').html(choiceName);
-            e.preventDefault();
+            ChoiceFilter.__super__._onValueUpdated.apply(this, arguments);
         }
     });
+
+    return ChoiceFilter;
 });

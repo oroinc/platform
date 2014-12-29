@@ -6,6 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
@@ -57,12 +58,12 @@ class EntityFieldChoiceType extends AbstractType
                 ? [] // return empty list if entity is not specified or skip_load_data = true
                 : $that->getChoices(
                     $options['entity'],
-                    $options['with_relations']
+                    $options['with_relations'],
+                    $options['with_virtual_fields']
                 );
         };
 
         $defaultConfigs = array(
-            'is_translated_option'    => true,
             'placeholder'             => 'oro.entity.form.choose_entity_field',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection.html.twig',
@@ -79,13 +80,15 @@ class EntityFieldChoiceType extends AbstractType
 
         $resolver->setDefaults(
             array(
-                'entity'             => null,
-                'with_relations'     => false,
-                'choices'            => $choices,
-                'empty_value'        => '',
-                'skip_load_entities' => false,
-                'skip_load_data'     => false,
-                'configs'            => $defaultConfigs
+                'entity'              => null,
+                'with_relations'      => false,
+                'with_virtual_fields' => false,
+                'choices'             => $choices,
+                'empty_value'         => '',
+                'skip_load_entities'  => false,
+                'skip_load_data'      => false,
+                'configs'             => $defaultConfigs,
+                'translatable_options' => false
             )
         );
         $resolver->setNormalizers(
@@ -134,18 +137,20 @@ class EntityFieldChoiceType extends AbstractType
     /**
      * Returns a list of choices
      *
-     * @param string $entityName    Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations Indicates whether association fields should be returned as well.
+     * @param string $entityName        Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations     Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields Indicates whether virtual fields should be returned as well.
      * @return array of entity fields
-     *                              key = field name, value = ChoiceListItem
+     *                                  key = field name, value = ChoiceListItem
      */
-    protected function getChoices($entityName, $withRelations)
+    protected function getChoices($entityName, $withRelations, $withVirtualFields)
     {
         $choiceFields    = [];
         $choiceRelations = [];
         $fields          = $this->entityFieldProvider->getFields(
             $entityName,
             $withRelations,
+            $withVirtualFields,
             true
         );
         foreach ($fields as $field) {
@@ -155,7 +160,7 @@ class EntityFieldChoiceType extends AbstractType
                     $attributes['data-' . $key] = $val;
                 }
             }
-            if (!isset($field['related_entity_name'])) {
+            if (!isset($field['relation_type'])) {
                 $choiceFields[$field['name']] = new ChoiceListItem($field['label'], $attributes);
             } else {
                 $choiceRelations[$field['name']] = new ChoiceListItem($field['label'], $attributes);
@@ -165,6 +170,7 @@ class EntityFieldChoiceType extends AbstractType
         if (empty($choiceRelations)) {
             return $choiceFields;
         }
+
         $choices = [];
         if (!empty($choiceFields)) {
             $choices[$this->translator->trans('oro.entity.form.entity_fields')] = $choiceFields;

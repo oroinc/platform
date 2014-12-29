@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 
@@ -20,6 +21,7 @@ use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -41,9 +43,7 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var AclHelper */
     protected $aclHelper;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $groupParts = [];
 
     public function __construct(
@@ -98,7 +98,9 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $onlyOnePage  = $result['options']['totalRecords'] == count($result['data']);
+        $onlyOnePage  = !isset($result['options'], $result['options']['totalRecords']) ||
+            $result['options']['totalRecords'] == count($result['data']);
+
         $totals       = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         $totalData = [];
         if (null != $totals && !empty($result['data'])) {
@@ -113,7 +115,8 @@ class OrmTotalsExtension extends AbstractExtension
                     $this->getData(
                         $result,
                         $rowConfig['columns'],
-                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY]
+                        $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY],
+                        $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
                     )
                 );
             }
@@ -130,6 +133,7 @@ class OrmTotalsExtension extends AbstractExtension
     {
         $totals = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         $metaData
+            ->offsetAddToArray('initialState', ['totals' => $totals])
             ->offsetAddToArray('state', ['totals' => $totals])
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orodatagrid/js/totals-builder']);
     }
@@ -264,9 +268,10 @@ class OrmTotalsExtension extends AbstractExtension
      * @param ResultsObject $pageData Grid page data
      * @param array $columnsConfig Total row columns config
      * @param bool $perPage Get data only for page data or for all data
+     * @param bool $skipAclWalkerCheck Check Acl with acl helper or not
      * @return array
      */
-    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false)
+    protected function getData(ResultsObject $pageData, $columnsConfig, $perPage = false, $skipAclWalkerCheck = false)
     {
         // todo: Need refactor this method. If query has not order by part and doesn't have id's in select, result
         //       can be unexpected
@@ -293,7 +298,11 @@ class OrmTotalsExtension extends AbstractExtension
 
         $this->addPageLimits($query, $pageData, $perPage);
 
-        $resultData = $this->aclHelper->apply($query)
+        if (!$skipAclWalkerCheck) {
+            $query = $this->aclHelper->apply($query);
+        }
+
+        $resultData = $query
             ->setFirstResult(null)
             ->setMaxResults(1)
             ->getScalarResult();
@@ -323,14 +332,16 @@ class OrmTotalsExtension extends AbstractExtension
             $data = $pageData['data'];
         }
         foreach ($rootIdentifiers as $identifier) {
-            $ids = [];
-            foreach ($data as $res) {
-                $ids[] = $res[$identifier['alias']];
-            }
+            $ids = ArrayUtils::arrayColumn($data, $identifier['alias']);
 
             $field = isset($identifier['entityAlias'])
                 ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
                 : $identifier['fieldAlias'];
+
+            $filteredIds = array_filter($ids);
+            if (empty($filteredIds)) {
+                continue;
+            }
 
             $dataQueryBuilder->andWhere($dataQueryBuilder->expr()->in($field, $ids));
         }
@@ -380,13 +391,13 @@ class OrmTotalsExtension extends AbstractExtension
      * @param array $rowConfig
      * @param string $gridName
      * @return array
-     * @throws \Exception
+     * @throws LogicException
      */
     protected function mergeTotals(&$totalRows, $rowName, $rowConfig, $gridName)
     {
         if (isset($rowConfig[Configuration::TOTALS_EXTEND_KEY]) && $rowConfig[Configuration::TOTALS_EXTEND_KEY]) {
             if (!isset($totalRows[$rowConfig[Configuration::TOTALS_EXTEND_KEY]])) {
-                throw new \Exception(sprintf(
+                throw new LogicException(sprintf(
                     'Total row "%s" definition in "%s" datagrid config does not exist',
                     $rowConfig[Configuration::TOTALS_EXTEND_KEY],
                     $gridName

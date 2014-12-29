@@ -18,7 +18,7 @@ class TranslationStatusExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var TranslationStatisticProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $sp;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
@@ -28,7 +28,7 @@ class TranslationStatusExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new TranslationStatusExtension($this->cm, $this->sp);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->extension, $this->sp, $this->cm);
     }

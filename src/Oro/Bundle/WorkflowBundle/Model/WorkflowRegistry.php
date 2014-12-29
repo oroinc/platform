@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
@@ -50,38 +50,45 @@ class WorkflowRegistry
     /**
      * Get Workflow by name
      *
-     * @param string $workflowName
-     * @return Workflow
+     * @param string $name
+     * @param bool $exceptionOnNotFound
+     * @return Workflow|null
      * @throws WorkflowNotFoundException
      */
-    public function getWorkflow($workflowName)
+    public function getWorkflow($name, $exceptionOnNotFound = true)
     {
-        if (!isset($this->workflowByName[$workflowName])) {
-            $workflowDefinition = $this->findWorkflowDefinition($workflowName);
-            if (!$workflowDefinition) {
-                throw new WorkflowNotFoundException($workflowName);
+        if (!isset($this->workflowByName[$name])) {
+            /** @var WorkflowDefinition $definition */
+            $definition = $this->getWorkflowDefinitionRepository()->find($name);
+            if (!$definition) {
+                if ($exceptionOnNotFound) {
+                    throw new WorkflowNotFoundException($name);
+                } else {
+                    return null;
+                }
             }
-            return $this->getAssembledWorkflow($workflowDefinition);
+
+            return $this->getAssembledWorkflow($definition);
         }
 
-        return $this->refreshWorkflowDefinitionEntity($this->workflowByName[$workflowName]);
+        return $this->refreshWorkflow($this->workflowByName[$name]);
     }
 
     /**
      * Get Workflow by WorkflowDefinition
      *
-     * @param WorkflowDefinition $workflowDefinition
+     * @param WorkflowDefinition $definition
      * @return Workflow
      */
-    protected function getAssembledWorkflow(WorkflowDefinition $workflowDefinition)
+    protected function getAssembledWorkflow(WorkflowDefinition $definition)
     {
-        $workflowName = $workflowDefinition->getName();
+        $workflowName = $definition->getName();
         if (!isset($this->workflowByName[$workflowName])) {
-            $workflow = $this->assembleWorkflow($workflowDefinition);
+            $workflow = $this->workflowAssembler->assemble($definition);
             $this->workflowByName[$workflowName] = $workflow;
         }
 
-        return $this->refreshWorkflowDefinitionEntity($this->workflowByName[$workflowName]);
+        return $this->refreshWorkflow($this->workflowByName[$workflowName]);
     }
 
     /**
@@ -97,11 +104,7 @@ class WorkflowRegistry
             $activeWorkflowName = $entityConfig->get('active_workflow');
 
             if ($activeWorkflowName) {
-                $workflows = $this->getWorkflowsByEntityClass($entityClass, $activeWorkflowName);
-
-                if (array_key_exists($activeWorkflowName, $workflows)) {
-                    return $workflows[$activeWorkflowName];
-                }
+                return $this->getWorkflow($activeWorkflowName, false);
             }
         }
 
@@ -120,49 +123,7 @@ class WorkflowRegistry
     }
 
     /**
-     * Get Workflows that is applicable to entity class
-     *
-     * @param string $entityClass
-     * @param string|null $workflowName
-     * @return Workflow[]
-     */
-    public function getWorkflowsByEntityClass($entityClass, $workflowName = null)
-    {
-        $result = array();
-        $workflowDefinitions = $this->getWorkflowDefinitionRepository()
-            ->findByEntityClass($entityClass, $workflowName);
-
-        foreach ($workflowDefinitions as $workflowDefinition) {
-            $result[$workflowDefinition->getName()] = $this->getAssembledWorkflow($workflowDefinition);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Find WorkflowDefinition
-     *
-     * @param string $name
-     * @return WorkflowDefinition|null
-     */
-    protected function findWorkflowDefinition($name)
-    {
-        return $this->getWorkflowDefinitionRepository()->find($name);
-    }
-
-    /**
-     * Assembles Workflow by WorkflowDefinition
-     *
-     * @param WorkflowDefinition $workflowDefinition
-     * @return Workflow
-     */
-    protected function assembleWorkflow(WorkflowDefinition $workflowDefinition)
-    {
-        return $this->workflowAssembler->assemble($workflowDefinition);
-    }
-
-    /**
-     * @return WorkflowDefinitionRepository
+     * @return EntityRepository
      */
     protected function getWorkflowDefinitionRepository()
     {
@@ -176,24 +137,33 @@ class WorkflowRegistry
      * @return Workflow
      * @throws WorkflowNotFoundException
      */
-    protected function refreshWorkflowDefinitionEntity(Workflow $workflow)
+    protected function refreshWorkflow(Workflow $workflow)
     {
-        $oldDefinition = $workflow->getDefinition();
+        $refreshedDefinition = $this->refreshWorkflowDefinition($workflow->getDefinition());
+        $workflow->setDefinition($refreshedDefinition);
 
+        return $workflow;
+    }
+
+    /**
+     * @param WorkflowDefinition $definition
+     * @return WorkflowDefinition
+     * @throws WorkflowNotFoundException
+     */
+    protected function refreshWorkflowDefinition(WorkflowDefinition $definition)
+    {
         /** @var EntityManager $entityManager */
         $entityManager = $this->managerRegistry->getManagerForClass('OroWorkflowBundle:WorkflowDefinition');
 
-        if (!$entityManager->getUnitOfWork()->isInIdentityMap($oldDefinition)) {
-            $definitionName = $oldDefinition->getName();
+        if (!$entityManager->getUnitOfWork()->isInIdentityMap($definition)) {
+            $definitionName = $definition->getName();
 
-            $newDefinition = $this->getWorkflowDefinitionRepository()->find($definitionName);
-            if (!$newDefinition) {
+            $definition = $this->getWorkflowDefinitionRepository()->find($definitionName);
+            if (!$definition) {
                 throw new WorkflowNotFoundException($definitionName);
             }
-
-            $workflow->setDefinition($newDefinition);
         }
 
-        return $workflow;
+        return $definition;
     }
 }

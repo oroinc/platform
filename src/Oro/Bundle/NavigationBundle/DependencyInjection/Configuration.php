@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\NavigationBundle\DependencyInjection;
 
-use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
-
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
+use Oro\Bundle\NavigationBundle\Config\Definition\Builder\MenuTreeBuilder;
 
 class Configuration implements ConfigurationInterface
 {
@@ -25,24 +25,12 @@ class Configuration implements ConfigurationInterface
 
         SettingsBuilder::append(
             $rootNode,
-            array(
-                'maxItems' => array(
-                    'value' => 20, // default value, can be overridden in config.yml
-                    'type'  => 'scalar',
-                ),
-                'title_suffix' => array(
-                    'value' => '', // default value, can be overridden in config.yml
-                    'type'  => 'scalar',
-                ),
-                'title_delimiter' => array(
-                    'value' => '-', // default value, can be overridden in config.yml
-                    'type'  => 'scalar',
-                ),
-                'breadcrumb_menu' => array(
-                    'value' => 'application_menu', // default value, can be overridden in config.yml
-                    'type'  => 'scalar',
-                ),
-            )
+            [
+                'maxItems'        => ['value' => 20],
+                'title_suffix'    => ['value' => ''],
+                'title_delimiter' => ['value' => '-'],
+                'breadcrumb_menu' => ['value' => 'application_menu'],
+            ]
         );
 
         return $treeBuilder;
@@ -53,11 +41,28 @@ class Configuration implements ConfigurationInterface
      *
      * @param $node NodeBuilder
      * @return Configuration
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function setChildren($node)
     {
         $node->
-        arrayNode('templates')
+            arrayNode('oro_navigation_elements')
+            ->useAttributeAsKey('id')
+            ->prototype('array')
+                ->children()
+                    ->booleanNode('default')->defaultFalse()->end()
+                    ->arrayNode('routes')
+                        ->useAttributeAsKey('routes')
+                            ->prototype('boolean')
+                                ->treatNullLike(false)
+                                ->defaultFalse()
+                            ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ->end()
+        ->arrayNode('templates')
             ->useAttributeAsKey('templates')
             ->prototype('array')
                 ->children()

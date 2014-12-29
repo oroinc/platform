@@ -1,0 +1,41 @@
+Oro\Bundle\TrackingBundle\Entity\TrackingWebsite:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: identifier
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                max: 255
+        identifier:
+            - NotBlank: ~
+            - Length:
+                max: 255
+        url:
+            - NotBlank: ~
+            - Url: ~
+            - Length:
+                max: 255
+        organization:
+            - NotBlank: ~
+
+Oro\Bundle\TrackingBundle\Entity\TrackingEvent:
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                max: 255
+        userIdentifier:
+            - NotBlank: ~
+            - Length:
+                max: 255
+        url:
+            - NotBlank: ~
+        loggedAt:
+            - NotBlank: ~
+
+Oro\Bundle\TrackingBundle\Entity\TrackingData:
+    properties:
+        data:
+            - NotBlank: ~
+        event:
+            - Valid: ~

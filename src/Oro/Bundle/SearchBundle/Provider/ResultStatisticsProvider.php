@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\SearchBundle\Provider;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ResultStatisticsProvider
 {
@@ -13,11 +16,25 @@ class ResultStatisticsProvider
     protected $indexer;
 
     /**
-     * @param Indexer $indexer
+     * @var ConfigManager
      */
-    public function __construct(Indexer $indexer)
+    protected $configManager;
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
+     * @param Indexer       $indexer
+     * @param ConfigManager $configManager
+     * @param Translator $translator
+     */
+    public function __construct(Indexer $indexer, ConfigManager $configManager, Translator $translator)
     {
         $this->indexer = $indexer;
+        $this->configManager = $configManager;
+        $this->translator = $translator;
     }
 
     /**
@@ -45,7 +62,9 @@ class ResultStatisticsProvider
             '' => array(
                 'count'  => 0,
                 'class'  => '',
-                'config' => array()
+                'config' => array(),
+                'icon'   => '',
+                'label'  => ''
             )
         );
 
@@ -55,16 +74,43 @@ class ResultStatisticsProvider
             $alias  = $config['alias'];
 
             if (!isset($result[$alias])) {
-                $result[$alias] = array(
+
+                $group = array(
                     'count'  => 0,
                     'class'  => $item->getEntityName(),
                     'config' => $config,
+                    'icon'   => '',
+                    'label'  => ''
                 );
+
+                if (!empty($group['class']) && $this->configManager->hasConfig($group['class'])) {
+                    $entityConfigId = new EntityConfigId('entity', $group['class']);
+                    $entityConfig = $this->configManager->getConfig($entityConfigId);
+                    if ($entityConfig->has('plural_label')) {
+                        $group['label'] = $this->translator->trans($entityConfig->get('plural_label'));
+                    }
+                    if ($entityConfig->has('icon')) {
+                        $group['icon'] = $entityConfig->get('icon');
+                    }
+                }
+
+                $result[$alias] = $group;
             }
 
             $result[$alias]['count']++;
             $result['']['count']++;
         }
+
+        uasort(
+            $result,
+            function ($first, $second) {
+                if ($first['label'] == $second['label']) {
+                    return 0;
+                }
+
+                return $first['label'] > $second['label'] ? 1 : -1;
+            }
+        );
 
         return $result;
     }

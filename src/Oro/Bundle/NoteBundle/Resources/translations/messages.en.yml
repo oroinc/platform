@@ -1,0 +1,25 @@
+oro:
+    note:
+        enabled:              Enable notes
+
+        entity_label:         Note
+        entity_plural_label:  Notes
+        entity_description:   Represent notes
+
+        id.label:             Id
+        message.label:        Message
+        owner.label:          Created By
+        organization.label:   Organization
+        updated_by.label:     Updated By
+
+        action:
+            add:              Add note
+            edit:             Edit note
+            remove:           Remove note
+
+        no_notes_exist:       No notes found
+        updated_by:           Updated by {{ user }} at {{ date }}
+        note_added_by:        added by {{ user }} at {{ date }}
+        note_updated_by:      added by {{ user }} at {{ date }}, updated by {{ editor }} at {{ editor_date }}
+        note_update:          Update {{ entity }}
+        note_delete:          Delete {{ entity }}

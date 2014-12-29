@@ -6,19 +6,22 @@ use Psr\Log\LoggerAwareInterface;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
+use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Reader\IteratorBasedReader;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+
+use Oro\Bundle\IntegrationBundle\Exception\LogicException;
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
-use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 
 abstract class AbstractConnector extends IteratorBasedReader implements ConnectorInterface, StepExecutionAwareInterface
 {
     /** @var TransportInterface */
     protected $transport;
 
-    /** @var Channel */
+    /** @var Integration */
     protected $channel;
 
     /** @var ParameterBag */
@@ -50,7 +53,7 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
      */
     protected function initializeFromContext(ContextInterface $context)
     {
-        $this->transport = $this->contextMediator->getTransport($context);
+        $this->transport = $this->contextMediator->getTransport($context, true);
         $this->channel   = $this->contextMediator->getChannel($context);
 
         $this->validateConfiguration();
@@ -66,13 +69,55 @@ abstract class AbstractConnector extends IteratorBasedReader implements Connecto
      * Validates initialization
      * Basically added to be overridden in child classes
      *
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function validateConfiguration()
     {
         if (!$this->transport instanceof TransportInterface) {
-            throw new \LogicException('Could not retrieve transport from context');
+            throw new LogicException('Could not retrieve transport from context');
         }
+    }
+
+    /**
+     * Returns whether connector supports force sync or no
+     *
+     * @return bool
+     */
+    protected function supportsForceSync()
+    {
+        return false;
+    }
+
+    /**
+     * Adds any connector's service data to execution context
+     * Than it will be stored in serialized format in integration status entity
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    protected function addStatusData($key, $value)
+    {
+        $context    = $this->getStepExecution()->getExecutionContext();
+        $data       = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ? : [];
+        $data[$key] = $value;
+
+        $context->put(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY, $data);
+    }
+
+    /**
+     * Fetches data which collected to be saved in status
+     *
+     * @param null|string $key
+     * @param mixed       $defaultValue
+     *
+     * @return mixed|null
+     */
+    protected function getStatusData($key = null, $defaultValue = null)
+    {
+        $context = $this->getStepExecution()->getExecutionContext();
+        $data    = $context->get(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY) ? : [];
+
+        return array_key_exists($key, $data) ? $data[$key] : $defaultValue;
     }
 
     /**

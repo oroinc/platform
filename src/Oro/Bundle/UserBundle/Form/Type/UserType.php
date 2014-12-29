@@ -12,32 +12,31 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Form\Type\EmailType;
 
 class UserType extends AbstractType
 {
-    /**
-     * @var SecurityContextInterface
-     */
+    /** @var SecurityContextInterface */
     protected $security;
 
-    /**
-     * @var bool
-     */
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var bool */
     protected $isMyProfilePage;
 
     /**
      * @param SecurityContextInterface $security Security context
-     * @param Request                  $request  Request
+     * @param SecurityFacade           $securityFacade
+     * @param Request                  $request Request
      */
-    public function __construct(
-        SecurityContextInterface $security,
-        Request $request
-    ) {
+    public function __construct(SecurityContextInterface $security, SecurityFacade $securityFacade, Request $request)
+    {
+        $this->security       = $security;
+        $this->securityFacade = $securityFacade;
 
-        $this->security = $security;
         if ($request->attributes->get('_route') == 'oro_user_profile_update') {
             $this->isMyProfilePage = true;
         } else {
@@ -50,19 +49,17 @@ class UserType extends AbstractType
         $this->addEntityFields($builder);
     }
 
-
     /**
      * {@inheritdoc}
      */
     public function addEntityFields(FormBuilderInterface $builder)
     {
         // user fields
-        $builder->addEventSubscriber(
-            new UserSubscriber($builder->getFormFactory(), $this->security)
-        );
+        $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->security));
         $this->setDefaultUserFields($builder);
-        $builder
-            ->add(
+
+        if ($this->securityFacade->isGranted('oro_user_role_view')) {
+            $builder->add(
                 'roles',
                 'entity',
                 array(
@@ -81,9 +78,13 @@ class UserType extends AbstractType
                     'required'      => !$this->isMyProfilePage,
                     'read_only'     => $this->isMyProfilePage,
                     'disabled'      => $this->isMyProfilePage,
+                    'translatable_options' => false
                 )
-            )
-            ->add(
+            );
+        }
+
+        if ($this->securityFacade->isGranted('oro_user_group_view')) {
+            $builder->add(
                 'groups',
                 'entity',
                 array(
@@ -94,19 +95,25 @@ class UserType extends AbstractType
                     'expanded'  => true,
                     'required'  => false,
                     'read_only' => $this->isMyProfilePage,
-                    'disabled'  => $this->isMyProfilePage
+                    'disabled'  => $this->isMyProfilePage,
+                    'translatable_options' => false
                 )
-            )
-            ->add(
-                'businessUnits',
-                'oro_business_unit_tree',
+            );
+        }
+
+        if ($this->securityFacade->isGranted('oro_organization_view')
+            && $this->securityFacade->isGranted('oro_business_unit_view')
+        ) {
+            $builder->add(
+                'organizations',
+                'oro_organizations_select',
                 array(
-                    'multiple' => true,
-                    'expanded' => true,
                     'required' => false,
-                    'label'    => 'oro.user.business_units.label'
                 )
-            )
+            );
+        }
+
+        $builder
             ->add(
                 'plainPassword',
                 'repeated',
@@ -114,26 +121,27 @@ class UserType extends AbstractType
                     'label'          => 'oro.user.password.label',
                     'type'           => 'password',
                     'required'       => true,
-                    'first_options'  => array('label' => 'Password'),
-                    'second_options' => array('label' => 'Re-enter password'),
+                    'first_options'  => array('label' => 'oro.user.password.label'),
+                    'second_options' => array('label' => 'oro.user.password_re.label'),
                 )
             )
             ->add(
                 'emails',
                 'collection',
                 array(
+                    'label'          => 'oro.user.emails.label',
                     'type'           => 'oro_user_email',
                     'allow_add'      => true,
                     'allow_delete'   => true,
                     'by_reference'   => false,
                     'prototype'      => true,
-                    'prototype_name' => 'tag__name__',
-                    'label'          => ' '
+                    'prototype_name' => 'tag__name__'
                 )
             )
             ->add('tags', 'oro_tag_select', ['label' => 'oro.tag.entity_plural_label'])
             ->add('imapConfiguration', 'oro_imap_configuration', ['label' => 'oro.user.imap_configuration.label'])
-            ->add('change_password', 'oro_change_password');
+            ->add('change_password', 'oro_change_password')
+            ->add('avatar', 'oro_image', ['label' => 'oro.user.avatar.label', 'required' => false]);
 
         $this->addInviteUserField($builder);
     }
@@ -161,7 +169,8 @@ class UserType extends AbstractType
                         : array('Registration', 'Roles', 'Default');
                 },
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'cascade_validation'   => true
+                'cascade_validation'   => true,
+                'ownership_disabled'   => $this->isMyProfilePage
             )
         );
     }
@@ -189,60 +198,7 @@ class UserType extends AbstractType
             ->add('middleName', 'text', ['label' => 'oro.user.middle_name.label', 'required' => false])
             ->add('lastName', 'text', ['label' => 'oro.user.last_name.label', 'required' => true])
             ->add('nameSuffix', 'text', ['label' => 'oro.user.name_suffix.label', 'required' => false])
-            ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false])
-            ->add(
-                'imageFile',
-                'file',
-                [
-                    'label' => 'oro.user.image.label',
-                    'required' => false,
-                    'tooltip' => 'oro.user.image.tooltip',
-                    'tooltip_parameters' => ['%file_size%' => $this->comparePhpIniSizes()]
-                ]
-            );
-    }
-
-    /**
-     * Compare upload_max_filesize and post_max_size ini settings and return the lesser
-     *
-     * @return int
-     */
-    protected function comparePhpIniSizes()
-    {
-        $uploadMaxFilesize = ini_get('upload_max_filesize');
-        $postMaxSize = ini_get('post_max_size');
-
-        if ($uploadMaxFilesize <= 0) {
-            return $postMaxSize;
-        }
-
-        if ($postMaxSize <= 0) {
-            return $uploadMaxFilesize;
-        }
-
-        return $this->getBytes($uploadMaxFilesize) <= $this->getBytes($postMaxSize) ? $uploadMaxFilesize : $postMaxSize;
-    }
-
-    /**
-     * Calculate bytes from config string
-     *
-     * @param string $value
-     * @return int
-     */
-    protected function getBytes($value)
-    {
-        switch(substr($value, -1)) {
-            case 'G':
-                $value = (int)$value * 1024;
-                // break intentionally omitted
-            case 'M':
-                $value = (int)$value * 1024;
-                // break intentionally omitted
-            case 'K':
-                $value = (int)$value * 1024;
-        }
-
-        return $value;
+            ->add('birthday', 'oro_date', ['label' => 'oro.user.birthday.label', 'required' => false]);
     }
 
     /**

@@ -14,7 +14,7 @@ class DebugAsseticNodeTest extends \PHPUnit_Framework_TestCase
      */
     protected $compiler;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->compiler = $this->getMockBuilder('\Twig_Compiler')
             ->disableOriginalConstructor()

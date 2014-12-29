@@ -1,0 +1,3 @@
+oro_qb_entity_api:
+    resource: "@OroQueryDesignerBundle/Controller/Api/Rest/QueryDesignerEntityController.php"
+    type:     rest

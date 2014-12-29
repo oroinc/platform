@@ -39,7 +39,6 @@ class EntityChoiceType extends AbstractType
         };
 
         $defaultConfigs = array(
-            'is_translated_option'    => true,
             'placeholder'             => 'oro.entity.form.choose_entity',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
@@ -55,7 +54,8 @@ class EntityChoiceType extends AbstractType
                 'choices'     => $choices,
                 'empty_value' => '',
                 'show_plural' => false,
-                'configs'     => $defaultConfigs
+                'configs'     => $defaultConfigs,
+                'translatable_options' => false
             )
         );
         $resolver->setNormalizers(
@@ -69,6 +69,7 @@ class EntityChoiceType extends AbstractType
      * Returns a list of choices
      *
      * @param bool $showPlural If true a plural label will be used as a choice text; otherwise, a label will be used
+     *
      * @return array of entities
      *               key = full class name, value = ChoiceListItem
      */

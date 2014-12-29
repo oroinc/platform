@@ -10,24 +10,32 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(name="oro_workflow_definition")
- * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository")
+ * @ORM\Entity
  * @Config(
- *  routeName="oro_workflow_definition_index",
- *  routeView="oro_workflow_definition_update",
- *  defaultValues={
- *      "entity"={
- *          "label"="Workflow",
- *          "plural_label"="Workflows",
- *          "icon"="icon-exchange"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_workflow_definition_index",
+ *      routeView="oro_workflow_definition_view",
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-exchange"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @ORM\HasLifecycleCallbacks()
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -119,6 +127,13 @@ class WorkflowDefinition implements DomainObjectInterface
      * @var \DateTime $created
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -126,6 +141,13 @@ class WorkflowDefinition implements DomainObjectInterface
      * @var \DateTime $updated
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

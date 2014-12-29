@@ -1,12 +1,16 @@
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
+{% block widget_content %}
 <div class="widget-content">
     <script type="text/javascript">
         require(['oroui/js/mediator', 'oroui/js/widget-manager'],
         function(mediator, widgetManager) {
             var gridName = {{ gridName|json_encode|raw }};
             mediator.bind('datagrid_create_before', function(options) {
-                if (options.name == gridName && !options.rowClickAction) {
+                if (options.name == gridName) {
+                    {% if multiselect %}
+                    options.multiSelectRowEnabled = true;
+                    {% else %}
                     options.rowClickAction = function(data) {
                         return {
                             run: function() {
@@ -19,6 +23,7 @@
                             }
                         }
                     };
+                    {% endif %}
                 }
             });
         });
@@ -26,3 +31,4 @@
 
     {{ dataGrid.renderGrid(gridName, params, renderParams) }}
 </div>
+{% endblock %}

@@ -7,12 +7,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
+use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
@@ -27,7 +29,7 @@ class GridController extends Controller
      * @Route(
      *      "/widget/{gridName}",
      *      name="oro_datagrid_widget",
-     *      requirements={"gridName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      * @Template
      *
@@ -40,7 +42,8 @@ class GridController extends Controller
         return array(
             'gridName'     => $gridName,
             'params'       => $this->getRequest()->get('params', array()),
-            'renderParams' => $this->getRequest()->get('renderParams', array())
+            'renderParams' => $this->getRequest()->get('renderParams', array()),
+            'multiselect'  => (bool)$this->getRequest()->get('multiselect', false),
         );
     }
 
@@ -48,18 +51,25 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}",
      *      name="oro_datagrid_index",
-     *      requirements={"gridName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      *
      * @param string $gridName
-     *
-     * @throws \Exception
      * @return Response
+     * @throws \Exception
      */
     public function getAction($gridName)
     {
-        $parameters = (array)$this->getRequest()->query->get($gridName, array());
-        $grid       = $this->get('oro_datagrid.datagrid.manager')->getDatagrid($gridName, $parameters);
+        $gridManager = $this->get('oro_datagrid.datagrid.manager');
+        $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
+        $acl         = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
+        $aclSkip     = $gridConfig->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
+
+        if (!$aclSkip && $acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+            throw new AccessDeniedException('Access denied.');
+        }
+
+        $grid = $gridManager->getDatagridByRequestParams($gridName);
 
         try {
             $result = $grid->getData();
@@ -83,7 +93,7 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}/export/",
      *      name="oro_datagrid_export_action",
-     *      requirements={"gridName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+"}
      * )
      *
      * @param string $gridName
@@ -99,7 +109,14 @@ class GridController extends Controller
         $request = $this->getRequest();
         $format  = $request->query->get('format');
 
-        $context = new ExportContext(['gridName' => $gridName]);
+        $parametersFactory = $this->get('oro_datagrid.datagrid.request_parameters_factory');
+        $parameters = $parametersFactory->createParameters($gridName);
+        $context = new ExportContext(
+            array(
+                'gridName' => $gridName,
+                'gridParameters' => $parameters,
+            )
+        );
 
         // prepare export executor
         $executor = new StepExecutor();
@@ -138,7 +155,7 @@ class GridController extends Controller
      * @Route(
      *      "/{gridName}/massAction/{actionName}",
      *      name="oro_datagrid_mass_action",
-     *      requirements={"gridName"="[\w-]+", "actionName"="[\w-]+"}
+     *      requirements={"gridName"="[\w\:-]+", "actionName"="[\w-]+"}
      * )
      *
      * @param string $gridName

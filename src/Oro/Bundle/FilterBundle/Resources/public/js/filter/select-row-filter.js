@@ -1,17 +1,23 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', './select-filter'
-    ], function (_, Backbone, SelectFilter) {
+define([
+    'underscore',
+    'backbone',
+    './select-filter'
+], function (_, Backbone, SelectFilter) {
     'use strict';
+
+    var SelectRowFilter;
 
     /**
      * Fetches information of rows selection
      * and implements filter by selected/Not selected rows
      *
-     * @export  orofilter/js/filter/select-row-filter
-     * @class   orofilter.filter.SelectRowFilter
-     * @extends orofilter.filter.SelectFilter
+     * @export  oro/filter/select-row-filter
+     * @class   oro.filter.SelectRowFilter
+     * @extends oro.filter.SelectFilter
      */
-    return SelectFilter.extend({
+    SelectRowFilter = SelectFilter.extend({
 
         /**
          * Fetches raw format value on getting current value
@@ -101,4 +107,6 @@ define(['underscore', 'backbone', './select-filter'
             );
         }
     });
+
+    return SelectRowFilter;
 });

@@ -19,7 +19,7 @@ class PrepareResultItemEventTest extends \PHPUnit_Framework_TestCase
     /**
      * Set Up test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->resultItem = $this->getMockBuilder('Oro\Bundle\SearchBundle\Query\Result\Item')
             ->disableOriginalConstructor()

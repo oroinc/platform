@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\AddressBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Oro\Bundle\FormBundle\Entity\PrimaryItem;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\Mapping as ORM;
+
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
+use Oro\Bundle\FormBundle\Entity\PrimaryItem;
 
 /**
  * @ORM\MappedSuperclass
@@ -29,6 +31,13 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
      *
      * @ORM\Column(name="email", type="string", length=255, nullable=false)
      * @Soap\ComplexType("string", nillable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true
+     *          }
+     *      }
+     * )
      */
     protected $email;
 
@@ -127,5 +136,25 @@ abstract class AbstractEmail implements PrimaryItem, EmptyItem
     public function isEmpty()
     {
         return empty($this->email);
+    }
+
+    /**
+     * @param mixed $other
+     * @return bool
+     */
+    public function isEqual($other)
+    {
+        $class = ClassUtils::getClass($this);
+
+        /** @var AbstractAddress $other */
+        if (!$other instanceof $class) {
+            return false;
+        } elseif ($this->getId() && $other->getId()) {
+            return $this->getId() == $other->getId();
+        } elseif ($this->getId() || $other->getId()) {
+            return false;
+        } else {
+            return $this == $other;
+        }
     }
 }

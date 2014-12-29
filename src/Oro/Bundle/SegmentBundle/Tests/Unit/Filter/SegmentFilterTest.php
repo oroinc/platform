@@ -60,7 +60,7 @@ class SegmentFilterTest extends OrmTestCase
     /** @var SegmentFilter */
     protected $filter;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -115,6 +115,11 @@ class SegmentFilterTest extends OrmTestCase
             ->disableOriginalConstructor()->getMock();
 
         $this->entityNameProvider   = $this->getMock('Oro\Bundle\SegmentBundle\Provider\EntityNameProvider');
+        $this->entityNameProvider
+            ->expects($this->any())
+            ->method('getEntityName')
+            ->will($this->returnValue('Namespace\Entity'));
+
         $this->entityConfigProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()->getMock();
@@ -151,7 +156,7 @@ class SegmentFilterTest extends OrmTestCase
         $this->filter->init('segment', ['entity' => '']);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->formFactory, $this->dynamicSegmentQueryBuilder, $this->filter);
     }
@@ -188,7 +193,7 @@ class SegmentFilterTest extends OrmTestCase
                         [
                             $deletedClassName,
                             null,
-                            $this->createExtendConfig($deletedClassName, ExtendScope::STATE_DELETED)
+                            $this->createExtendConfig($deletedClassName, ExtendScope::STATE_DELETE)
                         ],
                     ]
                 )

@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 
@@ -13,6 +13,10 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
  * @package Oro\Bundle\DataGridBundle\EventListener
  *
  * Event listener should be applied when entities relation managed via datagrid
+ *
+ * @deprecated Deperecated since 1.4.1 in favor of RowSelectionListener and "bind_parameters" option in source
+ * @see RowSelectionListener
+ * @see DatasourceBindParametersListener
  */
 class BaseOrmRelationDatagridListener
 {
@@ -23,22 +27,20 @@ class BaseOrmRelationDatagridListener
     const GRID_PARAM_DATA_IN     = 'data_in';
     const GRID_PARAM_DATA_NOT_IN = 'data_not_in';
 
-    /** @var string */
-    protected $paramName;
+    /** @var array */
+    protected $parameterNames;
 
     /** @var boolean */
     protected $isEditMode;
 
     /**
-     * @param string            $paramName  Parameter name that should be taken from request and binded to query
-     * @param RequestParameters $requestParams
-     * @param bool              $isEditMode whether or not to add data_in, data_not_in params to query
+     * @param array|string $paramName  One or more parameter names that should be taken from request and binded to query
+     * @param bool         $isEditMode whether or not to add data_in, data_not_in params to query
      */
-    public function __construct($paramName, RequestParameters $requestParams, $isEditMode = true)
+    public function __construct($paramName, $isEditMode = true)
     {
-        $this->paramName     = $paramName;
-        $this->requestParams = $requestParams;
-        $this->isEditMode    = $isEditMode;
+        $this->parameterNames = is_array($paramName) ? $paramName : [$paramName];
+        $this->isEditMode     = $isEditMode;
     }
 
     /**
@@ -57,29 +59,40 @@ class BaseOrmRelationDatagridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datasource = $event->getDatagrid()->getDatasource();
+        $datagrid   = $event->getDatagrid();
+        $datasource = $datagrid->getDatasource();
+        $parameters = $datagrid->getParameters();
         if ($datasource instanceof OrmDatasource) {
             /** @var QueryBuilder $query */
             $queryBuilder = $datasource->getQueryBuilder();
 
-            $additionalParams = $this->requestParams->get(RequestParameters::ADDITIONAL_PARAMETERS);
+            $additionalParams = $parameters->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+
+            $dataIn  = [0];
+            $dataOut = [0];
+
             if (isset($additionalParams[self::GRID_PARAM_DATA_IN])) {
-                $dataIn = $additionalParams[self::GRID_PARAM_DATA_IN];
-            } else {
-                $dataIn = [0];
+                $filteredParams = array_filter($additionalParams[self::GRID_PARAM_DATA_IN]);
+                if (!empty($filteredParams)) {
+                    $dataIn = $additionalParams[self::GRID_PARAM_DATA_IN];
+                }
             }
 
             if (isset($additionalParams[self::GRID_PARAM_DATA_NOT_IN])) {
-                $dataOut = $additionalParams[self::GRID_PARAM_DATA_NOT_IN];
-            } else {
-                $dataOut = [0];
+                $filteredParams = array_filter($additionalParams[self::GRID_PARAM_DATA_NOT_IN]);
+                if (!empty($filteredParams)) {
+                    $dataOut = $additionalParams[self::GRID_PARAM_DATA_NOT_IN];
+                }
             }
 
-            $queryParameters = array(
-                $this->paramName => $this->requestParams->get($this->paramName, null),
+            $queryParameters = [
                 'data_in'        => $dataIn,
                 'data_not_in'    => $dataOut,
-            );
+            ];
+
+            foreach ($this->parameterNames as $paramName) {
+                $queryParameters[$paramName] = $parameters->get($paramName);
+            }
 
             if (!$this->isEditMode) {
                 unset($queryParameters['data_in'], $queryParameters['data_not_in']);

@@ -2,91 +2,84 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Util\ClassUtils;
+use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\SearchBundle\Engine\AbstractEngine;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
+use Oro\Bundle\SearchBundle\Engine\EngineInterface;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class IndexListener
+class IndexListener implements OptionalListenerInterface
 {
     /**
-     * @var ContainerInterface
+     * @var DoctrineHelper
      */
-    protected $container;
+    protected $doctrineHelper;
 
     /**
-     * @var bool
-     */
-    protected $realtime;
-
-    /**
-     * @var array
-     */
-    protected $entities;
-
-    /**
-     * @var AbstractEngine
+     * @var EngineInterface
      */
     protected $searchEngine;
 
     /**
-     * @var array
-     */
-    protected $insertEntities = [];
-
-    /**
-     * @todo: refactor in global listeners scope story, see BAP-3285
-     *
      * @var bool
      */
-    protected $postFlush = true;
+    protected $realTimeUpdate = true;
 
     /**
-     * Unfortunately, can't use AbstractEngine as a parameter here due to circular reference
-     *
-     * @param ContainerInterface $container
-     * @param bool               $realtime  Realtime update flag
-     * @param array              $entities  Entities config array from search.yml
+     * @var array
      */
-    public function __construct(ContainerInterface $container, $realtime, $entities)
+    protected $entitiesConfig = [];
+
+    /**
+     * @var array
+     */
+    protected $savedEntities = [];
+
+    /**
+     * @var array
+     */
+    protected $deletedEntities = [];
+
+    /**
+     * @var bool
+     */
+    protected $enabled = true;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param EngineInterface $searchEngine
+     */
+    public function __construct(DoctrineHelper $doctrineHelper, EngineInterface $searchEngine)
     {
-        $this->container = $container;
-        $this->realtime  = $realtime;
-        $this->entities  = $entities;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->searchEngine   = $searchEngine;
     }
 
     /**
-     * @return void
+     * {@inheritdoc}
      */
-    public function disablePostFlush()
+    public function setEnabled($enabled = true)
     {
-        $this->postFlush = false;
-
-        register_shutdown_function(
-            function () {
-                if (!$this->postFlush) {
-                    $this->postFlush = true;
-                    $entityManager   = $this->container->get('doctrine.orm.entity_manager');
-
-                    $this->flush($entityManager);
-                }
-            }
-        );
+        $this->enabled = $enabled;
     }
 
     /**
-     * @return AbstractEngine
+     * @param $realTime bool
      */
-    protected function getSearchEngine()
+    public function setRealTimeUpdate($realTime)
     {
-        if (!$this->searchEngine) {
-            $this->searchEngine = $this->container->get('oro_search.search.engine');
-        }
+        $this->realTimeUpdate = $realTime;
+    }
 
-        return $this->searchEngine;
+    /**
+     * @param array $entities
+     */
+    public function setEntitiesConfig(array $entities)
+    {
+        $this->entitiesConfig = $entities;
     }
 
     /**
@@ -94,27 +87,34 @@ class IndexListener
      */
     public function onFlush(OnFlushEventArgs $args)
     {
-        if (!$this->isActive()) {
+        if (!$this->enabled) {
             return;
         }
 
-        $uow = $args->getEntityManager()->getUnitOfWork();
+        $entityManager = $args->getEntityManager();
+        $unitOfWork = $entityManager->getUnitOfWork();
 
-        foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->insertEntities[] = $entity;
+        // schedule saved entities
+        // inserted and updated entities should be processed as is
+        $savedEntities = array_merge(
+            $unitOfWork->getScheduledEntityInsertions(),
+            $unitOfWork->getScheduledEntityUpdates()
+        );
+        foreach ($savedEntities as $hash => $entity) {
+            if ($this->isSupported($entity) && empty($this->savedEntities[$hash])) {
+                $this->savedEntities[$hash] = $entity;
             }
         }
 
-        foreach ($uow->getScheduledEntityUpdates() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->getSearchEngine()->save($entity, $this->realtime, true);
-            }
-        }
-
-        foreach ($uow->getScheduledEntityDeletions() as $entity) {
-            if ($this->isSupported($entity)) {
-                $this->getSearchEngine()->delete($entity, true);
+        // schedule deleted entities
+        // deleted entities should be processed as references because on postFlush they are already deleted
+        $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
+        foreach ($deletedEntities as $hash => $entity) {
+            if ($this->isSupported($entity) && empty($this->deletedEntities[$hash])) {
+                $this->deletedEntities[$hash] = $entityManager->getReference(
+                    $this->doctrineHelper->getEntityClass($entity),
+                    $this->doctrineHelper->getSingleEntityIdentifier($entity)
+                );
             }
         }
     }
@@ -124,45 +124,63 @@ class IndexListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (!$this->postFlush) {
+        if (!$this->enabled) {
             return;
         }
 
-        $this->flush($args->getEntityManager());
+        if ($this->hasEntitiesToIndex()) {
+            $this->indexEntities();
+        }
     }
 
     /**
-     * @param EntityManager $manager
+     * Clear object storage when error was occurred during UOW#Commit
+     *
+     * @param OnClearEventArgs $args
      */
-    protected function flush(EntityManager $manager)
+    public function onClear(OnClearEventArgs $args)
     {
-        if (!$this->isActive() || empty($this->insertEntities)) {
+        if (!($this->enabled && $this->hasEntitiesToIndex())) {
             return;
         }
 
-        foreach ($this->insertEntities as $entity) {
-            $this->getSearchEngine()->save($entity, $this->realtime, true);
+        $this->savedEntities = $this->deletedEntities = [];
+    }
+
+    /**
+     * Synchronise all changed entities with search index
+     */
+    protected function indexEntities()
+    {
+        // process saved entities
+        if ($this->savedEntities) {
+            $savedEntities = $this->savedEntities;
+            $this->savedEntities = [];
+            $this->searchEngine->save($savedEntities, $this->realTimeUpdate);
         }
 
-        $this->insertEntities = [];
-
-        $manager->flush();
+        // process deleted entities
+        if ($this->deletedEntities) {
+            $deletedEntities = $this->deletedEntities;
+            $this->deletedEntities = [];
+            $this->searchEngine->delete($deletedEntities, $this->realTimeUpdate);
+        }
     }
 
     /**
-     * @return bool
-     */
-    protected function isActive()
-    {
-        return !empty($this->entities);
-    }
-
-    /**
-     * @param string $entity
+     * @param object $entity
      * @return bool
      */
     protected function isSupported($entity)
     {
-        return isset($this->entities[ClassUtils::getRealClass($entity)]);
+        return isset($this->entitiesConfig[ClassUtils::getClass($entity)]);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function hasEntitiesToIndex()
+    {
+        return !empty($this->savedEntities) || !empty($this->deletedEntities);
     }
 }

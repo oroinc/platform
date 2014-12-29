@@ -63,14 +63,14 @@ class OroHelpExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($container->hasDefinition('oro_help.model.help_link_provider'));
         $linkProvider = $container->getDefinition('oro_help.model.help_link_provider');
-        $this->assertEquals(
+        $this->assertContains(
+            $linkProvider->getMethodCalls()[1],
             array(
                 array(
                     'setConfiguration',
                     array($expectedConfiguration)
                 )
-            ),
-            $linkProvider->getMethodCalls()
+            )
         );
     }
 

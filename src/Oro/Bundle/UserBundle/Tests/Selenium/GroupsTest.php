@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Selenium;
 
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Selenium\Pages\Groups;
 
 /**
@@ -27,7 +27,7 @@ class GroupsTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Groups $login */
         $login->openGroups('Oro\Bundle\UserBundle')
-            ->assertTitle('Groups - Users Management - System');
+            ->assertTitle('Groups - User Management - System');
     }
 
     public function testGroupsGridDefaultContent()
@@ -67,7 +67,7 @@ class GroupsTest extends Selenium2TestCase
 
     public function testGroupAdd()
     {
-        $randomPrefix = ToolsAPI::randomGen(5);
+        $randomPrefix = WebTestCase::generateRandomString(5);
 
         $login = $this->login();
         /** @var Groups $login */

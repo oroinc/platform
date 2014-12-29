@@ -38,23 +38,24 @@ oro:
                 report_type:        Report type
         form:
             designer:               Designer
+            chart_designer:         Chart Designer
             columns:                Columns
             grouping:               Grouping
             filters:                Filters
             choose_report_type:     Choose a report type...
 
+        chart_options.label: Chart Options
+        definition.label:    Definition
+        description.label:   Description
+        entity.label:        Entity
         entity_label:        Report
-        entity_plural_label: Reports
         entity_description:  Represent Report
-        id.label:           Id
-        type.label:         Report type
-        owner.label:        Owner
-        name.label:         Name
-        entity.label:       Entity
-        description.label:  Description
-        definition.label:   Definition
-        created_at.label:   Created at
-        updated_at.label:   Updated at
+        entity_plural_label: Reports
+        id.label:            Id
+        name.label:          Name
+        owner.label:         Owner
+        type.label:          Report type
+        organization.label:  Organization
 
         reporttype:
             entity_label:        Report Type
@@ -62,6 +63,10 @@ oro:
             entity_description:  Represent Report Type
             name.label:          Name
             label.label:         Label
+            chart.label:         Chart
+            hasChart:
+                label:   Report design
+                tooltip: Add chart to the report
 
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports

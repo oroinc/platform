@@ -25,7 +25,8 @@ function(_, Backbone, TransitionsShortListView) {
             template: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#step-row-template').html();
             this.template = _.template(template);
             this.transitionsListView = null;

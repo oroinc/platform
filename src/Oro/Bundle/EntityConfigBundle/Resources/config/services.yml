@@ -9,7 +9,6 @@ parameters:
     oro_entity_config.event_listener.option_set_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\OptionSetListener
     oro_entity_config.event_listener.entityconfig_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\EntityConfigGridListener
     oro_entity_config.event_listener.entityfields_grid_listener.class: Oro\Bundle\EntityConfigBundle\EventListener\FieldConfigGridListener
-    oro_entity_config.twig.extension.dynamic_fields.class:      Oro\Bundle\EntityConfigBundle\Twig\DynamicFieldsExtension
     oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
     oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
 
@@ -74,6 +73,7 @@ services:
         arguments:
             - @oro_entity_config.cache.file_cache
             - @oro_entity_config.model.file_cache
+            - %kernel.debug%
 
     oro_entity_config.cache.file_cache:
         parent: oro.cache.abstract
@@ -104,14 +104,12 @@ services:
         arguments:
             - @oro_entity_config.config_manager
             - @oro_datagrid.provider.resolver
-            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: kernel.event_subscriber }
 
     oro_entity_config.event_listener.audit_log_grid_listener:
         class: %oro_dataaudit.event_listener.dataaudit_history_grid_listener.class%
         arguments:
-            - @oro_datagrid.datagrid.request_params
             - [objectClass, fieldName]
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.audit-log-grid, method: onBuildAfter }
@@ -122,18 +120,6 @@ services:
         class: %oro_entity_config.twig.extension.config.class%
         arguments:
             - @oro_entity_config.config_manager
-        tags:
-            - { name: twig.extension }
-
-    oro_entity_config.twig.extension.dynamic_fields:
-        class: %oro_entity_config.twig.extension.dynamic_fields.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity_config.provider.extend
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.view
-            - @oro_locale.formatter.date_time
-            - @router
         tags:
             - { name: twig.extension }
 

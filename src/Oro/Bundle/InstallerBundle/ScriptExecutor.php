@@ -61,11 +61,12 @@ class ScriptExecutor
                     sprintf('Launching %s script', $scriptLabel)
                 );
                 ob_start();
+                // this variables defined here to be used in included files without $this, just a shortcut
                 $container       = $this->container;
                 $commandExecutor = $this->commandExecutor;
                 include($fileName);
                 $scriptOutput = ob_get_contents();
-                ob_clean();
+                ob_end_clean();
                 $this->output->writeln($scriptOutput);
             } else {
                 $this->output->writeln(

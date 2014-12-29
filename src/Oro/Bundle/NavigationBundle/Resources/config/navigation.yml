@@ -5,7 +5,7 @@ oro_menu_config:
             currentClass: 'active'
             ancestorClass: 'active'
             allow_safe_labels: true
-            rootClass: 'nav nav-multilevel oroplatform-menu'
+            rootClass: 'nav nav-multilevel main-menu'
         dots_menu:
             template: 'OroNavigationBundle:Menu:dots_menu.html.twig'
         shortcuts:
@@ -59,7 +59,6 @@ oro_menu_config:
         dots_menu:
             type: dots_menu
             children:
-                pinbar: ~
                 history: ~
                 favorite: ~
                 mostviewed: ~
@@ -70,3 +69,10 @@ oro_menu_config:
 oro_titles:
     oro_shortcut_actionslist: 'Shortcut Actions List'
     oro_pinbar_help: 'How To Use Pinbar'
+
+oro_navigation_elements:
+    pinButton:
+        default: true
+
+    favoriteButton:
+        default: true

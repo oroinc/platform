@@ -1,0 +1,36 @@
+# offset test case
+request:
+    search: item
+    offset: 5
+    max_results: 5
+response:
+    records_count: 9
+    count: 4
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_url: http://localhost/search/
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_url: http://localhost/search/
+    soap:
+        item:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordUrl: http://localhost/search/
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordUrl: http://localhost/search/

@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 
 use Metadata\MetadataFactory;
 
+use Oro\Bundle\EntityConfigBundle\Event\FlushConfigEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -25,7 +26,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -265,7 +265,9 @@ class ConfigManager
             : null;
 
         if (!$config) {
-            $model = $this->modelManager->getModelByConfigId($configId);
+            $model = $configId instanceof FieldConfigId
+                ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
+                : $this->modelManager->getEntityModel($configId->getClassName());
 
             $config = new Config($configId);
             $config->setValues($model->toArray($configId->getScope()));
@@ -284,28 +286,51 @@ class ConfigManager
     }
 
     /**
-     * @param string $scope
-     * @param string $className
-     * @param bool   $withHidden Set true if you need all configurable entities,
-     *                           including entities marked as mode="hidden"
-     * @return array
+     * Gets configuration data for all configurable entities (if $className is not specified)
+     * or all configurable fields of the given $className.
+     *
+     * @param string      $scope
+     * @param string|null $className
+     * @param bool        $withHidden Set true if you need ids of all configurable entities,
+     *                                including entities marked as mode="hidden"
+     *
+     * @return array|ConfigInterface[]
      */
-    public function getIds($scope, $className = null, $withHidden = false)
+    public function getConfigs($scope, $className = null, $withHidden = false)
     {
         if (!$this->modelManager->checkDatabase()) {
             return [];
         }
 
-        if ($withHidden) {
-            $models = $this->modelManager->getModels($className);
-        } else {
-            $models = array_filter(
-                $this->modelManager->getModels($className),
-                function (AbstractConfigModel $model) {
-                    return $model->getMode() != ConfigModelManager::MODE_HIDDEN;
-                }
-            );
+        return array_map(
+            function ($model) use ($scope) {
+                return $this->getConfig($this->getConfigIdByModel($model, $scope));
+            },
+            $this->modelManager->getModels($className, $withHidden)
+        );
+    }
+
+    /**
+     * Gets a list of ids for all configurable entities (if $className is not specified)
+     * or all configurable fields of the given $className.
+     *
+     * @param string $scope
+     * @param string|null $className
+     * @param bool $withHidden Set true if you need ids of all configurable entities,
+     *                                including entities marked as mode="hidden"
+     * @param bool $regenerateCaches Regenerate local caches before getting results
+     * @return array
+     */
+    public function getIds($scope, $className = null, $withHidden = false, $regenerateCaches = false)
+    {
+        if (!$this->modelManager->checkDatabase()) {
+            return [];
         }
+
+        if ($regenerateCaches) {
+            $this->modelManager->clearCache();
+        }
+        $models = $this->modelManager->getModels($className, $withHidden);
 
         return array_map(
             function ($model) use ($scope) {
@@ -387,10 +412,10 @@ class ConfigManager
      */
     public function clearConfigurableCache()
     {
+        $this->modelManager->clearCheckDatabase();
         if ($this->cache) {
             $this->cache->removeAllConfigurable();
         }
-        $this->modelManager->clearCheckDatabase();
     }
 
     /**
@@ -436,17 +461,23 @@ class ConfigManager
         $models = [];
         $this->prepareFlush($models);
 
-        if ($this->cache) {
-            $this->cache->removeAllConfigurable();
-        }
-
         $this->auditManager->log();
 
         foreach ($models as $model) {
             $this->getEntityManager()->persist($model);
         }
 
+        // @todo: need investigation if we can call this flush only if !empty($models)
         $this->getEntityManager()->flush();
+
+        $this->eventDispatcher->dispatch(
+            Events::POST_FLUSH_CONFIG,
+            new FlushConfigEvent($models, $this)
+        );
+
+        if ($this->cache && !empty($models)) {
+            $this->cache->removeAllConfigurable();
+        }
 
         $this->persistConfigs   = [];
         $this->configChangeSets = [];
@@ -462,11 +493,16 @@ class ConfigManager
 
             $this->eventDispatcher->dispatch(Events::PRE_PERSIST_CONFIG, new PersistConfigEvent($config, $this));
 
-            $configKey = $this->buildConfigKey($config->getId());
+            $configId = $config->getId();
+            $configKey = $configId instanceof FieldConfigId
+                ? sprintf('%s_%s', $configId->getClassName(), $configId->getFieldName())
+                : $configId->getClassName();
             if (isset($models[$configKey])) {
                 $model = $models[$configKey];
             } else {
-                $model = $this->modelManager->getModelByConfigId($config->getId());
+                $model = $configId instanceof FieldConfigId
+                    ? $this->modelManager->getFieldModel($configId->getClassName(), $configId->getFieldName())
+                    : $this->modelManager->getEntityModel($configId->getClassName());
 
                 $models[$configKey] = $model;
             }
@@ -768,7 +804,7 @@ class ConfigManager
             );
             $providers = $this->getProviders();
             foreach ($providers as $provider) {
-                /** @var FieldConfigId $configId */
+                /** @var FieldConfigId $newConfigId */
                 $newConfigId = $this->getId($provider->getScope(), $className, $newFieldName);
                 $newConfigKey = $this->buildConfigKey($newConfigId);
                 $configId = new FieldConfigId(
@@ -904,12 +940,11 @@ class ConfigManager
     {
         $defaultValues = [];
 
+        $scope = $provider->getScope();
+
         // try to get default values from an annotation
-        if ($metadata) {
-            $scope = $provider->getScope();
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
+        if ($metadata && isset($metadata->defaultValues[$scope])) {
+            $defaultValues = $metadata->defaultValues[$scope];
         }
 
         // combine them with default values from a config file
@@ -923,9 +958,9 @@ class ConfigManager
             $translatablePropertyNames = $provider->getPropertyConfig()
                 ->getTranslatableValues(PropertyConfigContainer::TYPE_ENTITY);
             foreach ($translatablePropertyNames as $propertyName) {
-                if (!in_array($propertyName, $defaultValues)) {
+                if (empty($defaultValues[$propertyName])) {
                     $defaultValues[$propertyName] =
-                        ConfigHelper::getTranslationKey($propertyName, $className);
+                        ConfigHelper::getTranslationKey($scope, $propertyName, $className);
                 }
             }
         }
@@ -952,12 +987,11 @@ class ConfigManager
     ) {
         $defaultValues = [];
 
+        $scope = $provider->getScope();
+
         // try to get default values from an annotation
-        if ($metadata) {
-            $scope = $provider->getScope();
-            if (isset($metadata->defaultValues[$scope])) {
-                $defaultValues = $metadata->defaultValues[$scope];
-            }
+        if ($metadata && isset($metadata->defaultValues[$scope])) {
+            $defaultValues = $metadata->defaultValues[$scope];
         }
 
         // combine them with default values from a config file
@@ -970,9 +1004,9 @@ class ConfigManager
         $translatablePropertyNames = $provider->getPropertyConfig()
             ->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
         foreach ($translatablePropertyNames as $propertyName) {
-            if (!in_array($propertyName, $defaultValues)) {
+            if (empty($defaultValues[$propertyName])) {
                 $defaultValues[$propertyName] =
-                    ConfigHelper::getTranslationKey($propertyName, $className, $fieldName);
+                    ConfigHelper::getTranslationKey($scope, $propertyName, $className, $fieldName);
             }
         }
 

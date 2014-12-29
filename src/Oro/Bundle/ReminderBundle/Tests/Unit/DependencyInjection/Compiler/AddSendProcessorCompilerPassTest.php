@@ -18,7 +18,7 @@ class AddSendProcessorCompilerPassTest extends \PHPUnit_Framework_TestCase
      */
     private $compiler;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->container = $this->getMockBuilder('Symfony\\Component\\DependencyInjection\\ContainerBuilder')
             ->disableOriginalConstructor()

@@ -5,6 +5,19 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 interface PagerInterface
 {
     /**
+     * Pager parameters
+     */
+    const PAGER_ROOT_PARAM = '_pager';
+    const PAGE_PARAM       = '_page';
+    const PER_PAGE_PARAM   = '_per_page';
+    const DISABLED_PARAM   = '_disabled';
+
+    const MINIFIED_PAGE_PARAM     = 'i';
+    const MINIFIED_PER_PAGE_PARAM = 'p';
+
+    const TOTAL_PATH_PARAM = '[options][totalRecords]';
+
+    /**
      * Initialize the pager.
      *
      * @return void
@@ -70,15 +83,6 @@ interface PagerInterface
      * @return integer
      */
     public function getFirstPage();
-
-    /**
-     * Returns an array of page numbers to use in pagination links.
-     *
-     * @param  integer $nbLinks The maximum number of page numbers to return
-     *
-     * @return array
-     */
-    public function getLinks($nbLinks = null);
 
     /**
      * @return boolean

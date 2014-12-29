@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Table(
@@ -20,14 +21,23 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * )
  * @ORM\Entity
  * @Config(
- *  mode="hidden",
- *  defaultValues={
- *      "ownership"={
- *          "owner_type"="USER",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="user_owner_id"
+ *      mode="hidden",
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="USER",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="user_owner_id"
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Tagging
@@ -58,6 +68,13 @@ class Tagging
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $created;
 
@@ -92,7 +109,7 @@ class Tagging
             $this->setResource($resource);
         }
 
-        $this->setCreatedAt(new \DateTime('now'));
+        $this->setCreated(new \DateTime('now'));
     }
 
     /**
@@ -205,7 +222,7 @@ class Tagging
      * @param \DateTime $date
      * @return $this
      */
-    public function setCreatedAt(\DateTime $date)
+    public function setCreated(\DateTime $date)
     {
         $this->created = $date;
 
@@ -217,7 +234,7 @@ class Tagging
      *
      * @return \Datetime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }

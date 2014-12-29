@@ -1,7 +1,24 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
-    ], function (_, Backbone, BackbonePageableCollection, app) {
+define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tools'
+    ], function (_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
+
+    var PageableCollection, stateShortKeys;
+
+    /**
+     * Object declares state keys that will be involved in URL-state saving with their shorthands
+     *
+     * @property {Object}
+     */
+    stateShortKeys = {
+        currentPage: 'i',
+        pageSize: 'p',
+        sorters: 's',
+        filters: 'f',
+        gridView: 'v',
+        gridParams: 'g'
+    };
 
     /**
      * Pageable collection
@@ -15,7 +32,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
      * @class   orodatagrid.PageableCollection
      * @extends Backbone.PageableCollection
      */
-    var PageableCollection = BackbonePageableCollection.extend({
+    PageableCollection = BackbonePageableCollection.extend({
         /**
          * Basic model to store row data
          *
@@ -28,7 +45,13 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
          *
          * @property
          */
-        initialState: {},
+        initialState: {
+            currentPage: 1,
+            pageSize: 25,
+            totals: null,
+            filters: {},
+            sorters: {}
+        },
 
         /**
          * Declaration of URL parameters
@@ -45,20 +68,6 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
         }),
 
         /**
-         * Object declares state keys that will be involved in URL-state saving with their shorthands
-         *
-         * @property {Object}
-         */
-        stateShortKeys: {
-            currentPage: 'i',
-            pageSize: 'p',
-            sorters: 's',
-            filters: 'f',
-            gridName: 't',
-            gridView: 'v'
-        },
-
-        /**
          * @property {Object}
          */
         additionalParameters: {
@@ -73,26 +82,45 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
         multipleSorting: true,
 
         /**
+         * @property {Object}
+         */
+        urlParams: {},
+
+        /**
          * Initialize basic parameters from source options
          *
          * @param models
          * @param options
          */
-        initialize: function(models, options) {
+        initialize: function (models, options) {
             options = options || {};
+
+            // copy initialState from the prototype to own property
+            this.initialState = tools.deepClone(this.initialState);
+            _.defaults(this.initialState, this.state);
+            if (options.initialState) {
+                if (options.initialState.sorters) {
+                    _.each(options.initialState.sorters, function (direction, field) {
+                        options.initialState.sorters[field] = this.getSortDirectionKey(direction);
+                    }, this);
+                }
+                _.extend(this.initialState, options.initialState);
+            }
+
+            // copy state from the prototype to own property
+            this.state = tools.deepClone(this.state);
             if (options.state) {
                 if (options.state.sorters) {
-                    _.each(options.state.sorters, function(direction, field) {
+                    _.each(options.state.sorters, function (direction, field) {
                         options.state.sorters[field] = this.getSortDirectionKey(direction);
                     }, this);
                 }
                 _.extend(this.state, options.state);
             }
 
-            this.initialState = app.deepClone(this.state);
-
             if (options.url) {
                 this.url = options.url;
+                this.urlParams = options.urlParams;
             }
             if (options.model) {
                 this.model = options.model;
@@ -110,7 +138,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
 
             this.on('remove', this.onRemove, this);
 
-            BackbonePageableCollection.prototype.initialize.apply(this, arguments);
+            PageableCollection.__super__.initialize.call(this, models, options);
 
             if (models.options) {
                 this.state.totals = models.options.totals;
@@ -128,31 +156,6 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             if (this.state.totalRecords > 0) {
                 this.state.totalRecords--;
             }
-        },
-
-        /**
-         * Encode state object to string
-         *
-         * @param {Object} stateObject
-         * @return {String}
-         */
-        encodeStateData: function(stateObject) {
-            var data = _.pick(stateObject, _.keys(this.stateShortKeys));
-            data.gridName = this.inputName;
-            data = app.invertKeys(data, this.stateShortKeys);
-            return app.packToQueryString(data);
-        },
-
-        /**
-         * Decode state object from string, operation is invert for encodeStateData.
-         *
-         * @param {String} stateString
-         * @return {Object}
-         */
-        decodeStateData: function(stateString) {
-            var data = app.unpackFromQueryString(stateString);
-            data = app.invertKeys(data, _.invert(this.stateShortKeys));
-            return data;
         },
 
         /**
@@ -188,7 +191,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
          * @return {Object}
          */
         processAdditionalParams: function (state) {
-            var state = app.deepClone(state);
+            var state = tools.deepClone(state);
             state.parameters = state.parameters || {};
 
             _.each(this.additionalParameters, _.bind(function(value, key) {
@@ -361,7 +364,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
                 var nvp = url.slice(qsi + 1).split('&');
                 for (var i = 0 ; i < nvp.length ; i++) {
                     var pair  = nvp[i].split('=');
-                    data[app.decodeUriComponent(pair[0])] = app.decodeUriComponent(pair[1]);
+                    data[tools.decodeUriComponent(pair[0])] = tools.decodeUriComponent(pair[1]);
                 }
             }
 
@@ -379,7 +382,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             this.trigger('beforeFetch', this, options);
             var BBColProto = Backbone.Collection.prototype;
 
-            options = options || {};
+            options = _.defaults(options || {}, {reset: true});
 
             var state = this._checkState(this.state);
 
@@ -395,7 +398,7 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             var url = options.url || _.result(this, "url") || '';
             var qsi = url.indexOf('?');
             if (qsi != -1) {
-                _.extend(data, app.unpackFromQueryString(url.slice(qsi + 1)));
+                _.extend(data, tools.unpackFromQueryString(url.slice(qsi + 1)));
                 url = url.slice(0, qsi);
             }
 
@@ -591,10 +594,81 @@ define(['underscore', 'backbone', 'backbone/pageable-collection', 'oroui/js/app'
             collectionOptions.url = this.url;
             collectionOptions.inputName = this.inputName;
             var newCollection = new PageableCollection(this.toJSON(), collectionOptions);
-            newCollection.state = app.deepClone(this.state);
+            newCollection.state = tools.deepClone(this.state);
+            newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;
+        },
+
+        /**
+         * Fetches value for a state hash
+         *  - this value is used to preserve collection state in URL
+         *
+         * @param {boolean=} purge If true, clears value from initial state
+         * @param {Object|null} gridParams
+         * @returns {string|null}
+         */
+        stateHashValue: function (purge, gridParams) {
+            var hash;
+            hash = PageableCollection.encodeStateData(this.state);
+            if (purge && hash === PageableCollection.encodeStateData(this.initialState)) {
+                // if the state is the same as initial, remove URL param for grid state
+                hash = null;
+            }
+            if (gridParams) {
+                this.state.gridParams = gridParams;
+                hash = PageableCollection.encodeStateData(this.state);
+            }
+
+            return hash;
+        },
+
+        /**
+         * Fetches key for a state hash
+         *
+         * @returns {string}
+         */
+        stateHashKey: function () {
+            return PageableCollection.stateHashKey(this.inputName);
         }
     });
+
+    /**
+     * Generates name of URL parameter for collection state
+     *
+     * @static
+     * @param {string} inputName
+     * @returns {string}
+     */
+    PageableCollection.stateHashKey = function (inputName) {
+        return 'grid[' + inputName + ']';
+    };
+
+    /**
+     * Encode state object to string
+     *
+     * @static
+     * @param {Object} stateObject
+     * @return {string}
+     */
+    PageableCollection.encodeStateData = function (stateObject) {
+        var data;
+        data = _.pick(stateObject, _.keys(stateShortKeys));
+        data = tools.invertKeys(data, stateShortKeys);
+        return tools.packToQueryString(data);
+    };
+
+    /**
+     * Decode state object from string, operation is invert for encodeStateData.
+     *
+     * @static
+     * @param {string} stateString
+     * @return {Object}
+     */
+    PageableCollection.decodeStateData = function (stateString) {
+        var data = tools.unpackFromQueryString(stateString);
+        data = tools.invertKeys(data, _.invert(stateShortKeys));
+        return data;
+    };
 
     return PageableCollection;
 });

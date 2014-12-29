@@ -34,11 +34,11 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($value, $this->dashboard->getLabel());
     }
 
-    public function testIsDefault()
+    public function testGetIsDefault()
     {
-        $this->assertFalse($this->dashboard->isDefault());
+        $this->assertFalse($this->dashboard->getisDefault());
         $this->dashboard->setIsDefault(true);
-        $this->assertTrue($this->dashboard->isDefault());
+        $this->assertTrue($this->dashboard->getisDefault());
     }
 
     public function testName()
@@ -55,6 +55,14 @@ class DashboardTest extends \PHPUnit_Framework_TestCase
         $value = $this->getMock('Oro\\Bundle\\UserBundle\\Entity\\User');
         $this->assertEquals($this->dashboard, $this->dashboard->setOwner($value));
         $this->assertEquals($value, $this->dashboard->getOwner());
+    }
+
+    public function testOrganization()
+    {
+        $this->assertNull($this->dashboard->getOrganization());
+        $value = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->assertEquals($this->dashboard, $this->dashboard->setOrganization($value));
+        $this->assertEquals($value, $this->dashboard->getOrganization());
     }
 
     public function testStartDashboard()

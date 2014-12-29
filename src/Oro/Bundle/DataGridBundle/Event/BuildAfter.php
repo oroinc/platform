@@ -19,13 +19,9 @@ class BuildAfter extends Event implements GridEventInterface
     /** @var DatagridInterface */
     protected $datagrid;
 
-    /** @var array */
-    protected $parameters;
-
-    public function __construct(DatagridInterface $datagrid, array $parameters = array())
+    public function __construct(DatagridInterface $datagrid)
     {
         $this->datagrid = $datagrid;
-        $this->parameters = $parameters;
     }
 
     /**
@@ -34,13 +30,5 @@ class BuildAfter extends Event implements GridEventInterface
     public function getDatagrid()
     {
         return $this->datagrid;
-    }
-
-    /**
-     * @return array
-     */
-    public function getParameters()
-    {
-        return $this->parameters;
     }
 }

@@ -7,7 +7,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -36,21 +35,17 @@ class SearchResultsExtension extends AbstractExtension
     protected $dispatcher;
 
     /**
-     * @param RequestParameters        $requestParams
      * @param ResultFormatter          $formatter
      * @param EntityManager            $em
      * @param ObjectMapper             $mapper
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
-        RequestParameters $requestParams,
         ResultFormatter $formatter,
         EntityManager $em,
         ObjectMapper $mapper,
         EventDispatcherInterface $dispatcher
     ) {
-        parent::__construct($requestParams);
-
         $this->resultFormatter = $formatter;
         $this->em              = $em;
         $this->mapper          = $mapper;
@@ -71,40 +66,49 @@ class SearchResultsExtension extends AbstractExtension
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $rows = $result->offsetGetByPath('[data]');
-        $rows = is_array($rows) ? $rows : array();
+        $rows = is_array($rows) ? $rows : [];
 
         $rows = array_map(
             function (ResultRecordInterface $record) {
-                return $record->getRootEntity();
+                if ($rootEntity = $record->getRootEntity()) {
+                    return $rootEntity;
+                }
+
+                $entityName = $record->getValue('entityName');
+                $recordId   = $record->getValue('recordId');
+                if ($entityName && $recordId) {
+                    return new ResultItem(
+                        $this->em,
+                        $entityName,
+                        $recordId,
+                        null,
+                        null,
+                        null,
+                        $this->mapper->getEntityConfig($entityName)
+                    );
+                }
+
+                return null;
             },
             $rows
         );
 
-        $entities   = $this->resultFormatter->getResultEntities($rows);
+        $entities = $this->resultFormatter->getResultEntities($rows);
 
         $resultRows = [];
-        foreach ($rows as $row) {
-            $entity     = null;
-            $entityName = $row->getEntityName();
-            $entityId   = $row->getRecordId();
-            if (isset($entities[$entityName][$entityId])) {
-                $entity = $entities[$entityName][$entityId];
-            } else {
+        /** @var ResultItem $item */
+        foreach ($rows as $item) {
+            $entityName = $item->getEntityName();
+            $entityId   = $item->getRecordId();
+            if (!isset($entities[$entityName][$entityId])) {
                 continue;
             }
 
-            $item         = new ResultItem(
-                $this->em,
-                $entityName,
-                $entityId,
-                null,
-                null,
-                null,
-                $this->mapper->getEntityConfig($entityName)
-            );
-            $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
+            $entity = $entities[$entityName][$entityId];
 
             $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item, $entity));
+
+            $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
         }
 
         // set results

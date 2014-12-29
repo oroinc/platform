@@ -2,16 +2,28 @@
 
 namespace Oro\Bundle\SecurityBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class AclPermissionController extends Controller
 {
     /**
      * @Route(
-     *  "/acl-access-levels/{oid}", name="oro_security_access_levels" , requirements={"oid"="\w+:[\w\(\)]+"
-     * })
+     *  "/acl-access-levels/{oid}",
+     *  name="oro_security_access_levels",
+     *  requirements={"oid"="\w+:[\w\(\)]+"},
+     *  defaults={"_format"="json"}
+     * )
+     * @Template
      */
     public function aclAccessLevelsAction($oid)
     {
@@ -22,13 +34,36 @@ class AclPermissionController extends Controller
         $levels = $this
             ->get('oro_security.acl.manager')
             ->getAccessLevels($oid);
-        $translator = $this->get('translator');
-        foreach ($levels as $id => $label) {
-            $levels[$id] = $translator->trans('oro.security.access-level.' . $label);
+
+        return array('levels' => $levels);
+    }
+
+    /**
+     * @Route(
+     *      "/switch-organization/{id}",
+     *      name="oro_security_switch_organization", defaults={"id"=0}
+     * )
+     * @ParamConverter("organization", class="OroOrganizationBundle:Organization")
+     * @throws NotFoundHttpException, AccessDeniedException
+     */
+    public function switchOrganizationAction(Organization $organization)
+    {
+        $token = $this->container->get('security.context')->getToken();
+
+        if (!$token instanceof OrganizationContextTokenInterface ||
+            !$token->getUser() instanceof User ||
+            !$organization->isEnabled() ||
+            !$token->getUser()->getOrganizations()->contains($organization)
+        ) {
+            throw new AccessDeniedException(
+                $this->get('translator')->trans(
+                    'oro.security.organization.access_denied',
+                    array('%organization_name%' => $organization->getName())
+                )
+            );
         }
 
-        return new JsonResponse(
-            $levels
-        );
+        $token->setOrganizationContext($organization);
+        return $this->redirect($this->generateUrl('oro_default'));
     }
 }

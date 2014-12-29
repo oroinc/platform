@@ -1,0 +1,18 @@
+{
+    "OroCRM\\Bundle\\AccountBundle\\Entity\\Account": {
+        "label": "Account",
+        "name": "OroCRM\\Bundle\\AccountBundle\\Entity\\Account",
+        "fields": [
+            {
+                "name": "name",
+                "type": "string",
+                "label": "Account name"
+            },
+            {
+                "name": "createdAt",
+                "type": "datetime",
+                "label": "Created At"
+            }
+        ]
+    }
+}

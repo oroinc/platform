@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -23,6 +22,11 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      * @var EmailOwnerProvider
      */
     protected $emailOwnerProvider;
+
+    /**
+     * @var array
+     */
+    protected $changes = array();
 
     /**
      * @var Email[]
@@ -146,9 +150,6 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     public function addOrigin(EmailOrigin $origin)
     {
         $key = $origin->getId();
-        if (isset($this->origins[$key])) {
-            throw new \LogicException(sprintf('The origin %s already exists in the batch.', $origin));
-        }
         $this->origins[$key] = $origin;
     }
 
@@ -178,10 +179,22 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     }
 
     /**
+     * Get the list of all changes made by {@see persist()} method
+     * For example new objects can be replaced by existing ones from a database
+     *
+     * @return array [old, new] The list of changes
+     */
+    public function getChanges()
+    {
+        return $this->changes;
+    }
+
+    /**
      * Removes all objects from this batch processor
      */
     public function clear()
     {
+        $this->changes = array();
         $this->emails = array();
         $this->folders = array();
         $this->origins = array();
@@ -226,6 +239,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
                         foreach ($folders as $folder) {
                             $existingEmail->addFolder($folder);
                         }
+                        $this->changes[] = ['old' => $this->emails[$key], 'new' => $existingEmail];
                         unset($this->emails[$key]);
                     }
                 }
@@ -311,6 +325,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
             if ($dbObj === null) {
                 $em->persist($obj);
             } else {
+                $this->changes[] = ['old' => $obj, 'new' => $dbObj];
                 $this->updateFolderReferences($obj, $dbObj);
                 $this->folders[$key] = $dbObj;
             }
@@ -346,8 +361,8 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateFolderReferences(EmailFolder $old, EmailFolder $new)
     {
         foreach ($this->emails as $obj) {
-            if ($obj->removeFolder($old)) {
-                $obj->addFolder($new);
+            if ($obj->hasFolder($old)) {
+                $obj->removeFolder($old)->addFolder($new);
             }
         }
     }

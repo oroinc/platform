@@ -1,0 +1,9 @@
+parameters:
+    oro_integration.action.schedule_sync.class: Oro\Bundle\IntegrationBundle\Datagrid\ScheduleSyncAction
+
+services:
+    oro_integration.action.schedule_sync:
+        class: %oro_integration.action.schedule_sync.class%
+        scope: prototype
+        tags:
+            - { name:  oro_datagrid.extension.action.type, type: schedule-sync }

@@ -8,11 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 use JMS\Serializer\Annotation as Serializer;
 
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Model\EntityAwareInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
-use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 /**
  * Workflow item
@@ -27,11 +29,23 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  *  )
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
- * @Config()
+ * @Config(
+ *      defaultValues={
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
+ *      }
+ * )
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
  */
-class WorkflowItem
+class WorkflowItem implements EntityAwareInterface
 {
     /**
      * @var integer
@@ -112,6 +126,13 @@ class WorkflowItem
      * @var \Datetime $created
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $created;
 
@@ -119,6 +140,13 @@ class WorkflowItem
      * @var \Datetime $updated
      *
      * @ORM\Column(type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updated;
 
@@ -339,7 +367,7 @@ class WorkflowItem
     }
 
     /**
-     * @return object
+     * {@inheritdoc}
      */
     public function getEntity()
     {
@@ -431,7 +459,7 @@ class WorkflowItem
      */
     public function setAclIdentities($aclIdentities)
     {
-        $newAttributeSteps = array();
+        $newAttributeSteps = [];
         foreach ($aclIdentities as $aclIdentity) {
             $newAttributeSteps[] = $aclIdentity->getAclAttributeStepKey();
         }
@@ -512,7 +540,7 @@ class WorkflowItem
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }
@@ -522,7 +550,7 @@ class WorkflowItem
      *
      * @return \DateTime
      */
-    public function getUpdatedAt()
+    public function getUpdated()
     {
         return $this->updated;
     }

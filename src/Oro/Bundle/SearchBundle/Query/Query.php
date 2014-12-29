@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\Query;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Oro\Bundle\SearchBundle\Entity\IndexText;
 
 class Query
 {
@@ -37,6 +36,9 @@ class Query
     const TYPE_DECIMAL = 'decimal';
 
     const INFINITY = 10000000;
+    const FINITY   = 0.000001;
+
+    const DELIMITER = ' ';
 
     /**
      * @var array
@@ -76,8 +78,8 @@ class Query
     /**
      * @var string
      */
-
     protected $orderDirection;
+
     /**
      * @var array
      */
@@ -89,7 +91,7 @@ class Query
     protected $fields;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var ObjectManager
      */
     private $em;
 
@@ -98,9 +100,10 @@ class Query
         if ($queryType) {
             $this->createQuery($queryType);
         }
-        $this->options = array();
+
+        $this->options    = array();
         $this->maxResults = 0;
-        $this->from = false;
+        $this->from       = false;
     }
 
     /**
@@ -129,23 +132,23 @@ class Query
     public function setMappingConfig($mappingConfig)
     {
         $fields = array();
+
         foreach ($mappingConfig as $entity => $config) {
             foreach ($config['fields'] as $field) {
                 if (isset($field['relation_fields'])) {
                     $fields = $this->mapRelationFields($fields, $field, $entity);
-                } else {
-                    if (isset($field['target_fields']) && count($field['target_fields']) > 0) {
-                        $fields = $this->mapTargetFields($fields, $field, $entity);
-                    }
+                } elseif (isset($field['target_fields']) && count($field['target_fields']) > 0) {
+                    $fields = $this->mapTargetFields($fields, $field, $entity);
                 }
             }
         }
-        $this->fields = $fields;
+
+        $this->fields        = $fields;
         $this->mappingConfig = $mappingConfig;
     }
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $em
+     * @param ObjectManager $em
      */
     public function setEntityManager(ObjectManager $em)
     {
@@ -157,7 +160,7 @@ class Query
      *
      * @param string $query
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return Query
      */
     public function createQuery($query)
     {
@@ -171,18 +174,15 @@ class Query
      *
      * @param array|string $entities
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return Query
      */
     public function from($entities)
     {
         if (!is_array($entities)) {
-            $entities = array($entities);
+            $entities = [$entities];
         }
-        $this->from = $entities;
 
-        foreach ($this->from as $index => $fromValue) {
-            $this->from[$index] = $this->clearString($fromValue);
-        }
+        $this->from = $entities;
 
         return $this;
     }
@@ -195,9 +195,9 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return Query
      */
-    public function andWhere($fieldName, $condition, $fieldValue, $fieldType = null)
+    public function andWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
         return $this->where(self::KEYWORD_AND, $fieldName, $condition, $fieldValue, $fieldType);
     }
@@ -210,9 +210,9 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return Query
      */
-    public function orWhere($fieldName, $condition, $fieldValue, $fieldType = null)
+    public function orWhere($fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
         return $this->where(self::KEYWORD_OR, $fieldName, $condition, $fieldValue, $fieldType);
     }
@@ -226,26 +226,17 @@ class Query
      * @param string $fieldValue
      * @param string $fieldType
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
-     * @throws \InvalidArgumentException
+     * @return Query
      */
     public function where($keyWord, $fieldName, $condition, $fieldValue, $fieldType = self::TYPE_TEXT)
     {
-        //if ($fieldName!='*' && !$this->checkFieldInConfig($fieldName)) {
-        //    throw new \InvalidArgumentException('Field ' . $fieldName . ' does not exists in config');
-        //}
-
-        if ($fieldType == self::TYPE_TEXT) {
-            $fieldValue = $this->clearString($fieldValue);
-        }
-
-        $this->options[] = array(
+        $this->options[] = [
             'fieldName'  => $fieldName,
             'condition'  => $condition,
             'fieldValue' => $fieldValue,
             'fieldType'  => $fieldType,
             'type'       => $keyWord
-        );
+        ];
 
         return $this;
     }
@@ -303,7 +294,7 @@ class Query
      *
      * @param int $maxResults
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return Query
      */
     public function setMaxResults($maxResults)
     {
@@ -327,7 +318,7 @@ class Query
      *
      * @param int $firstResult
      *
-     * @return \Oro\Bundle\SearchBundle\Query\Query
+     * @return Query
      */
     public function setFirstResult($firstResult)
     {
@@ -355,11 +346,11 @@ class Query
      *
      * @return Query
      */
-    public function setOrderBy($fieldName, $direction = "ASC", $type = self::TYPE_TEXT)
+    public function setOrderBy($fieldName, $direction = self::ORDER_ASC, $type = self::TYPE_TEXT)
     {
-        $this->orderBy = $fieldName;
+        $this->orderBy        = $fieldName;
         $this->orderDirection = $direction;
-        $this->orderType = $type;
+        $this->orderType      = $type;
 
         return $this;
     }
@@ -367,7 +358,7 @@ class Query
     /**
      * Get order by field
      *
-     * @return array
+     * @return string
      */
     public function getOrderBy()
     {
@@ -387,13 +378,43 @@ class Query
     /**
      * Get order by direction
      *
-     * @return type
+     * @return string
      */
     public function getOrderDirection()
     {
         return $this->orderDirection;
     }
 
+    /**
+     * Clear string
+     *
+     * @param  string $inputString
+     * @return string
+     */
+    public static function clearString($inputString)
+    {
+        $string = trim(
+            preg_replace(
+                '/ +/',
+                self::DELIMITER,
+                preg_replace('/[^\w:*]/u', self::DELIMITER, $inputString)
+            )
+        );
+
+        $fullString = str_replace(self::DELIMITER, '', $string);
+        if (filter_var($fullString, FILTER_VALIDATE_INT)) {
+            return $fullString;
+        }
+
+        return $string;
+    }
+
+    /**
+     * @param array  $fields
+     * @param array  $field
+     * @param string $entity
+     * @return array
+     */
     private function mapTargetFields($fields, $field, $entity)
     {
         foreach ($field['target_fields'] as $targetFields) {
@@ -405,6 +426,12 @@ class Query
         return $fields;
     }
 
+    /**
+     * @param array  $fields
+     * @param array  $field
+     * @param string $entity
+     * @return array
+     */
     private function mapRelationFields($fields, $field, $entity)
     {
         foreach ($field['relation_fields'] as $relationField) {
@@ -418,18 +445,5 @@ class Query
         }
 
         return $fields;
-    }
-
-    /**
-     * Clear string
-     *
-     * @param  string $inputString
-     * @return string
-     */
-    private function clearString($inputString)
-    {
-        $clearedString = str_replace('-', IndexText::HYPHEN_SUBSTITUTION, $inputString);
-        $clearedString = trim(preg_replace('/ +/', ' ', mb_ereg_replace('[^\w:*]', ' ', $clearedString)));
-        return $clearedString;
     }
 }

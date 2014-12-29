@@ -17,11 +17,10 @@ class TagsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->add()
             ->setLabel('Label_' . $randomPrefix)
-            ->setOwner('Main')
-            ->setEntity('Tag', array('Create', 'Edit', 'Delete', 'View'), 'System')
-            ->setEntity('User', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
-            ->setEntity('Group', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
-            ->setEntity('Role', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'System')
+            ->setEntity('Tag', array('Create', 'Edit', 'Delete', 'View'), 'Organization')
+            ->setEntity('User', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
+            ->setEntity('Group', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
+            ->setEntity('Role', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setCapability(
                 array(
                     'Tag assign/unassign',
@@ -49,7 +48,7 @@ class TagsAcl extends Selenium2TestCase
         /** @var Users $login*/
         $login->openUsers('Oro\Bundle\UserBundle')
             ->add()
-            ->assertTitle('Create User - Users - Users Management - System')
+            ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($userName)
             ->setOwner('Main')
             ->enable()
@@ -59,11 +58,13 @@ class TagsAcl extends Selenium2TestCase
             ->setLastName('Last_'.$userName)
             ->setEmail($userName.'@mail.com')
             ->setRoles(array('Label_' . $role))
+            ->setOrganization('OroCRM')
+            ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - Users Management - System');
+            ->assertTitle('Users - User Management - System');
 
         return $userName;
     }
@@ -224,7 +225,7 @@ class TagsAcl extends Selenium2TestCase
             ->open(array($username))
             ->edit()
             ->assertElementNotPresent(
-                "//div[@id='s2id_oro_user_user_form_tags']//li[contains(., '{$tagName}')]" .
+                "//div[starts-with(@id,'s2id_oro_user_user_form_tags')]//li[contains(., '{$tagName}')]" .
                 "/a[@class='select2-search-choice-close']"
             );
     }

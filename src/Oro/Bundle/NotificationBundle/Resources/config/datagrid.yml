@@ -2,12 +2,13 @@ datagrid:
     email-notification-grid:
         options:
             entityHint: transactional email
+            entity_pagination: true
         source:
             acl_resource: oro_notification_emailnotification_view
             type: orm
             query:
                 select:
-                    - e
+                    - partial e.{id, entityName}
                     - event.name as eventName
                     - event.id as eventId
                     - recipientList.owner as ownerRecipient
@@ -77,14 +78,14 @@ datagrid:
         actions:
             update:
                 type: navigate
-                label: Update
+                label: oro.grid.action.update
                 acl_resource: oro_notification_emailnotification_update
                 icon: edit
                 link: update_link
                 rowAction: true
             delete:
                 type: delete
-                label: Delete
+                label: oro.grid.action.delete
                 acl_resource: oro_notification_emailnotification_delete
                 icon: trash
                 link: delete_link
@@ -97,10 +98,10 @@ datagrid:
                     type: choice
                     data_name: e.entityName
                     options:
-                        is_translated_choices: true
                         field_options:
                             multiple: true
                             choices: @oro_entity.datagrid_helper->getEntityNames
+                            translatable_options: false
 
                 eventName:
                     filter_by_having: true

@@ -8,8 +8,9 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * Class User
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\Users openUsers() openUsers()
- * @method \Oro\Bundle\UserBundle\Tests\Selenium\Pages\User assertTitle() assertTitle($title, $message = '')
+ * @method Users openUsers() openUsers(string)
+ * @method User openUser() openUser(string)
+ * @method User assertTitle() assertTitle($title, $message = '')
  */
 class User extends AbstractPageEntity
 {
@@ -178,8 +179,9 @@ class User extends AbstractPageEntity
 
     public function verifyTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_oro_user_user_form_tags_autocomplete']")) {
-            $this->tags = $this->test->byXpath("//div[@id='s2id_oro_user_user_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]")) {
+            $this->tags = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]//input");
             $this->tags->click();
             $this->tags->value(substr($tag, 0, (strlen($tag)-1)));
             $this->waitForAjax();
@@ -208,8 +210,9 @@ class User extends AbstractPageEntity
      */
     public function setTag($tag)
     {
-        if ($this->isElementPresent("//div[@id='s2id_oro_user_user_form_tags_autocomplete']")) {
-            $this->tags = $this->test->byXpath("//div[@id='s2id_oro_user_user_form_tags_autocomplete']//input");
+        if ($this->isElementPresent("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]")) {
+            $this->tags = $this->test
+                ->byXpath("//div[starts-with(@id,'s2id_oro_user_user_form_tags_autocomplete')]//input");
             $this->tags->click();
             $this->tags->value($tag);
             $this->waitForAjax();
@@ -241,14 +244,18 @@ class User extends AbstractPageEntity
                 }
                 $condition .= "normalize-space(text()) = '{$role}'";
             }
-            $this->roles->element(
+            $element = $this->roles->element(
                 $this->test->using('xpath')->value("div[label[{$condition}]]/input")
-            )->click();
+            );
+            $this->test->moveto($element);
+            $element->click();
         } else {
             foreach ($roles as $role) {
-                $this->roles->element(
+                $element = $this->roles->element(
                     $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
-                )->click();
+                );
+                $this->test->moveto($element);
+                $element->click();
             }
         }
 
@@ -261,6 +268,23 @@ class User extends AbstractPageEntity
         foreach ($groups as $group) {
             $this->groups->element(
                 $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$group}']]/input")
+            )->click();
+        }
+
+        return $this;
+    }
+
+    /**
+     * This method can set Business units and Organizations
+     * @param array $businessUnits
+     * @return $this
+     */
+    public function setBusinessUnit($businessUnits = array('Main'))
+    {
+        foreach ($businessUnits as $businessUnit) {
+            $this->test->byXpath(
+                "//div[@id='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]".
+                "/preceding-sibling::input"
             )->click();
         }
 
@@ -314,16 +338,16 @@ class User extends AbstractPageEntity
         )->click();
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ".
-            "ui-front ui-draggable ui-resizable ui-dialog-normal ui-dialog-buttons']"
+            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
+            "ui-dialog-normal']"
         );
         $this->test->byXpath(
             "//div[@class='ui-dialog-titlebar-buttonpane']/button[@title='close']"
         )->click();
         $this->waitForAjax();
         $this->assertElementNotPresent(
-            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all " .
-            "ui-front ui-draggable ui-resizable ui-dialog-normal ui-dialog-buttons']"
+            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
+            "ui-dialog-normal']"
         );
 
         return $this;

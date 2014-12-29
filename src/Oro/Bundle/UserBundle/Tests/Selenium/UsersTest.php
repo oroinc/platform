@@ -17,8 +17,9 @@ class UsersTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
+            ->assertTitle('Users - User Management - System')
             ->add()
-            ->assertTitle('Create User - Users - Users Management - System')
+            ->assertTitle('Create User - Users - User Management - System')
             ->setUsername($username)
             ->enable()
             ->setOwner('Main')
@@ -28,12 +29,13 @@ class UsersTest extends Selenium2TestCase
             ->setLastName('Last_'.$username)
             ->setEmail($username.'@mail.com')
             ->setRoles(array('Manager', 'Marketing Manager'), true)
+            ->setOrganization('OroCRM')
             ->uncheckInviteUser()
             ->save()
             ->assertMessage('User saved')
             ->toGrid()
             ->close()
-            ->assertTitle('Users - Users Management - System');
+            ->assertTitle('Users - User Management - System');
 
         return $username;
     }
@@ -53,14 +55,14 @@ class UsersTest extends Selenium2TestCase
             ->filterBy('Username', $username)
             ->open(array($username))
             ->edit()
-            ->assertTitle('First_' . $username . ' Last_' . $username . ' - Edit - Users - Users Management - System')
+            ->assertTitle('First_' . $username . ' Last_' . $username . ' - Edit - Users - User Management - System')
             ->setUsername($newUsername)
             ->setFirstName('First_' . $newUsername)
             ->setLastName('Last_' . $newUsername)
             ->save()
             ->assertMessage('User saved')
             ->toGrid()
-            ->assertTitle('Users - Users Management - System')
+            ->assertTitle('Users - User Management - System')
             ->close();
 
         return $newUsername;
@@ -93,7 +95,7 @@ class UsersTest extends Selenium2TestCase
             ->filterBy('Username', $username)
             ->open(array($username))
             ->delete()
-            ->assertTitle('Users - Users Management - System')
+            ->assertTitle('Users - User Management - System')
             ->assertMessage('User deleted');
 
         $login->openUsers('Oro\Bundle\UserBundle')

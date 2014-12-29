@@ -6,7 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
+
+use Oro\Bundle\UserBundle\Entity\UserApi;
 
 class GenerateWSSEHeaderCommand extends ContainerAwareCommand
 {
@@ -16,10 +19,10 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
     public function configure()
     {
         $this->setName('oro:wsse:generate-header');
-        $this->setDescription('Generate X-WSSE HTTP header for a given user');
+        $this->setDescription('Generate X-WSSE HTTP header for a given API key');
         $this->setDefinition(
             array(
-                 new InputArgument('username', InputArgument::REQUIRED, 'The username'),
+                new InputArgument('apiKey', InputArgument::REQUIRED, 'User API Key'),
             )
         );
     }
@@ -33,18 +36,30 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $username = $input->getArgument('username');
-        $user     = $this
-            ->getContainer()
-            ->get('oro_user.manager')
-            ->findUserByUsername($username);
-
-        if (null === $user) {
-            throw new \InvalidArgumentException(sprintf('User "%s" does not exist', $username));
+        /** @var ContainerInterface $container */
+        $container = $this->getContainer();
+        $apiKey = $input->getArgument('apiKey');
+        /** @var UserApi $userApi */
+        $userApi = $container->get('doctrine')->getRepository('OroUserBundle:UserApi')->findOneBy(
+            ['apiKey' => $apiKey]
+        );
+        if (!$userApi) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'API key "%s" does not exists',
+                    $apiKey
+                )
+            );
         }
-
-        if (null === $user->getApi() || null === $user->getApi()->getApiKey()) {
-            throw new \InvalidArgumentException(sprintf('User "%s" does not yet have an API key generated', $username));
+        $user = $userApi->getUser();
+        $organization = $userApi->getOrganization();
+        if (!$organization->isEnabled()) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Organization for API key "%s" is not active',
+                    $apiKey
+                )
+            );
         }
 
         $created = date('c');
@@ -55,13 +70,13 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $salt   = ''; // do not use real salt here, because API key already encrypted enough
 
         /** @var MessageDigestPasswordEncoder $encoder */
-        $encoder        = $this->getContainer()->get('escape_wsse_authentication.encoder.wsse_secured');
+        $encoder        = $container->get('escape_wsse_authentication.encoder.wsse_secured');
         $passwordDigest = $encoder->encodePassword(
             sprintf(
                 '%s%s%s',
                 base64_decode($nonce),
                 $created,
-                $user->getApi()->getApiKey()
+                $userApi->getApiKey()
             ),
             $salt
         );
@@ -71,7 +86,7 @@ class GenerateWSSEHeaderCommand extends ContainerAwareCommand
         $output->writeln(
             sprintf(
                 'X-WSSE: UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
-                $username,
+                $user->getUsername(),
                 $passwordDigest,
                 $nonce,
                 $created

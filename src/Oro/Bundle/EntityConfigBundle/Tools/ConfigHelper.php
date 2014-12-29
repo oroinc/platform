@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tools;
 
 use Doctrine\Common\Util\Inflector;
 
+use Oro\Bundle\UIBundle\Tools\EntityLabelBuilder;
+
 class ConfigHelper
 {
     private static $configModelClasses = [
@@ -26,7 +28,7 @@ class ConfigHelper
 
     /**
      * Returns translation key (placeholder) by entity class name, field name and property code
-     * example:
+     * examples (for default scope which is 'entity'):
      *      [vendor].[bundle].[entity].[field].[config property]
      *      oro.user.group.name.label
      *
@@ -36,7 +38,18 @@ class ConfigHelper
      *      if NO fieldName -> add prefix 'entity_'
      *      oro.user.entity_label
      *      oro.user.group.entity_label
+     * examples (for other scopes, for instance 'test'):
+     *      [vendor].[bundle].[entity].[field].[scope]_[config property]
+     *      oro.user.group.name.test_label
      *
+     *      if [entity] == [bundle] -> skip it
+     *      oro.user.first_name.test_label
+     *
+     *      if NO fieldName -> add prefix 'entity_'
+     *      oro.user.entity_test_label
+     *      oro.user.group.entity_test_label
+     *
+     * @param string $scope
      * @param string $propertyName property key: label, description, plural_label, etc.
      * @param string $className
      * @param string $fieldName
@@ -44,8 +57,11 @@ class ConfigHelper
      * @return string
      * @throws \InvalidArgumentException
      */
-    public static function getTranslationKey($propertyName, $className, $fieldName = null)
+    public static function getTranslationKey($scope, $propertyName, $className, $fieldName = null)
     {
+        if (empty($scope)) {
+            throw new \InvalidArgumentException('$scope must not be empty');
+        }
         if (empty($propertyName)) {
             throw new \InvalidArgumentException('$propertyName must not be empty');
         }
@@ -53,28 +69,22 @@ class ConfigHelper
             throw new \InvalidArgumentException('$className must not be empty');
         }
 
-        //example: className - OroCRM\Bundle\ContactBundle\Entity\ContactAddress
-        $class = str_replace(['Bundle\\Entity', 'Bundle\\'], '', $className);
-
-        //example: className - OroCRM\Contact\ContactAddress
-        $classArray = explode('\\', strtolower($class));
-        $classArray = array_filter($classArray);
-
-        $keyArray = [];
-        foreach ($classArray as $item) {
-            if (!in_array(Inflector::camelize($item), $keyArray)) {
-                $keyArray[] = Inflector::camelize($item);
-            }
+        // handle 'entity' scope separately
+        if ($scope === 'entity') {
+            return EntityLabelBuilder::getTranslationKey($propertyName, $className, $fieldName);
         }
 
+        $parts = EntityLabelBuilder::explodeClassName($className);
+
+        $propertyName = Inflector::tableize($scope) . '_' . $propertyName;
         if ($fieldName) {
-            $keyArray[] = Inflector::tableize($fieldName);
+            $parts[] = Inflector::tableize($fieldName);
+            $parts[] = $propertyName;
+        } else {
+            $parts[] = 'entity_' . $propertyName;
         }
 
-        $propertyName = Inflector::tableize($propertyName);
-        $keyArray[]   = $fieldName ? $propertyName : 'entity_' . $propertyName;
-
-        return implode('.', $keyArray);
+        return implode('.', $parts);
     }
 
     /**

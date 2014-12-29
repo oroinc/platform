@@ -27,7 +27,7 @@ class WebSocketSendProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $reminder;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->topicPublisher = $this->getMockBuilder('Oro\Bundle\SyncBundle\Wamp\TopicPublisher')
             ->disableOriginalConstructor()

@@ -40,6 +40,7 @@ define(['jquery', 'underscore', './view', 'json'
          */
         initialize: function (options) {
             options = options || {};
+            this.options = _.defaults(options, this.options);
 
             if (!options.autocompleteFieldId) {
                 throw new TypeError("'autocompleteFieldId' is required");

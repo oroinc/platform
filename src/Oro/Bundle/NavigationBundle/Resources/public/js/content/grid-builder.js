@@ -1,19 +1,15 @@
+/*jslint nomen:true */
 /*global define*/
 define(['underscore', '../content-manager'], function (_, ContentManager) {
     'use strict';
 
-    var initialized = false,
-        methods = {
-            initHandler: function ($el) {
-                this.metadata = $el.data('metadata') || {};
-
-                if (!_.isUndefined(this.metadata.options) && _.isArray(this.metadata.options.contentTags || [])) {
-                    ContentManager.tagContent(this.metadata.options.contentTags);
-                }
-
-                initialized = true;
+    var methods = {
+        initHandler: function (deferred, metadata) {
+            if (metadata.options && _.isArray(metadata.options.contentTags)) {
+                ContentManager.tagContent(metadata.options.contentTags);
             }
-        };
+        }
+    };
 
     return {
         /** @property [] */
@@ -33,13 +29,19 @@ define(['underscore', '../content-manager'], function (_, ContentManager) {
         /**
          * Builder interface implementation
          *
-         * @param $el
-         * @param {String} gridName
+         * @param {jQuery.Deferred} deferred
+         * @param {Object} options
+         * @param {jQuery} [options.$el] container for the grid
+         * @param {string} [options.gridName] grid name
+         * @param {Object} [options.gridPromise] grid builder's promise
+         * @param {Object} [options.data] data for grid's collection
+         * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function ($el, gridName) {
-            if (_.indexOf(this.allowedTracking, gridName) !== -1) {
-                methods.initHandler($el);
+        init: function (deferred, options) {
+            if (_.indexOf(this.allowedTracking, options.gridName) !== -1) {
+                methods.initHandler(deferred, options.metadata);
             }
+            deferred.resolve();
         }
     };
 });

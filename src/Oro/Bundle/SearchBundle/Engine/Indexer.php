@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -21,9 +22,9 @@ class Indexer
     const SEARCH_ENTITY_PERMISSION = 'VIEW';
 
     /**
-     * @var AbstractEngine
+     * @var EngineInterface
      */
-    protected $adapter;
+    protected $engine;
 
     /**
      * @var ObjectManager
@@ -42,18 +43,18 @@ class Indexer
 
     /**
      * @param ObjectManager $em
-     * @param AbstractEngine $adapter
+     * @param EngineInterface $engine
      * @param ObjectMapper $mapper
      * @param SecurityProvider $securityProvider
      */
     public function __construct(
         ObjectManager $em,
-        AbstractEngine $adapter,
+        EngineInterface $engine,
         ObjectMapper $mapper,
         SecurityProvider $securityProvider
     ) {
         $this->em      = $em;
-        $this->adapter = $adapter;
+        $this->engine  = $engine;
         $this->mapper  = $mapper;
         $this->securityProvider = $securityProvider;
     }
@@ -96,7 +97,9 @@ class Indexer
             $query->from('*');
         }
 
-        $query->andWhere(self::TEXT_ALL_DATA_FIELD, '~', $searchString, 'text');
+        if ($searchString) {
+            $query->andWhere(self::TEXT_ALL_DATA_FIELD, Query::OPERATOR_CONTAINS, $searchString, Query::TYPE_TEXT);
+        }
 
         if ($maxResults > 0) {
             $query->setMaxResults($maxResults);
@@ -136,13 +139,13 @@ class Indexer
      */
     public function query(Query $query)
     {
-        $this->applyAclToQuery($query);
+        $this->prepareQuery($query);
         // we haven't allowed entities, so return null search result
         if (count($query->getFrom()) == 0) {
             return new Result($query, array(), 0);
         }
 
-        return $this->adapter->search($query);
+        return $this->engine->search($query);
     }
 
     /**
@@ -156,6 +159,17 @@ class Indexer
         $parser = new Parser($this->mapper->getMappingConfig());
 
         return $this->query($parser->getQueryFromString($searchString));
+    }
+
+    /**
+     * Do query manipulations such as ACL apply etc.
+     *
+     * @param Query $query
+     */
+    protected function prepareQuery(Query $query)
+    {
+        $this->applyModesBehavior($query);
+        $this->applyAclToQuery($query);
     }
 
     /**
@@ -178,8 +192,58 @@ class Indexer
                 }
             }
             $query->from($queryFromEntities);
-        } else {
+        } elseif ($allowedEntities != $this->mapper->getEntitiesListAliases()) {
             $query->from($allowedEntities);
+        }
+    }
+
+    /**
+     * Apply special behavior of class inheritance processing
+     *
+     * @param Query $query
+     */
+    protected function applyModesBehavior(Query $query)
+    {
+        // process abstract indexes
+        // make hashes increasing performance
+        $fromParts   = (array)$query->getFrom();
+        $fromHash    = array_combine($fromParts, $fromParts);
+        $aliases     = $this->mapper->getEntitiesListAliases();
+        $aliasesHash = array_flip($aliases);
+
+        if (!isset($fromHash['*'])) {
+            foreach ($fromParts as $part) {
+                $entityName = $part;
+                $isAlias    = false;
+                if (isset($aliasesHash[$part])) {
+                    // find real name by alias
+                    $entityName = $aliasesHash[$part];
+                    $isAlias    = true;
+                }
+
+                $mode        = $this->mapper->getEntityModeConfig($entityName);
+                $descendants = $this->mapper->getRegisteredDescendants($entityName);
+                if (false !== $descendants) {
+                    // add descendants to from clause
+                    foreach ($descendants as $fromPart) {
+                        if ($isAlias) {
+                            $fromPart = $aliases[$fromPart];
+                        }
+                        if (!isset($fromHash[$fromPart])) {
+                            $fromHash[$fromPart] = $fromPart;
+                        }
+                    }
+                }
+
+                if ($mode === Mode::ONLY_DESCENDANTS) {
+                    unset($fromHash[$part]);
+                }
+            }
+        }
+
+        $collectedParts = array_values($fromHash);
+        if ($collectedParts !== $fromParts) {
+            $query->from($collectedParts);
         }
     }
 

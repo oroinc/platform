@@ -1,0 +1,18 @@
+# max_results test case
+request:
+    search: item
+    offset: ~
+    max_results: 1
+response:
+    records_count: 9
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_url: http://localhost/search/
+    soap:
+        item:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordUrl: http://localhost/search/

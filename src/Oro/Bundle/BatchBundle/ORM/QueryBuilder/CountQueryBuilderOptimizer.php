@@ -3,6 +3,7 @@
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Query\Expr\GroupBy;
 use Doctrine\ORM\QueryBuilder;
 
 class CountQueryBuilderOptimizer
@@ -40,6 +41,7 @@ class CountQueryBuilderOptimizer
         $this->originalQb = $originalQb;
 
         $this->qbTools->prepareFieldAliases($originalQb->getDQLPart('select'));
+        $this->qbTools->prepareJoinTablePaths($originalQb->getDQLPart('join'));
         $this->rootAlias = current($this->originalQb->getRootAliases());
         $this->initIdFieldName();
     }
@@ -59,16 +61,23 @@ class CountQueryBuilderOptimizer
         $qb->setFirstResult(null)
             ->setMaxResults(null)
             ->resetDQLPart('orderBy')
+            ->resetDQLPart('groupBy')
             ->resetDQLPart('select')
             ->resetDQLPart('join')
             ->resetDQLPart('where')
             ->resetDQLPart('having');
 
-        $this->qbTools->prepareFieldAliases($parts['select']);
-        $fieldsToSelect = array($this->getFieldFQN($this->idFieldName));
-        $usedAliases = array();
+        $fieldsToSelect = array();
         if ($parts['groupBy']) {
-            $usedAliases = array_merge($usedAliases, $this->qbTools->getUsedAliases((array) $parts['groupBy']));
+            $groupBy = (array) $parts['groupBy'];
+            $groupByFields = $this->getSelectFieldFromGroupBy($groupBy);
+            $usedGroupByAliases = [];
+            foreach ($groupByFields as $key => $groupByField) {
+                $alias = '_groupByPart' . $key;
+                $usedGroupByAliases[] = $alias;
+                $fieldsToSelect[] = $groupByField . ' as ' . $alias;
+            }
+            $qb->groupBy(implode(', ', $usedGroupByAliases));
         } elseif (!$parts['where'] && $parts['having']) {
             // If there is no where and group by, but having is present - convert having to where.
             $parts['where'] = $parts['having'];
@@ -77,58 +86,28 @@ class CountQueryBuilderOptimizer
         }
 
         if ($parts['having']) {
-            $usedAliases = array_merge($usedAliases, $this->qbTools->getUsedAliases($parts['having']));
-            $parts['having'] = $this->qbTools->fixHavingAliases($parts['having']);
-            $qb->having($parts['having']);
+            $qb->having(
+                $this->qbTools->replaceAliasesWithFields($parts['having'])
+            );
         }
 
         $hasJoins = false;
         if ($parts['join']) {
             $hasJoins = $this->addJoins($qb, $parts);
         }
-
-        // Add group by fields to select fields.
-        foreach ($usedAliases as $alias) {
-            $fieldsToSelect[] = $this->qbTools->getFieldByAlias($alias) . ' as ' . $alias;
-        }
-        if ($parts['having']) {
-            $fieldsToSelect = $this->appendFieldsToSelect(
-                $this->qbTools->getFields($parts['having']),
-                $fieldsToSelect
-            );
+        if (!$parts['groupBy']) {
+            $qb->distinct($hasJoins);
+            $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
         }
 
         if ($parts['where']) {
             $qb->where($this->qbTools->replaceAliasesWithFields($parts['where']));
         }
 
-        $qb->select($fieldsToSelect);
-        $qb->distinct($hasJoins);
+        $qb->select(array_unique($fieldsToSelect));
         $this->qbTools->fixUnusedParameters($qb);
 
         return $qb;
-    }
-
-    /**
-     * @param array $fields
-     * @param array $fieldsToSelect
-     * @return array
-     */
-    protected function appendFieldsToSelect($fields, $fieldsToSelect)
-    {
-        $result = $fieldsToSelect;
-        $select = implode(' ,', $fieldsToSelect) . ' ';
-        $idx = 0;
-        $prefix = '_havingField';
-        foreach ($fields as $field) {
-            if (stripos($select, $field . ' ') === false) {
-                $alias = $prefix . $idx;
-                $result[] = $field . ' as ' . $alias;
-                $idx++;
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -153,11 +132,13 @@ class CountQueryBuilderOptimizer
         /** @var Expr\Join $join */
         $hasJoins = false;
         foreach ($parts['join'][$this->rootAlias] as $join) {
-            $alias = $join->getAlias();
+            $alias     = $join->getAlias();
             // To count results number join all tables with inner join and required to tables
             if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin)) {
                 $hasJoins = true;
                 $condition = $this->qbTools->replaceAliasesWithFields($join->getCondition());
+                $condition = $this->qbTools->replaceAliasesWithJoinPaths($condition);
+
                 if ($join->getJoinType() == Expr\Join::INNER_JOIN) {
                     $qb->innerJoin(
                         $join->getJoin(),
@@ -214,5 +195,42 @@ class CountQueryBuilderOptimizer
         }
 
         return $fieldName;
+    }
+
+    /**
+     * @param GroupBy[] $groupBy
+     * @return array
+     */
+    protected function getSelectFieldFromGroupBy(array $groupBy)
+    {
+        $expressions = array();
+        foreach ($groupBy as $groupByPart) {
+            foreach ($groupByPart->getParts() as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        }
+
+        return $expressions;
+    }
+
+    /**
+     * @param string $groupByPart
+     * @return array
+     */
+    protected function getSelectFieldFromGroupByPart($groupByPart)
+    {
+        $expressions = array();
+        if (strpos($groupByPart, ',') !== false) {
+            $groupByParts = explode(',', $groupByPart);
+            foreach ($groupByParts as $part) {
+                $expressions = array_merge($expressions, $this->getSelectFieldFromGroupByPart($part));
+            }
+        } else {
+            $groupByPart = trim($groupByPart);
+            $groupByPart = $this->qbTools->replaceAliasesWithFields($groupByPart);
+            $expressions[] = $groupByPart;
+        }
+
+        return $expressions;
     }
 }

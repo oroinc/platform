@@ -8,12 +8,13 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
-use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendColumn;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
@@ -49,7 +50,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator)
     {
@@ -64,7 +65,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Schema $schema
      * @param string $entityName
      * @param array  $options
+     *
      * @return Table
+     *
      * @throws \InvalidArgumentException
      */
     public function createCustomEntityTable(
@@ -72,34 +75,33 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $entityName,
         array $options = []
     ) {
-        $className = ExtendConfigDumper::ENTITY . $entityName;
+        $className = ExtendHelper::ENTITY_NAMESPACE . $entityName;
         $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
         $table     = $schema->createTable($tableName);
+        $this->entityMetadataHelper->registerEntityClass($tableName, $className);
 
+        $options = new OroOptions($options);
         // set options
-        if (!isset($options['extend'])) {
-            $options['extend'] = [];
-        }
-        $options[ExtendOptionsManager::ENTITY_CLASS_OPTION] = $className;
-        if (isset($options['extend']['owner'])) {
-            if ($options['extend']['owner'] !== ExtendScope::OWNER_CUSTOM) {
+        $options->setAuxiliary(ExtendOptionsManager::ENTITY_CLASS_OPTION, $className);
+        if ($options->has('extend', 'owner')) {
+            if ($options->get('extend', 'owner') !== ExtendScope::OWNER_CUSTOM) {
                 throw new \InvalidArgumentException(
                     sprintf('The "extend.owner" option for a custom entity must be "%s".', ExtendScope::OWNER_CUSTOM)
                 );
             }
         } else {
-            $options['extend']['owner'] = ExtendScope::OWNER_CUSTOM;
+            $options->set('extend', 'owner', ExtendScope::OWNER_CUSTOM);
         }
-        if (isset($options['extend']['is_extend'])) {
-            if ($options['extend']['is_extend'] !== true) {
+        if ($options->has('extend', 'is_extend')) {
+            if ($options->get('extend', 'is_extend') !== true) {
                 throw new \InvalidArgumentException(
                     'The "extend.is_extend" option for a custom entity must be TRUE.'
                 );
             }
         } else {
-            $options['extend']['is_extend'] = true;
+            $options->set('extend', 'is_extend', true);
         }
-        $table->addOption(ExtendColumn::ORO_OPTIONS_NAME, $options);
+        $table->addOption(OroOptions::KEY, $options);
 
         // add a primary key
         $table->addColumn(self::AUTO_GENERATED_ID_COLUMN_NAME, 'integer', ['autoincrement' => true]);
@@ -109,12 +111,213 @@ class ExtendExtension implements NameGeneratorAwareInterface
     }
 
     /**
+     * Creates a table that is used to store enum values for the enum with the given code.
+     *
+     * @param Schema        $schema
+     * @param string        $enumCode   The unique identifier of an enum
+     * @param bool          $isMultiple Indicates whether several options can be selected for this enum
+     *                                  or it supports only one selected option
+     * @param bool          $isPublic   Indicates whether this enum can be used by any entity or
+     *                                  it is designed to use in one entity only
+     * @param bool|string[] $immutable  Indicates whether the changing the list of enum values and
+     *                                  public flag is allowed or not. More details can be found
+     *                                  in entity_config.yml
+     * @param array         $options
+     *
+     * @return Table A table that is used to store enum values
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function createEnum(
+        Schema $schema,
+        $enumCode,
+        $isMultiple = false,
+        $isPublic = false,
+        $immutable = false,
+        array $options = []
+    ) {
+        if ($enumCode !== ExtendHelper::buildEnumCode($enumCode)) {
+            new \InvalidArgumentException(
+                sprintf(
+                    'The enum code "%s" must contain only lower alphabetical symbols, numbers and underscore.',
+                    $enumCode
+                )
+            );
+        }
+
+        $tableName = $this->nameGenerator->generateEnumTableName($enumCode);
+        $className = ExtendHelper::buildEnumValueClassName($enumCode);
+
+        $options = array_replace_recursive(
+            [
+                ExtendOptionsManager::MODE_OPTION         => ConfigModelManager::MODE_HIDDEN,
+                ExtendOptionsManager::ENTITY_CLASS_OPTION => $className,
+                'entity'                                  => [
+                    'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode),
+                    'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
+                    'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode)
+                ],
+                'extend'                                  => [
+                    'owner'     => ExtendScope::OWNER_SYSTEM,
+                    'is_extend' => true,
+                    'table'     => $tableName,
+                    'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
+                ],
+                'enum'                                    => [
+                    'code'     => $enumCode,
+                    'public'   => $isPublic,
+                    'multiple' => $isMultiple
+                ]
+            ],
+            $options
+        );
+        if ($immutable) {
+            $options['enum']['immutable'] = true;
+        }
+
+        $table = $schema->createTable($tableName);
+        $this->entityMetadataHelper->registerEntityClass($tableName, $className);
+        $table->addOption(OroOptions::KEY, $options);
+
+        $table->addColumn(
+            'id',
+            'string',
+            [
+                'length'        => ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH,
+                OroOptions::KEY => [
+                    'entity' => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
+                    ]
+                ]
+            ]
+        );
+        $table->addColumn(
+            'name',
+            'string',
+            [
+                'length'        => 255,
+                OroOptions::KEY => [
+                    'entity' => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
+                    ]
+                ]
+            ]
+        );
+        $table->addColumn(
+            'priority',
+            'integer',
+            [
+                OroOptions::KEY => [
+                    'entity' => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
+                    ]
+                ]
+            ]
+        );
+        $table->addColumn(
+            'is_default',
+            'boolean',
+            [
+                OroOptions::KEY => [
+                    ExtendOptionsManager::FIELD_NAME_OPTION => 'default',
+                    'entity'                                => [
+                        'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
+                        'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
+                    ]
+                ]
+            ]
+        );
+        $table->setPrimaryKey(['id']);
+
+        return $table;
+    }
+
+    /**
+     * Adds enumerable field
+     *
+     * Take in attention that this method creates new private enum if the enum with the given code
+     * is not exist yet. If you want to create a public enum use {@link createEnum} method before.
+     *
+     * @param Schema        $schema
+     * @param Table|string  $table           A Table object or table name
+     * @param string        $associationName A relation name
+     * @param string        $enumCode        The target enum identifier
+     * @param bool          $isMultiple      Indicates whether several options can be selected for this enum
+     *                                       or it supports only one selected option
+     * @param bool|string[] $immutable       Indicates whether the changing the list of enum values and
+     *                                       public flag is allowed or not. More details can be found
+     *                                       in entity_config.yml
+     * @param array         $options
+     */
+    public function addEnumField(
+        Schema $schema,
+        $table,
+        $associationName,
+        $enumCode,
+        $isMultiple = false,
+        $immutable = false,
+        array $options = []
+    ) {
+        $enumTableName = $this->nameGenerator->generateEnumTableName($enumCode);
+        $selfTable     = $this->getTable($table, $schema);
+
+        // make sure a table that is used to store enum values exists
+        if (!$schema->hasTable($enumTableName)) {
+            $this->createEnum($schema, $enumCode, $isMultiple, false, $immutable);
+        }
+
+        // create appropriate relation
+        $options['enum']['enum_code'] = $enumCode;
+        if ($isMultiple) {
+            $options['extend']['without_default'] = true;
+            $this->addManyToManyRelation(
+                $schema,
+                $selfTable,
+                $associationName,
+                $enumTableName,
+                ['name'],
+                ['name'],
+                ['name'],
+                $options,
+                'multiEnum'
+            );
+            // create a column that will contain selected options
+            // this column is required to avoid group by clause when multiple enum is shown in a datagrid
+            $selfTable->addColumn(
+                $this->nameGenerator->generateMultiEnumSnapshotColumnName($associationName),
+                'string',
+                [
+                    'notnull' => false,
+                    'length'  => ExtendHelper::MAX_ENUM_SNAPSHOT_LENGTH
+                ]
+            );
+        } else {
+            $this->addManyToOneRelation(
+                $schema,
+                $selfTable,
+                $associationName,
+                $enumTableName,
+                'name',
+                $options,
+                'enum'
+            );
+        }
+    }
+
+    /**
      * Adds OptionSet column
      *
      * @param Schema       $schema
      * @param Table|string $table A Table object or table name
      * @param string       $optionSetName
      * @param array        $options
+     *
+     * @deprecated since 1.4. Will be removed in 2.0
      */
     public function addOptionSet(
         Schema $schema,
@@ -142,7 +345,12 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string[]     $targetTitleColumnNames    Column names are used to show a title of related entity
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
-     * @param array        $options
+     * @param array        $options                   Entity config values
+     *                                                format is [CONFIG_SCOPE => [CONFIG_KEY => CONFIG_VALUE]]
+     * @param string       $fieldType                 The field type. By default the field type is oneToMany,
+     *                                                but you can specify another type if it is based on oneToMany.
+     *                                                In this case this type should be registered
+     *                                                in entity_extend.yml under underlying_types section
      */
     public function addOneToManyRelation(
         Schema $schema,
@@ -152,14 +360,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
-        array $options = []
+        array $options = [],
+        $fieldType = 'oneToMany'
     ) {
         $this->ensureExtendFieldSet($options);
 
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
 
@@ -168,19 +376,22 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $targetColumnName           = $this->nameGenerator
             ->generateOneToManyRelationColumnName($selfClassName, $associationName);
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
-        $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
         $this->checkColumnsExist($targetTable, $targetDetailedColumnNames);
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
-        $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex([$selfColumnName]);
-        $selfTable->addForeignKeyConstraint(
-            $targetTable,
-            [$selfColumnName],
-            [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
-        );
+        if (!isset($options['extend']['without_default']) || !$options['extend']['without_default']) {
+            $selfColumnName         = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
+            $targetPrimaryKeyColumn = $targetTable->getColumn($targetPrimaryKeyColumnName);
+            $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
+            $selfTable->addUniqueIndex([$selfColumnName]);
+            $selfTable->addForeignKeyConstraint(
+                $targetTable,
+                [$selfColumnName],
+                [$targetPrimaryKeyColumnName],
+                ['onDelete' => 'SET NULL']
+            );
+        }
 
         $this->addRelationColumn($targetTable, $targetColumnName, $selfPrimaryKeyColumn, ['notnull' => false]);
         $targetTable->addIndex([$targetColumnName]);
@@ -200,7 +411,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             ],
         ];
 
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'oneToMany';
+        $options[ExtendOptionsManager::TYPE_OPTION] = $fieldType;
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
@@ -219,6 +430,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string[]     $targetDetailedColumnNames Column names are used to show detailed info about related entity
      * @param string[]     $targetGridColumnNames     Column names are used to show related entity in a grid
      * @param array        $options
+     * @param string       $fieldType                 The field type. By default the field type is manyToMany,
+     *                                                but you can specify another type if it is based on manyToMany.
+     *                                                In this case this type should be registered
+     *                                                in entity_extend.yml under underlying_types section
      */
     public function addManyToManyRelation(
         Schema $schema,
@@ -228,14 +443,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $targetTitleColumnNames,
         array $targetDetailedColumnNames,
         array $targetGridColumnNames,
-        array $options = []
+        array $options = [],
+        $fieldType = 'manyToMany'
     ) {
         $this->ensureExtendFieldSet($options);
 
         $selfTableName            = $this->getTableName($table);
         $selfTable                = $this->getTable($table, $schema);
         $selfClassName            = $this->getEntityClassByTableName($selfTableName);
-        $selfColumnName           = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
         $selfRelationName         = $this->nameGenerator->generateManyToManyRelationColumnName($selfClassName);
         $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $selfPrimaryKeyColumn     = $selfTable->getColumn($selfPrimaryKeyColumnName);
@@ -251,14 +466,17 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->checkColumnsExist($targetTable, $targetDetailedColumnNames);
         $this->checkColumnsExist($targetTable, $targetGridColumnNames);
 
-        $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $selfTable->addUniqueIndex([$selfColumnName]);
-        $selfTable->addForeignKeyConstraint(
-            $targetTable,
-            [$selfColumnName],
-            [$targetPrimaryKeyColumnName],
-            ['onDelete' => 'SET NULL']
-        );
+        if (!isset($options['extend']['without_default']) || !$options['extend']['without_default']) {
+            $selfColumnName = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
+            $this->addRelationColumn($selfTable, $selfColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
+            $selfTable->addUniqueIndex([$selfColumnName]);
+            $selfTable->addForeignKeyConstraint(
+                $targetTable,
+                [$selfColumnName],
+                [$targetPrimaryKeyColumnName],
+                ['onDelete' => 'SET NULL']
+            );
+        }
 
         $relationsTableName = $this->nameGenerator->generateManyToManyJoinTableName(
             $selfClassName,
@@ -293,7 +511,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
             ],
         ];
 
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'manyToMany';
+        $options[ExtendOptionsManager::TYPE_OPTION] = $fieldType;
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
@@ -310,7 +528,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param Table|string $targetTable      A Table object or table name
      * @param string       $targetColumnName A column name is used to show related entity
      * @param array        $options
-     * @throws \RuntimeException
+     * @param string       $fieldType        The field type. By default the field type is manyToOne,
+     *                                       but you can specify another type if it is based on manyToOne.
+     *                                       In this case this type should be registered
+     *                                       in entity_extend.yml under underlying_types section
      */
     public function addManyToOneRelation(
         Schema $schema,
@@ -318,7 +539,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $associationName,
         $targetTable,
         $targetColumnName,
-        array $options = []
+        array $options = [],
+        $fieldType = 'manyToOne'
     ) {
         $this->ensureExtendFieldSet($options);
 
@@ -346,12 +568,23 @@ class ExtendExtension implements NameGeneratorAwareInterface
             'column'     => $targetColumnName,
         ];
 
-        $options[ExtendOptionsManager::TYPE_OPTION] = 'manyToOne';
+        $options[ExtendOptionsManager::TYPE_OPTION] = $fieldType;
         $this->extendOptionsManager->setColumnOptions(
             $selfTableName,
             $associationName,
             $options
         );
+    }
+
+    /**
+     * Gets an entity full class name by a table name
+     *
+     * @param string $tableName
+     * @return string|null
+     */
+    public function getEntityClassByTableName($tableName)
+    {
+        return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
     }
 
     /**
@@ -371,17 +604,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
     protected function getTable($table, Schema $schema)
     {
         return $table instanceof Table ? $table : $schema->getTable($table);
-    }
-
-    /**
-     * Gets an entity full class name by a table name
-     *
-     * @param string $tableName
-     * @return string|null
-     */
-    protected function getEntityClassByTableName($tableName)
-    {
-        return $this->entityMetadataHelper->getEntityClassByTableName($tableName);
     }
 
     /**
@@ -431,17 +653,38 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected function addRelationColumn(Table $table, $columnName, Column $targetColumn, array $options = [])
     {
-        $columnTypeName = $targetColumn->getType()->getName();
-        if (!in_array($columnTypeName, [Type::INTEGER, Type::SMALLINT, Type::BIGINT])) {
+        if ($targetColumn->getName() !== 'id') {
             throw new SchemaException(
-                sprintf('A relation column type must be an integer. "%s" type is not supported.', $columnTypeName)
+                sprintf(
+                    'The target column name must be "id". Relation column: "%s::%s". Target column name: "%s".',
+                    $table->getName(),
+                    $columnName,
+                    $targetColumn->getName()
+                )
             );
+        }
+        $columnTypeName = $targetColumn->getType()->getName();
+        if (!in_array($columnTypeName, [Type::INTEGER, Type::STRING, Type::SMALLINT, Type::BIGINT])) {
+            throw new SchemaException(
+                sprintf(
+                    'The type of relation column "%s::%s" must be an integer or string. "%s" type is not supported.',
+                    $table->getName(),
+                    $columnName,
+                    $columnTypeName
+                )
+            );
+        }
+
+        if ($columnTypeName === Type::STRING && $targetColumn->getLength() !== null) {
+            $options['length'] = $targetColumn->getLength();
         }
 
         $table->addColumn($columnName, $columnTypeName, $options);
     }
 
     /**
+     * Makes sure that required for any extend field attributes are set
+     *
      * @param array $options
      */
     protected function ensureExtendFieldSet(array &$options)
@@ -449,8 +692,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
         if (!isset($options['extend'])) {
             $options['extend'] = [];
         }
-        if (!isset($options['extend']['extend'])) {
-            $options['extend']['extend'] = true;
+        if (!isset($options['extend']['is_extend'])) {
+            $options['extend']['is_extend'] = true;
+        }
+        if (!isset($options['extend']['owner'])) {
+            $options['extend']['owner'] = ExtendScope::OWNER_SYSTEM;
         }
     }
 }

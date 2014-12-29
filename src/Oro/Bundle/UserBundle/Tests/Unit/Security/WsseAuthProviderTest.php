@@ -3,12 +3,14 @@
 namespace Oro\Bundle\UserBundle\Tests\Security;
 
 use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder;
 
 use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
+use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Security\WsseAuthProvider;
 
 class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
@@ -27,7 +29,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     /** @var WsseAuthProvider */
     protected $provider;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->userProvider = $this->getMock('Symfony\Component\Security\Core\User\UserProviderInterface');
         $this->encoder      = new MessageDigestPasswordEncoder('sha1', true, 1);
@@ -36,7 +38,7 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new WsseAuthProvider($this->userProvider, $this->encoder, $cache);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->userProvider, $this->encoder, $this->provider);
     }
@@ -50,7 +52,9 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
      */
     public function testOverridesLogic(UserInterface $user, $secret, $salt = '')
     {
-        $this->userProvider->expects($this->once())->method('loadUserByUsername')
+        $this->userProvider
+            ->expects($this->exactly(2))
+            ->method('loadUserByUsername')
             ->will($this->returnValue($user));
 
         $nonce = base64_encode(uniqid(self::TEST_NONCE));
@@ -80,19 +84,26 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
     public function userProvider()
     {
         $regularUser = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-        $regularUser->expects($this->once())->method('getPassword')->will($this->returnValue(self::TEST_PASSWORD));
+        $regularUser->expects($this->exactly(2))->method('getPassword')->will($this->returnValue(self::TEST_PASSWORD));
         $regularUser->expects($this->once())->method('getSalt')->will($this->returnValue(self::TEST_SALT));
         $regularUser->expects($this->any())->method('getRoles')->will($this->returnValue([]));
 
+        $userApiKey = new UserApi();
+        $userApiKey->setApiKey(self::TEST_API_KEY);
+        $userApiKeys = new ArrayCollection([$userApiKey]);
+
         $advancedUser = $this->getMock('Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface');
-        $advancedUser->expects($this->once())->method('getApiKey')->will($this->returnValue(self::TEST_API_KEY));
+        $advancedUser
+            ->expects($this->exactly(2))
+            ->method('getApiKeys')
+            ->will($this->returnValue($userApiKeys));
         $advancedUser->expects($this->never())->method('getPassword');
         $advancedUser->expects($this->never())->method('getSalt');
         $advancedUser->expects($this->any())->method('getRoles')->will($this->returnValue([]));
 
         return [
             'regular user given, should use password and salt' => [$regularUser, self::TEST_PASSWORD, self::TEST_SALT],
-            'advanced user given, should take API key only'    => [$advancedUser, self::TEST_API_KEY]
+            'advanced user given, should take API key only'    => [$advancedUser, $userApiKeys]
         ];
     }
 }

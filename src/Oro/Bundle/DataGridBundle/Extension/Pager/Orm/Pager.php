@@ -25,8 +25,17 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var AclHelper */
     protected $aclHelper;
 
+    /** @var boolean */
+    protected $skipAclCheck;
+
+    /** @var boolean */
+    protected $skipCountWalker;
+
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
+
+    /** @var string */
+    protected $aclPermission = 'VIEW';
 
     public function __construct(
         AclHelper $aclHelper,
@@ -49,6 +58,7 @@ class Pager extends AbstractPager implements PagerInterface
     public function setQueryBuilder(QueryBuilder $qb)
     {
         $this->qb = $qb;
+        $this->isTotalCalculated = false;
 
         return $this;
     }
@@ -70,9 +80,15 @@ class Pager extends AbstractPager implements PagerInterface
     {
         $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
         $query = $countQb->getQuery();
-        $query = $this->aclHelper->apply($query);
+        if (!$this->skipAclCheck) {
+            $query = $this->aclHelper->apply($query, $this->aclPermission);
+        }
 
-        return QueryCountCalculator::calculateCount($query);
+        $useWalker = null;
+        if ($this->skipCountWalker !== null) {
+            $useWalker = !$this->skipCountWalker;
+        }
+        return QueryCountCalculator::calculateCount($query, $useWalker);
     }
 
     /**
@@ -172,6 +188,30 @@ class Pager extends AbstractPager implements PagerInterface
     public function setParameter($name, $value)
     {
         $this->parameters[$name] = $value;
+    }
+
+    /**
+     * @param boolean $skipCheck
+     */
+    public function setSkipAclCheck($skipCheck)
+    {
+        $this->skipAclCheck = $skipCheck;
+    }
+
+    /**
+     * @param boolean $skipCountWalker
+     */
+    public function setSkipCountWalker($skipCountWalker)
+    {
+        $this->skipCountWalker = $skipCountWalker;
+    }
+
+    /**
+     * @param string $permission
+     */
+    public function setAclPermission($permission)
+    {
+        $this->aclPermission = $permission;
     }
 
     /**

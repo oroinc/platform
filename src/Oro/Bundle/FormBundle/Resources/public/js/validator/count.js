@@ -31,9 +31,11 @@ define(['underscore', './number'
             return numberValidator[1].call(this, value, element, param);
         },
         function (param, element) {
-            var value = getCount(this, element);
+            var value = getCount(this, element),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return numberValidator[2].call(this, param, element, value);
+            placeholders.count = value;
+            return numberValidator[2].call(this, param, element, value, placeholders);
         }
     ];
 });

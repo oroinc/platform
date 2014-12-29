@@ -17,8 +17,8 @@
     {% if resource_granted('oro_email_emailtemplate_preview') %}
         {{ UI.button({
             'path' :  path('oro_email_emailtemplate_preview', {'id': form.vars.value.id }),
-            'title' : 'Preview',
-            'label' : 'Preview',
+            'title' : 'oro.email.emailtemplate.action.preview'|trans,
+            'label' : 'oro.email.emailtemplate.action.preview'|trans,
             'aCss': 'btn-success dialog-form-renderer no-hash',
             'iCss': 'icon-share'
         }) }}
@@ -29,8 +29,8 @@
     {% if form.vars.value.id and resource_granted('oro_email_emailtemplate_clone') %}
         {{ UI.button({
             'path':  path('oro_email_emailtemplate_clone', {'id': form.vars.value.id}),
-            'title': 'Clone',
-            'label': 'Clone',
+            'title': 'oro.email.emailtemplate.action.clone'|trans,
+            'label': 'oro.email.emailtemplate.action.clone'|trans,
             'aCss': 'btn-success',
             'iCss': 'icon-share'
         }) }}
@@ -83,14 +83,14 @@
     {% set id = 'emailtemplate-edit' %}
     {% set dataBlocks = [
         {
-            'title': 'General',
+            'title': 'General'|trans,
             'class': 'active',
             'subblocks': [{
                 'title': '',
                 'data': [
-                    form_row(form.entityName),
+                    form_row(form.name),
                     form_row(form.type),
-                    form_row(form.name)
+                    form_row(form.entityName)
                 ]
             }]
         },
@@ -104,7 +104,7 @@
                 ]
             },
             {
-                'title': 'Available variables'|trans,
+                'title': '',
                 'data': [
                     _emailMacros.renderAvailableVariablesWidget(form.vars.value.entityName, form.entityName.vars.id)
                 ]

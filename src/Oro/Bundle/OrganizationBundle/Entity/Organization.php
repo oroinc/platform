@@ -5,24 +5,42 @@ namespace Oro\Bundle\OrganizationBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
+
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
+use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
 
 /**
  * Organization
  *
  * @ORM\Table(name="oro_organization")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository")
+ * @ORM\HasLifecycleCallbacks()
+ * @UniqueEntity(
+ *     fields={"name"}
+ * )
  * @Config(
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "form"={
+ *              "form_type"="oro_organization_select"
+ *          },
+ *          "dataaudit"={
+ *              "auditable"=true
+ *          }
  *      }
- *  }
  * )
  */
-class Organization implements NotificationEmailInterface
+class Organization extends ExtendOrganization implements
+    OrganizationInterface,
+    NotificationEmailInterface,
+    \Serializable
 {
     /**
      * @var integer
@@ -36,23 +54,33 @@ class Organization implements NotificationEmailInterface
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @ORM\Column(name="name", type="string", length=255, unique=true)
+     * @ConfigField(
+     *  defaultValues={
+     *    "dataaudit"={
+     *       "auditable"=true
+     *    },
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $name;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="currency", type="string", length=3)
+     * @ORM\Column(name="description", type="text", nullable=true)
+     * @ConfigField(
+     *  defaultValues={
+     *    "dataaudit"={
+     *       "auditable"=true
+     *    }
+     *   }
+     * )
      */
-    protected $currency;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="currency_precision", type="string", length=10)
-     */
-    protected $precision;
+    protected $description;
 
     /**
      * @var ArrayCollection
@@ -67,6 +95,56 @@ class Organization implements NotificationEmailInterface
     protected $businessUnits;
 
     /**
+     * @var ArrayCollection
+     *
+     * @ORM\ManyToMany(targetEntity="Oro\Bundle\UserBundle\Entity\User", mappedBy="organizations")
+     * @ORM\JoinTable(name="oro_user_organization")
+     */
+    protected $users;
+
+    /**
+     * @var \Datetime $created
+     *
+     * @ORM\Column(name="created_at", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $createdAt;
+
+    /**
+     * @var \Datetime $updated
+     *
+     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
+     */
+    protected $updatedAt;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="enabled", type="boolean", options={"default"="1"})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $enabled;
+
+    /**
      * Get id
      *
      * @return integer
@@ -74,6 +152,19 @@ class Organization implements NotificationEmailInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set id
+     *
+     * @param int $id
+     * @return Organization
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
     }
 
     /**
@@ -100,49 +191,63 @@ class Organization implements NotificationEmailInterface
     }
 
     /**
-     * Set Currency
+     * @param string $description
      *
-     * @param string $currency
-     * @return Organization
+     * @return $this
      */
-    public function setCurrency($currency)
+    public function setDescription($description)
     {
-        $this->currency = $currency;
+        $this->description = $description;
 
         return $this;
     }
 
     /**
-     * Get Currency
-     *
      * @return string
      */
-    public function getCurrency()
+    public function getDescription()
     {
-        return $this->currency;
+        return $this->description;
     }
 
     /**
-     * Set Precision
+     * @param \Datetime $createdAt
      *
-     * @param string $precision
-     * @return Organization
+     * @return $this
      */
-    public function setPrecision($precision)
+    public function setCreatedAt($createdAt)
     {
-        $this->precision = $precision;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
     /**
-     * Get Precision
-     *
-     * @return string
+     * @return \Datetime
      */
-    public function getPrecision()
+    public function getCreatedAt()
     {
-        return $this->precision;
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \Datetime $updatedAt
+     *
+     * @return $this
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return \Datetime
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
     }
 
     /**
@@ -150,7 +255,7 @@ class Organization implements NotificationEmailInterface
      */
     public function __toString()
     {
-        return (string) $this->getName();
+        return (string)$this->getName();
     }
 
     /**
@@ -186,5 +291,92 @@ class Organization implements NotificationEmailInterface
         );
 
         return new ArrayCollection($emails);
+    }
+
+    /**
+     * @param  bool $enabled User state
+     * @return $this
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = (boolean)$enabled;
+
+        return $this;
+    }
+
+    /**
+     * @return Boolean true if organization is enabled, false otherwise
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * Pre persist event handler
+     *
+     * @ORM\PrePersist
+     */
+    public function prePersist()
+    {
+        $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->updatedAt = clone $this->createdAt;
+    }
+
+    /**
+     * Pre update event handler
+     *
+     * @ORM\PreUpdate
+     */
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Serializes organization
+     *
+     * @return string
+     */
+    public function serialize()
+    {
+        $result = serialize(
+            array(
+                $this->name,
+                $this->enabled,
+                $this->id,
+            )
+        );
+        return $result;
+    }
+
+    /**
+     * Unserializes organization
+     *
+     * @param string $serialized
+     */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->name,
+            $this->enabled,
+            $this->id,
+            ) = unserialize($serialized);
+    }
+
+    /**
+     * @param ArrayCollection $users
+     */
+    public function setUsers(ArrayCollection $users)
+    {
+        $this->users = $users;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 }

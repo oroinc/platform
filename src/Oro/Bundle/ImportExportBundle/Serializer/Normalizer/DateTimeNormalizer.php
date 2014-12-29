@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
-use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Symfony\Component\Serializer\Exception\RuntimeException;
 
 class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
@@ -56,11 +54,15 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      * @param string $class
      * @param mixed $format
      * @param array $context
-     * @return \DateTime
+     * @return \DateTime|null
      * @throws RuntimeException
      */
     public function denormalize($data, $class, $format = null, array $context = array())
     {
+        if (empty($data)) {
+            return null;
+        }
+
         $timezone = $this->getTimezone($context);
         $format = $this->getFormat($context);
         $datetime = \DateTime::createFromFormat($format . '|', (string) $data, $timezone);
@@ -74,7 +76,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, $format = null, array $context = array())
     {
         return $data instanceof \DateTime;
     }
@@ -82,7 +84,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
         return is_string($data) && $type == 'DateTime';
     }
@@ -112,8 +114,8 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @return string
      * @param array $context
+     * @return \DateTimeZone
      */
     protected function getTimezone(array $context)
     {

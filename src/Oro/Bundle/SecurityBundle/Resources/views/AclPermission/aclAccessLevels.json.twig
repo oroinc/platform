@@ -1,0 +1,11 @@
+{
+{% set translatedLevels = {} %}
+{% for id, level in levels %}
+    {% if level is empty %}
+        {% set level = 'NONE' %}
+    {% endif %}
+    {% set label = 'oro.security.access-level.' ~ level %}
+    {% if loop.index != loop.first %},{% endif %}
+    "{{ id }}":"{{ label|trans }}"
+{% endfor %}
+}

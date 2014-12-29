@@ -1,0 +1,30 @@
+{% import 'OroChartBundle::macros.html.twig' as chart %}
+
+{# Chart variables format:
+
+    "options":
+        "name": "chart_name",
+        "data_schema" => array(
+            "label" => array("field_name" => "name", "label" => "First Name", "type" => "string"),
+            "value" => array("field_name" => "salary", "label" => "Salary", "type" => "money"),
+        ),
+        "settings" => array(
+            "foo" => "bar"
+        ),
+    "config": { /** Chart config from in format of oro/chart.yml */ }
+    "data": [
+        {"label": "In progress", "value": 100, "fraction": 0.1},
+        {"label": "Lost", "value": 500, "fraction": 0.5},
+        {"label": "Won", "value": 400, "fraction": 0.4},
+    ]
+
+#}
+{% if data|length>0  %}
+    {{ chart.renderChart(data, options, config, isMobileVersion()) }}
+{% else %}
+    <div class="container-fluid">
+        <div class="clearfix no-data">
+            <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
+        </div>
+    </div>
+{% endif %}

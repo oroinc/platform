@@ -3,9 +3,11 @@
 namespace Oro\Bundle\SearchBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 
 /**
  * Search index items that correspond to specific entity record
@@ -17,6 +19,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository")
  * @ORM\HasLifecycleCallbacks
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Item
 {
@@ -59,7 +62,7 @@ class Item
     /**
      * @var bool $changed
      *
-     * @ORM\Column(name="changed", type="boolean", options={"unsigned"=true})
+     * @ORM\Column(name="changed", type="boolean")
      */
     protected $changed = false;
 
@@ -410,10 +413,10 @@ class Item
      */
     public function saveItemData($objectData)
     {
-        $this->saveData($objectData, $this->textFields, new IndexText(), 'text');
-        $this->saveData($objectData, $this->integerFields, new IndexInteger(), 'integer');
-        $this->saveData($objectData, $this->datetimeFields, new IndexDatetime(), 'datetime');
-        $this->saveData($objectData, $this->decimalFields, new IndexDecimal(), 'decimal');
+        $this->saveData($objectData, $this->textFields, new IndexText(), SearchQuery::TYPE_TEXT);
+        $this->saveData($objectData, $this->integerFields, new IndexInteger(), SearchQuery::TYPE_INTEGER);
+        $this->saveData($objectData, $this->datetimeFields, new IndexDatetime(), SearchQuery::TYPE_DATETIME);
+        $this->saveData($objectData, $this->decimalFields, new IndexDecimal(), SearchQuery::TYPE_DECIMAL);
 
         return $this;
     }
@@ -469,6 +472,7 @@ class Item
     public function getRecordText()
     {
         $recordText = '';
+        /** @var IndexText $textField */
         foreach ($this->textFields as $textField) {
             if ($textField->getField() == Indexer::TEXT_ALL_DATA_FIELD) {
                 $recordText = $textField->getValue();
@@ -480,23 +484,27 @@ class Item
 
     /**
      * @param array  $objectData
-     * @param object $fields
+     * @param Collection $fields
      * @param object $newRecord
      * @param string $type
      */
-    protected function saveData($objectData, $fields, $newRecord, $type)
+    protected function saveData($objectData, Collection $fields, $newRecord, $type)
     {
         if (isset($objectData[$type]) && count($objectData[$type])) {
             $itemData = $objectData[$type];
             $updatedTextFields = array();
             foreach ($itemData as $fieldName => $fieldData) {
-                foreach ($fields as $index => $collectionElement) {
-                    //update fields
-                    if ($fieldName == $collectionElement->getField()) {
-                        $collectionElement->setValue($fieldData);
-                        $updatedTextFields[$index] = $index;
-                        unset($itemData[$fieldName]);
+                if (!is_array($fieldData)) {
+                    foreach ($fields as $index => $collectionElement) {
+                        //update fields
+                        if ($fieldName == $collectionElement->getField()) {
+                            $collectionElement->setValue($fieldData);
+                            $updatedTextFields[$index] = $index;
+                            unset($itemData[$fieldName]);
+                        }
                     }
+                } else {
+                    $this->deleteArrayFields($fields, $fieldName);
                 }
             }
             //delete fields
@@ -510,10 +518,44 @@ class Item
             //add new fields
             if (isset($itemData) && count($itemData)) {
                 foreach ($itemData as $fieldName => $fieldData) {
-                    $record = clone $newRecord;
-                    $this->setFieldData($record, $fieldName, $fieldData);
-                    $fields[] = $record;
+                    $this->addFieldData($fieldName, $fieldData, $fields, $newRecord);
                 }
+            }
+        }
+    }
+
+    /**
+     * @param string $fieldName
+     * @param mixed $fieldData
+     * @param Collection $fields
+     * @param object $newRecord
+     */
+    protected function addFieldData($fieldName, $fieldData, Collection $fields, $newRecord)
+    {
+        if (!is_array($fieldData)) {
+            $fieldData = [$fieldData];
+        }
+        foreach ($fieldData as $data) {
+            $record = clone $newRecord;
+            $this->setFieldData($record, $fieldName, $data);
+            $fields->add($record);
+        }
+    }
+
+    /**
+     * @param $fields
+     * @param $fieldName
+     */
+    protected function deleteArrayFields($fields, $fieldName)
+    {
+        $fieldsToDelete = $fields->filter(
+            function ($valueEntity) use ($fieldName) {
+                return $valueEntity->getField() === $fieldName;
+            }
+        );
+        if (!empty($fieldsToDelete)) {
+            foreach ($fieldsToDelete as $fieldElement) {
+                $fields->removeElement($fieldElement);
             }
         }
     }

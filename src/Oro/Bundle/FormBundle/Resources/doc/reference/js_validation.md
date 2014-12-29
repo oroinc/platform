@@ -97,7 +97,7 @@ After that, validation for sub-entinty works only if some of fields is not blank
 | Collection   |    √    |     |                               |   (2)   |
 | Count        |         |  √  | oroform/js/validator/count    |   (1)   |
 | Country      |    √    |     |                               |         |
-| DateTime     |    √    |  √  |                               |         |
+| DateTime     |    √    |  √  | oroform/js/validator/datetime |         |
 | Date         |    √    |  √  | oroform/js/validator/date     |         |
 | Email        |    √    |     | oroform/js/validator/email    |         |
 | False        |    √    |     |                               |   (2)   |

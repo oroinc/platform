@@ -1,18 +1,25 @@
-/*jslint nomen: true*/
+/*jslint nomen:true*/
 /*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter',
-        'orolocale/js/locale-settings', '../datevariables-widget'
-    ], function ($, _, __, ChoiceFilter, localeSettings) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    './choice-filter',
+    'orolocale/js/locale-settings',
+    'orofilter/js/datevariables-widget'
+], function ($, _, __, ChoiceFilter, localeSettings) {
     'use strict';
+
+    var DateFilter;
 
     /**
      * Date filter: filter type as option + interval begin and end dates
      *
-     * @export  orofilter/js/filter/date-filter
-     * @class   orofilter.filter.DateFilter
-     * @extends orofilter.filter.ChoiceFilter
+     * @export  oro/filter/date-filter
+     * @class   oro.filter.DateFilter
+     * @extends oro.filter.ChoiceFilter
      */
-    return ChoiceFilter.extend({
+    DateFilter = ChoiceFilter.extend({
         /**
          * Template selector for filter criteria
          *
@@ -77,16 +84,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @property
          */
         externalWidgetOptions: {},
-
-        /**
-         * References to date widgets
-         *
-         * @property
-         */
-        dateWidgets: {
-            start: null,
-            end: null
-        },
 
         /**
          * Date filter type values
@@ -166,7 +163,31 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 };
             }
 
-            ChoiceFilter.prototype.initialize.apply(this, arguments);
+            this.dateWidgets = {};
+
+            DateFilter.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.dateParts;
+            delete this.emptyPart;
+            delete this.emptyValue;
+            _.each(this.dateWidgets, function ($elem, name) {
+                if (name.slice(-5) === '_vars') {
+                    this._destroyDateVariablesWidget(name);
+                } else {
+                    this._destroyDateWidget(name);
+                }
+                delete this.dateWidgets[name];
+            }, this);
+            delete this.dateWidgets;
+            DateFilter.__super__.dispose.call(this);
         },
 
         onChangeFilterType: function (e) {
@@ -206,7 +227,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         /**
          * @inheritDoc
          */
-        render: function () {
+        _renderCriteria: function () {
             var value = _.extend({}, this.emptyValue, this.getValue());
             var part  = {value: value.part, type: value.part};
 
@@ -219,10 +240,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             var parts = [];
 
             // add date parts only if embed template used
-            if (this.templateTheme != "") {
+            if (this.templateTheme !== "") {
                 parts.push(
                     datePartTemplate({
-                        name: this.name+'_part',
+                        name: this.name + '_part',
                         choices: this.dateParts,
                         selectedChoice: value.part,
                         selectedChoiceLabel: selectedPartLabel
@@ -239,14 +260,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
                 })
             );
 
+            var displayValue = this._formatDisplayValue(value);
             var $filter = $(
                 this.template({
                     inputClass: this.inputClass,
-                    value: this._formatDisplayValue(value),
+                    value: displayValue,
                     parts: parts
                 })
             );
-            this._wrap($filter);
+
+            this._appendFilter($filter);
             this.$(this.criteriaSelector).attr('tabindex', '0');
 
             this.changeFilterType(value.type);
@@ -255,21 +278,50 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             _.each(this.criteriaValueSelectors.value, _.bind(this._appendDropdown, this, dropdownTemplate));
 
+            if (!this._isDateVariable(displayValue.value.start)) {
+                this.dateWidgets.start.datepicker('setDate', displayValue.value.start);
+            }
+            if (!this._isDateVariable(displayValue.value.end)) {
+                this.dateWidgets.end.datepicker('setDate', displayValue.value.end);
+            }
+
             this.$('.nav-tabs a').click(function (e) {
                 e.preventDefault();
                 $(this).tab('show');
             });
 
-            return this;
+            this._criteriaRenderd = true;
         },
 
+        /**
+         * @param {string} value
+         * @returns {boolean}
+         * @private
+         */
+        _isDateVariable: function (value) {
+            var result, dateVars;
+            dateVars = this.dateWidgetOptions.dateVars;
+            result = _.some(dateVars.value, function (displayValue, index) {
+                var rawValue = '{{' + index + '}}';
+                return rawValue === value.substr(0, rawValue.length) ||
+                    displayValue === value.substr(0, displayValue.length);
+            });
+            return result;
+        },
+
+        /**
+         * @param {function} template
+         * @param {string} actualSelector
+         * @param {string} name
+         * @private
+         */
         _appendDropdown: function (template, actualSelector, name) {
             var $calendar, $el = this.$el,
                 $input = this.$(actualSelector),
                 $dropdown = $input.wrap('<div class="dropdown datefilter">').parent(),
                 tabSuffix = '-' + this.cid + '-' + name,
                 widgetOptions = _.extend({onSelect: function (date) {
-                    $input.val(date);
+                    $input.val(date).trigger('change');
                 }}, this.dateWidgetOptions);
 
             var tabs = [];
@@ -286,6 +338,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             $input.on('focus, click', function () {
                 $el.find('.dropdown.open').removeClass('open');
                 $dropdown.addClass('open');
+                $calendar.datepicker('refresh');
             });
 
             $calendar = this.dateWidgets[name] = this._initializeDateWidget('#calendar' + tabSuffix, widgetOptions);
@@ -296,9 +349,8 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             $calendar.data('datepicker').inline = false;
             $calendar.datepicker('refresh');
-
-            $calendar.on('click', '.ui-datepicker-close', function(e) {
-                $dropdown.removeClass('open')
+            $calendar.on('click', '.ui-datepicker-close', function() {
+                $dropdown.removeClass('open');
             });
 
             widgetOptions = _.extend({
@@ -320,6 +372,16 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         },
 
         /**
+         * Removes date widget
+         *
+         * @param {string} name of widget
+         * @protected
+         */
+        _destroyDateWidget: function (name) {
+            this.dateWidgets[name].datepicker('destroy');
+        },
+
+        /**
          * Initialize date variables widget
          *
          * @param {String} widgetSelector
@@ -335,6 +397,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             return widget;
         },
+
+        /**
+         * Removes date variables widget
+         *
+         * @param {string} name of widget
+         * @protected
+         */
+        _destroyDateVariablesWidget: function (name) {
+            this.dateWidgets[name].dateVariables('destroy');
+        },
+
 
         /**
          * @inheritDoc
@@ -420,7 +493,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
         },
 
         /**
-         * Format datetes in a valut to another format
+         * Format dates in a vault to another format
          *
          * @param {Object} value
          * @param {String} fromFormat
@@ -444,14 +517,22 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
 
             if (mode == 'raw') {
                 for (var part in dateVars) {
-                    for (var varCode in dateVars[part]) {
-                        value = value.replace(new RegExp(dateVars[part][varCode], 'g'), '{{' + varCode+'}}');
+                    if (dateVars.hasOwnProperty(part)) {
+                        for (var varCode in dateVars[part]) {
+                            if (dateVars[part].hasOwnProperty(varCode)) {
+                                value = value.replace(new RegExp(dateVars[part][varCode], 'g'), '{{' + varCode+'}}');
+                            }
+                        }
                     }
                 }
             } else {
                 for (var part in dateVars) {
-                    for (var varCode in dateVars[part]) {
-                        value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[part][varCode]);
+                    if (dateVars.hasOwnProperty(part)) {
+                        for (var varCode in dateVars[part]) {
+                            if (dateVars[part].hasOwnProperty(varCode)) {
+                                value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[part][varCode]);
+                            }
+                        }
                     }
                 }
             }
@@ -469,11 +550,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @protected
          */
         _formatDate: function (value, fromFormat, toFormat) {
-            var fromValue = $.datepicker.parseDate(fromFormat, value);
+            var fromValue;
+            if (this._isDateVariable(value)) {
+                return value;
+            }
+            fromValue = $.datepicker.parseDate(fromFormat, value);
             if (!fromValue) {
                 fromValue = $.datepicker.parseDate(toFormat, value);
                 if (!fromValue) {
-                    return value;
+                    return '';
                 }
             }
             return $.datepicker.formatDate(toFormat, fromValue);
@@ -518,7 +603,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
          * @inheritDoc
          */
         _hideCriteria: function () {
-            ChoiceFilter.prototype._hideCriteria.apply(this, arguments);
+            DateFilter.__super__._hideCriteria.apply(this, arguments);
         },
 
         _getSelectedChoiceLabel: function (property, value) {
@@ -533,4 +618,6 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', './choice-filter
             return selectedChoiceLabel;
         }
     });
+
+    return DateFilter;
 });

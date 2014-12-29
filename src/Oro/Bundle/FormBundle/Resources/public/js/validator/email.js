@@ -12,13 +12,18 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.validate
      */
     return [
         'Email',
-        function () {
+        function (value, element) {
             // @TODO add support of MX check action
-            return $.validator.methods.email.apply(this, arguments);
+            // original email validator is too slow for some values
+            //  return $.validator.methods.email.apply(this, arguments);
+            return this.optional(element) || /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))$/i.test(value)
         },
-        function (param) {
+        function (param, element) {
+            var value = this.elementValue(element),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return __(param.message);
+            placeholders.value = value;
+            return __(param.message, placeholders);
         }
     ];
 });

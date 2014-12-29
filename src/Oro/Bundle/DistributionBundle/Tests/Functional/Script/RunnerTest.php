@@ -1,29 +1,24 @@
 <?php
+
 namespace Oro\Bundle\DistributionBundle\Tests\Functional\Script;
 
 use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\DistributionBundle\Script\Runner;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class RunnerTest extends WebTestCase
 {
     /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
      * @var string
      */
     protected $applicationRootDir;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient();
+        $this->initClient();
         $this->applicationRootDir = $this->client->getKernel()->getRootDir();
         if (!is_dir($this->applicationRootDir . '/config/dist')) {
             $this->markTestSkipped('Distribution tests are not compatibility with CRM environment');
@@ -32,8 +27,12 @@ class RunnerTest extends WebTestCase
 
     public function testShouldBeConstructedWithInstallationManager()
     {
-        new Runner($this->createInstallationManagerMock(), $this->createLoggerMock(
-        ), 'path/to/application/root/dir', 'test');
+        new Runner(
+            $this->createInstallationManagerMock(),
+            $this->createLoggerMock(),
+            'path/to/application/root/dir',
+            'test'
+        );
     }
 
     public function testShouldRunValidInstallScriptOfPackageAndReturnOutput()

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer;
 
-use Symfony\Component\Serializer\Serializer;
+use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;

@@ -1,0 +1,8 @@
+definitions:
+    test_definition:
+        label: 'Test Definition'
+        enabled: true
+        entity: Oro\Bundle\UserBundle\Entity\User
+        order: 20
+        actions_configuration:
+            - @assign_value: [$entity.field, 'value']

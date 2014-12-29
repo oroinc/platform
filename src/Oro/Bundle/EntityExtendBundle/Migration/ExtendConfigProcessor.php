@@ -15,6 +15,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class ExtendConfigProcessor
 {
+    const APPEND_CONFIGS = '_append_configs';
     const RENAME_CONFIGS = '_rename_configs';
 
     /**
@@ -26,6 +27,11 @@ class ExtendConfigProcessor
      * @var LoggerInterface
      */
     protected $logger;
+
+    /**
+     * @var array
+     */
+    protected $appendConfigs;
 
     /**
      * @param ConfigManager $configManager
@@ -46,11 +52,9 @@ class ExtendConfigProcessor
         $this->logger = $logger ? : new NullLogger();
         try {
             if (!empty($configs)) {
-                $renameConfigs = [];
-                if (isset($configs[self::RENAME_CONFIGS])) {
-                    $renameConfigs = $configs[self::RENAME_CONFIGS];
-                    unset($configs[self::RENAME_CONFIGS]);
-                }
+                $this->appendConfigs = $this->getAndRemoveElement($configs, self::APPEND_CONFIGS, []);
+
+                $renameConfigs = $this->getAndRemoveElement($configs, self::RENAME_CONFIGS, []);
 
                 $this->filterConfigs($configs);
 
@@ -239,7 +243,7 @@ class ExtendConfigProcessor
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfig         = $extendConfigProvider->getConfig($className);
             if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+                $extendConfig->set('state', ExtendScope::STATE_UPDATE);
             }
             $this->configManager->persist($extendConfig);
         }
@@ -256,7 +260,7 @@ class ExtendConfigProcessor
      */
     protected function createFieldModel($className, $fieldName, $fieldType, $mode, array $configs, $isExtendEntity)
     {
-        if (!$isExtendEntity && isset($configs['extend']['extend']) && $configs['extend']['extend']) {
+        if (!$isExtendEntity && isset($configs['extend']['is_extend']) && $configs['extend']['is_extend']) {
             throw new \LogicException(
                 sprintf('An extend field "%s" cannot be added to non extend entity "%s".', $fieldName, $className)
             );
@@ -301,7 +305,7 @@ class ExtendConfigProcessor
             $extendConfigProvider = $this->configManager->getProvider('extend');
             $extendConfig         = $extendConfigProvider->getConfig($className, $fieldName);
             if (!$extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                $extendConfig->set('state', ExtendScope::STATE_UPDATED);
+                $extendConfig->set('state', ExtendScope::STATE_UPDATE);
             }
             $this->configManager->persist($extendConfig);
         }
@@ -336,7 +340,11 @@ class ExtendConfigProcessor
             $config     = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);
             $hasChanges = false;
             foreach ($values as $key => $value) {
-                $config->set($key, $value);
+                if ($this->isAppend($scope, $key, $className, $fieldName)) {
+                    $config->set($key, array_merge((array)$config->get($key), (array)$value));
+                } else {
+                    $config->set($key, $value);
+                }
                 $hasChanges = true;
             }
             if ($hasChanges) {
@@ -386,5 +394,44 @@ class ExtendConfigProcessor
         );
 
         return $this->configManager->changeFieldName($className, $fieldName, $newFieldName);
+    }
+
+    /**
+     * Gets a value of an element with the given key and then remove the element from array
+     *
+     * @param array  $arr
+     * @param string $key
+     * @param mixed  $defaultValue
+     * @return mixed
+     */
+    protected function getAndRemoveElement(array &$arr, $key, $defaultValue = null)
+    {
+        $value = $defaultValue;
+        if (isset($arr[$key])) {
+            $value = $arr[$key];
+            unset($arr[$key]);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param string      $scope
+     * @param string      $code
+     * @param string      $className
+     * @param string|null $fieldName
+     * @return bool
+     */
+    protected function isAppend($scope, $code, $className, $fieldName = null)
+    {
+        if (empty($fieldName)) {
+            return
+                isset($this->appendConfigs[$className]['configs'][$scope]) &&
+                in_array($code, $this->appendConfigs[$className]['configs'][$scope]);
+        } else {
+            return
+                isset($this->appendConfigs[$className]['fields'][$fieldName]['configs'][$scope]) &&
+                in_array($code, $this->appendConfigs[$className]['fields'][$fieldName]['configs'][$scope]);
+        }
     }
 }

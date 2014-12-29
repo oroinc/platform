@@ -1,7 +1,12 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', './filters-manager'
-    ], function (_, FiltersManager) {
+define([
+    'underscore',
+    './filters-manager'
+], function (_, FiltersManager) {
     'use strict';
+
+    var CollectionFiltersManager;
 
     /**
      * View that represents all grid filters
@@ -10,7 +15,7 @@ define(['underscore', './filters-manager'
      * @class   orofilter.CollectionFiltersManager
      * @extends orofilter.FiltersManager
      */
-    return FiltersManager.extend({
+    CollectionFiltersManager = FiltersManager.extend({
         /**
          * Initialize filter list options
          *
@@ -22,11 +27,19 @@ define(['underscore', './filters-manager'
         initialize: function (options) {
             this.collection = options.collection;
 
-            this.collection.on('beforeFetch', this._beforeCollectionFetch, this);
-            this.collection.on('updateState', this._onUpdateCollectionState, this);
-            this.collection.on('reset', this._onCollectionReset, this);
+            this.listenTo(this.collection, {
+                'beforeFetch': this._beforeCollectionFetch,
+                'updateState': this._onUpdateCollectionState,
+                'reset': this._onCollectionReset
+            });
 
-            FiltersManager.prototype.initialize.apply(this, arguments);
+            CollectionFiltersManager.__super__.initialize.apply(this, arguments);
+        },
+
+        render: function () {
+            CollectionFiltersManager.__super__.render.apply(this, arguments);
+            this._onUpdateCollectionState(this.collection);
+            return this;
         },
 
         /**
@@ -40,9 +53,9 @@ define(['underscore', './filters-manager'
                 return;
             }
             this.collection.state.currentPage = 1;
-            this.collection.fetch();
+            this.collection.fetch({reset: true});
 
-            FiltersManager.prototype._onFilterUpdated.apply(this, arguments);
+            CollectionFiltersManager.__super__._onFilterUpdated.apply(this, arguments);
         },
 
         /**
@@ -71,8 +84,13 @@ define(['underscore', './filters-manager'
          * @protected
          */
         _onCollectionReset: function (collection) {
-            if (collection.state.totalRecords > 0 && this.$el.children().length > 0) {
+            var hasRecords, hasFiltersState;
+            hasRecords = collection.state.totalRecords > 0;
+            hasFiltersState = !_.isEmpty(collection.state.filters);
+            if (hasRecords || hasFiltersState) {
                 this.$el.show();
+            } else {
+                this.$el.hide();
             }
         },
 
@@ -146,4 +164,6 @@ define(['underscore', './filters-manager'
             return this;
         }
     });
+
+    return CollectionFiltersManager;
 });

@@ -6,13 +6,15 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessBuilder;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class CommandExecutor
 {
+    const DEFAULT_TIMEOUT = 300;
+
     /**
      * @var string|null
      */
@@ -39,6 +41,11 @@ class CommandExecutor
     protected $lastCommandExitCode;
 
     /**
+     * @var int
+     */
+    protected $defaultTimeout = self::DEFAULT_TIMEOUT;
+
+    /**
      * Constructor
      *
      * @param string|null         $env
@@ -62,7 +69,7 @@ class CommandExecutor
      * Launches a command.
      * If '--process-isolation' parameter is specified the command will be launched as a separate process.
      * In this case you can parameter '--process-timeout' to set the process timeout
-     * in seconds. Default timeout is 60 seconds.
+     * in seconds. Default timeout is 300 seconds.
      * If '--ignore-errors' parameter is specified any errors are ignored;
      * otherwise, an exception is raises if an error happened.
      *
@@ -75,14 +82,10 @@ class CommandExecutor
     {
         $params = array_merge(
             [
-                'command'    => $command,
-                '--no-debug' => true,
+                'command' => $command
             ],
             $params
         );
-        if (!$params['--no-debug']) {
-            unset($params['--no-debug']);
-        }
         if ($this->env && $this->env !== 'dev') {
             $params['--env'] = $this->env;
         }
@@ -102,6 +105,8 @@ class CommandExecutor
             if (array_key_exists('--process-timeout', $params)) {
                 $pb->setTimeout($params['--process-timeout']);
                 unset($params['--process-timeout']);
+            } else {
+                $pb->setTimeout($this->defaultTimeout);
             }
 
             foreach ($params as $name => $val) {
@@ -225,5 +230,21 @@ class CommandExecutor
         }
 
         return $phpPath;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDefaultTimeout()
+    {
+        return $this->defaultTimeout;
+    }
+
+    /**
+     * @param int $defaultTimeout
+     */
+    public function setDefaultTimeout($defaultTimeout)
+    {
+        $this->defaultTimeout = $defaultTimeout;
     }
 }

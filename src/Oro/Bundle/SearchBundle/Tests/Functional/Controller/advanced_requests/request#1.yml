@@ -1,0 +1,18 @@
+# common test case
+request:
+    query: "from oro_test_item where stringValue ~ item5 max_results 10"
+response:
+    records_count: 1
+    count: 1
+    rest:
+        data:
+            -
+                entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                record_string: item5@mail.com
+                record_url: http://localhost/search/
+    soap:
+        data:
+            -
+                entityName: Oro\Bundle\TestFrameworkBundle\Entity\Item
+                recordTitle: item5@mail.com
+                recordUrl: http://localhost/search/

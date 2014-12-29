@@ -1,0 +1,91 @@
+oro_system_configuration:
+    groups:
+        tracking:
+            title:  oro.tracking.system_configuration.groups.tracking.title
+            icon:  'icon-screenshot'
+        tracking_settings:
+            title:  oro.tracking.system_configuration.groups.tracking_settings.title
+            icon:  'icon-screenshot'
+
+    fields:
+        oro_tracking.dynamic_tracking_enabled:
+            data_type: boolean
+            type: oro_config_checkbox
+            priority: 50
+            options:
+                label: oro.tracking.system_configuration.fields.dynamic_tracking_enabled.label
+                tooltip: oro.tracking.form.tooltip.dynamic_tracking_enabled
+                required: true
+
+        oro_tracking.log_rotate_interval:
+            data_type: integer
+            type: choice
+            priority: 40
+            options:
+                label: oro.tracking.system_configuration.fields.log_rotate_interval.label
+                tooltip: oro.tracking.form.tooltip.log_rotate_interval
+                required: true
+                constraints:
+                    - NotBlank: ~
+                choices:
+                    60: oro.tracking.system_configuration.fields.log_rotate_interval.choices.60
+                    30: oro.tracking.system_configuration.fields.log_rotate_interval.choices.30
+                    20: oro.tracking.system_configuration.fields.log_rotate_interval.choices.20
+                    15: oro.tracking.system_configuration.fields.log_rotate_interval.choices.15
+                    10: oro.tracking.system_configuration.fields.log_rotate_interval.choices.10
+                    5:  oro.tracking.system_configuration.fields.log_rotate_interval.choices.5
+
+        oro_tracking.piwik_host:
+            data_type: string
+            type: text
+            priority: 20
+            options:
+                label: oro.tracking.system_configuration.fields.piwik_host.label
+                tooltip: oro.tracking.form.tooltip.piwik_host
+                required: false
+
+        oro_tracking.piwik_token_auth:
+            data_type: string
+            type: text
+            priority: 10
+            options:
+                label: oro.tracking.system_configuration.fields.piwik_token_auth.label
+                tooltip: oro.tracking.form.tooltip.piwik_token_auth
+                required: false
+
+        oro_tracking.wesite_configuration:
+            ui_only: true
+            type: oro_link_type # @todo BAP-4696 use template
+            priority: 0
+            options:
+                label: false
+                required: false
+                resettable: false
+                route: oro_tracking_website_index
+                acl: oro_tracking_website_view
+                title: oro.tracking.website_configuration
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            tracking:
+                                priority: 50
+                                children:
+                                    tracking_settings:
+                                        priority: 100
+                                        children:
+                                            - oro_tracking.dynamic_tracking_enabled
+                                            - oro_tracking.log_rotate_interval
+                                            - oro_tracking.piwik_host
+                                            - oro_tracking.piwik_token_auth
+                                            - oro_tracking.wesite_configuration
+
+    api_tree:
+        tracking:
+            oro_tracking.dynamic_tracking_enabled: ~
+            oro_tracking.log_rotate_interval: ~
+            oro_tracking.piwik_host: ~
+            oro_tracking.piwik_token_auth: ~

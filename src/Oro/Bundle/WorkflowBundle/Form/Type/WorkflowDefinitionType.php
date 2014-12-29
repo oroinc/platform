@@ -18,7 +18,7 @@ class WorkflowDefinitionType extends AbstractType
                 'label',
                 'text',
                 array(
-                    'label' => 'oro.workflow.workflowdefinition.name.label',
+                    'label' => 'oro.workflow.workflowdefinition.label.label',
                     'required' => true,
                     'constraints' => array(array('NotBlank' => null)),
                     'tooltip' => 'oro.workflow.workflowdefinition.name.tooltip'
@@ -47,7 +47,7 @@ class WorkflowDefinitionType extends AbstractType
                 'transition_prototype_icon',
                 'oro_icon_select',
                 array(
-                    'label' => 'Button icon',
+                    'label' => 'oro.workflow.form.button_icon.label',
                     'mapped' => false,
                     'tooltip' => 'oro.workflow.workflowdefinition.transition.icon.tooltip'
                 )

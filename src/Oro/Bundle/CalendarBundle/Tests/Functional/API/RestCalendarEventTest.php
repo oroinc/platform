@@ -3,59 +3,56 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class RestCalendarEventTest extends WebTestCase
 {
     const DEFAULT_USER_CALENDAR_ID = 1;
 
-    /** @var Client  */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
+        $this->initClient(array(), $this->generateWsseAuthHeader());
     }
 
     public function testGets()
     {
         $request = array(
-                "calendar" => self::DEFAULT_USER_CALENDAR_ID,
-                "start" => date(DATE_RFC3339, strtotime('-1 day')),
-                "end" => date(DATE_RFC3339, strtotime('+1 day')),
-                'subordinate' => false
+            "calendar" => self::DEFAULT_USER_CALENDAR_ID,
+            "start" => date(DATE_RFC3339, strtotime('-1 day')),
+            "end" => date(DATE_RFC3339, strtotime('+1 day')),
+            'subordinate' => false
         );
-        $this->client->request('GET', $this->client->generate('oro_api_get_calendarevents', $request));
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertEmpty($result);
     }
 
     /**
-     * create new event
+     * Create new event
+     *
      * @return int
      */
     public function testPost()
     {
         $request = array(
-            "calendar" => self::DEFAULT_USER_CALENDAR_ID,
-            "id" => null,
-            "title" => "Test Event",
-            "start" => date(DATE_RFC3339),
-            "end" => date(DATE_RFC3339),
-            "allDay" => true
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'id'              => null,
+            'title'           => "Test Event",
+            'description'     => "Test Description",
+            'start'           => date(DATE_RFC3339),
+            'end'             => date(DATE_RFC3339),
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000'
         );
-        $this->client->request('POST', $this->client->generate('oro_api_post_calendarevent'), $request);
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
         $this->assertNotEmpty($result);
         $this->assertTrue(isset($result['id']));
@@ -66,46 +63,118 @@ class RestCalendarEventTest extends WebTestCase
     /**
      * @depends testPost
      *
-     * @param $id
+     * @param int $id
+     *
+     * @return int
      */
     public function testPut($id)
     {
         $request = array(
-            "calendar" => self::DEFAULT_USER_CALENDAR_ID,
-            "title" => "Test Event Updated",
-            "start" => date(DATE_RFC3339),
-            "end" => date(DATE_RFC3339),
-            "allDay" => true
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'title'           => 'Test Event Updated',
+            'description'     => 'Test Description Updated',
+            'start'           => date(DATE_RFC3339),
+            'end'             => date(DATE_RFC3339),
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000'
         );
         $this->client->request(
             'PUT',
-            $this->client->generate('oro_api_put_calendarevent', array("id" => $id)),
+            $this->getUrl('oro_api_put_calendarevent', array("id" => $id)),
             $request
         );
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 204);
-        $result = ToolsAPI::jsonToArray($result->getContent());
 
-        $this->assertEmpty($result);
+        $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
+
+        return $id;
     }
 
     /**
-     * @depends testPost
      * @depends testPut
+     *
+     * @param int $id
      */
     public function testGet($id)
     {
-        $request = array(
-            "calendar" => self::DEFAULT_USER_CALENDAR_ID,
-            "start" => date(DATE_RFC3339, strtotime('-1 day')),
-            "end" => date(DATE_RFC3339, strtotime('+1 day')),
-            'subordinate' => true
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
         );
-        $this->client->request('GET', $this->client->generate('oro_api_get_calendarevents', $request));
-        $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200);
-        $result = ToolsAPI::jsonToArray($result->getContent());
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
+        $this->assertEquals($id, $result['id']);
+    }
+
+    /**
+     * @depends testPut
+     *
+     * @param int $id
+     */
+    public function testGetByCalendar($id)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_api_get_calendarevent_by_calendar',
+                ['id' => self::DEFAULT_USER_CALENDAR_ID, 'eventId' => $id]
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertEquals($id, $result['id']);
+    }
+
+    /**
+     * @depends testPut
+     *
+     * @param int $id
+     */
+    public function testCget($id)
+    {
+        $request = array(
+            'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+            'start'       => date(DATE_RFC3339, strtotime('-1 day')),
+            'end'         => date(DATE_RFC3339, strtotime('+1 day')),
+            'subordinate' => true
+        );
+        $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        $this->assertEquals($id, $result[0]['id']);
+    }
+
+    /**
+     * @depends testPut
+     */
+    public function testCgetFiltering()
+    {
+        $request = array(
+            'calendar'    => self::DEFAULT_USER_CALENDAR_ID,
+            'page'        => 1,
+            'limit'       => 10,
+            'subordinate' => false
+        );
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevents', $request) . '&createdAt>2014-03-04T20:00:00+0000'
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertCount(1, $result);
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevents', $request) . '&createdAt>2050-03-04T20:00:00+0000'
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertEmpty($result);
     }
 }

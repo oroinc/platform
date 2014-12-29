@@ -318,6 +318,8 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
             $actualWorkflow->getTransitionManager()->getTransitions()->toArray(),
             'Unexpected transitions'
         );
+
+        $this->assertEquals(!empty($startStep), $actualWorkflow->getStepManager()->hasStartStep());
     }
 
     /**
@@ -358,6 +360,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
                     'step_to' => $stepName,
                     'is_start' => true,
                     'is_hidden' => true,
+                    'is_unavailable_hidden' => true,
                     'transition_definition' => '__start___definition'
                 )
             );

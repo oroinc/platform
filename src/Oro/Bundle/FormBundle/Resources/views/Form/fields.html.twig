@@ -125,16 +125,16 @@
 
 {% block oro_combobox_dataconfig_autocomplete %}
     select2Config.ajax = {
-        'url': {{ url|json_encode|raw }},
-        'data': function (query, page) {
+        url: {{ url|json_encode|raw }},
+        data: function (query, page) {
             return {
-                'page': page,
-                'per_page': {{ configs.per_page|default(10) }},
-                'name': "{{ configs.autocomplete_alias }}",
-                'query': query
+                page: page,
+                per_page: {{ configs.per_page|default(10)|json_encode|raw }},
+                name: {{ configs.autocomplete_alias|json_encode|raw }},
+                query: query
             };
         },
-        'results': function (data, page) {
+        results: function (data, page) {
             return data;
         }
     };
@@ -165,14 +165,23 @@
 
     select2Config.ajax = {
         'url': {{ url|json_encode|raw }},
-        'data': function (query, page) {
-            return {
-                '{{ configs.grid.name }}[_pager][_page]': page,
-                '{{ configs.grid.name }}[_pager][_per_page]': {{ perPage }},
-                '{{ configs.grid.name }}[_sort_by][{{ configs.grid.sort_by|default(configs.properties[0]) }}]': "{{ configs.grid.sort_order|default('ASC') }}",
-                '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][type]': 1,
-                '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][value]': query
-            };
+        'data': function (query, page, searchById) {
+            if (searchById) {
+                return {
+                    '{{ configs.grid.name }}[_pager][_page]': 1,
+                    '{{ configs.grid.name }}[_pager][_per_page]': 1,
+                    '{{ configs.grid.name }}[_filter][id][type]': 3,
+                    '{{ configs.grid.name }}[_filter][id][value]': query
+                };
+            } else {
+                return {
+                    '{{ configs.grid.name }}[_pager][_page]': page,
+                    '{{ configs.grid.name }}[_pager][_per_page]': {{ perPage }},
+                    '{{ configs.grid.name }}[_sort_by][{{ configs.grid.sort_by|default(configs.properties[0]) }}]': "{{ configs.grid.sort_order|default('ASC') }}",
+                    '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][type]': 1,
+                    '{{ configs.grid.name }}[_filter][{{ configs.properties[0] }}][value]': query
+                };
+            }
         },
         'results': function (data, page) {
             return {
@@ -210,6 +219,15 @@
             'text!{{ asset('bundles/oroform/js/multiple-entity/templates/multiple-entity.html') }}'
         ],
         function($, MultipleEntity, MultipleEntityCollection, MultipleEntityModel, EntitiesTpl, EntityTpl) {
+            {% set selectionUrl = null %}
+            {% if form.vars.grid_url is defined and form.vars.grid_url %}
+                {% set selectionUrl = form.vars.grid_url %}
+            {% elseif form.vars.selection_url is defined and form.vars.selection_url %}
+                {% set selectionUrl = form.vars.selection_url %}
+            {% endif %}
+            {% set selectionRouteName = form.vars.selection_route|default(null) %}
+            {% set selectionRouteParameters = form.vars.selection_route_parameters|default({}) %}
+
             var widget = new MultipleEntity({
                 el: '#{{ id }}-container',
                 template: EntitiesTpl,
@@ -218,7 +236,9 @@
                 removedElement: '#{{ id }}_removed',
                 name: {{ id|json_encode|raw }},
                 defaultElement: {{ form.vars.default_element|json_encode|raw }},
-                selectionUrl: {{ form.vars.grid_url|json_encode|raw }},
+                selectionUrl: {{ selectionUrl|json_encode|raw }},
+                selectionRouteName: {{ selectionRouteName|json_encode|raw }},
+                selectionRouteParams: {{ selectionRouteParameters|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
                 allowAction: {{ form.vars.allow_action|json_encode|raw }},
                 collection: new MultipleEntityCollection(),
                 selectorWindowTitle: {{ form.vars.selector_window_title|trans|json_encode|raw }}
@@ -228,6 +248,10 @@
                 data.push(new MultipleEntityModel({{ element|json_encode|raw }}));
             {% endfor %}
             widget.getCollection().reset(data);
+
+            {% if form.vars.extra_config is defined and form.vars.extra_config %}
+                {{ block('oro_multiple_entity_js_' ~ form.vars.extra_config) }}
+            {% endif %}
         });
     </script>
 {% endblock %}
@@ -260,7 +284,7 @@
                 ) }}
             {%- endif -%}
 
-            {%- if is_translated_label is defined and is_translated_label -%}
+            {%- if translatable_label is defined and not translatable_label -%}
                 {{ label }}
             {%- elseif raw_label is defined and raw_label -%}
                 {{ label|raw }}
@@ -274,7 +298,7 @@
 
 {% block oro_money_row %}
     {% set label = label|trans({}, translation_domain) ~ ' (' ~ currency_symbol ~')' %}
-    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
+    {{ form_row(form, {'type': 'text', 'label': label, 'translatable_label': false}) }}
 {% endblock %}
 
 {% block oro_money_widget %}
@@ -284,7 +308,7 @@
 
 {% block percent_row %}
     {% set label = label|trans({}, translation_domain) ~ ' (%)' %}
-    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
+    {{ form_row(form, {'type': 'text', 'label': label, 'translatable_label': false}) }}
 {% endblock %}
 
 {% block percent_widget %}
@@ -322,8 +346,17 @@
                 altFormat: 'yy-mm-dd',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
-                showButtonPanel: true
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
+                showButtonPanel: true,
+                onSelect: function () {
+                    var form = selector.parents('form');
+
+                    if (form.length && form.data('validator')) {
+                        form.validate()
+                            .element(selector);
+                    }
+                    selector.trigger('change');
+                }
             });
             selector.keyup(
                 function () {
@@ -372,8 +405,11 @@
                 altSeparator: 'T',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
-                showButtonPanel: true
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
+                showButtonPanel: true,
+                onSelect: function () {
+                    selector.trigger('change');
+                }
             });
             selector.keyup(
                 function () {
@@ -390,63 +426,73 @@
 {% endblock oro_datetime_widget %}
 
 {% macro oro_collection_item_prototype(widget) %}
-    {% if 'prototype' in widget.vars|keys %}
+    {% if 'collection' in widget.vars.block_prefixes %}
         {% set form = widget.vars.prototype %}
         {% set name = widget.vars.prototype.vars.name %}
+        {% set disabled = widget.vars.disabled %}
+        {% set allow_delete = widget.vars.allow_delete %}
     {% else %}
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
+        {% set disabled = widget.parent.vars.disabled %}
+        {% set allow_delete = widget.parent.vars.allow_delete %}
     {% endif %}
     <div data-content="{{ name }}" data-validation-optional-group>
-        <div class="row-oro oro-multiselect-holder">
-            {{ form_widget(form) }}
+        <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
+            {{ form_widget(form, {disabled: disabled}) }}
+            {% if allow_delete %}
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
 
 {% block oro_collection_widget %}
     {% spaceless %}
-        {% set prototypeHtml = _self.oro_collection_item_prototype(form) %}
+        {% if prototype is defined %}
+            {% set prototype_html = _self.oro_collection_item_prototype(form) %}
+        {% endif %}
         {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
         {% set id = id ~ '_collection' %}
         <div class="row-oro">
-            <div {{ block('widget_container_attributes') }} data-prototype="{{ prototypeHtml|escape }}">
+            <div {{ block('widget_container_attributes') }}{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                 {% if form.children|length %}
                     {% for child in form.children %}
                         {{ _self.oro_collection_item_prototype(child) }}
                     {% endfor %}
-                {% elseif show_form_when_empty %}
-                    {{ prototypeHtml|replace({'__name__': '0'})|raw }}
+                {% elseif show_form_when_empty and prototype_html is defined %}
+                    {{ prototype_html|replace({'__name__': '0'})|raw }}
                 {% endif %}
             </div>
+            {% if allow_add %}
             <a class="btn add-list-item" href="javascript: void(0);"><i class="icon-plus"></i>{{ 'Add'|trans }}</a>
+            {% endif %}
         </div>
-        {{ _self.oro_collection_validate_primary_js(_context) }}
+        {% if handle_primary and (prototype is not defined or prototype.primary is defined) %}
+            {{ _self.oro_collection_validate_primary_js(_context) }}
+        {% endif %}
     {% endspaceless %}
 {% endblock %}
 
 {% macro oro_collection_validate_primary_js(context) %}
-    {% if context.form.vars.prototype.primary is defined %}
-        <script type="text/javascript">
-            require(['jquery'],
-            function($){
-                $(function() {
-                    var container = $('#{{ context.id }}');
-                    /**
-                     * Allow only 1 primary checkbox to be checked.
-                     * This logic convert checkbox logic to logic used in radiobutton
-                     */
-                    container.on('click', '[name$="[primary]"]', function() {
-                        container.find('[name$="[primary]"]').each(function (idx, el) {
-                            el.checked = false;
-                        });
-                        this.checked = true;
+    <script type="text/javascript">
+        require(['jquery'],
+        function($){
+            $(function() {
+                var container = $('#{{ context.id }}');
+                /**
+                 * Allow only 1 primary checkbox to be checked.
+                 * This logic convert checkbox logic to logic used in radiobutton
+                 */
+                container.on('click', '[name$="[primary]"]', function() {
+                    container.find('[name$="[primary]"]').each(function (idx, el) {
+                        el.checked = false;
                     });
+                    this.checked = true;
                 });
             });
-        </script>
-    {% endif %}
+        });
+    </script>
 {% endmacro %}
 
 {% block oro_form_js_validation %}
@@ -488,7 +534,7 @@
 
     <div class="create-select-entity-container clearfix">
         <div id="{{ btnGroupId }}" class="buttons-container">
-            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}">
+            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
                 <span
                     data-label="{{ 'Choose Existing'|trans }}"
                     data-alt-label-view="{{ 'Choose Another'|trans }}"
@@ -501,11 +547,11 @@
                 </span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}">
+            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
                 <span>{{ 'Create New'|trans }}</span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}">
+            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
                 <span>{{ 'Cancel'|trans }}</span>
             </a>
         </div>
@@ -572,4 +618,132 @@
             });
         });
     </script>
+{% endblock %}
+
+{% block oro_entity_create_or_select_inline_widget %}
+    <div id="{{ id }}-el" class="entity-create-or-select-container {% if form.vars.create_enabled %}entity-create-enabled{% endif %}">
+        <div class="input-append">
+            {{ form_widget(form) }}
+            <button class="add-on btn entity-select-btn"{% if disabled or read_only %} disabled="disabled"{% endif %}><i class="icon-bars"></i></button>
+
+            {% if form.vars.create_enabled %}
+                <button class="btn entity-create-btn"{% if disabled or read_only %} disabled="disabled"{% endif %}><i class="icon-plus"></i></button>
+            {% endif %}
+        </div>
+    </div>
+
+    {% set _block = false %}
+    {% if configs.extra_config is defined and configs.extra_config %}
+        {% set _block = block('oro_entity_create_or_select_inline_js_' ~ configs.extra_config) %}
+    {% endif %}
+    {% if _block is not empty %}
+        {{ _block|raw }}
+    {% else %}
+        <script type="text/javascript">
+            require(['jquery', 'oroform/js/select-create-inline-type-handler'],
+            function ($, handler) {
+                $(function() {
+                    {% set urlParts = {
+                        grid: {
+                            route: 'oro_datagrid_widget',
+                            parameters: {
+                                gridName     : form.vars.grid_name,
+                                params       : form.vars.grid_parameters,
+                                renderParams : form.vars.grid_render_parameters
+                            }
+                        }
+                    } %}
+
+                    {% if form.vars.create_enabled|default(false) is sameas(true) %}
+                        {% set urlParts = urlParts|merge({
+                            create: {
+                                route:      form.vars.create_form_route,
+                                parameters: form.vars.create_form_route_parameters
+                            }
+                        }) %}
+                    {% endif %}
+
+                    handler(
+                        $('#{{ id }}-el'),
+                        $('#{{ id }}'),
+                        {{ label|trans|json_encode|raw }},
+                        {{ urlParts|json_encode(constant('JSON_FORCE_OBJECT'))|raw }},
+                        {{ form.vars.existing_entity_grid_id|default('id')|json_encode|raw }},
+                        {{ form.vars.create_enabled|default(false)|json_encode|raw }}
+                    );
+                });
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+
+{% block oro_link_type_widget %}
+    {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
+        {# @todo after BAP-4696 implementation remove link class #}
+        {% if value is defined and value is iterable%}
+            {% for fileName, route in value %}
+                <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                    {{ fileName }}
+                </a>
+            {% endfor %}
+        {% else %}
+            <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                {{ title|trans }}
+            </a>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block oro_simple_color_picker_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_simple_color_picker_widget %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-picker-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
+    {% set type = 'hidden' %}
+    {{ block('form_widget_simple') }}
+{% endblock %}
+
+{% block oro_simple_color_choice_widget %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-choice-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
+    {% if required and empty_value is none and not empty_value_in_choices and not multiple -%}
+        {% set required = false %}
+    {%- endif -%}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {% if allow_empty_color -%}
+            <option value="" class="empty-color"{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
+            <optgroup label="---"></optgroup>
+        {%- endif %}
+        {% set options = choices -%}
+        {{- block('oro_simple_color_choice_widget_options') -}}
+    </select>
+{% endblock %}
+
+{% block oro_simple_color_choice_widget_options %}
+    {% for group_label, choice in options %}
+        {%- if choice is iterable -%}
+            <optgroup label="{{ group_label }}"></optgroup>
+        {%- else -%}
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ translatable ? choice.label|trans({}, translation_domain) : choice.label }}</option>
+        {%- endif -%}
+    {% endfor %}
+{% endblock %}
+
+{% block oro_color_table_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_color_table_widget %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/color-table-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
+    {% set type = 'hidden' %}
+    {{ block('form_widget_simple') }}
 {% endblock %}

@@ -98,16 +98,15 @@ class LocaleListener implements EventSubscriberInterface
 
         if ($this->isInstalled) {
             try {
-                $this->setPhpDefaultLocale(
-                    $this->localeSettings->getLocale()
-                );
-
-                $this->translatableListener->setTranslatableLocale(
-                    $this->localeSettings->getLanguage()
-                );
+                $locale = $this->localeSettings->getLocale();
+                $language = $this->localeSettings->getLanguage();
             } catch (DBALException $exception) {
-                throw new \RuntimeException('Oro Application already installed. Use --force option to reinstall.');
+                // application is not installed
+                return;
             }
+
+            $this->setPhpDefaultLocale($locale);
+            $this->translatableListener->setTranslatableLocale($language);
         }
     }
 

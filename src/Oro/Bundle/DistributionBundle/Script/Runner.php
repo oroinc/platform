@@ -6,10 +6,11 @@ use Composer\Installer\InstallationManager;
 use Composer\Package\PackageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
+
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class Runner
 {
@@ -102,7 +103,7 @@ class Runner
      */
     public function runPlatformUpdate()
     {
-        return $this->runCommand('oro:platform:update');
+        return $this->runCommand('oro:platform:update --force');
     }
 
     /**

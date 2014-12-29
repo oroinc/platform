@@ -8,9 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class ConfigEntities
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
- * @method \Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities openConfigEntities() openConfigEntities()
- * @method \Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities
- *         assertTitle() assertTitle($title, $message = '')
+ * @method ConfigEntities openConfigEntities() openConfigEntities(string)
+ * @method ConfigEntities assertTitle() assertTitle($title, $message = '')
  */
 class ConfigEntities extends AbstractPageFilteredGrid
 {
@@ -24,7 +23,7 @@ class ConfigEntities extends AbstractPageFilteredGrid
 
     public function add()
     {
-        $this->test->byXPath("//a[@title='Create Entity']")->click();
+        $this->test->byXPath("//a[@title='Create entity']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $entity = new ConfigEntity($this->test);

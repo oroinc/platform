@@ -4,7 +4,9 @@
 
 require(['oroui/js/mediator'], function (mediator) {
     'use strict';
-    mediator.once('tab:changed', function () {
+    mediator.once('page:afterChange', function () {
+        //@TODO remove delay, when afterChange event will
+        // take in account rendering from inline scripts
         setTimeout(function () {
             // emulates 'document ready state' for selenium tests
             document['page-rendered'] = true;
@@ -13,26 +15,22 @@ require(['oroui/js/mediator'], function (mediator) {
     });
 });
 
-require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
-        'oroui/js/mediator', 'oroui/js/layout', 'oronavigation/js/navigation',
-        'oroui/js/delete-confirmation', 'oroui/js/messenger', 'oroui/js/scrollspy',
+require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
+        'oroui/js/mediator', 'oroui/js/layout',
+        'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
         'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
-    ], function ($, _, __, app, mediator, layout, Navigation, DeleteConfirmation, messenger, scrollspy) {
+    ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
     /* ============================================================
      * from layout.js
      * ============================================================ */
     $(function () {
-        layout.init();
-
-        /* hide progress bar on page ready in case we don't need hash navigation request*/
-        if (!Navigation.isEnabled() || !Navigation.prototype.checkHashForUrl() || Navigation.prototype.isMaintenancePage()) {
-            if ($('#page-title').size()) {
-                document.title = _.unescape($('#page-title').text());
-            }
-            layout.hideProgressBar();
+        var $pageTitle = $('#page-title');
+        if ($pageTitle.size()) {
+            document.title = $('<div.>').html($('#page-title').text()).text();
         }
+        layout.hideProgressBar();
 
         /* side bar functionality */
         $('div.side-nav').each(function () {
@@ -40,7 +38,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 myParentHolder = $(myParent).parent().height() - 18;
             $(myParent).height(myParentHolder);
             /* open close bar */
-            $(this).find("span.maximaze-bar").click(function () {
+            $(this).find("span.maximize-bar").click(function () {
                 if (($(myParent).hasClass("side-nav-open")) || ($(myParent).hasClass("side-nav-locked"))) {
                     $(myParent).removeClass("side-nav-locked side-nav-open");
                     if ($(myParent).hasClass('left-panel')) {
@@ -94,10 +92,13 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 var myItem = $(this);
                 $(myItem).find('.sn-opener').click(function () {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
-                    var overlayHeight = $('#page').height(),
-                        overlayWidth = $('#page > .wrapper').width();
-                    $('#bar-drop-overlay').width(overlayWidth).height(overlayHeight);
-                    $('#bar-drop-overlay').toggleClass('bar-open-overlay');
+
+                    var $barOverlay   = $('#bar-drop-overlay'),
+                        $page         = $('#page'),
+                        overlayHeight = $page.height(),
+                        overlayWidth  = $page.children('.wrapper').width();
+                    $barOverlay.width(overlayWidth).height(overlayHeight);
+                    $barOverlay.toggleClass('bar-open-overlay');
                 });
                 $(myItem).find("span.close").click(function () {
                     $(myItem).find("div.nav-box").fadeToggle("slow");
@@ -176,6 +177,14 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             $(openDropdownsSelector).removeClass('open');
         });
 
+        mediator.on('page:beforeChange', function () {
+            $('.pin-menus.dropdown.open, .nav .dropdown.open').removeClass('open');
+            $('.dropdown:hover > .dropdown-menu').hide().addClass('manually-hidden');
+        });
+        mediator.on('page:afterChange', function() {
+            $('.dropdown .dropdown-menu.manually-hidden').css('display', '');
+        });
+
         // fix + extend bootstrap.collapse functionality
         $(document).on('click.collapse.data-api', '[data-action^="accordion:"]', function (e) {
             var $elem = $(e.target),
@@ -188,105 +197,108 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
             $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
         });
-
-        layout.pageRendered();
-    });
-
-    mediator.bind('hash_navigation_request:before', function () {
-        layout.pageRendering();
-    });
-
-    /**
-     * Init page layout js and hide progress bar after hash navigation request is completed
-     */
-    mediator.bind("hash_navigation_request:complete", function () {
-        layout.init();
-        layout.hideProgressBar();
-        layout.pageRendered();
     });
 
     /* ============================================================
      * from height_fix.js
      * ============================================================ */
-    (function () {
-        if (app.isMobile()) {
-            return;
-        }
-        /* dynamic height for central column */
-        var anchor = $('#bottom-anchor'),
+    //@TODO should be refactored in BAP-4020
+     $(function () {
+        var anchor, content,
+            initializeContent, adjustHeight,
+            $main, $topPage, $leftPanel, $rightPanel;
+
+        if (tools.isMobile()) {
+            adjustHeight = function () {
+                layout.updateResponsiveLayout();
+            }
+        } else {
+            /* dynamic height for central column */
+            anchor = $('#bottom-anchor');
             content = false;
 
-        var initializeContent = function () {
-            if (!content) {
-                content = $('.scrollable-container').filter(':parents(.ui-widget)');
-                if (!app.isMobile()) {
-                    content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
-                } else {
-                    content.css('overflow', 'hidden');
-                    content.last().css('overflow-y', 'auto');
-                }
-            }
-        };
-
-        var adjustHeight = function () {
-            initializeContent();
-
-            var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
-            var anchorTop = anchor.position().top;
-            var footerHeight = $('#footer:visible').height() || 0;
-            var fixContent = 1;
-
-            $(content.get().reverse()).each(function (pos, el) {
-                el = $(el);
-                el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
-            });
-
-            scrollspy.adjust();
-
-            var fixDialog = 2;
-            var footersHeight = $('.sf-toolbar').height() + $('#footer').height();
-
-            $('#dialog-extend-fixed-container').css({
-                position: 'fixed',
-                bottom: footersHeight + fixDialog,
-                zIndex: 9999
-            });
-
-            $('.sidebar').css({
-                'margin-bottom': footersHeight
-            });
-        };
-
-        if (!anchor.length) {
-            anchor = $('<div id="bottom-anchor"/>')
-                .css({
-                    position: 'fixed',
-                    bottom: '0',
-                    left: '0',
-                    width: '1px',
-                    height: '1px'
-                })
-                .appendTo($(document.body));
-        }
-
-        if ($('.sf-toolbar').length) {
-            adjustHeight = (function () {
-                var orig = adjustHeight;
-                var waitForDebugBar = function (attempt) {
-                    if ($('.sf-toolbar').children().length) {
-                        $('body').addClass('dev-mode');
-                        _.delay(orig, 10);
-                    } else if (attempt < 100) {
-                        _.delay(waitForDebugBar, 500, attempt + 1);
+            initializeContent = function () {
+                if (!content) {
+                    content = $('.scrollable-container').filter(':parents(.ui-widget)');
+                    if (!tools.isMobile()) {
+                        content.css('overflow', 'inherit').last().css('overflow-y', 'auto');
+                    } else {
+                        content.css('overflow', 'hidden');
+                        content.last().css('overflow-y', 'auto');
                     }
-                };
+                }
+            };
+            $main = $('#main');
+            $topPage = $('#top-page');
+            $leftPanel = $('#left-panel');
+            $rightPanel = $('#right-panel');
+            adjustHeight = function () {
+                initializeContent();
 
-                return _.wrap(adjustHeight, function (orig) {
-                    $('body').removeClass('dev-mode');
-                    orig();
-                    waitForDebugBar(0);
+                // set width for #main container
+                $main.width($topPage.width() - $leftPanel.width() - $rightPanel.width());
+                layout.updateResponsiveLayout();
+
+                var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
+                var anchorTop = anchor.position().top;
+                var footerHeight = $('#footer:visible').height() || 0;
+                var fixContent = 1;
+
+                $(content.get().reverse()).each(function (pos, el) {
+                    el = $(el);
+                    el.height(anchorTop - el.position().top - footerHeight - debugBarHeight + fixContent);
                 });
-            }());
+
+                // set height for #left-panel and #right-panel
+                $leftPanel.add($rightPanel).height($main.height());
+
+                scrollspy.adjust();
+
+                var fixDialog = 2;
+                var footersHeight = $('.sf-toolbar').height() + $('#footer').height();
+
+                $('#dialog-extend-fixed-container').css({
+                    position: 'fixed',
+                    bottom: footersHeight + fixDialog,
+                    zIndex: 9999
+                });
+
+                $('.sidebar').css({
+                    'margin-bottom': footersHeight
+                });
+            };
+
+            if (!anchor.length) {
+                anchor = $('<div id="bottom-anchor"/>')
+                    .css({
+                        position: 'fixed',
+                        bottom: '0',
+                        left: '0',
+                        width: '1px',
+                        height: '1px'
+                    })
+                    .appendTo($(document.body));
+            }
+
+            if ($('.sf-toolbar').length) {
+                adjustHeight = (function () {
+                    var orig = adjustHeight;
+                    var waitForDebugBar = function (attempt) {
+                        if ($('.sf-toolbar').children().length) {
+                            $('body').addClass('dev-mode');
+                            _.delay(orig, 10);
+                        } else if (attempt < 100) {
+                            _.delay(waitForDebugBar, 500, attempt + 1);
+                        }
+                    };
+
+                    return _.wrap(adjustHeight, function (orig) {
+                        $('body').removeClass('dev-mode');
+                        orig();
+                        waitForDebugBar(0);
+                    });
+                }());
+            }
         }
 
         var adjustReloaded = function () {
@@ -296,18 +308,16 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
 
         layout.onPageRendered(adjustHeight);
 
-        $(window).on('resize', adjustHeight);
+        $(window).on('resize', _.debounce(adjustHeight, 40));
 
-        mediator.on("hash_navigation_request:complete", adjustReloaded);
+        mediator.on("page:afterChange", adjustReloaded);
 
         mediator.on('layout:adjustReloaded', adjustReloaded);
         mediator.on('layout:adjustHeight', adjustHeight);
-        mediator.on('datagrid:rendered datagrid_filters:rendered', scrollspy.adjust);
+        mediator.on('datagrid:rendered datagrid_filters:rendered widget_remove', scrollspy.adjust);
 
-        $(function () {
-            adjustHeight();
-        });
-    }());
+        adjustHeight();
+    });
 
     /* ============================================================
      * from form_buttons.js
@@ -333,37 +343,35 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app',
                 });
 
                 confirm.on('ok', function () {
-                    var navigation = Navigation.getInstance();
-                    if (navigation) {
-                        navigation.loadingMask.show();
-                    }
+                    mediator.execute('showLoading');
 
                     $.ajax({
                         url: el.data('url'),
                         type: 'DELETE',
                         success: function (data) {
                             el.trigger('removesuccess');
-                            messenger.addMessage('success', el.data('success-message'), {'hashNavEnabled': Navigation.isEnabled()});
-                            if (el.data('redirect')) {
-                                $.isActive(true);
-                                if (navigation) {
-                                    navigation.setLocation(el.data('redirect'));
+                            var redirectTo = el.data('redirect');
+                            if (redirectTo) {
+                                mediator.execute('addMessage', 'success', el.data('success-message'));
+
+                                // In case when redirectTo is current page just refresh it, otherwise redirect.
+                                if (mediator.execute('compareUrl', redirectTo)) {
+                                    mediator.execute('refreshPage');
                                 } else {
-                                    window.location.href = el.data('redirect');
+                                    mediator.execute('redirectTo', {url: redirectTo});
                                 }
-                            } else if (navigation) {
-                                navigation.loadingMask.hide();
+                            } else {
+                                mediator.execute('hideLoading');
+                                mediator.execute('showFlashMessage', 'success', el.data('success-message'));
                             }
                         },
                         error: function () {
-                            if (navigation) {
-                                navigation.loadingMask.hide();
-                            }
-
-                            messenger.notificationMessage(
-                                'error',
-                                el.data('error-message') ||  __('Unexpected error occured. Please contact system administrator.')
-                            );
+                            console.log(5);
+                            var message;
+                            message = el.data('error-message') ||
+                                __('Unexpected error occurred. Please contact system administrator.');
+                            mediator.execute('hideLoading');
+                            mediator.execute('showMessage', 'error', message);
                         }
                     });
                 });

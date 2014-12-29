@@ -9,12 +9,12 @@ class SimpleTagGeneratorTest extends \PHPUnit_Framework_TestCase
     /** @var  SimpleTagGenerator */
     protected $generator;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->generator = new SimpleTagGenerator();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->generator);
     }

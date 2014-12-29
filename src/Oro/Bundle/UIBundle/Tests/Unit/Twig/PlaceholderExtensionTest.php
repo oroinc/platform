@@ -1,5 +1,8 @@
 <?php
+
 namespace Oro\Bundle\UIBundle\Tests\Unit\Twig;
+
+use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\UIBundle\Twig\PlaceholderExtension;
 
@@ -74,9 +77,14 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
     public function testRenderPlaceholder()
     {
         $variables = array('variables' => 'test');
+        $query = array('key' => 'value');
         $expectedTemplateRender = '<p>template</p>';
         $expectedActionRender = '<p>action</p>';
         $expectedResult = $expectedTemplateRender . self::DELIMITER . $expectedActionRender;
+
+        $request = new Request();
+        $request->query->add($query);
+        $this->extension->setRequest($request);
 
         $this->placeholderProvider->expects($this->once())
             ->method('getPlaceholderItems')
@@ -96,7 +104,7 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->kernelExtension->expects($this->once())
             ->method('controller')
-            ->with(self::ACTION_NAME, $variables)
+            ->with(self::ACTION_NAME, $variables, $query)
             ->will($this->returnValue($controllerReference));
 
         $this->kernelExtension->expects($this->once())
@@ -104,7 +112,11 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($controllerReference)
             ->will($this->returnValue($expectedActionRender));
 
-        $result = $this->extension->renderPlaceholder(self::PLACEHOLDER_NAME, $variables, self::DELIMITER);
+        $result = $this->extension->renderPlaceholder(
+            self::PLACEHOLDER_NAME,
+            $variables,
+            array('delimiter' => self::DELIMITER)
+        );
 
         $this->assertEquals($expectedResult, $result);
     }
@@ -122,7 +134,11 @@ class PlaceholderExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::INVALID_PLACEHOLDER_NAME, array())
             ->will($this->returnValue($this->placeholders[self::INVALID_PLACEHOLDER_NAME]['items']));
 
-        $this->extension->renderPlaceholder(self::INVALID_PLACEHOLDER_NAME, array(), self::DELIMITER);
+        $this->extension->renderPlaceholder(
+            self::INVALID_PLACEHOLDER_NAME,
+            array(),
+            array('delimiter' => self::DELIMITER)
+        );
     }
 
     public function testGetFunctions()

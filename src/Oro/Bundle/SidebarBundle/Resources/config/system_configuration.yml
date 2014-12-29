@@ -1,20 +1,21 @@
 oro_system_configuration:
     groups:
         sidebar_settings:
-            title:       'Sidebar settings'
-            description: 'Reload the page for settings to take effect'
+            title:       oro.sidebar.system_configuration.groups.sidebar_settings.title
     fields:
         oro_sidebar.sidebar_left_active:
+            data_type: boolean
             type: choice
             options:
-                label: 'Enable left sidebar'
+                label: oro.sidebar.system_configuration.fields.sidebar_left_active.label
                 choices:
                     - No
                     - Yes
         oro_sidebar.sidebar_right_active:
+            data_type: boolean
             type: choice
             options:
-                label: 'Enable right sidebar'
+                label: oro.sidebar.system_configuration.fields.sidebar_right_active.label
                 choices:
                     - No
                     - Yes
@@ -30,3 +31,8 @@ oro_system_configuration:
                                         children:
                                             - oro_sidebar.sidebar_left_active
                                             - oro_sidebar.sidebar_right_active
+
+    api_tree:
+        look-and-feel:
+            oro_sidebar.sidebar_left_active: ~
+            oro_sidebar.sidebar_right_active: ~

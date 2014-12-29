@@ -23,22 +23,25 @@ class DataGridTagListenerTest extends \PHPUnit_Framework_TestCase
     /** @var DataGridTagListener */
     protected $listener;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->generator = $this->getMock('Oro\Bundle\NavigationBundle\Content\TagGeneratorChain');
         $this->listener  = new DataGridTagListener($this->generator);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->generator, $this->listener);
     }
 
     public function testBuildAfter()
     {
-        $config   = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
-        $acceptor = new Acceptor($config);
-        $grid     = new DataGrid(self::TEST_GRID_NAME, $acceptor);
+        $config     = DatagridConfiguration::createNamed(self::TEST_GRID_NAME, []);
+        $acceptor   = new Acceptor();
+        $acceptor->setConfig($config);
+        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+        $grid       = new Datagrid(self::TEST_GRID_NAME, $config, $parameters);
+        $grid->setAcceptor($acceptor);
 
         $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')->disableOriginalConstructor()->getMock();
         $qb->expects($this->once())->method('getDQLPart')->with($this->equalTo('from'))

@@ -1,0 +1,6 @@
+oro_chart:
+    advanced_chart:
+        label: Advanced Chart (overridden)
+        default_settings:
+             chartColors: 'testColor'
+        template: SecondTestBundle:Chart:advancedChart.html.twig

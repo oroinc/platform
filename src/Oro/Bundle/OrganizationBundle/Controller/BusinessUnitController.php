@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -55,6 +56,31 @@ class BusinessUnitController extends Controller
     }
 
     /**
+     * @Route(
+     *      "/search/{organizationId}",
+     *      name="oro_business_unit_search",
+     *      requirements={"organizationId"="\d+"}
+     * )
+     * Acl(
+     *      id="oro_business_unit_view",
+     *      type="action",
+     *      class="OroOrganizationBundle:BusinessUnit",
+     *      permission="VIEW"
+     * )
+     */
+    public function searchAction($organizationId)
+    {
+        $businessUnits = [];
+        if ($organizationId) {
+            $businessUnits = $this->get('oro_organization.business_unit_manager')
+                ->getBusinessUnitRepo()
+                ->getOrganizationBusinessUnitsTree($organizationId);
+        }
+
+        return new Response(json_encode($businessUnits));
+    }
+
+    /**
      * Edit business_unit form
      *
      * @Route("/update/{id}", name="oro_business_unit_update", requirements={"id"="\d+"}, defaults={"id"=0})
@@ -83,7 +109,9 @@ class BusinessUnitController extends Controller
      */
     public function indexAction(Request $request)
     {
-        return array();
+        return array(
+            'entity_class' => $this->container->getParameter('oro_organization.business_unit.entity.class')
+        );
     }
 
     /**

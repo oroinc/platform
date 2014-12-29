@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Symfony\Component\Translation\Translator;
 
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
@@ -30,6 +30,9 @@ class EntityProvider
      */
     protected $translator;
 
+    /** @var ExclusionProviderInterface */
+    protected $exclusionProvider;
+
     /**
      * Constructor
      *
@@ -51,9 +54,20 @@ class EntityProvider
     }
 
     /**
+     * Sets exclusion provider
+     *
+     * @param ExclusionProviderInterface $exclusionProvider
+     */
+    public function setExclusionProvider(ExclusionProviderInterface $exclusionProvider)
+    {
+        $this->exclusionProvider = $exclusionProvider;
+    }
+
+    /**
      * Returns entities
      *
      * @param bool $sortByPluralLabel If true entities will be sorted by 'plural_label'; otherwise, by 'label'
+     * @param bool $applyExclusions   Indicates whether exclusion logic should be applied.
      * @param bool $translate         Flag means that label, plural label should be translated
      * @return array of entities sorted by entity label
      *                                .    'name'          - entity full class name
@@ -61,10 +75,13 @@ class EntityProvider
      *                                .    'plural_label'  - entity plural label
      *                                .    'icon'          - an icon associated with an entity
      */
-    public function getEntities($sortByPluralLabel = true, $translate = true)
-    {
+    public function getEntities(
+        $sortByPluralLabel = true,
+        $applyExclusions = true,
+        $translate = true
+    ) {
         $result = array();
-        $this->addEntities($result, $translate);
+        $this->addEntities($result, $applyExclusions, $translate);
         $this->sortEntities($result, $sortByPluralLabel ? 'plural_label' : 'label');
 
         return $result;
@@ -102,29 +119,53 @@ class EntityProvider
      * Adds entities to $result
      *
      * @param array $result
+     * @param bool  $applyExclusions
      * @param bool  $translate
      */
-    protected function addEntities(array &$result, $translate)
+    protected function addEntities(array &$result, $applyExclusions, $translate)
     {
         // only configurable entities are supported
-        $configs = $this->entityConfigProvider->getConfigs();
-        foreach ($configs as $config) {
-            $className = $config->getId()->getClassName();
-            if ($this->extendConfigProvider->getConfig($className)->in(
-                'state',
-                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
-            )
-            ) {
-                $this->addEntity(
-                    $result,
-                    $className,
-                    $config->get('label'),
-                    $config->get('plural_label'),
-                    $config->get('icon'),
-                    $translate
+        $entityConfigs = $this->entityConfigProvider->getConfigs();
+
+        foreach ($entityConfigs as $entityConfig) {
+            $entityConfigId = $entityConfig->getId();
+
+            $isStateCorrect = $this->extendConfigProvider
+                ->getConfigById($entityConfigId)
+                ->in(
+                    'state',
+                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                 );
+            if (false == $isStateCorrect) {
+                continue;
             }
+
+            $className = $entityConfigId->getClassName();
+            if ($applyExclusions && $this->isIgnoredEntity($className)) {
+                continue;
+            }
+
+            $this->addEntity(
+                $result,
+                $className,
+                $entityConfig->get('label'),
+                $entityConfig->get('plural_label'),
+                $entityConfig->get('icon'),
+                $translate
+            );
         }
+    }
+
+    /**
+     * Checks if the given entity should be ignored
+     *
+     * @param string $className
+     *
+     * @return bool
+     */
+    protected function isIgnoredEntity($className)
+    {
+        return $this->exclusionProvider->isIgnoredEntity($className);
     }
 
     /**

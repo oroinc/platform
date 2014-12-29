@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Extension;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 
 interface ExtensionVisitorInterface
@@ -57,6 +58,13 @@ interface ExtensionVisitorInterface
      * @return mixed
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data);
+
+    /**
+     * Set instance of parameters used for current grid
+     *
+     * @param ParameterBag $parameters
+     */
+    public function setParameters(ParameterBag $parameters);
 
     /**
      * Returns priority needed for applying

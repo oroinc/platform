@@ -4,32 +4,22 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync\Fixtures;
 
 use Doctrine\ORM\EntityManager;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
-use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
+use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
 
 class TestEmailSynchronizationProcessor extends AbstractEmailSynchronizationProcessor
 {
     public function __construct(
-        LoggerInterface $log,
         EntityManager $em,
         EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager,
-        KnownEmailAddressChecker $knownEmailAddressChecker
+        KnownEmailAddressCheckerInterface $knownEmailAddressChecker
     ) {
-        parent::__construct($log, $em, $emailEntityBuilder, $emailAddressManager, $knownEmailAddressChecker);
+        parent::__construct($em, $emailEntityBuilder, $knownEmailAddressChecker);
     }
 
     public function process(EmailOrigin $origin, $syncStartTime)
     {
-    }
-
-    public function callGetKnownEmailAddresses()
-    {
-        return $this->getKnownEmailAddresses();
     }
 }

@@ -78,7 +78,7 @@ function ($, _, SegmentFilter) {
             var filterId = null;
 
             _.each(this.options.filters, function (filter, id) {
-                if ('segment' === filter.type) {
+                if ('segment' === filter.name) {
                     filterId = id;
                 }
             });
@@ -120,7 +120,7 @@ function ($, _, SegmentFilter) {
                     columnName: this.filter.entity_ids[this.$segmentChoice.data('entity')],
                     criteria: 'condition-segment',
                     criterion: {
-                        filter: this.filter.type,
+                        filter: this.filter.name,
                         data: this.filter.getValue()
                     }
                 };

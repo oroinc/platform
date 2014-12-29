@@ -71,6 +71,11 @@ class NameFormatterTest extends \PHPUnit_Framework_TestCase
                 'ln FN mn NP ns',
                 new PersonAllNamePartsStub()
             ),
+            array(
+                '%last_name% %first_name% %middle_name% %prefix% %suffix%',
+                '',
+                new \stdClass()
+            ),
         );
     }
 

@@ -13,6 +13,11 @@ class StepManager
     protected $steps;
 
     /**
+     * @var string
+     */
+    protected $startStepName;
+
+    /**
      * @param Collection|Step[] $steps
      */
     public function __construct($steps = null)
@@ -33,7 +38,7 @@ class StepManager
 
     /**
      * @param Step[]|Collection $steps
-     * @return Workflow
+     * @return StepManager
      */
     public function setSteps($steps)
     {
@@ -72,5 +77,37 @@ class StepManager
             }
         );
         return new ArrayCollection($steps);
+    }
+
+    /**
+     * @param string $startStepName
+     * @return StepManager
+     */
+    public function setStartStepName($startStepName)
+    {
+        $this->startStepName = $startStepName;
+
+        return $this;
+    }
+
+    /**
+     * @return Step|null
+     */
+    public function getStartStep()
+    {
+        if ($this->startStepName) {
+            return $this->getStep($this->startStepName);
+        }
+
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasStartStep()
+    {
+        $startStep = $this->getStartStep();
+        return !empty($startStep);
     }
 }

@@ -18,3 +18,6 @@ response:
         - [admin,1,/user/view/1]
 export:
         - [admin]
+export_filter:
+        oro_segment_grid_$id[_filter][c1][value]: admin
+        oro_segment_grid_$id[_filter][c1][type]: 1

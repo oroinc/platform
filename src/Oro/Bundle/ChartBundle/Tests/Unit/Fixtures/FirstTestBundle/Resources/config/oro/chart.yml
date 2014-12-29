@@ -1,0 +1,27 @@
+oro_chart:
+    line_chart:
+        label: Line Chart
+        data_schema:
+          - name: label
+            label: Category (X axis)
+            required: true
+          - name: value
+            label: Value (Y axis)
+            required: true
+        settings_schema:
+          - name: connect_dots_with_line
+            label: Connect line with dots
+            type: boolean
+            options: { required: true }
+        default_settings:
+            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87']
+            chartFontSize: 9
+            chartFontColor: '#454545'
+            chartHighlightColor: '#FF5E5E'
+        data_transformer: some_service_id
+        template: FirstTestBundle:Chart:lineChart.html.twig
+    advanced_chart:
+        label: Advanced Chart
+        default_settings:
+            chartColors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF', '#65BC87']
+        template: FirstTestBundle:Chart:advancedChart.html.twig

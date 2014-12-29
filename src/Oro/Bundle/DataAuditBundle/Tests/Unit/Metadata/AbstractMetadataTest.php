@@ -20,7 +20,7 @@ abstract class AbstractMetadataTest extends OrmTestCase
      */
     protected $loggableAnnotationDriver;
 
-    public function setUp()
+    protected function setUp()
     {
         $reader = new AnnotationReader();
 

@@ -13,6 +13,8 @@ class LoadEmailTemplates extends AbstractEmailFixture
      */
     public function getEmailsDir()
     {
-        return __DIR__ . DIRECTORY_SEPARATOR . 'data/emails';
+        return $this->container
+            ->get('kernel')
+            ->locateResource('@OroCalendarBundle/Migrations/Data/ORM/data/emails/events');
     }
 }

@@ -8,6 +8,8 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+
 class NumberFilterType extends AbstractType
 {
     const TYPE_GREATER_EQUAL = 1;
@@ -20,6 +22,7 @@ class NumberFilterType extends AbstractType
 
     const DATA_INTEGER = 'data_integer';
     const DATA_DECIMAL = 'data_decimal';
+    const PERCENT      = 'percent';
 
     /**
      * @var TranslatorInterface
@@ -56,12 +59,14 @@ class NumberFilterType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $operatorChoices = array(
-            self::TYPE_EQUAL         => $this->translator->trans('oro.filter.form.label_type_equal'),
-            self::TYPE_NOT_EQUAL     => $this->translator->trans('oro.filter.form.label_type_not_equal'),
-            self::TYPE_GREATER_EQUAL => $this->translator->trans('oro.filter.form.label_type_greater_equal'),
-            self::TYPE_GREATER_THAN  => $this->translator->trans('oro.filter.form.label_type_greater_than'),
-            self::TYPE_LESS_EQUAL    => $this->translator->trans('oro.filter.form.label_type_less_equal'),
-            self::TYPE_LESS_THAN     => $this->translator->trans('oro.filter.form.label_type_less_than'),
+            self::TYPE_EQUAL              => $this->translator->trans('oro.filter.form.label_type_equal'),
+            self::TYPE_NOT_EQUAL          => $this->translator->trans('oro.filter.form.label_type_not_equal'),
+            self::TYPE_GREATER_EQUAL      => $this->translator->trans('oro.filter.form.label_type_greater_equal'),
+            self::TYPE_GREATER_THAN       => $this->translator->trans('oro.filter.form.label_type_greater_than'),
+            self::TYPE_LESS_EQUAL         => $this->translator->trans('oro.filter.form.label_type_less_equal'),
+            self::TYPE_LESS_THAN          => $this->translator->trans('oro.filter.form.label_type_less_than'),
+            FilterUtility::TYPE_EMPTY     => $this->translator->trans('oro.filter.form.label_type_empty'),
+            FilterUtility::TYPE_NOT_EMPTY => $this->translator->trans('oro.filter.form.label_type_not_empty'),
         );
 
         $resolver->setDefaults(
@@ -89,6 +94,11 @@ class NumberFilterType extends AbstractType
         $formatterOptions = array();
 
         switch ($dataType) {
+            case self::PERCENT:
+                $formatterOptions['decimals'] = 2;
+                $formatterOptions['grouping'] = false;
+                $formatterOptions['percent'] = true;
+                break;
             case self::DATA_DECIMAL:
                 $formatterOptions['decimals'] = 2;
                 $formatterOptions['grouping'] = true;

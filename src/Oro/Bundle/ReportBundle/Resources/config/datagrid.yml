@@ -57,10 +57,10 @@ datagrid:
                     type:      choice
                     data_name: r.entity
                     options:
-                        is_translated_choices: true
                         field_options:
                             multiple:       true
                             choices:        @oro_entity.datagrid_helper->getEntityNames
+                            translatable_options: false
                 reportType:
                     type: choice
                     data_name: r.type
@@ -71,21 +71,25 @@ datagrid:
             view:
                 type:          navigate
                 acl_resource:  oro_report_view
-                label:         View
-                icon:          user
+                label:         oro.grid.action.view
+                icon:          eye-open
                 link:          view_link
                 rowAction:     true
             update:
                 type:          navigate
                 acl_resource:  oro_report_update
-                label:         Update
+                label:         oro.grid.action.update
                 icon:          edit
                 link:          update_link
+                launcherOptions:
+                    className: 'no-hash mobile-hide'
             delete:
                 type:          delete
                 acl_resource:  oro_report_delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link
+                launcherOptions:
+                    className: 'no-hash mobile-hide'
         options:
             entityHint: report

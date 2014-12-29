@@ -7,20 +7,31 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber as IntegrationFormSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber;
 
 class ChannelType extends AbstractType
 {
     const NAME            = 'oro_integration_channel_form';
     const TYPE_FIELD_NAME = 'type';
 
-    /** @var TypesRegistry */
-    protected $registry;
+    /** @var DefaultUserOwnerSubscriber */
+    protected $defaultUserOwnerSubscriber;
 
-    public function __construct(TypesRegistry $registry)
-    {
-        $this->registry = $registry;
+    /** @var IntegrationFormSubscriber */
+    protected $integrationFormSubscriber;
+
+    /**
+     * @param DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber
+     * @param IntegrationFormSubscriber  $integrationFormSubscriber
+     */
+    public function __construct(
+        DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber,
+        IntegrationFormSubscriber $integrationFormSubscriber
+    ) {
+        $this->defaultUserOwnerSubscriber = $defaultUserOwnerSubscriber;
+        $this->integrationFormSubscriber  = $integrationFormSubscriber;
     }
 
     /**
@@ -28,25 +39,25 @@ class ChannelType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventSubscriber(new ChannelFormSubscriber($this->registry));
+        $builder->addEventSubscriber($this->integrationFormSubscriber);
+        $builder->addEventSubscriber($this->defaultUserOwnerSubscriber);
 
         $builder->add(
             self::TYPE_FIELD_NAME,
-            'choice',
+            'oro_integration_type_select',
             [
                 'required' => true,
-                'choices'  => $this->registry->getAvailableChannelTypesChoiceList(),
-                'label'    => 'oro.integration.channel.type.label'
+                'label'    => 'oro.integration.integration.type.label'
             ]
         );
-        $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.channel.name.label']);
+        $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.integration.name.label']);
 
         // add transport type selector
         $builder->add(
             'transportType',
             'choice',
             [
-                'label'       => 'oro.integration.channel.transport.label',
+                'label'       => 'oro.integration.integration.transport.label',
                 'choices'     => [], //will be filled in event listener
                 'mapped'      => false,
                 'constraints' => new NotBlank()
@@ -58,11 +69,21 @@ class ChannelType extends AbstractType
             'connectors',
             'choice',
             [
-                'label'    => 'oro.integration.channel.connectors.label',
+                'label'    => 'oro.integration.integration.connectors.label',
                 'expanded' => true,
                 'multiple' => true,
                 'choices'  => [], //will be filled in event listener
                 'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'defaultUserOwner',
+            'oro_user_select',
+            [
+                'required' => true,
+                'label'    => 'oro.integration.integration.default_user_owner.label',
+                'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip'
             ]
         );
     }

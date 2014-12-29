@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
@@ -40,7 +39,6 @@ class TestHelper
         OwnershipMetadataProvider $metadataProvider = null,
         OwnerTree $ownerTree = null
     ) {
-        $classAccessor = new EntityClassAccessor();
         $idAccessor = new ObjectIdAccessor();
         $selector = new AclExtensionSelector($idAccessor);
         $actionMetadataProvider =
@@ -54,7 +52,7 @@ class TestHelper
             new ActionAclExtension($actionMetadataProvider)
         );
         $selector->addAclExtension(
-            $this->createEntityAclExtension($metadataProvider, $ownerTree, $classAccessor, $idAccessor)
+            $this->createEntityAclExtension($metadataProvider, $ownerTree, $idAccessor)
         );
 
         return $selector;
@@ -63,19 +61,14 @@ class TestHelper
     /**
      * @param  OwnershipMetadataProvider $metadataProvider
      * @param  OwnerTree                 $ownerTree
-     * @param  EntityClassAccessor       $classAccessor
      * @param  ObjectIdAccessor          $idAccessor
      * @return EntityAclExtension
      */
     public function createEntityAclExtension(
         OwnershipMetadataProvider $metadataProvider = null,
         OwnerTree $ownerTree = null,
-        EntityClassAccessor $classAccessor = null,
         ObjectIdAccessor $idAccessor = null
     ) {
-        if ($classAccessor === null) {
-            $classAccessor = new EntityClassAccessor();
-        }
         if ($idAccessor === null) {
             $idAccessor = new ObjectIdAccessor();
         }
@@ -96,9 +89,8 @@ class TestHelper
 
         $decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
-            $classAccessor,
             $idAccessor,
-            new EntityOwnerAccessor($classAccessor, $metadataProvider),
+            new EntityOwnerAccessor($metadataProvider),
             $metadataProvider
         );
 
@@ -154,7 +146,6 @@ class TestHelper
             ->will($this->testCase->returnValue(true));
 
         return new EntityAclExtension(
-            $classAccessor,
             $idAccessor,
             new EntityClassResolver($doctrine),
             $entityMetadataProvider,

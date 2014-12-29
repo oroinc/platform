@@ -63,7 +63,7 @@ class StaticSegmentManager
                 $id = reset($data);
 
                 $writeCount++;
-
+                /** @var Segment $reference */
                 $reference = $this->em->getReference(ClassUtils::getClass($segment), $segment->getId());
                 $snapshot = new SegmentSnapshot($reference);
                 $snapshot->setEntityId($id);

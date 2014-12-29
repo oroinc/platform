@@ -32,6 +32,13 @@ services:
             - "export"
             - @oro_importexport.context_registry
 
+    oro_importexport.processor.export_template_delegate:
+        class: %oro_importexport.processor.registry_delegate_processor.class%
+        arguments:
+            - @oro_importexport.processor.registry
+            - "export_template"
+            - @oro_importexport.context_registry
+
     oro_importexport.processor.export_abstract:
         class: %oro_importexport.processor.export_abstract.class%
         abstract: true

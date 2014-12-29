@@ -15,7 +15,7 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $entityManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
@@ -26,7 +26,7 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entityManager, $this->repository);
     }
@@ -59,12 +59,18 @@ class ChannelRepositoryTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->at(2))
             ->method('where')->with('c.transport is NOT NULL')
             ->will($this->returnSelf());
+        $qb->expects($this->at(3))
+            ->method('andWhere')->with('c.enabled = :isEnabled')
+            ->will($this->returnSelf());
+        $qb->expects($this->at(4))
+            ->method('setParameter')->with('isEnabled', true)
+            ->will($this->returnSelf());
 
         if (null !== $type) {
-            $qb->expects($this->at(3))
-                ->method('where')->with('c.type = :type')
+            $qb->expects($this->at(5))
+                ->method('andWhere')->with('c.type = :type')
                 ->will($this->returnSelf());
-            $qb->expects($this->at(4))
+            $qb->expects($this->at(6))
                 ->method('setParameter')->with('type', $type)
                 ->will($this->returnSelf());
         }

@@ -10,9 +10,10 @@ interface SearchHandlerInterface extends ConverterInterface
      * @param string $query
      * @param int $page
      * @param int $perPage
+     * @param bool $searchById
      * @return array
      */
-    public function search($query, $page, $perPage);
+    public function search($query, $page, $perPage, $searchById = false);
 
     /**
      * Gets properties that should be displayed

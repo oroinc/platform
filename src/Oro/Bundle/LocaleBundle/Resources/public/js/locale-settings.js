@@ -27,6 +27,10 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             timezone: 'UTC',
             timezone_offset: '+00:00',
             format_address_by_address_country: true,
+            unit: {
+                'temperature': 'fahrenheit',
+                'wind_speed':  'miles_per_hour'
+            },
             locale_data: {
                 US: {
                     phone_prefix: '1',
@@ -44,7 +48,8 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                     moment: {
                         date: 'YYYY-MM-DD',
                         time: 'HH:mms',
-                        datetime: 'YYYY-MM-DD HH:mm'
+                        datetime: 'YYYY-MM-DD HH:mm',
+                        backend: 'YYYY-MM-DD HH:mm:ssZZ'
                     }
                 },
                 address: {
@@ -119,10 +124,12 @@ define(['underscore', 'orolocale/js/locale-settings/data'
 
         extendSettings: function(settings) {
             this.settings = this._deepExtend(this.settings, settings);
+            this._timezone_shift = this.calculateTimeZoneShift(this.getTimeZoneOffset());
         },
 
         extendDefaults: function(defaults) {
             this.defaults = this._deepExtend(this.defaults, defaults);
+            this._timezone_shift = this.calculateTimeZoneShift(this.getTimeZoneOffset());
         },
 
         getLocale: function() {
@@ -158,8 +165,17 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @returns {number}
          */
         getTimeZoneShift: function () {
-            var tz = localeSettings.getTimeZoneOffset(),
-                matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
+            return this._timezone_shift;
+        },
+
+        /**
+         * Calculates timezone shift in minutes by given string
+         *
+         * @param tz {string} timezone specification, just like "+08:00"
+         * @returns {number} shift in minutes
+         */
+        calculateTimeZoneShift: function (tz) {
+            var matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
                 sign = Number(matches[1] + '1'),
                 hours = Number(matches[2]),
                 minutes = Number(matches[3]);

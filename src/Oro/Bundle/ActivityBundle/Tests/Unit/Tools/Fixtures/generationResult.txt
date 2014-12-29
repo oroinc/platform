@@ -1,0 +1,105 @@
+namespace Test;
+
+class Entity implements \Oro\Bundle\ActivityBundle\Model\ActivityInterface
+{
+    /**
+     * Checks if an entity of the given type can be associated with this entity
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportActivityTarget($targetClass)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);
+        if ($className === 'Test\TargetEntity1') { return true; }
+        if ($className === 'Test\TargetEntity2') { return true; }
+        return false;
+    }
+
+    /**
+     * Removes the association of the given entity and this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function removeActivityTarget($target)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if ($className === 'Test\TargetEntity1') {
+            if ($this->target_entity1_246e8211->contains($target)) { $this->target_entity1_246e8211->removeElement($target); }
+            return $this;
+        }
+        if ($className === 'Test\TargetEntity2') {
+            if ($this->target_entity2_bd67d3ab->contains($target)) { $this->target_entity2_bd67d3ab->removeElement($target); }
+            return $this;
+        }
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+
+    /**
+     * Checks is the given entity is associated with this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return bool
+     */
+    public function hasActivityTarget($target)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if ($className === 'Test\TargetEntity1') { return $this->target_entity1_246e8211->contains($target); }
+        if ($className === 'Test\TargetEntity2') { return $this->target_entity2_bd67d3ab->contains($target); }
+        return false;
+    }
+
+    /**
+     * Gets entities of the given type associated with this entity
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return object[]
+     */
+    public function getActivityTargets($targetClass)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);
+        if ($className === 'Test\TargetEntity1') { return $this->target_entity1_246e8211; }
+        if ($className === 'Test\TargetEntity2') { return $this->target_entity2_bd67d3ab; }
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+
+    /**
+     * Returns array with all associated entities
+     *
+     * @return array
+     */
+    public function getActivityTargetEntities()
+    {
+        $associationEntities = [];
+        $entities = $this->target_entity1_246e8211->toArray();
+        if (!empty($entities)) {
+            $associationEntities = array_merge($associationEntities, $entities);
+        }
+        $entities = $this->target_entity2_bd67d3ab->toArray();
+        if (!empty($entities)) {
+            $associationEntities = array_merge($associationEntities, $entities);
+        }
+        return $associationEntities;
+    }
+
+    /**
+     * Associates the given entity with this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function addActivityTarget($target)
+    {
+        $className = \Doctrine\Common\Util\ClassUtils::getClass($target);
+        if ($className === 'Test\TargetEntity1') {
+            if (!$this->target_entity1_246e8211->contains($target)) { $this->target_entity1_246e8211->add($target); }
+            return $this;
+        }
+        if ($className === 'Test\TargetEntity2') {
+            if (!$this->target_entity2_bd67d3ab->contains($target)) { $this->target_entity2_bd67d3ab->add($target); }
+            return $this;
+        }
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+}

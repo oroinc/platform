@@ -17,7 +17,7 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()->getMock();
@@ -31,7 +31,7 @@ class EmailTemplateTestTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->type);
     }

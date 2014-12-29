@@ -1,32 +1,38 @@
 placeholders:
     header_logo:
-        label: Header Logo
         items:
             logo:
                 order: 100
     user_menu:
-        label: Profile menu
         items:
             help:
                 order: 200
     form_buttons:
-        label: Profile menu
         items:
             add_update_delete:
                 order: 100
-    head_style:
-        label: Head styles
-    head_script:
-        label: Head scripts
+    head_style: ~
+    head_script: ~
     scripts_after:
         items:
             init_pinned_dropdown_button:
                 order: 100
-
     requirejs_config_extend:
         items:
             ui_requirejs_config:
                 order: 10
+    right_panel:
+        items:
+            navbar:
+                order: 250
+    left_panel:
+        items:
+            navbar:
+                order: 150
+    view_navButtons_after:
+        items:
+            view_buttons:
+                order: 200
 
 items:
     logo:
@@ -35,7 +41,13 @@ items:
         template: OroUIBundle:Default:help.html.twig
     add_update_delete:
         template: OroUIBundle:Form:buttons.html.twig
-    ui_requirejs_config:
-        template: OroUIBundle::requirejs.config.js.twig
     init_pinned_dropdown_button:
         template: OroUIBundle:Js:init_pinned_dropdown_button.js.twig
+    ui_requirejs_config:
+        template: OroUIBundle::requirejs.config.js.twig
+    navbar:
+        template: OroUIBundle:Default/navbar:sided.html.twig
+    view_buttons:
+        template: OroUIBundle::buttons.html.twig
+        applicable: @oro_ui.widget_provider.view_actions->supports($entity$)
+        data: @oro_ui.widget_provider.view_actions->getWidgets($entity$)

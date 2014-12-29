@@ -1,0 +1,25 @@
+@media print {
+  #calendar {
+    /*
+     * compilation of oro.css uses it's internal file order
+     * so import instruction moved into #calendar selector to override desktop styles
+     */
+    @import "../../lib/fullcalendar/fullcalendar.print.less";
+    .span2 {
+      display: none;
+    }
+    .span10 {
+      width: 100%;
+    }
+  }
+  .calendar-events.scrollable-container {
+    overflow-y: visible !important;
+    overflow-x: visible !important;
+    height: auto !important;
+  }
+  .calendar-container {
+    hr.timeline {
+      display: none;
+    }
+  }
+}

@@ -9,14 +9,23 @@ parameters:
     oro_search.prepare_result_item.listener.class:        Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener
 
     oro_search.extension.formatter.property.search_result_property.class: Oro\Bundle\SearchBundle\Extension\SearchResultProperty
-    oro_search.extension.search_results.class:          Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
+    oro_search.extension.search_results.class:                            Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
 
-    oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
     oro_search.event_listener.search_results_grid_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchResultsGridListener
-    oro_search.datasource.search.class:                 Oro\Bundle\SearchBundle\Extension\SearchDatasource
+    oro_search.event_listener.demo_data_listener.class:           Oro\Bundle\SearchBundle\EventListener\DemoDataMigrationListener
+    oro_search.datasource.search.class:                           Oro\Bundle\SearchBundle\Extension\SearchDatasource
 
-    oro_search.extension.orm_pager.class:               Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
-    oro_search.extension.pager.search.pager.class:      Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
+    oro_search.extension.orm_pager.class:          Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
+    oro_search.extension.pager.search.pager.class: Oro\Bundle\SearchBundle\Extension\Pager\IndexerPager
+
+    # services used only for ORM search engine
+    oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
+    oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
+    oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
+
+    oro_search.drivers:
+        pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
+        pdo_pgsql: Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql
 
 services:
     oro_search.index:
@@ -36,10 +45,16 @@ services:
 
     oro_search.index_listener:
         class:                        %oro_search.index_listener.class%
-        arguments:                    ["@service_container", %oro_search.realtime_update%, %oro_search.entities_config%]
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_search.search.engine
+        calls:
+            - [setRealTimeUpdate, [%oro_search.realtime_update%]]
+            - [setEntitiesConfig, [%oro_search.entities_config%]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: onClear }
 
     oro_search.twig.search_extension:
         class:                        %oro_search.twig_extension.class%
@@ -48,11 +63,14 @@ services:
 
     oro_search.mapper:
         class:                        %oro_search.mapper.class%
-        arguments:                    ["@service_container", %oro_search.entities_config%]
+        arguments:                    [@event_dispatcher, %oro_search.entities_config%]
 
     oro_search.provider.result_statistics_provider:
         class:                        %oro_search.provider.result_statistics_provider.class%
-        arguments:                    ["@oro_search.index"]
+        arguments:
+            - @oro_search.index
+            - @oro_entity_config.config_manager
+            - @translator
         lazy: true
 
     oro_search.formatter.result_formatter:
@@ -73,14 +91,12 @@ services:
         arguments:
             - @twig
             - %oro_search.entities_config%
-
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: search-result }
 
     oro_search.extension.search_results:
         class: %oro_search.extension.search_results.class%
         arguments:
-            - @oro_datagrid.datagrid.request_params
             - @oro_search.formatter.result_formatter
             - @doctrine.orm.entity_manager
             - @oro_search.mapper
@@ -90,11 +106,8 @@ services:
 
     oro_search.event_listener.search_results_grid_listener:
         class: %oro_search.event_listener.search_results_grid_listener.class%
-        arguments:
-          - @oro_datagrid.datagrid.request_params
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.search-grid, method: onBuildAfter }
-        lazy: true
 
     oro_search.datasource.search:
         class: %oro_search.datasource.search.class%
@@ -110,11 +123,36 @@ services:
         class: %oro_search.extension.orm_pager.class%
         arguments:
             - @oro_search.extension.pager.orm.pager
-            - @oro_datagrid.datagrid.request_params
         tags:
             - { name: oro_datagrid.extension }
 
+    # services used only for ORM search engine
+    oro_search.fulltext_index_manager:
+        class: %oro_search.fulltext_index_manager.class%
+        arguments:
+            - @doctrine.dbal.default_connection
+            - %oro_search.drivers%
+
     oro_search.event_listener.update_schema_listener:
         class: %oro_search.event_listener.update_schema_listener.class%
+        arguments:
+            - @oro_search.fulltext_index_manager
+            - @service_container
         tags:
-          - { name: kernel.event_listener, event: console.terminate }
+            - { name: kernel.event_listener, event: console.terminate }
+
+    oro_search.event_listener.demo_data_listener:
+        class: %oro_search.event_listener.demo_data_listener.class%
+        arguments:
+            - @oro_search.search.engine
+            - @oro_search.index_listener
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+            - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
+
+    oro_search.event_listener.orm.fulltext_index_listener:
+        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
+        arguments:
+            - %database_driver%
+        tags:
+            - { name: doctrine.event_listener, event: loadClassMetadata }

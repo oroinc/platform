@@ -32,24 +32,61 @@ class ConfigExtension extends \Twig_Extension
 
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('oro_entity_config', array($this, 'getClassConfig')),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_entity_config', [$this, 'getClassConfig']),
+            new \Twig_SimpleFunction('oro_entity_config_value', [$this, 'getClassConfigValue']),
+            new \Twig_SimpleFunction('oro_entity_route', [$this, 'getClassRoute']),
+        ];
     }
 
     /**
-     * @param string $className
-     * @param string $scope
+     * @param string $className The entity class name
+     * @param string $scope     The entity config scope name
+     *
      * @return array
      */
     public function getClassConfig($className, $scope = 'entity')
     {
         if (!$this->configManager->hasConfig($className)) {
-            return array();
+            return [];
         }
 
         $entityConfig = new EntityConfigId($scope, $className);
 
         return $this->configManager->getConfig($entityConfig)->all();
+    }
+
+    /**
+     * @param string $className The entity class name
+     * @param string $attrName  The entity config attribute name
+     * @param string $scope     The entity config scope name
+     *
+     * @return mixed
+     */
+    public function getClassConfigValue($className, $attrName, $scope = 'entity')
+    {
+        if (!$this->configManager->hasConfig($className)) {
+            return null;
+        }
+
+        $entityConfig = new EntityConfigId($scope, $className);
+
+        return $this->configManager->getConfig($entityConfig)->get($attrName);
+    }
+
+    /**
+     * @param string $className The entity class name
+     * @param string $routeType Route Type
+     * @param bool   $strict    Should exception be thrown if no route of given type found
+     *
+     * @return string
+     */
+    public function getClassRoute($className, $routeType = 'view', $strict = false)
+    {
+        if (!$this->configManager->hasConfig($className)) {
+            return null;
+        }
+
+        return $this->configManager->getEntityMetadata($className)->getRoute($routeType, $strict);
     }
 }

@@ -2,19 +2,26 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+
 class ExtendOptionsParser
 {
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $entityMetadataHelper;
+
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
+     * @param FieldTypeHelper      $fieldTypeHelper
      */
-    public function __construct(EntityMetadataHelper $entityMetadataHelper)
-    {
+    public function __construct(
+        EntityMetadataHelper $entityMetadataHelper,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
+        $this->fieldTypeHelper      = $fieldTypeHelper;
     }
 
     /**
@@ -25,9 +32,14 @@ class ExtendOptionsParser
      */
     public function parseOptions(array $options)
     {
-        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper);
+        $builder = new ExtendOptionsBuilder($this->entityMetadataHelper, $this->fieldTypeHelper);
 
-        $objectKeys = array_keys($options);
+        $objectKeys = array_filter(
+            array_keys($options),
+            function ($key) {
+                return strpos($key, '_') !== 0;
+            }
+        );
 
         // at first all table's options should be processed,
         // because it is possible that a reference to new table is created
@@ -42,6 +54,35 @@ class ExtendOptionsParser
             if (strpos($objectKey, '!')) {
                 $keyParts = explode('!', $objectKey);
                 $builder->addColumnOptions($keyParts[0], $keyParts[1], $options[$objectKey]);
+            }
+        }
+
+        // process auxiliary sections, such as append flags
+        $auxiliarySections = array_filter(
+            array_keys($options),
+            function ($key) {
+                return strpos($key, '_') === 0;
+            }
+        );
+        foreach ($auxiliarySections as $sectionName) {
+            $configType = $builder->getAuxiliaryConfigType($sectionName);
+            $objectKeys = array_keys($options[$sectionName]);
+            foreach ($objectKeys as $objectKey) {
+                if (!strpos($objectKey, '!')) {
+                    $builder->addTableAuxiliaryOptions(
+                        $configType,
+                        $objectKey,
+                        $options[$sectionName][$objectKey]
+                    );
+                } else {
+                    $keyParts = explode('!', $objectKey);
+                    $builder->addColumnAuxiliaryOptions(
+                        $configType,
+                        $keyParts[0],
+                        $keyParts[1],
+                        $options[$sectionName][$objectKey]
+                    );
+                }
             }
         }
 

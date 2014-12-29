@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
+use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
 /**
@@ -17,43 +18,51 @@ class Manager implements ManagerInterface
     /** @var Builder */
     protected $datagridBuilder;
 
-    /** @var RequestParameters */
-    protected $requestParams;
-
     /** @var ConfigurationProviderInterface */
     protected $configurationProvider;
+
+    /** @var RequestParameterBagFactory */
+    protected $parametersFactory;
+
+    /** @var NameStrategyInterface */
+    protected $nameStrategy;
 
     /**
      * Constructor
      *
      * @param ConfigurationProviderInterface $configurationProvider
      * @param Builder                        $builder
-     * @param RequestParameters              $requestParams
+     * @param RequestParameterBagFactory     $parametersFactory
+     * @param NameStrategyInterface          $nameStrategy
      */
     public function __construct(
         ConfigurationProviderInterface $configurationProvider,
         Builder $builder,
-        RequestParameters $requestParams
+        RequestParameterBagFactory $parametersFactory,
+        NameStrategyInterface $nameStrategy
     ) {
         $this->configurationProvider = $configurationProvider;
         $this->datagridBuilder       = $builder;
-        $this->requestParams         = $requestParams;
+        $this->parametersFactory     = $parametersFactory;
+        $this->nameStrategy          = $nameStrategy;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getDatagrid($name, array $parameters = [])
+    public function getDatagrid($name, $parameters = null)
     {
-        // prepare for work with current grid
-        $this->requestParams->setRootParameter($name);
-        foreach ($parameters as $key => $value) {
-            $this->requestParams->set($key, $value);
+        if (null === $parameters) {
+            $parameters = new ParameterBag();
+        } elseif (is_array($parameters)) {
+            $parameters = new ParameterBag($parameters);
+        } elseif (!$parameters instanceof ParameterBag) {
+            throw new InvalidArgumentException('$parameters must be an array or instance of ParameterBag.');
         }
 
-        $config = $this->getConfigurationForGrid($name);
+        $configuration = $this->getConfigurationForGrid($name);
 
-        $datagrid = $this->getDatagridBuilder()->build($config, $parameters);
+        $datagrid = $this->datagridBuilder->build($configuration, $parameters);
 
         return $datagrid;
     }
@@ -61,18 +70,37 @@ class Manager implements ManagerInterface
     /**
      * {@inheritDoc}
      */
-    public function getConfigurationForGrid($name)
+    public function getDatagridByRequestParams($name, array $additionalParameters = [])
     {
-        return $this->configurationProvider->getConfiguration($name);
+        $gridScope = $this->nameStrategy->parseGridScope($name);
+        if (!$gridScope) {
+            // In case if grid has scope in config we should use it to get grid parameters properly
+            $configuration = $this->getConfigurationForGrid($name);
+            $scope = $configuration->offsetGetOr('scope');
+            if ($scope) {
+                $name = $this->nameStrategy->buildGridFullName($name, $scope);
+            }
+        }
+
+        $parameters = $this->parametersFactory->createParameters($name);
+        $parameters->add($additionalParameters);
+
+        return $this->getDatagrid($name, $parameters);
     }
 
     /**
-     * Internal getter for builder
-     *
-     * @return Builder
+     * {@inheritDoc}
      */
-    protected function getDatagridBuilder()
+    public function getConfigurationForGrid($name)
     {
-        return $this->datagridBuilder;
+        $gridName = $this->nameStrategy->parseGridName($name);
+        $result = $this->configurationProvider->getConfiguration($gridName);
+
+        $gridScope = $this->nameStrategy->parseGridScope($name);
+        if ($gridScope) {
+            $result->offsetSet('scope', $gridScope);
+        }
+
+        return $result;
     }
 }

@@ -21,18 +21,24 @@ class EmbeddedFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('title', 'text')
-            ->add('formType', 'oro_available_embedded_forms')
+            ->add('title', 'text', ['label' => 'oro.embeddedform.title.label'])
+            ->add('formType', 'oro_available_embedded_forms', ['label' => 'oro.embeddedform.form_type.label'])
             ->add(
-                'channel',
-                'entity',
+                'css',
+                'textarea',
                 [
-                    'class' => 'OroIntegrationBundle:Channel',
-                    'property' => 'name'
+                    'label'   => 'oro.embeddedform.css.label',
+                    'tooltip' => 'oro.embeddedform.css.tooltip'
                 ]
             )
-            ->add('css', 'textarea')
-            ->add('successMessage', 'textarea', ['tooltip' => 'oro.embeddedform.success_message.tooltip']);
+            ->add(
+                'successMessage',
+                'textarea',
+                [
+                    'label'   => 'oro.embeddedform.success_message.label',
+                    'tooltip' => 'oro.embeddedform.success_message.tooltip'
+                ]
+            );
     }
 
     /**

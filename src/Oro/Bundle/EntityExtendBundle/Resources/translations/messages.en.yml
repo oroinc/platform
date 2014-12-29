@@ -1,9 +1,25 @@
 "Your config changes will be applied to schema.": "Your config changes will be applied to schema."
 "It may take few minutes...": "It may take few minutes..."
+"System": "System"
+"Custom": "Custom"
+"New": "New"
+"Requires update": "Requires update"
+"Active": "Active"
+"Deleted": "Deleted"
+"Field successfully deleted": "Field successfully deleted"
+
 oro:
     entity_extend:
+        datagrid:
+            enum:
+                filter.empty:       None
         form:
+            data_type_group:
+                fields:             Fields
+                relations:          Relations
             data_type:
+                choose_value:       Choose a field type...
+
                 string:             String
                 integer:            Integer
                 smallint:           SmallInt
@@ -11,17 +27,40 @@ oro:
                 boolean:            Boolean
                 decimal:            Decimal
                 date:               Date
+                datetime:           DateTime
+                time:               Time
                 text:               Text
                 float:              Float
                 money:              Currency
                 percent:            Percent
-                oneToMany:          Relation one to many
-                manyToOne:          Relation many to one
-                manyToMany:         Relation many to many
-                optionSet:          Option set
+                oneToMany:          One to many
+                manyToOne:          Many to one
+                manyToMany:         Many to many
+                optionSet:          Option Set (deprecated)
+                enum:               Select
+                multiEnum:          Multi-Select
 
                 ref-one:            System relation
                 ref-many:           System relation
+                array:              Binary
+                json_array:         Binary
+                simple_array:       Binary
+                object:             Binary
+
+                inverse_relation:   Reuse "%field_name%" of %entity_name%
+            field_name.label:       Field name
+            name.label:             Name
+            key.label:              Key
+            target_entity:          Target entity
+            target_field:           Target field
+            relation:
+                entity_data_fields: Related entity data fields
+                entity_info_title:  Related entity info title
+                entity_detailed:    Related entity detailed
+
+        enum_name:    Option Set Name
+        enum_public:  Public
+        enum_options: Options
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:
@@ -41,3 +80,50 @@ oro:
             config_field:
                 message:
                     saved: "Field saved"
+        unique_keys: "Unique Keys"
+
+        entity_config:
+            extend:
+                entity:
+                    grid_action:
+                        remove: "Remove"
+                        restore: "Restore"
+                    layout_action:
+                        create_entity: "Create entity"
+                    items:
+                        owner: "Type"
+                        is_extend: "Is Extend"
+                        state: "Schema status"
+                field:
+                    grid_action:
+                        remove: "Remove"
+                        restore: "Restore"
+                    layout_action:
+                        manage_unique_keys: "Manage unique keys"
+                        create_field: "Create field"
+                        update_schema: "Update schema"
+                    items:
+                        owner: "Type"
+                        state: "Schema status"
+                        length: "Length"
+                        precision: "Precision"
+                        scale: "Scale"
+                        set_expanded: "Expanded"
+                        set_options: "Options"
+
+        config_grid:
+            entities: Entities
+            new_entity: New entity
+            unique_keys: Unique keys
+            new_field: New field
+
+    entityextend:
+        enumvalue:
+            id.label:               Id
+            id.description:         The unique identifier of the option
+            name.label:             Name
+            name.description:       The option name
+            priority.label:         Priority
+            priority.description:   A number is used to sort options
+            default.label:          Is Default
+            default.description:    Determines if this option is selected by default for new records

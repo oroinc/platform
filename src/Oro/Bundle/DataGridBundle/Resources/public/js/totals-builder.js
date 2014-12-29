@@ -1,24 +1,33 @@
-/* jshint browser:true */
-/* global define, require */
-define(['jquery', 'underscore', 'oroui/js/tools', 'oroui/js/mediator'],
-function($, _, tools,  mediator) {
+/*jslint nomen:true */
+/*global define, require*/
+define(['jquery', 'underscore', 'oroui/js/mediator'
+    ], function ($, _, mediator) {
     'use strict';
-    var initialized = false,
-        initHandler = function (collection, $el) {
-            collection.on('beforeReset', function (collection, resp){
-                collection.state.totals = resp.options.totals;
-            });
-            initialized = true;
-        };
+
+    var initHandler = function (collection) {
+        collection.on('beforeReset', function (collection, resp) {
+            collection.state.totals = resp.options.totals;
+        });
+    };
 
     return {
-        init: function () {
-            initialized = false;
-            mediator.once('datagrid_collection_set_after', initHandler);
-            mediator.once('hash_navigation_request:start', function() {
-                if (!initialized) {
-                    mediator.off('datagrid_collection_set_after', initHandler);
-                }
+        /**
+         * Builder interface implementation
+         *
+         * @param {jQuery.Deferred} deferred
+         * @param {Object} options
+         * @param {jQuery} [options.$el] container for the grid
+         * @param {string} [options.gridName] grid name
+         * @param {Object} [options.gridPromise] grid builder's promise
+         * @param {Object} [options.data] data for grid's collection
+         * @param {Object} [options.metadata] configuration for the grid
+         */
+        init: function (deferred, options) {
+            options.gridPromise.done(function (grid) {
+                initHandler(grid.collection);
+                deferred.resolve();
+            }).fail(function () {
+                deferred.reject();
             });
         }
     };

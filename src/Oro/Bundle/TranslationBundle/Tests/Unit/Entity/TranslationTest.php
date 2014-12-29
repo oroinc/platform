@@ -9,7 +9,7 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
     /** @var  Translation */
     protected $translation;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->translation = new Translation();
     }

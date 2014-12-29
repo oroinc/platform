@@ -1,13 +1,8 @@
 parameters:
     oro_installer.scenario.class:                     Oro\Bundle\InstallerBundle\Process\InstallerScenario
-    oro_installer.requirements.class:                 Oro\Bundle\InstallerBundle\Requirement\OroRequirements
-    oro_installer.requirements.settings.class:        Oro\Bundle\InstallerBundle\Requirement\SettingsRequirements
-    oro_installer.requirements.extensions.class:      Oro\Bundle\InstallerBundle\Requirement\ExtensionsRequirements
-    oro_installer.requirements.filesystem.class:      Oro\Bundle\InstallerBundle\Requirement\FilesystemRequirements
     oro_installer.yaml_persister.class:               Oro\Bundle\InstallerBundle\Persister\YamlPersister
     oro_installer.listener.request.class:             Oro\Bundle\InstallerBundle\EventListener\RequestListener
     oro_installer.script_manager.class:               Oro\Bundle\InstallerBundle\ScriptManager
-
 services:
     oro_installer.scenario:
         class: %oro_installer.scenario.class%

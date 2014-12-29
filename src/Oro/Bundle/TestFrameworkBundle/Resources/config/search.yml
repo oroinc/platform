@@ -1,6 +1,7 @@
 Oro\Bundle\TestFrameworkBundle\Entity\Item:
-    label: Test Search Bundle Item
-    alias: oro_test_item
+    label:           Test Search Bundle Item
+    alias:           oro_test_item
+    search_template: OroSearchBundle:Test:searchResult.html.twig
     route:
         name: oro_search_results
     fields:
@@ -28,3 +29,7 @@ Oro\Bundle\TestFrameworkBundle\Entity\Item:
             name: blobValue
             target_type: text
             target_fields: [blobValue, all_data]
+        -
+            name: phone
+            target_type: text
+            target_fields: [phone]

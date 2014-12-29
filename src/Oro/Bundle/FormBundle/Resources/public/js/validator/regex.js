@@ -19,9 +19,12 @@ define(['underscore', 'orotranslation/js/translator'
             param = _.extend({}, defaultParam, param);
             return this.optional(element) || Boolean(param.match) === pattern.test(value);
         },
-        function (param) {
+        function (param, element) {
+            var value = this.elementValue(element),
+                placeholders = {};
             param = _.extend({}, defaultParam, param);
-            return __(param.message);
+            placeholders.value = value;
+            return __(param.message, placeholders);
         }
     ];
 });

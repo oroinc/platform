@@ -1,9 +1,17 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-input', './page-size', './actions-panel'
-    ], function (_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
+define([
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    './pagination-input',
+    './page-size',
+    './actions-panel'
+], function (_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
     'use strict';
 
-    var $ = Backbone.$;
+    var $, Toolbar;
+    $ = Backbone.$;
 
     /**
      * Datagrid toolbar widget
@@ -12,7 +20,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
      * @class   orodatagrid.datagrid.Toolbar
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    Toolbar = Backbone.View.extend({
         /** @property */
         template: '#template-datagrid-toolbar',
 
@@ -45,19 +53,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
 
             this.collection = options.collection;
 
-            this.pagination = new this.pagination(_.extend({}, options.pagination, { collection: this.collection }));
+            this.subviews = {
+                pagination: new this.pagination(_.defaults({collection: this.collection}, options.pagination)),
+                pageSize: new this.pageSize(_.defaults({collection: this.collection}, options.pageSize)),
+                actionsPanel: new this.actionsPanel(_.extend({}, options.actionsPanel)),
+                extraActionsPanel: new this.extraActionsPanel()
+            };
 
-            options.pageSize = options.pageSize || {};
-            this.pageSize = new this.pageSize(_.extend({}, options.pageSize, { collection: this.collection }));
-
-            this.actionsPanel = new this.actionsPanel(_.extend({}, options.actionsPanel));
             if (options.actions) {
-                this.actionsPanel.setActions(options.actions);
+                this.subviews.actionsPanel.setActions(options.actions);
             }
-
-            this.extraActionsPanel = new this.extraActionsPanel();
             if (options.extraActions) {
-                this.extraActionsPanel.setActions(options.extraActions);
+                this.subviews.extraActionsPanel.setActions(options.extraActions);
             }
 
             if (_.has(options, 'enable') && !options.enable) {
@@ -69,7 +76,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
 
             this.template = _.template($(options.template || this.template).html());
 
-            Backbone.View.prototype.initialize.call(this, options);
+            Toolbar.__super__.initialize.call(this, options);
         },
 
         /**
@@ -78,10 +85,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
          * @return {*}
          */
         enable: function () {
-            this.pagination.enable();
-            this.pageSize.enable();
-            this.actionsPanel.enable();
-            this.extraActionsPanel.enable();
+            this.subviews.pagination.enable();
+            this.subviews.pageSize.enable();
+            this.subviews.actionsPanel.enable();
+            this.subviews.extraActionsPanel.enable();
             return this;
         },
 
@@ -91,10 +98,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
          * @return {*}
          */
         disable: function () {
-            this.pagination.disable();
-            this.pageSize.disable();
-            this.actionsPanel.disable();
-            this.extraActionsPanel.disable();
+            this.subviews.pagination.disable();
+            this.subviews.pageSize.disable();
+            this.subviews.actionsPanel.disable();
+            this.subviews.extraActionsPanel.disable();
             return this;
         },
 
@@ -112,15 +119,18 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
          * Render toolbar with pager and other views
          */
         render: function () {
+            var $pagination;
             this.$el.empty();
             this.$el.append(this.template());
-            var $pagination = this.pagination.render().$el.attr('class', this.$('.pagination').attr('class'));
+
+            $pagination = this.subviews.pagination.render().$el;
+            $pagination.attr('class', this.$('.pagination').attr('class'));
 
             this.$('.pagination').replaceWith($pagination);
-            this.$('.page-size').append(this.pageSize.render().$el);
-            this.$('.actions-panel').append(this.actionsPanel.render().$el);
-            if (this.extraActionsPanel.haveActions()) {
-                this.$('.extra-actions-panel').append(this.extraActionsPanel.render().$el);
+            this.$('.page-size').append(this.subviews.pageSize.render().$el);
+            this.$('.actions-panel').append(this.subviews.actionsPanel.render().$el);
+            if (this.subviews.extraActionsPanel.haveActions()) {
+                this.$('.extra-actions-panel').append(this.subviews.extraActionsPanel.render().$el);
             } else {
                 this.$('.extra-actions-panel').hide();
             }
@@ -128,4 +138,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './pagination-
             return this;
         }
     });
+
+    return Toolbar;
 });

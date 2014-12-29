@@ -1,0 +1,8 @@
+oro.note.add_note_title:       Add note
+oro.note.edit_note_title:      Update note
+oro.note.note_saved:           Note saved
+oro.note.note_removed:         Note deleted
+oro.note.note_delete_confirmation: Are you sure you want to delete this note?
+oro.note.load_notes_error:     Sorry, notes were not loaded correctly.
+oro.note.delete_note_error:    Sorry, the note deleting was failed.
+oro.note.forbidden_error:      You do not have permission to perform this action.

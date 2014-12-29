@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\EventListener;
 
-use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\DataGridBundle\Datagrid\RequestParameters;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
@@ -15,19 +12,14 @@ class AuditHistoryGridListener
     const GRID_PARAM_OBJECT_ID  = 'object_id';
     const GRID_PARAM_FIELD_NAME = 'field_name';
 
-    /** @var  RequestParameters */
-    protected $requestParams;
-
     /** @var array */
     protected $paramsToBind = [];
 
     /**
-     * @param RequestParameters $requestParams
      * @param array $paramsToBind
      */
-    public function __construct(RequestParameters $requestParams, $paramsToBind = [])
+    public function __construct($paramsToBind = [])
     {
-        $this->requestParams = $requestParams;
         $this->paramsToBind = $paramsToBind;
     }
 
@@ -40,7 +32,7 @@ class AuditHistoryGridListener
     {
         $config = $event->getConfig();
 
-        $fieldName = $this->requestParams->get(self::GRID_PARAM_FIELD_NAME, false);
+        $fieldName = $event->getDatagrid()->getParameters()->get(self::GRID_PARAM_FIELD_NAME, false);
         $config->offsetSetByPath('[columns][diffs][context][field_name]', $fieldName);
     }
 
@@ -49,20 +41,21 @@ class AuditHistoryGridListener
      */
     public function onBuildAfter(BuildAfter $event)
     {
-        $datasource = $event->getDatagrid()->getDatasource();
+        $datagrid = $event->getDatagrid();
+        $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            /** @var QueryBuilder $query */
+            $parameters = $datagrid->getParameters();
             $queryBuilder = $datasource->getQueryBuilder();
 
             $queryParameters = array(
-                'objectClass' => str_replace('_', '\\', $this->requestParams->get(self::GRID_PARAM_CLASS, '')),
+                'objectClass' => str_replace('_', '\\', $parameters->get(self::GRID_PARAM_CLASS, '')),
             );
 
             if (in_array('objectId', $this->paramsToBind)) {
-                $queryParameters['objectId'] = $this->requestParams->get(self::GRID_PARAM_OBJECT_ID, 0);
+                $queryParameters['objectId'] = $parameters->get(self::GRID_PARAM_OBJECT_ID, 0);
             }
 
-            $fieldName = $this->requestParams->get(self::GRID_PARAM_FIELD_NAME, false);
+            $fieldName = $parameters->get(self::GRID_PARAM_FIELD_NAME, false);
             if (!empty($fieldName) && in_array('fieldName', $this->paramsToBind)) {
                 $queryParameters['fieldName'] = $fieldName;
             }

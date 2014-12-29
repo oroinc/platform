@@ -53,6 +53,10 @@ function($, localeSettings) {
         'timezone': oro_timezone(),
         'timezone_offset': oro_timezone_offset(),
         'format_address_by_address_country': oro_format_address_by_address_country(),
+        'unit': {
+            'temperature': oro_config_value('oro_locale.temperature_unit'),
+            'wind_speed':  oro_config_value('oro_locale.wind_speed_unit')
+        },
         'format': {
             'datetime': dateTimeFormats,
             'number': numberFormatSettings

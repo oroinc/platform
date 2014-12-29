@@ -1,16 +1,16 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Engine\Orm;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
 {
-    public $columns = array();
+    public $columns = [];
     public $needle;
     public $mode;
 
@@ -39,7 +39,7 @@ class PdoPgsql extends BaseDriver
      */
     public static function getPlainSql()
     {
-        return "CREATE INDEX string_fts ON oro_search_index_text USING gin(to_tsvector('english', 'value'))";
+        return "CREATE INDEX value ON oro_search_index_text USING gin(to_tsvector('english', 'value'))";
     }
 
     /**
@@ -52,12 +52,17 @@ class PdoPgsql extends BaseDriver
      */
     protected function createContainsStringQuery($index, $useFieldName = true)
     {
-        $stringQuery = '';
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :non_value' . $index . ')) = TRUE';
+
         if ($useFieldName) {
-            $stringQuery = ' AND textField.field = :field' .$index;
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
         }
 
-        return '(TsvectorTsquery(textField.value, :value' .$index. ')) = TRUE' . $stringQuery;
+        $stringQuery .= ' AND TsRank(' . $joinAlias . '.value, :value' . $index . ') > ' . Query::FINITY;
+
+        return $stringQuery;
     }
 
     /**
@@ -70,7 +75,15 @@ class PdoPgsql extends BaseDriver
      */
     protected function createNotContainsStringQuery($index, $useFieldName = true)
     {
-        return $this->createContainsStringQuery($index, $useFieldName);
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
+        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :value' . $index . ')) = TRUE';
+
+        if ($useFieldName) {
+            $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
+        }
+
+        return $stringQuery;
     }
 
     /**
@@ -83,18 +96,24 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        $searchArray = explode(' ', $fieldValue);
-        foreach ($searchArray as $index => $string) {
-            $searchArray[$index] = $string . ':*';
+        $notContains = $searchCondition != Query::OPERATOR_CONTAINS;
+        $searchArray = explode(Query::DELIMITER, $fieldValue);
+
+        foreach ($searchArray as $key => $string) {
+            $searchArray[$key] = $string . ':*';
         }
 
-        if ($searchCondition != Query::OPERATOR_CONTAINS) {
-            foreach ($searchArray as $index => $string) {
-                $searchArray[$index] = '!' . $string;
+        if ($notContains) {
+            foreach ($searchArray as $key => $string) {
+                $searchArray[$key] = '!' . $string;
             }
         }
 
         $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+
+        if (!$notContains) {
+            $qb->setParameter('non_value' . $index, implode(' | ', $searchArray));
+        }
     }
 
     /**
@@ -105,13 +124,42 @@ class PdoPgsql extends BaseDriver
      */
     protected function setTextOrderBy(QueryBuilder $qb, $index)
     {
+        $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
+
         $qb->select(
-            array(
-                 'search as item',
-                 'text',
-                 'TsRank(textField.value, :value' .$index. ') AS rankField'
-            )
+            [
+                'search as item',
+                'TsRank(' . $joinAlias . '.value, :value' . $index . ') AS rankField'
+            ]
         );
         $qb->orderBy('rankField', 'DESC');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function addOrderBy(Query $query, QueryBuilder $qb)
+    {
+        parent::addOrderBy($query, $qb);
+
+        // all columns from order part must be in select
+        if ($query->getOrderBy()) {
+            $qb->addSelect('orderTable.value');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
+    {
+        $query = parent::getTruncateQuery($dbPlatform, $tableName);
+
+        // cascade required to perform truncate of related entities
+        if (strpos($query, ' CASCADE') === false) {
+            $query .= ' CASCADE';
+        }
+
+        return $query;
     }
 }

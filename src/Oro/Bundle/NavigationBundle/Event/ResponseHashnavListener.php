@@ -2,7 +2,7 @@
 namespace Oro\Bundle\NavigationBundle\Event;
 
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 
@@ -21,10 +21,24 @@ class ResponseHashnavListener
      */
     protected $templating;
 
-    public function __construct(SecurityContextInterface $security, EngineInterface $templating)
-    {
-        $this->security = $security;
+    /**
+     * @var bool
+     */
+    protected $isDebug;
+
+    /**
+     * @param SecurityContextInterface $security
+     * @param EngineInterface          $templating
+     * @param bool                     $isDebug
+     */
+    public function __construct(
+        SecurityContextInterface $security,
+        EngineInterface $templating,
+        $isDebug = false
+    ) {
+        $this->security   = $security;
         $this->templating = $templating;
+        $this->isDebug    = $isDebug;
     }
 
     /**
@@ -34,10 +48,10 @@ class ResponseHashnavListener
      */
     public function onResponse(FilterResponseEvent $event)
     {
-        $request = $event->getRequest();
+        $request  = $event->getRequest();
         $response = $event->getResponse();
         if ($request->get(self::HASH_NAVIGATION_HEADER) || $request->headers->get(self::HASH_NAVIGATION_HEADER)) {
-            $location = '';
+            $location       = '';
             $isFullRedirect = false;
             if ($response->isRedirect()) {
                 $location = $response->headers->get('location');
@@ -45,21 +59,27 @@ class ResponseHashnavListener
                     $isFullRedirect = true;
                 }
             }
-            if ($response->isNotFound() || $response->getStatusCode() == 503) {
+            if ($response->isNotFound() || ($response->getStatusCode() == 503 && !$this->isDebug)) {
                 $location = $request->getUri();
                 $isFullRedirect = true;
             }
             if ($location) {
-                $event->setResponse(
-                    $this->templating->renderResponse(
-                        'OroNavigationBundle:HashNav:redirect.html.twig',
-                        array(
-                            'full_redirect' => $isFullRedirect,
-                            'location' => $location,
-                        )
+                $response = $this->templating->renderResponse(
+                    'OroNavigationBundle:HashNav:redirect.html.twig',
+                    array(
+                        'full_redirect' => $isFullRedirect,
+                        'location'      => $location,
                     )
                 );
             }
+
+            // disable cache for ajax navigation pages and change content type to json
+            $response->headers->set('Content-Type', 'application/json');
+            $response->headers->addCacheControlDirective('no-cache', true);
+            $response->headers->addCacheControlDirective('max-age', 0);
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+            $response->headers->addCacheControlDirective('no-store', true);
+            $event->setResponse($response);
         }
     }
 }

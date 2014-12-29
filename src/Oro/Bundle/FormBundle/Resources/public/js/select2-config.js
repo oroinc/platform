@@ -1,6 +1,6 @@
 /*global define*/
-define(['jquery', 'underscore'
-    ], function ($, _) {
+define(['jquery', 'underscore', 'oroui/js/tools'
+    ], function ($, _, tools) {
     'use strict';
 
     /**
@@ -21,15 +21,15 @@ define(['jquery', 'underscore'
             // and if this object was not created in extra config block
             if (this.config.ajax === undefined && this.url) {
                 this.config.ajax = {
-                    'url': this.url,
-                    'data': function (query, page) {
+                    url: this.url,
+                    data: function (query, page) {
                         return {
-                            'page': page,
-                            'per_page': self.perPage,
-                            'query': query
+                            page: page,
+                            per_page: self.perPage,
+                            query: query
                         };
                     },
-                    'results': function (data, page) {
+                    results: function (data, page) {
                         return data;
                     }
                 };
@@ -119,20 +119,77 @@ define(['jquery', 'underscore'
         },
 
         initSelection: function(element, callback) {
-            var data = element.data('selected-data')
-                ? element.data('selected-data')
-                : [{'id': element.val(), 'text': element.val()}];
+            var self = this;
 
-            if (this.config.multiple === true) {
-                callback(data);
+            var handleResults = function(data) {
+                if (self.config.multiple === true) {
+                    callback(data);
+                } else {
+                    callback(data.pop());
+                }
+            };
+
+            var setSelect2ValueById = function(id) {
+                if (_.isArray(id)) {
+                    id = id.join(',');
+                }
+                var select2Obj = element.data('select2');
+                var select2AjaxOptions = select2Obj.opts.ajax;
+                var searchData = select2AjaxOptions.data(id, 1, true);
+                var url = (typeof select2AjaxOptions.url === 'function')
+                    ? select2AjaxOptions.url.call(select2Obj, id, 1)
+                    : select2AjaxOptions.url;
+
+                searchData.search_by_id = true;
+                $.ajax({
+                    url: url,
+                    data: searchData,
+                    success: function(response) {
+                        if (typeof select2AjaxOptions.results == 'function') {
+                            response = select2AjaxOptions.results.call(select2Obj, response, 1);
+                        }
+                        if (typeof response.results != 'undefined') {
+                            handleResults(response.results);
+                        }
+                        element.trigger('select2-data-loaded');
+                    }
+                });
+            };
+
+            var currentValue = element.select2('val');
+            if (!_.isArray(currentValue)) {
+                currentValue = [currentValue];
+            }
+
+            // elementData must have name
+            var elementData = _.filter(
+                element.data('selected-data'),
+                function (item) {
+                    return item.name !== undefined && item.name !== null;
+                }
+            );
+
+            if (_.isArray(elementData) && elementData.length > 0) {
+                var dataIds = _.map(elementData, function(item) {
+                    return item.id;
+                });
+
+                // handle case when creation of new item allowed and value should be restored (f.e. validation failed)
+                dataIds = _.compact(dataIds);
+
+                if (dataIds.length === 0 || dataIds.sort().join(',') === currentValue.sort().join(',')) {
+                    handleResults(elementData);
+                } else {
+                    setSelect2ValueById(currentValue);
+                }
             } else {
-                callback(data.pop());
+                setSelect2ValueById(currentValue);
             }
         },
 
         highlightSelection: function(str, selection) {
             return str && selection && selection.term ?
-                str.replace(new RegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
+                str.replace(tools.safeRegExp(selection.term, 'ig'), '<span class="select2-match">$&</span>') : str;
         },
 
         getTitle: function(data, properties) {

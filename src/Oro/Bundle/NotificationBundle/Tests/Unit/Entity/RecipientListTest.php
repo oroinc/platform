@@ -11,7 +11,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
      */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new RecipientList();
 
@@ -22,7 +22,7 @@ class RecipientListTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $this->entity->getGroups());
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entity);
     }

@@ -80,4 +80,20 @@ class StepManagerTest extends \PHPUnit_Framework_TestCase
 
         return $step;
     }
+
+    public function testStartStep()
+    {
+        $testStartStep = 'start_step';
+
+        $startStep = new Step();
+        $startStep->setName($testStartStep);
+
+        $stepManager = new StepManager(array($startStep));
+        $this->assertNull($stepManager->getStartStep());
+        $this->assertFalse($stepManager->hasStartStep());
+
+        $stepManager->setStartStepName($testStartStep);
+        $this->assertEquals($startStep, $stepManager->getStartStep());
+        $this->assertTrue($stepManager->hasStartStep());
+    }
 }

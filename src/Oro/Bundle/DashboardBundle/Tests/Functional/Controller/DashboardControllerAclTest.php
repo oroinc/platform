@@ -3,57 +3,37 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData;
+use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
- * @db_reindex
+ * @dbIsolation
+ * @dbReindex
  */
 class DashboardControllerAclTest extends WebTestCase
 {
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @var Manager
-     */
-    protected $dashboardManager;
-
-    /**
-     * @var bool
-     */
-    protected static $hasLoaded = false;
-
     protected function setUp()
     {
-        $this->client = static::createClient(
+        $this->initClient(
             [],
-            ToolsAPI::generateBasicHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            $this->generateBasicAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
-
-        $this->dashboardManager = $this->client->getContainer()->get('oro_dashboard.manager');
-
-        if (!self::$hasLoaded) {
-            $this->client->appendFixtures(__DIR__ . DIRECTORY_SEPARATOR . 'DataFixtures');
-        }
-
-        self::$hasLoaded = true;
+        $this->loadFixtures(
+            array(
+                'Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData'
+            )
+        );
     }
 
     public function testView()
     {
         $this->client->request(
             'GET',
-            $this->client->generate('oro_dashboard_view')
+            $this->getUrl('oro_dashboard_view')
         );
         $result = $this->client->getResponse();
-        ToolsAPI::assertJsonResponse($result, 200, 'text/html; charset=UTF-8');
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertContains(
             'Quick Launchpad',
             $result->getContent()

@@ -36,12 +36,27 @@ class ActionPermissionProvider
         $isSystem = $record->getValue('system');
 
         return array(
-            'view' => true,
-            'update' => !$isSystem,
-            'clone'  => true,
-            'delete' => !$isSystem,
-            'activate' => !$isActiveWorkflow,
-            'deactivate' => $isActiveWorkflow
+            'activate'   => !$isActiveWorkflow,
+            'clone'      => true,
+            'deactivate' => $isActiveWorkflow,
+            'delete'     => !$isSystem,
+            'update'     => !$isSystem,
+            'view'       => true,
+
+        );
+    }
+
+    /**
+     * @param ResultRecordInterface $record
+     * @return array
+     */
+    public function getProcessDefinitionPermissions(ResultRecordInterface $record)
+    {
+        $isEnabled = $record->getValue('enabled');
+        return array(
+            'activate'   => !$isEnabled,
+            'deactivate' => $isEnabled,
+            'view'       => true,
         );
     }
 }

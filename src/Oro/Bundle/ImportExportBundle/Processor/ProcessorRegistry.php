@@ -8,6 +8,7 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 class ProcessorRegistry
 {
     const TYPE_EXPORT = 'export';
+    const TYPE_EXPORT_TEMPLATE = 'export_template';
     const TYPE_IMPORT = 'import';
     const TYPE_IMPORT_VALIDATION = 'import_validation';
 
@@ -21,7 +22,7 @@ class ProcessorRegistry
      *
      * @var array
      */
-    protected $processors = array();
+    protected $processors = [];
 
     /**
      * Processor storage format:
@@ -35,7 +36,7 @@ class ProcessorRegistry
      *
      * @var array
      */
-    protected $processorsByEntity = array();
+    protected $processorsByEntity = [];
 
     /**
      * @param ProcessorInterface $processor
@@ -47,21 +48,25 @@ class ProcessorRegistry
     public function registerProcessor(ProcessorInterface $processor, $type, $entityName, $alias)
     {
         if (empty($this->processors[$type])) {
-            $this->processors[$type] = array();
+            $this->processors[$type] = [];
         }
 
         if (empty($this->processorsByEntity[$entityName])) {
-            $this->processorsByEntity[$entityName] = array();
+            $this->processorsByEntity[$entityName] = [];
         }
 
         if (empty($this->processorsByEntity[$entityName][$type])) {
-            $this->processorsByEntity[$entityName][$type] = array();
+            $this->processorsByEntity[$entityName][$type] = [];
         }
 
         if (!empty($this->processors[$type][$alias])) {
             throw new LogicException(
-                sprintf('Processor with type "%s" and alias "%s" already exists', $type, $entityName)
+                sprintf('Processor with type "%s" and alias "%s" already exists', $type, $alias)
             );
+        }
+
+        if ($processor instanceof EntityNameAwareInterface) {
+            $processor->setEntityName($entityName);
         }
 
         $this->processors[$type][$alias] = $processor;
@@ -123,7 +128,7 @@ class ProcessorRegistry
     public function getProcessorsByEntity($type, $entityName)
     {
         if (empty($this->processorsByEntity[$entityName][$type])) {
-            return array();
+            return [];
         }
 
         return $this->processorsByEntity[$entityName][$type];
@@ -139,7 +144,7 @@ class ProcessorRegistry
     public function getProcessorAliasesByEntity($type, $entityName)
     {
         if (empty($this->processorsByEntity[$entityName][$type])) {
-            return array();
+            return [];
         }
 
         return array_keys($this->processorsByEntity[$entityName][$type]);
@@ -163,5 +168,19 @@ class ProcessorRegistry
         throw new UnexpectedValueException(
             sprintf('Processor with type "%s" and alias "%s" is not exist', $type, $alias)
         );
+    }
+
+    /**
+     * @param string $type
+
+     * @return ProcessorInterface[]
+     */
+    public function getProcessorsByType($type)
+    {
+        if (!empty($this->processors[$type])) {
+            return $this->processors[$type];
+        }
+
+        return [];
     }
 }

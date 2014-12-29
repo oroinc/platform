@@ -132,12 +132,7 @@ class AclRoleHandler
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();
                 $removeUsers = $this->form->get('removeUsers')->getData();
-                if (!$role->getRole()) {
-                    // Set role system name for new role.
-                    $role->setRole(strtoupper(trim(preg_replace('/[^\w\-]/i', '_', $role->getLabel()))));
-                }
                 $this->onSuccess($role, $appendUsers, $removeUsers);
-
                 $this->processPrivileges($role);
 
                 return true;

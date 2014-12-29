@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Selenium;
 
+use Oro\Bundle\EmailBundle\Tests\Selenium\Pages\EmailTemplates;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
  * Class EmailTemplateTest
  *
- * @package Oro\Bundle\TestFrameworkBundle\Tests\Selenium
+ * @package Oro\Bundle\EmailBundle\Tests\Selenium
  */
 class EmailTemplateTest extends Selenium2TestCase
 {
@@ -19,7 +20,9 @@ class EmailTemplateTest extends Selenium2TestCase
         $templateName = 'EmailTemplate_'.mt_rand();
 
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
+            ->assertTitle('Templates - Emails - System')
             ->add()
             ->assertTitle('Create Email Template - Templates - Emails - System')
             ->setEntityName('User')
@@ -46,6 +49,7 @@ class EmailTemplateTest extends Selenium2TestCase
         $newTemplateName = 'Clone_' . $templateName;
         $fields = array();
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->cloneEntity('Template name', $templateName)
             ->setName($newTemplateName)
@@ -54,6 +58,7 @@ class EmailTemplateTest extends Selenium2TestCase
             ->assertTitle('Templates - Emails - System')
             ->close()
             ->open(array($newTemplateName))
+            ->assertTitle("Template {$newTemplateName} - Edit - Templates - Emails - System")
             ->getFields($fields);
         $this->assertEquals('User', $fields['entityname']);
         // label with space according to markup in OroFormBundle:Form/fields.html.twig
@@ -65,7 +70,7 @@ class EmailTemplateTest extends Selenium2TestCase
     }
 
     /**
-     * @depends testCreateEmailTemplate
+     * @depends testCloneEmailTemplate
      * @param $templateName
      * @return string
      */
@@ -73,8 +78,10 @@ class EmailTemplateTest extends Selenium2TestCase
     {
         $newTemplateName = 'Update_' . $templateName;
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->open(array($templateName))
+            ->assertTitle("Template {$templateName} - Edit - Templates - Emails - System")
             ->setName($newTemplateName)
             ->save()
             ->assertMessage('Template saved')
@@ -91,6 +98,7 @@ class EmailTemplateTest extends Selenium2TestCase
     public function testDeleteEmailTemplate($templateName)
     {
         $login = $this->login();
+        /* @var EmailTemplates $login*/
         $login->openEmailTemplates('Oro\Bundle\EmailBundle')
             ->delete('Template name', $templateName)
             ->assertTitle('Templates - Emails - System')

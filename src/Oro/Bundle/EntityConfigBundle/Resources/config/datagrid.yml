@@ -5,7 +5,7 @@ datagrid:
             entityHint: entity
             toolbarOptions:
                 pageSize:
-                    default_per_page: 50
+                    default_per_page: 100
         source:
             acl_resource: oro_entityconfig_manage
             type: orm
@@ -21,7 +21,7 @@ datagrid:
                         - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
         columns:
             updated:
-                label: oro.entity_config.entity_config.updated.label
+                label: oro.ui.updated_at
                 frontend_type: datetime
 
         properties:
@@ -40,13 +40,13 @@ datagrid:
             # @TODO check why those actions dont have ACL
             view:
                 type: navigate
-                label: View
-                icon: book
+                label: oro.grid.action.view
+                icon: eye-open
                 link: view_link
                 rowAction: true
             update:
                 type: navigate
-                label: Update
+                label: oro.grid.action.update
                 icon: edit
                 link: update_link
         sorters:
@@ -79,16 +79,26 @@ datagrid:
                     - cf.fieldName
                     - cf.type
                     - cf.mode
+                    - ce.id as entity_id
                 from:
                     - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
+                join:
+                    inner:
+                        - { join: cf.entity, alias: ce }
+                where:
+                    and:
+                        - ce.id = :entity_id
+                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
 
         columns:
             fieldName:
                 label: oro.entity_config.field_config.field_name.label
                 frontend_type: string
             type:
-                label: oro.entity_config.field_config.field_name.label
-                frontend_type: string
+                label: oro.entity_config.field_config.type.label
+                frontend_type: html
+                type: twig
+                template: OroEntityConfigBundle:Config:fieldType.html.twig
 
         properties:
             update_link:
@@ -100,7 +110,7 @@ datagrid:
             # @TODO check why those actions dont have ACL
             update:
                 type: navigate
-                label: Edit
+                label: oro.grid.action.update
                 icon: edit
                 link: update_link
                 rowAction: true
@@ -108,8 +118,6 @@ datagrid:
             columns:
                 fieldName:
                     data_name: cf.fieldName
-                type:
-                    data_name: cf.type
         filters: ~
 
     # Audit entity log grid

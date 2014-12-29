@@ -11,6 +11,8 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class CreateEntity extends CreateObject
 {
+    const OPTION_KEY_FLUSH = 'flush';
+
     /**
      * @var ManagerRegistry
      */
@@ -44,7 +46,9 @@ class CreateEntity extends CreateObject
 
         try {
             $entityManager->persist($entity);
-            $entityManager->flush($entity);
+            if ($this->doFlush()) {
+                $entityManager->flush($entity);
+            }
         } catch (\Exception $e) {
             throw new ActionException(
                 sprintf('Can\'t create entity %s. %s', $entityClassName, $e->getMessage())
@@ -52,5 +56,15 @@ class CreateEntity extends CreateObject
         }
 
         return $entity;
+    }
+
+    /**
+     * Whether perform flush immediately after entity creation or later
+     *
+     * @return bool
+     */
+    protected function doFlush()
+    {
+        return $this->getOption($this->options, self::OPTION_KEY_FLUSH, false);
     }
 }

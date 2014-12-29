@@ -4,6 +4,7 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -14,7 +15,7 @@ class TagTest extends \PHPUnit_Framework_TestCase
      */
     protected $tag;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->tag = new Tag();
 
@@ -36,11 +37,11 @@ class TagTest extends \PHPUnit_Framework_TestCase
         $timeCreated = new \DateTime('now');
         $timeUpdated = new \DateTime('now');
 
-        $this->tag->setCreatedAt($timeCreated);
-        $this->tag->setUpdatedAt($timeUpdated);
+        $this->tag->setCreated($timeCreated);
+        $this->tag->setUpdated($timeUpdated);
 
-        $this->assertEquals($timeCreated, $this->tag->getCreatedAt());
-        $this->assertEquals($timeUpdated, $this->tag->getUpdatedAt());
+        $this->assertEquals($timeCreated, $this->tag->getCreated());
+        $this->assertEquals($timeUpdated, $this->tag->getUpdated());
     }
 
     public function testAuthorAndUpdaterStoring()
@@ -54,11 +55,11 @@ class TagTest extends \PHPUnit_Framework_TestCase
     public function testUpdatedTime()
     {
         $this->tag->doUpdate();
-        $oldUpdatedTime = $this->tag->getUpdatedAt();
+        $oldUpdatedTime = $this->tag->getUpdated();
         sleep(1);
         $this->tag->doUpdate();
-        $this->assertInstanceOf('\DateTime', $this->tag->getUpdatedAt());
-        $this->assertNotEquals($oldUpdatedTime, $this->tag->getUpdatedAt());
+        $this->assertInstanceOf('\DateTime', $this->tag->getUpdated());
+        $this->assertNotEquals($oldUpdatedTime, $this->tag->getUpdated());
     }
 
     public function testGetTagging()
@@ -76,5 +77,15 @@ class TagTest extends \PHPUnit_Framework_TestCase
         $entity->setOwner($user);
 
         $this->assertEquals($user, $entity->getOwner());
+    }
+
+    public function testOrganization()
+    {
+        $entity         = $this->tag;
+        $organization   = new Organization();
+
+        $this->assertNull($entity->getOrganization());
+        $entity->setOrganization($organization);
+        $this->assertSame($organization, $entity->getOrganization());
     }
 }

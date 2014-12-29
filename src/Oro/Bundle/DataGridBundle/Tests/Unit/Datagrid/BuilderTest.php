@@ -5,15 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\DataGridBundle\Event\BuildAfter;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Event\GridEventInterface;
 
 class BuilderTest extends \PHPUnit_Framework_TestCase
 {
     const TEST_DATASOURCE_TYPE = 'array';
     const TEST_DATAGRID_NAME   = 'testGrid';
-    const TEST_ACL_NAME        = 'testACL';
-    const TEST_ACL_DESCRIPTOR  = 'testACLDescriptor';
 
     const DEFAULT_DATAGRID_CLASS = 'Oro\Bundle\DataGridBundle\Datagrid\Datagrid';
     const DEFAULT_ACCEPTOR_CLASS = 'Oro\Bundle\DataGridBundle\Extension\Acceptor';
@@ -27,14 +25,14 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
         $this->securityFacade  = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()->getMock();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->eventDispatcher);
         unset($this->securityFacade);
@@ -74,11 +72,31 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
      * @param array                 $raisedEvents
      * @param int                   $extensionsCount
      * @param array                 $extensionsMocks
+     * @param array                 $minifiedParams
      */
-    public function testBuild($config, $resultFQCN, $raisedEvents, $extensionsCount, $extensionsMocks = [])
-    {
+    public function testBuild(
+        $config,
+        $resultFQCN,
+        $raisedEvents,
+        $extensionsCount,
+        $extensionsMocks = [],
+        $minifiedParams = []
+    ) {
         $builder = $this->getBuilderMock(['buildDataSource']);
-        $parameters = array('key' => 'value');
+        $parameters = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\ParameterBag');
+
+        $parameters->expects($this->once())
+            ->method('get')
+            ->with(ParameterBag::MINIFIED_PARAMETERS)
+            ->will($this->returnValue($minifiedParams));
+
+        if (is_array($minifiedParams) && array_key_exists('g', $minifiedParams) && is_array($minifiedParams['g'])) {
+            $parameters->expects($this->once())
+                ->method('add');
+        } else {
+            $parameters->expects($this->never())
+                ->method('add');
+        }
 
         foreach ($extensionsMocks as $extension) {
             $builder->registerExtension($extension);
@@ -87,12 +105,15 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         foreach ($raisedEvents as $at => $eventDetails) {
             list($name, $eventType) = $eventDetails;
             $this->eventDispatcher->expects($this->at($at))->method('dispatch')
-                ->with($this->equalTo($name), $this->isInstanceOf($eventType))
-                ->will(
-                    $this->returnCallback(
-                        function ($eventName, $event) use ($parameters) {
-                            /** @var $event BuildBefore|BuildAfter */
-                            \PHPUnit_Framework_TestCase::assertEquals($parameters, $event->getParameters());
+                ->with(
+                    $this->equalTo($name),
+                    $this->callback(
+                        function ($event) use ($eventType, $resultFQCN) {
+                            $this->isInstanceOf($eventType, $event);
+                            if ($event instanceof GridEventInterface) {
+                                $this->isInstanceOf($resultFQCN, $event->getDatagrid());
+                            }
+                            return true;
                         }
                     )
                 );
@@ -112,8 +133,9 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
      */
     public function buildProvider()
     {
-        $stubDatagridClass = 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Stub\DatagridClass';
+        $stubDatagridClass = 'Oro\Bundle\DataGridBundle\Datagrid\Datagrid';
         $baseEventList     = [
+            ['oro_datagrid.datagrid.build.pre', 'Oro\Bundle\DataGridBundle\Event\PreBuild'],
             ['oro_datagrid.datagrid.build.before', 'Oro\Bundle\DataGridBundle\Event\BuildBefore'],
             ['oro_datagrid.datagrid.build.after', 'Oro\Bundle\DataGridBundle\Event\BuildAfter'],
         ];
@@ -155,6 +177,22 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 $baseEventList,
                 2,
                 [$extToAdd, $extNotToAdd, $extToAdd2]
+            ],
+            'With minified parameters without grid params'               => [
+                DatagridConfiguration::createNamed(self::TEST_DATAGRID_NAME, []),
+                self::DEFAULT_DATAGRID_CLASS,
+                $baseEventList,
+                0,
+                [],
+                ['i' => '1', 'p' => '25']
+            ],
+            'With minified parameters with grid params'                  => [
+                DatagridConfiguration::createNamed(self::TEST_DATAGRID_NAME, []),
+                self::DEFAULT_DATAGRID_CLASS,
+                $baseEventList,
+                0,
+                [],
+                ['g' => ['class_name' => 'Extended_Entity_Test']]
             ]
         ];
     }
@@ -164,14 +202,12 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
      *
      * @param  DatagridConfiguration $config
      * @param array                  $datasources
-     * @param array                  $expectedACLCheck
      * @param array                  $expectedException
      * @param int                    $processCallExpects
      */
     public function testBuildDatasource(
         $config,
         $datasources = [],
-        array $expectedACLCheck = null,
         array $expectedException = null,
         $processCallExpects = 0
     ) {
@@ -183,13 +219,6 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             if ($processCallExpects) {
                 $obj->expects($this->once())->method('process')->with($grid);
             }
-        }
-
-        if ($expectedACLCheck !== null) {
-            list ($name, $result) = $expectedACLCheck;
-
-            $builder->expects($this->once())->method('isResourceGranted')->with($this->equalTo($name))
-                ->will($this->returnValue($result));
         }
 
         if ($expectedException !== null) {
@@ -213,78 +242,21 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             'Datasource not configured, exceptions should be thrown' => [
                 DatagridConfiguration::create([]),
                 [],
-                null,
                 ['\RuntimeException', 'Datagrid source does not configured']
             ],
             'Configured datasource does not exist'                   => [
                 DatagridConfiguration::create(['source' => ['type' => self::TEST_DATASOURCE_TYPE]]),
                 [],
-                null,
                 ['\RuntimeException', sprintf('Datagrid source "%s" does not exist', self::TEST_DATASOURCE_TYPE)]
             ],
-            'Configured datasource denied for caller'                => [
-                DatagridConfiguration::create(
-                    ['source' => ['type' => self::TEST_DATASOURCE_TYPE, 'acl_resource' => self::TEST_ACL_NAME]]
-                ),
-                [self::TEST_DATASOURCE_TYPE => clone $datasourceMock],
-                [self::TEST_ACL_NAME, false],
-                ['Symfony\Component\Security\Core\Exception\AccessDeniedException', 'Access denied.']
-            ],
             'Configured correct and allowed'                         => [
-                DatagridConfiguration::create(
-                    ['source' => ['type' => self::TEST_DATASOURCE_TYPE, 'acl_resource' => self::TEST_ACL_NAME]]
-                ),
-                [self::TEST_DATASOURCE_TYPE => clone $datasourceMock],
-                [self::TEST_ACL_NAME, true],
-                null,
-                true
-            ],
-            'Configured correct and ACL not set'                     => [
                 DatagridConfiguration::create(
                     ['source' => ['type' => self::TEST_DATASOURCE_TYPE]]
                 ),
                 [self::TEST_DATASOURCE_TYPE => clone $datasourceMock],
                 null,
-                null,
                 true
             ]
-        ];
-    }
-
-    /**
-     * @dataProvider isGrantedProvider
-     *
-     * @param string $acl
-     * @param bool   $withDelimiter
-     */
-    public function testIsGranted($acl, $withDelimiter)
-    {
-        $builder = $this->getBuilderMock();
-
-        if ($withDelimiter) {
-            $this->securityFacade->expects($this->once())->method('isGranted')->with(
-                self::TEST_ACL_NAME,
-                self::TEST_ACL_DESCRIPTOR
-            );
-        } else {
-            $this->securityFacade->expects($this->once())->method('isGranted')->with(self::TEST_ACL_NAME);
-        }
-
-        $method = new \ReflectionMethod($builder, 'isResourceGranted');
-        $method->setAccessible(true);
-        $method->invoke($builder, $acl);
-    }
-
-    /**
-     * @return array
-     */
-    public function isGrantedProvider()
-    {
-        return [
-            'ACL resource given'          => [
-                self::TEST_ACL_NAME,
-                false
-            ],
         ];
     }
 

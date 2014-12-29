@@ -9,18 +9,12 @@
         });
 
         sync(new Wamp({
+            secure: {{ app.request.headers.get('X-Forwarded-Proto') == 'https' or app.request.isSecure() ? 'true' : 'false' }},
             host: '{{ ws.host == '*' ? app.request.headers.get('host') : ws.host }}',
-            port: {{ ws.port }},
+            port: {{ ws.port|json_encode|raw }},
             maxRetries: 3,
             retryDelay: 30000
         }));
-
-        /*mediator.on('datagrid_collection_set_after', function(obj) {
-            sync.keepRelevant(obj.collection);
-            mediator.once('hash_navigation_request:start', function() {
-                sync.stopTracking(obj.collection);
-            });
-        });*/
     });
 </script>
 {% endif %}

@@ -1,6 +1,6 @@
 /*global define*/
-define(['numeral', '../locale-settings'
-    ], function (numeral, localeSettings) {
+define(['numeral', '../locale-settings', 'underscore'
+    ], function (numeral, localeSettings, _) {
     'use strict';
 
     /**
@@ -109,7 +109,7 @@ define(['numeral', '../locale-settings'
                 return doFormat(value, options, formattersChain);
             },
             formatInteger: function(value) {
-                var options = localeSettings.getNumberFormats('decimal');
+                var options = _.extend({},localeSettings.getNumberFormats('decimal'));
                 options.style = 'integer';
                 options.max_fraction_digits = 0;
                 options.min_fraction_digits = 0;

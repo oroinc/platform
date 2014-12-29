@@ -1,10 +1,29 @@
 oro:
     importexport:
-        import:
-            success: "File was successful imported."
-            error: "Errors occurred during file import."
-            error %number%: "Error in row #%number%."
         action:
+            export:  "Export entities"
             general: "General import/action operations"
-            import: "Import entities"
-            export: "Export entities"
+            import:  "Import entities"
+            
+        export:
+            label: Export
+
+        entity_config:
+            block_title:    "Import & Export"
+            excluded.label: "Exclude Column"
+            full.label:     "Export Fields"
+            header.label:   "Column Name"
+            identity.label: "Use as Identity Field"
+            order.label:    "Column Position"
+            
+        import:
+            error:          "Errors occurred during file import."
+            error %number%: "Error in row #%number%."
+            label:          Import
+            success:        "File was successfully imported."
+            entity:         Import %entityName%
+            tempate:        Download Data Template
+            file:           File
+            strategy:       Strategy
+
+"Identity only": "Identity only"

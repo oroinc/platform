@@ -14,38 +14,6 @@
     {% endspaceless %}
 {% endblock form_row %}
 
-{% block choice_widget_collapsed %}
-    {% if client_validation %}
-    <script type="text/javascript">
-        require(['jquery'],
-        function($){
-            $(function() {
-                $('#{{ id }}').on('uniformInit', function () {
-                    $(this).filter('.error:not([multiple])').removeClass('error').closest('.selector').addClass('error');
-                });
-            });
-        });
-    </script>
-    {% endif %}
-    {{ parent() }}
-{% endblock choice_widget_collapsed %}
-
-{% block form_widget_simple %}
-    {% if type is defined and type == 'file' and client_validation %}
-    <script type="text/javascript">
-        require(['jquery'],
-        function($){
-            $(function() {
-                $('#{{ id }}').on('uniformInit', function () {
-                    $(this).filter('.error').removeClass('error').closest('.uploader').addClass('error');
-                });
-            });
-        });
-    </script>
-    {% endif %}
-    {{ parent() }}
-{% endblock form_widget_simple %}
-
 {% block widget_attributes %}
     {% if errors|length > 0 %}
         {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' error' : 'error'}) %}
@@ -66,10 +34,7 @@
             {% if form.parent %}
                 {% set combinedError = '' %}
                 {% for error in errors %}
-                    {% set error = error.messagePluralization is null
-                        ? error.messageTemplate|trans(error.messageParameters, 'validators')
-                        : error.messageTemplate|transchoice(error.messagePluralization, error.messageParameters, 'validators') %}
-                    {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error : error %}
+                    {% set combinedError = (combinedError != '') ? combinedError ~ '; ' ~ error.message : error.message %}
                 {% endfor %}
                 <span class="validation-failed">{{ combinedError }}</span>
             {% else %}
@@ -104,7 +69,7 @@
             {% for child in form %}
                 <div class="oro-clearfix">
                     {{ form_widget(child) }}
-                    {{ form_label(child) }}
+                    {{ form_label(child, null, {'raw_label' : raw_label is defined ? raw_label : false, 'translatable_label' : translatable_options is defined ? translatable_options : true }) }}
                 </div>
             {% endfor %}
         </div>
@@ -115,12 +80,12 @@
     {% spaceless %}
         {% for group_label, choice in options %}
             {% if choice is iterable %}
-                <optgroup label="{{ configs.is_translated_group is defined and configs.is_translated_group ? group_label : group_label|trans({}, translation_domain) }}">
+                <optgroup label="{{ translatable_groups is defined and not translatable_groups ? group_label : group_label|trans({}, translation_domain) }}">
                     {% set options = choice %}
                     {{ block('choice_widget_options') }}
                 </optgroup>
             {% else %}
-                {% set label = configs.is_translated_option is defined and configs.is_translated_option ? choice.label : choice.label|trans({}, translation_domain) %}
+                {% set label = translatable_options is defined and not translatable_options ? choice.label : choice.label|trans({}, translation_domain) %}
                 <option {{ block('choice_widget_option_attributes') }} value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{% if (configs.is_safe is defined and configs.is_safe) %}{{ label|raw }}{% else %}{{ label }}{% endif %}</option>
             {% endif %}
         {% endfor %}
@@ -134,16 +99,6 @@
     {% endif %}
 {% endspaceless %}
 {% endblock choice_widget_option_attributes %}
-
-{% block oro_flexibleentity_email_collection_widget %}
-    {% set subform = form.collection %}
-    {{ block('collection_render') }}
-{%  endblock oro_flexibleentity_email_collection_widget %}
-
-{% block oro_flexibleentity_phone_collection_widget %}
-    {% set subform = form.collection %}
-    {{ block('collection_render') }}
-{%  endblock oro_flexibleentity_phone_collection_widget %}
 
 {% block collection_render %}
     {% spaceless %}

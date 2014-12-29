@@ -12,12 +12,12 @@ class EmailTemplateTranslationTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected $type;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->type = new EmailTemplateTranslationType(array());
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->type);
     }

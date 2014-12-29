@@ -1,7 +1,7 @@
 config:
     paths:
         'jquery.fullcalendar': 'bundles/orocalendar/lib/fullcalendar/fullcalendar.js'
-        'orocalendar/js/calendar': 'bundles/orocalendar/js/calendar.js'
+        'orocalendar/js/calendar-view': 'bundles/orocalendar/js/calendar-view.js'
         'orocalendar/js/calendar/connection/collection': 'bundles/orocalendar/js/calendar/connection/collection.js'
         'orocalendar/js/calendar/connection/model': 'bundles/orocalendar/js/calendar/connection/model.js'
         'orocalendar/js/calendar/connection/view': 'bundles/orocalendar/js/calendar/connection/view.js'
@@ -10,3 +10,5 @@ config:
         'orocalendar/js/calendar/event/view': 'bundles/orocalendar/js/calendar/event/view.js'
         'orocalendar/js/form-validation': 'bundles/orocalendar/js/form-validation.js'
         'orocalendar/js/calendar/color-manager': 'bundles/orocalendar/js/calendar/color-manager.js'
+        'orocalendar/js/app/views/change-status-view': 'bundles/orocalendar/js/app/views/change-status-view.js'
+        'orocalendar/js/app/views/guest-notifier-view': 'bundles/orocalendar/js/app/views/guest-notifier-view.js'

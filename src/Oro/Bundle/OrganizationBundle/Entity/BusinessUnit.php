@@ -10,6 +10,7 @@ use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * BusinessUnit
@@ -19,21 +20,25 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
  * @Config(
- *  defaultValues={
- *      "entity"={"icon"="icon-building"},
- *      "ownership"={
- *          "owner_type"="BUSINESS_UNIT",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="business_unit_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-building"
+ *          },
+ *          "ownership"={
+ *              "owner_type"="BUSINESS_UNIT",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="business_unit_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          }
  *      }
- *  }
  * )
  */
-class BusinessUnit implements NotificationEmailInterface
+class BusinessUnit implements NotificationEmailInterface, EmailHolderInterface
 {
     /**
      * @var integer
@@ -49,6 +54,13 @@ class BusinessUnit implements NotificationEmailInterface
      *
      * @ORM\Column(name="name", type="string", length=255)
      * @Oro\Versioned
+     * @ConfigField(
+     *  defaultValues={
+     *    "importexport"={
+     *       "identity"=true
+     *    }
+     *   }
+     * )
      */
     protected $name;
 
@@ -96,6 +108,13 @@ class BusinessUnit implements NotificationEmailInterface
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -103,6 +122,13 @@ class BusinessUnit implements NotificationEmailInterface
      * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
 

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class EmailTemplateTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +14,7 @@ class EmailTemplateTest extends \PHPUnit_Framework_TestCase
      */
     protected $emailTemplate;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->emailTemplate = new EmailTemplate('update_entity.html.twig', "@subject = sdfdsf\n abc");
 
@@ -22,7 +23,7 @@ class EmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('html', $this->emailTemplate->getType());
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->emailTemplate);
     }
@@ -53,6 +54,15 @@ class EmailTemplateTest extends \PHPUnit_Framework_TestCase
             );
             $this->assertCount(1, $this->emailTemplate->getTranslations());
         }
+    }
+
+    public function testOrganization()
+    {
+        $template       = new EmailTemplate();
+        $organization   = new Organization();
+        $this->assertNull($template->getOrganization());
+        $template->setOrganization($organization);
+        $this->assertEquals($organization, $template->getOrganization());
     }
 
     /**

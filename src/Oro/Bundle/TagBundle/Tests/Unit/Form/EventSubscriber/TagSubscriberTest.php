@@ -20,7 +20,7 @@ class TagSubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $transformer;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->transformer = $this->getMockBuilder('Oro\Bundle\TagBundle\Form\Transformer\TagTransformer')
             ->disableOriginalConstructor()->getMock();
@@ -30,7 +30,7 @@ class TagSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber = new TagSubscriber($this->manager, $this->transformer);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->subscriber);
         unset($this->transformer);

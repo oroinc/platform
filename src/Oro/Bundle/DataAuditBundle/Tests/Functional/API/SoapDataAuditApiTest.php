@@ -3,28 +3,17 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class SoapDataAuditApiTest extends WebTestCase
 {
-    /** @var Client  */
-    protected $client = null;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
-        $this->client->soap(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
     }
 
     /**
@@ -32,38 +21,38 @@ class SoapDataAuditApiTest extends WebTestCase
      */
     public function testPreconditions()
     {
-        //create users
-        $request = array(
-            "username" => 'user_' . mt_rand(),
-            "email" => 'test_'  . mt_rand() . '@test.com',
-            "enabled" => '1',
-            "plainPassword" => '1231231q',
-            "namePrefix" => "Mr",
-            "firstName" => "firstName",
-            "middleName" => "middleName",
-            "lastName" => "lastName",
-            "nameSuffix" => "Sn.",
-            "roles" => array("2"),
-            "owner" => "1"
-        );
+        // create users
+        $request = [
+            'username'      => 'user_' . mt_rand(),
+            'email'         => 'test_' . mt_rand() . '@test.com',
+            'enabled'       => '1',
+            'plainPassword' => '1231231q',
+            'namePrefix'    => 'Mr',
+            'firstName'     => 'firstName',
+            'middleName'    => 'middleName',
+            'lastName'      => 'lastName',
+            'nameSuffix'    => 'Sn.',
+            'roles'         => ['2'],
+            'owner'         => '1'
+        ];
 
-        $this->client->setServerParameters(ToolsAPI::generateWsseHeader());
-        $id = $this->client->getSoap()->createUser($request);
-        $this->assertInternalType('int', $id, $this->client->getSoap()->__getLastResponse());
+        $this->client->setServerParameters($this->generateWsseAuthHeader());
+        $id = $this->soapClient->createUser($request);
+        $this->assertInternalType('int', $id, $this->soapClient->__getLastResponse());
         $this->assertGreaterThan(0, $id);
 
         return $request;
     }
 
     /**
-     * @param $response
+     * @param array $response
      * @return array
      * @depends testPreconditions
      */
-    public function testGetAudits($response)
+    public function testGetAudits(array $response)
     {
-        $result = $this->client->getSoap()->getAudits();
-        $result = ToolsAPI::classToArray($result);
+        $result = $this->soapClient->getAudits();
+        $result = $this->valueToArray($result);
 
         if (!is_array(reset($result['item']))) {
             $result[] = $result['item'];
@@ -81,15 +70,15 @@ class SoapDataAuditApiTest extends WebTestCase
     }
 
     /**
-     * @param  array $response
+     * @param array $response
      * @return array
      * @depends testGetAudits
      */
     public function testGetAudit($response)
     {
         foreach ($response as $audit) {
-            $result = $this->client->getSoap()->getAudit($audit['id']);
-            $result = ToolsAPI::classToArray($result);
+            $result = $this->soapClient->getAudit($audit['id']);
+            $result = $this->valueToArray($result);
             unset($result['loggedAt']);
             unset($audit['loggedAt']);
             $this->assertEquals($audit, $result);

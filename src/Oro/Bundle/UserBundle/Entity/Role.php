@@ -6,10 +6,10 @@ use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -17,28 +17,35 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\RoleRepository")
  * @ORM\Table(name="oro_access_role")
+ * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "ownership"={
- *          "owner_type"="BUSINESS_UNIT",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="business_unit_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
 class Role extends BaseRole
 {
+    const PREFIX_ROLE = 'ROLE_';
+
     /**
      * @var int
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      * @JMS\Type("integer")
      * @JMS\Expose
@@ -62,13 +69,6 @@ class Role extends BaseRole
      * @JMS\Expose
      */
     protected $label;
-
-    /**
-     * @var BusinessUnit
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit")
-     * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
-     */
-    protected $owner;
 
     /**
      * Populate the role field
@@ -123,8 +123,8 @@ class Role extends BaseRole
         $this->role = (string) strtoupper($role);
 
         // every role should be prefixed with 'ROLE_'
-        if (strpos($this->role, 'ROLE_') !== 0) {
-            $this->role = 'ROLE_' . $this->role;
+        if (strpos($this->role, self::PREFIX_ROLE) !== 0) {
+            $this->role = self::PREFIX_ROLE . $this->role;
         }
 
         return $this;
@@ -154,21 +154,52 @@ class Role extends BaseRole
     }
 
     /**
-     * @return BusinessUnit
+     * Pre persist event listener
+     *
+     * @ORM\PrePersist
+     *
+     * @param LifecycleEventArgs $args
+     *
+     * @throws \LogicException
      */
-    public function getOwner()
+    public function beforeSave(LifecycleEventArgs $args)
     {
-        return $this->owner;
+        /**
+         * @var integer $count
+         * count of attempts to set unique role, maximum 10 else exception
+         */
+        $count = 1;
+
+        while (!$this->updateRole($args) && $count++ < 10) {
+        }
+
+        if ($count > 10) {
+            throw new \LogicException('10 attempts to generate unique role are failed.');
+        }
     }
 
     /**
-     * @param BusinessUnit $owningBusinessUnit
-     * @return Role
+     * Update role field.
+     *
+     * @param LifecycleEventArgs $args
+     *
+     * @return bool
      */
-    public function setOwner($owningBusinessUnit)
+    protected function updateRole(LifecycleEventArgs $args)
     {
-        $this->owner = $owningBusinessUnit;
+        if ($this->getRole()) {
+            return true;
+        }
 
-        return $this;
+        $roleValue  = strtoupper(Role::PREFIX_ROLE . trim(preg_replace('/[^\w\-]/i', '_', uniqid() . mt_rand())));
+        $sameObject = $args->getEntityManager()->getRepository('OroUserBundle:Role')->findOneByRole($roleValue);
+
+        if ($sameObject) {
+            return false;
+        }
+
+        $this->setRole($roleValue);
+
+        return true;
     }
 }

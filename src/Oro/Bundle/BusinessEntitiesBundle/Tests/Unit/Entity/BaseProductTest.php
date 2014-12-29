@@ -13,12 +13,12 @@ class BaseProductTest extends \PHPUnit_Framework_TestCase
     /** @var BaseProduct */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = new BaseProduct();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->entity);
     }

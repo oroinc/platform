@@ -1,5 +1,6 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore'], function (_) {
+define(['underscore', 'oroui/js/tools/color-util'], function (_, colorUtil) {
     'use strict';
 
     /**
@@ -8,33 +9,27 @@ define(['underscore'], function (_) {
      */
     var ColorManager = {
         /**
-         * A list of text/background colors are used to determine colors of events of connected calendars
+         * A list of background colors are used to determine colors of events of connected calendars
          *  @property {Array}
          */
-        colors: [
-            ['FFFFFF', 'AC725E'], ['FFFFFF', 'D06B64'], ['FFFFFF', 'F83A22'], ['000000', 'FA573C'],
-            ['000000', 'FF7537'], ['000000', 'FFAD46'], ['000000', '42D692'], ['FFFFFF', '16A765'],
-            ['000000', '7BD148'], ['000000', 'B3DC6C'], ['000000', 'FBE983'], ['000000', 'FAD165'],
-            ['000000', '92E1C0'], ['000000', '9FE1E7'], ['000000', '9FC6E7'], ['FFFFFF', '4986E7'],
-            ['000000', '9A9CFF'], ['000000', 'B99AFF'], ['000000', 'C2C2C2'], ['000000', 'CABDBF'],
-            ['000000', 'CCA6AC'], ['000000', 'F691B2'], ['FFFFFF', 'CD74E6'], ['FFFFFF', 'A47AE2']
-        ],
+        colors: null,
 
-        /** @property {Object} */
-        defaultColors: null,
+        /** @property {String} */
+        defaultColor: null,
 
         /** @property {Object} */
         calendarColors: null,
 
-        initialize: function () {
-            this.defaultColors = this.findColors('4986E7');
+        initialize: function (options) {
+            this.colors = options.colors;
+            this.defaultColor = options.colors[15];
             this.calendarColors = {};
         },
 
-        setCalendarColors: function (calendarId, color, backgroundColor) {
+        setCalendarColors: function (calendarId, backgroundColor) {
             this.calendarColors[calendarId] = {
-                color: '#' + color,
-                backgroundColor: '#' + backgroundColor
+                color: this.getContrastColor(backgroundColor),
+                backgroundColor: backgroundColor
             };
         },
 
@@ -50,52 +45,67 @@ define(['underscore'], function (_) {
 
         applyColors: function (obj, getLastBackgroundColor) {
             if (_.isEmpty(obj.color) && _.isEmpty(obj.backgroundColor)) {
-                var colors = this.findNextColors(getLastBackgroundColor());
-                obj.color = colors[0];
-                obj.backgroundColor = colors[1];
+                obj.backgroundColor = this._findNextColor(getLastBackgroundColor());
+                obj.color = this.getContrastColor(obj.backgroundColor);
             } else if (_.isEmpty(obj.color)) {
-                obj.color = this.defaultColors[0];
+                obj.color = this.getContrastColor(this.defaultColor);
             } else if (_.isEmpty(obj.backgroundColor)) {
-                obj.backgroundColor = this.defaultColors[1];
+                obj.backgroundColor = this.defaultColor;
             }
         },
 
-        findColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
-            }
-            bgColor = bgColor.toUpperCase();
-            var result = _.find(this.colors, function (item) { return item[1] === bgColor; });
-            if (_.isUndefined(result)) {
-                result = this.findColors(this.defaultColors[1]);
-            }
-            return result;
+        /**
+         * Calculates contrast color
+         *
+         * @param {string} hex A color in six-digit hexadecimal form.
+         * @returns {string}
+         */
+        getContrastColor: function (hex) {
+            return colorUtil.getContrastColor(hex);
         },
 
-        findNextColors: function (bgColor) {
-            if (_.isEmpty(bgColor)) {
-                return this.findColors(this.defaultColors[1]);
-            }
-            bgColor = bgColor.toUpperCase();
+        _findColorIndex: function (color) {
             var i = -1;
-            _.each(this.colors, function (item, index) {
-                if (item[1] === bgColor) {
+            _.each(this.colors, function (clr, index) {
+                if (clr === color) {
                     i = index;
                 }
             });
+            return i;
+        },
+
+        _findNextColor: function (color) {
+            if (_.isEmpty(color)) {
+                return this.defaultColor;
+            }
+            color = color.toUpperCase();
+            var i = this._findColorIndex(color);
             if (i === -1) {
-                return this.findColors(this.defaultColors[1]);
+                i = this._findColorIndex(this.defaultColor);
             }
-            if ((i + 1) === _.size(this.colors)) {
-                return _.first(this.colors);
+            var unusedColors = _.difference(this.colors, _.pluck(this.calendarColors, 'backgroundColor'));
+            if (unusedColors.length > 0) {
+                //find unused color to end of color list
+                for (var j=i+1; j < this.colors.length; j++) {
+                    if (_.indexOf(unusedColors, this.colors[j]) !== -1) {
+                        return this.colors[j];
+                    }
+                }
+                //find unused color from start of color list to current color
+                for (j=0; j < i+1; j++) {
+                    if (_.indexOf(unusedColors, this.colors[j]) !== -1) {
+                        return this.colors[j];
+                    }
+                }
             }
-            return this.colors[i + 1];
+            //get next color from list because all colors was used
+            return this.colors[i+1];
         }
     };
 
-    return function () {
+    return function (options) {
         var obj = _.extend({}, ColorManager);
-        obj.initialize();
+        obj.initialize(options);
         return obj;
     };
 });

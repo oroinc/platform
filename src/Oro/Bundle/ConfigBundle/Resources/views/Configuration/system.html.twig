@@ -6,13 +6,24 @@
 {% import 'OroConfigBundle::macros.html.twig' as configUI %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
-{% set pageTitle = 'Configuration' %}
+{% set pageTitle = 'oro.config.menu.system_configuration.label'|trans %}
 
 {% block content %}
-    {% set saveButton = UI.saveAndCloseButton('Save Settings') %}
-    {% set restoreButton = UI.buttonType({type: 'reset', label: 'Restore Saved Values' }) %}
-    {% set formAction = path('oro_config_configuration_system', {activeGroup: activeGroup, activeSubGroup: activeSubGroup}) %}
-    <form id="{{ form.vars.name }}" {{ form_enctype(form) }} action="{{ formAction }}" method="post" data-collect="true">
+    {% set pageReload    = attribute(form.vars.block_config, activeSubGroup).page_reload %}
+    {% set saveButton    = UI.saveAndCloseButton('oro.config.actions.save_settings'|trans) %}
+    {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
+    {% set formAction    = path(
+        'oro_config_configuration_system',
+        {activeGroup: activeGroup, activeSubGroup: activeSubGroup}
+    ) %}
+
+    <form
+        id="{{ form.vars.name }}"
+        {{ form_enctype(form) }}
+        action="{{ formAction }}"
+        method="post"
+        data-collect="true"
+    >
         {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
         {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
     </form>
@@ -21,8 +32,8 @@
     <script type="text/javascript">
         /* jshint browser:true, devel:true */
         /* global require */
-        require(['jquery', 'orotranslation/js/translator', 'oroconfig/js/form/state', 'oroconfig/js/form/default', 'oroui/js/modal'],
-        function ($, __, FormState, FormDefault, Modal) {
+        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/state', 'oroconfig/js/form/default', 'oroui/js/modal'],
+        function ($, __, Mediator, Messenger, FormState, FormDefault, Modal) {
             'use strict';
 
             $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
@@ -30,7 +41,7 @@
                     $checkboxes = $form.find('.parent-scope-checkbox input'),
                     confirm = new Modal({
                         title: __('Confirmation'),
-                        okText: __('Ok'),
+                        okText: __('OK'),
                         cancelText: __('Cancel'),
                         content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
                         className: 'modal modal-primary',
@@ -44,6 +55,16 @@
                 confirm.open();
                 e.preventDefault();
             });
+
+            {% if pageReload %}
+                $('#{{ form.vars.name }}').submit(function() {
+                    Mediator.once('page:update', function() {
+                        Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
+                        // force reload without hash navigation
+                        window.location.reload();
+                    });
+                });
+            {% endif %}
 
             new FormState();
             new FormDefault();

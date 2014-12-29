@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Controller;
 
-use Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -13,9 +11,12 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
+use Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider;
+
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class CalendarController extends Controller
 {
@@ -30,10 +31,14 @@ class CalendarController extends Controller
         /** @var User $user */
         $user = $this->getUser();
 
+        /** @var Organization $organization */
+        $organization = $this->get('oro_security.security_facade')->getOrganization();
+
         $em = $this->getDoctrine()->getManager();
         /** @var CalendarRepository $repo */
         $repo     = $em->getRepository('OroCalendarBundle:Calendar');
-        $calendar = $repo->findByUser($user->getId());
+
+        $calendar = $repo->findDefaultCalendar($user->getId(), $organization->getId());
 
         return $this->forward(
             'OroCalendarBundle:Calendar:view',
@@ -65,17 +70,29 @@ class CalendarController extends Controller
         $dateRange = $calendarConfigProvider->getDateRange();
 
         $result = array(
-            'event_form' => $this->get('oro_calendar.calendar_event.form')->createView(),
+            'event_form' => $this->get('oro_calendar.calendar_event.form.template')->createView(),
             'user_select_form' => $this->get('form.factory')
                 ->createNamed(
-                    'new_calendar_owner',
+                    'new_calendar',
                     'oro_user_select',
                     null,
                     array(
-                        'required' => true,
-                        'configs'  => array(
-                            'placeholder' => 'oro.calendar.form.choose_user_to_add_calendar',
-                        )
+                        'autocomplete_alias' => 'user_calendars',
+
+                        'configs' => array(
+                            'entity_id'               => $calendar->getId(),
+                            'entity_name'             => 'OroCalendarBundle:Calendar',
+                            'excludeCurrent'          => true,
+                            'extra_config'            => 'acl_user_autocomplete',
+                            'permission'              => 'VIEW',
+                            'placeholder'             => 'oro.calendar.form.choose_user_to_add_calendar',
+                            'result_template_twig'    => 'OroCalendarBundle:Calendar:Autocomplete/result.html.twig',
+                            'selection_template_twig' => 'OroCalendarBundle:Calendar:Autocomplete/selection.html.twig',
+                        ),
+
+                        'grid_name' => 'users-calendar-select-grid-exclude-owner',
+                        'random_id' => false,
+                        'required'  => true,
                     )
                 )
                 ->createView(),

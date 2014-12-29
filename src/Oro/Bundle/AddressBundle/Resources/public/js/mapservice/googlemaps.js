@@ -1,7 +1,7 @@
 /* jshint browser:true  */
 /*global define, google*/
-define(['underscore', 'backbone', 'orotranslation/js/translator'
-    ], function (_, Backbone, __) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/locale-settings'
+    ], function (_, Backbone, __, localeSettings) {
     'use strict';
 
     var $ = Backbone.$;
@@ -28,7 +28,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator'
         mapLocationCache: {},
         mapsLoadExecuted: false,
 
-        initialize: function () {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.$mapContainer = $('<div class="map-visual"/>')
                 .appendTo(this.$el);
             this.$unknownAddress = $('<div class="map-unknown">' + __('map.unknown.location') + '</div>')
@@ -67,7 +68,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator'
             });
 
             if (this.options.showWeather) {
-                weatherLayer = new google.maps.weather.WeatherLayer();
+                var temperatureUnitKey = localeSettings.settings.unit.temperature.toUpperCase();
+                var windSpeedUnitKey = localeSettings.settings.unit.wind_speed.toUpperCase();
+                weatherLayer = new google.maps.weather.WeatherLayer({
+                    temperatureUnits: google.maps.weather.TemperatureUnit[temperatureUnitKey],
+                    windSpeedUnits: google.maps.weather.WindSpeedUnit[windSpeedUnitKey]
+                });
                 weatherLayer.setMap(this.map);
 
                 cloudLayer = new google.maps.weather.CloudLayer();
@@ -95,13 +101,19 @@ define(['underscore', 'backbone', 'orotranslation/js/translator'
                         other_params: googleMapsSettings,
                         callback: _.bind(this.onGoogleMapsInit, this)
                     });
+
+                    this.mapsLoadExecuted = false;
                 }, this)
             });
         },
 
         updateMap: function (address, label) {
             // Load google maps js
-            if (!this.hasGoogleMaps() && !this.mapsLoadExecuted) {
+            if (!this.hasGoogleMaps()) {
+                if (this.mapsLoadExecuted) {
+                    return;
+                }
+
                 this.mapsLoadExecuted = true;
                 this.requestedLocation = {
                     'address': address,

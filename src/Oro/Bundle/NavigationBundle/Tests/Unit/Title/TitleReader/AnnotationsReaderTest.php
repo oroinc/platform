@@ -21,7 +21,7 @@ class AnnotationsReaderTest extends \PHPUnit_Framework_TestCase
      */
     private $testBundle;
 
-    public function setUp()
+    protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Annotations\Reader')) {
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');

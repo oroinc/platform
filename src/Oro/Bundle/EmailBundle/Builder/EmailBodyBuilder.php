@@ -3,7 +3,6 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
@@ -43,7 +42,7 @@ class EmailBodyBuilder
     {
         $this->emailBody = new EmailBody();
         $this->emailBody
-            ->setContent($content)
+            ->setBodyContent($content)
             ->setBodyIsText($bodyIsText);
     }
 
@@ -72,7 +71,7 @@ class EmailBodyBuilder
         $emailAttachmentContent
             ->setEmailAttachment($emailAttachment)
             ->setContentTransferEncoding($contentTransferEncoding)
-            ->setValue($content);
+            ->setContent($content);
 
         $emailAttachment
             ->setFileName($fileName)

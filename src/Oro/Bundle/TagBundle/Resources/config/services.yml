@@ -69,10 +69,14 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_search.mapper
             - @oro_tag.security_provider
+            - @oro_search.index
+            - @oro_entity_config.config_manager
+            - @translator
 
     # Tag API
     oro_tag.tag.manager.api:
         class: %oro_tag.tag.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_tag.tag.entity.class%
             - @doctrine.orm.entity_manager
@@ -146,11 +150,9 @@ services:
     oro_tag.event_listener.search_results_grid_listener:
         class: %oro_tag.event_listener.search_results_grid_listener.class%
         arguments:
-          - @oro_datagrid.datagrid.request_params
           - @oro_tag.security_provider
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
-        lazy: true
 
     oro_tag.owner_assignment_checker.tag:
         class: %oro_tag.owner_assignment_checker.tag.class%

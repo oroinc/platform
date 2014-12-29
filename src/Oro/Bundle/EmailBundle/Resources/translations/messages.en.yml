@@ -1,48 +1,19 @@
 oro:
+    dashboard:
+        recent_emails:
+            title:       Recent Emails
+            inbox:       Inbox
+            sent:        Sent
+            view_all:    View All
+            description: This widget allows you to see most recent additions to your inbox and outbox
+
     email:
-        menu:
-            emailtemplate_list.description: List of email templates
-
         controller.emailtemplate.saved.message: "Template saved"
-        form.choose_template: "Choose a template..."
-        datagrid:
-            emailtemplate:
-                action:
-                    update: "Update"
-                    clone: "Clone"
-                    delete: "Delete"
-                filter:
-                    type:
-                        html: "Html"
-                        txt: "Plain text"
-                page_size:
-                    all: "All"
-                view:
-                    system_templates: "System only"
+        form.choose_template:                   "Choose a template..."
+        variable.not.found:                     N/A
 
-        handler:
-            attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
-            unable_to_send_email: "Unable to send the email."
-
-        entity_label:        Email
-        entity_plural_label: Emails
-        entity_description:  Email message
-        send_email:          Send email
-        id.label:            Id
-        created.label:       Created at
-        subject.label:       Subject
-        from_name.label:     From
-        received_at.label:   Received at
-        sent_at.label:       Sent at
-        importance.label:    Importance
-        internal_date.label: Internal date
-        message_id.label:    Message Id
-        x_message_id.label:  xMessage Id
-        x_thread_id.label:   xThread Id
-        recipients.label:    Recipients
-        folder.label:        Folder
-        email_body.label:    Body
-        from_email_address.label: From
+        system_configuration:
+            email_configuration: Email Configuration
 
         emailtemplate:
             entity_label:        Template
@@ -54,12 +25,96 @@ oro:
             is_system.label:     Is system
             is_editable.label:   Is editable
             name.label:          Template name
+            owner.label:         Owner
             parent.label:        Parent
             subject.label:       Subject
             content.label:       Content
             entity_name.label:   Entity name
             type.label:          Type
             translations.label:  Translations
+            organization.label:  Organization
+
+            # sections for email template variables
+            variables:
+                system: 'System variables'
+                entity: 'Entity variables'
+
+            action:
+                preview: Preview
+                clone: Clone
+
+            # email template system variables
+            organization_name:   Organization name of logged in user
+            user_name:           Username of logged in user
+            user_first_name:     First name of logged in user
+            user_last_name:      Last name of logged in user
+            user_full_name:      Full name of logged in user
+            app_short_name:      Short name of application #@deprecated since 1.4 Provider\SystemVariablesProvider
+            app_full_name:       Full name of application  #@deprecated since 1.4 Provider\SystemVariablesProvider
+            app_url:             Application URL
+            current_datetime:    Current date & time
+            current_date:        Current date
+            current_time:        Current time
+
+        menu:
+            emailtemplate_list.description: List of email templates
+            user_emails: My Emails
+
+        datagrid:
+            emailtemplate:
+                action:
+                    clone:  "Clone"
+                    delete: "Delete"
+                    update: "Update"
+                filter:
+                    type:
+                        html: "Html"
+                        txt:  "Plain text"
+                    entityName:
+                        empty: None
+                page_size:
+                    all: "All"
+                view:
+                    system_templates: "System only"
+            emails:
+                action:
+                    view: "View"
+
+
+        handler:
+            attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
+            unable_to_send_email:         "Unable to send the email."
+
+        folders.label:            Folders
+        from_email_address.label: From
+        from_name.label:          From
+        email_body.label:         Body
+        entity_label:             Email
+        entity_plural_label:      Emails
+        entity_description:       Email message
+        id.label:                 Id
+        importance.label:         Importance
+        internal_date.label:      Internal date
+        message_id.label:         Message Id
+        received_at.label:        Received at
+        recipients.label:         Recipients
+        send_email:               Send email
+        sent_at.label:            Sent at
+        sent_by.label:            sent by {{ user }} on {{ date }}
+        subject.label:            Subject
+        x_message_id.label:       xMessage Id
+        x_thread_id.label:        xThread Id
+        template.label:           Template
+        type.label:               Type
+
+        empty_body:               Empty body
+        unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
+
+        entity_config:
+            email:
+                field:
+                    items:
+                        available_in_template: Available in email templates
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
@@ -72,4 +127,4 @@ oro:
 "Body": "Body"
 "Send email": "Send email"
 "Send": "Send"
-"Click to insert variable or drag it.": "Click to insert variable or drag it."
+"Content": "Content"

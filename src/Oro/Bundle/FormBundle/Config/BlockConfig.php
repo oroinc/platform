@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Config;
 
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+
 class BlockConfig implements FormConfigInterface
 {
     /**
@@ -188,7 +190,7 @@ class BlockConfig implements FormConfigInterface
     }
 
     /**
-     * @return array|SubBlockConfig
+     * @return SubBlockConfig[]
      */
     public function getSubBlocks()
     {
@@ -233,11 +235,6 @@ class BlockConfig implements FormConfigInterface
 
     protected function sortSubBlocks()
     {
-        $priority = array();
-        foreach ($this->subBlocks as $key => $subBlock) {
-            $priority[$key] = $subBlock->getPriority();
-        }
-
-        array_multisort($priority, SORT_DESC, $this->subBlocks);
+        ArrayUtils::sortBy($this->subBlocks, true);
     }
 }

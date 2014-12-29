@@ -11,7 +11,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
      */
     protected $event;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->event = new Event('test.name.from.construct');
 
@@ -19,7 +19,7 @@ class EventTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->event->getId());
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         unset($this->event);
     }

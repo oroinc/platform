@@ -43,6 +43,8 @@ class OroTranslationExtension extends Extension
             $container->setAlias('oro_translation.uploader.default_adapter', $serviceId);
         }
 
+        $container->setParameter('oro_translation.debug_translator', $config['debug_translator']);
+
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }

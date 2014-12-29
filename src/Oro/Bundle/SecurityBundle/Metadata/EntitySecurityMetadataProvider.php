@@ -91,7 +91,7 @@ class EntitySecurityMetadataProvider
         $securityTypes = array();
         foreach ($this->securityConfigProvider->getConfigs() as $securityConfig) {
             $securityType = $securityConfig->get('type');
-            if (!in_array($securityType, $securityTypes, true)) {
+            if ($securityType && !in_array($securityType, $securityTypes, true)) {
                 $securityTypes[] = $securityType;
             }
         }
@@ -177,7 +177,7 @@ class EntitySecurityMetadataProvider
             if ($securityConfig->get('type') === $securityType
                 && $this->extendConfigProvider->getConfig($className)->in(
                     'state',
-                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATED]
+                    [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
                 )
             ) {
                 $label = '';

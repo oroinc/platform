@@ -2,13 +2,25 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
+use Doctrine\ORM\Query;
+
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\GroupingOrmQueryConverter;
 
 class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
 {
+    /**
+     * @var DatagridGuesser
+     */
+    protected $datagridGuesser;
+
     /**
      * @var DatagridConfiguration
      */
@@ -40,6 +52,24 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     protected $leftJoins;
 
     /**
+     * Constructor
+     *
+     * @param FunctionProviderInterface     $functionProvider
+     * @param VirtualFieldProviderInterface $virtualFieldProvider
+     * @param ManagerRegistry               $doctrine
+     * @param DatagridGuesser               $datagridGuesser
+     */
+    public function __construct(
+        FunctionProviderInterface $functionProvider,
+        VirtualFieldProviderInterface $virtualFieldProvider,
+        ManagerRegistry $doctrine,
+        DatagridGuesser $datagridGuesser
+    ) {
+        parent::__construct($functionProvider, $virtualFieldProvider, $doctrine);
+        $this->datagridGuesser = $datagridGuesser;
+    }
+
+    /**
      * Converts a query specified in $source parameter to a datagrid configuration
      *
      * @param string                $gridName
@@ -59,19 +89,28 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
      */
     protected function doConvert(AbstractQueryDesigner $source)
     {
-        $this->selectColumns     = [];
-        $this->groupingColumns   = [];
-        $this->from              = [];
-        $this->innerJoins        = [];
-        $this->leftJoins         = [];
+        $this->selectColumns   = [];
+        $this->groupingColumns = [];
+        $this->from            = [];
+        $this->innerJoins      = [];
+        $this->leftJoins       = [];
         parent::doConvert($source);
-        $this->selectColumns     = null;
-        $this->groupingColumns   = null;
-        $this->from              = null;
-        $this->innerJoins        = null;
-        $this->leftJoins         = null;
+        $this->selectColumns   = null;
+        $this->groupingColumns = null;
+        $this->from            = null;
+        $this->innerJoins      = null;
+        $this->leftJoins       = null;
 
         $this->config->offsetSetByPath('[source][type]', 'orm');
+        $this->config->offsetSetByPath(
+            '[source][hints]',
+            [
+                [
+                    'name'  => Query::HINT_CUSTOM_OUTPUT_WALKER,
+                    'value' => 'Gedmo\\Translatable\\Query\\TreeWalker\\TranslationWalker'
+                ]
+            ]
+        );
     }
 
     /**
@@ -106,24 +145,29 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $entityClassName,
         $tableAlias,
         $fieldName,
+        $columnExpr,
         $columnAlias,
         $columnLabel,
         $functionExpr,
-        $functionReturnType
+        $functionReturnType,
+        $isDistinct = false
     ) {
-        $columnName = sprintf('%s.%s', $tableAlias, $fieldName);
+        if ($isDistinct) {
+            $columnExpr = 'DISTINCT ' . $columnExpr;
+        }
+
         if ($functionExpr !== null) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,
                 $tableAlias,
                 $fieldName,
-                $columnName,
+                $columnExpr,
                 $columnAlias
             );
         }
         $this->selectColumns[] = sprintf(
             '%s as %s',
-            $functionExpr !== null ? $functionExpr : $columnName,
+            $functionExpr !== null ? $functionExpr : $columnExpr,
             $columnAlias
         );
 
@@ -132,37 +176,24 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             $fieldType = $this->getFieldType($entityClassName, $fieldName);
         }
 
-        // Add visible columns
-        $this->config->offsetSetByPath(
-            sprintf('[columns][%s]', $columnAlias),
-            [
-                'label'         => $columnLabel,
-                'translatable'  => false,
-                'frontend_type' => $this->getFrontendFieldType($fieldType)
-            ]
-        );
-
-        // Add sorters
-        $this->config->offsetSetByPath(
-            sprintf('[sorters][columns][%s]', $columnAlias),
-            [
+        $columnOptions = [
+            DatagridGuesser::FORMATTER => [
+                'label'        => $columnLabel,
+                'translatable' => false
+            ],
+            DatagridGuesser::SORTER    => [
                 'data_name' => $columnAlias
-            ]
-        );
-
-        // Add filters
-        $filter = [
-            'type'         => $this->getFilterType($fieldType),
-            'data_name'    => $columnAlias,
-            'translatable' => false,
+            ],
+            DatagridGuesser::FILTER    => [
+                'data_name'    => $this->getFilterByExpr($entityClassName, $tableAlias, $fieldName, $columnAlias),
+                'translatable' => false
+            ],
         ];
         if ($functionExpr !== null) {
-            $filter['filter_by_having'] = true;
+            $columnOptions[DatagridGuesser::FILTER][FilterUtility::BY_HAVING_KEY] = true;
         }
-        $this->config->offsetSetByPath(
-            sprintf('[filters][columns][%s]', $columnAlias),
-            $filter
-        );
+        $this->datagridGuesser->applyColumnGuesses($entityClassName, $fieldName, $fieldType, $columnOptions);
+        $this->datagridGuesser->setColumnOptions($this->config, $columnAlias, $columnOptions);
     }
 
     /**
@@ -202,16 +233,23 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addJoinStatement($joinTableAlias, $joinFieldName, $joinAlias)
+    protected function addJoinStatement($joinType, $join, $joinAlias, $joinConditionType, $joinCondition)
     {
-        $join = [
-            'join'  => sprintf('%s.%s', $joinTableAlias, $joinFieldName),
+        $joinDefinition = [
+            'join'  => $join,
             'alias' => $joinAlias
         ];
-        if ($this->isInnerJoin($joinAlias, $joinFieldName)) {
-            $this->innerJoins[] = $join;
+        if (!empty($joinConditionType)) {
+            $joinDefinition['conditionType'] = $joinConditionType;
+        }
+        if (!empty($joinCondition)) {
+            $joinDefinition['condition'] = $joinCondition;
+        }
+
+        if ('left' === $joinType) {
+            $this->leftJoins[] = $joinDefinition;
         } else {
-            $this->leftJoins[] = $join;
+            $this->innerJoins[] = $joinDefinition;
         }
     }
 
@@ -240,13 +278,9 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function addGroupByColumn($tableAlias, $fieldName)
+    protected function addGroupByColumn($columnAlias)
     {
-        $this->groupingColumns[] = sprintf(
-            '%s.%s',
-            $tableAlias,
-            $fieldName
-        );
+        $this->groupingColumns[] = $columnAlias;
     }
 
     /**
@@ -258,36 +292,5 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             sprintf('[sorters][default][%s]', $columnAlias),
             $columnSorting
         );
-    }
-
-    /**
-     * Gets a datagrid column frontend type for the given field type
-     *
-     * @param string $fieldType
-     * @return string
-     */
-    protected function getFrontendFieldType($fieldType)
-    {
-        switch ($fieldType) {
-            case 'integer':
-            case 'smallint':
-            case 'bigint':
-                return PropertyInterface::TYPE_INTEGER;
-            case 'decimal':
-            case 'float':
-                return PropertyInterface::TYPE_DECIMAL;
-            case 'boolean':
-                return PropertyInterface::TYPE_BOOLEAN;
-            case 'date':
-                return PropertyInterface::TYPE_DATE;
-            case 'datetime':
-                return PropertyInterface::TYPE_DATETIME;
-            case 'money':
-                return PropertyInterface::TYPE_CURRENCY;
-            case 'percent':
-                return PropertyInterface::TYPE_PERCENT;
-        }
-
-        return PropertyInterface::TYPE_STRING;
     }
 }

@@ -1,16 +1,27 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', './choice-filter', '../formatter/number-formatter'
-    ], function (_, ChoiceFilter, NumberFormatter) {
+define([
+    'underscore',
+    './choice-filter',
+    'orofilter/js/formatter/number-formatter'
+], function (_, ChoiceFilter, NumberFormatter) {
     'use strict';
+
+    var NumberFilter;
 
     /**
      * Number filter: formats value as a number
      *
-     * @export  orofilter/js/filter/number-filter
-     * @class   orofilter.filter.NumberFilter
-     * @extends orofilter.filter.ChoiceFilter
+     * @export  oro/filter/number-filter
+     * @class   oro.filter.NumberFilter
+     * @extends oro.filter.ChoiceFilter
      */
-    return ChoiceFilter.extend({
+    NumberFilter = ChoiceFilter.extend({
+        /**
+         * @property {boolean}
+         */
+        wrapHintValue: false,
+
         /**
          * Initialize.
          *
@@ -18,20 +29,30 @@ define(['underscore', './choice-filter', '../formatter/number-formatter'
          * @param {*} [options.formatter] Object with methods fromRaw and toRaw or
          *      a string name of formatter (e.g. "integer", "decimal")
          */
-        initialize: function(options) {
-            options = options || {};
+        initialize: function (options) {
             // init formatter options if it was not initialized so far
             if (_.isUndefined(this.formatterOptions)) {
                 this.formatterOptions = {};
             }
             this.formatter = new NumberFormatter(this.formatterOptions);
-            ChoiceFilter.prototype.initialize.apply(this, arguments);
+            NumberFilter.__super__.initialize.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
-        _formatRawValue: function(value) {
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.formatter;
+            NumberFilter.__super__.dispose.call(this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _formatRawValue: function (value) {
             if (value.value === '') {
                 value.value = undefined;
             } else {
@@ -43,11 +64,17 @@ define(['underscore', './choice-filter', '../formatter/number-formatter'
         /**
          * @inheritDoc
          */
-        _formatDisplayValue: function(value) {
+        _formatDisplayValue: function (value) {
+            if (value.value && _.isString(value.value)) {
+                value.value = parseFloat(value.value);
+            }
+
             if (_.isNumber(value.value)) {
                 value.value = this.formatter.fromRaw(value.value);
             }
             return value;
         }
     });
+
+    return NumberFilter;
 });

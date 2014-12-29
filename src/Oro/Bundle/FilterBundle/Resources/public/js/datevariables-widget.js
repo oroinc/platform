@@ -1,7 +1,12 @@
 /*global define, require*/
 /*jslint nomen: true*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout', 'jquery-ui'],
-    function ($, _, __, layout) {
+define([
+    'jquery',
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/layout',
+    'jquery-ui'
+], function ($, _, __, layout) {
     'use strict';
 
     /**
@@ -19,13 +24,17 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
             htmlTemplate: '<div class="ui-datevariables-div <%- attributes %>">' +
                 '<b><%- title %></b><%= tooltipHTML %><ul>' +
                 '<% _.each(dateVars, function(dateVariable, varCode) { %>' +
-                '<li><a class="ui_dvariable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
+                '<li><a class="ui_date_variable" href="#" data-code="<%- varCode %>"><%- dateVariable %></a></li>' +
                 '<% }); %>' +
                 '</ul></div>'
         },
 
         _create: function () {
             this.render();
+        },
+
+        _destroy: function () {
+            this.widget().find('.ui-datevariables-div a.ui_date_variable').off();
         },
 
         setPart: function (part) {
@@ -68,7 +77,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/layout
 
             layout.initPopover(widget);
 
-            widget.find('.ui-datevariables-div a.ui_dvariable').click(
+            widget.find('.ui-datevariables-div a.ui_date_variable').click(
                 _.bind(this.onSelectVar, this)
             );
         },

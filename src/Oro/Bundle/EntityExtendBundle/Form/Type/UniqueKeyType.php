@@ -14,26 +14,24 @@ class UniqueKeyType extends AbstractType
      */
     protected $fields;
 
-    public function __construct($fields)
+    /**
+     * @param array $fields
+     */
+    public function __construct(array $fields)
     {
         $this->fields = $fields;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $choices = array_map(
-            function (FieldConfigId $field) {
-                return ucfirst($field->getFieldName());
-            },
-            $this->fields
-        );
-
-        $choices = array_combine($choices, $choices);
-
         $builder->add(
             'name',
             'text',
             array(
+                'label' => 'oro.entity_extend.form.name.label',
                 'required' => true,
             )
         );
@@ -42,8 +40,9 @@ class UniqueKeyType extends AbstractType
             'key',
             'choice',
             array(
+                'label' => 'oro.entity_extend.form.key.label',
                 'multiple' => true,
-                'choices'  => $choices,
+                'choices'  => $this->fields,
                 'required' => true,
             )
         );

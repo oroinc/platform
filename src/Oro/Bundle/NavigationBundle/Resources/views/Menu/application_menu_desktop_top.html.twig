@@ -1,0 +1,49 @@
+{% extends 'OroNavigationBundle:Menu:menu.html.twig' %}
+
+{% block list_wrapper %}
+    {{ block('list') }}
+{% endblock %}
+
+{% block item %}
+    {% if item.hasChildren and item.displayChildren %}
+        {%- set classes = classes|merge(['dropdown']) %}
+        {%- set childrenClasses = childrenClasses|merge(['dropdown-menu']) %}
+    {% else %}
+        {%- set classes = classes|merge(['single']) %}
+    {% endif %}
+    {% if item.extras is defined and item.extras.routes is defined and item.extras.routes[0] is defined %}
+        {% set itemAttributes = itemAttributes|merge({'data-route': item.extras.routes[0]})%}
+        {% if item.extras.routes|length > 1 %}
+            {% set itemAttributes = itemAttributes|merge({'data-routes': item.extras.routes|slice(1)|json_encode })%}
+        {% endif %}
+    {% endif %}
+    {{ block('item_renderer') }}
+{% endblock %}
+
+{% block linkElement %}
+    {% import 'OroNavigationBundle:Menu:menu.html.twig' as oro_menu %}
+
+    {% if item.hasChildren and item.displayChildren and item.level is sameas(0) %}
+        {% set linkAttributes = linkAttributes|merge({
+            'class':       oro_menu.add_attribute_values(linkAttributes, 'class', ['dropdown-toggle']),
+            'data-toggle': 'dropdown'
+        }) %}
+    {% endif %}
+
+    {% if item.uri is empty or item.uri=='#' %}
+        {% set linkAttributes = linkAttributes|merge({
+            'class': oro_menu.add_attribute_values(linkAttributes, 'class', ['unclickable'])
+        }) %}
+    {% endif %}
+
+    <a href="{{ item.uri }}"{{ oro_menu.attributes(linkAttributes) }}><span class="title">{{ block('label') }}</span></a>
+{% endblock %}
+
+{% block children %}
+    {% if item.level is sameas(1) %}
+        {%- set labelAttributes = item.labelAttributes %}
+        <li class="dropdown-menu-title">{{ block('spanElement') }}</li>
+        <li class="divider"><span></span></li>
+    {% endif %}
+    {{ parent() }}
+{% endblock %}

@@ -7,8 +7,7 @@ define([
     'oroworkflow/js/workflow-management/step/view/edit',
     'oroworkflow/js/workflow-management/transition/view/edit',
     'oroworkflow/js/workflow-management/helper',
-    'oronavigation/js/navigation',
-    'oroui/js/app',
+    'oroui/js/tools',
     'oroui/js/mediator',
     'oroui/js/delete-confirmation',
     'oroentity/js/fields-loader'
@@ -20,8 +19,7 @@ function(_, Backbone, routing, messenger, __,
      StepEditView,
      TransitionEditForm,
      Helper,
-     Navigation,
-     app,
+     tools,
      mediator,
      Confirmation
 ) {
@@ -46,7 +44,8 @@ function(_, Backbone, routing, messenger, __,
             entities: []
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.saveAndClose = false;
 
             _.each(this.model.get('steps').models, this.setWorkflow, this);
@@ -135,8 +134,8 @@ function(_, Backbone, routing, messenger, __,
         initEntityFieldsLoader: function() {
             var confirm = new Confirmation({
                 title: __('Change Entity Confirmation'),
-                okText: __('Yes, I Agree'),
-                content: __('Are you sure you want to change entity?')
+                okText: __('Yes'),
+                content: __('oro.workflow.change_entity_confirmation')
             });
             confirm.on('ok', _.bind(function() {
                 this.model.set('entity', this.$entitySelectEl.val());
@@ -147,7 +146,7 @@ function(_, Backbone, routing, messenger, __,
 
             this.$entitySelectEl.fieldsLoader({
                 router: 'oro_workflow_api_rest_entity_get',
-                routingParams: {"with-relations": 1, "with-entity-details": 1, "deep-level": 2},
+                routingParams: {},
                 confirm: confirm,
                 requireConfirm: _.bind(function () {
                      return this.model.get('steps').length > 1 &&
@@ -156,6 +155,7 @@ function(_, Backbone, routing, messenger, __,
                             + this.model.get('attributes').length) > 0;
                 }, this)
             });
+
             this.$entitySelectEl.on('change', _.bind(function() {
                 if (!this.model.get('entity')) {
                     this.model.set('entity', this.$entitySelectEl.val());
@@ -163,8 +163,21 @@ function(_, Backbone, routing, messenger, __,
             }, this));
 
             this.$entitySelectEl.on('fieldsloadercomplete', _.bind(function(e) {
-                this.createPathMapping($(e.target).data('fields'));
+                this.initEntityFieldsData($(e.target).data('fields'));
             }, this));
+
+            this._preloadEntityFieldsData();
+        },
+
+        _preloadEntityFieldsData: function() {
+            if (this.$entitySelectEl.val()) {
+                var fieldsData = this.$entitySelectEl.fieldsLoader('getFieldsData');
+                if (!fieldsData.length) {
+                    this.$entitySelectEl.fieldsLoader('loadFields');
+                } else {
+                    this.initEntityFieldsData(fieldsData);
+                }
+            }
         },
 
         addStartingPoint: function() {
@@ -190,40 +203,8 @@ function(_, Backbone, routing, messenger, __,
             this.addStartingPoint();
         },
 
-        createPathMapping: function(fields) {
-            var rootAttributeName = this.model.get('entity_attribute');
-            var mapping = {};
-
-            var addMapping = _.bind(function(field, parentPropertyPath, parentFieldId) {
-                var propertyPath = parentPropertyPath + '.' + field.name;
-                var fieldIdParts = [];
-
-                if (parentFieldId) {
-                    fieldIdParts.push(parentFieldId);
-                }
-
-                var fieldIdName = field.name;
-                if (field.hasOwnProperty('related_entity_name')) {
-                    fieldIdName += '+' + field.related_entity_name;
-                }
-                fieldIdParts.push(fieldIdName);
-
-                if (!field.hasOwnProperty('related_entity_name')) {
-                    mapping[propertyPath] = fieldIdParts.join('::');
-                }
-
-                if (field.hasOwnProperty('related_entity_fields')) {
-                    _.each(field.related_entity_fields, function(relatedField) {
-                        addMapping(relatedField, propertyPath, fieldIdParts.join('::'));
-                    });
-                }
-            });
-
-            _.each(fields, function(field) {
-                addMapping(field, rootAttributeName, "");
-            });
-
-            this.model.setPropertyPathToFieldIdMapping(mapping);
+        initEntityFieldsData: function(fields) {
+            this.model.setEntityFieldsData(fields);
         },
 
         saveConfiguration: function(e) {
@@ -247,11 +228,10 @@ function(_, Backbone, routing, messenger, __,
                 return;
             }
 
-            var navigation = Navigation.getInstance();
-            navigation.showLoading();
+            mediator.execute('showLoading');
             this.model.save(null, {
                 'success': _.bind(function() {
-                    navigation.hideLoading();
+                    mediator.execute('hideLoading');
 
                     var redirectUrl = '',
                         modelName = this.model.get('name');
@@ -261,16 +241,16 @@ function(_, Backbone, routing, messenger, __,
                         redirectUrl = routing.generate('oro_workflow_definition_update', { name: modelName });
                     }
 
-                    mediator.once('hash_navigation_request:complete', function() {
+                    mediator.once('page:afterChange', function() {
                         messenger.notificationFlashMessage('success', __('Workflow saved.'));
                     });
-                    navigation.setLocation(redirectUrl);
+                    mediator.execute('redirectTo', {url: redirectUrl});
                 }, this),
                 'error': function(model, response) {
-                    navigation.hideLoading();
+                    mediator.execute('hideLoading');
                     var jsonResponse = response.responseJSON || {};
 
-                    if (app.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
+                    if (tools.debug && !_.isUndefined(console) && !_.isUndefined(jsonResponse.error)) {
                         console.error(jsonResponse.error);
                     }
                     messenger.notificationFlashMessage('error', __('Could not save workflow.'));
@@ -372,7 +352,7 @@ function(_, Backbone, routing, messenger, __,
             var confirm = new Confirmation({
                 title: title || '',
                 content: message,
-                okText: okText || __('Ok'),
+                okText: okText || __('OK'),
                 allowCancel: false
             });
             confirm.open();

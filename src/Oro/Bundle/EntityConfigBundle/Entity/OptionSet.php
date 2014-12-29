@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\PersistentCollection;
 
 /**
+ * @deprecated since 1.4. Will be removed in 2.0
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityConfigBundle\Entity\Repository\OptionSetRepository")
  * @ORM\Table(name="oro_entity_config_optionset")
  * @ORM\HasLifecycleCallbacks
@@ -176,5 +179,27 @@ class OptionSet
             ->setPriority($priority)
             ->setLabel($label)
             ->setIsDefault($default);
+    }
+
+    /**
+     * Remove all relations
+     *
+     * @return array
+     * @deprecated
+     */
+    public function __sleep()
+    {
+        return ['id', 'label', 'priority', 'is_default'];
+    }
+
+    /**
+     * Default relation data
+     *
+     * @deprecated
+     */
+    public function __wakeup()
+    {
+        $this->field = null;
+        $this->relation = new ArrayCollection();
     }
 }

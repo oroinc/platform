@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
-use Oro\Bundle\EmailBundle\Entity\Util\EmailUtil;
+
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,11 +12,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -36,10 +35,32 @@ class EmailController extends Controller
      */
     public function viewAction(Email $entity)
     {
-        $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
+        $templateVars = array('entity' => $entity, 'noBodyFound' => false);
+        try {
+            $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
+        } catch (LoadEmailBodyException $e) {
+            $templateVars['noBodyFound'] = true;
+        }
 
+        return $templateVars;
+    }
+
+    /**
+     * This action is used to render the list of emails associated with the given entity
+     * on the view page of this entity
+     *
+     * @Route(
+     *      "/activity/view/{entityClass}/{entityId}",
+     *      name="oro_email_activity_view"
+     * )
+     *
+     * @AclAncestor("oro_email_view")
+     * @Template
+     */
+    public function activityAction($entityClass, $entityId)
+    {
         return array(
-            'entity' => $entity
+            'entity' => $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId)
         );
     }
 
@@ -69,21 +90,6 @@ class EmailController extends Controller
     }
 
     /**
-     * Get email list
-     * TODO: This is a temporary action created for demo purposes. It will be removed when 'display activities'
-     *       functionality is implemented
-     *
-     * @AclAncestor("oro_email_view")
-     * @Template
-     */
-    public function activitiesAction($emails)
-    {
-        return array(
-            'entities' => array()
-        );
-    }
-
-    /**
      * Get the given email body content
      *
      * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
@@ -91,7 +97,7 @@ class EmailController extends Controller
      */
     public function bodyAction(EmailBody $entity)
     {
-        return new Response($entity->getContent());
+        return new Response($entity->getBodyContent());
     }
 
     /**
@@ -108,7 +114,7 @@ class EmailController extends Controller
         $response->headers->set('Pragma', 'no-cache');
         $response->headers->set('Expires', '0');
         $content = ContentDecoder::decode(
-            $entity->getContent()->getValue(),
+            $entity->getContent()->getContent(),
             $entity->getContent()->getContentTransferEncoding()
         );
         $response->setContent($content);
@@ -144,6 +150,16 @@ class EmailController extends Controller
         return array(
             'datagridParameters' => $request->query->all()
         );
+    }
+
+    /**
+     * @Route("/user-emails", name="oro_email_user_emails")
+     * @AclAncestor("oro_email_view")
+     * @Template
+     */
+    public function userEmailsAction()
+    {
+        return [];
     }
 
     /**

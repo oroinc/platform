@@ -8,9 +8,9 @@ define(['backbone', '../constants'], function (Backbone, constants) {
      * @class   orosidebar.widgetContainer.Model
      * @extends Backbone.Model
      */
-    var WidgetContainerModel = Backbone.Model.extend({
+    return Backbone.Model.extend({
         defaults: {
-            icon:       '#',
+            icon:       '',
             iconClass:  '',
             module:     '',
             position:   0,
@@ -41,6 +41,7 @@ define(['backbone', '../constants'], function (Backbone, constants) {
             } else {
                 model.set('state', constants.WIDGET_MINIMIZED);
             }
+            this.save();
         },
 
         /**
@@ -54,7 +55,8 @@ define(['backbone', '../constants'], function (Backbone, constants) {
          * Restores state of widget container
          */
         restoreState: function () {
-            this.set({ state: this.stateSnapshot });
+            this.set({ state: this.stateSnapshot }, {silent: true});
+            this.save();
         },
 
         /**
@@ -64,6 +66,4 @@ define(['backbone', '../constants'], function (Backbone, constants) {
             this.set(_.omit(widgetData, 'settings', 'placement'));
         }
     });
-
-    return WidgetContainerModel;
 });

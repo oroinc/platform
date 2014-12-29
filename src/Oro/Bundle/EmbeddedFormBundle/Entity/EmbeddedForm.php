@@ -2,28 +2,39 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Entity;
 
-
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Component\Validator\Constraints as Assert;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\EmbeddedFormBundle\Model\ExtendEmbeddedForm;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
-use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="oro_embedded_form")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  routeName="oro_embedded_form_list",
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_embedded_form_list",
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="owner_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
-class EmbeddedForm
+class EmbeddedForm extends ExtendEmbeddedForm
 {
     /**
      * @var integer
@@ -41,15 +52,6 @@ class EmbeddedForm
      * @Assert\NotBlank()
      */
     protected $title;
-
-    /**
-     * @var Channel
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Channel")
-     * @ORM\JoinColumn(name="channel_id", referencedColumnName="id")
-     *
-     */
-    protected $channel;
 
     /**
      * @var string
@@ -71,7 +73,7 @@ class EmbeddedForm
     /**
      * @var string
      *
-     * @ORM\Column(name="success_message", type="string", length=255)
+     * @ORM\Column(name="success_message", type="text")
      */
     protected $successMessage;
 
@@ -79,6 +81,13 @@ class EmbeddedForm
      * @var \DateTime $created
      *
      * @ORM\Column(name="created_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -86,8 +95,23 @@ class EmbeddedForm
      * @var \DateTime $updated
      *
      * @ORM\Column(name="updated_at", type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="owner_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $owner;
 
     /**
      * @return int
@@ -95,22 +119,6 @@ class EmbeddedForm
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param Channel $channel
-     */
-    public function setChannel(Channel $channel)
-    {
-        $this->channel = $channel;
-    }
-
-    /**
-     * @return Channel
-     */
-    public function getChannel()
-    {
-        return $this->channel;
     }
 
     /**
@@ -223,5 +231,21 @@ class EmbeddedForm
     public function prePersist()
     {
         $this->createdAt = $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return Organization
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param Organization $organization
+     */
+    public function setOwner(Organization $organization)
+    {
+        $this->owner = $organization;
     }
 }

@@ -32,7 +32,7 @@ class Tag extends AbstractPageEntity
     {
         if ($new) {
             $this->tagName = $this->test->byId('oro_tag_tag_form_name');
-            $this->owner = $this->test->byXpath("//div[@id='s2id_oro_tag_tag_form_owner']/a");
+            $this->owner = $this->test->byXpath("//div[starts-with(@id,'s2id_oro_tag_tag_form_owner')]/a");
         }
         return $this;
     }
@@ -78,8 +78,9 @@ class Tag extends AbstractPageEntity
     public function save()
     {
         $this->test->byXpath("//button[contains(., 'Save')]")->click();
-        $this->waitPageToLoad();
         $this->waitForAjax();
+        $this->waitPageToLoad();
+
         return $this;
     }
 }

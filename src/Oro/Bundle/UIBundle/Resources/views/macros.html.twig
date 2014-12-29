@@ -25,39 +25,37 @@
 {% endmacro %}
 
 {% macro tooltip(tooltip, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
-    {% set details_anchor = details_anchor|default(null) %}
-    {% set details_link = details_link|default(null) %}
-    {% set details_enabled = details_enabled|default(false) %}
     {% set tooltip_parameters = tooltip_parameters|default({}) %}
-    {% set tooltip_placement = tooltip_placement|default(null) %}
     {% set tooltip = tooltip|trans(tooltip_parameters, "tooltips") %}
+    {% if tooltip is not empty %}
+        {% set details_anchor = details_anchor|default(null) %}
+        {% set details_link = details_link|default(null) %}
+        {% set details_enabled = details_enabled|default(false) %}
+        {% set tooltip_placement = tooltip_placement|default(null) %}
 
-    {# Help link logic #}
-    {% if details_enabled or details_anchor or details_link %}
-        {% set helpLink = details_link|default(get_help_link()) %}
-        {% if details_anchor %}
-            {% set helpLink = helpLink ~ '#' ~ details_anchor %}
+        {# Help link logic #}
+        {% if details_enabled or details_anchor or details_link %}
+            {% set helpLink = details_link|default(get_help_link()) %}
+            {% if details_anchor %}
+                {% set helpLink = helpLink ~ '#' ~ details_anchor %}
+            {% endif %}
+            {% set tooltip = tooltip
+                ~ '<div class="clearfix"><div class="pull-right"><a href="' ~ helpLink ~ '">'
+                ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
+            %}
         {% endif %}
-        {% set tooltip = tooltip
-            ~ '<div class="clearfix"><div class="pull-right"><a href="' ~ helpLink ~ '">'
-            ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
+        {# End help link logic #}
+
+        {% set tooltip = '<div class="oro-popover-content">'
+            ~ tooltip
+            ~ '</div>'
         %}
+
+        <i class="icon-info-sign tooltip-icon"
+           {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
+           data-content="{{ tooltip }}"
+           data-toggle="popover"></i>
     {% endif %}
-    {# End help link logic #}
-
-    <i class="icon-info-sign tooltip-icon"
-       {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
-       data-content="{{ tooltip }}"
-       data-toggle="popover"></i>
-{% endmacro %}
-
-{#
-    Render flexible attribute row
-    Parameters:
-        value - flexible attribute
-#}
-{% macro flexibleAttributeRow(value) %}
-    {{ _self.attibuteRow(value.attribute.label, value.__toString|default('N/A')) }}
 {% endmacro %}
 
 {#
@@ -68,12 +66,12 @@
         additionalData - array with additional data
 #}
 {% macro attibuteRow(title, value, additionalData) %}
-    {% macro attribute_data(value, additionalData) %}
+    {% set attributeValue %}
         <div class="clearfix-oro">
             {% if value.value is not defined  %}
                 <div class="control-label">{{ value }}</div>
             {% else %}
-                <div class="control-label">{{ value.value }} <strong>{{ value.hint|trans }}</strong></div>
+                <div class="control-label">{{ value.value }} <strong>{{ value.hint }}</strong></div>
             {% endif %}
         </div>
         {% if additionalData|length %}
@@ -83,8 +81,8 @@
                 </div>
             {% endfor %}
         {% endif %}
-    {% endmacro %}
-    {{ _self.renderAttribute(title, _self.attribute_data(value, additionalData)) }}
+    {% endset %}
+    {{ _self.renderAttribute(title, attributeValue) }}
 {% endmacro %}
 
 {#
@@ -95,7 +93,7 @@
 #}
 {% macro renderAttribute(title, data) %}
     <div class="control-group">
-        <label class="control-label">{{ title|trans }}</label>
+        <label class="control-label">{{ title }}</label>
         <div class="controls">
             {{ data|raw }}
         </div>
@@ -119,7 +117,21 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('N/A'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+{% endmacro %}
+
+{#
+    Render color property block
+    Parameters:
+        title - property title
+        data  - property data
+        empty - a value which should be used if data is empty
+#}
+{% macro renderColorProperty(title, data, empty) %}
+    {% if data is not none %}
+       {% set data = '<i class="color hide-text" title="' ~ data ~ '" style="background-color: ' ~ data ~ ';">' ~ data ~ '</i>' %}
+    {% endif %}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default(empty)|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -139,7 +151,7 @@
     {% set iconHtml = '' %}
     {% if parameters.iCss is defined %}
         {% set iconHtml %}
-        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label|trans }}</i>
+        <i class="{{ parameters.iCss }} hide-text" >{{ parameters.label }}</i>
         {% endset %}
     {% else %}
     {% endif %}
@@ -150,11 +162,11 @@
         {% endif %}
         {% if parameters.data is defined %}
             {% for dataItemName,dataItemValue in parameters.data %}
-                data-{{ dataItemName }}="{{ dataItemValue|raw }}"
+                data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
             {% endfor %}
         {% endif %}
        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
-       title="{{ parameters.title|trans }}">{{ iconHtml|trim|raw }}{{ parameters.label|trans|trim }}</a>
+       {% if parameters.title is defined %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}{{ parameters.label|trim }}</a>
     {% endspaceless %}
 {% endmacro %}
 
@@ -191,7 +203,7 @@
             {% if parameters.iCss is defined %}
                 <i class="{{ parameters.iCss }}"></i>
             {% endif %}
-            {{ parameters.label|trans }}
+            {{ parameters.label }}
             <span class="caret"></span>
         </a>
         <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
@@ -201,7 +213,7 @@
                 {% endfor %}
             {% endif %}
             {% if parameters.html is defined and parameters.html is not empty %}
-                {{ parameters.html }}
+                {{ parameters.html|raw }}
             {% endif %}
         </ul>
     </div>
@@ -234,7 +246,7 @@
 {% macro pinnedDropdownButton(parameters) %}
     {% if isDesktopVersion() %}
         {% set options = parameters.options|default({})|merge({
-            groupKey: parameters.groupKey,
+            groupKey: parameters.groupKey is defined ? parameters.groupKey : '',
             useMainButtonsClone: true
         }) %}
         <div class="pull-right" data-pinned-dropdown-button="{{ options|json_encode }}">
@@ -266,7 +278,10 @@
         'path' - button url
         'label' - button label | 'Cancel' by default
 #}
-{% macro cancelButton(path, label = 'Cancel') %}
+{% macro cancelButton(path, label) %}
+    {% if label is empty %}
+        {% set label = 'Cancel'|trans %}
+    {% endif %}
     {{ _self.button({'path' : path, 'title' : label, 'label' : label}) }}
 {% endmacro %}
 
@@ -308,6 +323,10 @@
         'title': title,
         'label': label
     }) %}
+
+    {# Add URL parameters to button path #}
+    {% set parameters = parameters|merge({ 'path' : oro_url_add_query(parameters['path']) }) %}
+
     {{ _self.button(parameters) }}
 {% endmacro %}
 
@@ -370,7 +389,7 @@
     {% endif %}
 
     {% if parameters.aCss is defined %}
-        {% set aCss = aCss ~ ' ' ~ aCss ~ parameters.aCss %}
+        {% set aCss = aCss ~ ' ' ~ parameters.aCss %}
     {% endif %}
 
     {% set parameters = parameters|merge({'aCss': aCss}) %}
@@ -392,14 +411,14 @@
         %}
     {% endif %}
 
-    {% set message = parameters.dataMessage is defined ? parameters.dataMessage|trans : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) %}
-    {% set successMessage = parameters.successMessage is defined ? parameters.successMessage|trans : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set message = parameters.dataMessage is defined ? parameters.dataMessage : 'oro.ui.delete_confirm'|trans({ '%entity_label%' : entityLabel }) %}
+    {% set successMessage = parameters.successMessage is defined ? parameters.successMessage : 'oro.ui.delete_message'|trans({ '%entity_label%' : entityLabel }) %}
     {% set url = parameters.dataUrl is defined ? parameters.dataUrl : '' %}
     {% set linkParams = {
         'data': {
             'message': message,
             'success-message': successMessage,
-            'url':url
+            'url': url
         },
         'iCss': 'icon-trash',
         'aCss': parameters.aCss,
@@ -417,7 +436,12 @@
         {% set data = linkParams.data|merge({'redirect': parameters.dataRedirect}) %}
         {% set linkParams = linkParams|merge({ 'data': data }) %}
     {% endif %}
-
+    {% if parameters.data is defined %}
+        {% for dataItemName,dataItemValue in parameters.data %}
+            {% set data = linkParams.data|merge({(dataItemName): dataItemValue}) %}
+            {% set linkParams = linkParams|merge({ 'data': data }) %}
+        {% endfor %}
+    {% endif %}
     {{ _self.link(linkParams) }}
 {% endmacro %}
 
@@ -439,7 +463,7 @@
         ]
 #}
 {% macro clientLink(parameters) %}
-    <a href="javascript: void(0);" class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
+    <a href="javascript: void(0);" class="{{ parameters.class is defined ? parameters.class : '' }} {{ parameters.aCss is defined ? parameters.aCss : '' }}"
         {% if (parameters.id is defined) %}
         id="{{ parameters.id }}"
         {% endif %}
@@ -450,14 +474,12 @@
         data-url="{{ parameters.dataUrl }}"
         {% endif %}
         {% if (parameters.successMessage is defined) %}
-        data-success-message="{{ parameters.successMessage|trans }}"
+        data-success-message="{{ parameters.successMessage }}"
         {% endif %}
         {% if parameters.dataRedirect is defined %}
         data-redirect="{{ parameters.dataRedirect  }}"
         {% endif %}
-        {% if (parameters.title is defined) %}
-        title="{{ parameters.title|trans }}"
-        {% endif -%}
+        title="{{ parameters.title is defined ? parameters.title : (parameters.label is defined ? parameters.label : '') }}"
         {% if (parameters.visible is defined and not parameters.visible) %}
         style="display: none"
         {% endif -%}
@@ -467,12 +489,17 @@
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
         {% endif %}
-        ><i class="{{ parameters.iCss is defined ? parameters.iCss : '' }} hide-text">{{ parameters.label|trans }}</i>{{ parameters.label|trans -}}
+    >
+        {%- if (parameters.iCss is defined) -%}
+            <i class="{{ parameters.iCss }} hide-text">{{ parameters.label is defined ? parameters.label : '' }}</i>
+        {%- endif %}
+        {{- parameters.label is defined ? parameters.label : '' -}}
     </a>
 {% endmacro %}
 
 {% macro renderWidgetDataAttributes(options) %}
-    {{ _self.renderAttributes(options, 'widget') }}
+    data-page-component-module="oroui/js/app/components/widget-component"
+    data-page-component-options="{{ options|json_encode(constant('JSON_FORCE_OBJECT')) }}"
 {% endmacro %}
 
 {% macro renderAttributes(options, prefix) %}
@@ -539,16 +566,22 @@
     <div class="btn-group">
         <button type="{{ parameters.type }}" class="btn {% if (parameters.class is defined) %}{{ parameters.class }}{% endif %}{% if (parameters.action is defined) %} action-button{% endif %}"
                 {% if (parameters.action is defined) %}data-action="{{ parameters.action }}"{% endif %}>
-            {{ parameters.label|trans }}
+            {{ parameters.label }}
         </button>
     </div>
 {% endmacro %}
 
-{% macro saveAndCloseButton(label = 'Save and Close') %}
+{% macro saveAndCloseButton(label) %}
+    {% if label is empty %}
+        {% set label = 'Save and Close'|trans %}
+    {% endif %}
     {{ _self.buttonType({'type': 'submit', 'class': 'btn-success', 'label': label}) }}
 {% endmacro %}
 
-{% macro saveAndStayButton(label = 'Save') %}
+{% macro saveAndStayButton(label) %}
+    {% if label is empty %}
+        {% set label = 'Save'|trans %}
+    {% endif %}
     {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
 {% endmacro %}
 
@@ -581,7 +614,7 @@
         <div class="{{ span }}">
     {% endif %#}
     <div class="{{ spanClass }}">
-    {% if title|length %}<h5 class="user-fiedset"><span>{{ title|trans }}</span></h5>{% endif %}
+    {% if title|length %}<h5 class="user-fieldset"><span>{{ title }}</span></h5>{% endif %}
     {% for dataBlock in data %}
         {{ dataBlock|raw }}
     {% endfor %}
@@ -608,7 +641,7 @@
 {% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider) %}
     {% set cols = subblocks|length %}
     <div class="responsive-section">
-        <h4 class="scrollspy-title">{{ title|trans }}</h4>
+        <h4 class="scrollspy-title">{{ title }}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="row-fluid{% if (contentAttributes is defined and contentAttributes.class is defined and contentAttributes.class|length) %} {{ contentAttributes.class }}{% endif %}{% if cols > 1 and (useSubBlockDivider is not defined or useSubBlockDivider == true) %} row-fluid-divider{% endif %}" {{ _self.attributes(contentAttributes, ['class']) }}>
             {% if isForm is defined and isForm == true %}
@@ -639,6 +672,7 @@
             'dataBlocks' - array of blocks. each block consist of:
                 [
                     'title' - title of scroll block
+                    'priority' - a number that can be used to change the order of blocks
                     'class' - additional css class for scroll block menu item
                     'useSubBlockDivider' - [optional] indicates if 'row-fluid-divider' css class should be added to a row when there are more than one subblocks
                     'subblocks' - array with scroll sub blocks:
@@ -658,14 +692,14 @@
         {% set isForm = false %}
     {% endif %}
 
-    {% set dataBlocks = data.dataBlocks %}
+    {% set dataBlocks = data.dataBlocks|oro_sort_by %}
 
     <div id="{{ dataTarget }}" class="navbar navbar-static scrollspy-nav">
         <div class="navbar-inner">
             <div class="container-fluid" style="width: auto;">
                 <ul class="nav">
                     {% for navElement in dataBlocks %}
-                        <li {% if navElement.class is defined %}class="{{ navElement.class }}"{% endif %}><a href="#scroll-{{ loop.index }}">{{ navElement.title|trans }}</a></li>
+                        <li {% if navElement.class is defined %}class="{{ navElement.class }}"{% endif %}><a href="#scroll-{{ loop.index }}">{{ navElement.title }}</a></li>
                     {% endfor %}
                 </ul>
             </div>
@@ -707,15 +741,15 @@
 #}
 {% macro collectionField(field, label, buttonCaption) %}
     <div class="control-group">
-        <label class="control-label">{{ label|trans }}</label>
+        <label class="control-label">{{ label }}</label>
         <div class="controls">
             <div class="row-oro">
-                <div class="collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
+                <div class="oro-item-collection collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
                     {% for emailField in field.children %}
                         {{ _self.collection_prototype(emailField) }}
                     {% endfor %}
                 </div>
-                <a class="btn add-list-item" href="javascript: void(0);">{{ buttonCaption|trans }}</a>
+                <a class="btn add-list-item" href="javascript: void(0);">{{ buttonCaption }}</a>
             </div>
         </div>
     </div>
@@ -741,24 +775,24 @@
 #}
 {% macro entityOwnerLink(entity) %}
     {%- if entity.owner is defined and entity.owner %}
-        {% set ownerType = oro_get_owner_type(entity) %}
-        {% if (ownerType == 'USER') %}
-            {% if resource_granted('oro_user_user_view') %}
+        {% if resource_granted('VIEW', entity.owner)  %}
+            {% set ownerType = oro_get_owner_type(entity) %}
+            {% if (ownerType == 'USER') %}
                 {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
                 {% set ownerName = entity.owner|oro_format_name %}
-            {% endif %}
-        {% elseif (ownerType == 'BUSINESS_UNIT') %}
-            {% if resource_granted('oro_business_unit_view') %}
+            {% elseif (ownerType == 'BUSINESS_UNIT') %}
                 {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
                 {% set ownerName = entity.owner.name %}
+            {% elseif (ownerType == 'ORGANIZATION') %}
+                {% set ownerName = entity.owner.name %}
             {% endif %}
-        {% endif %}
-        {% if ownerName is defined %}
-            {{ 'Owner'|trans }}:
-            {% if ownerPath is defined %}
-                <a href="{{ ownerPath }}">{{ ownerName }}</a>
-            {% else %}
-                {{ ownerName }}
+            {% if ownerName is defined %}
+                {{ 'oro.ui.owner'|trans }}:
+                {% if ownerPath is defined %}
+                    <a href="{{ ownerPath }}">{{ ownerName }}</a>
+                {% else %}
+                    {{ ownerName }}
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endif -%}
@@ -773,7 +807,7 @@
             {% set class = '' %}
         {% endif %}
         {% if url is not empty %}
-            <a href="{{ url|raw }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title|escape }}</a>
+            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -783,7 +817,7 @@
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}">{{ title|escape }}</a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
 

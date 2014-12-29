@@ -15,7 +15,7 @@ class AddressProviderPassTest extends \PHPUnit_Framework_TestCase
     /**
      * Environment setup
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->container = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')->getMock();
     }

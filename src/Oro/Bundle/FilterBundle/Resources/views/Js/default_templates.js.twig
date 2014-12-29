@@ -27,7 +27,7 @@
     </div>
 </script>
 <script type="text/template" id="choice-filter-template">
-    <div class="choicefilter">
+    <div class="choice-filter">
         <div class="input-prepend">
             <div class="btn-group">
                 <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -62,9 +62,9 @@
     <div>
         <%= parts.join('') %>
         <div>
-            <input type="text" class="<%= inputClass %>" value="" name="start" placeholder="from">
+            <input type="text" class="<%= inputClass %>" value="<%= value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
             <span class="filter-separator">-</span>
-            <input type="text" class="<%= inputClass %>" value="" name="end" placeholder="to">
+            <input type="text" class="<%= inputClass %>" value="<%= value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
         </div>
         <div class="oro-action">
             <div class="btn-group">
@@ -98,8 +98,8 @@
             <strong class="select-filter-placeholder"><%= placeholder %></strong>
             <select>
                 <% _.each(options, function (option) { %>
-                <option value="<%= option.value %>"<% if (option.value == selected.value) { %> selected="selected"<% } %>
-                    title="<%- option.label %>">
+                <option value="<%= option.value %>" title="<%- option.label %>"
+                    <% if (option.value == selected.value) { %> selected="selected"<% } %>>
                     <%- option.label %>
                 </option>
                 <% }); %>
@@ -113,9 +113,12 @@
     <div class="filter-item oro-drop">
         <div class="btn filter-select filter-criteria-selector <% if (isEmpty) { %>filter-default-value<% } %>">
             <% if (showLabel) { %><%= label %>: <% } %>
-            <strong class="select-filter-placeholder"><%= placeholder %></strong>
+            <strong class="select-filter-placeholder multiselect-filter-placeholder"><%= placeholder %></strong>
             <select multiple>
-                <% _.each(options, function (option) { %><option value="<%= option.value %>" title="<%- option.label %>">
+                <% _.each(options, function (option) { %>
+                <option value="<%= option.value %>" title="<%- option.label %>"
+                    <% if (_.isArray(selected.value)) { %><% if (_.indexOf(selected.value, option.value) !== -1) { %> selected="selected"<% } %>
+                    <% } else if (option.value == selected.value) { %> selected="selected"<% } %>>
                     <%- option.label %>
                 </option><% }); %>
             </select>

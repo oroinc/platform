@@ -1,0 +1,27 @@
+{{ UI.clientLink({
+    'dataUrl': path(
+        'oro_attachment_create', {
+            entityClass: oro_class_name(entity, true),
+            entityId: entity.id
+    }),
+    'aCss': 'no-hash',
+    'iCss': 'icon-paper-clip',
+    'label' : 'oro.attachment.action.add'|trans,
+    'widget' : {
+        'type' : 'dialog',
+        'multiple' : false,
+        'reload-grid-name' : 'attachment-grid',
+        'options' : {
+            'alias': 'attachment-dialog',
+            'dialogOptions' : {
+                'title' : 'oro.attachment.action.add'|trans,
+                'allowMaximize': false,
+                'allowMinimize': false,
+                'modal': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 550
+            }
+        }
+    },
+}) }}

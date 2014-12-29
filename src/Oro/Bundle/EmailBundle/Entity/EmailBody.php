@@ -110,7 +110,7 @@ class EmailBody
      *
      * @return \DateTime
      */
-    public function getCreatedAt()
+    public function getCreated()
     {
         return $this->created;
     }
@@ -120,7 +120,7 @@ class EmailBody
      *
      * @return string
      */
-    public function getContent()
+    public function getBodyContent()
     {
         return $this->bodyContent;
     }
@@ -131,7 +131,7 @@ class EmailBody
      * @param string $bodyContent
      * @return $this
      */
-    public function setContent($bodyContent)
+    public function setBodyContent($bodyContent)
     {
         $this->bodyContent = ($bodyContent === null ? '' : $bodyContent);
 

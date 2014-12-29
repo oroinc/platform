@@ -2,23 +2,26 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyType;
 use Symfony\Component\Form\Test\TypeTestCase;
+
+use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyType;
 
 class UniqueKeyTypeTest extends TypeTestCase
 {
+    /**
+     * @var UniqueKeyType
+     */
     protected $type;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $fields = array(
-            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'firstName', 'string'),
-            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'lastName', 'string'),
-            new FieldConfigId('entity', 'Oro\Bundle\UserBundle\Entity\User', 'email', 'string'),
-        );
+        $fields = [
+            'firstName' => 'First Name',
+            'lastName'  => 'Last Name',
+            'email'     => 'Email',
+        ];
 
         $this->type = new UniqueKeyType($fields);
     }

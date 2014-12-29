@@ -10,14 +10,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 use Oro\Bundle\DashboardBundle\Model\Manager;
-use Oro\Bundle\DashboardBundle\Model\WidgetAttributes;
+use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @Route("/dashboard")
@@ -42,7 +40,9 @@ class DashboardController extends Controller
      */
     public function indexAction()
     {
-        return [];
+        return [
+            'entity_class' => $this->container->getParameter('oro_dashboard.dashboard_entity.class')
+        ];
     }
 
     /**
@@ -51,7 +51,8 @@ class DashboardController extends Controller
      * @Route(
      *      "/view/{id}",
      *      name="oro_dashboard_view",
-     *      defaults={"id" = ""}
+     *      requirements={"id"="\d+"},
+     *      defaults={"id" = "0"}
      * )
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -81,7 +82,7 @@ class DashboardController extends Controller
             array(
                 'dashboards' => $this->getDashboardManager()->findAllowedDashboards(),
                 'dashboard'  => $currentDashboard,
-                'widgets'    => $this->get('oro_dashboard.config_provider')->getWidgetConfigs()
+                'widgets'    => $this->get('oro_dashboard.widget_configs')->getWidgetConfigs(),
             )
         );
     }
@@ -145,11 +146,18 @@ class DashboardController extends Controller
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     array(
                         'route'      => 'oro_dashboard_update',
-                        'parameters' => array('id' => $dashboardModel->getId()),
+                        'parameters' => array(
+                            'id' => $dashboardModel->getId(),
+                            '_enableContentProviders' => 'mainMenu'
+                        ),
                     ),
                     array(
                         'route'      => 'oro_dashboard_view',
-                        'parameters' => array('id' => $dashboardModel->getId(), 'change_dashboard' => true),
+                        'parameters' => array(
+                            'id' => $dashboardModel->getId(),
+                            'change_dashboard' => true,
+                            '_enableContentProviders' => 'mainMenu'
+                        ),
                     )
                 );
             }
@@ -169,7 +177,7 @@ class DashboardController extends Controller
     {
         return $this->render(
             sprintf('%s:Dashboard:%s.html.twig', $bundle, $name),
-            $this->get('oro_dashboard.widget_attributes')->getWidgetAttributesForTwig($widget)
+            $this->get('oro_dashboard.widget_configs')->getWidgetAttributesForTwig($widget)
         );
     }
 
@@ -183,7 +191,7 @@ class DashboardController extends Controller
     public function itemizedWidgetAction($widget, $bundle, $name)
     {
         /** @var WidgetAttributes $manager */
-        $manager = $this->get('oro_dashboard.widget_attributes');
+        $manager = $this->get('oro_dashboard.widget_configs');
 
         $params = array_merge(
             [

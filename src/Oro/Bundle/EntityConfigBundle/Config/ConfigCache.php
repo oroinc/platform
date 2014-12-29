@@ -23,13 +23,20 @@ class ConfigCache
     protected $modelCache;
 
     /**
+     * @var bool
+     */
+    protected $isDebug;
+
+    /**
      * @param CacheProvider $cache
      * @param CacheProvider $modelCache
+     * @param bool          $isDebug
      */
-    public function __construct(CacheProvider $cache, CacheProvider $modelCache)
+    public function __construct(CacheProvider $cache, CacheProvider $modelCache, $isDebug = false)
     {
         $this->cache      = $cache;
         $this->modelCache = $modelCache;
+        $this->isDebug    = $isDebug;
     }
 
     /**
@@ -44,9 +51,26 @@ class ConfigCache
     /**
      * @param ConfigInterface $config
      * @return bool
+     * @throws \LogicException
      */
     public function putConfigInCache(ConfigInterface $config)
     {
+        $configId = $config->getId();
+        if ($this->isDebug && $configId instanceof FieldConfigId) {
+            if ($configId->getFieldType() === null) {
+                // undefined field type can cause unpredictable logical bugs
+                throw new \LogicException(
+                    sprintf(
+                        'A field config "%s::%s" with undefined field type cannot be cached.'
+                        . ' It seems that there is some critical bug in entity config core functionality.'
+                        . ' Please contact ORO team if you see this error.',
+                        $configId->getClassName(),
+                        $configId->getFieldName()
+                    )
+                );
+            }
+        }
+
         return $this->cache->save($this->buildConfigCacheKey($config->getId()), $config);
     }
 

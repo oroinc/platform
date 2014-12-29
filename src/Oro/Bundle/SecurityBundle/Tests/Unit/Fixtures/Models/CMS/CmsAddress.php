@@ -36,9 +36,16 @@ class CmsAddress
 
     /**
      * @OneToOne(targetEntity="CmsUser", inversedBy="address")
-     * @JoinColumn(referencedColumnName="id")
+     * @JoinColumn(name="user_id", referencedColumnName="id")
      */
     public $user;
+
+    /**
+     * @OneToOne(targetEntity="CmsOrganization", inversedBy="address")
+     * @JoinColumn(name="organization", referencedColumnName="id")
+     */
+    public $organization;
+
 
     public function getId()
     {
@@ -71,5 +78,21 @@ class CmsAddress
             $this->user = $user;
             $user->setAddress($this);
         }
+    }
+
+    /**
+     * @param mixed $organization
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

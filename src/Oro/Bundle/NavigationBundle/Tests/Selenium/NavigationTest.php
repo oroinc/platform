@@ -19,21 +19,21 @@ class NavigationTest extends Selenium2TestCase
         $login = $this->login();
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
-            ->menu('Users Management')
+            ->menu('User Management')
             ->menu('Users')
             ->open()
             ->assertElementPresent("//table[@class='grid table-hover table table-bordered table-condensed']/tbody");
 
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
-            ->menu('Users Management')
+            ->menu('User Management')
             ->menu('Roles')
             ->open()
             ->assertElementPresent("//table[@class='grid table-hover table table-bordered table-condensed']/tbody");
 
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
-            ->menu('Users Management')
+            ->menu('User Management')
             ->menu('Groups')
             ->open()
             ->assertElementPresent("//table[@class='grid table-hover table table-bordered table-condensed']/tbody");
@@ -126,7 +126,7 @@ class NavigationTest extends Selenium2TestCase
         $login->getTest()->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button']")->click();
         $login->waitForAjax();
         $login->assertElementPresent(
-            "//div[@class='list-bar']//a[@title = 'Users - Users Management - System' and text() = 'Users']",
+            "//div[@class='list-bar']//a[@title = 'Users - User Management - System' and text() = 'Users']",
             'Element does not minimised to pinbar tab'
         );
     }

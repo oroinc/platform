@@ -20,7 +20,7 @@ class Status
      * @var integer
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
@@ -60,6 +60,13 @@ class Status
      * @ORM\Column(name="date", type="datetime")
      */
     protected $date;
+
+    /**
+     * @var array $data
+     *
+     * @ORM\Column(name="data", type="json_array", nullable=true)
+     */
+    protected $data;
 
     public function __construct()
     {
@@ -182,5 +189,21 @@ class Status
     public function __sleep()
     {
         return [];
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData(array $data)
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }

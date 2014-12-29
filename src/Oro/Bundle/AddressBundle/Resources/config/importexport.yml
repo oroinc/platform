@@ -1,33 +1,26 @@
 parameters:
-    oro_address.importexport.phone_normalizer.class: Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\PhoneNormalizer
-    oro_address.importexport.email_normalizer.class: Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\EmailNormalizer
-    oro_address.importexport.address_type_normalizer.class: Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\AddressTypeNormalizer
-    oro_address.importexport.address_normalizer.class: Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\AddressNormalizer
-    oro_address.importexport.typed_address_normalizer.class: Oro\Bundle\AddressBundle\ImportExport\Serializer\Normalizer\TypedAddressNormalizer
+    oro_address.importexport.template_fixture.country.class:       Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\CountryFixture
+    oro_address.importexport.template_fixture.region.class:        Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\RegionFixture
+    oro_address.importexport.template_fixture.address.class:       Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\AddressFixture
+    oro_address.importexport.template_fixture.address_type.class:  Oro\Bundle\AddressBundle\ImportExport\TemplateFixture\AddressTypeFixture
 
 services:
-    oro_address.importexport.phone_normalizer:
-        class: %oro_address.importexport.phone_normalizer.class%
+    oro_address.importexport.template_fixture.country:
+        class: %oro_address.importexport.template_fixture.country.class%
         tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
+            - { name: oro_importexport.template_fixture }
 
-    oro_address.importexport.email_normalizer:
-        class: %oro_address.importexport.email_normalizer.class%
+    oro_address.importexport.template_fixture.region:
+        class: %oro_address.importexport.template_fixture.region.class%
         tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
+            - { name: oro_importexport.template_fixture }
 
-    oro_address.importexport.address_type_normalizer:
-        class: %oro_address.importexport.address_type_normalizer.class%
+    oro_address.importexport.template_fixture.address:
+        class: %oro_address.importexport.template_fixture.address.class%
         tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
+            - { name: oro_importexport.template_fixture }
 
-    oro_address.importexport.address_normalizer:
-        class: %oro_address.importexport.address_normalizer.class%
+    oro_address.importexport.template_fixture.address_type:
+        class: %oro_address.importexport.template_fixture.address_type.class%
         tags:
-            - { name: oro_importexport.normalizer, priority: -10 }
-
-    oro_address.importexport.typed_address_normalizer:
-        class: %oro_address.importexport.typed_address_normalizer.class%
-        arguments: [@oro_address.importexport.address_normalizer]
-        tags:
-            - { name: oro_importexport.normalizer, priority: -5 }
+            - { name: oro_importexport.template_fixture }

@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
+use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
@@ -16,9 +15,10 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
-    /**
-     * @var ImapConnectorFactory
-     */
+    /** @var ImapEmailSynchronizationProcessorFactory */
+    protected $syncProcessorFactory;
+
+    /** @var ImapConnectorFactory */
     protected $connectorFactory;
 
     /** @var Mcrypt */
@@ -27,22 +27,24 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     /**
      * Constructor
      *
-     * @param EntityManager        $em
-     * @param EmailEntityBuilder   $emailEntityBuilder
-     * @param EmailAddressManager  $emailAddressManager
-     * @param ImapConnectorFactory $connectorFactory
-     * @param Mcrypt               $encryptor
+     * @param ManagerRegistry                          $doctrine
+     * @param KnownEmailAddressCheckerFactory          $knownEmailAddressCheckerFactory
+     * @param ImapEmailSynchronizationProcessorFactory $syncProcessorFactory
+     * @param ImapConnectorFactory                     $connectorFactory
+     * @param Mcrypt                                   $encryptor
      */
     public function __construct(
-        EntityManager $em,
-        EmailEntityBuilder $emailEntityBuilder,
-        EmailAddressManager $emailAddressManager,
+        ManagerRegistry $doctrine,
+        KnownEmailAddressCheckerFactory $knownEmailAddressCheckerFactory,
+        ImapEmailSynchronizationProcessorFactory $syncProcessorFactory,
         ImapConnectorFactory $connectorFactory,
         Mcrypt $encryptor
     ) {
-        parent::__construct($em, $emailEntityBuilder, $emailAddressManager);
-        $this->connectorFactory = $connectorFactory;
-        $this->encryptor        = $encryptor;
+        parent::__construct($doctrine, $knownEmailAddressCheckerFactory);
+
+        $this->syncProcessorFactory = $syncProcessorFactory;
+        $this->connectorFactory     = $connectorFactory;
+        $this->encryptor            = $encryptor;
     }
 
     /**
@@ -77,13 +79,9 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             $this->encryptor->decryptData($origin->getPassword())
         );
 
-        return new ImapEmailSynchronizationProcessor(
-            $this->log,
-            $this->em,
-            $this->emailEntityBuilder,
-            $this->emailAddressManager,
-            $this->knownEmailAddressChecker,
-            new ImapEmailManager($this->connectorFactory->createImapConnector($config))
+        return $this->syncProcessorFactory->create(
+            new ImapEmailManager($this->connectorFactory->createImapConnector($config)),
+            $this->getKnownEmailAddressChecker()
         );
     }
 }

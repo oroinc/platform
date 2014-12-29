@@ -32,9 +32,10 @@ class ReflectionUtil
     }
 
     /**
-     * @param mixed $obj
+     * @param mixed  $obj
      * @param string $methodName
-     * @param array $args
+     * @param array  $args
+     *
      * @return mixed
      */
     public static function callProtectedMethod($obj, $methodName, array $args)

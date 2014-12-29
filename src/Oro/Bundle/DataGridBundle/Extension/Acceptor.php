@@ -15,11 +15,6 @@ class Acceptor
     /** @var ExtensionVisitorInterface[] */
     protected $extensions = [];
 
-    public function __construct(DatagridConfiguration $config)
-    {
-        $this->setConfig($config);
-    }
-
     /**
      * Ask extensions to process configuration
      */
@@ -69,10 +64,7 @@ class Acceptor
      */
     public function addExtension(ExtensionVisitorInterface $extension)
     {
-        /**
-         * ATTENTION: extension object should be cloned cause it can contain some state
-         */
-        $this->extensions[] = clone $extension;
+        $this->extensions[] = $extension;
 
         $comparisonClosure = function (ExtensionVisitorInterface $a, ExtensionVisitorInterface $b) {
             if ($a->getPriority() === $b->getPriority()) {

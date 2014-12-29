@@ -18,19 +18,29 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testRegisterProcessor()
     {
-        $type = ProcessorRegistry::TYPE_IMPORT;
         $entityName = 'entity_name';
         $alias = 'processor_alias';
-        $processor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        $importProcessor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+        $exportProcessor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareProcessor');
+        $exportProcessor->expects($this->once())->method('setEntityName')->with($entityName);
 
-        $this->registry->registerProcessor($processor, $type, $entityName, $alias);
+        $this->registry->registerProcessor($importProcessor, ProcessorRegistry::TYPE_IMPORT, $entityName, $alias);
+        $this->registry->registerProcessor($exportProcessor, ProcessorRegistry::TYPE_EXPORT, $entityName, $alias);
         $this->assertAttributeEquals(
-            array($type => array($alias => $processor)),
+            [
+                ProcessorRegistry::TYPE_IMPORT => [$alias => $importProcessor],
+                ProcessorRegistry::TYPE_EXPORT => [$alias => $exportProcessor],
+            ],
             'processors',
             $this->registry
         );
         $this->assertAttributeEquals(
-            array($entityName => array($type => array($alias => $processor))),
+            [
+                $entityName => [
+                    ProcessorRegistry::TYPE_IMPORT => [$alias => $importProcessor],
+                    ProcessorRegistry::TYPE_EXPORT => [$alias => $exportProcessor]
+                ]
+            ],
             'processorsByEntity',
             $this->registry
         );
@@ -40,7 +50,7 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\ImportExportBundle\Exception\LogicException
-     * @expectedExceptionMessage Processor with type "import" and alias "entity_name" already exists
+     * @expectedExceptionMessage Processor with type "import" and alias "processor_alias" already exists
      */
     public function testRegisterProcessorFails()
     {
@@ -69,15 +79,15 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->registerProcessor($barProcessor, $barType, $barEntityName, $barAlias);
         $this->registry->unregisterProcessor($fooType, $fooEntityName, $fooAlias);
         $this->assertAttributeEquals(
-            array($fooType => array(), $barType => array($barAlias => $barProcessor)),
+            [$fooType => [], $barType => [$barAlias => $barProcessor]],
             'processors',
             $this->registry
         );
         $this->assertAttributeEquals(
-            array(
-                $fooEntityName => array($fooType => array()),
-                $barEntityName => array($barType => array($barAlias => $barProcessor)),
-            ),
+            [
+                $fooEntityName => [$fooType => []],
+                $barEntityName => [$barType => [$barAlias => $barProcessor]],
+            ],
             'processorsByEntity',
             $this->registry
         );
@@ -128,7 +138,7 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->registerProcessor($barProcessor, $type, $entityName, $barAlias);
 
         $this->assertEquals(
-            array($fooAlias => $fooProcessor, $barAlias => $barProcessor),
+            [$fooAlias => $fooProcessor, $barAlias => $barProcessor],
             $this->registry->getProcessorsByEntity($type, $entityName)
         );
     }
@@ -136,7 +146,7 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetProcessorsByEntityUnknown()
     {
         $this->assertEquals(
-            array(),
+            [],
             $this->registry->getProcessorsByEntity('unknown', 'unknown')
         );
     }
@@ -144,7 +154,7 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
     public function testGetProcessorAliasesByEntityUnknown()
     {
         $this->assertEquals(
-            array(),
+            [],
             $this->registry->getProcessorAliasesByEntity('unknown', 'unknown')
         );
     }
@@ -162,7 +172,7 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->registerProcessor($barProcessor, $type, $entityName, $barAlias);
 
         $this->assertEquals(
-            array($fooAlias, $barAlias),
+            [$fooAlias, $barAlias],
             $this->registry->getProcessorAliasesByEntity($type, $entityName)
         );
     }
@@ -188,5 +198,95 @@ class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
         $type = ProcessorRegistry::TYPE_IMPORT;
         $alias = 'foo_alias';
         $this->registry->getProcessorEntityName($type, $alias);
+    }
+
+    /**
+     * @param array  $processors
+     * @param string $type
+     * @param array  $expected
+     *
+     * @dataProvider processorsByTypeDataProvider
+     */
+    public function testGetProcessorsByType(array $processors, $type, array $expected)
+    {
+
+        foreach ($processors as $processorType => $processorsByType) {
+            foreach ($processorsByType as $processorName => $processor) {
+                $this->registry->registerProcessor($processor, $processorType, '\stdClass', $processorName);
+            }
+        }
+
+        $this->assertEquals(
+            $expected,
+            $this->registry->getProcessorsByType($type)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function processorsByTypeDataProvider()
+    {
+        $processor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface');
+
+        return [
+            [
+                [
+                    ProcessorRegistry::TYPE_IMPORT            => [
+                        'processor1' => $processor,
+                        'processor2' => $processor,
+                    ],
+                    ProcessorRegistry::TYPE_IMPORT_VALIDATION => [
+                        'processor3' => $processor,
+                        'processor4' => $processor,
+                    ],
+                    ProcessorRegistry::TYPE_EXPORT            => [
+                        'processor5' => $processor,
+                        'processor6' => $processor,
+                    ]
+                ],
+                ProcessorRegistry::TYPE_IMPORT,
+                [
+                    'processor1' => $processor,
+                    'processor2' => $processor,
+                ]
+            ],
+            [
+                [
+                    ProcessorRegistry::TYPE_IMPORT            => [
+                        'processor1' => $processor,
+                        'processor2' => $processor,
+                    ],
+                    ProcessorRegistry::TYPE_IMPORT_VALIDATION => [
+                        'processor3' => $processor,
+                        'processor4' => $processor,
+                    ],
+                    ProcessorRegistry::TYPE_EXPORT            => [
+                        'processor5' => $processor,
+                        'processor6' => $processor,
+                    ]
+                ],
+                ProcessorRegistry::TYPE_IMPORT_VALIDATION,
+                [
+                    'processor3' => $processor,
+                    'processor4' => $processor,
+                ]
+            ],
+            [
+                [],
+                ProcessorRegistry::TYPE_IMPORT_VALIDATION,
+                []
+            ],
+            [
+                [
+                    ProcessorRegistry::TYPE_EXPORT => [
+                        'processor5' => $processor,
+                        'processor6' => $processor,
+                    ]
+                ],
+                'non_existing_type',
+                []
+            ]
+        ];
     }
 }

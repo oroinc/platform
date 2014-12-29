@@ -69,7 +69,8 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             ]
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             this.listenTo(this.model, 'destroy', this.remove);
 
             var template = this.options.template || $('#transition-form-template').html();
@@ -226,12 +227,13 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
         },
 
         renderWidget: function() {
+            var widget = this;
             if (!this.widget) {
                 var title = this.model.get('name') ? __('Edit transition') : __('Add new transition');
                 if (this.model.get('_is_clone')) {
                     title = __('Clone transition');
                 }
-                this.widget = new DialogWidget({
+                this.widget = widget = new DialogWidget({
                     'title': title,
                     'el': this.$el,
                     'stateEnabled': false,
@@ -243,7 +245,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
                     }
                 });
                 this.listenTo(this.widget, 'renderComplete', function(el) {
-                    mediator.trigger('layout.init', el);
+                    mediator.execute('layout:init', el, widget);
                 });
                 this.widget.render();
             } else {
@@ -280,7 +282,13 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
             var form = $(this.template(data));
 
             this.renderAddAttributeForm(form);
-            this.renderAttributesList(form);
+            if (this.options.workflow.entityFieldsInitialized) {
+                this.renderAttributesList(form);
+            } else {
+                this.listenTo(this.options.workflow, 'entityFieldsInitialize', _.bind(function() {
+                    this.renderAttributesList(form);
+                }, this));
+            }
 
             this.$el.append(form);
 

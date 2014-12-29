@@ -8,8 +8,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -71,7 +71,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                         'type' => 'integer'
                     ],
                     'field2' => [
-                        'type' => 'string',
+                        'type'    => 'string',
                         'configs' => [
                             'extend' => [
                                 'length' => 200
@@ -79,7 +79,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                         ]
                     ],
                     'field3' => [
-                        'type' => 'text',
+                        'type'    => 'text',
                         'configs' => [
                             'extend' => [
                                 'length' => null
@@ -115,7 +115,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $configs = [
             self::CLASS_NAME => [
                 'configs' => [],
-                'fields' => [
+                'fields'  => [
                     'field1' => [
                         'type' => 'integer'
                     ]
@@ -136,24 +136,43 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testModificationOfNonExtendEntity()
     {
         $configs = [
-            self::CLASS_NAME => [
+            self::CLASS_NAME                      => [
                 'configs' => [
-                    'entity' => [
+                    'entity'   => [
                         'icon' => 'icon1'
+                    ],
+                    'append' => [
+                        'attr1' => ['newItem'],
+                        'attr2' => 'newItem',
+                        'attr3' => ['newItem'],
                     ]
                 ]
+            ],
+            ExtendConfigProcessor::APPEND_CONFIGS => [
+                self::CLASS_NAME => [
+                    'configs' => [
+                        'append' => ['attr1', 'attr2', 'attr3']
+                    ]
+                ],
             ]
         ];
 
-        $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
-        $entityConfigEntity = $this->createConfig('entity', self::CLASS_NAME);
+        $extendConfigEntity   = $this->createConfig('extend', self::CLASS_NAME);
+        $entityConfigEntity   = $this->createConfig('entity', self::CLASS_NAME);
+        $appendConfigEntity = $this->createConfig('append', self::CLASS_NAME);
+        $appendConfigEntity->set('attr1', ['existingItem']);
+        $appendConfigEntity->set('attr2', ['existingItem']);
 
         // config providers configuration
-        $extendConfigProvider = $this->getConfigProviderMock();
-        $entityConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider   = $this->getConfigProviderMock();
+        $entityConfigProvider   = $this->getConfigProviderMock();
+        $appendConfigProvider = $this->getConfigProviderMock();
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->will(
@@ -161,6 +180,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                     [
                         ['extend', $extendConfigProvider],
                         ['entity', $entityConfigProvider],
+                        ['append', $appendConfigProvider],
                     ]
                 )
             );
@@ -192,6 +212,15 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+        $appendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::CLASS_NAME, null, $appendConfigEntity],
+                    ]
+                )
+            );
 
         $this->configManager->expects($this->once())
             ->method('flush');
@@ -199,18 +228,26 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
 
         $this->assertEquals(
-            ['state' => ExtendScope::STATE_UPDATED],
+            ['state' => ExtendScope::STATE_UPDATE],
             $extendConfigEntity->all()
         );
         $this->assertEquals(
             ['icon' => 'icon1'],
             $entityConfigEntity->all()
         );
+        $this->assertEquals(
+            [
+                'attr1' => ['existingItem', 'newItem'],
+                'attr2' => ['existingItem', 'newItem'],
+                'attr3' => ['newItem'],
+            ],
+            $appendConfigEntity->all()
+        );
     }
 
     public function testCreateCustomEntity()
     {
-        $testClassName = ExtendConfigDumper::ENTITY . 'TestEntity';
+        $testClassName = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
         $configs       = [
             $testClassName => [
                 'configs' => [
@@ -303,7 +340,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                         'type'    => 'string',
                         'configs' => [
                             'extend' => [
-                                'extend' => true
+                                'is_extend' => true
                             ],
                         ]
                     ],
@@ -369,7 +406,6 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
-        $extendConfigEntity->set('extend', true);
         $extendConfigEntity->set('is_extend', true);
         $extendConfigField   = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
@@ -427,7 +463,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
 
         $this->assertEquals(
-            ['extend' => true, 'is_extend' => true],
+            ['is_extend' => true],
             $extendConfigEntity->all()
         );
         $this->assertEquals(
@@ -462,7 +498,6 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
-        $extendConfigEntity->set('extend', true);
         $extendConfigEntity->set('is_extend', true);
         $extendConfigField   = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
         $datagridConfigField = $this->createConfig('datagrid', self::CLASS_NAME, $testFieldName, 'string');
@@ -527,11 +562,11 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $this->generator->processConfigs($configs);
 
         $this->assertEquals(
-            ['extend' => true, 'is_extend' => true],
+            ['is_extend' => true],
             $extendConfigEntity->all()
         );
         $this->assertEquals(
-            ['state' => ExtendScope::STATE_UPDATED, 'owner' => ExtendScope::OWNER_CUSTOM],
+            ['state' => ExtendScope::STATE_UPDATE, 'owner' => ExtendScope::OWNER_CUSTOM],
             $extendConfigField->all()
         );
         $this->assertEquals(

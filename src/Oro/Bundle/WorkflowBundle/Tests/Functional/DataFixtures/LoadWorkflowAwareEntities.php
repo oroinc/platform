@@ -3,13 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 
-class LoadWorkflowAwareEntities extends AbstractFixture
+class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixtureInterface
 {
     const COUNT = 20;
 
@@ -59,5 +60,13 @@ class LoadWorkflowAwareEntities extends AbstractFixture
                 ->setWorkflowStep($workflowItem->getCurrentStep());
         }
         $manager->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDependencies()
+    {
+        return array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions');
     }
 }

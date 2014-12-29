@@ -20,20 +20,20 @@ function(_, Backbone, AttributeFormOptionRowView) {
             entity_field_template: null
         },
 
-        initialize: function() {
+        initialize: function (options) {
+            this.options = _.defaults(options || {}, this.options);
             var template = this.options.template || $('#attribute-form-option-list-template').html();
             this.template = _.template(template);
             this.rowViews = {};
             this.rowViewsByAttribute = {};
             this.$listElBody = null;
 
-            this.fieldUtil = this.options.fields_selector_el.data('oroentity-fieldChoice').entityFieldUtil;
             this.entityFieldTemplate = _.template(
                 this.options.entity_field_template || $('#entity-column-chain-template').html()
             );
 
             this.listenTo(this.options.workflow, 'pathMappingInit', this.render);
-            if (this.options.workflow.pathMappingInitialized) {
+            if (this.options.workflow.entityFieldsInitialized) {
                 this.render();
             }
         },
@@ -55,13 +55,13 @@ function(_, Backbone, AttributeFormOptionRowView) {
                 this.getCollection().push(data);
             }
             var fieldId = this.options.workflow.getFieldIdByPropertyPath(data.property_path);
+            var $fieldChoice = this.options.fields_selector_el;
             data.isSystemLabel = !data.label;
             if (fieldId) {
-                var pathData = this.fieldUtil.splitFieldId(fieldId);
                 if (!data.label) {
-                    data.label = _.last(pathData).label;
+                    data.label = _.last($fieldChoice.fieldChoice('splitFieldId', fieldId)).field.label;
                 }
-                data.entityField = this.entityFieldTemplate(pathData);
+                data.entityField = $fieldChoice.fieldChoice('formatChoice', fieldId, this.entityFieldTemplate);
             } else {
                 if (!data.label && data.attribute_name) {
                     var attribute = this.options.workflow.getAttributeByName(data.attribute_name);
@@ -89,6 +89,9 @@ function(_, Backbone, AttributeFormOptionRowView) {
                     var i = collection.length - 1;
                     while (i >= 0) {
                         if (collection[i].attribute_name == data.attribute_name) {
+                            if (this.rowViewsByAttribute.hasOwnProperty(data.attribute_name)) {
+                                delete this.rowViewsByAttribute[data.attribute_name];
+                            }
                             collection.splice(i, 1);
                         }
                         i--;

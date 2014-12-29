@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
 
@@ -53,6 +54,9 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         // batch remove should be processed in transaction
         $this->entityManager->beginTransaction();
         try {
+            // if huge amount data must be deleted
+            set_time_limit(0);
+
             foreach ($results as $result) {
                 /** @var $result ResultRecordInterface */
                 $entity = $result->getRootEntity();
@@ -72,20 +76,15 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
 
                     $iteration++;
                     if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
-                        $this->entityManager->flush();
-                        if ($this->entityManager->getConnection()->getTransactionNestingLevel() == 1) {
-                            $this->entityManager->clear();
-                        }
+                        $this->finishBatch();
                     }
                 }
             }
 
             if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-                $this->entityManager->flush();
-                if ($this->entityManager->getConnection()->getTransactionNestingLevel() == 1) {
-                    $this->entityManager->clear();
-                }
+                $this->finishBatch();
             }
+
             $this->entityManager->commit();
         } catch (\Exception $e) {
             $this->entityManager->rollback();
@@ -93,6 +92,17 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         }
 
         return $this->getResponse($args, $iteration);
+    }
+
+    /**
+     * Finish processed batch
+     */
+    protected function finishBatch()
+    {
+        $this->entityManager->flush();
+        if ($this->entityManager->getConnection()->getTransactionNestingLevel() == 1) {
+            $this->entityManager->clear();
+        }
     }
 
     /**
@@ -124,14 +134,14 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      * @param MassActionHandlerArgs $args
      *
      * @return string
-     * @throws \LogicException
+     * @throws LogicException
      */
     protected function getEntityName(MassActionHandlerArgs $args)
     {
         $massAction = $args->getMassAction();
         $entityName = $massAction->getOptions()->offsetGet('entity_name');
         if (!$entityName) {
-            throw new \LogicException(sprintf('Mass action "%s" must define entity name', $massAction->getName()));
+            throw new LogicException(sprintf('Mass action "%s" must define entity name', $massAction->getName()));
         }
 
         return $entityName;
@@ -140,7 +150,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     /**
      * @param MassActionHandlerArgs $args
      *
-     * @throws \LogicException
+     * @throws LogicException
      * @return string
      */
     protected function getEntityIdentifierField(MassActionHandlerArgs $args)
@@ -148,7 +158,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
         $massAction = $args->getMassAction();
         $identifier = $massAction->getOptions()->offsetGet('data_identifier');
         if (!$identifier) {
-            throw new \LogicException(sprintf('Mass action "%s" must define identifier name', $massAction->getName()));
+            throw new LogicException(sprintf('Mass action "%s" must define identifier name', $massAction->getName()));
         }
 
         // if we ask identifier that's means that we have plain data in array

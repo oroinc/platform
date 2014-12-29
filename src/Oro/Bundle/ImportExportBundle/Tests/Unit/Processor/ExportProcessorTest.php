@@ -149,4 +149,17 @@ class ExportProcessorTest extends \PHPUnit_Framework_TestCase
         $this->processor->setDataConverter($dataConverter);
         $this->processor->setImportExportContext($this->context);
     }
+
+    public function testSetEntityName()
+    {
+        $entityName = 'TestEntity';
+
+        $dataConverter
+            = $this->getMock('Oro\Bundle\ImportExportBundle\Tests\Unit\Converter\Stub\EntityNameAwareDataConverter');
+        $dataConverter->expects($this->once())->method('setEntityName')->with($entityName);
+
+        $this->processor->setDataConverter($dataConverter);
+        $this->processor->setEntityName($entityName);
+        $this->assertAttributeEquals($entityName, 'entityName', $this->processor);
+    }
 }

@@ -3,11 +3,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 /**
  * @ORM\Table(name="test_search_item")
  * @ORM\Entity
  */
-class Item
+class Item implements TestFrameworkEntityInterface
 {
     /**
      * @ORM\Id
@@ -31,7 +33,7 @@ class Item
     protected $integerValue;
 
     /**
-     * @var decimal $decimalValue
+     * @var float $decimalValue
      *
      * @ORM\Column(name="decimalValue", type="decimal", scale=2, nullable=true)
      */
@@ -52,7 +54,7 @@ class Item
     protected $booleanValue;
 
     /**
-     * @var blob $blobValue
+     * @var string $blobValue
      *
      * @ORM\Column(name="blobValue", type="blob", nullable=true)
      */
@@ -66,14 +68,14 @@ class Item
     protected $arrayValue;
 
     /**
-     * @var datetime $arrayValue
+     * @var \DateTime $arrayValue
      *
      * @ORM\Column(name="datetimeValue", type="datetime", nullable=true)
      */
     protected $datetimeValue;
 
     /**
-     * @var guid $arrayValue
+     * @var string $arrayValue
      *
      * @ORM\Column(name="guidValue", type="guid", nullable=true)
      */
@@ -87,11 +89,26 @@ class Item
     protected $objectValue;
 
     /**
-     * @var Value
+     * @var ItemValue
      *
      * @ORM\OneToMany(targetEntity="ItemValue", mappedBy="entity", cascade={"persist", "remove"})
      */
     protected $values;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="phone1", type="string", nullable=true)
+     */
+    protected $phone;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
 
     public function __set($name, $value)
     {

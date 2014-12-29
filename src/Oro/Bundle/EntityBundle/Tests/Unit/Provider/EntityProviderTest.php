@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
@@ -53,12 +54,16 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
         $translator->expects($this->any())
             ->method('trans')
             ->will($this->returnArgument(0));
+
+        $exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
+
         $this->provider = new EntityProvider(
             $this->entityConfigProvider,
             $this->extendConfigProvider,
             $this->entityClassResolver,
             $translator
         );
+        $this->provider->setExclusionProvider($exclusionProvider);
     }
 
     public function testGetEntity()
@@ -142,6 +147,30 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $map = [
+            $entityClassName1 => $entityConfig1,
+            $entityClassName2 => $entityConfig2,
+            $entityClassName3 => $entityConfig3,
+            $entityClassName4 => $entityConfig4,
+            $entityClassName5 => $entityConfig5,
+        ];
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigById')
+            ->will(
+                $this->returnCallback(
+                    function (EntityConfigId $configId) use ($map) {
+                        $className = $configId->getClassName();
+
+                        /** @var ConfigInterface $config */
+                        $config = $map[$className];
+                        $config->set('state', ExtendScope::STATE_ACTIVE);
+
+                        return $config;
+                    }
+                )
+            );
+
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfig')
             ->will(
@@ -155,6 +184,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
+
         $this->entityConfigProvider->expects($this->any())
             ->method('getConfigs')
             ->will(
@@ -178,7 +208,7 @@ class EntityProviderTest extends \PHPUnit_Framework_TestCase
                             $this->extendConfig->set('state', ExtendScope::STATE_NEW);
                         }
                         if ($param == 'Acme\Entity\Test4') {
-                            $this->extendConfig->set('state', ExtendScope::STATE_DELETED);
+                            $this->extendConfig->set('state', ExtendScope::STATE_DELETE);
                         }
                         return $this->extendConfig;
                     }

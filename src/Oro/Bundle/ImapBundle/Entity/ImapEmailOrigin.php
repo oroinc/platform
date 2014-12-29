@@ -28,7 +28,7 @@ class ImapEmailOrigin extends EmailOrigin
     protected $port;
 
     /**
-     * The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tsl'
+     * The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tls'
      *
      * @var string
      *
@@ -111,7 +111,7 @@ class ImapEmailOrigin extends EmailOrigin
     /**
      * Sets the SSL type to be used to connect to IMAP server
      *
-     * @param string $ssl Can be empty string, 'ssl' or 'tsl'
+     * @param string $ssl Can be empty string, 'ssl' or 'tls'
      * @return ImapEmailOrigin
      */
     public function setSsl($ssl)
@@ -165,5 +165,15 @@ class ImapEmailOrigin extends EmailOrigin
         $this->password = $password;
 
         return $this;
+    }
+
+    /**
+     * Get a human-readable representation of this object.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return sprintf('%s (%s)', $this->user, $this->host);
     }
 }

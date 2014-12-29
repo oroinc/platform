@@ -1,0 +1,76 @@
+oro:
+    tracking:
+        trackingwebsite:
+            entity_label:        Tracking Website
+            entity_plural_label: Tracking Websites
+            entity_description:  Websites for tracking
+
+            id.label:            Id
+            name.label:          Name
+            identifier.label:    Identifier
+            url.label:           Url
+            owner.label:         Owner
+            organization.label:  Organization
+
+            saved_message: Tracking Website saved
+
+        trackingevent:
+            entity_label:        Tracking Event
+            entity_plural_label: Tracking Events
+            entity_description:  Tracked events
+
+            id.label:             Id
+            title.label:          Title
+            name.label:           Name
+            value.label:          Value
+            userIdentifier.label: User
+            url.label:            Url
+            website.label:        Website
+            code.label:           Code
+            logged_at.label:      Logged At
+            user_identifier.label: User Id
+
+        trackingdata:
+            entity_label:        Tracking Data
+            entity_plural_label: Tracking Data
+            entity_description:  Tracked raw data
+
+            data.label:       Data
+            event.label:      Event
+            id.label:         Id
+
+        block:
+            general:    General
+            additional: Additional
+            tracking:   Tracking Code
+            events:     Events
+
+        help:
+            event_tooltip: |
+                Make sure this code is on every page of your website before the </body> tag.
+                To track custom events, please uncomment the trackEvent string and replace
+                [name], [value], and [user_identifier] parameters with your values.
+                The script will log an event with the [name] name and optional [value].
+            secure: |
+                To enable tracking on secure (HTTPS) websites HTTPS should also be enabled
+                on the OroCRM web server.
+
+        website_configuration: Tracking websites
+
+        system_configuration:
+            groups:
+                tracking.title: 'Tracking'
+                tracking_settings.title: 'Tracking settings'
+            fields:
+                dynamic_tracking_enabled.label: 'Enable dynamic tracking'
+                log_rotate_interval:
+                    label: 'Log Rotation Interval'
+                    choices:
+                        60: '1 hour'
+                        30: '30 minutes'
+                        20: '20 minutes'
+                        15: '15 minutes'
+                        10: '10 minutes'
+                        5:  '5 minutes'
+                piwik_host.label: 'Piwik Host'
+                piwik_token_auth.label: 'Piwik Token Auth'

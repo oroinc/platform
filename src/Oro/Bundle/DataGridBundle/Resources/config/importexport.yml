@@ -29,4 +29,3 @@ services:
         class: %oro_datagrid.importexport.export_connector.class%
         arguments:
             - @oro_datagrid.datagrid.manager.link
-            - @oro_datagrid.datagrid.request_params

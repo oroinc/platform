@@ -23,7 +23,7 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * SetUp test environment
      */
-    public function setUp()
+    protected function setUp()
     {
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $this->formBuilder = $this->getMock('Symfony\Component\Form\FormFactoryInterface');

@@ -1,9 +1,8 @@
 parameters:
-    oro.embedded_form.form_type.available_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
-    oro_embedded_form.manager.class: Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
-    oro_embedded_form.back_link.twig.extension.class: Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
-    oro_embedded_form.form_type.channel_aware_form.class: Oro\Bundle\EmbeddedFormBundle\Form\Type\ChannelAwareFormType
-    oro_embedded_form.channel_related_data_delete_provider.class: Oro\Bundle\EmbeddedFormBundle\Manager\ChannelRelatedDataDeleteProvider
+    oro.embedded_form.form_type.available_form.class:        Oro\Bundle\EmbeddedFormBundle\Form\Type\AvailableEmbeddedFormType
+    oro_embedded_form.manager.class:                         Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager
+    oro_embedded_form.back_link.twig.extension.class:        Oro\Bundle\EmbeddedFormBundle\Twig\BackLinkExtension
+    oro_embedded_form.form_type.class:                       Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormType
 services:
     oro_embedded_form.form_type.available_embedded_form:
         class: %oro.embedded_form.form_type.available_form.class%
@@ -11,11 +10,6 @@ services:
             - @oro_embedded_form.manager
         tags:
             - { name: form.type, alias: oro_available_embedded_forms }
-
-    oro_embedded_form.form_type.channel_aware_form:
-        class: %oro_embedded_form.form_type.channel_aware_form.class%
-        tags:
-            - { name: form.type, alias: oro_channel_aware_form}
 
     oro_embedded_form.manager:
         class: %oro_embedded_form.manager.class%
@@ -31,9 +25,7 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_embedded_form.channel_related_data_delete_provider:
-        class: %oro_embedded_form.channel_related_data_delete_provider.class%
-        arguments:
-            - @doctrine.orm.entity_manager
+    oro_embedded_form.form_type:
+        class: %oro_embedded_form.form_type.class%
         tags:
-            - { name: oro_integration.channel_delete_provider }
+            - { name: form.type, alias: embedded_form }

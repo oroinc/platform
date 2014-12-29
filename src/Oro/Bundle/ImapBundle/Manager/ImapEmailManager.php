@@ -2,34 +2,44 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Oro\Bundle\ImapBundle\Connector\ImapConnector;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
-use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
-use Oro\Bundle\ImapBundle\Manager\DTO\Email;
-use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
-use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Zend\Mail\Headers;
 use Zend\Mail\Header\HeaderInterface;
 use Zend\Mail\Header\AbstractAddressList;
 use Zend\Mail\Address\AddressInterface;
 use Zend\Mail\Storage\Exception as MailException;
+
+use Oro\Bundle\ImapBundle\Connector\ImapConnector;
+use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
+use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
+use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
+use Oro\Bundle\ImapBundle\Manager\DTO\Email;
+use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
+use Oro\Bundle\ImapBundle\Util\DateTimeParser;
 
 class ImapEmailManager
 {
-    /**
-     * @var ImapConnector
-     */
+    /** @var ImapConnector */
     protected $connector;
 
     /**
-     * Constructor
-     *
      * @param ImapConnector $connector
      */
     public function __construct(ImapConnector $connector)
     {
         $this->connector = $connector;
+    }
+
+    /**
+     * Checks if IMAP server supports the given capability
+     *
+     * @param string $capability
+     *
+     * @return bool
+     */
+    public function hasCapability($capability)
+    {
+        return in_array($capability, $this->connector->getCapability());
     }
 
     /**
@@ -76,7 +86,8 @@ class ImapEmailManager
      * Retrieve folders
      *
      * @param string|null $parentFolder The global name of a parent folder.
-     * @param bool $recursive True to get all subordinate folders
+     * @param bool        $recursive    True to get all subordinate folders
+     *
      * @return Folder[]
      */
     public function getFolders($parentFolder = null, $recursive = false)
@@ -88,6 +99,7 @@ class ImapEmailManager
      * Retrieve emails by the given criteria
      *
      * @param SearchQuery $query
+     *
      * @return ImapEmailIterator
      */
     public function getEmails(SearchQuery $query = null)
@@ -102,6 +114,7 @@ class ImapEmailManager
      * Retrieve email by its UID
      *
      * @param int $uid The UID of an email message
+     *
      * @return Email|null An Email DTO or null if an email with the given UID was not found
      */
     public function findEmail($uid)
@@ -119,12 +132,13 @@ class ImapEmailManager
      * Creates Email DTO for the given email message
      *
      * @param Message $msg
+     *
      * @return Email
      */
     public function convertToEmail(Message $msg)
     {
         $headers = $msg->getHeaders();
-        $email = new Email($msg);
+        $email   = new Email($msg);
         $email
             ->setId(
                 new ItemId(
@@ -158,7 +172,8 @@ class ImapEmailManager
      * Gets a string representation of an email header
      *
      * @param Headers $headers
-     * @param string $name
+     * @param string  $name
+     *
      * @return string
      */
     protected function getString(Headers $headers, $name)
@@ -175,17 +190,15 @@ class ImapEmailManager
      * Gets an email header as DateTime type
      *
      * @param Headers $headers
-     * @param string $name
+     * @param string  $name
+     *
      * @return \DateTime
      */
     protected function getDateTime(Headers $headers, $name)
     {
         $val = $headers->get($name);
         if ($val instanceof HeaderInterface) {
-            $dt = new \DateTime($val->getFieldValue());
-            $dt->setTimezone(new \DateTimeZone('UTC'));
-
-            return $dt;
+            return $this->convertToDateTime($val->getFieldValue());
         }
 
         return new \DateTime('0001-01-01', new \DateTimeZone('UTC'));
@@ -195,6 +208,7 @@ class ImapEmailManager
      * Gets DateTime when an email is received
      *
      * @param Headers $headers
+     *
      * @return \DateTime
      */
     protected function getReceivedAt(Headers $headers)
@@ -211,10 +225,8 @@ class ImapEmailManager
         $delim = strrpos($str, ';');
         if ($delim !== false) {
             $str = trim(preg_replace('@[\r\n]+@', '', substr($str, $delim + 1)));
-            $dt = new \DateTime($str);
-            $dt->setTimezone(new \DateTimeZone('UTC'));
 
-            return $dt;
+            return $this->convertToDateTime($str);
         }
 
         return new \DateTime('0001-01-01', new \DateTimeZone('UTC'));
@@ -224,13 +236,14 @@ class ImapEmailManager
      * Get an email recipients
      *
      * @param Headers $headers
-     * @param string $name
+     * @param string  $name
+     *
      * @return string[]
      */
     protected function getRecipients(Headers $headers, $name)
     {
         $result = array();
-        $val = $headers->get($name);
+        $val    = $headers->get($name);
         if ($val instanceof AbstractAddressList) {
             /** @var AddressInterface $addr */
             foreach ($val->getAddressList() as $addr) {
@@ -245,6 +258,7 @@ class ImapEmailManager
      * Gets an email importance
      *
      * @param Headers $headers
+     *
      * @return integer
      */
     protected function getImportance(Headers $headers)
@@ -275,5 +289,19 @@ class ImapEmailManager
         }
 
         return 0;
+    }
+
+    /**
+     * Convert a string to DateTime
+     *
+     * @param string $value
+     *
+     * @return \DateTime
+     *
+     * @throws \Exception
+     */
+    protected function convertToDateTime($value)
+    {
+        return DateTimeParser::parse($value);
     }
 }

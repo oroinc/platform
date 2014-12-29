@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Selenium;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntity;
+use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 
 /**
@@ -19,15 +22,18 @@ class EntityTest extends Selenium2TestCase
         $entityName = 'Entity'.mt_rand();
 
         $login = $this->login();
+        /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
+            ->assertTitle('Entity Management - Entities - System')
             ->add()
-            ->assertTitle('New Entity - Entities - System')
+            ->assertTitle('New Entity - Entity Management - Entities - System')
             ->setName($entityName)
             ->setLabel($entityName)
             ->setPluralLabel($entityName)
             ->save()
             ->assertMessage('Entity saved')
             ->createField()
+            ->setStorageType('Table column')
             ->setFieldName('test_field')
             ->setType('String')
             ->proceed()
@@ -49,15 +55,17 @@ class EntityTest extends Selenium2TestCase
     {
         $newEntityName = 'Update' . $entityName;
         $login = $this->login();
+        /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            //->filterBy('Label', $entityName)
+            ->filterBy('Name', $entityName)
             ->open(array($entityName))
             ->edit()
             ->setLabel($newEntityName)
             ->save()
             ->assertMessage('Entity saved')
-            ->assertTitle($newEntityName .' - Entities - System')
+            ->assertTitle($newEntityName .' - Entity Management - Entities - System')
             ->createField()
+            ->setStorageType('Table column')
             ->setFieldName('test_field2')
             ->setType('Integer')
             ->proceed()
@@ -76,11 +84,13 @@ class EntityTest extends Selenium2TestCase
     public function testEntityFieldsAvailability($entityName)
     {
         $login = $this->login();
+        /** @var Navigation $login */
         $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
             ->menu($entityName)
             ->open()
+            /** @var ConfigEntity $login */
             ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
             ->checkEntityField('test_field')
@@ -88,19 +98,24 @@ class EntityTest extends Selenium2TestCase
     }
 
     /**
+     * @depends testCreateEntity
      * @depends testUpdateEntity
      * @param $entityName
+     * @param $entityUpdateName
      */
-    public function testDeleteEntity($entityName)
+    public function testDeleteEntity($entityName, $entityUpdateName)
     {
         $login = $this->login();
+        /** @var ConfigEntities $login */
         $entityExist = $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            //->filterBy('Label', $entityName)
+            ->filterBy('Name', $entityName)
             ->deleteEntity(array($entityName), 'Remove')
-            ->assertMessage('Item was removed')
+            ->assertMessage('Item deleted')
             ->open(array($entityName))
+            ->assertTitle($entityUpdateName . ' - Entity Management - Entities - System')
             ->updateSchema()
             ->assertMessage('Schema updated')
+            ->assertTitle('Entity Management - Entities - System')
             ->close()
             ->entityExists(array($entityName));
 

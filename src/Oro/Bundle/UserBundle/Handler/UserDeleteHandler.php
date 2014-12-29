@@ -3,11 +3,24 @@
 namespace Oro\Bundle\UserBundle\Handler;
 
 use Doctrine\Common\Persistence\ObjectManager;
+
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 class UserDeleteHandler extends DeleteHandler
 {
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /**
+     * @param SecurityFacade $securityFacade
+     */
+    public function setSecurityFacade(SecurityFacade $securityFacade)
+    {
+        $this->securityFacade = $securityFacade;
+    }
+
     /**
      * {@inheritdoc}
      */

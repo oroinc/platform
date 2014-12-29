@@ -13,7 +13,7 @@ class EntityNameProviderTest extends \PHPUnit_Framework_TestCase
     /** @var AbstractQueryDesigner|\PHPUnit_Framework_MockObject_MockObject */
     protected $entity;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->entity = $this->getMockBuilder('Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner')
             ->setMethods(['getEntity'])

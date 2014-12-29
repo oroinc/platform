@@ -3,8 +3,11 @@
 namespace Oro\Bundle\DistributionBundle\EventListener;
 
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
+
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+
+use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 
 class NavigationListener
 {
@@ -14,18 +17,33 @@ class NavigationListener
     protected $securityContext;
 
     /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * @var string
      */
     protected $entryPoint;
 
     /**
      * @param SecurityContextInterface $securityContext
-     * @param null|string $entryPoint
+     * @param null|string              $entryPoint
      */
-    public function __construct(SecurityContextInterface $securityContext, $entryPoint = null)
-    {
+    public function __construct(
+        SecurityContextInterface $securityContext,
+        $entryPoint = null
+    ) {
         $this->securityContext = $securityContext;
-        $this->entryPoint = $entryPoint;
+        $this->entryPoint      = $entryPoint;
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -40,17 +58,25 @@ class NavigationListener
             return;
         }
 
+        $uri = '/' . $this->entryPoint;
+
+        if ($this->request) {
+            $uri = $this->request->getBasePath() . $uri;
+        }
+
         /** @var ItemInterface $systemTabMenuItem */
         $systemTabMenuItem = $event->getMenu()->getChild('system_tab');
         if ($systemTabMenuItem) {
             $systemTabMenuItem->addChild(
                 'package_manager',
                 [
-                    'label' => 'Package Manager',
-                    'uri' => $this->entryPoint,
-                    'linkAttributes' => ['class' => 'no-hash']
+                    'label'          => 'oro.distribution.package_manager.label',
+                    'uri'            => $uri,
+                    'linkAttributes' => ['class' => 'no-hash'],
+                    'extras'         => ['position' => '110'],
                 ]
             );
+
         }
     }
 }

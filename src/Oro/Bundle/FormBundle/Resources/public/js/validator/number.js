@@ -44,9 +44,10 @@ define(['underscore', 'orotranslation/js/translator'
             var result = between(Number(value), param.min, param.max);
             return result === true;
         },
-        function (param, element, value) {
+        function (param, element, value, placeholders) {
             var result,
-                message, placeholders = {}, number;
+                message,
+                number;
             param = _.extend({}, defaultParam, param);
             value = _.isUndefined(value) ? this.elementValue(element) : value;
             result = between(Number(value), param.min, param.max);
@@ -66,7 +67,13 @@ define(['underscore', 'orotranslation/js/translator'
                 default:
                     return '';
             }
+            if (_.isUndefined(placeholders)) {
+                placeholders = {};
+            }
             placeholders.limit = number;
+            if (_.isUndefined(placeholders.value)) {
+                placeholders.value = value;
+            }
             return __(message, placeholders, number);
         }
     ];

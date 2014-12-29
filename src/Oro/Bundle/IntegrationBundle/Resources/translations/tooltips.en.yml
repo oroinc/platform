@@ -1,0 +1,8 @@
+oro.integration.integration.sync_priority.tooltip: >
+    Select if your local version of the data or the remote application
+    data get priority in the case that both were updated since the last sync process.
+oro.integration.integration.default_user_owner.tooltip: >
+    Select the owner of the integration. All entities imported from the integration
+    will be assigned to the selected user.
+oro.integration.integration.organization.tooltip: >
+    Select the organization for the integration.

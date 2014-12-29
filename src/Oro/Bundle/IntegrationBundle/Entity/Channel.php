@@ -5,30 +5,56 @@ namespace Oro\Bundle\IntegrationBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\DataGridBundle\Common\Object as ConfigObject;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\DataAuditBundle\Metadata\Annotation as Oro;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * @ORM\Table(name="oro_integration_channel")
+ * @ORM\Table(
+ *      name="oro_integration_channel",
+ *      indexes={
+ *          @ORM\Index(name="oro_integration_channel_name_idx",columns={"name"})
+ *      }
+ * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository")
  * @Config(
- *  routeName="oro_integration_channel_index",
- *  defaultValues={
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      routeName="oro_integration_index",
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="ORGANIZATION",
+ *              "owner_field_name"="organization",
+ *              "owner_column_name"="organization_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  * @Oro\Loggable()
  */
 class Channel
 {
+    const EDIT_MODE_ALLOW = 3;
+    const EDIT_MODE_RESTRICTED = 2;
+    const EDIT_MODE_DISALLOW = 1;
+
     /**
      * @var integer
      *
      * @ORM\Id
-     * @ORM\Column(type="smallint", name="id")
+     * @ORM\Column(type="integer", name="id")
      * @ORM\GeneratedValue(strategy="AUTO")
      */
     protected $id;
@@ -66,19 +92,73 @@ class Channel
     protected $connectors;
 
     /**
+     * @var ConfigObject
+     *
+     * @ORM\Column(name="synchronization_settings", type="object", nullable=false)
+     */
+    protected $synchronizationSettings;
+
+    /**
+     * @var ConfigObject
+     *
+     * @ORM\Column(name="mapping_settings", type="object", nullable=false)
+     */
+    protected $mappingSettings;
+
+    /**
+     * @var boolean
+    *
+    * @ORM\Column(name="enabled", type="boolean", nullable=true)
+    * @Oro\Versioned()
+    */
+    protected $enabled;
+
+    /**
+     * @var User
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
+     * @ORM\JoinColumn(name="default_user_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Oro\Versioned()
+     */
+    protected $defaultUserOwner;
+
+    /**
+     * @var Organization
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @Oro\Versioned()
+     */
+    protected $organization;
+
+    /**
      * @var Status[]|ArrayCollection
      *
      * Cascade persisting is not used due to lots of detach/merge
      * @ORM\OneToMany(targetEntity="Oro\Bundle\IntegrationBundle\Entity\Status",
-     *     cascade={"merge"}, orphanRemoval=true, mappedBy="channel"
+     *     cascade={"merge"}, orphanRemoval=true, mappedBy="channel", fetch="EXTRA_LAZY"
      * )
      * @ORM\OrderBy({"date" = "DESC"})
      */
     protected $statuses;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(
+     *     name="edit_mode",
+     *     type="integer",
+     *     nullable=false,
+     *     options={"default"=\Oro\Bundle\IntegrationBundle\Entity\Channel::EDIT_MODE_ALLOW})
+     * )
+     */
+    protected $editMode;
+
     public function __construct()
     {
-        $this->statuses = new ArrayCollection();
+        $this->statuses                = new ArrayCollection();
+        $this->synchronizationSettings = ConfigObject::create([]);
+        $this->mappingSettings         = ConfigObject::create([]);
+        $this->enabled                 = true;
+        $this->editMode                = self::EDIT_MODE_ALLOW;
     }
 
     /**
@@ -160,7 +240,7 @@ class Channel
     }
 
     /**
-     * @param [] $connectors
+     * @param array $connectors
      *
      * @return $this
      */
@@ -172,11 +252,63 @@ class Channel
     }
 
     /**
-     * @return []
+     * @return array
      */
     public function getConnectors()
     {
         return $this->connectors;
+    }
+
+    /**
+     * @param ConfigObject $synchronizationSettings
+     */
+    public function setSynchronizationSettings($synchronizationSettings)
+    {
+        $this->synchronizationSettings = $synchronizationSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getSynchronizationSettings()
+    {
+        return clone $this->synchronizationSettings;
+    }
+
+    /**
+     * NOTE: object type column are immutable when changes provided in object by reference
+     *
+     * @return ConfigObject
+     */
+    public function getSynchronizationSettingsReference()
+    {
+        return $this->synchronizationSettings;
+    }
+
+    /**
+     * @param ConfigObject $mappingSettings
+     */
+    public function setMappingSettings($mappingSettings)
+    {
+        $this->mappingSettings = $mappingSettings;
+    }
+
+    /**
+     * @return ConfigObject
+     */
+    public function getMappingSettings()
+    {
+        return clone $this->mappingSettings;
+    }
+
+    /**
+     * NOTE: object type column are immutable when changes provided in object by reference
+     *
+     * @return ConfigObject
+     */
+    public function getMappingSettingsReference()
+    {
+        return $this->mappingSettings;
     }
 
     /**
@@ -218,5 +350,83 @@ class Channel
                 return $connectorFilter && $codeFilter;
             }
         );
+    }
+
+    /**
+     * @param User $owner
+     *
+     * @return $this
+     */
+    public function setDefaultUserOwner(User $owner = null)
+    {
+        $this->defaultUserOwner = $owner;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getDefaultUserOwner()
+    {
+        return $this->defaultUserOwner;
+    }
+
+    /**
+     * @param Organization $organization
+     */
+    public function setOrganization($organization)
+    {
+        $this->organization = $organization;
+    }
+
+    /**
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * @param boolean $enabled
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
+     *
+     * @deprecated in favor of isEnabled since 1.4.1 will be removed in 1.6
+     * @return boolean
+     */
+    public function getEnabled()
+    {
+        return $this->isEnabled();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    /**
+     * @param int $editMode
+     */
+    public function setEditMode($editMode)
+    {
+        $this->editMode = $editMode;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEditMode()
+    {
+        return $this->editMode;
     }
 }

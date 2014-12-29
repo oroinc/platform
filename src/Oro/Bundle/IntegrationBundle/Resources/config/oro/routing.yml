@@ -3,8 +3,8 @@ oro_integration_bundle:
     type:         annotation
     prefix:       /
 
-oro_integration_bundle_channel_api:
-    resource: "@OroIntegrationBundle/Controller/Api/Rest/ChannelController.php"
+oro_integration_bundle_api:
+    resource: "@OroIntegrationBundle/Controller/Api/Rest/IntegrationController.php"
     type:     rest
     prefix:   api/rest/{version}/
     requirements:

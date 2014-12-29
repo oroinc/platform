@@ -1,5 +1,9 @@
 <div class="widget-content" id="import-validation">
     <style type="text/css">
+        #import-validation {
+            padding-bottom: 1px;
+        }
+
         .import-errors ol {
             height: 198px;
             overflow: auto;
@@ -27,8 +31,16 @@
             border-bottom: 1px solid #e5e5e5;
         }
     </style>
+
     <div class="validation-info">
-        <strong>{{ 'Import validation results'|trans }}</strong>
+        <strong>
+        {% if showStrategy %}
+            {{ 'Import validation results with strategy "%strategy%"'|trans({'%strategy%': ('oro.importexport.import.' ~ processorAlias)|trans}) }}
+        {% else %}
+            {{ 'Import validation results'|trans }}
+        {% endif %}
+        </strong>
+
         <table class="table table-condensed table-hover">
             <thead>
                 <tr>
@@ -114,7 +126,7 @@
         <div class="clearfix">
             <div class="pull-right">
                 <a href="javascript:void(0);" class="error-toggle">{{ 'Hide'|trans }}</a>
-                <a href="{{ errorsUrl }}" target="_blank" class="btn btn-small"><i class="icon-download-alt"></i>{{ 'Download log'|trans }}</a>
+                <a href="{{ errorsUrl }}" target="_blank" class="btn btn-small no-hash"><i class="icon-download-alt"></i>{{ 'Download log'|trans }}</a>
             </div>
         </div>
     </div>
@@ -122,7 +134,7 @@
 
     <script type="text/javascript">
         require(['jquery', 'orotranslation/js/translator', 'oroui/js/widget-manager', 'oroui/js/messenger'],
-        function($, __, WidgetManager, Messanger) {
+        function($, __, WidgetManager, Messenger) {
             var container = $('#import-validation');
             var toggleErrors = function(e) {
                 e.preventDefault();
@@ -147,10 +159,10 @@
                 });
                 widget.addAction('back', 'adopted', backAction);
 
-                {% if isSuccessful %}
+                {% if success %}
                     var importAction = $('<button type="button" class="btn btn-primary">{{ 'Import'|trans }}</button>');
                     importAction.on('click', function(e) {
-                        Messanger.notificationFlashMessage(
+                        Messenger.notificationFlashMessage(
                             'info',
                             {{ 'Import started, please wait...'|trans|json_encode|raw }}
                         );
@@ -161,13 +173,13 @@
                             widget.trigger('importComplete', data);
                             var message = data.message;
                             if (!data.success && data.errorsUrl) {
-                                var link = '<a target="_blank" href="' + data.errorsUrl + '">' + __('Download error log') + '</a>';
+                                var link = '<a href="' + data.errorsUrl + '" class="no-hash" target="_blank">' + __('Download error log') + '</a>';
                                 message += ' ' + link;
                             }
-                            Messanger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);
+                            Messenger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);
                             widget.remove();
                         }).fail(function() {
-                            Messanger.notificationFlashMessage('error', {{ 'Import process failed'|trans|json_encode|raw }});
+                            Messenger.notificationFlashMessage('error', {{ 'Import process failed'|trans|json_encode|raw }});
                             widget.trigger('contentLoad', '', widget);
                         });
 

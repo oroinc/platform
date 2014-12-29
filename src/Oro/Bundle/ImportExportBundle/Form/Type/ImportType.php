@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -35,7 +36,15 @@ class ImportType extends AbstractType
             'file',
             'file',
             array(
-                'required' => true
+                'required' => true,
+                'constraints' => [
+                    new File(
+                        [
+                            'mimeTypes' => ['text/plain', 'text/csv'],
+                            'mimeTypesMessage' => 'This file type is not allowed.'
+                        ]
+                    ),
+                ]
             )
         );
 

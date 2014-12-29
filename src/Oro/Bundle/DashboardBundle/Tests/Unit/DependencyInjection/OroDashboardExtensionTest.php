@@ -69,6 +69,11 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                 'widget' => 'quick_launchpad'
                             ),
                             'items' => array(
+                                'test1' => array(
+                                    'label' => 'Test1',
+                                    'route' => 'test1',
+                                    'route_parameters' => array()
+                                ),
                                 'index'  => array(
                                     'label' => 'List',
                                     'route' => 'orocrm_sales_opportunity_index',
@@ -80,7 +85,12 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                     'route' => 'orocrm_sales_opportunity_create',
                                     'acl' => 'orocrm_sales_opportunity_create',
                                     'route_parameters' => array()
-                                )
+                                ),
+                                'test2' => array(
+                                    'label' => 'Test2',
+                                    'route' => 'test2',
+                                    'route_parameters' => array()
+                                ),
                             )
                         ),
                         'second_quick_launchpad' => array(

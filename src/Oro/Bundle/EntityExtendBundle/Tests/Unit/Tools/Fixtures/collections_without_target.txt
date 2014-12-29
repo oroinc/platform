@@ -1,0 +1,38 @@
+namespace Test;
+
+class Entity implements \Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface
+{
+    public function removeRel2($value)
+    {
+        if ($this->rel_2 && $this->rel_2->contains($value)) {
+            $this->rel_2->removeElement($value);
+        }
+    }
+
+    public function removeRel1($value)
+    {
+        if ($this->rel1 && $this->rel1->contains($value)) {
+            $this->rel1->removeElement($value);
+        }
+    }
+
+    public function addRel2($value)
+    {
+        if (!$this->rel_2->contains($value)) {
+            $this->rel_2->add($value);
+        }
+    }
+
+    public function addRel1($value)
+    {
+        if (!$this->rel1->contains($value)) {
+            $this->rel1->add($value);
+        }
+    }
+
+    public function __construct()
+    {
+        $this->rel1 = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->rel_2 = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+}

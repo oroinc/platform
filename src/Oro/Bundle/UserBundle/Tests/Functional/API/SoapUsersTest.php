@@ -3,83 +3,68 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\API;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\TestFrameworkBundle\Test\ToolsAPI;
-use Oro\Bundle\TestFrameworkBundle\Test\Client;
 
 /**
  * @outputBuffering enabled
- * @db_isolation
+ * @dbIsolation
  */
 class SoapUsersTest extends WebTestCase
 {
     /** Default value for role label */
     const DEFAULT_VALUE = 'USER_LABEL';
 
-    /** @var Client */
-    protected $client;
-
-    public function setUp()
+    protected function setUp()
     {
-        $this->client = static::createClient(array(), ToolsAPI::generateWsseHeader());
-        $this->client->soap(
-            "http://localhost/api/soap",
-            array(
-                'location' => 'http://localhost/api/soap',
-                'soap_version' => SOAP_1_2
-            )
-        );
+        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initSoapClient();
     }
 
     /**
-     * @param string $request
-     * @param array  $response
-     *
-     * @dataProvider requestsApi
+     * @param array $request
+     * @dataProvider usersDataProvider
      */
-    public function testCreateUser($request, $response)
+    public function testCreateUser(array $request)
     {
-        $id = $this->client->getSoap()->createUser($request);
+        $id = $this->soapClient->createUser($request);
         $this->assertInternalType('int', $id);
         $this->assertGreaterThan(0, $id);
     }
 
     /**
-     * @param string $request
-     * @param array  $response
-     *
-     * @dataProvider requestsApi
+     * @param array $request
+     * @param array $response
+     * @dataProvider usersDataProvider
      * @depends testCreateUser
      */
-    public function testUpdateUser($request, $response)
+    public function testUpdateUser(array $request, array $response)
     {
         //get user id
-        $userId = $this->client
-            ->getSoap()
-            ->getUserBy(array('item' => array('key' =>'username', 'value' => $request['username'])));
-        $userId = ToolsAPI::classToArray($userId);
+        $userId = $this->soapClient->getUserBy(
+            array('item' => array('key' =>'username', 'value' => $request['username']))
+        );
+        $userId = $this->valueToArray($userId);
 
         $request['username'] = 'Updated_' . $request['username'];
         $request['email'] = 'Updated_' . $request['email'];
         unset($request['plainPassword']);
 
-        $result = $this->client->getSoap()->updateUser($userId['id'], $request);
-        $result = ToolsAPI::classToArray($result);
-        ToolsAPI::assertEqualsResponse($response, $result);
+        $result = $this->soapClient->updateUser($userId['id'], $request);
+        $this->assertEquals($response['return'], $result);
 
-        $user = $this->client->getSoap()->getUser($userId['id']);
-        $user = ToolsAPI::classToArray($user);
+        $user = $this->soapClient->getUser($userId['id']);
+        $user = $this->valueToArray($user);
         $this->assertEquals($request['username'], $user['username']);
         $this->assertEquals($request['email'], $user['email']);
     }
 
     /**
-     * @dataProvider requestsApi
+     * @dataProvider usersDataProvider
      * @depends testUpdateUser
      */
-    public function testGetUsers($request, $response)
+    public function testGetUsers(array $request)
     {
-        $users = $this->client->getSoap()->getUsers(1, 1000);
-        $users = ToolsAPI::classToArray($users);
+        $users = $this->soapClient->getUsers(1, 1000);
+        $users = $this->valueToArray($users);
 
         $user = array_filter(
             $users['item'],
@@ -94,15 +79,15 @@ class SoapUsersTest extends WebTestCase
 
     public function testGetUserRoles()
     {
-        $roles = $this->client->getSoap()->getUserRoles(1);
-        $roles = ToolsAPI::classToArray($roles);
+        $roles = $this->soapClient->getUserRoles(1);
+        $roles = $this->valueToArray($roles);
         $this->assertEquals('Administrator', $roles['item']['label']);
     }
 
     public function testGetUserGroups()
     {
-        $groups = $this->client->getSoap()->getUserGroups(1);
-        $groups = ToolsAPI::classToArray($groups);
+        $groups = $this->soapClient->getUserGroups(1);
+        $groups = $this->valueToArray($groups);
         $this->assertEquals('Administrators', $groups['item']['name']);
     }
 
@@ -112,31 +97,31 @@ class SoapUsersTest extends WebTestCase
      */
     public function testGetUserByException()
     {
-        $this->client->getSoap()->getUserBy();
+        $this->soapClient->getUserBy();
     }
 
     /**
-     * @dataProvider requestsApi
+     * @dataProvider usersDataProvider
      * @depends testGetUsers
      * @expectedException \SoapFault
      * @expectedExceptionMessage User cannot be found using specified filter
      */
-    public function testDeleteUser($request)
+    public function testDeleteUser(array $request)
     {
         //get user id
-        $userId = $this->client->getSoap()->getUserBy(
+        $user = $this->soapClient->getUserBy(
             array(
                 'item' => array(
                     'key' =>'username',
                     'value' =>'Updated_' . $request['username'])
             )
         );
-        $userId = ToolsAPI::classToArray($userId);
+        $user = $this->valueToArray($user);
 
-        $result = $this->client->getSoap()->deleteUser($userId['id']);
+        $result = $this->soapClient->deleteUser($user['id']);
         $this->assertTrue($result);
 
-        $this->client->getSoap()->getUserBy(
+        $this->soapClient->getUserBy(
             array(
                 'item' => array(
                     'key' =>'username',
@@ -151,7 +136,7 @@ class SoapUsersTest extends WebTestCase
      */
     public function testSelfDeleteUser()
     {
-        $this->client->getSoap()->deleteUser(1);
+        $this->soapClient->deleteUser(1);
     }
 
     /**
@@ -159,8 +144,8 @@ class SoapUsersTest extends WebTestCase
      *
      * @return array
      */
-    public function requestsApi()
+    public function usersDataProvider()
     {
-        return ToolsAPI::requestsApi(__DIR__ . DIRECTORY_SEPARATOR . 'UserRequest');
+        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'UserRequest');
     }
 }

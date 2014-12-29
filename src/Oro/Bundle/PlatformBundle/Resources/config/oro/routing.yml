@@ -1,0 +1,4 @@
+oro_platform_bundle:
+    resource:     "@OroPlatformBundle/Controller"
+    type:         annotation
+    prefix:       /

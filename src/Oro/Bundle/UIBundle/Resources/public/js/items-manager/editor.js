@@ -1,6 +1,9 @@
 /*global define*/
 /*jslint nomen: true*/
-define(['jquery', 'jquery-ui'],   function ($) {
+define([
+    'jquery',
+    'jquery-ui'
+], function ($) {
     'use strict';
 
     function setValue($elem, value) {
@@ -27,7 +30,17 @@ define(['jquery', 'jquery-ui'],   function ($) {
             },
             getter: function ($el, name, value) {
                 return value;
-            }
+            },
+            changed: false
+        },
+
+        /**
+         * Is this component changed by user
+         *
+         * @returns {boolean}
+         */
+        hasChanges: function () {
+            return this.changed;
         },
 
         _create: function () {
@@ -35,7 +48,12 @@ define(['jquery', 'jquery-ui'],   function ($) {
             this.element.attr('data-validation-ignore', '');
             this.errors = $({});
             this.form = this.element.parents('form');
-            this.form.on('submit', $.proxy(this._hideErrors, this));
+            this._on(this.form, {
+                submit: '_hideErrors'
+            });
+            if (typeof this.options.namePattern === 'string') {
+                this.options.namePattern = new RegExp(this.options.namePattern);
+            }
 
             this.reset();
             this._on({
@@ -69,6 +87,7 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 });
             }
             this._updateActions();
+            this.changed = false;
         },
 
         _onSaveItem: function (e) {
@@ -135,7 +154,7 @@ define(['jquery', 'jquery-ui'],   function ($) {
 
         _getValidator: function () {
             var validator;
-            if (this.form.validate) {
+            if (this.form.data('validator')) {
                 validator = this.form.validate();
             }
             return validator;
@@ -147,6 +166,7 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         _onElementChange: function (e) {
+            this.changed = true;
             if (this.validated) {
                 this._validate(e.target);
             }
@@ -173,7 +193,8 @@ define(['jquery', 'jquery-ui'],   function ($) {
         },
 
         _elementsMap: function () {
-            var elementsMap = {},
+            var mapped,
+                elementsMap = {},
                 $container = this.element,
                 pattern = this.options.namePattern;
 
@@ -185,8 +206,12 @@ define(['jquery', 'jquery-ui'],   function ($) {
                 }
             });
 
+            mapped = $.map(elementsMap, function ($elem) {
+                return $elem[0];
+            });
+
             // collect elements using name pattern
-            $.each(this._elements(), function () {
+            $.each(this._elements().not(mapped), function () {
                 var name = this.name && (this.name.match(pattern) || [])[1];
                 if (name && !elementsMap[name]) {
                     elementsMap[name] = $(this);

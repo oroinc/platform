@@ -20,22 +20,19 @@ class SetupType extends AbstractType
     {
         $builder
             ->add(
-                'company_name',
+                'application_url',
                 'text',
                 array(
-                    'label'    => 'form.setup.company_name',
+                    'label'    => 'form.setup.application_url',
                     'mapped'   => false,
-                    'constraints'   => array(
-                        new Assert\NotBlank(),
-                        new Assert\Length(array('max' => 15))
-                    ),
+                    'required' => false,
                 )
             )
             ->add(
-                'company_title',
+                'organization_name',
                 'text',
                 array(
-                    'label'    => 'form.setup.company_title',
+                    'label'    => 'form.setup.organization_name',
                     'mapped'   => false,
                     'required' => false,
                 )

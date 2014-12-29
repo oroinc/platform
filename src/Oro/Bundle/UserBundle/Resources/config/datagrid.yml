@@ -3,6 +3,7 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
+            entity_pagination: true
         source:
             acl_resource: oro_user_user_view
             type: orm
@@ -20,21 +21,21 @@ datagrid:
                     - { table: %oro_user.entity.class%, alias: u }
         columns:
             username:
-                label: oro.user.username.label
+                label:         oro.user.username.label
             email:
-                label: oro.user.email.label
+                label:         oro.user.email.label
             firstName:
-                label: oro.user.first_name.label
+                label:         oro.user.first_name.label
             lastName:
-                label: oro.user.last_name.label
+                label:         oro.user.last_name.label
             createdAt:
-                label: oro.user.created_at.label
+                label:         oro.ui.created_at
                 frontend_type: datetime
             updatedAt:
-                label: oro.user.updated_at.label
+                label:         oro.ui.updated_at
                 frontend_type: datetime
             enabled:
-                label: oro.user.enabled.label
+                label:         oro.user.enabled.label
                 frontend_type: select
                 choices:
                    - Inactive
@@ -108,20 +109,20 @@ datagrid:
         actions:
             view:
                 type:          navigate
-                label:         View
+                label:         oro.grid.action.view
                 link:          view_link
-                icon:          user
+                icon:          eye-open
                 acl_resource:  oro_user_user_view
                 rowAction:     true
             update:
                 type:          navigate
-                label:         Update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_user_update
             delete:
                 type:          delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_user_delete
@@ -129,6 +130,7 @@ datagrid:
     groups-grid:
         options:
             entityHint: group
+            entity_pagination: true
         source:
             acl_resource: oro_user_group_view
             type: orm
@@ -159,14 +161,14 @@ datagrid:
         actions:
             update:
                 type:          navigate
-                label:         Update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_group_update
                 rowAction:     true
             delete:
                 type:          delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_group_delete
@@ -187,6 +189,7 @@ datagrid:
     roles-grid:
         options:
             entityHint: role
+            entity_pagination: true
         source:
             acl_resource: oro_user_role_view
             type: orm
@@ -221,14 +224,14 @@ datagrid:
         actions:
             update:
                 type:          navigate
-                label:         Update
+                label:         oro.grid.action.update
                 link:          update_link
                 icon:          edit
                 acl_resource:  oro_user_role_update
                 rowAction:     true
             delete:
                 type:          delete
-                label:         Delete
+                label:         oro.grid.action.delete
                 link:          delete_link
                 icon:          trash
                 acl_resource:  oro_user_role_delete
@@ -245,22 +248,6 @@ datagrid:
                 label:
                     type: string
                     data_name: r.label
-
-    users-email-grid:
-        extends: email-grid
-        source:
-            query:
-                join:
-                    inner:
-                        folder:
-                            join: e.folders
-                            alias: f
-                        origin:
-                            join: f.origin
-                            alias: o
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
 
     user-relation-grid:
         source:
@@ -309,9 +296,11 @@ datagrid:
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       END) as has_role
+            bind_parameters:
+                - role_id
         columns:
             has_role:
-                label: Has role
+                label: oro.user.role.has_role.label
                 editable: true
                 frontend_type: boolean
             firstName:
@@ -350,9 +339,7 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: has_role
                 selectors:
@@ -373,9 +360,11 @@ datagrid:
                         CASE WHEN u.id IN (:data_in) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       END) as has_group
+            bind_parameters:
+                - group_id
         columns:
             has_group:
-                label: Has group
+                label: oro.user.group.has_group.label
                 editable: true
                 frontend_type: boolean
             firstName:
@@ -413,102 +402,153 @@ datagrid:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
 
         options:
-            requireJSModules:
-              - orodatagrid/js/datagrid/listener/column-form-listener
-            columnListener:
+            rowSelection:
                 dataField: id
                 columnName: has_group
                 selectors:
                     included: '#groupAppendUsers'
                     excluded: '#groupRemoveUsers'
 
-    dashboard-recent-emails-grid:
+    users-select-grid:
+        extended_entity_name: %oro_user.entity.class%
+        options:
+            entityHint: user
         source:
+            acl_resource: oro_user_user_view
             type: orm
             query:
                 select:
-                    - e
+                    - u.id
+                    - u.username
+                    - u.email
+                    - u.firstName
+                    - u.lastName
+                    - u.enabled
                 from:
-                    - { table: OroEmailBundle:Email, alias: e }
-                join:
-                    inner:
-                        folder:
-                            join: e.folders
-                            alias: f
-                        origin:
-                            join: f.origin
-                            alias: o
-                        from_email_address:
-                            join: e.fromEmailAddress
-                            alias: a
-                where:
-                    and:
-                        - o.id IN (:origin_ids)
+                    - { table: %oro_user.entity.class%, alias: u }
+        columns:
+            username:
+                label: oro.user.username.label
+            email:
+                label: oro.user.email.label
+            firstName:
+                label: oro.user.first_name.label
+            lastName:
+                label: oro.user.last_name.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
+
         properties:
             id: ~
-        options:
-            toolbarOptions:
-                hide: true
-                pageSize:
-                    items: [10]
-                    default_per_page: 10
+        sorters:
+            columns:
+                username:
+                    data_name: u.username
+                email:
+                    data_name: u.email
+                firstName:
+                    data_name: u.firstName
+                lastName:
+                    data_name: u.lastName
+                enabled:
+                    data_name: u.enabled
+            default:
+                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        filters:
+            columns:
+                username:
+                    type: string
+                    data_name: u.username
+                email:
+                    type: string
+                    data_name: u.email
+                firstName:
+                    type: string
+                    data_name: u.firstName
+                lastName:
+                    type: string
+                    data_name: u.lastName
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                false: Inactive
+                                true:  Active
 
-    dashboard-recent-emails-inbox-grid:
-        extends: dashboard-recent-emails-grid
+    owner-users-select-grid:
+        extended_entity_name: %oro_user.entity.class%
         options:
-            entityHint: email
+            entityHint: user
+            skip_acl_check: true
         source:
+            acl_resource: oro_user_user_view
+            type: orm
             query:
                 select:
-                    - @oro_email.datagrid_query_factory->getFromEmailExpression
-                where:
-                    and:
-                        - f.type = '%oro_email.email_folder.entity.class%::INBOX'
+                    - u.id
+                    - u.username
+                    - u.firstName
+                    - u.lastName
+                    - u.enabled
+                from:
+                    - { table: %oro_user.entity.class%, alias: u }
         columns:
-            receivedAt:
-                label: oro.email.received_at.label
-                frontend_type: datetime
-            fromEmailAddress:
-                type: twig
-                label: oro.email.from_name.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
-            subject:
-                type: twig
-                label: oro.email.subject.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+            username:
+                label: oro.user.username.label
+            firstName:
+                label: oro.user.first_name.label
+            lastName:
+                label: oro.user.last_name.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
+        properties:
+            id: ~
         sorters:
             columns:
-                receivedAt:  { data_name: e.receivedAt }
+                username:
+                    data_name: u.username
+                firstName:
+                    data_name: u.firstName
+                lastName:
+                    data_name: u.lastName
+                enabled:
+                    data_name: u.enabled
             default:
-                receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                username: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
+        filters:
+            columns:
+                username:
+                    type: string
+                    data_name: u.username
+                firstName:
+                    type: string
+                    data_name: u.firstName
+                lastName:
+                    type: string
+                    data_name: u.lastName
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                false: Inactive
+                                true:  Active
 
-    dashboard-recent-emails-sent-grid:
-        options:
-            entityHint: email
-        extends: dashboard-recent-emails-grid
+    users-select-grid-exclude-owner:
+        extends: users-select-grid
         source:
             query:
                 where:
                     and:
-                        - f.type = '%oro_email.email_folder.entity.class%::SENT'
-        columns:
-            sentAt:
-                label: oro.email.sent_at.label
-                frontend_type: datetime
-            recipients:
-                type: twig
-                label: oro.email.recipients.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
-            subject:
-                type: twig
-                label: oro.email.subject.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
-        sorters:
-            columns:
-                sentAt:  { data_name: e.sentAt }
-            default:
-                sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+                        - u.id != @oro_security.security_facade->getLoggedUserId

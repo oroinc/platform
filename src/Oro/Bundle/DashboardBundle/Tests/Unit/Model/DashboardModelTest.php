@@ -6,6 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\DashboardBundle\Model\DashboardModel;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ */
 class DashboardModelTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -302,7 +306,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
     {
         $isDefault = true;
         $this->dashboardEntity->expects($this->once())
-            ->method('isDefault')
+            ->method('getIsDefault')
             ->will($this->returnValue($isDefault));
 
         $this->assertEquals($isDefault, $this->dashboardModel->isDefault());
@@ -336,6 +340,26 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
             ->with($owner);
 
         $this->assertEquals($this->dashboardModel, $this->dashboardModel->setOwner($owner));
+    }
+
+    public function testGetOrganization()
+    {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->dashboardEntity->expects($this->once())
+            ->method('getOrganization')
+            ->will($this->returnValue($organization));
+
+        $this->assertEquals($organization, $this->dashboardModel->getOrganization());
+    }
+
+    public function testSetOrganization()
+    {
+        $organization = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\Organization');
+        $this->dashboardEntity->expects($this->once())
+            ->method('setOrganization')
+            ->with($organization);
+
+        $this->assertEquals($this->dashboardModel, $this->dashboardModel->setOrganization($organization));
     }
 
     public function testGetLabelFromEntity()

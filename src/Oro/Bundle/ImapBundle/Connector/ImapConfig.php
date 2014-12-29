@@ -32,7 +32,7 @@ class ImapConfig
     /**
      * @param string $host The host name of IMAP server
      * @param string $port The port of IMAP server
-     * @param string $ssl The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tsl'
+     * @param string $ssl The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tls'
      * @param string $user The user name
      * @param string $password The user password
      */
@@ -98,7 +98,7 @@ class ImapConfig
     /**
      * Sets the SSL type to be used to connect to IMAP server
      *
-     * @param string $ssl Can be empty string, 'ssl' or 'tsl'
+     * @param string $ssl Can be empty string, 'ssl' or 'tls'
      */
     public function setSsl($ssl)
     {

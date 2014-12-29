@@ -3,20 +3,20 @@
 namespace Oro\Bundle\EntityExtendBundle;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
-
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Process;
 
 use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityMetadataBuilderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPass;
 use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
+use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class OroEntityExtendBundle extends Bundle
 {
@@ -45,8 +45,10 @@ class OroEntityExtendBundle extends Bundle
 
         $this->ensureInitialized();
 
+        $container->addCompilerPass(new EntityExtendPass());
         $container->addCompilerPass(new ConfigLoaderPass());
         $container->addCompilerPass(new EntityManagerPass());
+        $container->addCompilerPass(new EntityMetadataBuilderPass());
         $container->addCompilerPass(new MigrationConfigPass());
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createYamlMappingDriver(
@@ -55,6 +57,7 @@ class OroEntityExtendBundle extends Bundle
                 )
             )
         );
+        $container->addCompilerPass(new ExtensionPass());
     }
 
     private function ensureInitialized()
@@ -67,17 +70,24 @@ class OroEntityExtendBundle extends Bundle
     private function ensureCacheInitialized()
     {
         $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->kernel->getCacheDir());
-        if (!$this->isCommandExecuting('oro:entity-extend:dump') && !file_exists($aliasesPath)) {
+        if (!$this->isCommandExecuting('oro:entity-extend:cache:warmup')
+            && !$this->isCommandExecuting('doctrine:cache:clear-metadata')
+            && !file_exists($aliasesPath)
+        ) {
+            $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
+            $env     = $this->kernel->getEnvironment();
+
             // We have to warm up the extend entities cache in separate process
             // to allow this process continue executing.
             // The problem is we need initialized DI contained for warming up this cache,
             // but in this moment we are exactly doing this for the current process.
-            $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
-            $env     = $this->kernel->getEnvironment();
+            $process = new Process($console . ' oro:entity-extend:cache:warmup' . ' --env ' . $env);
+            $process->setTimeout(300);
+            $process->run();
 
-            // Execute aliases cache generation process
-            $process = new Process($console . ' oro:entity-extend:dump' . ' --env ' . $env);
-            $process->setTimeout(100000);
+            // Doctrine metadata might be invalid after extended cache generation
+            $process = new Process($console . ' doctrine:cache:clear-metadata' . ' --env ' . $env);
+            $process->setTimeout(300);
             $process->run();
         }
     }

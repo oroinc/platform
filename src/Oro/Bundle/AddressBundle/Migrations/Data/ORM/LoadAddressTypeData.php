@@ -54,8 +54,8 @@ class LoadAddressTypeData extends AbstractTranslatableEntityFixture
                 // save
                 $manager->persist($addressType);
             }
-
-            $manager->flush();
         }
+
+        $manager->flush();
     }
 }

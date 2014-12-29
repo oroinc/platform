@@ -26,7 +26,7 @@ class ReminderExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected $paramsProvider;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
             ->disableOriginalConstructor()

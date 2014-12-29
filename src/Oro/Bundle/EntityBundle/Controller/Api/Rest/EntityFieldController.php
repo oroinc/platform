@@ -10,7 +10,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -32,16 +32,18 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      *      name="with-relations", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether association fields should be returned as well.")
      * @QueryParam(
+     *      name="with-virtual-fields", requirements="(1)|(0)", nullable=true, strict=true, default="0",
+     *      description="Indicates whether virtual fields should be returned as well.")
+     * @QueryParam(
      *      name="with-entity-details", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether details of related entity should be returned as well.")
      * @QueryParam(
-     *      name="deep-level", requirements="\d+", nullable=true, strict=true, default="0",
-     *      description="The maximum deep level of related entities.")
+     *      name="with-unidirectional", requirements="(1)|(0)", nullable=true, strict=true, default="0",
+     *      description="Indicates whether Unidirectional association fields should be returned.")
+     * @Get(requirements={"entityName"="((\w+)_)+(\w+)"})
      * @QueryParam(
-     *      name="last-deep-level-relations", requirements="(1)|(0)",
-     *      nullable=true, strict=true, default="0",
-     *      description="Indicates whether fields for the last deep level of related entities should be returned.")
-     * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
+     *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
+     *      description="Indicates whether exclusion logic should be applied.")
      * @ApiDoc(
      *      description="Get entity fields",
      *      resource=true
@@ -51,24 +53,25 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      */
     public function getFieldsAction($entityName)
     {
-        $entityName        = str_replace('_', '\\', $entityName);
-        $withRelations     = ('1' == $this->getRequest()->query->get('with-relations'));
-        $withEntityDetails = ('1' == $this->getRequest()->query->get('with-entity-details'));
-        $deepLevel         = $this->getRequest()->query->has('deep-level')
-            ? (int)$this->getRequest()->query->get('deep-level')
-            : 0;
-        $lastDeepLevelRelations = ('1' == $this->getRequest()->query->get('last-deep-level-relations'));
+        $entityName         = str_replace('_', '\\', $entityName);
+        $withRelations      = filter_var($this->getRequest()->get('with-relations'), FILTER_VALIDATE_BOOLEAN);
+        $withEntityDetails  = filter_var($this->getRequest()->get('with-entity-details'), FILTER_VALIDATE_BOOLEAN);
+        $withUnidirectional = filter_var($this->getRequest()->get('with-unidirectional'), FILTER_VALIDATE_BOOLEAN);
+        $withVirtualFields  = filter_var($this->getRequest()->get('with-virtual-fields'), FILTER_VALIDATE_BOOLEAN);
+        $applyExclusions    = filter_var($this->getRequest()->get('apply-exclusions'), FILTER_VALIDATE_BOOLEAN);
 
-        $statusCode = Codes::HTTP_OK;
         /** @var EntityFieldProvider $provider */
         $provider = $this->get('oro_entity.entity_field_provider');
+
+        $statusCode = Codes::HTTP_OK;
         try {
             $result = $provider->getFields(
                 $entityName,
                 $withRelations,
+                $withVirtualFields,
                 $withEntityDetails,
-                $deepLevel,
-                $lastDeepLevelRelations
+                $withUnidirectional,
+                $applyExclusions
             );
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;

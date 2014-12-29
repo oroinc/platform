@@ -12,11 +12,8 @@ define(function (require) {
      * @class   orosidebar.widgetContainer.Collection
      * @extends Backbone.Collection
      */
-    var WidgetContainerCollection = Backbone.Collection.extend({
+    return Backbone.Collection.extend({
         model: WidgetContainerModel,
-
         comparator: 'position'
     });
-
-    return WidgetContainerCollection;
 });

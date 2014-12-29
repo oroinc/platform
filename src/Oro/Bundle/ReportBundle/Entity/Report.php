@@ -3,30 +3,47 @@
 namespace Oro\Bundle\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Oro\Bundle\QueryDesignerBundle\Model\GridQueryDesignerInterface;
 
 /**
  * @ORM\Entity()
  * @ORM\Table(name="oro_report")
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "ownership"={
- *          "owner_type"="BUSINESS_UNIT",
- *          "owner_field_name"="owner",
- *          "owner_column_name"="business_unit_owner_id"
- *      },
- *      "security"={
- *          "type"="ACL",
- *          "group_name"=""
+ *      defaultValues={
+ *          "ownership"={
+ *              "owner_type"="BUSINESS_UNIT",
+ *              "owner_field_name"="owner",
+ *              "owner_column_name"="business_unit_owner_id",
+ *              "organization_field_name"="organization",
+ *              "organization_column_name"="organization_id"
+ *          },
+ *          "security"={
+ *              "type"="ACL",
+ *              "group_name"=""
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          },
+ *          "attachment"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
-class Report extends AbstractQueryDesigner
+class Report extends AbstractQueryDesigner implements GridQueryDesignerInterface
 {
+    const GRID_PREFIX = 'oro_report_table_';
+
     /**
      * @var integer
      *
@@ -80,9 +97,23 @@ class Report extends AbstractQueryDesigner
     protected $definition;
 
     /**
+     * @var array
+     *
+     * @ORM\Column(name="chart_options", type="json_array", nullable=true)
+     */
+    protected $chartOptions;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.created_at"
+     *          }
+     *      }
+     * )
      */
     protected $createdAt;
 
@@ -90,8 +121,31 @@ class Report extends AbstractQueryDesigner
      * @var \DateTime
      *
      * @ORM\Column(type="datetime")
+     * @ConfigField(
+     *      defaultValues={
+     *          "entity"={
+     *              "label"="oro.ui.updated_at"
+     *          }
+     *      }
+     * )
      */
     protected $updatedAt;
+
+    /**
+     * @var Organization
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $organization;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGridPrefix()
+    {
+        return self::GRID_PREFIX;
+    }
 
     /**
      * Get id
@@ -219,9 +273,7 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Get this report definition in YAML format
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getDefinition()
     {
@@ -229,14 +281,31 @@ class Report extends AbstractQueryDesigner
     }
 
     /**
-     * Set this report definition in YAML format
-     *
-     * @param string $definition
-     * @return Report
+     * {@inheritdoc}
      */
     public function setDefinition($definition)
     {
         $this->definition = $definition;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getChartOptions()
+    {
+        return $this->chartOptions;
+    }
+
+    /**
+     * @param array $chartOptions
+     *
+     * @return Report
+     */
+    public function setChartOptions(array $chartOptions)
+    {
+        $this->chartOptions = $chartOptions;
 
         return $this;
     }
@@ -291,5 +360,28 @@ class Report extends AbstractQueryDesigner
     public function beforeUpdate()
     {
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * Set organization
+     *
+     * @param Organization $organization
+     * @return Report
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

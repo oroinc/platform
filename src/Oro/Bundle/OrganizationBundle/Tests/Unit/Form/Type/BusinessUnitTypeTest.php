@@ -5,24 +5,43 @@ use Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitType;
 
 class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
 {
-
-    /**
-     * @var BusinessUnitType
-     */
+    /** @var BusinessUnitType */
     protected $form;
 
     protected function setUp()
     {
-        $this->form = new BusinessUnitType();
+        /** @var \PHPUnit_Framework_MockObject_MockObject $businessUnitManager */
+        $businessUnitManager = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject $securityFacade */
+        $securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $businessUnitManager->expects($this->any())
+            ->method('getBusinessUnitsTree')
+            ->will($this->returnValue([]));
+
+        $businessUnitManager->expects($this->any())
+            ->method('getBusinessUnitIds')
+            ->will($this->returnValue([]));
+
+        $this->form = new BusinessUnitType($businessUnitManager, $securityFacade);
     }
 
     public function testSetDefaultOptions()
     {
         $optionResolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
-
         $optionResolver->expects($this->once())
             ->method('setDefaults')
-            ->with(array('data_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'));
+            ->with(
+                [
+                    'data_class' => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
+                    'ownership_disabled'      => true
+                ]
+            );
         $this->form->setDefaultOptions($optionResolver);
     }
 
@@ -31,6 +50,7 @@ class BusinessUnitTypeTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
             ->disableOriginalConstructor()
             ->getMock();
+
         $builder->expects($this->any())
             ->method('add')
             ->will($this->returnSelf());

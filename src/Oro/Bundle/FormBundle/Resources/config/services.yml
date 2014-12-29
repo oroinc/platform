@@ -2,6 +2,7 @@ parameters:
     oro_form.validator.constraint_factory.class: Oro\Bundle\FormBundle\Validator\ConstraintFactory
     oro_form.twig.form.class:                    Oro\Bundle\FormBundle\Twig\FormExtension
     oro_form.twig.js_validation_extension.class: Oro\Bundle\FormBundle\Twig\JsValidationExtension
+    oro_form.model.update_handler.class:         Oro\Bundle\FormBundle\Model\UpdateHandler
 
 services:
     oro_form.validator.constraint_factory:
@@ -16,3 +17,12 @@ services:
         class: %oro_form.twig.js_validation_extension.class%
         tags:
             - { name: twig.extension }
+
+    oro_form.model.update_handler:
+        class: %oro_form.model.update_handler.class%
+        scope: request
+        arguments:
+            - @request
+            - @session
+            - @oro_ui.router
+            - @oro_entity.doctrine_helper

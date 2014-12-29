@@ -5,22 +5,21 @@ datagrid:
             type: orm
             query:
                 select:
-                    - e
-                    - @oro_email.datagrid_query_factory->getFromEmailExpression
+                    - partial e.{id, subject, sentAt}
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
-                join:
-                    inner:
-                        from_email_address:
-                            join: e.fromEmailAddress
-                            alias: a
 
         columns:
-            fromEmailAddress:
+            fromEmailExpression:
                 type: twig
                 label: oro.email.from_name.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
+            recipients:
+                type: twig
+                label: oro.email.recipients.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
@@ -29,17 +28,13 @@ datagrid:
             sentAt:
                 label: oro.email.sent_at.label
                 frontend_type: datetime
-            recipients:
-                type: twig
-                label: oro.email.recipients.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
         properties:
             id: ~
         sorters:
             columns:
                 subject: { data_name: e.subject }
                 sentAt:  { data_name: e.sentAt }
+                fromEmailExpression: { data_name: fromEmailExpression }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
@@ -55,9 +50,96 @@ datagrid:
         extends: base-email-grid
         filters:
             columns:
-                fromEmailAddress: { type: string,   data_name: a.email }
-                subject:          { type: string,   data_name: e.subject }
-                sentAt:           { type: datetime, data_name: e.sentAt }
+                fromEmailExpression: { type: string,   data_name: fromEmailExpression }
+                subject:             { type: string,   data_name: e.subject }
+                sentAt:              { type: datetime, data_name: e.sentAt }
+
+    activity-email-grid:
+        extends: email-grid
+
+    user-email-grid:
+        extends: email-grid
+
+    dashboard-recent-emails-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - partial e.{id, subject, receivedAt, sentAt}
+                from:
+                    - { table: OroEmailBundle:Email, alias: e }
+                join:
+                    inner:
+                        - { join: e.folders, alias: f }
+                        - { join: f.origin, alias: o }
+                        - { join: e.fromEmailAddress, alias: a }
+                where:
+                    and:
+                        - o.id IN (:origin_ids)
+        properties:
+            id: ~
+        options:
+            entityHint: email
+            toolbarOptions:
+                hide: true
+                pageSize:
+                    items: [10]
+                    default_per_page: 10
+
+    dashboard-recent-emails-inbox-grid:
+        extends: dashboard-recent-emails-grid
+        source:
+            query:
+                where:
+                    and:
+                        - f.type IN ('%oro_email.email_folder.model.class%::INBOX', '%oro_email.email_folder.model.class%::OTHER')
+        columns:
+            receivedAt:
+                label: oro.email.received_at.label
+                frontend_type: datetime
+            fromEmailExpression:
+                type: twig
+                label: oro.email.from_name.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
+            subject:
+                type: twig
+                label: oro.email.subject.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+        sorters:
+            columns:
+                fromEmailExpression: { data_name: fromEmailExpression }
+                receivedAt:  { data_name: e.receivedAt }
+            default:
+                receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
+
+    dashboard-recent-emails-sent-grid:
+        extends: dashboard-recent-emails-grid
+        source:
+            query:
+                where:
+                    and:
+                        - f.type = '%oro_email.email_folder.model.class%::SENT'
+        columns:
+            sentAt:
+                label: oro.email.sent_at.label
+                frontend_type: datetime
+            recipients:
+                type: twig
+                label: oro.email.recipients.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
+            subject:
+                type: twig
+                label: oro.email.subject.label
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+        sorters:
+            columns:
+                sentAt:  { data_name: e.sentAt }
+            default:
+                sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
     email-templates:
         source:
@@ -110,11 +192,12 @@ datagrid:
                 entityName:
                     type:      choice
                     data_name: t.entityName
+                    null_value: _empty_
                     options:
-                        is_translated_choices: true
                         field_options:
                             multiple:       true
-                            choices:        @oro_entity.datagrid_helper->getEntityNames
+                            choices:        @oro_email.emailtemplate.datagrid_helper->getEntityNames
+                            translatable_options: false
                 name:
                     type:      string
                     data_name: t.name
@@ -138,24 +221,25 @@ datagrid:
         actions:
             update:
                 type:         navigate
-                label:        oro.email.datagrid.emailtemplate.action.update
+                label:        oro.grid.action.update
                 link:         update_link
                 icon:         edit
                 acl_resource: oro_email_emailtemplate_update
                 rowAction:    true
             clone:
                 type:         navigate
-                label:        oro.email.datagrid.emailtemplate.action.clone
+                label:        oro.grid.action.clone
                 link:         clone_link
                 icon:         copy
                 acl_resource: oro_email_emailtemplate_create
             delete:
                 type:         delete
-                label:        oro.email.datagrid.emailtemplate.action.delete
+                label:        oro.grid.action.delete
                 acl_resource: oro_email_emailtemplate_delete
                 icon:         trash
                 link:         delete_link
-
+        options:
+            entity_pagination: true
         action_configuration: @oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure
         views_list : @oro_email.emailtemplate.datagrid_view_list
         options: { entityHint: email template }

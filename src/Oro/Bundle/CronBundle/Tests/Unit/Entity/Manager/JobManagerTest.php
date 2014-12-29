@@ -53,8 +53,13 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('Oro\Bundle\CronBundle\Entity\Schedule'))
             ->will($this->returnValue($class));
 
-        $conn->expects($this->any())
-            ->method('query')
+        $stmt = $this->getMockBuilder('Doctrine\DBAL\Statement')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $stmt->expects($this->any())
+            ->method('execute');
+        $stmt->expects($this->any())
+            ->method('fetchAll')
             ->will($this->returnValue(array(
                 array(
                     'characteristic' => 'memory',
@@ -62,6 +67,9 @@ class JobManagerTest extends \PHPUnit_Framework_TestCase
                     'charValue'      => '818759584'
                 )
             )));
+        $conn->expects($this->any())
+            ->method('prepare')
+            ->will($this->returnValue($stmt));
 
         $this->object = new Manager\JobManager($em);
         $this->job    = new Job('oro:test');

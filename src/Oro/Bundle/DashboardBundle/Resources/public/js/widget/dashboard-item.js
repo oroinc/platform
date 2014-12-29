@@ -1,6 +1,6 @@
 /*global define*/
-define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
-    function (_, Backbone, mediator, BlockWidget) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'oroui/js/mediator', 'oro/block-widget'],
+    function (_, Backbone, __, mediator, BlockWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -19,11 +19,11 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
         widgetEvents: {
             'click .collapse-expand-action-container .collapse-action': function(event) {
                 event.preventDefault();
-                this.collapse();
-            },
-            'click .collapse-expand-action-container .expand-action': function(event) {
-                event.preventDefault();
-                this.expand();
+                if (this.state.expanded) {
+                    this.collapse();
+                }else{
+                    this.expand();
+                }
             },
             'click .default-actions-container .move-action': function(event) {
                 event.preventDefault();
@@ -59,11 +59,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
                 '<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
                     '<div class="pull-left actions-container">' +
                         '<div class="pull-left collapse-expand-action-container">' +
-                            '<a class="collapse-action" href="#" title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
-                                '<i class="icon-collapse-alt hide-text"></i>' +
-                            '</a>' +
-                            '<a class="expand-action" href="#" title="<%- _.__(\'oro.dashboard.widget.expand\') %>">' +
-                                '<i class="icon-expand-alt hide-text"></i>' +
+                            '<a class="collapse-action <%= collapsed ? \'collapsed\' : \'\' %>" href="#" ' +
+                                'data-collapsed-title="<%- _.__(\'oro.dashboard.widget.expand\') %>"' +
+                                ' data-expanded-title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
                             '</a>' +
                         '</div>' +
                     '</div>' +
@@ -96,7 +94,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          * @param {Object} options
          */
         initialize: function(options) {
+            this.options = _.defaults(options || {}, this.options);
             this.options.templateParams.allowEdit = this.options.allowEdit;
+            this.options.templateParams.collapsed = options.state.expanded;
             BlockWidget.prototype.initialize.apply(this, arguments);
         },
 
@@ -142,9 +142,9 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          */
         _initWidgetCollapseState: function() {
             if (this.isCollapsed()) {
-                this._setCollapsed();
+                this._setCollapsed(true);
             } else {
-                this._setExpanded();
+                this._setExpanded(true);
             }
         },
 
@@ -153,18 +153,35 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          */
         collapse: function() {
             this._setCollapsed();
-            this.trigger('collapse', this.$el, this);
-            mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
         },
 
         /**
          * Set collapsed state
+         *
+         * @param {Boolean} isInit
          */
-        _setCollapsed: function() {
+        _setCollapsed: function(isInit) {
+            if (this.widgetContentContainer.is(':animated')) {
+                return;
+            }
+
             this.state.expanded = false;
-            this.widget.addClass('collapsed');
-            $('.collapse-expand-action-container .collapse-action', this.widget).hide();
-            $('.collapse-expand-action-container .expand-action', this.widget).show();
+            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
+            collapseControl.attr('title', collapseControl.data('collapsed-title')).toggleClass('collapsed');
+
+            if (isInit) {
+                this.widget.addClass('collapsed');
+                this.widgetContentContainer.slideUp('slow');
+            } else {
+                this.trigger('collapse', this.$el, this);
+                mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
+                var self = this;
+                this.widgetContentContainer.slideUp({
+                    complete: function  () {
+                        self.widget.addClass('collapsed');
+                    }
+                });
+            }
         },
 
         /**
@@ -172,18 +189,36 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'],
          */
         expand: function() {
             this._setExpanded();
-            this.trigger('expand', this.$el, this);
-            mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
         },
 
         /**
          * Set expanded state
+         *
+         * @param {Boolean} isInit
          */
-        _setExpanded: function() {
+        _setExpanded: function(isInit) {
+            if (this.widgetContentContainer.is(':animated')) {
+                return;
+            }
+
             this.state.expanded = true;
+
+            var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
+            var $chart = this.$el.find(".chart");
+            collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
+
             this.widget.removeClass('collapsed');
-            $('.collapse-expand-action-container .collapse-action', this.widget).show();
-            $('.collapse-expand-action-container .expand-action', this.widget).hide();
+
+            if (!isInit) {
+                this.trigger('expand', this.$el, this);
+                mediator.trigger('widget:dashboard:expand:' + this.getWid(), this.$el, this);
+                this.widgetContentContainer.slideDown();
+
+            }
+
+            if($chart.length > 0) {
+                $chart.trigger("update");
+            }
         },
 
         /**

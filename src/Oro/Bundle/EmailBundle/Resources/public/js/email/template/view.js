@@ -24,18 +24,19 @@ define(['jquery', 'underscore', 'backbone'
             this.target = options.target;
 
             this.listenTo(this.collection, 'reset', this.render);
+            if (!$(this.target).val()) {
+                this.selectionChanged();
+            }
         },
 
         /**
          * onChange event listener
-         *
-         * @param e {Object}
          */
-        selectionChanged: function (e) {
-            var entityId = $(e.currentTarget).val();
+        selectionChanged: function () {
+            var entityId = this.$el.val();
             this.collection.setEntityId(entityId.split('\\').join('_'));
             if (entityId) {
-                this.collection.fetch();
+                this.collection.fetch({reset: true});
             } else {
                 this.collection.reset();
             }
