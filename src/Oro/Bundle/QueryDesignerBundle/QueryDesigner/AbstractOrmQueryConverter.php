@@ -41,9 +41,6 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     {
         $joinType = parent::getJoinType($joinId);
 
-
-
-
         if ($joinType === null) {
             $entityClassName = $this->getEntityClassName($joinId);
             if (!empty($entityClassName)) {
