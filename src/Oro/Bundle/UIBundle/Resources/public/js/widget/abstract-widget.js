@@ -678,7 +678,7 @@ define(function (require) {
          */
         _onContentLoad: function(content) {
             this.loading = false;
-            this._removeComponents();
+            this.disposePageComponents();
             this.setContent(content, true);
             if (this.renderDeffered) {
                 this.renderDeffered
@@ -735,20 +735,6 @@ define(function (require) {
                 this.widget.addClass('invisible');
                 $(this.options.container).append(this.widget);
                 this.containerFilled = true;
-            }
-        },
-
-        /**
-         * Removes all components attached during layout initialization
-         * @private
-         */
-        _removeComponents: function () {
-            for (var i = 0; i < this.subviews.length; i++) {
-                var subview = this.subviews[i];
-                if (subview instanceof BaseComponent) {
-                    this.removeSubview(subview);
-                    i--;
-                }
             }
         },
 
