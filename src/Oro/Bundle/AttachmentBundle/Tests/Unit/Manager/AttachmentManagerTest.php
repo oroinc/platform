@@ -277,9 +277,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
             [pow(1024, 1), '1.02 KB'],
             [pow(1024, 2), '1.05 MB'],
             [pow(1024, 3), '1.07 GB'],
-            [pow(1024, 4), '1.10 TB'],
-            [pow(1024, 5), '1.13 PB'],
-            [pow(1024, 6), pow(1024, 6)],
+            [pow(1024, 4), pow(1024, 4)],
         ];
     }
 }

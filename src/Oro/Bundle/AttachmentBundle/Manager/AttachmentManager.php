@@ -211,7 +211,7 @@ class AttachmentManager
      */
     public function getFileSize($bytes)
     {
-        $sz = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+        $sz = ['B', 'KB', 'MB', 'GB'];
         $factor = floor((strlen($bytes) - 1) / 3);
         $key = (int)$factor;
 
