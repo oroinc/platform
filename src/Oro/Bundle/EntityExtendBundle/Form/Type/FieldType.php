@@ -24,6 +24,9 @@ class FieldType extends AbstractType
     const GROUP_FIELDS                   = 'fields';
     const GROUP_RELATIONS                = 'relations';
 
+    /**
+     * @var array
+     */
     protected $types = [
         self::GROUP_FIELDS       => [
             'string',
@@ -45,7 +48,8 @@ class FieldType extends AbstractType
             'multiEnum',
         ],
         self::GROUP_RELATIONS    => [
-            RelationTypeBase::ONE_TO_ONE,
+//            BAP-5875
+//            RelationTypeBase::ONE_TO_ONE,
             RelationTypeBase::ONE_TO_MANY,
             RelationTypeBase::MANY_TO_ONE,
             RelationTypeBase::MANY_TO_MANY,

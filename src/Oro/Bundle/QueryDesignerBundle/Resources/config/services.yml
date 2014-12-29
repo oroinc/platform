@@ -69,6 +69,8 @@ services:
             - @oro_entity.virtual_field_provider.chain
             - @doctrine
             - @oro_datagrid.datagrid.guesser
+        calls:
+            - [setVirtualRelationProvider, [@oro_entity.virtual_relation_provider.chain]]
 
     oro_query_designer.validator.query_validator:
         class: %oro_query_designer.validator.query_validator.class%
