@@ -88,7 +88,7 @@ class RestApiTest extends WebTestCase
         $request['message'] = 'new message';
 
         $this->client->request(
-            'PUT',
+            'POST',
             $this->getUrl(
                 'oro_api_comment_update_item',
                 [
