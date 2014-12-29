@@ -9,7 +9,7 @@ use Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents;
 use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
-abstract class AbstractAction implements ActionInterface
+abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface
 {
     /**
      * @var ContextAccessor

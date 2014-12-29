@@ -65,19 +65,7 @@ class Configurable implements ActionInterface
             $this->action = $this->assembler->assemble($this->configuration);
         }
 
-        // dispatch oro_workflow.action.handle_before event
-        $this->eventDispatcher->dispatch(
-            ExecuteActionEvents::HANDLE_BEFORE,
-            new ExecuteActionEvent($context, $this)
-        );
-
         $this->action->execute($context);
-
-        // dispatch oro_workflow.action.handle_after event
-        $this->eventDispatcher->dispatch(
-            ExecuteActionEvents::HANDLE_AFTER,
-            new ExecuteActionEvent($context, $this)
-        );
     }
 
     /**

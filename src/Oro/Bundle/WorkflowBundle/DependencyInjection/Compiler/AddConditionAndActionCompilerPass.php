@@ -14,6 +14,7 @@ class AddConditionAndActionCompilerPass implements CompilerPassInterface
     const ACTION_TAG = 'oro_workflow.action';
     const ACTION_FACTORY_SERVICE = 'oro_workflow.action_factory';
     const EVENT_DISPATCHER_SERVICE = 'event_dispatcher';
+    const EVENT_DISPATCHER_AWARE_ACTION = 'Oro\Bundle\WorkflowBundle\Model\Action\EventDispatcherAwareActionInterface';
 
     /**
      * @param ContainerBuilder $container
@@ -21,23 +22,25 @@ class AddConditionAndActionCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $this->injectEntityTypesByTag($container, self::CONDITION_FACTORY_SERVICE, self::CONDITION_TAG);
-        $this->injectEntityTypesByTag($container, self::ACTION_FACTORY_SERVICE, self::ACTION_TAG, true);
+        $this->injectEntityTypesByTag($container, self::ACTION_FACTORY_SERVICE, self::ACTION_TAG);
     }
 
     /**
      * @param ContainerBuilder $container
      * @param string           $serviceId
      * @param string           $tagName
-     * @param bool             $addDispatcher
      */
-    protected function injectEntityTypesByTag(ContainerBuilder $container, $serviceId, $tagName, $addDispatcher = false)
+    protected function injectEntityTypesByTag(ContainerBuilder $container, $serviceId, $tagName)
     {
         $types = [];
 
         foreach ($container->findTaggedServiceIds($tagName) as $id => $attributes) {
             $definition = $container->getDefinition($id);
             $definition->setScope(ContainerInterface::SCOPE_PROTOTYPE);
-            if ($addDispatcher) {
+
+            $className = $definition->getClass();
+            $refClass = new \ReflectionClass($className);
+            if ($refClass->implementsInterface(self::EVENT_DISPATCHER_AWARE_ACTION)) {
                 $definition->addMethodCall('setDispatcher', [new Reference(self::EVENT_DISPATCHER_SERVICE)]);
             }
 
