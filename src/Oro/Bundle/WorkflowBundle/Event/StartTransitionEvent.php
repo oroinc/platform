@@ -9,19 +9,13 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class StartTransitionEvent extends Event
 {
-    /**
-     * @var Transition
-     */
+    /** @var Transition */
     protected $transition;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $routeParameters;
 
-    /**
-     * @var Workflow
-     */
+    /** @var Workflow */
     protected $workflow;
 
     /**
@@ -31,9 +25,9 @@ class StartTransitionEvent extends Event
      */
     public function __construct(Workflow $workflow, Transition $transition, $routeParameters)
     {
-        $this->transition = $transition;
+        $this->transition      = $transition;
         $this->routeParameters = $routeParameters;
-        $this->workflow = $workflow;
+        $this->workflow        = $workflow;
     }
 
     /**

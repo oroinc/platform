@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\EventDispatcherAwareActionInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\WorkflowBundle\Model\Action\EventDispatcherAwareActionInterface;
 
 class DispatcherAwareAction implements EventDispatcherAwareActionInterface
 {

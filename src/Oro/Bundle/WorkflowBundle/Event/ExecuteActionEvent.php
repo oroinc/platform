@@ -8,14 +8,10 @@ use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
 
 class ExecuteActionEvent extends Event
 {
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     protected $context;
 
-    /**
-     * @var ActionInterface
-     */
+    /** @var ActionInterface */
     protected $action;
 
     /**
@@ -25,7 +21,7 @@ class ExecuteActionEvent extends Event
     public function __construct($context, ActionInterface $action)
     {
         $this->context = $context;
-        $this->action = $action;
+        $this->action  = $action;
     }
 
     /**

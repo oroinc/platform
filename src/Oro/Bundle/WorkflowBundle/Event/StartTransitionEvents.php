@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event;
 
-
 class StartTransitionEvents
 {
     /**
