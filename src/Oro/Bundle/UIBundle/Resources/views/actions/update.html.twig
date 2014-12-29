@@ -96,7 +96,9 @@
                             {% block navButtons %}{% endblock navButtons %}
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
-                            <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
+                            {% if form.vars.method != 'GET' %}
+                                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
+                            {% endif %}
                         </div>
                         <div class="pull-right user-info-state">
                             <div class="inline-decorate-container">
