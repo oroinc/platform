@@ -44,7 +44,7 @@ define({
         }
         for (var name in this.pageComponents) {
             this.removePageComponent(name);
-            delete this.pageComponents;
         }
+        delete this.pageComponents;
     }
 });

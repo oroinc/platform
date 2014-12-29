@@ -51,13 +51,18 @@ define(function (require) {
             initDeferred = $.Deferred();
 
             container.find('[data-page-component-module]').each(function () {
-                var $elem, module, options, loadDeferred;
+                var $elem, module, name, options, loadDeferred;
 
                 $elem = $(this);
                 module = $elem.data('pageComponentModule');
+                name = $elem.data('pageComponentName');
                 options = $elem.data('pageComponentOptions') || {};
                 options._sourceElement = $elem;
+                if (name) {
+                    options.name = name;
+                }
                 options.parent = parent;
+
                 $elem
                     .attr('data-bound-component', module)
                     .removeData('pageComponentModule')
@@ -85,7 +90,7 @@ define(function (require) {
                     } else {
                         // prevent interface from blocking by loader in production mode
                         mediator.execute('showMessage', 'error',
-                            __('Page component ') + '"' + e.requireModules[0] + '" ' + __(" cannot be loaded")
+                            __('Cannot load module ') + '"' + e.requireModules[0] + '"'
                         );
                         loadDeferred.resolve();
                     }
