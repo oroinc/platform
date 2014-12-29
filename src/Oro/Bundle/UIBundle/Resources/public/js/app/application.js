@@ -30,6 +30,8 @@ define([
                 this.router.changeURL(null, null, route, options);
                 mediator.trigger('route:change');
             }, this);
+
+            mediator.trigger('app:start');
         },
 
         /**

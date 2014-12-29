@@ -7,10 +7,8 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         BaseView = require('oroui/js/app/views/base/view'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         LoadingMask = require('oroui/js/loading-mask'),
-        layout = require('oroui/js/layout'),
         __ = require('orotranslation/js/translator');
     require('jquery.form');
 
@@ -709,7 +707,7 @@ define(function (require) {
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
             this.renderDeffered = $.Deferred();
-            layout.init(this.widget, this)
+            mediator.execute('layout:init', this.widget, this)
                 .done(_.bind(this._afterLayoutInit, this));
         },
 

@@ -8,7 +8,6 @@ define(function (require) {
         __= require('orotranslation/js/translator'),
         tools = require('oroui/js/tools'),
         error = require('oroui/js/error'),
-        layout = require('oroui/js/layout'),
         messenger = require('oroui/js/messenger'),
         AbstractWidget = require('oroui/js/widget/abstract-widget'),
         StateModel = require('orowindows/js/dialog/state/model');
