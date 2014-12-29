@@ -69,7 +69,7 @@ class AttachmentController extends Controller
             ['parentEntityClass' => $entityClass, 'checkEmptyFile' => true]
         );
 
-        $formAction = $this->get('oro_entity.routing_helper')->generateUrlByRequest(
+        $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_attachment_create',
             $this->getRequest(),
             [

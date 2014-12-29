@@ -88,7 +88,7 @@ class NoteController extends Controller
         $noteEntity = new Note();
         $noteEntity->setTarget($entity);
 
-        $formAction = $this->get('oro_entity.routing_helper')->generateUrlByRequest(
+        $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_note_create',
             $this->getRequest(),
             [
