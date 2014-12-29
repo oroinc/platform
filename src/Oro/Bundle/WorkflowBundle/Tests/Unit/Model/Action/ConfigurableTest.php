@@ -33,6 +33,10 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
             ->setMethods(array('assemble'))
             ->getMock();
         $this->configurableAction = new Configurable($this->assembler);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->configurableAction->setDispatcher($dispatcher);
     }
 
     protected function tearDown()

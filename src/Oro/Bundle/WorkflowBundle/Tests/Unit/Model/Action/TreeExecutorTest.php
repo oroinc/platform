@@ -54,6 +54,11 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
             $this->listAction->addAction($action);
         }
 
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->listAction->setDispatcher($dispatcher);
+
         $this->listAction->execute($context);
     }
 
@@ -68,6 +73,11 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
         $action->expects($this->never())
             ->method('execute');
+
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->listAction->setDispatcher($dispatcher);
         $this->listAction->addAction($actionError, true);
         $this->listAction->addAction($action);
         $this->listAction->execute(array());
@@ -80,6 +90,11 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
         $action->expects($this->once())
             ->method('execute');
+
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->listAction->setDispatcher($dispatcher);
         $this->listAction->addAction($actionError, false);
         $this->listAction->addAction($action);
         $this->listAction->execute(array());
@@ -93,6 +108,10 @@ class TreeExecutorTest extends \PHPUnit_Framework_TestCase
             ->method('log')
             ->with('ALERT', 'TEST');
         $listAction = new TreeExecutor($logger);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $listAction->setDispatcher($dispatcher);
         $actionError = $this->getExceptionAction();
         $listAction->addAction($actionError, false);
         $listAction->execute(array());
