@@ -324,7 +324,7 @@ class EntityFieldProvider
             }
 
             $fieldType = $virtualRelation['relation_type'];
-            $targetClassName = $virtualRelation['related_entity_name'];
+            $targetClassName = $this->entityClassResolver->getEntityClass($virtualRelation['related_entity_name']);
 
             $this->addRelation(
                 $result,
