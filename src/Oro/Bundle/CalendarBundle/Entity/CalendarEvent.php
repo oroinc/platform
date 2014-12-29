@@ -55,6 +55,9 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          },
  *          "attachment"={
  *              "immutable"=true
+ *          },
+ *          "comment"={
+ *              "applicable"=true
  *          }
  *      }
  * )

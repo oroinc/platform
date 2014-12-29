@@ -26,8 +26,8 @@ class CommentAssociationChoiceType extends AssociationChoiceType
         $className = $configId->getClassName();
 
         if (!empty($className)) {
-            $groups = $this->configManager->getProvider('grouping')->getConfig($className)->get('groups');
-            if (empty($groups) || !in_array(ActivityScope::GROUP_ACTIVITY, $groups)) {
+            $applicable = $this->configManager->getProvider('comment')->getConfig($className)->get('applicable');
+            if (!$applicable) {
                 return true;
             }
         }
