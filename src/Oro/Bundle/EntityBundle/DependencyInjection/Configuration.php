@@ -124,6 +124,8 @@ class Configuration implements ConfigurationInterface
                                 ->isRequired()
                                 ->cannotBeEmpty()
                             ->end()
+                            ->scalarNode('label')
+                            ->end()
                             ->arrayNode('query')
                                 ->children()
                                     ->arrayNode('join')

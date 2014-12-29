@@ -326,11 +326,17 @@ class EntityFieldProvider
             $fieldType = $virtualRelation['relation_type'];
             $targetClassName = $virtualRelation['related_entity_name'];
 
+            if (empty($virtualRelation['label'])) {
+                $label = $this->getFieldLabel($className, $associationName);
+            } else {
+                $label = $virtualRelation['label'];
+            }
+
             $this->addRelation(
                 $result,
                 $associationName,
                 $fieldType,
-                $this->getFieldLabel($className, $associationName),
+                $label,
                 $this->getRelationType($fieldType),
                 $targetClassName,
                 $withEntityDetails,
