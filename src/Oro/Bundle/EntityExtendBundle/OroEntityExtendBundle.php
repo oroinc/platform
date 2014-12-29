@@ -70,7 +70,10 @@ class OroEntityExtendBundle extends Bundle
     private function ensureCacheInitialized()
     {
         $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->kernel->getCacheDir());
-        if (!$this->isCommandExecuting('oro:entity-extend:cache:warmup') && !file_exists($aliasesPath)) {
+        if (!$this->isCommandExecuting('oro:entity-extend:cache:warmup')
+            && !$this->isCommandExecuting('doctrine:cache:clear-metadata')
+            && !file_exists($aliasesPath)
+        ) {
             $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
             $env     = $this->kernel->getEnvironment();
 
