@@ -15,6 +15,7 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
  * @todo: need to think how to reduce the complexity of this class
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 abstract class AbstractQueryConverter
 {
