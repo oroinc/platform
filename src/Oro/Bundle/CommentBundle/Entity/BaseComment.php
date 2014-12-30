@@ -153,7 +153,7 @@ abstract class BaseComment
      *
      * @return self
      */
-    public function setOwner(User $owner)
+    public function setOwner(User $owner = null)
     {
         $this->owner = $owner;
 
@@ -177,7 +177,7 @@ abstract class BaseComment
      *
      * @return self
      */
-    public function setOrganization(Organization $organization)
+    public function setOrganization(Organization $organization = null)
     {
         $this->organization = $organization;
 

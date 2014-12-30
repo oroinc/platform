@@ -100,6 +100,21 @@ class Pager extends AbstractPager implements PagerInterface
     }
 
     /**
+     * Get result which are filtered by ACL
+     *
+     * @param int $hydrationMode
+     *
+     * @return array
+     */
+    public function getAppliedResult($hydrationMode = Query::HYDRATE_OBJECT)
+    {
+        $qb    = $this->getQueryBuilder();
+        $query = $this->aclHelper->apply($qb);
+
+        return $query->execute([], $hydrationMode);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
