@@ -657,27 +657,35 @@ abstract class AbstractQueryConverter
      */
     protected function addTableAliasesForColumn($columnName)
     {
-        $this->addTableAliasesForJoinIdentifiers($this->explodeColumnName($columnName));
+        if ($this->isVirtualRelation($columnName)) {
+            $this->addTableAliasesForVirtualRelation($columnName);
+        } else {
+            $this->addTableAliasesForJoinIdentifiers($this->joinIdHelper->explodeColumnName($columnName));
+        }
         $this->addTableAliasesForVirtualColumn($columnName);
-        $this->addTableAliasesForVirtualRelation($columnName);
     }
 
     /**
      * @param string $columnName
      *
-     * @return string[]
+     * @return bool
      */
-    protected function explodeColumnName($columnName)
+    protected function isVirtualRelation($columnName)
     {
-        $parentJoinIdentifier = $this->getParentJoinIdentifier($columnName);
+        $relationFieldName = $this->getMainEntityRelationFieldName($columnName);
 
-        if ($parentJoinIdentifier && $this->virtualRelationProvider
-            && $this->virtualRelationProvider->isVirtualRelation($this->getRootEntity(), $parentJoinIdentifier)
-        ) {
-            return $this->joinIdHelper->explodeColumnName($parentJoinIdentifier);
-        }
+        return $relationFieldName && $this->virtualRelationProvider
+            && $this->virtualRelationProvider->isVirtualRelation($this->getRootEntity(), $relationFieldName);
+    }
 
-        return $this->joinIdHelper->explodeColumnName($columnName);
+    /**
+     * @param string $columnName
+     * @return string
+     */
+    protected function getMainEntityRelationFieldName($columnName)
+    {
+        $joinIdParts = explode('+', $columnName);
+        return $joinIdParts[0];
     }
 
     /**
@@ -728,7 +736,7 @@ abstract class AbstractQueryConverter
         }
 
         $className = $this->getRootEntity();
-        $fieldName = $this->getParentJoinIdentifier($columnName);
+        $fieldName = $this->getMainEntityRelationFieldName($columnName);
         if (!$this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
             // non virtual column
             return;
@@ -759,6 +767,7 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @param string $columnName
      * @param array  $query
      */
@@ -797,18 +806,32 @@ abstract class AbstractQueryConverter
             }
         }
 
+        // Replace virtual field with it's real presentation. Add table aliases for column
+        $relationFieldName = $this->getMainEntityRelationFieldName($columnName);
+        $originalColumnName = $columnName;
+        if ($relationFieldName && !empty($aliases[$relationFieldName]) && strpos($columnName, '+') !== false) {
+            $realPath = $this->joins[$aliases[$relationFieldName]];
+            $columnName = preg_replace('/^' . $relationFieldName . '\+/', $realPath . '+', $columnName);
+            $parentJoinId = $this->getParentJoinIdentifier($columnName);
+            $joinParts = $this->joinIdHelper->explodeJoinIdentifier($parentJoinId);
+
+            $this->addTableAliasesForJoinIdentifiers($joinParts);
+        }
+
         if (empty($query['select']['expr'])) {
-            $expr = sprintf(
-                '%s.%s',
-                $aliases[$this->getParentJoinIdentifier($columnName)],
-                $this->getFieldName($columnName)
-            );
+            $tableAlias = $this->tableAliases[$this->getParentJoinIdentifier($columnName)];
+            if (empty($tableAlias)) {
+                throw new InvalidConfigurationException(
+                    sprintf('Could not get table alias for column %s', $columnName)
+                );
+            }
+            $expr = sprintf('%s.%s', $tableAlias, $this->getFieldName($columnName));
         } else {
             $expr = $query['select']['expr'];
         }
 
         $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect($expr, $aliases);
-        $this->virtualColumnExpressions[$columnName] = $columnExpr;
+        $this->virtualColumnExpressions[$originalColumnName] = $columnExpr;
     }
 
     /**

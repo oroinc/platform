@@ -111,6 +111,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
                 ]
             ]
         );
+        $this->config->offsetSetByPath('[options][skip_count_walker]', true);
     }
 
     /**

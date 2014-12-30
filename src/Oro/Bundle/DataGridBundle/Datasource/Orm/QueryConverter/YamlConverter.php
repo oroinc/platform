@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter;
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Config\Definition\Processor;
-
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Yaml\Yaml;
+
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 
 class YamlConverter implements QueryConverterInterface
 {
@@ -68,31 +69,76 @@ class YamlConverter implements QueryConverterInterface
 
     /**
      * @param QueryBuilder $qb
-     * @param array        $value
+     * @param array $value
      */
     protected function addJoin(QueryBuilder $qb, $value)
     {
+        /** @var Expr\From[] $from */
+        $from = $qb->getDQLPart('from');
+        if ($from) {
+            $usedAliases = [$from[0]->getAlias()];
+        } else {
+            $usedAliases = ['t1'];
+        }
+
+        $knownAliases = 1;
+        if (isset($value['join']['inner'])) {
+            $knownAliases += count($value['join']['inner']);
+        }
+        if (isset($value['join']['left'])) {
+            $knownAliases += count($value['join']['left']);
+        }
+        $qbTools = new QueryBuilderTools();
+
+        do {
+            $this->addJoinByDefinition($qb, $qbTools, $value, 'inner', $usedAliases);
+            $this->addJoinByDefinition($qb, $qbTools, $value, 'left', $usedAliases);
+        } while (count($usedAliases) != $knownAliases);
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param QueryBuilderTools $qbTools
+     * @param array $value
+     * @param string $joinType
+     * @param array $usedAliases
+     */
+    protected function addJoinByDefinition(
+        QueryBuilder $qb,
+        QueryBuilderTools $qbTools,
+        array $value,
+        $joinType,
+        array &$usedAliases
+    ) {
+        $joinType = strtolower($joinType);
+        if (!isset($value['join'][$joinType])) {
+            return;
+        }
         $defaultValues = ['conditionType' => null, 'condition' => null];
-        if (isset($value['join'])) {
-            if (isset($value['join']['inner'])) {
-                foreach ((array)$value['join']['inner'] as $join) {
-                    $join = array_merge($defaultValues, $join);
-                    $qb->innerJoin($join['join'], $join['alias'], $join['conditionType'], $join['condition']);
-                }
+        foreach ((array)$value['join'][$joinType] as $join) {
+            if (in_array($join['alias'], $usedAliases)) {
+                continue;
+            }
+            $join = array_merge($defaultValues, $join);
+
+            $joinUsedAliases = array_merge(
+                $qbTools->getUsedTableAliases($join['join']),
+                $qbTools->getUsedTableAliases($join['condition'])
+            );
+            $unknownAliases = array_diff($joinUsedAliases, array_merge($usedAliases, [$join['alias']]));
+            if (!empty($unknownAliases)) {
+                continue;
             }
 
-            if (isset($value['join']['left'])) {
-                foreach ((array)$value['join']['left'] as $join) {
-                    $join = array_merge($defaultValues, $join);
-                    $qb->leftJoin($join['join'], $join['alias'], $join['conditionType'], $join['condition']);
-                }
-            }
+            $joinMethod = $joinType . 'Join';
+            $qb->$joinMethod($join['join'], $join['alias'], $join['conditionType'], $join['condition']);
+            $usedAliases[] = $join['alias'];
         }
     }
 
     /**
      * @param QueryBuilder $qb
-     * @param array        $value
+     * @param array $value
      */
     protected function addWhere(QueryBuilder $qb, $value)
     {
@@ -113,7 +159,7 @@ class YamlConverter implements QueryConverterInterface
 
     /**
      * @param QueryBuilder $qb
-     * @param array        $value
+     * @param array $value
      */
     protected function addOrder(QueryBuilder $qb, $value)
     {
