@@ -100,6 +100,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     public function optionsDataProvider()
