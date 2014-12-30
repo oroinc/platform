@@ -46,17 +46,29 @@ define(function (require) {
          * @returns {jQuery.Promise}
          */
         initPageComponents: function (container, parent) {
-            var loadPromises, initDeferred, pageComponentNodes;
+            var loadPromises, initDeferred, pageComponentNodes, preloadQueue;
+            // console.groupCollapsed('container', container.attr('class'), {html: container.clone().html('')[0].outerHTML});
             loadPromises = [];
             initDeferred = $.Deferred(),
             pageComponentNodes = container.find('[data-page-component-module]');
 
             if (pageComponentNodes.length) {
+                preloadQueue = [];
                 pageComponentNodes.each(function () {
-                    var $elem, module, name, options, loadDeferred;
+                    var $elem, module, name, options, loadDeferred, $separateLayout;
 
                     $elem = $(this);
                     module = $elem.data('pageComponentModule');
+                    // find nearest marked container with separate layout
+                    $separateLayout = $elem.closest('[data-layout="separate"]');
+                    // if it placed inside container - prevent component creation from here
+                    if ($separateLayout.length && $.contains(container[0], $separateLayout[0])) {
+                        // optimize load time - push components to preload queue
+                        preloadQueue.push(module);
+                        return;
+                    }
+
+                    // console.log('pageComponent', container.attr('class'), {html: $elem.clone().html('')[0].outerHTML});
                     name = $elem.data('pageComponentName');
                     options = $elem.data('pageComponentOptions') || {};
                     options._sourceElement = $elem;
@@ -101,6 +113,9 @@ define(function (require) {
                     loadPromises.push(loadDeferred.promise());
                 });
 
+                // optimize load time - preload components in separate layouts
+                require(preloadQueue, function (){});
+
                 $.when.apply($, loadPromises).always(function () {
                     var initPromises = _.flatten(_.toArray(arguments), true);
                     $.when.apply($, initPromises).always(function () {
@@ -111,7 +126,7 @@ define(function (require) {
             } else {
                 initDeferred.resolve();
             }
-
+            // console.groupEnd();
             return initDeferred.promise();
         },
 

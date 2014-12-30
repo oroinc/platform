@@ -1,5 +1,5 @@
 {% if windowStates|length %}
-    <div style="display: none" id="widget-states-container">
+    <div style="display: none" id="widget-states-container" data-layout="separate">
         {% for windowState in windowStates %}
             <div id="widget-restored-state-{{ windowState.id|default("none") }}">
                 {{ oro_window_render_fragment(windowState) }}
