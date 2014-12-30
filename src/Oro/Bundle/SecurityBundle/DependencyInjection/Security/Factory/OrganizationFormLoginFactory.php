@@ -20,11 +20,6 @@ class OrganizationFormLoginFactory extends FormLoginFactory
         return 'organization-form-login';
     }
 
-    protected function getListenerId()
-    {
-        return 'oro_security.authentication.listener.form';
-    }
-
     protected function createAuthProvider(ContainerBuilder $container, $id, $config, $userProviderId)
     {
         $provider = 'oro_security.authentication.provider.username_password_organization.' . $id;

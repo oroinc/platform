@@ -1,15 +1,16 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone'
-    ], function (_, Backbone) {
+define(function (require) {
     'use strict';
 
+    var EmailVariableModel,
+        _ = require('underscore'),
+        BaseModel = require('oroui/js/app/models/base/model')
+
     /**
-     * @export  oroemail/js/email/variable/model
-     * @class   oroemail.email.variable.Model
-     * @extends Backbone.Model
+     * @export oroemail/js/app/models/email-variable-model
      */
-    return Backbone.Model.extend({
+    EmailVariableModel = BaseModel.extend({
         defaults: {
             system: [],
             entity: []
@@ -119,4 +120,6 @@ define(['underscore', 'backbone'
             return this.attributes.entity[entityName][fieldName].related_entity_name;
         }
     });
+
+    return EmailVariableModel;
 });

@@ -36,7 +36,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(3, $functions);
+        $this->assertCount(5, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $function = $functions[0];
@@ -52,6 +52,18 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
         /** @var \Twig_SimpleFunction $function */
         $function = $functions[2];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_field_config', $function->getName());
+        $this->assertEquals(array($this->twigExtension, 'getFieldConfig'), $function->getCallable());
+
+        /** @var \Twig_SimpleFunction $function */
+        $function = $functions[3];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_field_config_value', $function->getName());
+        $this->assertEquals(array($this->twigExtension, 'getFieldConfigValue'), $function->getCallable());
+
+        /** @var \Twig_SimpleFunction $function */
+        $function = $functions[4];
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_entity_route', $function->getName());
         $this->assertEquals(array($this->twigExtension, 'getClassRoute'), $function->getCallable());
@@ -74,6 +86,158 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig');
 
         $this->assertEquals(array(), $this->twigExtension->getClassConfig($className));
+    }
+
+    public function testGetFieldConfigNoConfig()
+    {
+        $className = 'Test\Entity';
+        $fieldName = 'testField';
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className, $fieldName)
+            ->will($this->returnValue(false));
+        $this->configManager->expects($this->never())
+            ->method('getProvider');
+
+        $this->assertEquals([], $this->twigExtension->getFieldConfig($className, $fieldName));
+    }
+
+    /**
+     * @param string|null $inputScope
+     *
+     * @dataProvider getFieldConfigDataProvider
+     */
+    public function testGetFieldConfig($inputScope)
+    {
+        $className = 'Test\Entity';
+        $fieldName = 'testField';
+        $config    = array('key' => 'value');
+
+        $configEntity = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+
+        $configEntity->expects($this->any())
+            ->method('all')
+            ->will($this->returnValue($config));
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className, $fieldName)
+            ->will($this->returnValue(true));
+
+
+        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $scope = $inputScope ? $inputScope : 'entity';
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with($scope)
+            ->willReturn($entityConfigProvider);
+
+        $entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className, $fieldName)
+            ->willReturn($configEntity);
+
+        if ($inputScope) {
+            $actualConfig = $this->twigExtension->getFieldConfig($className, $fieldName, $inputScope);
+        } else {
+            $actualConfig = $this->twigExtension->getFieldConfig($className, $fieldName);
+        }
+
+        $this->assertEquals($config, $actualConfig);
+    }
+
+    public function getFieldConfigDataProvider()
+    {
+        return array(
+            'default scope'   => array(
+                'inputScope'    => null,
+            ),
+            'specified scope' => array(
+                'inputScope'    => 'test',
+            ),
+        );
+    }
+
+    public function testGetFieldConfigValueNoConfig()
+    {
+        $className = 'Test\Entity';
+        $fieldName = 'testField';
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className, $fieldName)
+            ->will($this->returnValue(false));
+        $this->configManager->expects($this->never())
+            ->method('getProvider');
+
+        $this->assertNull($this->twigExtension->getFieldConfigValue($className, $fieldName, 'test'));
+    }
+
+    /**
+     * @param string|null $inputScope
+     *
+     * @dataProvider getFieldConfigValueDataProvider
+     */
+    public function testGetFieldConfigValue($inputScope)
+    {
+        $className = 'Test\Entity';
+        $fieldName = 'testField';
+        $attrName  = 'attrName';
+        $config    = array('key' => 'value');
+
+        $configEntity = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+
+        $configEntity->expects($this->any())
+            ->method('get')
+            ->with($attrName)
+            ->will($this->returnValue($config));
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfig')
+            ->with($className, $fieldName)
+            ->will($this->returnValue(true));
+
+
+        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $scope = $inputScope ? $inputScope : 'entity';
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with($scope)
+            ->willReturn($entityConfigProvider);
+
+        $entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className, $fieldName)
+            ->willReturn($configEntity);
+
+        if ($inputScope) {
+            $actualConfig = $this->twigExtension->getFieldConfigValue($className, $fieldName, $attrName, $inputScope);
+        } else {
+            $actualConfig = $this->twigExtension->getFieldConfigValue($className, $fieldName, $attrName);
+        }
+
+        $this->assertEquals($config, $actualConfig);
+    }
+
+    public function getFieldConfigValueDataProvider()
+    {
+        return array(
+            'default scope'   => array(
+                'inputScope'    => null,
+            ),
+            'specified scope' => array(
+                'inputScope'    => 'test',
+            ),
+        );
     }
 
     /**

@@ -9,13 +9,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class UpdateConfigCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:entity-extend:update-config';
+
     /**
      * Console command configuration
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:update-config')
+            ->setName(self::NAME)
             ->setDescription('Prepare entity config')
             ->addOption(
                 'skip-origin',
