@@ -2,10 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Guesser;
 
-use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess;
-use Symfony\Component\Form\Guess\TypeGuess;
-use Symfony\Component\Form\Guess\ValueGuess;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
@@ -14,8 +11,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityBundle\Form\Guesser\AbstractFormGuesser;
 
-class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
+class ExtendFieldTypeGuesser extends AbstractFormGuesser
 {
     /** @var ConfigProvider */
     protected $entityConfigProvider;
@@ -64,9 +62,13 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
      */
     public function guessType($className, $property)
     {
+        if (!$this->extendConfigProvider->hasConfig($className, $property)) {
+            return $this->createDefaultTypeGuess();
+        }
+
         $formConfig = $this->formConfigProvider->getConfig($className, $property);
         if (!$formConfig->is('is_enabled')) {
-            return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+            return $this->createDefaultTypeGuess();
         }
 
         /** @var FieldConfigId $fieldConfigId */
@@ -78,7 +80,7 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
         $options         = $this->getOptions($extendConfig, $fieldConfigId);
 
         if (!$this->isApplicableField($extendConfig) || $isTypeNotExists) {
-            return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
+            return $this->createDefaultTypeGuess();
         }
 
         $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
@@ -93,31 +95,7 @@ class ExtendFieldTypeGuesser implements FormTypeGuesserInterface
             $this->typeMap[$fieldConfigId->getFieldType()]['options']
         );
 
-        return new TypeGuess($type, $options, TypeGuess::HIGH_CONFIDENCE);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function guessRequired($class, $property)
-    {
-        return new ValueGuess(false, ValueGuess::LOW_CONFIDENCE);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function guessMaxLength($class, $property)
-    {
-        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function guessPattern($class, $property)
-    {
-        return new ValueGuess(null, ValueGuess::LOW_CONFIDENCE);
+        return $this->createTypeGuess($type, $options);
     }
 
     /**
