@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Doctrine\Common\Collections\Collection;
+
+use Doctrine\ORM\PersistentCollection;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
@@ -9,7 +14,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\FormBundle\Form\DataMapper\UnidirectionalPropertyMapper;
 
 class MultipleEntityType extends AbstractType
 {
@@ -35,7 +39,8 @@ class MultipleEntityType extends AbstractType
                 'oro_entity_identifier',
                 [
                     'class'    => $options['class'],
-                    'multiple' => true
+                    'multiple' => true,
+                    'mapped'   => false,
                 ]
             )
             ->add(
@@ -43,11 +48,46 @@ class MultipleEntityType extends AbstractType
                 'oro_entity_identifier',
                 [
                     'class'    => $options['class'],
-                    'multiple' => true
+                    'multiple' => true,
+                    'mapped'   => false,
                 ]
             );
 
-        $builder->setDataMapper(new UnidirectionalPropertyMapper());
+        $builder->addEventListener(
+            FormEvents::POST_SUBMIT,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+
+                $added   = $form->get('added')->getData();
+                $removed = $form->get('removed')->getData();
+
+                /** @var Collection $collection */
+                $collection = $form->getData();
+                foreach ($added as $relation) {
+                    $collection->add($relation);
+                }
+
+                foreach ($removed as $relation) {
+                    $collection->removeElement($relation);
+                }
+            }
+        );
+
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            function (FormEvent $event) {
+                $form = $event->getForm();
+                /** @var PersistentCollection $collection */
+                $collection = $form->getData();
+                if ($collection instanceof PersistentCollection && $collection->isDirty()) {
+                    $added   = $collection->getInsertDiff();
+                    $removed = $collection->getDeleteDiff();
+
+                    $form->get('added')->setData($added);
+                    $form->get('removed')->setData($removed);
+                }
+            }
+        );
     }
 
     /**

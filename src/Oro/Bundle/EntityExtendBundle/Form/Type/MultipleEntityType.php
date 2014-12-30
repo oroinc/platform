@@ -42,7 +42,8 @@ class MultipleEntityType extends AbstractType
                 'oro_entity_identifier',
                 [
                     'class'    => $options['class'],
-                    'multiple' => false
+                    'multiple' => false,
+                    'mapped'   => false
                 ]
             );
         }
