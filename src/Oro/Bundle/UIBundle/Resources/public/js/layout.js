@@ -58,17 +58,17 @@ define(function (require) {
                     var $elem, module, name, options, loadDeferred, $separateLayout;
 
                     $elem = $(this);
+                    module = $elem.data('pageComponentModule');
                     // find nearest marked container with separate layout
                     $separateLayout = $elem.closest('[data-layout="separate"]');
                     // if it placed inside container - prevent component creation from here
                     if ($separateLayout.length && $.contains(container[0], $separateLayout[0])) {
                         // optimize load time - push components to preload queue
-                        preloadQueue.push($elem.data('pageComponentModule'));
+                        preloadQueue.push(module);
                         return;
                     }
 
                     // console.log('pageComponent', container.attr('class'), {html: $elem.clone().html('')[0].outerHTML});
-                    module = $elem.data('pageComponentModule');
                     name = $elem.data('pageComponentName');
                     options = $elem.data('pageComponentOptions') || {};
                     options._sourceElement = $elem;
