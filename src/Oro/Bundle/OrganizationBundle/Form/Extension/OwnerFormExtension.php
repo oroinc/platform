@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -310,7 +311,12 @@ class OwnerFormExtension extends AbstractTypeExtension
             $isRequired = $formBuilder->getOption('required');
 
             $options = array(
-                'label'              => $this->fieldLabel,
+                'label'              => ConfigHelper::getTranslationKey(
+                    'entity',
+                    'label',
+                    $dataClass,
+                    $this->fieldName
+                ),
                 'required'           => true,
                 'constraints'        => $isRequired ? array(new NotBlank()) : array(),
                 'autocomplete_alias' => 'acl_users',
