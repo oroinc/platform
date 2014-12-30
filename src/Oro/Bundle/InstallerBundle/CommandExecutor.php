@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
@@ -246,5 +247,41 @@ class CommandExecutor
     public function setDefaultTimeout($defaultTimeout)
     {
         $this->defaultTimeout = $defaultTimeout;
+    }
+
+    /**
+     * Check whether specified command is running now
+     *
+     * @param string $commandName
+     * @return bool
+     */
+    public static function isCommandRunning($commandName)
+    {
+        if (self::isCurrentCommand($commandName)) {
+            return true;
+        }
+
+        if (defined('PHP_WINDOWS_VERSION_BUILD')) {
+            $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
+        } else {
+            $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $commandName);
+        }
+
+        $process = new Process($cmd);
+        $process->run();
+        $results = $process->getOutput();
+
+        return !empty($results);
+    }
+
+    /**
+     * Check if this process executes specified command
+     *
+     * @param string $commandName
+     * @return bool
+     */
+    public static function isCurrentCommand($commandName)
+    {
+        return php_sapi_name() == 'cli' && isset($_SERVER['argv']) && in_array($commandName, $_SERVER['argv']);
     }
 }

@@ -17,6 +17,7 @@ use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
 use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
+use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class OroEntityExtendBundle extends Bundle
 {
@@ -70,31 +71,51 @@ class OroEntityExtendBundle extends Bundle
     private function ensureCacheInitialized()
     {
         $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->kernel->getCacheDir());
-        if (!$this->isCommandExecuting('oro:entity-extend:cache:warmup')
-            && !$this->isCommandExecuting('doctrine:cache:clear-metadata')
-            && !file_exists($aliasesPath)
+        if (file_exists($aliasesPath)
+            || $this->isCurrentCommand('oro:entity-extend:cache:warmup')
+            || $this->isCurrentCommand('doctrine:cache:clear-metadata')
         ) {
-            $console = escapeshellarg($this->getPhp()) . ' ' . escapeshellarg($this->kernel->getRootDir() . '/console');
-            $env     = $this->kernel->getEnvironment();
-
-            // We have to warm up the extend entities cache in separate process
-            // to allow this process continue executing.
-            // The problem is we need initialized DI contained for warming up this cache,
-            // but in this moment we are exactly doing this for the current process.
-            $process = new Process($console . ' oro:entity-extend:cache:warmup' . ' --env ' . $env);
-            $process->setTimeout(300);
-            $process->run();
-
-            // Doctrine metadata might be invalid after extended cache generation
-            $process = new Process($console . ' doctrine:cache:clear-metadata' . ' --env ' . $env);
-            $process->setTimeout(300);
-            $process->run();
+            return;
         }
+
+        $attempts = 0;
+        do {
+            if (!$this->isCommandRunning('oro:entity-extend:cache:warmup')
+                && !$this->isCommandRunning('doctrine:cache:clear-metadata')
+            ) {
+                // if cache was generated there is no need to generate it again
+                if ($attempts > 0) {
+                    return;
+                }
+
+                $console = escapeshellarg($this->getPhp()) . ' '
+                    . escapeshellarg($this->kernel->getRootDir() . '/console');
+                $env = $this->kernel->getEnvironment();
+
+                // We have to warm up the extend entities cache in separate process
+                // to allow this process continue executing.
+                // The problem is we need initialized DI contained for warming up this cache,
+                // but in this moment we are exactly doing this for the current process.
+                $process = new Process($console . ' oro:entity-extend:cache:warmup' . ' --env ' . $env);
+                $process->setTimeout(300);
+                $process->run();
+
+                // Doctrine metadata might be invalid after extended cache generation
+                $process = new Process($console . ' doctrine:cache:clear-metadata' . ' --env ' . $env);
+                $process->setTimeout(300);
+                $process->run();
+
+                return;
+            } else {
+                $attempts++;
+                sleep(1);
+            }
+        } while ($attempts < 120);
     }
 
     private function ensureAliasesSet()
     {
-        if (!$this->isCommandExecuting('oro:entity-extend:update-config')) {
+        if (!$this->isCurrentCommand('oro:entity-extend:update-config')) {
             ExtendClassLoadingUtils::setAliases($this->kernel->getCacheDir());
         }
     }
@@ -127,33 +148,24 @@ class OroEntityExtendBundle extends Bundle
     }
 
     /**
-     * Indicates if the given command is being executed.
+     * Indicates if the given command is being executed
      *
      * @param string $commandName
      * @return bool
      */
-    private function isCommandExecuting($commandName)
+    private function isCommandRunning($commandName)
     {
-        $isExecuting = false;
+        return CommandExecutor::isCommandRunning($commandName);
+    }
 
-        if (!empty($_SERVER['argv'])) {
-            $isExecuting = in_array($commandName, $_SERVER['argv']);
-        }
-
-        if (!$isExecuting) {
-            if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-                $cmd = 'WMIC path win32_process get Processid,Commandline | findstr "%s" | findstr /V findstr';
-            } else {
-                $cmd = sprintf('ps ax | grep "%s" | grep -v grep', $commandName);
-            }
-
-            $process = new Process($cmd);
-            $process->run();
-            $results = $process->getOutput();
-
-            $isExecuting = !empty($results);
-        }
-
-        return $isExecuting;
+    /**
+     * Check if this process executes specified command
+     *
+     * @param string $commandName
+     * @return bool
+     */
+    private function isCurrentCommand($commandName)
+    {
+        return CommandExecutor::isCurrentCommand($commandName);
     }
 }
