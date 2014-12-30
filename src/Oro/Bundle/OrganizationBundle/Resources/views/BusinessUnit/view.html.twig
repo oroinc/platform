@@ -41,7 +41,7 @@
         }) }}
     {% endset %}
 
-    {% set businessUnitEmailsWidget %}
+    {% set businessUnitUsersWidget %}
         {{ oro_widget_render({
             'widgetType': 'block',
             'url': path('oro_business_unit_widget_users', {id: entity.id})
@@ -59,7 +59,7 @@
         {
             'title': 'oro.organization.businessunit.users.label'|trans,
             'subblocks': [
-                {'data' : [businessUnitEmailsWidget]}
+                {'data' : [businessUnitUsersWidget]}
             ]
         },
     ] %}
