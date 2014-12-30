@@ -37,6 +37,10 @@ class FormatStringTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->action = new FormatString(new ContextAccessor());
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     protected function tearDown()

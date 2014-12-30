@@ -39,6 +39,10 @@ class CreateDateTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(self::TIMEZONE));
 
         $this->action = new CreateDate($this->contextAccessor, $this->localeSettings);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     protected function tearDown()

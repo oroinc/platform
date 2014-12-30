@@ -30,6 +30,10 @@ class AssignActiveUserTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new AssignActiveUser(new ContextAccessor(), $this->securityContext);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     protected function tearDown()
