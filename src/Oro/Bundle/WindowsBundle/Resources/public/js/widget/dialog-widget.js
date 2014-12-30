@@ -243,6 +243,7 @@ define(function (require) {
                     this.options.dialogOptions
                 );
                 this.widget = $('<div/>').append(this.$el).dialog(dialogOptions);
+                this.widget.attr('data-layout', 'separate');
             } else {
                 this.widget.html(this.$el);
             }
