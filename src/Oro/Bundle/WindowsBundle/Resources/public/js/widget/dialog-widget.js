@@ -9,6 +9,7 @@ define(function (require) {
         tools = require('oroui/js/tools'),
         error = require('oroui/js/error'),
         messenger = require('oroui/js/messenger'),
+        layout = require('oroui/js/layout'),
         AbstractWidget = require('oroui/js/widget/abstract-widget'),
         StateModel = require('orowindows/js/dialog/state/model');
     require('jquery.dialog.extended');
