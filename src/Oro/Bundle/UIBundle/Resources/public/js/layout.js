@@ -46,66 +46,71 @@ define(function (require) {
          * @returns {jQuery.Promise}
          */
         initPageComponents: function (container, parent) {
-            var loadPromises, initDeferred;
+            var loadPromises, initDeferred, pageComponentNodes;
             loadPromises = [];
-            initDeferred = $.Deferred();
+            initDeferred = $.Deferred(),
+            pageComponentNodes = container.find('[data-page-component-module]');
 
-            container.find('[data-page-component-module]').each(function () {
-                var $elem, module, name, options, loadDeferred;
+            if (pageComponentNodes.length) {
+                pageComponentNodes.each(function () {
+                    var $elem, module, name, options, loadDeferred;
 
-                $elem = $(this);
-                module = $elem.data('pageComponentModule');
-                name = $elem.data('pageComponentName');
-                options = $elem.data('pageComponentOptions') || {};
-                options._sourceElement = $elem;
-                if (name) {
-                    options.name = name;
-                }
-                options.parent = parent;
-
-                $elem
-                    .attr('data-bound-component', module)
-                    .removeData('pageComponentModule')
-                    .removeData('pageComponentOptions')
-                    .removeAttr('data-page-component-module')
-                    .removeAttr('data-page-component-options');
-                loadDeferred = $.Deferred();
-
-                require([module], function (component) {
-                    if (typeof component.init === "function") {
-                        loadDeferred.resolve(component.init(options));
-                    } else {
-                        loadDeferred.resolve(component(options));
+                    $elem = $(this);
+                    module = $elem.data('pageComponentModule');
+                    name = $elem.data('pageComponentName');
+                    options = $elem.data('pageComponentOptions') || {};
+                    options._sourceElement = $elem;
+                    if (name) {
+                        options.name = name;
                     }
-                }, function (e) {
-                    var e2;
-                    if (tools.debug) {
-                        try {
-                            // rethrow of exception will not show stack - try to show it manually
-                            console.log(e.stack)
-                        } catch (e2) {
-                            // have no access to stack information, suppress
+                    options.parent = parent;
+
+                    $elem
+                        .attr('data-bound-component', module)
+                        .removeData('pageComponentModule')
+                        .removeData('pageComponentOptions')
+                        .removeAttr('data-page-component-module')
+                        .removeAttr('data-page-component-options');
+                    loadDeferred = $.Deferred();
+
+                    require([module], function (component) {
+                        if (typeof component.init === "function") {
+                            loadDeferred.resolve(component.init(options));
+                        } else {
+                            loadDeferred.resolve(component(options));
                         }
-                        throw e;
-                    } else {
-                        // prevent interface from blocking by loader in production mode
-                        mediator.execute('showMessage', 'error',
-                            __('Cannot load module ') + '"' + e.requireModules[0] + '"'
-                        );
-                        loadDeferred.resolve();
-                    }
+                    }, function (e) {
+                        var e2;
+                        if (tools.debug) {
+                            try {
+                                // rethrow of exception will not show stack - try to show it manually
+                                console.log(e.stack)
+                            } catch (e2) {
+                                // have no access to stack information, suppress
+                            }
+                            throw e;
+                        } else {
+                            // prevent interface from blocking by loader in production mode
+                            mediator.execute('showMessage', 'error',
+                                __('Cannot load module ') + '"' + e.requireModules[0] + '"'
+                            );
+                            loadDeferred.resolve();
+                        }
+                    });
+
+                    loadPromises.push(loadDeferred.promise());
                 });
 
-                loadPromises.push(loadDeferred.promise());
-            });
-
-            $.when.apply($, loadPromises).always(function () {
-                var initPromises = _.flatten(_.toArray(arguments), true);
-                $.when.apply($, initPromises).always(function () {
-                    var components = _.compact(_.flatten(_.toArray(arguments), true));
-                    initDeferred.resolve(components);
+                $.when.apply($, loadPromises).always(function () {
+                    var initPromises = _.flatten(_.toArray(arguments), true);
+                    $.when.apply($, initPromises).always(function () {
+                        var components = _.compact(_.flatten(_.toArray(arguments), true));
+                        initDeferred.resolve(components);
+                    });
                 });
-            });
+            } else {
+                initDeferred.resolve();
+            }
 
             return initDeferred.promise();
         },

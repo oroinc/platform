@@ -2,8 +2,8 @@ define({
     /**
      * Getter/setter for components
      *
-     * @param name {string}
-     * @param component {instance} Optional
+     * @param {string} name
+     * @param {instance} component Optional
      */
     pageComponent: function (name, component) {
         if (!this.pageComponents) {
@@ -22,7 +22,7 @@ define({
     },
 
     /**
-     * @param name {string} component name to remove
+     * @param {string} name component name to remove
      */
     removePageComponent: function (name) {
         if (!this.pageComponents) {
