@@ -1,33 +1,26 @@
 <?php
+
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\FormBundle\Form\DataMapper\UnidirectionalPropertyMapper;
 
 class MultipleEntityType extends AbstractType
 {
-    /**
-     * @var OroEntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
 
-    public function __construct($entityManager, SecurityFacade $securityFacade)
+    /**
+     * @param SecurityFacade $securityFacade
+     */
+    public function __construct(SecurityFacade $securityFacade)
     {
-        $this->entityManager  = $entityManager;
         $this->securityFacade = $securityFacade;
     }
 
@@ -54,38 +47,7 @@ class MultipleEntityType extends AbstractType
                 ]
             );
 
-        if ($options['extend']) {
-            $em    = $this->entityManager;
-            $class = $options['class'];
-
-            $builder->addEventListener(
-                FormEvents::PRE_SUBMIT,
-                function (FormEvent $event) use ($em, $class) {
-                    $data       = $event->getData();
-                    $repository = $em->getRepository($class);
-                    $targetData = $event->getForm()->getParent()->getData();
-                    $fieldName  = $event->getForm()->getName();
-
-                    if (!empty($data['added'])) {
-                        foreach (explode(',', $data['added']) as $id) {
-                            $entity = $repository->find($id);
-                            if ($entity) {
-                                FieldAccessor::addValue($targetData, $fieldName, $entity);
-                            }
-                        }
-                    }
-
-                    if (!empty($data['removed'])) {
-                        foreach (explode(',', $data['removed']) as $id) {
-                            $entity = $repository->find($id);
-                            if ($entity) {
-                                FieldAccessor::removeValue($targetData, $fieldName, $entity);
-                            }
-                        }
-                    }
-                }
-            );
-        }
+        $builder->setDataMapper(new UnidirectionalPropertyMapper());
     }
 
     /**
@@ -99,9 +61,7 @@ class MultipleEntityType extends AbstractType
                 'add_acl_resource'           => null,
                 'class'                      => null,
                 'default_element'            => null,
-                'extend'                     => false,
                 'initial_elements'           => null,
-                'mapped'                     => false,
                 'selector_window_title'      => null,
                 'extra_config'               => null,
                 'grid_url'                   => null, // deprecated

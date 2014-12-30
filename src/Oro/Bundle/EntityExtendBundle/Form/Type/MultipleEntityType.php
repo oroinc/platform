@@ -2,27 +2,33 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class MultipleEntityType extends AbstractType
 {
     const TYPE = 'oro_entity_extend_multiple_entity';
 
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     protected $router;
+
+    /** @var ManagerRegistry */
+    protected $registry;
 
     /**
      * @param RouterInterface $router
+     * @param ManagerRegistry $registry
      */
-    public function __construct(RouterInterface $router)
+    public function __construct(RouterInterface $router, ManagerRegistry $registry)
     {
-        $this->router = $router;
+        $this->router   = $router;
+        $this->registry = $registry;
     }
 
     /**
@@ -67,11 +73,22 @@ class MultipleEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(['extend' => false /* deprecated since 1.5, not used anymore */]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::TYPE;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'oro_multiple_entity';

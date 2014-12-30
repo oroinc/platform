@@ -272,5 +272,6 @@ services:
         class: %oro_entity_extend.type.multiple_entity.class%
         arguments:
             - @router
+            - @doctrine
         tags:
             - { name: form.type, alias: oro_entity_extend_multiple_entity }

@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
 use Symfony\Component\Form\FormView;
+
+use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
 
 class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,16 +23,10 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getRepository'))
-            ->getMockForAbstractClass();
-
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
-        $this->type = new MultipleEntityType($em, $this->securityFacade);
+        $this->type = new MultipleEntityType($this->securityFacade);
     }
 
     public function testGetName()
@@ -70,7 +65,6 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
                     'add_acl_resource'           => null,
                     'class'                      => null,
                     'default_element'            => null,
-                    'extend'                     => false,
                     'grid_url'                   => null,
                     'initial_elements'           => null,
                     'mapped'                     => false,
