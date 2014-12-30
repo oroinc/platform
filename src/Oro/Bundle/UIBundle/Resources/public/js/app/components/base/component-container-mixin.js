@@ -3,7 +3,7 @@ define({
      * Getter/setter for components
      *
      * @param {string} name
-     * @param {BaseComponent} component Optional
+     * @param {BaseComponent=} component to set
      */
     pageComponent: function (name, component) {
         if (!this.pageComponents) {
