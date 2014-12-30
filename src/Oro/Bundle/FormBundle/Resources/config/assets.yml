@@ -1,0 +1,3 @@
+css:
+    'oroconfig':
+      - 'bundles/oroform/css/less/form.less'

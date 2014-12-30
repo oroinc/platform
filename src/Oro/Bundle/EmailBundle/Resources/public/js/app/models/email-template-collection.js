@@ -1,14 +1,16 @@
 /*global define*/
-define(['backbone', 'routing', './model'
-    ], function (Backbone, routing, EmailTemplateModel) {
+define(function (require) {
     'use strict';
 
+    var EmailTemplateCollection,
+        routing = require('routing'),
+        EmailTemplateModel = require('./email-template-model'),
+        BaseCollection = require('oroui/js/app/models/base/collection');
+
     /**
-     * @export  oroemail/js/email/template/collection
-     * @class   oroemail.email.template.Collection
-     * @extends Backbone.Collection
+     * @export  oroemail/js/app/models/email-template-collection
      */
-    return Backbone.Collection.extend({
+    EmailTemplateCollection = BaseCollection.extend({
         route: null,
         routeId: null,
         url: null,
@@ -39,4 +41,6 @@ define(['backbone', 'routing', './model'
             this.url = routing.generate(this.route, routeParams);
         }
     });
+
+    return EmailTemplateCollection;
 });

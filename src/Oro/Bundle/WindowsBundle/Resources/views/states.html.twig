@@ -1,5 +1,5 @@
 {% if windowStates|length %}
-    <div style="display: none" id="widget-states-container">
+    <div style="display: none" id="widget-states-container" data-layout="separate">
         {% for windowState in windowStates %}
             <div id="widget-restored-state-{{ windowState.id|default("none") }}">
                 {{ oro_window_render_fragment(windowState) }}
@@ -8,14 +8,14 @@
     </div>
 
     <script type="text/javascript">
-        require(['jquery', 'oro/dialog-widget', 'orowindows/js/dialog/state/model'],
+        require(['jquery', 'oro/dialog-widget', 'orowindows/js/dialog/state/model', 'ready!app'],
         function($, DialogWidget, StateModel) {
             $(function(){
                 {% for windowState in windowStates if windowState.renderedSuccessfully %}
-                var widget = new DialogWidget({
+                new DialogWidget({
+                    autoRender: true,
                     model: new StateModel({{ {'data': windowState.data, 'id': windowState.id}|json_encode|raw }})
                 });
-                widget.render();
                 {% endfor %}
             });
         });
