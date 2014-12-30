@@ -20,7 +20,15 @@ define(['underscore', 'oroui/js/app/components/base/component', 'oroui/js/tools'
                         { el: options._sourceElement }
                     );
                 this.view = new viewConstructor(viewOptions);
-                this._resolveDeferredInit();
+                if (this.view.renderDeffered) {
+                    this.view.renderDeffered
+                        .done(_.bind(this._resolveDeferredInit, this))
+                        .fail(function () {
+                            throw new Error("View rendering failed");
+                        });
+                } else {
+                    this._resolveDeferredInit();
+                }
             }, this);
         }
     });

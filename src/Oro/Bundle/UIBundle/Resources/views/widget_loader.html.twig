@@ -5,7 +5,7 @@
 </div>
 
 <script type="text/javascript">
-    require(['jquery', 'oro/{{ widgetType ~ '-widget' }}'],
+    require(['jquery', 'oro/{{ widgetType ~ '-widget' }}', 'ready!app'],
     function($, Widget){
         $(function(){
             var widget = new Widget({{ options|json_encode|raw }});

@@ -229,6 +229,18 @@ define(function (require) {
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
                 metadata: this.metadata
             };
+        },
+        dispose: function () {
+            // disposes registered sub-components
+            if (this.subComponents) {
+                _.each(this.subComponents, function (component) {
+                    if (component && typeof component.dispose === 'function') {
+                        component.dispose();
+                    }
+                });
+                delete this.subComponents;
+            }
+            DataGridComponent.__super__.dispose.call(this);
         }
     });
 

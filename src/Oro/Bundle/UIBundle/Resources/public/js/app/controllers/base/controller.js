@@ -2,8 +2,9 @@
 /*global define, require*/
 define([
     'jquery',
-    'chaplin'
-], function ($, Chaplin) {
+    'chaplin',
+    'oroui/js/mediator'
+], function ($, Chaplin, mediator) {
     'use strict';
 
     var BaseController, reuses, promiseLoads;
@@ -17,14 +18,13 @@ define([
          * @override
          */
         beforeAction: function (params, route, options) {
-            var i, deferredInit, self;
+            var i, self;
 
             BaseController.__super__.beforeAction.apply(this, arguments);
 
-            deferredInit = $.Deferred();
             self = this;
 
-            $.when.apply($, promiseLoads).then(function () {
+            return $.when.apply($, promiseLoads).then(function () {
                 // if it's first time route
                 if (!route.previous) {
                     // initializes page cache
@@ -34,11 +34,7 @@ define([
                 for (i = 0; i < reuses.length; i += 1) {
                     self.reuse.apply(self, reuses[i]);
                 }
-                // all compositions are ready, allows to execute action
-                deferredInit.resolve();
             });
-
-            return deferredInit.promise();
         },
 
         /**

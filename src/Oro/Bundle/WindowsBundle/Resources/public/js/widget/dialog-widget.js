@@ -8,8 +8,8 @@ define(function (require) {
         __= require('orotranslation/js/translator'),
         tools = require('oroui/js/tools'),
         error = require('oroui/js/error'),
-        layout = require('oroui/js/layout'),
         messenger = require('oroui/js/messenger'),
+        layout = require('oroui/js/layout'),
         AbstractWidget = require('oroui/js/widget/abstract-widget'),
         StateModel = require('orowindows/js/dialog/state/model');
     require('jquery.dialog.extended');
@@ -127,7 +127,7 @@ define(function (require) {
             this._hideLoading();
 
             // need to remove components in widget before DOM will be deleted
-            this._removeComponents();
+            this.disposePageComponents();
             if (this.widget) {
                 this.widget.remove();
                 delete this.widget;
@@ -232,12 +232,17 @@ define(function (require) {
          * Show dialog
          */
         show: function() {
+            var dialogOptions;
             if (!this.widget) {
                 if (typeof this.options.dialogOptions.position === 'undefined') {
                     this.options.dialogOptions.position = this._getWindowPlacement();
                 }
                 this.options.dialogOptions.stateChange = _.bind(this.handleStateChange, this);
-                this.widget = $('<div/>').append(this.$el).dialog(this.options.dialogOptions);
+                dialogOptions = _.extend(
+                    {dialogClass: 'invisible'},
+                    this.options.dialogOptions
+                );
+                this.widget = $('<div/>').append(this.$el).dialog(dialogOptions);
             } else {
                 this.widget.html(this.$el);
             }
@@ -256,6 +261,12 @@ define(function (require) {
             }, this));
 
             this.widget.on("dialogresizestop", _.bind(this._fixBorderShifting, this));
+        },
+
+        _afterLayoutInit: function () {
+            this.widget.closest('.invisible').removeClass('invisible');
+            this.renderDeffered.resolve();
+            delete this.renderDeffered;
         },
 
         _initAdjustHeight: function(content) {

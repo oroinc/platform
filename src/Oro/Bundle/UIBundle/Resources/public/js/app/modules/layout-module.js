@@ -17,4 +17,3 @@ require([
         mediator.on('page:afterChange', layout.pageRendered, layout);
     });
 });
-

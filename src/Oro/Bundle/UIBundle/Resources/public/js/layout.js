@@ -22,7 +22,7 @@ define(function (require) {
     pageRenderedCbPool = [];
 
     layout = {
-        init: function (container, superInstance) {
+        init: function (container, parent) {
             var promise;
             container = $(container);
             this.styleForm(container);
@@ -33,84 +33,83 @@ define(function (require) {
 
             this.initPopover(container.find('label'));
 
-            promise = this.initPageComponents(container, superInstance);
+            promise = this.initPageComponents(container, parent);
             return promise;
         },
 
         /**
          * Initializes components defined in HTML of the container
-         * and attaches them to passed superInstance
+         * and attaches them to passed parent instance
          *
          * @param {jQuery.Element} container
-         * @param {Backbone.View|Chaplin.View|PageController} superInstance
+         * @param {Backbone.View|Chaplin.View|PageController} parent
          * @returns {jQuery.Promise}
          */
-        initPageComponents: function (container, superInstance) {
-            var loadPromises, initDeferred;
+        initPageComponents: function (container, parent) {
+            var loadPromises, initDeferred, pageComponentNodes;
             loadPromises = [];
-            initDeferred = $.Deferred();
+            initDeferred = $.Deferred(),
+            pageComponentNodes = container.find('[data-page-component-module]');
 
-            container.find('[data-page-component-module]').each(function () {
-                var $elem, module, options, loadDeferred;
+            if (pageComponentNodes.length) {
+                pageComponentNodes.each(function () {
+                    var $elem, module, name, options, loadDeferred;
 
-                $elem = $(this);
-                module = $elem.data('pageComponentModule');
-                options = $elem.data('pageComponentOptions') || {};
-                options._sourceElement = $elem;
-                $elem
-                    .addClass('js-bound-component')
-                    .removeData('pageComponentModule')
-                    .removeData('pageComponentOptions')
-                    .removeAttr('data-page-component-module')
-                    .removeAttr('data-page-component-options');
-                loadDeferred = $.Deferred();
-
-                require([module], function (component) {
-                    if (typeof component.init === "function") {
-                        loadDeferred.resolve(component.init(options));
-                    } else {
-                        loadDeferred.resolve(component(options));
+                    $elem = $(this);
+                    module = $elem.data('pageComponentModule');
+                    name = $elem.data('pageComponentName');
+                    options = $elem.data('pageComponentOptions') || {};
+                    options._sourceElement = $elem;
+                    if (name) {
+                        options.name = name;
                     }
-                }, function (e) {
-                    throw e;
-                });
+                    options.parent = parent;
 
-                loadPromises.push(loadDeferred.promise());
-            });
+                    $elem
+                        .attr('data-bound-component', module)
+                        .removeData('pageComponentModule')
+                        .removeData('pageComponentOptions')
+                        .removeAttr('data-page-component-module')
+                        .removeAttr('data-page-component-options');
+                    loadDeferred = $.Deferred();
 
-            $.when.apply($, loadPromises).always(function () {
-                var initPromises = _.flatten(_.toArray(arguments), true);
-                $.when.apply($, initPromises).always(function () {
-                    var components = _.compact(_.flatten(_.toArray(arguments), true));
-                    initDeferred.resolve(components);
-                });
-            });
-
-            // if the super instance (view/controller) is passed,
-            // attache component instances to that super instance
-            if (superInstance) {
-                initDeferred.done(function (components) {
-                    _.each(components, function (component) {
-                        var name;
-                        if (typeof component.dispose !== 'function') {
-                            // the component is not disposable
-                            return;
-                        } else if (superInstance.disposed) {
-                            // the super instance is already disposed
-                            component.dispose();
-                            return;
-                        }
-
-                        name = 'component:' + (component.cid || _.uniqueId('component'));
-                        if (typeof superInstance.subview === 'function') {
-                            // the super instance implements subview method (like a Chaplin.View)
-                            superInstance.subview(name, component);
+                    require([module], function (component) {
+                        if (typeof component.init === "function") {
+                            loadDeferred.resolve(component.init(options));
                         } else {
-                            // the super instance is a controller or Backbone.View
-                            superInstance[name] = component;
+                            loadDeferred.resolve(component(options));
+                        }
+                    }, function (e) {
+                        var e2;
+                        if (tools.debug) {
+                            try {
+                                // rethrow of exception will not show stack - try to show it manually
+                                console.log(e.stack)
+                            } catch (e2) {
+                                // have no access to stack information, suppress
+                            }
+                            throw e;
+                        } else {
+                            // prevent interface from blocking by loader in production mode
+                            mediator.execute('showMessage', 'error',
+                                __('Cannot load module ') + '"' + e.requireModules[0] + '"'
+                            );
+                            loadDeferred.resolve();
                         }
                     });
+
+                    loadPromises.push(loadDeferred.promise());
                 });
+
+                $.when.apply($, loadPromises).always(function () {
+                    var initPromises = _.flatten(_.toArray(arguments), true);
+                    $.when.apply($, initPromises).always(function () {
+                        var components = _.compact(_.flatten(_.toArray(arguments), true));
+                        initDeferred.resolve(components);
+                    });
+                });
+            } else {
+                initDeferred.resolve();
             }
 
             return initDeferred.promise();
