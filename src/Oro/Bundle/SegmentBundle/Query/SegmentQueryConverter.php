@@ -80,7 +80,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function generateTableAlias()
+    protected function generateTableAlias($offset = 1)
     {
         return sprintf(static::TABLE_ALIAS_TEMPLATE, mt_rand());
     }
