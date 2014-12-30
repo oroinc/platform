@@ -1193,14 +1193,29 @@ i.mce-i-checkbox {
 .mce-flow-layout-item {
     display: inline-block;
     padding-right: 2px;
-    border-right: solid 1px #d8d8d8;
-    margin: 1px 0 2px 2px
+    margin: 1px 2px 2px 1px;
+    position: relative;
+}
+
+.mce-flow-layout-item:after {
+    content: "|";
+    display: inline-block;
+    position: absolute;
+    right: -3px;
+    color: #eee;
+    line-height: 26px;
+    top: 0;
+    font-size: 19px;
+    color: #ddd;
 }
 
 .mce-flow-layout-item.mce-last {
     margin-right: 2px;
     padding-right: 0;
     border-right: none;
+}
+.mce-flow-layout-item.mce-last:after {
+    display: none;
 }
 
 .mce-flow-layout {
