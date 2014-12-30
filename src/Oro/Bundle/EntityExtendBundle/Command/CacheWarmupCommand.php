@@ -10,13 +10,15 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class CacheWarmupCommand extends ContainerAwareCommand
 {
+    const NAME = 'oro:entity-extend:cache:warmup';
+
     /**
      * Console command configuration
      */
     public function configure()
     {
         $this
-            ->setName('oro:entity-extend:cache:warmup')
+            ->setName(self::NAME)
             ->setDescription('Warms up the extended entity cache.');
     }
 
