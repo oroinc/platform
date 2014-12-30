@@ -16,7 +16,6 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-
         $treeBuilder = new TreeBuilder();
         $treeBuilder->root('oro_require_js')
             ->children()
@@ -35,7 +34,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('web_root')->defaultValue('%kernel.root_dir%/../web')->end()
-                ->scalarNode('js_engine')->defaultValue(null)->end()
+                ->scalarNode('js_engine')->defaultNull()->end()
                 ->scalarNode('build_path')->defaultValue('js/app.min.js')->end()
                 ->integerNode('building_timeout')->min(1)->defaultValue(60)->end()
                 ->arrayNode('build')
@@ -55,8 +54,8 @@ class Configuration implements ConfigurationInterface
             ->validate()
                 ->always(
                     function ($value) {
-                        if (array_key_exists('js_engine', $value) && $value['js_engine'] == null) {
-                            $value['js_engine'] = self::checkDefaultJsEngine();
+                        if (empty($value['js_engine'])) {
+                            $value['js_engine'] = self::getDefaultJsEngine();
                         }
                         return $value;
                     }
@@ -69,7 +68,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @return string|null
      */
-    public static function checkDefaultJsEngine()
+    public static function getDefaultJsEngine()
     {
         $jsEngines = ['node', 'nodejs', 'rhino'];
         $availableJsEngines = [];
@@ -86,6 +85,6 @@ class Configuration implements ConfigurationInterface
             }
         }
 
-        return !empty($availableJsEngines) ? reset($availableJsEngines) : null;
+        return $availableJsEngines ? reset($availableJsEngines) : null;
     }
 }
