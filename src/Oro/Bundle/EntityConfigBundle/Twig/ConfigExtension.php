@@ -85,7 +85,7 @@ class ConfigExtension extends \Twig_Extension
     public function getFieldConfig($className, $fieldName, $scope = 'entity')
     {
         if (!$this->configManager->hasConfig($className, $fieldName)) {
-            return null;
+            return [];
         }
 
         return $this->configManager->getProvider($scope)->getConfig($className, $fieldName)->all();

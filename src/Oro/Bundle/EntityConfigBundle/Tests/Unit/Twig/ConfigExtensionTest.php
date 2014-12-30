@@ -100,7 +100,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->configManager->expects($this->never())
             ->method('getProvider');
 
-        $this->assertNull($this->twigExtension->getFieldConfig($className, $fieldName));
+        $this->assertEquals([], $this->twigExtension->getFieldConfig($className, $fieldName));
     }
 
     /**
