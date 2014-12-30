@@ -16,11 +16,18 @@ use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\MigrationConfigPa
 use Oro\Bundle\EntityExtendBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ExtensionPass;
+use Oro\Bundle\EntityExtendBundle\Command\CacheWarmupCommand;
+use Oro\Bundle\EntityExtendBundle\Command\UpdateConfigCommand;
 use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class OroEntityExtendBundle extends Bundle
 {
+    const DOCTRINE_CLEAR_COMMAND   = 'doctrine:cache:clear-metadata';
+    const CACHE_GENERATION_TIMEOUT = 300;
+    const CACHE_CHECKOUT_INTERVAL  = 1;
+    const CACHE_CHECKOUT_ATTEMPTS  = 120;
+
     private $kernel;
 
     public function __construct(KernelInterface $kernel)
@@ -72,16 +79,16 @@ class OroEntityExtendBundle extends Bundle
     {
         $aliasesPath = ExtendClassLoadingUtils::getAliasesPath($this->kernel->getCacheDir());
         if (file_exists($aliasesPath)
-            || $this->isCurrentCommand('oro:entity-extend:cache:warmup')
-            || $this->isCurrentCommand('doctrine:cache:clear-metadata')
+            || $this->isCurrentCommand(CacheWarmupCommand::NAME)
+            || $this->isCurrentCommand(self::DOCTRINE_CLEAR_COMMAND)
         ) {
             return;
         }
 
         $attempts = 0;
         do {
-            if (!$this->isCommandRunning('oro:entity-extend:cache:warmup')
-                && !$this->isCommandRunning('doctrine:cache:clear-metadata')
+            if (!$this->isCommandRunning(CacheWarmupCommand::NAME)
+                && !$this->isCommandRunning(self::DOCTRINE_CLEAR_COMMAND)
             ) {
                 // if cache was generated there is no need to generate it again
                 if ($attempts > 0) {
@@ -96,26 +103,26 @@ class OroEntityExtendBundle extends Bundle
                 // to allow this process continue executing.
                 // The problem is we need initialized DI contained for warming up this cache,
                 // but in this moment we are exactly doing this for the current process.
-                $process = new Process($console . ' oro:entity-extend:cache:warmup' . ' --env ' . $env);
-                $process->setTimeout(300);
+                $process = new Process($console . ' ' . CacheWarmupCommand::NAME . ' --env ' . $env);
+                $process->setTimeout(self::CACHE_GENERATION_TIMEOUT);
                 $process->run();
 
                 // Doctrine metadata might be invalid after extended cache generation
-                $process = new Process($console . ' doctrine:cache:clear-metadata' . ' --env ' . $env);
-                $process->setTimeout(300);
+                $process = new Process($console . ' ' . self::DOCTRINE_CLEAR_COMMAND . ' --env ' . $env);
+                $process->setTimeout(self::CACHE_GENERATION_TIMEOUT);
                 $process->run();
 
                 return;
             } else {
                 $attempts++;
-                sleep(1);
+                sleep(self::CACHE_CHECKOUT_INTERVAL);
             }
-        } while ($attempts < 120);
+        } while ($attempts < self::CACHE_CHECKOUT_ATTEMPTS);
     }
 
     private function ensureAliasesSet()
     {
-        if (!$this->isCurrentCommand('oro:entity-extend:update-config')) {
+        if (!$this->isCurrentCommand(UpdateConfigCommand::NAME)) {
             ExtendClassLoadingUtils::setAliases($this->kernel->getCacheDir());
         }
     }
