@@ -27,6 +27,8 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
+use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
+
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
@@ -309,7 +311,12 @@ class OwnerFormExtension extends AbstractTypeExtension
             $isRequired = $formBuilder->getOption('required');
 
             $options = [
-                'label'              => $this->fieldLabel,
+                'label'              => ConfigHelper::getTranslationKey(
+                    'entity',
+                    'label',
+                    $dataClass,
+                    $this->fieldName
+                ),
                 'required'           => true,
                 'constraints'        => $isRequired ? [new NotBlank()] : [],
                 'autocomplete_alias' => 'acl_users',

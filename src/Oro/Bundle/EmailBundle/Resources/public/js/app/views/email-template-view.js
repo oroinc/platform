@@ -1,14 +1,16 @@
 /*global define*/
-define(['jquery', 'underscore', 'backbone'
-    ], function ($, _, Backbone) {
+define(function (require) {
     'use strict';
 
+    var EmailTemplateView,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        BaseView= require('oroui/js/app/views/base/view');
+
     /**
-     * @export  oroemail/js/email/template/view
-     * @class   oroemail.email.template.View
-     * @extends Backbone.View
+     * @export oroemail/js/app/views/email-template-view
      */
-    return Backbone.View.extend({
+    EmailTemplateView = BaseView.extend({
         events: {
             'change': 'selectionChanged'
         },
@@ -50,4 +52,6 @@ define(['jquery', 'underscore', 'backbone'
             }
         }
     });
+
+    return EmailTemplateView;
 });

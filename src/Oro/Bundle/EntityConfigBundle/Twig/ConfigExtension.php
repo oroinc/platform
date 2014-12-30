@@ -35,6 +35,8 @@ class ConfigExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFunction('oro_entity_config', [$this, 'getClassConfig']),
             new \Twig_SimpleFunction('oro_entity_config_value', [$this, 'getClassConfigValue']),
+            new \Twig_SimpleFunction('oro_field_config', [$this, 'getFieldConfig']),
+            new \Twig_SimpleFunction('oro_field_config_value', [$this, 'getFieldConfigValue']),
             new \Twig_SimpleFunction('oro_entity_route', [$this, 'getClassRoute']),
         ];
     }
@@ -72,6 +74,37 @@ class ConfigExtension extends \Twig_Extension
         $entityConfig = new EntityConfigId($scope, $className);
 
         return $this->configManager->getConfig($entityConfig)->get($attrName);
+    }
+
+    /**
+     * @param string $className The entity class name
+     * @param string $fieldName The entity field name
+     * @param string $scope     The entity config scope name
+     * @return array
+     */
+    public function getFieldConfig($className, $fieldName, $scope = 'entity')
+    {
+        if (!$this->configManager->hasConfig($className, $fieldName)) {
+            return [];
+        }
+
+        return $this->configManager->getProvider($scope)->getConfig($className, $fieldName)->all();
+    }
+
+    /**
+     * @param string $className The entity class name
+     * @param string $fieldName The entity field name
+     * @param string $attrName  The entity config attribute name
+     * @param string $scope     The entity config scope name
+     * @return array
+     */
+    public function getFieldConfigValue($className, $fieldName, $attrName, $scope = 'entity')
+    {
+        if (!$this->configManager->hasConfig($className, $fieldName)) {
+            return null;
+        }
+
+        return $this->configManager->getProvider($scope)->getConfig($className, $fieldName)->get($attrName);
     }
 
     /**

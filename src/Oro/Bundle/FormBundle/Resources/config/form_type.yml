@@ -18,6 +18,7 @@ parameters:
     oro_form.type.color_table.class:                             Oro\Bundle\FormBundle\Form\Type\OroColorTableType
     oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
     oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\AbstractApiType
+    oro_form.type.rich_text.class:                               Oro\Bundle\FormBundle\Form\Type\OroRichTextType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
     oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
@@ -121,6 +122,15 @@ services:
         class: %oro_form.type.color_table.class%
         tags:
             - { name: form.type, alias: oro_color_table }
+
+    oro_form.type.rich_text:
+        class: %oro_form.type.rich_text.class%
+        arguments:
+            - @oro_config.global
+        calls:
+            - [setAssetHelper, ["@?templating.helper.assets="]]
+        tags:
+            - { name: form.type, alias: oro_rich_text }
 
     # Form extensions
     oro_form.extension.data_block:
