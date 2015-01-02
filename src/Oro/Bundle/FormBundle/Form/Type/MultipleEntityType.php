@@ -2,12 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Collections\ArrayCollection;
-
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
@@ -15,6 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 
 class MultipleEntityType extends AbstractType
 {
@@ -34,64 +29,26 @@ class MultipleEntityType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder
-            ->add(
-                'added',
-                'oro_entity_identifier',
-                [
-                    'class'    => $options['class'],
-                    'multiple' => true,
-                    'mapped'   => false,
-                ]
-            )
-            ->add(
-                'removed',
-                'oro_entity_identifier',
-                [
-                    'class'    => $options['class'],
-                    'multiple' => true,
-                    'mapped'   => false,
-                ]
-            );
-
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $form = $event->getForm();
-
-                $added   = $form->get('added')->getData();
-                $removed = $form->get('removed')->getData();
-
-                /** @var Collection $collection */
-                $collection = $form->getData();
-                foreach ($added as $relation) {
-                    $collection->add($relation);
-                }
-
-                foreach ($removed as $relation) {
-                    $collection->removeElement($relation);
-                }
-            }
+        $builder->add(
+            'added',
+            'oro_entity_identifier',
+            [
+                'class'    => $options['class'],
+                'multiple' => true,
+                'mapped'   => false,
+            ]
+        );
+        $builder->add(
+            'removed',
+            'oro_entity_identifier',
+            [
+                'class'    => $options['class'],
+                'multiple' => true,
+                'mapped'   => false,
+            ]
         );
 
-        $builder->addEventListener(
-            FormEvents::POST_SET_DATA,
-            function (FormEvent $event) {
-                $form       = $event->getForm();
-                $collection = $form->getData();
-                $added      = $removed = [];
-
-                if ($collection instanceof PersistentCollection && $collection->isDirty()) {
-                    $added   = $collection->getInsertDiff();
-                    $removed = $collection->getDeleteDiff();
-                } elseif ($collection instanceof ArrayCollection && $collection->count() > 0) {
-                    $added = $collection->toArray();
-                }
-
-                $form->get('added')->setData($added);
-                $form->get('removed')->setData($removed);
-            }
-        );
+        $builder->addEventSubscriber(new MultipleEntitySubscriber());
     }
 
     /**

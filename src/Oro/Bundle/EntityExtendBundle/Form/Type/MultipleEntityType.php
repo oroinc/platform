@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class MultipleEntityType extends AbstractType
@@ -18,17 +15,12 @@ class MultipleEntityType extends AbstractType
     /** @var RouterInterface */
     protected $router;
 
-    /** @var ManagerRegistry */
-    protected $registry;
-
     /**
      * @param RouterInterface $router
-     * @param ManagerRegistry $registry
      */
-    public function __construct(RouterInterface $router, ManagerRegistry $registry)
+    public function __construct(RouterInterface $router)
     {
-        $this->router   = $router;
-        $this->registry = $registry;
+        $this->router = $router;
     }
 
     /**
