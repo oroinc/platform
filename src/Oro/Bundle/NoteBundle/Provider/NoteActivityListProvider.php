@@ -129,7 +129,7 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
 
         return $config->is('enabled');
     }
-    
+
     /**
      * @param string $string
      * @param int $length
