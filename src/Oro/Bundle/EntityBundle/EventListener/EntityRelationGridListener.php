@@ -97,7 +97,7 @@ class EntityRelationGridListener
 
         $entityId = $datagrid->getParameters()->get('id', false);
 
-        if (false !== $entityId) {
+        if ($entityId) {
             $datasource->bindParameters(['relation' => 'id']);
         }
     }
