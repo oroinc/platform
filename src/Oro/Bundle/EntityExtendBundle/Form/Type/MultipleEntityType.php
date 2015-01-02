@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
@@ -21,6 +24,35 @@ class MultipleEntityType extends AbstractType
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        if (!empty($options['default_element'])) {
+            $builder->addEventListener(
+                FormEvents::PRE_SET_DATA,
+                function (FormEvent $event) use ($options) {
+                    // add field to parent in order to be mapped correctly automatically
+                    // because current field is filled by collection
+                    $parentForm   = $event->getForm()->getParent();
+                    $propertyName = $options['default_element'];
+
+                    if (!$parentForm->has($propertyName)) {
+                        $event->getForm()->getParent()->add(
+                            $propertyName,
+                            'oro_entity_identifier',
+                            [
+                                'class'    => $options['class'],
+                                'multiple' => false
+                            ]
+                        );
+                    }
+                }
+            );
+        }
     }
 
     /**
