@@ -6,14 +6,26 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
+use Oro\Bundle\UserBundle\Entity\User;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+
+/**
+ * Owner users select grid. This grid does not use search index or an ACL helper to limit data.
+ *
+ * Class OwnerUserGridListener
+ * @package Oro\Bundle\UserBundle\EventListener
+ */
 class OwnerUserGridListener
 {
     /** @var EntityManager */
@@ -28,6 +40,12 @@ class OwnerUserGridListener
     /** @var OwnerTreeProvider */
     protected $treeProvider;
 
+    /**
+     * @param EntityManager     $em
+     * @param ServiceLink       $securityContextLink
+     * @param OwnerTreeProvider $treeProvider
+     * @param AclVoter          $aclVoter
+     */
     public function __construct(
         EntityManager $em,
         ServiceLink $securityContextLink,
@@ -45,7 +63,6 @@ class OwnerUserGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        $config      = $event->getConfig();
         $parameters  = $event->getDatagrid()->getParameters();
         $permission  = $parameters->get('permission');
         $entityClass = str_replace('_', '\\', $parameters->get('entity'));
@@ -60,10 +77,27 @@ class OwnerUserGridListener
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         $this->getSecurityContext()->isGranted($permission, $object);
+        $accessLevel = $observer->getAccessLevel();
+
+        $config       = $event->getConfig();
         $user         = $this->getSecurityContext()->getToken()->getUser();
         $organization = $this->getSecurityContext()->getToken()->getOrganizationContext();
-        $accessLevel  = $observer->getAccessLevel();
 
+        $this->applyACL($config, $accessLevel, $user, $organization);
+    }
+
+    /**
+     * Add user limitation
+     *
+     * @param DatagridConfiguration $config
+     * @param string                $accessLevel
+     * @param User                  $user
+     * @param Organization          $organization
+     *
+     * @throws \Exception
+     */
+    protected function applyACL(DatagridConfiguration $config, $accessLevel, User $user, Organization $organization)
+    {
         $where = $config->offsetGetByPath('[source][query][where][and]', []);
         /** todo: refactor this check usages */
         if ($accessLevel == AccessLevel::BASIC_LEVEL) {

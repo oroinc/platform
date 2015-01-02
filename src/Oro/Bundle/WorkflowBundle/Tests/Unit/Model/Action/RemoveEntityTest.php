@@ -33,6 +33,10 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new RemoveEntity($this->contextAccessor, $this->registry);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     /**
