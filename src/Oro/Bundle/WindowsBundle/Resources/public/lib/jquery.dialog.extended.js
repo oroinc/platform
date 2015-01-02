@@ -49,7 +49,7 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
         }),
 
         _allowInteraction: function(e) {
-            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop').length;
+            return !!$(e.target).closest('.ui-dialog, .ui-datepicker, .select2-drop, .mce-window').length;
         },
 
         _create: function () {
