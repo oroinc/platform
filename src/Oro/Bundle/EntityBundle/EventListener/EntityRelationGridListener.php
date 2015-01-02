@@ -4,10 +4,10 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
 class EntityRelationGridListener
 {
@@ -95,10 +95,10 @@ class EntityRelationGridListener
         /** @var OrmDatasource $datasource */
         $datasource = $datagrid->getDatasource();
 
-        $entityId = $datagrid->getParameters()->get('id');
+        $entityId = $datagrid->getParameters()->get('id', false);
 
         if ($entityId) {
-            $datasource->bindParameters(['relation']);
+            $datasource->bindParameters(['relation' => 'id']);
         }
     }
 }
