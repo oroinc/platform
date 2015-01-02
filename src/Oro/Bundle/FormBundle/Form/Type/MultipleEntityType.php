@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\Common\Collections\Collection;
-
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
@@ -76,16 +77,19 @@ class MultipleEntityType extends AbstractType
         $builder->addEventListener(
             FormEvents::POST_SET_DATA,
             function (FormEvent $event) {
-                $form = $event->getForm();
-                /** @var PersistentCollection $collection */
+                $form       = $event->getForm();
                 $collection = $form->getData();
+                $added      = $removed = [];
+
                 if ($collection instanceof PersistentCollection && $collection->isDirty()) {
                     $added   = $collection->getInsertDiff();
                     $removed = $collection->getDeleteDiff();
-
-                    $form->get('added')->setData($added);
-                    $form->get('removed')->setData($removed);
+                } elseif ($collection instanceof ArrayCollection && $collection->count() > 0) {
+                    $added = $collection->toArray();
                 }
+
+                $form->get('added')->setData($added);
+                $form->get('removed')->setData($removed);
             }
         );
     }

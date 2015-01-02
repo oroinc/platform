@@ -34,24 +34,6 @@ class MultipleEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
-    {
-        if (!empty($options['default_element'])) {
-            $builder->add(
-                $options['default_element'],
-                'oro_entity_identifier',
-                [
-                    'class'    => $options['class'],
-                    'multiple' => false,
-                    'mapped'   => false
-                ]
-            );
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $data = $view->parent->vars['value'];

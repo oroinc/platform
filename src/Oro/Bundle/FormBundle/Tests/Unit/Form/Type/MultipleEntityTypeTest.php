@@ -41,13 +41,13 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $builder->expects($this->at(0))
             ->method('add')
-            ->with('added', 'oro_entity_identifier', array('class' => '\stdObject', 'multiple' => true))
+            ->with('added', 'oro_entity_identifier', ['class' => '\stdObject', 'multiple' => true, 'mapped' => false])
             ->will($this->returnSelf());
         $builder->expects($this->at(1))
             ->method('add')
-            ->with('removed', 'oro_entity_identifier', array('class' => '\stdObject', 'multiple' => true))
+            ->with('removed', 'oro_entity_identifier', ['class' => '\stdObject', 'multiple' => true, 'mapped' => false])
             ->will($this->returnSelf());
-        $this->type->buildForm($builder, array('class' => '\stdObject', 'extend' => false));
+        $this->type->buildForm($builder, ['class' => '\stdObject', 'extend' => false]);
     }
 
     public function testSetDefaultOptions()
@@ -67,7 +67,6 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
                     'default_element'            => null,
                     'grid_url'                   => null,
                     'initial_elements'           => null,
-                    'mapped'                     => false,
                     'selector_window_title'      => null,
                     'extra_config'               => null,
                     'selection_url'              => null,
