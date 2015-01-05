@@ -257,9 +257,19 @@ define(function (require) {
 
         _editItem: function (model) {
             if (!this.itemEditDialog) {
+                var unescapeHTML = function unescapeHtml(unsafe) {
+                    return unsafe
+                        .replace(/&nbsp;/g, " ")
+                        .replace(/&amp;/g, "&")
+                        .replace(/&lt;/g, "<")
+                        .replace(/&gt;/g, ">")
+                        .replace(/&quot;/g, "\"")
+                        .replace(/&#039;/g, "'");
+                };
+
                 this.itemEditDialog = new DialogWidget({
                     'url': this._getUrl('itemEdit', model),
-                    'title': model.get('subject'),
+                    'title': unescapeHTML(model.get('subject')),
                     'regionEnabled': false,
                     'incrementalPosition': false,
                     'alias': 'activity_list:item:update',
@@ -343,7 +353,7 @@ define(function (require) {
         _hideLoading: function () {
             if (this.loadingMask) {
                 this.$loadingMaskContainer.data('loading-mask-visible', false);
-                this.loadingMask.remove();
+                this.loadingMask.dispose();
                 this.loadingMask = null;
             }
         },

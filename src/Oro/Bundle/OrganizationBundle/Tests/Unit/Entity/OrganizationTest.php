@@ -73,4 +73,25 @@ class OrganizationTest extends \PHPUnit_Framework_TestCase
             ['users', new ArrayCollection([new User()])]
         ];
     }
+
+    public function testAddRemoveUser()
+    {
+        $org = new Organization();
+
+        $user = new User();
+        $user->setId(uniqid());
+
+        $this->assertFalse($org->hasUser($user));
+
+        $org->addUser($user);
+
+        $users = $org->getUsers()->toArray();
+        $this->assertCount(1, $users);
+        $this->assertTrue($org->hasUser($user));
+        $this->assertEquals($user, reset($users));
+
+        $org->removeUser($user);
+
+        $this->assertFalse($org->hasUser($user));
+    }
 }

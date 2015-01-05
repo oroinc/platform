@@ -115,6 +115,12 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
                     return !option.children && matcher.apply(this, arguments);
                 };
             }
+
+            var additionalRequestParams = options.element.data('select2_query_additional_params');
+            if (additionalRequestParams && options.ajax !== undefined) {
+                options.ajax.url += (options.ajax.url.indexOf('?') == -1 ? '?' : '&') + $.param(additionalRequestParams);
+            }
+
             return prepareOpts.call(this, options);
         };
     }(window.Select2['class'].abstract.prototype));
