@@ -57,6 +57,9 @@ config:
 
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
 
+        'oroform/js/app/views/datepicker/datetimepicker-view': 'bundles/oroform/js/app/views/datepicker/datetimepicker-view.js'
+        'oroform/js/app/views/datepicker/datepicker-view': 'bundles/oroform/js/app/views/datepicker/datepicker-view.js'
+        'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view.js'
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
