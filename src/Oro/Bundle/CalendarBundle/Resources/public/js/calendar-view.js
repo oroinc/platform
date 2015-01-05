@@ -901,7 +901,7 @@ define(function (require) {
             return result;
         },
 
-        getAvailableHeight: function () {
+        getAvailableCalendarHeight: function () {
             var $calendarEl = this.getCalendarElement(),
                 $scrollableParents = $calendarEl.parents('.scrollable-container'),
                 $viewEl = $calendarEl.find('.fc-view:first'),
@@ -912,13 +912,23 @@ define(function (require) {
             return heightDiff - this.devToolbarHeight - this.CALENDAR_BOTTOM_PADDING;
         },
 
+        getAvailableSidebarHeight: function () {
+            var $sidebarEl = $('.oro-page-sidebar'),
+                $scrollableParents = $sidebarEl.parents('.scrollable-container'),
+                heightDiff = $(document).height() - $sidebarEl[0].getBoundingClientRect().top;
+            $scrollableParents.each(function () {
+                heightDiff += this.scrollTop;
+            });
+            return heightDiff - this.devToolbarHeight;
+        },
+
         checkLayout: function () {
             if (this.options.eventsOptions.aspectRatio) {
                 this.setLayout('default');
                 // do nothing
                 return;
             }
-            if (this.getAvailableHeight() > this.options.eventsOptions.minimalHeightForFullScreenLayout) {
+            if (this.getAvailableCalendarHeight() > this.options.eventsOptions.minimalHeightForFullScreenLayout) {
                 this.setLayout('fullscreen');
             } else {
                 this.setLayout('scroll');
@@ -928,7 +938,8 @@ define(function (require) {
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 if (newLayout === 'fullscreen') {
-                    this.getCalendarElement().fullCalendar('option', 'contentHeight', this.getAvailableHeight());
+                    this.getCalendarElement().fullCalendar('option', 'contentHeight', this.getAvailableCalendarHeight());
+                    $('.calendars').height(this.getAvailableSidebarHeight());
                 }
                 return;
             }
@@ -938,15 +949,18 @@ define(function (require) {
                 height = '';
             switch (newLayout) {
                 case 'fullscreen':
+                    $('.calendars').height(this.getAvailableSidebarHeight());
                     this.disablePageScroll();
-                    contentHeight = this.getAvailableHeight();
+                    contentHeight = this.getAvailableCalendarHeight();
                     break;
                 case 'scroll':
                     height = 'auto';
                     contentHeight = 'auto';
+                    $('.calendars').height('');
                     this.enablePageScroll();
                     break;
                 case 'default':
+                    $('.calendars').height('');
                     this.enablePageScroll();
                     // default values
                     break;

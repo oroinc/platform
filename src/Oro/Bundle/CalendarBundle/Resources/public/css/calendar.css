@@ -16,6 +16,7 @@
 
 .calendars {
     padding-left: 10px;
+    overflow: auto;
 }
 
 .calendars li .calendar-color {
