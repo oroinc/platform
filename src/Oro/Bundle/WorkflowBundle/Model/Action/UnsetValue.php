@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
 use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 
-class UnsetValue implements ActionInterface
+class UnsetValue extends AbstractAction
 {
     /**
      * @var AssignValue
@@ -22,7 +22,7 @@ class UnsetValue implements ActionInterface
     /**
      * {@inheritdoc}
      */
-    public function execute($context)
+    public function executeAction($context)
     {
         $this->assignValueAction->execute($context);
     }

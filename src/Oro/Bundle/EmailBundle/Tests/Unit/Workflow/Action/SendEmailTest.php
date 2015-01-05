@@ -24,6 +24,11 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
     protected $nameFormatter;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $dispatcher;
+
+    /**
      * @var SendEmail
      */
     protected $action;
@@ -39,6 +44,9 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
         $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->action = new SendEmail(
             $this->contextAccessor,
@@ -46,6 +54,8 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
             new EmailAddressHelper(),
             $this->nameFormatter
         );
+
+        $this->action->setDispatcher($this->dispatcher);
     }
 
     /**

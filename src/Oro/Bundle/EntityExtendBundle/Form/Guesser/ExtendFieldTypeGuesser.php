@@ -152,8 +152,6 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 $options['class']                 = $extendConfig->get('target_entity');
                 $options['selector_window_title'] = 'Select ' . $blockName;
                 $options['initial_elements']      = null;
-                $options['mapped']                = false;
-                $options['extend']                = true;
                 if (!$extendConfig->is('without_default')) {
                     $options['default_element'] = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
                 }
