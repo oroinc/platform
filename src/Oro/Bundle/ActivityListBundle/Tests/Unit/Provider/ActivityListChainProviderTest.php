@@ -148,7 +148,8 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
                     'template' => 'test_template.js.twig',
                     'routes'   => [
                         'delete' => 'test_delete_route'
-                    ]
+                    ],
+                    'has_comments' => true,
                 ]
             ],
             $result

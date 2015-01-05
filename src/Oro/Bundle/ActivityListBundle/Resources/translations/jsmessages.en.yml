@@ -15,3 +15,5 @@ oro:
             filter:
                 date_picker.title: Date Range
                 activity.title: Activity Type
+        comment:
+            quantity_label: Comments quantity

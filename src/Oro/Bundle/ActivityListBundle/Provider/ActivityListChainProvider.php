@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 
 class ActivityListChainProvider
 {
@@ -159,15 +160,22 @@ class ActivityListChainProvider
     public function getActivityListOption()
     {
         $entityConfigProvider = $this->configManager->getProvider('entity');
+        $templates            = [];
 
-        $templates = [];
         foreach ($this->providers as $provider) {
+            $hasComment = false;
+
+            if ($provider instanceof CommentProviderInterface) {
+                $hasComment = $provider->hasComments($this->configManager, $provider->getActivityClass());
+            }
+
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
-                'icon'     => $entityConfig->get('icon'),
-                'label'    => $this->translator->trans($entityConfig->get('label')),
-                'template' => $provider->getTemplate(),
-                'routes'   => $provider->getRoutes(),
+                'icon'         => $entityConfig->get('icon'),
+                'label'        => $this->translator->trans($entityConfig->get('label')),
+                'template'     => $provider->getTemplate(),
+                'routes'       => $provider->getRoutes(),
+                'has_comments' => $hasComment,
             ];
         }
 
