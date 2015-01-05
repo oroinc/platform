@@ -36,7 +36,7 @@ class StripTagsTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return $value;
+        return strip_tags($value, $this->allowedTags);
     }
 
     /**
