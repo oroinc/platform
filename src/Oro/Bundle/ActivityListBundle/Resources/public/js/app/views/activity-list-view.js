@@ -89,23 +89,27 @@ define(function (require) {
         render: function () {
             ActivityListView.__super__.render.apply(this, arguments);
             this.$loadingMaskContainer = this.$('.loading-mask');
-            this._initActionMenus();
             return this;
+        },
+
+        initItemView: function(model) {
+            var className = model.getRelatedActivityClass(),
+                configuration = this.options.configuration[className];
+            if (this.itemView) {
+                return new this.itemView({
+                    autoRender: false,
+                    model: model,
+                    configuration: configuration
+                });
+            } else {
+                ActivityListView.__super__.render.apply(this, arguments);
+            }
         },
 
         refresh: function () {
             this.collection.setPage(1);
             this._setPageNumber();
             this._reload();
-        },
-
-        _initActionMenus: function () {
-            $('.activity-list .dropdown-toggle').unbind('mouseover').bind('mouseover', function () {
-                $(this).trigger('click');
-            });
-            $('.activity-list .dropdown-menu').unbind('mouseleave').bind('mouseleave', function () {
-                $(this).parent().find('a.dropdown-toggle').trigger('click');
-            });
         },
 
         _initPager: function () {
@@ -211,7 +215,6 @@ define(function (require) {
                     reset: true,
                     success: _.bind(function () {
                         this._hideLoading();
-                        this._initActionMenus();
                         this._initPager();
                     }, this),
                     error: _.bind(function (collection, response) {
@@ -223,10 +226,9 @@ define(function (require) {
             }
         },
 
-        _viewItem: function (model, modelView) {
+        _viewItem: function (model) {
             var that = this,
                 currentModel = model,
-                currentModelView = modelView,
                 options = {
                     url: this._getUrl('itemView', model),
                     type: 'get',
@@ -241,17 +243,10 @@ define(function (require) {
                 Backbone.$.ajax(options)
                     .done(function (data) {
                         var response = $('<html />').html(data);
-                        currentModel.set('is_loaded', true);
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
-
                         that._hideLoading();
-
-                        currentModelView.toggle();
-                        that._initActionMenus();
                     })
                     .fail(_.bind(this._showLoadItemsError, this));
-            } else {
-                currentModelView.toggle();
             }
         },
 
@@ -332,7 +327,7 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            var className = model.get('relatedActivityClass').replace(/\\/g, '_');
+            var className = model.getRelatedActivityClass();
             var route = this.options.configuration[className].routes[actionKey];
             return routing.generate(route, {'id': model.get('relatedActivityId')});
         },

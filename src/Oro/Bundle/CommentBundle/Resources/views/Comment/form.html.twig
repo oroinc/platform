@@ -1,0 +1,29 @@
+{% form_theme form with ['OroFormBundle:Form:fields.html.twig', _self] %}
+
+<form method="post" class="comment-form well">
+    <fieldset class="form-horizontal">
+        <label>
+            {{ form_widget(form.message) }}
+        </label>
+        <div class="pull-left">
+            {{ form_widget(form.attachment) }}
+            <% if (attachmentURL) { %>
+            <div class="attachment-item">
+                <i class="icon-paper-clip"></i>
+                <a href="<%= attachmentURL %>" class="no-hash" title="<%= attachmentFileName %>"><%= attachmentFileName %></a> (<%= attachmentSize %>)
+                <button class="btn btn-link icon-trash item-remove-attachment" type="button"></button>
+            </div>
+            <% } %>
+        </div>
+        <div class="pull-right">
+            <button class="btn add-comment-button" type="submit">
+                <%= id ? _.__('oro.comment.from.button.edit_comment.label') : _.__('oro.comment.from.button.add_comment.label') %>
+            </button>
+            <% if (id) { %>
+            <button class="btn cancel-comment-button" type="reset">
+                <%= _.__('oro.comment.from.button.cancel_comment.label')  %>
+            </button>
+            <% } %>
+        </div>
+    </fieldset>
+</form>
