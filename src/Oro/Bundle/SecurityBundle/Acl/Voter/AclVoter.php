@@ -187,6 +187,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     }
 
     /**
+     * Check organization. If user try to access entity what was created in organization this user do not have access -
+     *  deny access
+     *
      * @param int $result
      * @return int
      */
@@ -205,9 +208,15 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             if ($this->configProvider->hasConfig($className)) {
                 $config = $this->configProvider->getConfig($className);
                 $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
+                // we need to check organization in case if Access level is not system,
+                // or then access level and owner type of test object is User or Business Unit (in this owner types we
+                // do not allow to use System access level)
+                // (do not allow to manipulate records from another organization)
                 if (($accessLevel < AccessLevel::SYSTEM_LEVEL)
-                    || ($accessLevel === AccessLevel::SYSTEM_LEVEL
-                        && in_array($config->get('owner_type'), ['USER', 'BUSINESS_UNIT']))
+                    || (
+                        $accessLevel === AccessLevel::SYSTEM_LEVEL
+                        && in_array($config->get('owner_type'), ['USER', 'BUSINESS_UNIT'])
+                    )
                 ) {
                     if ($config->has('organization_field_name')) {
                         $accessor = PropertyAccess::createPropertyAccessor();

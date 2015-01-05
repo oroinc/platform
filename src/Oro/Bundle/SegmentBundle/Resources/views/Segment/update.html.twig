@@ -82,9 +82,8 @@
                     'title': '',
                     'data': [
                         form_row(form.entity, {'label': 'oro.segment.entity.label'}),
-                        form_row(form.type, {'label': 'oro.segment.type.label'}),
-                        ownerDataBlock.dataBlocks[0].subblocks[0].data[0]
-                    ]
+                        form_row(form.type, {'label': 'oro.segment.type.label'})
+                    ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
                 }
             ]
         }]

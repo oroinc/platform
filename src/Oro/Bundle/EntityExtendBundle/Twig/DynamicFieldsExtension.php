@@ -22,34 +22,22 @@ class DynamicFieldsExtension extends \Twig_Extension
 {
     const NAME = 'oro_entity_config_fields';
 
-    /**
-     * @var FieldTypeHelper
-     */
+    /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-    /**
-     * @var ConfigProviderInterface
-     */
+    /** @var ConfigProviderInterface */
     protected $extendProvider;
 
-    /**
-     * @var ConfigProviderInterface
-     */
+    /** @var ConfigProviderInterface */
     protected $entityProvider;
 
-    /**
-     * @var ConfigProviderInterface
-     */
+    /** @var ConfigProviderInterface */
     protected $viewProvider;
 
-    /**
-     * @var PropertyAccessor
-     */
+    /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /**
@@ -62,12 +50,11 @@ class DynamicFieldsExtension extends \Twig_Extension
         FieldTypeHelper $fieldTypeHelper,
         EventDispatcherInterface $dispatcher
     ) {
-        $this->fieldTypeHelper = $fieldTypeHelper;
-        $this->eventDispatcher = $dispatcher;
-
-        $this->extendProvider = $configManager->getProvider('extend');
-        $this->entityProvider = $configManager->getProvider('entity');
-        $this->viewProvider = $configManager->getProvider('view');
+        $this->fieldTypeHelper  = $fieldTypeHelper;
+        $this->eventDispatcher  = $dispatcher;
+        $this->extendProvider   = $configManager->getProvider('extend');
+        $this->entityProvider   = $configManager->getProvider('entity');
+        $this->viewProvider     = $configManager->getProvider('view');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -76,26 +63,26 @@ class DynamicFieldsExtension extends \Twig_Extension
      */
     public function getFunctions()
     {
-        return array(
-            new \Twig_SimpleFunction('oro_get_dynamic_fields', array($this, 'getFields')),
-        );
+        return [
+            new \Twig_SimpleFunction('oro_get_dynamic_fields', [$this, 'getFields']),
+        ];
     }
 
     /**
-     * @param object $entity
+     * @param object      $entity
      * @param null|string $entityClass
      * @return array
      */
     public function getFields($entity, $entityClass = null)
     {
-        $dynamicRow = array();
+        $dynamicRow = [];
+        $priorities = [];
+
         if (null === $entityClass) {
             $entityClass = ClassUtils::getRealClass($entity);
         }
 
-        $fields = $this->extendProvider->filter(array($this, 'filterFields'), $entityClass);
-        $priorities = [];
-
+        $fields = $this->extendProvider->filter([$this, 'filterFields'], $entityClass);
         foreach ($fields as $field) {
             /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $field->getId();
@@ -112,15 +99,11 @@ class DynamicFieldsExtension extends \Twig_Extension
             );
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
-            $label = $fieldConfig->get('label');
-            if (!$label) {
-                $label = $fieldName;
-            }
-            $dynamicRow[$fieldName] = array(
+            $dynamicRow[$fieldName] = [
                 'type'  => $fieldType,
-                'label' => $label,
+                'label' => $fieldConfig->get('label') ?: $fieldName,
                 'value' => $event->getFieldViewValue(),
-            );
+            ];
 
             $priorities[] = $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0);
         }

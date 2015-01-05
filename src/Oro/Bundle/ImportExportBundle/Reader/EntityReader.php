@@ -83,7 +83,7 @@ class EntityReader extends IteratorBasedReader
      */
     public function setSourceEntityName($entityName, Organization $organization = null)
     {
-        /** @var QueryBuilder $qb */
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->registry->getRepository($entityName)->createQueryBuilder('o');
 
         $metadata = $queryBuilder->getEntityManager()->getClassMetadata($entityName);
@@ -100,16 +100,26 @@ class EntityReader extends IteratorBasedReader
             $queryBuilder->orderBy('o.' . $fieldName, 'ASC');
         }
 
-        // Limit data with current organization
+        $this->addOrganizationLimits($queryBuilder, $entityName, $organization);
+
+        $this->setSourceQueryBuilder($queryBuilder);
+    }
+
+    /**
+     * Limit data with current organization
+     *
+     * @param QueryBuilder $queryBuilder
+     * @param string       $entityName
+     * @param Organization $organization
+     */
+    protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, Organization $organization = null)
+    {
         if ($organization) {
             $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getOrganizationFieldName();
             if ($organizationField) {
                 $queryBuilder->andWhere('o.' . $organizationField . ' = :organization')
                     ->setParameter('organization', $organization);
             }
-
         }
-
-        $this->setSourceQueryBuilder($queryBuilder);
     }
 }
