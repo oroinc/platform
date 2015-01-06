@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Event;
 
 use Doctrine\ORM\Query\AST\SelectStatement;
 use Doctrine\ORM\Query\AST\Subselect;
-use Doctrine\ORM\Query\AST\Node;
 
 use Symfony\Component\EventDispatcher\Event;
 
@@ -22,11 +21,11 @@ class ProcessSelectAfter extends Event
     protected $joinConditions;
 
     /**
-     * @param Node  $select
-     * @param array $whereConditions
-     * @param array $joinConditions
+     * @param Subselect|SelectStatement $select
+     * @param array                     $whereConditions
+     * @param array                     $joinConditions
      */
-    public function __construct(Node $select, array $whereConditions, array $joinConditions)
+    public function __construct($select, array $whereConditions, array $joinConditions)
     {
         $this->select          = $select;
         $this->whereConditions = $whereConditions;

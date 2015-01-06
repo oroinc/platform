@@ -14,14 +14,12 @@ use Doctrine\ORM\Query\AST\InExpression;
 use Doctrine\ORM\Query\AST\WhereClause;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\Subselect;
-use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\ComparisonExpression;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
-use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 
 /**
  * Class AclWalker
@@ -170,7 +168,9 @@ class AclWalker extends TreeWalkerAdapter
     {
         $aclConditionalFactors = [];
         foreach ($whereConditions as $whereCondition) {
-            $this->addConditionFactors($aclConditionalFactors, $whereCondition);
+            if ($whereCondition instanceof AclCondition) {
+                $this->addConditionFactors($aclConditionalFactors, $whereCondition);
+            }
         }
 
         if (!empty($aclConditionalFactors)) {
@@ -206,6 +206,7 @@ class AclWalker extends TreeWalkerAdapter
      * Get acl access level condition
      *
      * @param AclCondition $condition
+     *
      * @return ConditionalPrimary
      */
     protected function getConditionalFactor(AclCondition $condition)
@@ -245,6 +246,7 @@ class AclWalker extends TreeWalkerAdapter
      * Generates "organization_id=value" condition
      *
      * @param AclCondition $whereCondition
+     *
      * @return ConditionalPrimary|bool
      */
     protected function getOrganizationCheckCondition(AclCondition $whereCondition)
@@ -278,6 +280,7 @@ class AclWalker extends TreeWalkerAdapter
      * generate "in()" expression
      *
      * @param AclCondition $whereCondition
+     *
      * @return InExpression
      */
     protected function getInExpression(AclCondition $whereCondition)
@@ -295,6 +298,7 @@ class AclWalker extends TreeWalkerAdapter
      * Generate path expression
      *
      * @param AclCondition $whereCondition
+     *
      * @return PathExpression
      */
     protected function getPathExpression(AclCondition $whereCondition)
@@ -314,6 +318,7 @@ class AclWalker extends TreeWalkerAdapter
      * Get array with literal from acl condition value array
      *
      * @param AclCondition $whereCondition
+     *
      * @return array
      */
     protected function getLiterals(AclCondition $whereCondition)
