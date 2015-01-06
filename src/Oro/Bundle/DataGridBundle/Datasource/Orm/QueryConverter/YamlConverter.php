@@ -89,11 +89,30 @@ class YamlConverter implements QueryConverterInterface
             $knownAliases += count($value['join']['left']);
         }
         $qbTools = new QueryBuilderTools();
+        $joinTablePaths = $this->getJoinTablePaths($value['join']['inner']);
+        $joinTablePaths = array_merge($joinTablePaths, $this->getJoinTablePaths($value['join']['left']));
+        $qbTools->setJoinTablePaths($joinTablePaths);
 
         do {
             $this->addJoinByDefinition($qb, $qbTools, $value, 'inner', $usedAliases);
             $this->addJoinByDefinition($qb, $qbTools, $value, 'left', $usedAliases);
         } while (count($usedAliases) != $knownAliases);
+    }
+
+    /**
+     * @param array $value
+     * @return array
+     */
+    protected function getJoinTablePaths(array $value)
+    {
+        $joinTablePaths = [];
+        foreach ($value as $join) {
+            if (!empty($join['join'])) {
+                $joinTablePaths[$join['alias']] = $join['join'];
+            }
+        }
+
+        return $joinTablePaths;
     }
 
     /**
