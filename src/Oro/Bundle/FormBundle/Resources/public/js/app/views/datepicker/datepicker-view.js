@@ -2,41 +2,46 @@ define(function (require) {
     'use strict';
 
     var DatePickerView,
+        $ = require('jquery'),
         _ = require('underscore'),
         datetimeFormatter = require('orolocale/js/formatter/datetime'),
         BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
     DatePickerView = BaseView.extend({
-        type: 'date',
+        defaults: {
+            useNativePicker: false,
+            dateInputAttrs: {},
+            datePickerOptions: {}
+        },
 
         events: {
-            change: 'sync'
+            change: 'updateFront'
         },
 
         /**
          * Initializes view
          *  - creates front field
-         *  - updates original field
+         *  - updates front field
          *  - initializes picker widget
          *
          * @param {Object} options
          */
         initialize: function (options) {
-            var widgetOptions;
+            var opts = {};
+            $.extend(true, opts, this.defaults, options);
+            this.nativeMode = opts.useNativePicker;
 
-            this.createFrontField();
+            this.createFrontField(opts);
 
             this.$el.wrap('<span style="display:none"></span>');
             if (this.$el.val() && this.$el.val().length) {
-                this.sync();
+                this.updateFront();
             }
 
-            widgetOptions = _.clone(options);
-            _.extend(widgetOptions, {
-                onSelect: _.bind(this.onSelect, this)
-            });
-            this.initPickerWidget(widgetOptions);
+            if (!this.nativeMode) {
+                this.initPickerWidget(opts);
+            }
 
             DatePickerView.__super__.initialize.apply(this, arguments);
         },
@@ -53,33 +58,38 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
-            this.destroyPickerWidget();
-            this.$frontField.off().remove();
+            if (!this.nativeMode) {
+                this.destroyPickerWidget();
+            }
+            this.$frontDateField.off().remove();
             this.$el.unwrap();
             DatePickerView.__super__.initialize.apply(this, arguments);
         },
 
         /**
          * Creates frontend field
+         *
+         * @param {Object} options
          */
-        createFrontField: function () {
-            this.$frontField = this.$el.clone();
-            this.$frontField.attr({
-                type: 'text',
-                id: this.type + '_selector_' + this.$el.attr('id'),
-                name: this.type + '_selector_' + this.$el.attr('id')
-            });
-            this.$frontField.on('keyup', _.bind(this.onKeyup, this));
-            this.$el.after(this.$frontField);
+        createFrontField: function (options) {
+            this.$frontDateField = $('<input />');
+            options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
+            this.$frontDateField.attr(options.dateInputAttrs);
+            this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$el.after(this.$frontDateField);
         },
 
         /**
-         * Initializes picker widget
+         * Initializes date picker widget
          * 
          * @param {Object} options
          */
         initPickerWidget: function (options) {
-            this.$frontField.datepicker(options);
+            var widgetOptions = options.datePickerOptions;
+            _.extend(widgetOptions, {
+                onSelect: _.bind(this.onSelect, this)
+            });
+            this.$frontDateField.datepicker(widgetOptions);
         },
 
         /**
@@ -87,33 +97,33 @@ define(function (require) {
          */
         destroyPickerWidget: function () {
             // @TODO fix the bug BAP-7121
-            this.$frontField.datepicker('destroy');
-        },
-
-        /**
-         * Handles keyup event on front field and updates original field
-         */
-        onKeyup: function () {
-            this.$el.val(this.getBackendFormattedValue());
+            this.$frontDateField.datepicker('destroy');
         },
 
         /**
          * Handles pick date event
          */
         onSelect: function () {
-            var form = this.$frontField.parents('form');
+            var form = this.$frontDateField.parents('form');
             if (form.length && form.data('validator')) {
                 form.validate()
-                    .element(this.$frontField);
+                    .element(this.$frontDateField);
             }
-            this.$frontField.trigger('change');
+            this.$frontDateField.trigger('change');
         },
 
         /**
-         * Update front field value
+         * Updates original field on front field change
          */
-        sync: function () {
-            this.$frontField.val(this.getFrontendFormattedValue());
+        updateOrigin: function () {
+            this.$el.val(this.getBackendFormattedValue());
+        },
+
+        /**
+         * Update front date field value
+         */
+        updateFront: function () {
+            this.$frontDateField.val(this.getFrontendFormattedDate());
         },
 
         /**
@@ -122,8 +132,10 @@ define(function (require) {
          * @returns {string}
          */
         getBackendFormattedValue: function () {
-            var value = this.$frontField.val();
-            if (datetimeFormatter.isDateValid(value)) {
+            var value = this.$frontDateField.val();
+            if (this.nativeMode) {
+                // nothing to do, it's already suppose to be in 'yyyy-mm-dd' format
+            } else if (datetimeFormatter.isDateValid(value)) {
                 value = datetimeFormatter.convertDateToBackendFormat(value);
             } else {
                 value = '';
@@ -133,10 +145,10 @@ define(function (require) {
 
         /**
          * Reads value of original field and converts it to frontend format
-         * 
+         *
          * @returns {string}
          */
-        getFrontendFormattedValue: function () {
+        getFrontendFormattedDate: function () {
             var value = datetimeFormatter.formatDate(this.$el.val());
             return value;
         }

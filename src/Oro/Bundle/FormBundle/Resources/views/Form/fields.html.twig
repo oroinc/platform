@@ -304,11 +304,19 @@
 {% block oro_date_widget %}
     {% set options = {
         view: 'oroform/js/app/views/datepicker/datepicker-view',
-        altFormat: 'yy-mm-dd',
-        changeMonth: true,
-        changeYear: true,
-        yearRange: years|default('-80:+1')|json_encode|raw,
-        showButtonPanel: true
+        useNativePicker: isMobileVersion(),
+        dateInputAttrs: {
+            placeholder: 'oro.form.choose_date'|trans,
+            id: 'date_selector_' ~ id,
+            name: 'date_selector_' ~ id,
+        },
+        datePickerOptions: {
+            altFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: years|default('-80:+1')|json_encode|raw,
+            showButtonPanel: true
+        }
     } %}
 
     {% set attr = attr|merge({
@@ -322,14 +330,29 @@
 {% block oro_datetime_widget %}
     {% set options = {
         view: 'oroform/js/app/views/datepicker/datetimepicker-view',
-        altFormat: 'yy-mm-dd',
-        altTimeFormat: 'HH:mm:ssz',
-        altFieldTimeOnly: false,
-        altSeparator: 'T',
-        changeMonth: true,
-        changeYear: true,
-        yearRange: years|default('-80:+1')|json_encode|raw,
-        showButtonPanel: true
+        useNativePicker: isMobileVersion(),
+        fieldsWrapper: '<div></div>',
+        dateInputAttrs: {
+            placeholder: 'oro.form.choose_date'|trans,
+            id: 'date_selector_' ~ id,
+            name: 'date_selector_' ~ id,
+            class: 'input-small'
+        },
+        datePickerOptions: {
+            altFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: years|default('-80:+1')|json_encode|raw,
+            showButtonPanel: true
+        },
+        timeInputAttrs: {
+            placeholder: 'oro.form.choose_time'|trans,
+            id: 'time_selector_' ~ id,
+            name: 'time_selector_' ~ id,
+            class: 'input-small'
+        },
+        timePickerOptions: {
+        }
     } %}
 
     {% set attr = attr|merge({

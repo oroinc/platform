@@ -2,36 +2,102 @@ define(function (require) {
     'use strict';
 
     var DateTimePickerView,
+        $ = require('jquery'),
+        _ = require('underscore'),
         datetimeFormatter = require('orolocale/js/formatter/datetime'),
         DatePickerView = require('./datepicker-view');
-    require('jquery-ui-timepicker');
+    require('oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker');
+
+    // @TODO fixed in BAP-7094
+    $.fn.timepicker.defaults.timeFormat = 'g:i A';
 
     DateTimePickerView = DatePickerView.extend({
-        type: 'datetime',
+        defaults: {
+            useNativePicker: false,
+            fieldsWrapper: '',
+            dateInputAttrs: {},
+            datePickerOptions: {},
+            timeInputAttrs: {},
+            timePickerOptions: {}
+        },
 
         /**
-         * Initializes picker widget
+         * Cleans up HTML
+         *  - destroys picker widget
+         *  - removes front field
+         *  - unwrap original field
+         *
+         * @override
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            if (!this.nativeMode) {
+                this.destroyTimePickerWidget();
+            }
+            this.$frontTimeField.off().remove();
+            if (this.$frontDateField.data('isWrapped')) {
+                this.$frontDateField.unwrap();
+            }
+            DateTimePickerView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * Creates frontend field
+         *
+         * @param {Object} options
+         */
+        createFrontField: function (options) {
+            DateTimePickerView.__super__.createFrontField.call(this, options);
+            if (options.fieldsWrapper) {
+                this.$frontDateField
+                    .wrap(options.fieldsWrapper)
+                    .data('isWrapped', true);
+            }
+            this.$frontTimeField = $('<input />');
+            options.timeInputAttrs.type = this.nativeMode ? 'time' : 'text';
+            this.$frontTimeField.attr(options.timeInputAttrs);
+            this.$frontTimeField.on('keyup change', _.bind(this.updateOrigin, this));
+            this.$frontDateField.after(this.$frontTimeField);
+        },
+
+        /**
+         * Initializes date and time pickers widget
          *
          * @param {Object} options
          */
         initPickerWidget: function (options) {
-            this.$frontField.datetimepicker(options);
+            var widgetOptions = options.timePickerOptions;
+            this.$frontTimeField.timepicker(widgetOptions);
+            DateTimePickerView.__super__.initPickerWidget.apply(this, arguments);
         },
 
         /**
          * Destroys picker widget
          */
-        destroyPickerWidget: function () {
-            this.$frontField.datetimepicker('destroy');
+        destroyTimePickerWidget: function () {
+            this.$frontTimeField.timepicker('remove');
         },
 
         /**
-         * Reads value of front field and converts it to backend format
+         * Update front date and time fields values
+         */
+        updateFront: function () {
+            DateTimePickerView.__super__.updateFront.call(this);
+            this.$frontTimeField.val(this.getFrontendFormattedTime());
+        },
+
+        /**
+         * Reads value of front fields and converts it to backend format
          *
          * @returns {string}
          */
         getBackendFormattedValue: function () {
-            var value = this.$frontField.val();
+            var value, date, time;
+            date = this.$frontDateField.val();
+            time = this.$frontTimeField.val();
+            value = date + ' ' + time;
             if (datetimeFormatter.isDateTimeValid(value)) {
                 value = datetimeFormatter.convertDateTimeToBackendFormat(value);
             } else {
@@ -45,8 +111,20 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedValue: function () {
-            var value = datetimeFormatter.formatDateTime(this.$el.val());
+        getFrontendFormattedDate: function () {
+            var moment = datetimeFormatter.getMomentForBackendDateTime(this.$el.val()),
+                value = moment.format(datetimeFormatter.getDateFormat());
+            return value;
+        },
+
+        /**
+         * Reads value of original field and converts it to frontend format
+         *
+         * @returns {string}
+         */
+        getFrontendFormattedTime: function () {
+            var moment = datetimeFormatter.getMomentForBackendDateTime(this.$el.val()),
+                value = moment.format(datetimeFormatter.getTimeFormat());
             return value;
         }
     });
