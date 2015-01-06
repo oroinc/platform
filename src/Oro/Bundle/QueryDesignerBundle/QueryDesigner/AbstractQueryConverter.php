@@ -864,8 +864,12 @@ abstract class AbstractQueryConverter
      */
     protected function registerVirtualColumnTableAlias(&$joins, $item, $mainEntityJoinId)
     {
-        $parentJoinId = $mainEntityJoinId;
         $tableAlias = $item['alias'];
+        if (!empty($this->joins[$tableAlias])) {
+            return;
+        }
+
+        $parentJoinId = $mainEntityJoinId;
 
         $delimiterPos = strpos($item['join'], '.');
         if (false !== $delimiterPos) {
@@ -1085,13 +1089,15 @@ abstract class AbstractQueryConverter
      *
      * @param string $condition
      * @param string $alias
+     * @param int    $offset
+     *
+     * @todo: use QueryBuilderTools instead
      *
      * @return bool|int The position of $alias in $condition or FALSE if it was not found
      */
-    protected function checkTableAliasInCondition($condition, $alias)
+    protected function checkTableAliasInCondition($condition, $alias, $offset = 0)
     {
-        // @todo: handle case t2.alias = alias
-        $pos = strpos($condition, $alias);
+        $pos = strpos($condition, $alias, $offset);
         if (false !== $pos) {
             if (0 === $pos) {
                 // handle case "ALIAS.", "ALIAS.field"
@@ -1099,6 +1105,9 @@ abstract class AbstractQueryConverter
                 if (in_array($nextChar, ['.', ' ', '='])) {
                     return $pos;
                 }
+
+                // handle case "ALIASWord.entity = ALIAS"
+                return $this->checkTableAliasInCondition($condition, $alias, ++$pos);
             } elseif (strlen($condition) === $pos + strlen($alias)) {
                 // handle case "t2.someField = ALIAS"
                 $prevChar = substr($condition, $pos - 1, 1);
@@ -1114,6 +1123,9 @@ abstract class AbstractQueryConverter
                         return $pos;
                     }
                 }
+
+                // handle case "t2.ALIAS = ALIAS AND"
+                return $this->checkTableAliasInCondition($condition, $alias, ++$pos);
             }
         }
 
