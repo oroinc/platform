@@ -1,0 +1,28 @@
+parameters:
+    oro_comment.api.form.type.comment.class:   Oro\Bundle\CommentBundle\Form\Type\CommentTypeApi
+    oro_comment.api.form.handler.class:        Oro\Bundle\CommentBundle\Form\Handler\CommentApiHandler
+
+services:
+    oro_comment.form.type.comment_api:
+        class: %oro_comment.api.form.type.comment.class%
+        arguments:
+            - @oro_entity_config.config_manager
+        tags:
+            - { name: form.type, alias: oro_comment_api }
+
+    oro_comment.form.comment.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - ~
+            - 'oro_comment_api'
+
+    oro_comment.api.form.handler:
+        class: %oro_comment.api.form.handler.class%
+        scope: request
+        arguments:
+            - @oro_comment.form.comment.api
+            - @request
+            - @doctrine.orm.entity_manager
+            - @oro_entity_config.config_manager

@@ -51,6 +51,7 @@ config:
             'jquery': 'oroui/js/extend/jquery'
             'jquery.select2': 'oroui/js/extend/select2'
             'chaplin': 'oroui/js/extend/chaplin'
+            'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
@@ -63,6 +64,8 @@ config:
             'jquery-ui': 'jquery-ui'
         'oroui/js/extend/chaplin':
             'chaplin': 'chaplin'
+        'oroui/js/extend/underscore':
+            'underscore': 'underscore'
         'oroui/js/extend/backbone':
             'backbone': 'backbone'
         'oroui/js/extend/bootstrap':
@@ -105,6 +108,7 @@ config:
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
+        'oroui/js/app/views/page/before-content-addition-view': 'bundles/oroui/js/app/views/page/before-content-addition-view.js'
         'oroui/js/app/views/page/breadcrumb-view': 'bundles/oroui/js/app/views/page/breadcrumb-view.js'
         'oroui/js/app/views/page/content-view': 'bundles/oroui/js/app/views/page/content-view.js'
         'oroui/js/app/views/page/main-menu-view': 'bundles/oroui/js/app/views/page/main-menu-view.js'

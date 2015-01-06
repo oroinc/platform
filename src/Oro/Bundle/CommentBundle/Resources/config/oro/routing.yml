@@ -1,0 +1,43 @@
+oro_comment_bundle:
+    resource:     "@OroCommentBundle/Controller"
+    type:         annotation
+    prefix:       /
+
+#
+# REST actions
+#
+oro_api_comment_get_items:
+    pattern: api/rest/{version}/relation/{relationClass}/{relationId}/comment.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:cget, _format: json, version: latest }
+    requirements:
+         _method: GET
+
+oro_api_comment_create_item:
+    pattern: api/rest/{version}/relation/{relationClass}/{relationId}/comment.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:post, _format: json, version: latest }
+    requirements:
+         _method: POST
+
+oro_api_comment_get_item:
+    pattern: api/rest/{version}/comment/{id}.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:get, _format: json, version: latest }
+    requirements:
+         _method: GET
+
+oro_api_comment_update_item:
+    pattern: api/rest/{version}/comment/{id}.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:put, _format: json, version: latest }
+    requirements:
+         _method: POST
+
+oro_api_comment_remove_attachment_item:
+    pattern: api/rest/{version}/comment/{id}/removeAttachment.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:removeAttachment, _format: json, version: latest }
+    requirements:
+         _method: POST
+
+oro_api_comment_delete_item:
+    pattern: api/rest/{version}/comment/{id}.{_format}
+    defaults: { _controller: OroCommentBundle:Api/Rest/Comment:delete, _format: json, version: latest }
+    requirements:
+         _method: DELETE
