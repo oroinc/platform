@@ -43,6 +43,7 @@ config:
         'oroform/js/validator/range': 'bundles/oroform/js/validator/range.js'
         'oroform/js/validator/regex': 'bundles/oroform/js/validator/regex.js'
         'oroform/js/validator/repeated': 'bundles/oroform/js/validator/repeated.js'
+        'oroform/js/validator/time': 'bundles/oroform/js/validator/time.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
 
         'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
