@@ -30,6 +30,7 @@ config:
         'oroform/js/extend/validate':
             'jquery.validate': 'jquery.validate'
     paths:
+        'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
         'jquery.validate': 'bundles/oroform/lib/jquery.validate/jquery.validate.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
         'oroform/js/validator/date': 'bundles/oroform/js/validator/date.js'
@@ -71,3 +72,4 @@ build:
         'tinymce/plugins/code/plugin.min': 'empty:'
         'tinymce/plugins/link/plugin.min': 'empty:'
         'tinymce/themes/modern/theme.min': 'empty:'
+        'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'empty:'
