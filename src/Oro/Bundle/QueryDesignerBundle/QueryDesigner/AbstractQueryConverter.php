@@ -89,6 +89,16 @@ abstract class AbstractQueryConverter
     protected $virtualColumnOptions;
 
     /**
+     * @var array
+     */
+    protected $processedVirtualJoins = [];
+
+    /**
+     * @var array
+     */
+    protected $aliases = [];
+
+    /**
      * Constructor
      *
      * @param FunctionProviderInterface     $functionProvider
@@ -802,33 +812,35 @@ abstract class AbstractQueryConverter
         } else {
             $aliasKey = 'entity';
         }
-        $aliases = [$aliasKey => $mainEntityJoinAlias];
+        $this->aliases[$aliasKey] = $mainEntityJoinAlias;
 
-        if (isset($query['join'])) {
-            $this->processVirtualColumnJoins($joins, $aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
-            $this->processVirtualColumnJoins($joins, $aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
-            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $aliases);
+        if (isset($query['join']) && !isset($this->processedVirtualJoins[$mainEntityJoinId])) {
+            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
+            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
 
             foreach ($joins as &$item) {
                 $this->registerVirtualColumnTableAlias($joins, $item, $mainEntityJoinId);
             }
+
+            $this->processedVirtualJoins[$mainEntityJoinId] = true;
         }
 
         if (empty($query['select']['expr'])) {
             $selectFieldName = $this->getFieldName($fullJoinIdentifier);
             $parentFieldName = $this->getFieldName($this->getParentJoinIdentifier($fullJoinIdentifier));
 
-            if (empty($aliases[$parentFieldName])) {
+            if (empty($this->aliases[$parentFieldName])) {
                 throw new InvalidConfigurationException(
                     sprintf('Could not get table alias for column %s', $columnName)
                 );
             }
-            $expr = sprintf('%s.%s', $aliases[$parentFieldName], $selectFieldName);
+            $expr = sprintf('%s.%s', $this->aliases[$parentFieldName], $selectFieldName);
         } else {
             $expr = $query['select']['expr'];
         }
 
-        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect($expr, $aliases);
+        $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect($expr, $this->aliases);
         $this->virtualColumnExpressions[$columnName] = $columnExpr;
     }
 
