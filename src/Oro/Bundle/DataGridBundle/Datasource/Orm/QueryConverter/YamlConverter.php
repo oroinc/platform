@@ -88,15 +88,33 @@ class YamlConverter implements QueryConverterInterface
         if (isset($value['join']['left'])) {
             $knownAliases += count($value['join']['left']);
         }
-        $qbTools = new QueryBuilderTools();
-        $joinTablePaths = $this->getJoinTablePaths($value['join']['inner']);
-        $joinTablePaths = array_merge($joinTablePaths, $this->getJoinTablePaths($value['join']['left']));
-        $qbTools->setJoinTablePaths($joinTablePaths);
+        $qbTools = $this->createQueryBuilderTools($value);
 
+        // Add joins ordered by used tables
         do {
             $this->addJoinByDefinition($qb, $qbTools, $value, 'inner', $usedAliases);
             $this->addJoinByDefinition($qb, $qbTools, $value, 'left', $usedAliases);
         } while (count($usedAliases) != $knownAliases);
+    }
+
+    /**
+     * @param array $value
+     * @return QueryBuilderTools
+     */
+    protected function createQueryBuilderTools(array $value)
+    {
+        $joinTablePaths = [];
+        if (isset($value['join']['inner'])) {
+            $joinTablePaths = array_merge($joinTablePaths, $this->getJoinTablePaths($value['join']['inner']));
+        }
+        if (isset($value['join']['left'])) {
+            $joinTablePaths = array_merge($joinTablePaths, $this->getJoinTablePaths($value['join']['left']));
+        }
+
+        $qbTools = new QueryBuilderTools();
+        $qbTools->setJoinTablePaths($joinTablePaths);
+
+        return $qbTools;
     }
 
     /**

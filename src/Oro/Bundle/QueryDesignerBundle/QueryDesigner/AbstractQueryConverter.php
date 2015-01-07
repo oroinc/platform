@@ -814,7 +814,9 @@ abstract class AbstractQueryConverter
         }
         $this->aliases[$aliasKey] = $mainEntityJoinAlias;
 
-        if (isset($query['join']) && !isset($this->processedVirtualJoins[$mainEntityJoinId])) {
+        if (isset($query['join']) &&
+            ($mainEntityJoinId === self::ROOT_ALIAS_KEY || !isset($this->processedVirtualJoins[$mainEntityJoinId]))
+        ) {
             $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
             $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
