@@ -120,8 +120,7 @@ class CalendarEventController extends RestController implements ClassResourceInt
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
-            $calendarProvider = $this->get('oro_calendar.calendar_provider.user');
-            $qb    = $repo->getUserEventListQueryBuilder($filterCriteria, $calendarProvider->getExtraFields());
+            $qb    = $repo->getUserEventListQueryBuilder($filterCriteria);
             $page  = (int)$this->getRequest()->get('page', 1);
             $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
             $qb

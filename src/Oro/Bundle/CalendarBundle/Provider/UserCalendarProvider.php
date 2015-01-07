@@ -7,7 +7,7 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
-class UserCalendarProvider implements CalendarProviderInterface
+class UserCalendarProvider extends AbstractCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -17,9 +17,6 @@ class UserCalendarProvider implements CalendarProviderInterface
 
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
-
-    /** @var string[] */
-    protected $extraFields = [];
 
     /**
      * @param DoctrineHelper                  $doctrineHelper
@@ -111,13 +108,5 @@ class UserCalendarProvider implements CalendarProviderInterface
         }
 
         return $name;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getExtraFields()
-    {
-        return $this->extraFields;
     }
 }

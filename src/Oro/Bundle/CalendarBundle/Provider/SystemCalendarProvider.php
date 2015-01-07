@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 /**
  * Represents organization calendars
  */
-class SystemCalendarProvider implements CalendarProviderInterface
+class SystemCalendarProvider extends AbstractCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -24,9 +24,6 @@ class SystemCalendarProvider implements CalendarProviderInterface
 
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var string[] */
-    protected $extraFields = [];
 
     /**
      * @param DoctrineHelper                  $doctrineHelper
@@ -139,13 +136,5 @@ class SystemCalendarProvider implements CalendarProviderInterface
             //@TODO: Fix ACL for calendars providers
             $qb->getQuery()
         );
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getExtraFields()
-    {
-        return $this->extraFields;
     }
 }

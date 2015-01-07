@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 /**
  * Represents system wide calendars
  */
-class PublicCalendarProvider implements CalendarProviderInterface
+class PublicCalendarProvider extends AbstractCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -24,9 +24,6 @@ class PublicCalendarProvider implements CalendarProviderInterface
 
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var string[] */
-    protected $extraFields = [];
 
     /**
      * @param DoctrineHelper                  $doctrineHelper
@@ -115,13 +112,5 @@ class PublicCalendarProvider implements CalendarProviderInterface
         }
 
         return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getExtraFields()
-    {
-        return $this->extraFields;
     }
 }
