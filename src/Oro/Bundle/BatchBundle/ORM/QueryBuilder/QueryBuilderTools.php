@@ -8,10 +8,10 @@ use Doctrine\ORM\QueryBuilder;
 class QueryBuilderTools
 {
     /** @var array */
-    protected $fieldAliases = array();
+    protected $fieldAliases = [];
 
     /** @var array */
-    protected $joinTablePaths = array();
+    protected $joinTablePaths = [];
 
     /**
      * @param array $selects
@@ -47,7 +47,7 @@ class QueryBuilderTools
      */
     public function resetFieldAliases()
     {
-        $this->fieldAliases = array();
+        $this->fieldAliases = [];
     }
 
     /**
@@ -87,7 +87,7 @@ class QueryBuilderTools
      */
     public function resetJoinTablePaths()
     {
-        $this->joinTablePaths = array();
+        $this->joinTablePaths = [];
     }
 
     /**
@@ -98,6 +98,16 @@ class QueryBuilderTools
     public function getJoinTablePaths()
     {
         return $this->joinTablePaths;
+    }
+
+    /**
+     * Set join table paths.
+     *
+     * @param array $joinTablePaths
+     */
+    public function setJoinTablePaths(array $joinTablePaths)
+    {
+        $this->joinTablePaths = $joinTablePaths;
     }
 
     /**
@@ -130,7 +140,7 @@ class QueryBuilderTools
     public function fixUnusedParameters(QueryBuilder $qb)
     {
         $dql = $qb->getDQL();
-        $usedParameters = array();
+        $usedParameters = [];
         /** @var $parameter \Doctrine\ORM\Query\Parameter */
         foreach ($qb->getParameters() as $parameter) {
             if ($this->dqlContainsParameter($dql, $parameter->getName())) {
@@ -162,7 +172,7 @@ class QueryBuilderTools
      *
      * @param array $joins
      * @param array $aliases
-     * @param       $rootAlias
+     * @param string $rootAlias
      *
      * @return array
      */
@@ -173,8 +183,9 @@ class QueryBuilderTools
         foreach ($joins[$rootAlias] as $join) {
             $joinTable = $join->getJoin();
             $joinCondition = $join->getCondition();
+            $joinType = $join->getJoinType();
             $alias = $join->getAlias();
-            if (in_array($alias, $aliases)) {
+            if (strtoupper($joinType) == Expr\Join::INNER_JOIN || in_array($alias, $aliases)) {
                 if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
                     $data = explode('.', $joinTable);
                     if (!in_array($data[0], $aliases)) {
@@ -203,7 +214,7 @@ class QueryBuilderTools
      */
     public function getUsedTableAliases($where)
     {
-        $aliases = array();
+        $aliases = [];
 
         if (is_array($where)) {
             foreach ($where as $wherePart) {
@@ -272,7 +283,7 @@ class QueryBuilderTools
      */
     public function getUsedAliases($condition)
     {
-        $aliases = array();
+        $aliases = [];
         if (is_array($condition)) {
             foreach ($condition as $conditionPart) {
                 $aliases = array_merge($aliases, $this->getUsedAliases($conditionPart));
@@ -299,10 +310,10 @@ class QueryBuilderTools
     protected function getRegExpQueryForAlias($alias)
     {
         // Do not match string if it is part of another string or parameter (starts with :)
-        $searchRegExpParts = array(
+        $searchRegExpParts = [
             '(?<![\w:.])(' . $alias .')(?=[^\.\w]+)',
             '(?<![\w:.])(' . $alias .')$'
-        );
+        ];
 
         return '/' . implode('|', $searchRegExpParts) . '/';
     }
@@ -316,7 +327,7 @@ class QueryBuilderTools
     public function getFields($condition)
     {
         $condition = (string) $condition;
-        $fields = array();
+        $fields = [];
 
         preg_match_all('/(\w+\.\w+)/', $condition, $matches);
         if (count($matches) > 1) {

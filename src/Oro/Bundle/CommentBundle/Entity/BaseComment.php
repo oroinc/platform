@@ -153,7 +153,7 @@ abstract class BaseComment
      *
      * @return self
      */
-    public function setOwner(User $owner = null)
+    public function setOwner($owner = null)
     {
         $this->owner = $owner;
 
