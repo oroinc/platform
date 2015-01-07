@@ -37,10 +37,10 @@ class SystemCalendarProvider extends AbstractCalendarProvider implements Calenda
         SystemCalendarConfig $calendarConfig,
         SecurityFacade $securityFacade
     ) {
-        $this->doctrineHelper           = $doctrineHelper;
-        $this->calendarEventNormalizer  = $calendarEventNormalizer;
-        $this->calendarConfig           = $calendarConfig;
-        $this->securityFacade           = $securityFacade;
+        $this->doctrineHelper          = $doctrineHelper;
+        $this->calendarEventNormalizer = $calendarEventNormalizer;
+        $this->calendarConfig          = $calendarConfig;
+        $this->securityFacade          = $securityFacade;
     }
 
     /**
