@@ -18,11 +18,11 @@ class ChainVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
 
         $highPriorityProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface')
-            ->setMockClassName('HighPriorityVirtualFieldProvider')
+            ->setMockClassName('HighPriorityVirtualRelationProvider')
             ->getMock();
         $lowPriorityProvider = $this
             ->getMockBuilder('Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface')
-            ->setMockClassName('LowPriorityVirtualFieldProvider')
+            ->setMockClassName('LowPriorityVirtualRelationProvider')
             ->getMock();
 
         $this->chainProvider->addProvider($lowPriorityProvider);

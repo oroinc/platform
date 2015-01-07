@@ -44,6 +44,11 @@ abstract class AbstractQueryConverter
     protected $virtualRelationProvider;
 
     /**
+     * @var int
+     */
+    protected $tableAliasesCount = 0;
+
+    /**
      * @var string
      */
     private $rootEntity;
@@ -750,7 +755,9 @@ abstract class AbstractQueryConverter
             $className = $this->getEntityClassName($columnJoinId);
             $fieldName = $this->getFieldName($columnJoinId);
 
-            if ($this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
+            if ($this->virtualRelationProvider
+                && $this->virtualRelationProvider->isVirtualRelation($className, $fieldName)
+            ) {
                 $query = $this->virtualRelationProvider->getVirtualRelationQuery($className, $fieldName);
                 $this->addTableAliasesForVirtualItem($columnName, $query);
 
@@ -857,7 +864,9 @@ abstract class AbstractQueryConverter
             $className = $this->getEntityClassName($joinId);
             $fieldName = $this->getFieldName($joinId);
 
-            if ($this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
+            if ($this->virtualRelationProvider
+                && $this->virtualRelationProvider->isVirtualRelation($className, $fieldName)
+            ) {
                 break;
             }
 
@@ -946,14 +955,14 @@ abstract class AbstractQueryConverter
                 if (false !== $delimiterPos) {
                     $alias = substr($item['join'], 0, $delimiterPos);
                     if (!isset($aliases[$alias])) {
-                        $aliases[$alias] = $this->generateTableAlias(count($aliases));
+                        $aliases[$alias] = $this->generateTableAlias();
                     }
                     $item['join'] = $aliases[$alias] . substr($item['join'], $delimiterPos);
                 }
 
                 $alias = $item['alias'];
                 if (!isset($aliases[$alias])) {
-                    $aliases[$alias] = $this->generateTableAlias(count($aliases));
+                    $aliases[$alias] = $this->generateTableAlias();
                 }
                 $item['alias'] = $aliases[$alias];
 
@@ -1219,21 +1228,16 @@ abstract class AbstractQueryConverter
      *
      * @param string $joinId
      *
-     * @return null|string NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
+     * @return null|string NULL for autodetect, or a string represents the join type, for example 'INNER' or 'LEFT'
      */
     protected function getJoinType($joinId)
     {
-        $returnType = $this->getVirtualFieldReturnType($joinId);
-        if ($returnType) {
-            return $returnType;
-        }
-
-        $relationType = $this->getVirtualRelationType($joinId);
+        $relationType = $this->joinIdHelper->getJoinType($joinId);
         if ($relationType) {
-            return $relationType;
+            return strtoupper($relationType);
         }
 
-        return $this->joinIdHelper->getJoinType($joinId);
+        return null;
     }
 
     /**
@@ -1287,7 +1291,9 @@ abstract class AbstractQueryConverter
             return null;
         }
 
-        if ($this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
+        if ($this->virtualRelationProvider
+            && $this->virtualRelationProvider->isVirtualRelation($className, $fieldName)
+        ) {
             $relations = $this->virtualRelationProvider->getVirtualRelations($className);
 
             if (empty($relations[$fieldName])) {
@@ -1339,15 +1345,14 @@ abstract class AbstractQueryConverter
     }
 
     /**
-     * Generates new table alias
-     *
-     * @param int $offset
+     * Generates new unique table alias.
      *
      * @return string
      */
-    protected function generateTableAlias($offset = 1)
+    protected function generateTableAlias()
     {
-        return sprintf(static::TABLE_ALIAS_TEMPLATE, count($this->tableAliases) + $offset);
+        $this->tableAliasesCount++;
+        return sprintf(static::TABLE_ALIAS_TEMPLATE, $this->tableAliasesCount);
     }
 
     /**
