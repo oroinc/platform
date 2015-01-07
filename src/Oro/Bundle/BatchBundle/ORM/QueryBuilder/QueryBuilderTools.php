@@ -3,7 +3,6 @@
 namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 
 use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 class QueryBuilderTools
@@ -102,6 +101,16 @@ class QueryBuilderTools
     }
 
     /**
+     * Set join table paths.
+     *
+     * @param array $joinTablePaths
+     */
+    public function setJoinTablePaths(array $joinTablePaths)
+    {
+        $this->joinTablePaths = $joinTablePaths;
+    }
+
+    /**
      * Prepares an array of state passes by alias used in join WITH|ON condition
      *
      * @param array $joins
@@ -176,7 +185,7 @@ class QueryBuilderTools
             $joinCondition = $join->getCondition();
             $joinType = $join->getJoinType();
             $alias = $join->getAlias();
-            if (strtoupper($joinType) == Join::INNER_JOIN || in_array($alias, $aliases)) {
+            if (strtoupper($joinType) == Expr\Join::INNER_JOIN || in_array($alias, $aliases)) {
                 if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
                     $data = explode('.', $joinTable);
                     if (!in_array($data[0], $aliases)) {
