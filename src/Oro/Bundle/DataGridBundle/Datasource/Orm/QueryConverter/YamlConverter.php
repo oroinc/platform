@@ -13,6 +13,8 @@ use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 
 class YamlConverter implements QueryConverterInterface
 {
+    const MAX_ITERATIONS = 100;
+
     /**
      * {@inheritdoc}
      */
@@ -81,20 +83,32 @@ class YamlConverter implements QueryConverterInterface
             $usedAliases = ['t1'];
         }
 
-        $knownAliases = 1;
+        $knownAliases = [$usedAliases[0]];
         if (isset($value['join']['inner'])) {
-            $knownAliases += count($value['join']['inner']);
+            foreach ($value['join']['inner'] as $join) {
+                $knownAliases[] = $join['alias'];
+            }
         }
         if (isset($value['join']['left'])) {
-            $knownAliases += count($value['join']['left']);
+            foreach ($value['join']['left'] as $join) {
+                $knownAliases[] = $join['alias'];
+            }
         }
         $qbTools = $this->createQueryBuilderTools($value);
 
         // Add joins ordered by used tables
+        $tries = 0;
         do {
-            $this->addJoinByDefinition($qb, $qbTools, $value, 'inner', $usedAliases);
-            $this->addJoinByDefinition($qb, $qbTools, $value, 'left', $usedAliases);
-        } while (count($usedAliases) != $knownAliases);
+            $this->addJoinByDefinition($qb, $qbTools, $value, 'inner', $usedAliases, $knownAliases);
+            $this->addJoinByDefinition($qb, $qbTools, $value, 'left', $usedAliases, $knownAliases);
+
+            if ($tries > self::MAX_ITERATIONS) {
+                throw new \RuntimeException(
+                    'Could not reorder joins correctly. Number of tries has exceeded maximum allowed.'
+                );
+            }
+            $tries++;
+        } while (count($usedAliases) != count($knownAliases));
     }
 
     /**
@@ -139,13 +153,15 @@ class YamlConverter implements QueryConverterInterface
      * @param array $value
      * @param string $joinType
      * @param array $usedAliases
+     * @param array $knownAliases
      */
     protected function addJoinByDefinition(
         QueryBuilder $qb,
         QueryBuilderTools $qbTools,
         array $value,
         $joinType,
-        array &$usedAliases
+        array &$usedAliases,
+        array $knownAliases
     ) {
         $joinType = strtolower($joinType);
         if (!isset($value['join'][$joinType])) {
@@ -162,6 +178,8 @@ class YamlConverter implements QueryConverterInterface
                 $qbTools->getUsedTableAliases($join['join']),
                 $qbTools->getUsedTableAliases($join['condition'])
             );
+            // Intersect with known aliases to prevent counting aliases from subselects
+            $joinUsedAliases = array_intersect($joinUsedAliases, $knownAliases);
             $unknownAliases = array_diff($joinUsedAliases, array_merge($usedAliases, [$join['alias']]));
             if (!empty($unknownAliases)) {
                 continue;
