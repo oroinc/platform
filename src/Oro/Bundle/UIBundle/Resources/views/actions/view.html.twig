@@ -162,6 +162,22 @@
                     }]) %}
                 {% endif %}
 
+                {%- set commentsData  -%}
+                    {% placeholder view_content_data_comments with {entity: entity} %}
+                {%- endset -%}
+
+                {% if commentsData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'oro.comment.entity_plural_label'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'responsive-cell activity-list-widget',
+                                'data': [commentsData]
+                            }
+                        ]
+                    }]) %}
+                {% endif  %}
+
                 {% set data = data|merge({'dataBlocks': dataBlocks}) %}
             {% endif %}
             {{ UI.scrollData(id, data) }}
