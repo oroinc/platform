@@ -7,7 +7,7 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
-class UserCalendarProvider extends AbstractCalendarProvider implements CalendarProviderInterface
+class UserCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
