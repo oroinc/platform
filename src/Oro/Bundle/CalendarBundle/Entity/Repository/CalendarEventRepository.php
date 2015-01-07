@@ -15,12 +15,13 @@ class CalendarEventRepository extends EntityRepository
      * @param \DateTime      $endDate
      * @param array|Criteria $filters   Additional filtering criteria, e.g. ['allDay' => true, ...]
      *                                  or \Doctrine\Common\Collections\Criteria
+     * @param array          $extraFields
      *
      * @return QueryBuilder
      */
-    public function getUserEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
+    public function getUserEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [], $extraFields = [])
     {
-        $qb = $this->getUserEventListQueryBuilder($filters);
+        $qb = $this->getUserEventListQueryBuilder($filters, $extraFields);
         $this->addTimeIntervalFilter($qb, $startDate, $endDate);
 
         return $qb;

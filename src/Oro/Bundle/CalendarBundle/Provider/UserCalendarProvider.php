@@ -71,11 +71,11 @@ class UserCalendarProvider extends AbstractCalendarProvider implements CalendarP
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraFields)
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end);
+        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, $extraFields);
 
         $visibleIds = [];
         foreach ($connections as $id => $visible) {

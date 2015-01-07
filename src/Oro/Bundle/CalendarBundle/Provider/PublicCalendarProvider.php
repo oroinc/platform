@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 /**
  * Represents system wide calendars
  */
-class PublicCalendarProvider extends AbstractCalendarProvider implements CalendarProviderInterface
+class PublicCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -86,7 +86,7 @@ class PublicCalendarProvider extends AbstractCalendarProvider implements Calenda
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraFields)
     {
         if (!$this->calendarConfig->isPublicCalendarEnabled()) {
             return [];
@@ -97,7 +97,7 @@ class PublicCalendarProvider extends AbstractCalendarProvider implements Calenda
         $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder(
             $start,
             $end,
-            $this->getExtraFields()
+            $extraFields
         );
         $invisibleIds = [];
         foreach ($connections as $id => $visible) {

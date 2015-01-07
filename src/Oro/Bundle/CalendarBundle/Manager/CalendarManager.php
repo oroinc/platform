@@ -96,13 +96,21 @@ class CalendarManager
      * @param \DateTime $start          A date/time specifies the begin of a time interval
      * @param \DateTime $end            A date/time specifies the end of a time interval
      * @param bool      $subordinate    Determines whether events from connected calendars should be included or not
+     * @param array     $extraFields
      *
      * @return array
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $subordinate)
-    {
+    public function getCalendarEvents(
+        $organizationId,
+        $userId,
+        $calendarId,
+        $start,
+        $end,
+        $subordinate,
+        $extraFields = []
+    ) {
         // make sure input parameters have proper types
-        $calendarId  = (int)$calendarId;
+        $calendarId = (int)$calendarId;
         $subordinate = (bool)$subordinate;
 
         $allConnections = $this->calendarPropertyProvider->getItemsVisibility($calendarId, $subordinate);
@@ -116,7 +124,15 @@ class CalendarManager
                     $connections[$c['calendar']] = $c['visible'];
                 }
             }
-            $events = $provider->getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
+            $events = $provider->getCalendarEvents(
+                $organizationId,
+                $userId,
+                $calendarId,
+                $start,
+                $end,
+                $connections,
+                $extraFields
+            );
             if (!empty($events)) {
                 foreach ($events as &$event) {
                     $event['calendarAlias'] = $alias;

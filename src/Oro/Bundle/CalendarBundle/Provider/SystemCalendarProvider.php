@@ -11,7 +11,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 /**
  * Represents organization calendars
  */
-class SystemCalendarProvider extends AbstractCalendarProvider implements CalendarProviderInterface
+class SystemCalendarProvider implements CalendarProviderInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -92,7 +92,7 @@ class SystemCalendarProvider extends AbstractCalendarProvider implements Calenda
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraFields)
     {
         if (!$this->calendarConfig->isSystemCalendarEnabled()
             || !$this->securityFacade->isGranted('oro_system_calendar_view')
@@ -115,7 +115,7 @@ class SystemCalendarProvider extends AbstractCalendarProvider implements Calenda
         $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
             $start,
             $end,
-            $this->getExtraFields()
+            $extraFields
         )
             ->andWhere('c.organization = :organizationId')
             ->setParameter('organizationId', $organizationId);
