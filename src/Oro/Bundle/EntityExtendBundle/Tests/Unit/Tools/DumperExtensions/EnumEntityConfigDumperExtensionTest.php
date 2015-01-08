@@ -398,6 +398,9 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                     ],
+                    'datagrid' => [
+                        'is_visible' => false
+                    ],
                     'importexport' => [
                         'identity' => true
                     ]
@@ -412,6 +415,9 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
+                    ],
+                    'datagrid' => [
+                        'is_visible' => false
                     ]
                 ]
             );
@@ -424,6 +430,9 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
+                    ],
+                    'datagrid' => [
+                        'is_visible' => false
                     ]
                 ]
             );
