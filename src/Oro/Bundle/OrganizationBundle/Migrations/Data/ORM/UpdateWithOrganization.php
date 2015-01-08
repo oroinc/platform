@@ -12,13 +12,15 @@ abstract class UpdateWithOrganization extends AbstractFixture
      * @param ObjectManager $manager
      * @param string        $tableName
      * @param string        $relationName relation name to update. By default 'organization'
+     * @param bool          $onlyEmpty    Update data only for the records with empty relation
      */
-    public function update(ObjectManager $manager, $tableName, $relationName = 'organization')
+    public function update(ObjectManager $manager, $tableName, $relationName = 'organization', $onlyEmpty = false)
     {
         $manager->getRepository('OroOrganizationBundle:Organization')->updateWithOrganization(
             $tableName,
             $manager->getRepository('OroOrganizationBundle:Organization')->getFirst()->getId(),
-            $relationName
+            $relationName,
+            $onlyEmpty
         );
     }
 }

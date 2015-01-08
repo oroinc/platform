@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AbstractEntityConfigDumperExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\RelationBuilder;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -57,13 +58,9 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
             if (!$entityConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 continue;
             }
-            if (!$entityConfig->is('state', ExtendScope::STATE_NEW)) {
-                continue;
-            }
             if (!$ownershipConfigProvider->hasConfig($entityConfig->getId()->getClassName())) {
                 continue;
             }
-
             $ownershipConfig = $ownershipConfigProvider->getConfig($entityConfig->getId()->getClassName());
             $ownerType       = $ownershipConfig->get('owner_type');
             if (empty($ownerType)) {
@@ -76,13 +73,21 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
                 $ownershipConfig->get('owner_field_name')
             );
 
-            if (in_array($ownerType, [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT])
-                && $ownershipConfig->has('organization_field_name')
-            ) {
+            if (in_array($ownerType, [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT])) {
+                if (!$ownershipConfig->has('organization_field_name')) {
+                    $ownershipConfig->set('organization_field_name', 'organization');
+                    $ownershipConfig->set('organization_column_name', 'organization_id');
+
+                    $this->configManager->persist($ownershipConfig);
+                    $organizationFieldName = 'organization';
+                } else {
+                    $organizationFieldName = $ownershipConfig->get('organization_field_name');
+                }
+
                 $this->createOwnerRelation(
                     $entityConfig,
                     $this->ownershipMetadataProvider->getOrganizationClass(),
-                    $ownershipConfig->get('organization_field_name')
+                    $organizationFieldName
                 );
             }
         }
@@ -95,27 +100,35 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
      */
     protected function createOwnerRelation(ConfigInterface $entityConfig, $targetEntityClassName, $relationName)
     {
-        $this->relationBuilder->addManyToOneRelation(
-            $entityConfig,
-            $targetEntityClassName,
+        $relationKey = ExtendHelper::buildRelationKey(
+            $entityConfig->getId()->getClassName(),
             $relationName,
-            'id',
-            [
-                'entity'    => [
-                    'label'       => 'oro.custom_entity.' . $relationName . '.label',
-                    'description' => 'oro.custom_entity.' . $relationName . '.description',
-                ],
-                'view'      => [
-                    'is_displayable' => false
-                ],
-                'form'      => [
-                    'is_enabled' => false
-                ],
-                'dataaudit' => [
-                    'auditable' => true
-                ]
-            ]
+            'manyToOne',
+            $this->ownershipMetadataProvider->getOrganizationClass()
         );
+        if (!isset($entityConfig->get('relation')[$relationKey])) {
+            $this->relationBuilder->addManyToOneRelation(
+                $entityConfig,
+                $targetEntityClassName,
+                $relationName,
+                'id',
+                [
+                    'entity'    => [
+                        'label'       => 'oro.custom_entity.' . $relationName . '.label',
+                        'description' => 'oro.custom_entity.' . $relationName . '.description',
+                    ],
+                    'view'      => [
+                        'is_displayable' => false
+                    ],
+                    'form'      => [
+                        'is_enabled' => false
+                    ],
+                    'dataaudit' => [
+                        'auditable' => true
+                    ]
+                ]
+            );
+        }
     }
 
     /**

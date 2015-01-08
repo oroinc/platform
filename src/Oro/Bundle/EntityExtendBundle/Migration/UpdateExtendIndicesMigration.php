@@ -113,7 +113,14 @@ class UpdateExtendIndicesMigration implements
     protected function processColumn(Schema $schema, QueryBag $queries, $tableName, $columnName, $options)
     {
         $className = $this->entityMetadataHelper->getEntityClassByTableName($tableName);
-        $table     = $schema->getTable($tableName);
+        if (null === $className) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        if (!$table->hasColumn($columnName)) {
+            return;
+        }
 
         if (!isset($options[ExtendOptionsManager::NEW_NAME_OPTION])) {
             if (isset($options[ExtendOptionsManager::TYPE_OPTION])) {
