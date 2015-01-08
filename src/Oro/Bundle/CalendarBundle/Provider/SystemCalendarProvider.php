@@ -92,7 +92,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraFields)
     {
         if (!$this->calendarConfig->isSystemCalendarEnabled()
             || !$this->securityFacade->isGranted('oro_system_calendar_view')
@@ -112,7 +112,11 @@ class SystemCalendarProvider implements CalendarProviderInterface
 
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder($start, $end)
+        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
+            $start,
+            $end,
+            $extraFields
+        )
             ->andWhere('c.organization = :organizationId')
             ->setParameter('organizationId', $organizationId);
         $invisibleIds = [];
