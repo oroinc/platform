@@ -95,7 +95,9 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     }
 
     /**
-     * Determines whether the index for the given field is needed or not
+     * Determines whether the index for the given field is needed or not.
+     * All relation type fields should be excluded.
+     * Index requirement is determined by visibility of a field on a grid.
      *
      * @param string $className
      * @param string $fieldName
@@ -106,11 +108,6 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     protected function isIndexRequired($className, $fieldName, $fieldType)
     {
         $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-
-        /**
-         * Check for relation fields.
-         * They already has an index, so we should not process them.
-         */
         if (!$this->fieldTypeHelper->isRelation($underlyingType)) {
             $datagridConfigProvider = $this->configManager->getProvider('datagrid');
             if ($datagridConfigProvider->hasConfig($className, $fieldName)) {

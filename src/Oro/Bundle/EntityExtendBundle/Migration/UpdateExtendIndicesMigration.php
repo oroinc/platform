@@ -50,8 +50,6 @@ class UpdateExtendIndicesMigration implements
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
         $this->fieldTypeHelper      = $fieldTypeHelper;
-
-        var_dump($this->fieldTypeHelper->underlyingTypesMap);
     }
 
     /**
@@ -83,9 +81,6 @@ class UpdateExtendIndicesMigration implements
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-
-        var_dump($this->fieldTypeHelper->underlyingTypesMap);
-
         if ($schema instanceof ExtendSchema) {
             $extendOptions = $schema->getExtendOptions();
             $toSchema      = clone $schema;
