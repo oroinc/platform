@@ -98,12 +98,12 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
         $this->action->execute($context);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @codingStandardsIgnoreStart
      * @expectedExceptionMessage Action "populate_channel_owner" expects Oro\Bundle\IntegrationBundle\Entity\Channel in parameter "integration", stdClass is given.
-     * @codingStandardsIgnoreEnd
      */
+    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectIntegration()
     {
         $context = new \stdClass();

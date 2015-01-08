@@ -53,7 +53,6 @@ class ChangeSetBuilder
     {
         foreach ($haystack as $package) {
             if ($equalsCallback($needle, $package)) {
-
                 return true;
             }
         }
