@@ -118,7 +118,8 @@ class Notes extends AbstractPageEntity
     public function checkNote($note)
     {
         $this->assertElementPresent(
-            "//div[@class='container-fluid accordion']//span[@class='message-item message']//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]",
+            "//div[@class='container-fluid accordion']//span[@class='message-item message']" .
+            "//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]",
             'Note not found'
         );
 
@@ -131,7 +132,9 @@ class Notes extends AbstractPageEntity
      */
     public function editNote($note)
     {
-        $actionMenu = "//div[@class='container-fluid accordion']//span[@class='message-item message']//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]//ancestor::div[@class='accordion-heading']//div[@class='actions']//a[contains(., '...')]";
+        $actionMenu = "//div[@class='container-fluid accordion']//span[@class='message-item message']" .
+            "//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]" .
+            "//ancestor::div[@class='accordion-heading']//div[@class='actions']//a[contains(., '...')]";
         $editAction =
             "//ul[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
             "//a[@title='Update Note']";
@@ -155,7 +158,9 @@ class Notes extends AbstractPageEntity
      */
     public function deleteNote($note)
     {
-        $actionMenu = "//div[@class='container-fluid accordion']//span[@class='message-item message']//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]//ancestor::div[@class='accordion-heading']//div[@class='actions']//a[contains(., '...')]";
+        $actionMenu = "//div[@class='container-fluid accordion']//span[@class='message-item message']" .
+            "//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]" .
+            "//ancestor::div[@class='accordion-heading']//div[@class='actions']//a[contains(., '...')]";
         $deleteAction =
             "//ul[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
             "//a[@title='Delete Note']";
