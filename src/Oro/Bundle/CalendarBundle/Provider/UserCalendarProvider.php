@@ -18,6 +18,9 @@ class UserCalendarProvider implements CalendarProviderInterface
     /** @var AbstractCalendarEventNormalizer */
     protected $calendarEventNormalizer;
 
+    /** @var string[] */
+    protected $extraFields = [];
+
     /**
      * @param DoctrineHelper                  $doctrineHelper
      * @param NameFormatter                   $nameFormatter
@@ -108,5 +111,13 @@ class UserCalendarProvider implements CalendarProviderInterface
         }
 
         return $name;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExtraFields()
+    {
+        return $this->extraFields;
     }
 }

@@ -25,6 +25,9 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var string[] */
+    protected $extraFields = [];
+
     /**
      * @param DoctrineHelper                  $doctrineHelper
      * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
@@ -37,10 +40,10 @@ class SystemCalendarProvider implements CalendarProviderInterface
         SystemCalendarConfig $calendarConfig,
         SecurityFacade $securityFacade
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
-        $this->calendarEventNormalizer = $calendarEventNormalizer;
-        $this->calendarConfig          = $calendarConfig;
-        $this->securityFacade          = $securityFacade;
+        $this->doctrineHelper           = $doctrineHelper;
+        $this->calendarEventNormalizer  = $calendarEventNormalizer;
+        $this->calendarConfig           = $calendarConfig;
+        $this->securityFacade           = $securityFacade;
     }
 
     /**
@@ -112,7 +115,11 @@ class SystemCalendarProvider implements CalendarProviderInterface
 
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder($start, $end)
+        $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
+            $start,
+            $end,
+            $this->getExtraFields()
+        )
             ->andWhere('c.organization = :organizationId')
             ->setParameter('organizationId', $organizationId);
         $invisibleIds = [];
@@ -132,5 +139,13 @@ class SystemCalendarProvider implements CalendarProviderInterface
             //@TODO: Fix ACL for calendars providers
             $qb->getQuery()
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExtraFields()
+    {
+        return $this->extraFields;
     }
 }

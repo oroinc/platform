@@ -25,6 +25,9 @@ class PublicCalendarProvider implements CalendarProviderInterface
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var string[] */
+    protected $extraFields = [];
+
     /**
      * @param DoctrineHelper                  $doctrineHelper
      * @param AbstractCalendarEventNormalizer $calendarEventNormalizer
@@ -37,10 +40,10 @@ class PublicCalendarProvider implements CalendarProviderInterface
         SystemCalendarConfig $calendarConfig,
         SecurityFacade $securityFacade
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
-        $this->calendarEventNormalizer = $calendarEventNormalizer;
-        $this->calendarConfig          = $calendarConfig;
-        $this->securityFacade          = $securityFacade;
+        $this->doctrineHelper           = $doctrineHelper;
+        $this->calendarEventNormalizer  = $calendarEventNormalizer;
+        $this->calendarConfig           = $calendarConfig;
+        $this->securityFacade           = $securityFacade;
     }
 
     /**
@@ -94,7 +97,11 @@ class PublicCalendarProvider implements CalendarProviderInterface
 
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder($start, $end);
+        $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder(
+            $start,
+            $end,
+            $this->getExtraFields()
+        );
         $invisibleIds = [];
         foreach ($connections as $id => $visible) {
             if (!$visible) {
@@ -108,5 +115,13 @@ class PublicCalendarProvider implements CalendarProviderInterface
         }
 
         return $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getExtraFields()
+    {
+        return $this->extraFields;
     }
 }
