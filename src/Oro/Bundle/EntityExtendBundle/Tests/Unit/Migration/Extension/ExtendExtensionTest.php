@@ -362,12 +362,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.name.label',
                                     'description' => 'oro.entityextend.enumvalue.name.description',
                                 ],
-                                'datagrid'     => [
-                                    'is_visible' => false
-                                ],
-                                'importexport' => [
-                                    'identity' => true
-                                ]
+                                'datagrid'     => ['is_visible' => false],
+                                'importexport' => ['identity' => true]
                             ],
                             'type'    => 'string'
                         ],
@@ -377,9 +373,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.priority.label',
                                     'description' => 'oro.entityextend.enumvalue.priority.description',
                                 ],
-                                'datagrid' => [
-                                    'is_visible' => false
-                                ]
+                                'datagrid' => ['is_visible' => false]
                             ],
                             'type'    => 'integer',
                         ],
@@ -389,9 +383,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.default.label',
                                     'description' => 'oro.entityextend.enumvalue.default.description',
                                 ],
-                                'datagrid' => [
-                                    'is_visible' => false
-                                ]
+                                'datagrid' => ['is_visible' => false]
                             ],
                             'type'    => 'boolean',
                         ],
