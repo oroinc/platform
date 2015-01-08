@@ -9,7 +9,7 @@ class FieldTypeHelper
      *      key   = data type name
      *      value = underlying data type
      */
-    public $underlyingTypesMap;
+    protected $underlyingTypesMap;
 
     /**
      * @param string[] $underlyingTypesMap key = data type name, value = underlying data type
