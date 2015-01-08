@@ -9,13 +9,11 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $activityConfigProvider;
+    private $activityManager;
 
     /** @var EmailActivityManager */
     private $manager;
@@ -24,11 +22,11 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->activityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+        $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new EmailActivityManager($this->activityConfigProvider);
+        $this->manager = new EmailActivityManager($this->activityManager);
 
         $this->owners = [
             new TestUser('1'),
@@ -43,130 +41,20 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
         $email  = $this->getEmailEntity();
         $target = new TestUser();
 
-        $targetClass = get_class($target);
-        $emailClass  = get_class($email);
-
-        $config = new Config(new EntityConfigId('activity', $targetClass));
-        $config->set('activities', [$emailClass]);
-
-        $this->activityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($targetClass)
-            ->will($this->returnValue(true));
-        $this->activityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($targetClass)
-            ->will($this->returnValue($config));
-
-        $email->expects($this->once())
+        $this->activityManager->expects($this->once())
             ->method('addActivityTarget')
-            ->with($this->identicalTo($target));
-
-        $result = $this->manager->addAssociation($email, $target);
-
-        $this->assertTrue($result);
-    }
-
-    public function testAddAssociationForNotConfigurableTarget()
-    {
-        $email  = $this->getEmailEntity();
-        $target = new TestUser();
-
-        $targetClass = get_class($target);
-        $emailClass  = get_class($email);
-
-        $config = new Config(new EntityConfigId('activity', $targetClass));
-        $config->set('activities', [$emailClass]);
-
-        $this->activityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($targetClass)
-            ->will($this->returnValue(false));
-        $this->activityConfigProvider->expects($this->never())
-            ->method('getConfig');
-
-        $email->expects($this->never())
-            ->method('addActivityTarget');
-
-        $result = $this->manager->addAssociation($email, $target);
-
-        $this->assertFalse($result);
-    }
-
-    public function testAddAssociationForTargetWithoutEmailAssociation()
-    {
-        $email  = $this->getEmailEntity();
-        $target = new TestUser();
-
-        $targetClass = get_class($target);
-
-        $config = new Config(new EntityConfigId('activity', $targetClass));
-        $config->set('activities', ['Test\Entity']);
-
-        $this->activityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($targetClass)
+            ->with($this->identicalTo($email), $this->identicalTo($target))
             ->will($this->returnValue(true));
-        $this->activityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($targetClass)
-            ->will($this->returnValue($config));
 
-        $email->expects($this->never())
-            ->method('addActivityTarget');
-
-        $result = $this->manager->addAssociation($email, $target);
-
-        $this->assertFalse($result);
-    }
-
-    public function testAddAssociationForTargetWithoutAnyAssociations()
-    {
-        $email  = $this->getEmailEntity();
-        $target = new TestUser();
-
-        $targetClass = get_class($target);
-
-        $config = new Config(new EntityConfigId('activity', $targetClass));
-
-        $this->activityConfigProvider->expects($this->once())
-            ->method('hasConfig')
-            ->with($targetClass)
-            ->will($this->returnValue(true));
-        $this->activityConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($targetClass)
-            ->will($this->returnValue($config));
-
-        $email->expects($this->never())
-            ->method('addActivityTarget');
-
-        $result = $this->manager->addAssociation($email, $target);
-
-        $this->assertFalse($result);
+        $this->assertTrue(
+            $this->manager->addAssociation($email, $target)
+        );
     }
 
     public function testHandleOnFlush()
     {
         $email      = $this->getEmailEntity();
         $emailClass = get_class($email);
-
-        /** @var Config[] $configs */
-        $configs = [];
-        foreach ($this->owners as $owner) {
-            $configs[] = new Config(new EntityConfigId('activity', get_class($owner)));
-        }
-        $configs[0]->set('activities', [$emailClass]);
-        $configs[1]->set('activities', ['Test\Entity']);
-        $configs[3]->set('activities', [$emailClass]);
-
-        $this->activityConfigProvider->expects($this->exactly(4))
-            ->method('hasConfig')
-            ->with($configs[0]->getId()->getClassName())
-            ->will($this->onConsecutiveCalls(true, true, false, true));
-        $this->activityConfigProvider->expects($this->exactly(3))
-            ->method('getConfig')
-            ->will($this->onConsecutiveCalls($configs[0], $configs[1], $configs[3]));
 
         $em            = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
@@ -191,12 +79,10 @@ class EmailActivityManagerTest extends \PHPUnit_Framework_TestCase
             ->method('computeChangeSet')
             ->with($this->identicalTo($classMetaData), $this->identicalTo($email));
 
-        $email->expects($this->at(0))
-            ->method('addActivityTarget')
-            ->with($this->identicalTo($this->owners[0]));
-        $email->expects($this->at(1))
-            ->method('addActivityTarget')
-            ->with($this->identicalTo($this->owners[3]));
+        $this->activityManager->expects($this->at(0))
+            ->method('addActivityTargets')
+            ->with($this->identicalTo($email), $this->identicalTo($this->owners))
+            ->will($this->returnValue(true));
 
         $this->manager->handleOnFlush(new OnFlushEventArgs($em));
     }

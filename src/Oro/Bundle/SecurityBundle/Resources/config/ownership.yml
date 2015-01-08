@@ -24,6 +24,10 @@ services:
             - @oro_entity.orm.entity_class_resolver
             - @oro_security.owner.ownership_metadata_provider.cache
 
+    oro_security.owner.ownership_metadata_provider.link:
+        tags:
+            - { name: oro_service_link, service: oro_security.owner.ownership_metadata_provider }
+
     oro_security.owner.ownership_metadata_provider.cache:
         public: false
         parent: oro.cache.abstract

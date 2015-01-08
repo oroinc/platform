@@ -12,6 +12,7 @@ parameters:
     oro_search.extension.search_results.class:                            Oro\Bundle\SearchBundle\Extension\SearchResultsExtension
 
     oro_search.event_listener.search_results_grid_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchResultsGridListener
+    oro_search.event_listener.demo_data_listener.class:           Oro\Bundle\SearchBundle\EventListener\DemoDataMigrationListener
     oro_search.datasource.search.class:                           Oro\Bundle\SearchBundle\Extension\SearchDatasource
 
     oro_search.extension.orm_pager.class:          Oro\Bundle\SearchBundle\Extension\Pager\SearchPagerExtension
@@ -53,6 +54,7 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
+            - { name: doctrine.event_listener, event: onClear }
 
     oro_search.twig.search_extension:
         class:                        %oro_search.twig_extension.class%
@@ -138,6 +140,15 @@ services:
             - @service_container
         tags:
             - { name: kernel.event_listener, event: console.terminate }
+
+    oro_search.event_listener.demo_data_listener:
+        class: %oro_search.event_listener.demo_data_listener.class%
+        arguments:
+            - @oro_search.search.engine
+            - @oro_search.index_listener
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
+            - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
 
     oro_search.event_listener.orm.fulltext_index_listener:
         class: %oro_search.event_listener.orm.fulltext_index_listener.class%

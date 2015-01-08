@@ -44,3 +44,4 @@ oro:
                 field:
                     items:
                         is_displayable: Show on view
+                        priority: Priority

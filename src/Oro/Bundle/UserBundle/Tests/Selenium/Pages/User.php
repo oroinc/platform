@@ -274,6 +274,23 @@ class User extends AbstractPageEntity
         return $this;
     }
 
+    /**
+     * This method can set Business units and Organizations
+     * @param array $businessUnits
+     * @return $this
+     */
+    public function setBusinessUnit($businessUnits = array('Main'))
+    {
+        foreach ($businessUnits as $businessUnit) {
+            $this->test->byXpath(
+                "//div[@id='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]".
+                "/preceding-sibling::input"
+            )->click();
+        }
+
+        return $this;
+    }
+
     public function edit()
     {
         $this->test->byXpath("//div[@class='pull-left btn-group icons-holder']/a[@title = 'Edit User']")->click();
@@ -321,16 +338,16 @@ class User extends AbstractPageEntity
         )->click();
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ".
-            "ui-front ui-draggable ui-resizable ui-dialog-normal ui-dialog-buttons']"
+            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
+            "ui-dialog-normal']"
         );
         $this->test->byXpath(
             "//div[@class='ui-dialog-titlebar-buttonpane']/button[@title='close']"
         )->click();
         $this->waitForAjax();
         $this->assertElementNotPresent(
-            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all " .
-            "ui-front ui-draggable ui-resizable ui-dialog-normal ui-dialog-buttons']"
+            "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
+            "ui-dialog-normal']"
         );
 
         return $this;

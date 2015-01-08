@@ -31,7 +31,7 @@ class EmailGridHelperTest extends \PHPUnit_Framework_TestCase
         $this->emailSyncManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->activityManager  = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager')
+        $this->activityManager  = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->userClass        = 'Test\User';

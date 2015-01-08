@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 class OroTranslationAdapter extends AbstractAPIAdapter
 {
@@ -80,7 +80,7 @@ class OroTranslationAdapter extends AbstractAPIAdapter
 
             return $result;
         } else {
-            $this->logger->critical('Service unavailable. Status received: ' . $responseCode);
+            $this->logger->critical('Service unavailable. Status received: ' . $response->getStatusCode());
             throw new \RuntimeException('Service unavailable');
         }
     }

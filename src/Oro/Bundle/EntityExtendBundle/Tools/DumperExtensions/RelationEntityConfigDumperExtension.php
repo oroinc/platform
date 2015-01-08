@@ -162,6 +162,9 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
             'target_entity'   => $targetEntityClass,
             'target_field_id' => $targetFieldId
         ];
+        if ($fieldConfig->has('cascade')) {
+            $selfRelationConfig['cascade'] = $fieldConfig->get('cascade');
+        }
 
         $selfRelations               = $selfConfig->get('relation') ? : [];
         $selfRelations[$relationKey] = $selfRelationConfig;

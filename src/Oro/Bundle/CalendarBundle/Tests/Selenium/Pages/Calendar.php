@@ -21,17 +21,12 @@ class Calendar extends AbstractPage
         parent::__construct($testCase, $redirect);
     }
 
-    public function open($entityData = array())
-    {
-
-    }
-
     /**
      * @return $this
      */
     public function addEvent()
     {
-        $this->test->byXpath("//td[contains(@class,'fc-widget-content fc-today fc-state-highlight')]")->click();
+        $this->test->byXpath("//td[contains(@class,'fc-today fc-state-highlight')]")->click();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
@@ -47,7 +42,9 @@ class Calendar extends AbstractPage
      */
     public function editEvent($event)
     {
-        $this->test->byXpath("//div[@class='fc-event-container']//span[normalize-space(.)='{$event}']")->click();
+        $this->test->byXpath("//td[@class='fc-event-container']/a[contains(., '{$event}')]")->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//button[@type='button'][normalize-space(.)='Edit']")->click();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
@@ -112,7 +109,7 @@ class Calendar extends AbstractPage
     public function checkEventPresent($event)
     {
         $this->assertElementPresent(
-            "//div[@class='fc-event-container']//span[normalize-space(.)='{$event}']",
+            "//td[@class='fc-event-container']/a[contains(., '{$event}')]",
             'Event not found at calendar'
         );
 
@@ -126,7 +123,7 @@ class Calendar extends AbstractPage
     public function checkEventNotPresent($event)
     {
         $this->assertElementNotPresent(
-            "//div[@class='fc-event-container']//span[normalize-space(.)='{$event}']",
+            "//td[@class='fc-event-container']/a[contains(., '{$event}')]",
             'Event is found at calendar'
         );
 

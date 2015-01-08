@@ -1,16 +1,16 @@
 define(function(require) {
+    'use strict';
 
-    var _ = require("underscore");
-    var $ = require("jquery");
-    var chartTemplate = require("text!orochart/js/templates/base-chart-template.html");
-    var BaseComponent = require('oroui/js/app/components/base/component');
-    var BaseChartComponent;
-
+    var BaseChartComponent,
+        _ = require('underscore'),
+        $ = require('jquery'),
+        chartTemplate = require('text!orochart/js/templates/base-chart-template.html'),
+        BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
-     *
-     * @class orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BaseCharComponent
+     * @class orochart.app.components.BaseChartComponent
+     * @extends oroui.app.components.base.Component
+     * @exports orochart/app/components/base-chart-component
      */
     BaseChartComponent = BaseComponent.extend({
         template: _.template(chartTemplate),
@@ -18,20 +18,27 @@ define(function(require) {
         /**
          *
          * @constructor
-         * @param {object} params
+         * @param {Object} options
          */
-        initialize: function(params) {
-            this.data = params.data;
-            this.options = params.options;
-            this.config = params.config;
+        initialize: function(options) {
+            var updateHandler;
+            this.data = options.data;
+            this.options = options.options;
+            this.config = options.config;
 
-            this.$el = $(params._sourceElement);
+            this.$el = $(options._sourceElement);
             this.$chart = null;
 
             this.renderBaseLayout();
 
-            this.$chart.bind('update.' + this.cid, $.proxy(this.update, this));
-            $(window).bind('resize.' + this.cid, $.proxy(this.update, this));
+            updateHandler = _.bind(this.update, this);
+
+            this.$chart.bind('update.' + this.cid, updateHandler);
+            // updates the chart on resize once per frame (1000/25)
+            $(window).bind('resize.' + this.cid, _.throttle(updateHandler, 40, {leading: false}));
+            $(window).bind('responsive-reflow.' + this.cid, updateHandler);
+
+            _.defer(updateHandler);
         },
 
         /**
@@ -42,26 +49,30 @@ define(function(require) {
         dispose: function() {
             this.$chart.unbind('.' + this.cid);
             $(window).unbind('.' + this.cid);
+            delete this.$el;
+            delete this.$chart;
+            delete this.$legend;
+            delete this.$container;
             BaseChartComponent.__super__.dispose.call(this);
         },
 
         renderBaseLayout: function() {
             this.$el.html(this.template());
             this.$chart = this.$el.find('.chart-content');
+            this.$legend = this.$el.find('.chart-legend');
+            this.$container = this.$el.find('.chart-container');
         },
 
         /**
          * Update chart size and redraw
          */
         update: function() {
-            if(this.setChartSize()) {
+            var isChanged = this.setChartSize();
+
+            if(isChanged) {
                 this.draw();
                 this.fixSize();
             }
-        },
-
-        delayUpdate: function() {
-
         },
 
         /**
@@ -94,7 +105,7 @@ define(function(require) {
          */
         fixSize: function() {
             var $chart = this.$chart;
-            var $labels = $chart.find(".flotr-grid-label-x");
+            var $labels = $chart.find('.flotr-grid-label-x');
             var labelMaxHeight = $labels.height();
             var labelMinHeight = $labels.height();
 
@@ -116,7 +127,7 @@ define(function(require) {
          * Draw comonent
          */
         draw: function() {
-            this.$el.html("copmonent");
+            this.$el.html('copmonent');
         }
     });
 

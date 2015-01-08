@@ -4,19 +4,17 @@ namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\DBAL\Schema\Schema;
 
-class UpdateBundleVersionMigration implements Migration
+class UpdateBundleVersionMigration implements Migration, FailIndependentMigration
 {
-    /**
-     * @var array
-     */
-    protected $bundleVersions;
+    /** @var MigrationState[] */
+    protected $migrations;
 
     /**
-     * @param array $bundleVersions
+     * @param MigrationState[] $migrations
      */
-    public function __construct(array $bundleVersions)
+    public function __construct(array $migrations)
     {
-        $this->bundleVersions = $bundleVersions;
+        $this->migrations = $migrations;
     }
 
     /**
@@ -24,9 +22,10 @@ class UpdateBundleVersionMigration implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        if (!empty($this->bundleVersions)) {
+        $bundleVersions = $this->getLatestSuccessMigrationVersions();
+        if (!empty($bundleVersions)) {
             $date = new \DateTime();
-            foreach ($this->bundleVersions as $bundleName => $bundleVersion) {
+            foreach ($bundleVersions as $bundleName => $bundleVersion) {
                 $sql = sprintf(
                     "INSERT INTO %s (bundle, version, loaded_at) VALUES ('%s', '%s', '%s')",
                     CreateMigrationTableMigration::MIGRATION_TABLE,
@@ -37,5 +36,31 @@ class UpdateBundleVersionMigration implements Migration
                 $queries->addQuery($sql);
             }
         }
+    }
+
+    /**
+     * Extracts latest version of successfully finished migrations for each bundle
+     *
+     * @return string[]
+     *      key   = bundle name
+     *      value = version
+     */
+    protected function getLatestSuccessMigrationVersions()
+    {
+        $result = [];
+        foreach ($this->migrations as $migration) {
+            if (!$migration->isSuccessful() || !$migration->getVersion()) {
+                continue;
+            }
+            if (isset($result[$migration->getBundleName()])) {
+                if (version_compare($result[$migration->getBundleName()], $migration->getVersion()) === -1) {
+                    $result[$migration->getBundleName()] = $migration->getVersion();
+                }
+            } else {
+                $result[$migration->getBundleName()] = $migration->getVersion();
+            }
+        }
+
+        return $result;
     }
 }

@@ -352,7 +352,7 @@ function(_, Backbone, routing, messenger, __,
             var confirm = new Confirmation({
                 title: title || '',
                 content: message,
-                okText: okText || __('Ok'),
+                okText: okText || __('OK'),
                 allowCancel: false
             });
             confirm.open();

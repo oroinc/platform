@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\AddressBundle\DependencyInjection\Compiler\AddressProviderPass;
+use Oro\Bundle\AddressBundle\DependencyInjection\Compiler\PhoneProviderPass;
 
 class OroAddressBundle extends Bundle
 {
@@ -17,5 +18,6 @@ class OroAddressBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new AddressProviderPass());
+        $container->addCompilerPass(new PhoneProviderPass());
     }
 }

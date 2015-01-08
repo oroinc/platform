@@ -1,19 +1,15 @@
-placeholders:
-    view_navButtons_before:
-        items:
-            oro_add_note_button:
-                order: -100
-
-    view_content_data_additional_information:
-        items:
-            oro_notes:
-                order: 100
+placeholders: ~
 
 items:
     oro_add_note_button:
         template: OroNoteBundle:Note:addButton.html.twig
         applicable: @oro_note.placeholder.filter->isNoteAssociationEnabled($entity$)
-        acl: oro_note_view
+        acl: [oro_note_create, oro_note_view]
+
+    oro_add_note_link:
+        template: OroNoteBundle:Note:addLink.html.twig
+        applicable: @oro_note.placeholder.filter->isNoteAssociationEnabled($entity$)
+        acl: [oro_note_create, oro_note_view]
 
     oro_notes:
         template: OroNoteBundle:Note:notes.html.twig

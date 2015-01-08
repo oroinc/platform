@@ -316,6 +316,7 @@ abstract class AbstractQueryConverter
                 $functionExpr       = $function['expr'];
                 $functionReturnType = isset($function['return_type']) ? $function['return_type'] : null;
             }
+            $isDistinct = isset($column['distinct']) ? $column['distinct'] : false;
             $tableAlias = $this->getTableAliasForColumn($columnName);
             $this->addSelectColumn(
                 $this->getEntityClassName($columnName),
@@ -325,7 +326,8 @@ abstract class AbstractQueryConverter
                 $this->columnAliases[$this->buildColumnAliasKey($column)],
                 isset($column['label']) ? $column['label'] : $fieldName,
                 $functionExpr,
-                $functionReturnType
+                $functionReturnType,
+                $isDistinct
             );
         }
     }
@@ -341,6 +343,9 @@ abstract class AbstractQueryConverter
      * @param string                        $columnLabel
      * @param string|FunctionInterface|null $functionExpr
      * @param string|null                   $functionReturnType
+     * @param bool                          $isDistinct
+     *
+     * @return
      */
     abstract protected function addSelectColumn(
         $entityClassName,
@@ -350,7 +355,8 @@ abstract class AbstractQueryConverter
         $columnAlias,
         $columnLabel,
         $functionExpr,
-        $functionReturnType
+        $functionReturnType,
+        $isDistinct = false
     );
 
     /**

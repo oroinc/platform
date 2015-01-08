@@ -38,10 +38,7 @@ class ReminderExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            array($this, 'postSubmit')
-        );
+        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit'], -128);
     }
 
     /**

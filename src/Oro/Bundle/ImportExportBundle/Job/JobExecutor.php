@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Job;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
+use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
@@ -12,6 +13,7 @@ use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
+
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -46,9 +48,9 @@ class JobExecutor
     protected $managerRegistry;
 
     /**
-     * @var EntityManager
+     * @var BatchJobRepository
      */
-    protected $batchJobManager;
+    protected $batchJobRepository;
 
     public function __construct(
         ConnectorRegistry $jobRegistry,
@@ -56,11 +58,10 @@ class JobExecutor
         ContextRegistry $contextRegistry,
         ManagerRegistry $managerRegistry
     ) {
-        $this->batchJobRegistry = $jobRegistry;
-        $this->batchJobManager = $batchJobRepository->getJobManager();
-        $this->contextRegistry = $contextRegistry;
-        $this->entityManager = $managerRegistry->getManager();
-        $this->managerRegistry = $managerRegistry;
+        $this->batchJobRegistry   = $jobRegistry;
+        $this->batchJobRepository = $batchJobRepository;
+        $this->contextRegistry    = $contextRegistry;
+        $this->managerRegistry    = $managerRegistry;
     }
 
     /**
@@ -71,32 +72,20 @@ class JobExecutor
      */
     public function executeJob($jobType, $jobName, array $configuration = array())
     {
+        $this->initialize();
+
         // create and persist job instance and job execution
         $jobInstance = new JobInstance(self::CONNECTOR_NAME, $jobType, $jobName);
         $jobInstance->setCode($this->generateJobCode($jobName));
         $jobInstance->setLabel(sprintf('%s.%s', $jobType, $jobName));
         $jobInstance->setRawConfiguration($configuration);
-        $jobExecution = new JobExecution();
-        $jobExecution->setJobInstance($jobInstance);
 
         // persist batch entities
-        $this->batchJobManager->persist($jobInstance);
-        $this->batchJobManager->persist($jobExecution);
+        $this->batchJobRepository->getJobManager()->persist($jobInstance);
+        $jobExecution = $this->batchJobRepository->createJobExecution($jobInstance);
 
         // do job
         $jobResult = $this->doJob($jobInstance, $jobExecution);
-
-        // EntityManager can be closed when there was an exception in flush method called inside some jobs execution
-        // Can't be implemented right now due to OroEntityManager external dependencies
-        // on ExtendManager and FilterCollection
-        if (!$this->entityManager->isOpen()) {
-            $this->managerRegistry->resetManager();
-            $this->entityManager = $this->managerRegistry->getManager();
-        }
-
-        // flush batch entities
-        $this->batchJobManager->flush($jobInstance);
-        $this->batchJobManager->flush($jobExecution);
 
         // set data to JobResult
         $jobResult->setJobId($jobInstance->getId());
@@ -147,13 +136,36 @@ class JobExecutor
                     $jobResult->addFailureException($failureException);
                 }
             }
+
+            // trigger save of JobExecution and JobInstance
+            $this->batchJobRepository->getJobManager()->flush();
+            $this->batchJobRepository->getJobManager()->clear();
         } catch (\Exception $exception) {
             $this->entityManager->rollback();
             $jobExecution->addFailureException($exception);
             $jobResult->addFailureException($exception->getMessage());
+
+            $this->saveFailedJobExecution($jobExecution);
         }
 
         return $jobResult;
+    }
+
+    /**
+     * Try to save batch entities only in case when it's possible
+     *
+     * @param JobExecution $jobExecution
+     */
+    protected function saveFailedJobExecution(JobExecution $jobExecution)
+    {
+        $batchManager = $this->batchJobRepository->getJobManager();
+        $batchUow     = $batchManager->getUnitOfWork();
+        $couldBeSaved = $batchManager->isOpen()
+            && $batchUow->getEntityState($jobExecution) === UnitOfWork::STATE_MANAGED;
+
+        if ($couldBeSaved) {
+            $batchManager->flush();
+        }
     }
 
     /**
@@ -201,7 +213,7 @@ class JobExecutor
      */
     protected function getJobInstanceRepository()
     {
-        return $this->entityManager->getRepository('AkeneoBatchBundle:JobInstance');
+        return $this->managerRegistry->getRepository('AkeneoBatchBundle:JobInstance');
     }
 
     /**
@@ -250,5 +262,13 @@ class JobExecutor
         $prefix .= date('Y_m_d_H_i_s') . '_';
 
         return preg_replace('~\W~', '_', uniqid($prefix, true));
+    }
+
+    /**
+     * Initialize environment
+     */
+    protected function initialize()
+    {
+        $this->entityManager = $this->managerRegistry->getManager();
     }
 }

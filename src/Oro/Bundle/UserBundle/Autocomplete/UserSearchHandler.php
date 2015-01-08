@@ -7,7 +7,7 @@ use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
 
 class UserSearchHandler extends FullNameSearchHandler
 {
-    const IMAGINE_AVATAR_FILTER = 'avatar_med';
+    const IMAGINE_AVATAR_FILTER = 'avatar_xsmall';
 
     /**
      * @var AttachmentManager

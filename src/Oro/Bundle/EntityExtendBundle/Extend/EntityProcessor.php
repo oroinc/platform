@@ -38,12 +38,6 @@ class EntityProcessor
     protected $commands = [
         'oro:entity-extend:update-config' => [],
         'oro:entity-extend:update-schema' => [],
-        // TODO: Update foreign keys for extended relation fields (manyToOne, oneToMany, manyToMany)
-        // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3621
-        'doctrine:schema:update'          => ['--force' => true],
-        // TODO: Update extended entity cache after schema update
-        // TODO: Should be fixed in scope of https://magecore.atlassian.net/browse/BAP-3652
-        'cache:clear'                     => [],
     ];
 
     /**
@@ -125,6 +119,7 @@ class EntityProcessor
                     $meta         = $em->getClassMetadata($entityConfig->getId()->getClassName());
 
                     $proxyFactory->generateProxyClasses([$meta], $proxyDir);
+                    clearstatcache(true, $proxyFileName);
                 }
             }
         }

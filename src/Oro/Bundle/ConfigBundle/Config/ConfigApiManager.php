@@ -53,7 +53,8 @@ class ConfigApiManager
         $result    = [];
         foreach ($variables as $variable) {
             $var          = $variable->toArray();
-            $var['value'] = $this->configManager->get($variable->getKey());
+            $var['value'] = $this->getTypedValue($variable->getType(), $this->configManager->get($variable->getKey()));
+            $var          = array_merge($var, $this->configManager->getInfo($variable->getKey()));
             $result[]     = $var;
         }
 
@@ -77,5 +78,27 @@ class ConfigApiManager
             $result[] = $path;
             $this->extractSectionPaths($result, $subSection, $path);
         }
+    }
+
+    /**
+     * @param string $type
+     * @param mixed  $value
+     *
+     * @return mixed
+     */
+    protected function getTypedValue($type, $value)
+    {
+        if ($value !== null) {
+            switch ($type) {
+                case 'boolean':
+                    $value = (bool)$value;
+                    break;
+                case 'integer':
+                    $value = (int)$value;
+                    break;
+            }
+        }
+
+        return $value;
     }
 }

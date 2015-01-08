@@ -20,6 +20,18 @@ class FieldTypeHelper
     }
 
     /**
+     * Check if given form type is relation
+     *
+     * @param string $type
+     *
+     * @return bool
+     */
+    public static function isRelation($type)
+    {
+        return in_array($type, ['ref-one', 'ref-many', 'oneToMany', 'manyToOne', 'manyToMany', 'optionSet']);
+    }
+
+    /**
      * @param string $type
      *
      * @return string

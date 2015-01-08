@@ -17,45 +17,57 @@ function (routing, DialogWidget, widgetManager, __) {
         var handleGridSelect = function (e) {
             e.preventDefault();
 
+            var routeName = urlParts.grid.route,
+                routeParams = urlParts.grid.parameters;
+
+            var additionalRequestParams = selectorEl.data('select2_query_additional_params');
+            if (additionalRequestParams) {
+                routeParams = $.extend({}, routeParams, additionalRequestParams )
+            }
+
             var entitySelectDialog = new DialogWidget({
                 title: __('Select {{ entity }}', {'entity': label}),
-                url: routing.generate(urlParts.grid.route, urlParts.grid.parameters),
+                url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
-                incrementalPosition: false,
+                incrementalPosition: true,
                 dialogOptions: {
                     modal: true,
                     allowMaximize: true,
                     width: 1280,
-                    height: 650
+                    height: 650,
+                    close: function () {
+                        selectorEl.off('.' + entitySelectDialog._wid);
+                    }
                 }
             });
 
-            var processSelectedEntities = function (data) {
+            entitySelectDialog.on('grid-row-select', function (data) {
                 entitySelectDialog._showLoading();
                 selectorEl.select2('val', data.model.get(existingEntityGridId), true);
-                selectorEl.on('change', function(){
-                    widgetManager.getWidgetInstance(
-                        entitySelectDialog._wid,
-                        function(widget) {
-                            widget.remove();
-                            selectorEl.select2('focus');
-                        }
-                    );
+                selectorEl.on('change.' + entitySelectDialog._wid, function(){
+                    entitySelectDialog.remove();
+                    selectorEl.select2('focus');
                 });
-            };
-
-            entitySelectDialog.on('grid-row-select', _.bind(processSelectedEntities, this));
+            });
             entitySelectDialog.render();
         };
 
         var handleCreate = function (e) {
             e.preventDefault();
 
+            var routeName = urlParts.create.route,
+                routeParams = urlParts.create.parameters;
+
+            var additionalRequestParams = selectorEl.data('select2_query_additional_params');
+            if (additionalRequestParams) {
+                routeParams = $.extend({}, routeParams, additionalRequestParams )
+            }
+
             var entityCreateDialog = new DialogWidget({
                 title: __('Create {{ entity }}', {'entity': label}),
-                url: routing.generate(urlParts.create.route, urlParts.create.parameters),
+                url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
-                incrementalPosition: false,
+                incrementalPosition: true,
                 dialogOptions: {
                     modal: true,
                     allowMaximize: true,

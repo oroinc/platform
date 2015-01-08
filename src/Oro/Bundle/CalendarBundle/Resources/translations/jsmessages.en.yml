@@ -1,11 +1,36 @@
+oro:
+    calendar:
+        control:
+            all_day: " "
+            today:   today
+            month:   month
+            week:    week
+            day:     day
+        error_message:
+            event_model:
+                end_date_earlier_than_start: "The end date can't be earlier than start date"
 "Add New Event": "Add New Event"
+"View Event": "View Event"
 "Edit Event": "Edit Event"
 "This calendar already exists.": "This calendar already exists."
 "Adding the calendar, please wait ...": "Adding the calendar, please wait ..."
 "The calendar was added.": "The calendar was added."
-"Excluding the calendar, please wait ...": "Excluding the calendar, please wait ..."
-"The calendar was excluded.": "The calendar was excluded."
+"Removing the calendar, please wait ...": "Removing the calendar, please wait ..."
+"The calendar was removed.": "The calendar was removed."
+"Updating the calendar, please wait ...": "Updating the calendar, please wait ..."
+"The calendar was updated.": "The calendar was updated."
 "Sorry, calendar events were not loaded correctly": "Sorry, calendar events were not loaded correctly"
 "Sorry, calendar event was not saved correctly": "Sorry, calendar event was not saved correctly"
 "Sorry, the calendar adding was failed": "Sorry, the calendar adding was failed"
-"Sorry, the calendar excluding was failed": "Sorry, the calendar excluding was failed"
+"Sorry, the calendar excluding was failed": "Sorry, the calendar removing was failed"
+"Sorry, the calendar updating was failed": "Sorry, the calendar updating was failed"
+"Sorry, synchronization error was occurred": "Sorry, synchronization error was occurred"
+"The calendar cannot be changed because the event has guests": "The calendar cannot be changed because the event has guests"
+"Notify guests title": "Notification confirmation"
+"Notify guests message": "Do you want to notify all invited users about changes?"
+"Notify": "Notify"
+"Don't notify": "Don't notify"
+"Not responded": "Not responded"
+"Tentatively accepted": "Tentatively accepted"
+"Accepted": "Accepted"
+"Reminders": "Reminders"

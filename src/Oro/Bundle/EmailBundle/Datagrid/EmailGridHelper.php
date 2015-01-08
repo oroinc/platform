@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;

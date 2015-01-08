@@ -20,22 +20,6 @@
         {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
         <div {{ block('widget_container_attributes') }}>
-        {% if form.vars.show_organizations_selector is defined %}
-            {% for org in form.vars.organization_tree_ids %}
-                <div class="oro-clearfix">
-                    <input type="checkbox"
-                           id="{{ form.vars.id }}_organizations_{{ org.id }}"
-                           name="{{ form.vars.full_name }}[organizations][]" value="{{ org.id }}"
-                           {% if org.id in form.vars.selected_organizations %} checked="checked" {% endif %}
-                           class="org org-id-{{ org.id }}"
-                    />
-                    <label for="{{ form.vars.id }}_organizations_{{ org.id }}"><b>{{ org.name }}</b></label>
-                </div>
-                {% if org.children %}
-                    {{ _self.renderOrganizationChildren(form, org.id, org.children, form.vars.selected_business_units) }}
-                {% endif %}
-            {% endfor %}
-        {% else %}
             <input type="hidden" name="{{ form.vars.full_name }}[organizations][]" value="{{ form.default_organization.vars.value }}" />
             {{ _self.renderOrganizationChildren(
                 form,
@@ -44,30 +28,7 @@
                 form.vars.selected_business_units,
                 0
             ) }}
-        {% endif %}
         </div>
-        {% if form.vars.show_organizations_selector is defined %}
-        <script type="text/javascript">
-            require(['jquery'],
-            function($) {
-                'use strict';
-                $(function() {
-                    $(document).on('change', 'input.bu:checkbox', function (e) {
-                        var org_id = $(this).data('organization');
-                        $('input.org-id-' + org_id + ':checkbox').prop('checked', true);
-                    });
-                    $(document).on('change', 'input.org:checkbox', function (e) {
-                        if($(this).prop('checked') == false) {
-                            $('input.bu:checkbox[data-organization="' + $(this).val() + '"]')
-                                .each(function(index, el){
-                                    $(el).prop('checked', false);
-                                });
-                        }
-                    });
-                });
-            });
-        </script>
-        {% endif %}
     {% endspaceless %}
 {% endblock %}
 
@@ -82,12 +43,12 @@
             {% endif %}
             </span>
             <input type="checkbox"
-                   id="{{ form.vars.id }}_businessUnits_{{ child.id }}"
-                   name="{{ form.vars.full_name }}[businessUnits][]"
-                   value="{{ child.id }}"
-                   {% if child.id in selected %} checked="checked" {% endif %}
-                   class="bu"
-                   data-organization="{{ org_id }}"
+                id="{{ form.vars.id }}_businessUnits_{{ child.id }}"
+                name="{{ form.vars.full_name }}[businessUnits][]"
+                value="{{ child.id }}"
+                {% if child.id in selected %} checked="checked" {% endif %}
+                class="bu"
+                data-organization="{{ org_id }}"
             />
             <label for="{{ form.vars.id }}_businessUnits_{{ child.id }}">{{ child.name }}</label>
         </div>
@@ -168,8 +129,9 @@
                 <option {{ disable }} value="{{ choice.value }}"
                 {% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
                     {%- spaceless -%}
+                        {% set label = translatable_options is defined and not translatable_options ? choice.label : choice.label|trans({}, translation_domain) %}
                         {# output is not escaped because it's done form in type "oro_business_unit_tree" #}
-                        {{ choice.label|trans({}, translation_domain)|raw }}
+                        {{ label|raw }}
                     {%- endspaceless -%}
                 </option>
             {% endif %}

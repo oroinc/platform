@@ -1,0 +1,14 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set containerExtraClass = containerExtraClass is defined ? containerExtraClass : '' %}
+<div class="widget-content comment-list {{ containerExtraClass }}">
+    {% set options = {
+        'relatedEntityId': entity.id,
+        'relatedEntityClassName': oro_class_name(entity, true),
+        'listTemplate': '#template-activity-item-comment',
+    } %}
+    <div class="comment"
+         data-page-component-module="orocomment/js/app/components/comment-component"
+         data-page-component-options="{{ options|json_encode }}">
+    </div>
+</div>
+{% include 'OroCommentBundle:Comment/js:list.js.twig' with {'id': 'template-activity-item-comment'} %}

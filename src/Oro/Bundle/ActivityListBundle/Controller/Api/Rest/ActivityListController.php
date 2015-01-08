@@ -1,0 +1,116 @@
+<?php
+
+namespace Oro\Bundle\ActivityListBundle\Controller\Api\Rest;
+
+use Nelmio\ApiDocBundle\Annotation\ApiDoc;
+
+use FOS\RestBundle\Util\Codes;
+use FOS\RestBundle\Controller\Annotations\NamePrefix;
+use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\QueryParam;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
+
+/**
+ * @RouteResource("activitylist")
+ * @NamePrefix("oro_api_")
+ */
+class ActivityListController extends RestController
+{
+    /**
+     * Get filtered activity lists for given entity
+     *
+     * @param string  $entityClass Entity class name
+     * @param integer $entityId    Entity id
+     *
+     * @QueryParam(
+     *      name="page", requirements="\d+", nullable=true, description="Page number, starting from 1. Default is 1."
+     * )
+     * @QueryParam(
+     *      name="filter", nullable=true,
+     *      description="Array with Activity type and Date range filters values"
+     * )
+     *
+     * @ApiDoc(
+     *      description="Returns an array with collection of ActivityList objects and count of all records",
+     *      resource=true,
+     *      statusCodes={
+     *          200="Returned when successful",
+     *      }
+     * )
+     * @return JsonResponse
+     */
+    public function cgetAction($entityClass, $entityId)
+    {
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityClass);
+        $filter      = $this->getRequest()->get('filter');
+
+        $results = [
+            'count' => $this->getManager()->getListCount(
+                $entityClass,
+                $entityId,
+                $filter
+            ),
+            'data'  => $this->getManager()->getList(
+                $entityClass,
+                $entityId,
+                $filter,
+                $this->getRequest()->get('page', 1)
+            )
+        ];
+
+        return new JsonResponse($results);
+    }
+
+    /**
+     * Get ActivityList single object
+     *
+     * @param integer $entityId Entity id
+     *
+     * @ApiDoc(
+     *      description="Returns an ActivityList object",
+     *      resource=true,
+     *      statusCodes={
+     *          200="Returned when successful",
+     *          404="Activity association was not found",
+     *      }
+     * )
+     * @return Response
+     */
+    public function getActivityListItemAction($entityId)
+    {
+        $activityListEntity = $this->getManager()->getItem($entityId);
+        if (!$activityListEntity) {
+            return new JsonResponse([], Codes::HTTP_NOT_FOUND);
+        }
+
+        return new JsonResponse($activityListEntity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getManager()
+    {
+        return $this->get('oro_activity_list.manager');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getForm()
+    {
+        throw new \BadMethodCallException('FormHandler is not available.');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormHandler()
+    {
+        throw new \BadMethodCallException('FormHandler is not available.');
+    }
+}

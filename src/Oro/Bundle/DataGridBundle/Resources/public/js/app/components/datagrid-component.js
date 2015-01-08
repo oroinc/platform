@@ -47,7 +47,7 @@ define(function (require) {
             var promises, self;
 
             self = this;
-            this.defer = $.Deferred();
+            this._deferredInit();
             this.built = $.Deferred();
 
             options = options || {};
@@ -66,7 +66,7 @@ define(function (require) {
             $.when.apply($, promises).always(function () {
                 $(options.el).html(options.$el.children());
                 self.subComponents = _.compact(arguments);
-                self.defer.resolve(self);
+                self._resolveDeferredInit();
             });
         },
 
@@ -226,8 +226,21 @@ define(function (require) {
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
-                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions)
+                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
+                metadata: this.metadata
             };
+        },
+        dispose: function () {
+            // disposes registered sub-components
+            if (this.subComponents) {
+                _.each(this.subComponents, function (component) {
+                    if (component && typeof component.dispose === 'function') {
+                        component.dispose();
+                    }
+                });
+                delete this.subComponents;
+            }
+            DataGridComponent.__super__.dispose.call(this);
         }
     });
 

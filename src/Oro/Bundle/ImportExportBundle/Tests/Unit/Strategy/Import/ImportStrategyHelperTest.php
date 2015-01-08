@@ -22,6 +22,11 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fieldHelper;
+
+    /**
      * @var ImportStrategyHelper
      */
     protected $helper;
@@ -38,7 +43,16 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
 
-        $this->helper = new ImportStrategyHelper($this->managerRegistry, $this->validator, $this->translator);
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->helper = new ImportStrategyHelper(
+            $this->managerRegistry,
+            $this->validator,
+            $this->translator,
+            $this->fieldHelper
+        );
     }
 
     /**
@@ -48,7 +62,7 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
     public function testImportEntityException()
     {
         $basicEntity = new \stdClass();
-        $importedEntity  = new \DateTime();
+        $importedEntity = new \DateTime();
         $excludedProperties = array();
 
         $this->helper->importEntity($basicEntity, $importedEntity, $excludedProperties);
@@ -61,7 +75,7 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
     public function testImportEntityEntityManagerException()
     {
         $basicEntity = new \stdClass();
-        $importedEntity  = new \stdClass();
+        $importedEntity = new \stdClass();
         $excludedProperties = array();
 
         $this->managerRegistry->expects($this->once())
@@ -74,7 +88,7 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
     public function testImportEntity()
     {
         $basicEntity = new \stdClass();
-        $importedEntity  = new \stdClass();
+        $importedEntity = new \stdClass();
         $importedEntity->fieldOne = 'one';
         $importedEntity->fieldTwo = 'two';
         $importedEntity->excludedField = 'excluded';
@@ -90,22 +104,13 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationNames')
             ->will($this->returnValue(array('fieldTwo')));
 
-        $reflectionProperty = $this->getMockBuilder('\ReflectionProperty')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $reflectionProperty->expects($this->atLeastOnce())
-            ->method('setAccessible')
-            ->with(true);
-        $reflectionProperty->expects($this->atLeastOnce())
-            ->method('getValue')
+        $this->fieldHelper->expects($this->atLeastOnce())
+            ->method('getObjectValue')
             ->with($importedEntity)
             ->will($this->returnValue('testValue'));
-        $reflectionProperty->expects($this->atLeastOnce())
-            ->method('setValue')
-            ->with($basicEntity, 'testValue');
-        $metadata->expects($this->exactly(2))
-            ->method('getReflectionProperty')
-            ->will($this->returnValue($reflectionProperty));
+        $this->fieldHelper->expects($this->atLeastOnce())
+            ->method('setObjectValue')
+            ->with($basicEntity, $this->isType('string'), 'testValue');
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

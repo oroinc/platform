@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\WindowsBundle\Controller\Api;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
-use FOS\Rest\Util\Codes;
+
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\WindowsBundle\Entity\WindowsState;
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
  * @RouteResource("windows")
@@ -34,7 +32,7 @@ class WindowsStateController extends FOSRestController
     public function cgetAction()
     {
         $items = $this->getDoctrine()->getRepository('OroWindowsBundle:WindowsState')
-            ->findBy(array('user' => $this->getUser()));
+            ->findBy(['user' => $this->getUser()]);
 
         return $this->handleView(
             $this->view($items, is_array($items) ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND)
@@ -68,7 +66,7 @@ class WindowsStateController extends FOSRestController
         $manager->flush();
 
         return $this->handleView(
-            $this->view(array('id' => $entity->getId()), Codes::HTTP_CREATED)
+            $this->view(['id' => $entity->getId()], Codes::HTTP_CREATED)
         );
     }
 
@@ -90,10 +88,10 @@ class WindowsStateController extends FOSRestController
         /** @var $entity \Oro\Bundle\WindowsBundle\Entity\WindowsState */
         $entity = $this->getManager()->find('OroWindowsBundle:WindowsState', (int)$windowId);
         if (!$entity) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(array(), Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view([], Codes::HTTP_FORBIDDEN));
         }
 
         $entity->setData($postArray['data']);
@@ -102,7 +100,7 @@ class WindowsStateController extends FOSRestController
         $em->persist($entity);
         $em->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_OK));
+        return $this->handleView($this->view([], Codes::HTTP_OK));
     }
 
     /**
@@ -121,17 +119,17 @@ class WindowsStateController extends FOSRestController
         /** @var $entity \Oro\Bundle\WindowsBundle\Entity\WindowsState */
         $entity = $this->getManager()->find('OroWindowsBundle:WindowsState', (int)$windowId);
         if (!$entity) {
-            return $this->handleView($this->view(array(), Codes::HTTP_NOT_FOUND));
+            return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
-            return $this->handleView($this->view(array(), Codes::HTTP_FORBIDDEN));
+            return $this->handleView($this->view([], Codes::HTTP_FORBIDDEN));
         }
 
         $em = $this->getManager();
         $em->remove($entity);
         $em->flush();
 
-        return $this->handleView($this->view(array(), Codes::HTTP_NO_CONTENT));
+        return $this->handleView($this->view([], Codes::HTTP_NO_CONTENT));
     }
 
     /**

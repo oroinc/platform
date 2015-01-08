@@ -4,8 +4,6 @@ namespace Oro\Bundle\CronBundle\Tests\Unit\Command;
 
 use Doctrine\ORM\EntityManager;
 
-use JMS\JobQueueBundle\Entity\Job;
-
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -74,7 +72,7 @@ class CleanupCommandTest extends OrmTestCase
     protected function getStatementMock()
     {
         $statement = $this->getMock('\Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
-        $statement->expects($this->exactly(3))
+        $statement->expects($this->exactly(2))
             ->method('bindValue');
 
         $statement->expects($this->once())
@@ -108,10 +106,10 @@ class CleanupCommandTest extends OrmTestCase
         $output = new MemoryOutput();
 
         $stm = $this->getStatementMock();
-        $stm->expects($this->at(4))
+        $stm->expects($this->at(3))
             ->method('fetchColumn')
             ->will($this->returnValue(1));
-        $stm->expects($this->at(5))
+        $stm->expects($this->at(4))
             ->method('fetchColumn')
             ->will($this->returnValue(false));
 

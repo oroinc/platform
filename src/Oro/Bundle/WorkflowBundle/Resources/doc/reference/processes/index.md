@@ -63,8 +63,8 @@ will be processed in order defined by definition.
 After the specific entity item is deleted all job processes related to this entity also will be deleted.
 
 **Attention:** performing of the action that was described in the process definition can provoke triggers
-of other processes (or even same process). Please use appropriate condition to avoid recursion.
-This problem will be fixed in future.
+of other processes (or even same process). You should either use appropriate condition to avoid recursion or use 
+option "exclude_definitions".
 
 Configuration
 -------------
@@ -79,6 +79,7 @@ definitions:                                                 # list of definitio
         enabled: true                                        # this definition is enabled (activated)
         entity: OroCRM\Bundle\ContactBundle\Entity\Contact   # related entity
         order: 20                                            # processing order
+        exclude_definitions: [contact_definition]            # during handling those definitions won't trigger
         actions_configuration:                               # list of actions to perform
             - @find_entity:                                  # find existing entity
                 conditions:                                  # action conditions
@@ -108,6 +109,10 @@ Described logic is implemented using one definition and two triggers.
 First trigger will be processed immediately after the contact is be created, and second one creates new process job
 and put it to JMS queue with priority  ``10`` and time shift ``60``, so job will be processed one minute after
 the triggered action.
+
+When contact ``Assigned To`` field is updated then process "contact_definition" will be eventually handled and 
+value  of ``Assigned To`` field could be changed. But option "exclude_definitions" is specified, thus this process won't
+provoke self-triggering.
 
 **Note:** If you want to test this process configuration in real application, you can put this configuration in file
 ``Oro/Bundle/WorkflowBundle/Resources/config/process.yml`` and reload definitions using console command

@@ -17,7 +17,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             'oro_require_js' => array(
                 'build_path' => 'js/app.min.js'
             ),
-            'kernel.bundles' => array('Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\TestBundle')
+            'kernel.bundles' => array(
+                'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\TestBundle\TestBundle',
+                'Oro\Bundle\RequireJSBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle',
+            )
         );
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
@@ -44,7 +47,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $expected = array(
             'config' => array(
                 'paths' => array(
-                    'oro/test' => 'orotest/js/test'
+                    'oro/test' => 'orosecondtest/js/second-test'
                 )
             )
         );
@@ -67,7 +70,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             array(
                 'config' => array(
                     'paths' => array(
-                        'oro/test' => 'orotest/js/test'
+                        'oro/test' => 'orosecondtest/js/second-test'
                     )
                 )
             ),
@@ -100,7 +103,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'build_path' => 'js/app.min.js',
                 'config' => array(
                     'paths' => array(
-                        'oro/test' => 'bundles/orotest/js/test.js'
+                        'oro/test' => 'bundles/orosecondtest/js/second-test.js'
                     )
                 ),
                 'build' => array(

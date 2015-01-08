@@ -2,6 +2,7 @@ parameters:
     test.client.class:         Oro\Bundle\TestFrameworkBundle\Test\Client
     search_item_entity_class:  Oro\Bundle\TestFrameworkBundle\Entity\Item
     oro_test.event_listener.update_schema_listener.class: Oro\Bundle\TestFrameworkBundle\EventListener\UpdateSchemaListener
+    oro_test.provider.exclusion_provider.class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
 
 services:
     oro_test.event_listener.update_schema_listener:
@@ -10,3 +11,22 @@ services:
             - @kernel
         tags:
             - { name: kernel.event_listener, event: console.terminate }
+
+    oro_test.provider.exclusion_provider:
+        class: %oro_test.provider.exclusion_provider.class%
+
+    oro_test.entity_field_list_provider:
+        class: %oro_entity.entity_field_list_provider.class%
+        arguments:
+            - @oro_test.entity_field_provider
+            - @oro_test.entity_provider
+
+    oro_test.entity_field_provider:
+        parent: oro_entity.entity_field_provider
+        calls:
+            - [setExclusionProvider, [@oro_test.provider.exclusion_provider]]
+
+    oro_test.entity_provider:
+        parent: oro_entity.entity_provider
+        calls:
+            - [setExclusionProvider, [@oro_test.provider.exclusion_provider]]

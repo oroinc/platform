@@ -27,6 +27,8 @@ define([
          */
         useDirectLauncherLink: true,
 
+        gridParams: {},
+
         /**
          * Initialize launcher options with url
          *
@@ -38,6 +40,10 @@ define([
 
             if (options.useDirectLauncherLink) {
                 this.useDirectLauncherLink = options.useDirectLauncherLink;
+            }
+
+            if (options.datagrid.metadata.gridParams) {
+                this.gridParams = options.datagrid.metadata.gridParams
             }
 
             this.on('preExecute', _.bind(this._preExecuteSubscriber, this));
@@ -52,9 +58,17 @@ define([
 
         /**
          * Execute redirect
+         *  - extends URL with grid state parameter
          */
         execute: function () {
-            mediator.execute('redirectTo', {url: this.getLink()});
+            var url, key, value;
+            url = this.getLink();
+
+            key = this.datagrid.collection.stateHashKey();
+            value = this.datagrid.collection.stateHashValue(false, this.gridParams);
+
+            url = this.addUrlParameter(url, key, value);
+            mediator.execute('redirectTo', {url: url});
         },
 
         /**

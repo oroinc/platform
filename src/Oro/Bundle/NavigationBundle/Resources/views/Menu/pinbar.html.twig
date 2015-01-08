@@ -21,7 +21,5 @@
     {% endif %}
     {% import _self as pinbar %}
     {% set frontendOptions = ['maxPinbarItems', 'el', 'listBar', 'tabTitle', 'tabIcon', 'minimizeButton', 'closeButton', 'defaultUrl'] %}
-    <div data-data="{{ pinbarItems|json_encode }}" data-options="{{- pinbar.get_options(frontendOptions, options) -}}"></div>
-    <ul class="extra-list"></ul>
-    <div class="dot-menu-empty-message">{{ 'oro.navigation.messages.no_items'|trans }}</div>
+    <div class="hide" data-data="{{ pinbarItems|json_encode }}" data-options="{{- pinbar.get_options(frontendOptions, options) -}}"></div>
 {% endblock %}

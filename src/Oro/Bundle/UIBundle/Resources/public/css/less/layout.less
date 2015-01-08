@@ -1,37 +1,79 @@
-.responsive-cell, .responsive-block {
+.responsive-inline-position () {
   float: left;
   width: 50%;
-  &:only-child {
-    width: 100%;
-    float: none;
+}
+.responsive-block-position () {
+  float: none;
+  width: 100%;
+}
+
+.responsive-section {
+  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
+    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
   }
 }
 
-.responsive-cell{
-  .forScreen(@mediumScreen, width, 100%);
-  .forScreen(@mediumScreen, float, none);
-}
-
-.responsive-block{
-  .forScreen(@smallScreen, width, 100%);
-  .forScreen(@smallScreen, float, none);
-}
-.ui-dialog{
-  max-width: 100%;
-  /**
-   * That's a temporary solution and needs to be updated
-   */
+// by default, huge screen, cells: inline, blocks: inline
+.responsive-section {
   .responsive-cell {
-    width: auto;
-    float: left;
+    margin-bottom: 35px;
+    .responsive-inline-position();
   }
+  .responsive-block {
+    .responsive-inline-position();
+  }
+}
+
+// big screen, cells: inline, blocks: wrapped
+.responsive-section.responsive-big {
+  .responsive-block {
+    .responsive-block-position();
+  }
+}
+
+// medium screen, cells: wrapped (if there are blocks), blocks: inline
+.responsive-section.responsive-medium {
+  &:not(.responsive-section-no-blocks) {
+    .responsive-cell {
+      .responsive-block-position();
+    }
+    // remove horizontal separator if cells are wrapped
+    .row-fluid.row-fluid-divider {
+      background: none;
+    }
+  }
+  .responsive-block {
+    .responsive-inline-position();
+  }
+}
+
+// small screen, cells: wrapped, blocks: wrapped
+.responsive-section.responsive-small {
+  .responsive-cell,
+  .responsive-block {
+    .responsive-block-position();
+  }
+  // remove horizontal separator if cells are wrapped
   .row-fluid.row-fluid-divider {
     background: none;
   }
 }
-.responsive-cell {
-  margin-bottom: 35px;
+
+// the only cell and the only block -- with 100%;
+.responsive-section {
+  .responsive-cell:only-child,
+  .responsive-block:only-child {
+    .responsive-block-position();
+  }
 }
+
+.ui-dialog {
+  max-width: 100%;
+  .row-fluid.row-fluid-divider {
+    background: none;
+  }
+}
+
 .container-fluid > .responsive-section {
   margin: 0 -@horizontalPadding;
   padding-right: @horizontalPadding;
@@ -43,11 +85,50 @@
   }
   .responsive-cell:first-child {
     padding-right: @horizontalPadding;
-    .forScreen(@mediumScreen, padding-right, 0px);
+  }
+  &.responsive-medium .responsive-cell,
+  &.responsive-small .responsive-cell,
+  .responsive-cell:only-child {
+    padding-right: 0;
   }
 }
-.responsive-section {
-  .inner-grid {/* todo: need delete negative margins - ask Vova Eremenko for details*/
-    margin:-@contentPadding -@contentPadding @contentPadding -@contentPadding;
+
+.oro-page {
+  border-top: 1px solid @pageBorderColor;
+  background: @pageSidebarBackgroundColor;
+  border-bottom: 1px solid @pageBorderColor;
+  .oro-page-sidebar {
+    width: 236px;
+    margin-right: -1px;
+    float: left;
+    border-right: 1px solid @pageBorderColor;
+    border-bottom: 1px solid @pageBorderColor;
+    background: @pageSidebarBackgroundColor;
+  }
+  .oro-page-body {
+    float: right;
+    width: calc(~"100% - 235px");
+    border-left: 1px solid @pageBorderColor;
+    padding: 10px;
+    background-color: #ffffff;
+  }
+  &.collapsible-sidebar {
+
+    .oro-page-sidebar {
+      .dropdown-toggle {
+        display: none;
+      }
+      .dropdown-menu {
+        top: none;
+        left: none;
+        position: relative;
+        border: none;
+        box-shadow: none;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        width: 235px;
+      }
+    }
   }
 }

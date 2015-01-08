@@ -1,0 +1,40 @@
+oro:
+    activitylist:
+        entity_label:         Activity list
+        entity_plural_label:  Activity list
+        entity_description:   Represent activities list
+
+        id.label:             Id
+        owner.label:          Created by
+        editor.label:         Updated by
+        verb.label:           Verb
+        subject.label:        Subject
+        data.label:           Data
+        organization.label:   Organization
+        related_activity_class.label: Related activity class
+        related_activity_id.label:    Related activity id
+        created_at.label: Created at
+        updated_at.label: Updated at
+
+        no_activities_exist: No activities found
+
+        widget:
+            load_more.title: Load {{ count }} more
+        system_configuration:
+            activity_list.label: Activity lists
+            fields:
+                sorting_field:
+                    label:     Sort by field
+                    choices:
+                        createdAt: Created date
+                        updatedAt: Updated date
+                sorting_direction:
+                    label: Sort direction
+                    choices:
+                        DESC: Descending
+                        ASC:  Ascending
+                per_page.label: Items Per Page By Default
+
+        pagination:
+            page: Page:
+            total: of {{ pages }} | Total of {{ records }} records

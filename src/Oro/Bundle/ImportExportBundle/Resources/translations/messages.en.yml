@@ -20,8 +20,10 @@ oro:
             error:          "Errors occurred during file import."
             error %number%: "Error in row #%number%."
             label:          Import
-            success:        "File was successful imported."
+            success:        "File was successfully imported."
             entity:         Import %entityName%
             tempate:        Download Data Template
+            file:           File
+            strategy:       Strategy
 
 "Identity only": "Identity only"

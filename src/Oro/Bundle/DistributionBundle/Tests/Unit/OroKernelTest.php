@@ -8,7 +8,7 @@ use Oro\Bundle\DistributionBundle\Tests\Unit\Stub\OroKernelStub;
 class OroKernelTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var OroKernel
+     * @var OroKernel|OroKernelStub
      */
     protected $kernel;
 
@@ -176,6 +176,60 @@ class OroKernelTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
             ]
+        ];
+    }
+
+    /**
+     * @param string $name
+     * @param array $bundles
+     * @dataProvider getBundleDataProvider
+     */
+    public function testGetBundle($name, array $bundles)
+    {
+        // SingleInheritanceBundle extends NoInheritanceBundle
+        // DoubleInheritanceBundle extends SingleInheritanceBundle
+        $bundleMap = [
+            'NoInheritanceBundle'     => ['DoubleInheritanceBundle', 'SingleInheritanceBundle', 'NoInheritanceBundle'],
+            'SingleInheritanceBundle' => ['DoubleInheritanceBundle', 'SingleInheritanceBundle'],
+            'DoubleInheritanceBundle' => ['DoubleInheritanceBundle'],
+        ];
+        $this->kernel->setBundleMap($bundleMap);
+
+        $actualBundles = $this->kernel->getBundle($name, false);
+        $this->assertEquals($bundles, $actualBundles);
+        $this->assertEquals(current($actualBundles), $this->kernel->getBundle($name, true));
+    }
+
+    /**
+     * @return array
+     */
+    public function getBundleDataProvider()
+    {
+        return [
+            'bundle no inheritance' => [
+                'name'    => 'NoInheritanceBundle',
+                'bundles' => ['DoubleInheritanceBundle', 'SingleInheritanceBundle', 'NoInheritanceBundle'],
+            ],
+            'bundle single inheritance' => [
+                'name'    => 'SingleInheritanceBundle',
+                'bundles' => ['DoubleInheritanceBundle', 'SingleInheritanceBundle'],
+            ],
+            'bundle double inheritance' => [
+                'name'    => 'DoubleInheritanceBundle',
+                'bundles' => ['DoubleInheritanceBundle'],
+            ],
+            'precise bundle no inheritance' => [
+                'name'    => '!NoInheritanceBundle',
+                'bundles' => ['NoInheritanceBundle'],
+            ],
+            'precise bundle single inheritance' => [
+                'name'    => '!SingleInheritanceBundle',
+                'bundles' => ['SingleInheritanceBundle'],
+            ],
+            'precise bundle double inheritance' => [
+                'name'    => '!DoubleInheritanceBundle',
+                'bundles' => ['DoubleInheritanceBundle'],
+            ],
         ];
     }
 }

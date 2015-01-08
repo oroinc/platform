@@ -3,6 +3,7 @@ datagrid:
         options:
             entityHint: business unit
             skip_acl_check: true
+            entity_pagination: true
         source:
             acl_resource: oro_business_unit_view
             type: orm
@@ -14,14 +15,10 @@ datagrid:
                     - u.phone
                     - u.createdAt
                     - owner.name as ownerName
-                    - organization.name as organizationName
                 from:
                     - { table: OroOrganizationBundle:BusinessUnit, alias: u }
                 join:
                     left:
-                        organization:
-                            join: u.organization
-                            alias: organization
                         owner:
                             join: u.owner
                             alias: owner
@@ -36,8 +33,6 @@ datagrid:
                 frontend_type: phone
             ownerName:
                 label: oro.organization.businessunit.owner.label
-            organizationName:
-                label: oro.organization.entity_label
             createdAt:
                 label:         oro.ui.created_at
                 frontend_type: datetime
@@ -91,8 +86,6 @@ datagrid:
                     data_name: u.phone
                 ownerName:
                     data_name: owner.name
-                organizationName:
-                    data_name: organization.name
                 createdAt:
                     data_name: u.createdAt
 
@@ -114,14 +107,9 @@ datagrid:
                     type: choice
                     data_name: ownerName
                     options:
-                          field_options:
-                              choices: @oro_organization.provider.business_units_grid->getOwnerChoices
-                organizationName:
-                    type: choice
-                    data_name: organizationName
-                    options:
-                          field_options:
-                              choices: @oro_organization.provider.business_units_grid->getOrganizationChoices
+                        field_options:
+                            choices: @oro_organization.provider.business_units_grid->getOwnerChoices
+                            translatable_options: false
                 createdAt:
                     type: datetime
                     data_name: u.createdAt

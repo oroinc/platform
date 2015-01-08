@@ -59,7 +59,7 @@ abstract class CsvFileStreamWriter implements ItemWriterInterface, ClosableInter
         foreach ($items as $item) {
             $this->writeLine($item);
         }
-        $this->flush();
+        $this->flushOutput();
     }
 
     /**
@@ -119,7 +119,7 @@ abstract class CsvFileStreamWriter implements ItemWriterInterface, ClosableInter
     /**
      * Flushes the output to a file.
      */
-    protected function flush()
+    protected function flushOutput()
     {
         if ($this->fileHandle) {
             fflush($this->fileHandle);

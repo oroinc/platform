@@ -6,6 +6,8 @@ use Doctrine\Common\Inflector\Inflector;
 
 class ExtendHelper
 {
+    const ENTITY_NAMESPACE = 'Extend\\Entity\\';
+
     const MAX_ENUM_VALUE_ID_LENGTH = 32;
     const MAX_ENUM_SNAPSHOT_LENGTH = 500;
     const BASE_ENUM_VALUE_CLASS    = 'Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue';
@@ -209,7 +211,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
 
-        return ExtendConfigDumper::ENTITY . 'EV_' . str_replace(" ", "_", ucwords(strtr($enumCode, "_-", "  ")));
+        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(" ", "_", ucwords(strtr($enumCode, "_-", "  ")));
     }
 
     /**
@@ -262,7 +264,19 @@ class ExtendHelper
      */
     public static function isCustomEntity($className)
     {
-        return strpos($className, ExtendConfigDumper::ENTITY) === 0;
+        return strpos($className, ExtendHelper::ENTITY_NAMESPACE) === 0;
+    }
+
+    /**
+     * Checks if the given class is a proxy for extend entity
+     *
+     * @param string $className
+     *
+     * @return bool
+     */
+    public static function isExtendEntityProxy($className)
+    {
+        return strpos($className, ExtendHelper::ENTITY_NAMESPACE) === 0;
     }
 
     /**
@@ -279,5 +293,35 @@ class ExtendHelper
         return false === $lastDelimiter
             ? $className
             : substr($className, $lastDelimiter + 1);
+    }
+
+    /**
+     * Returns full class name of a proxy class for extendable entity.
+     *
+     * @param string $extendClassName The full class name of a parent class for extendable entity
+     *
+     * @return string
+     */
+    public static function getExtendEntityProxyClassName($extendClassName)
+    {
+        $parts = explode('\\', $extendClassName);
+        $shortClassName = array_pop($parts);
+        if (strpos($shortClassName, 'Extend') === 0) {
+            $shortClassName = substr($shortClassName, 6);
+        }
+        $proxyShortClassName = 'EX_' . array_shift($parts);
+        $nameParts = [];
+        foreach ($parts as $item) {
+            if ($item === 'Bundle' || $item === 'Model') {
+                continue;
+            }
+            if (!isset($nameParts[$item])) {
+                $nameParts[$item] = true;
+                $proxyShortClassName .= $item . '_';
+            }
+        }
+        $proxyShortClassName .= $shortClassName;
+
+        return ExtendHelper::ENTITY_NAMESPACE . $proxyShortClassName;
     }
 }

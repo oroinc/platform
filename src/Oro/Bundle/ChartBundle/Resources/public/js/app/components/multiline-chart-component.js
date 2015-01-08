@@ -1,28 +1,17 @@
 define(function(require) {
-    var Flotr = require('flotr2');
-    var dataFormatter = require('orochart/js/data_formatter');
-    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
-    var BarChartComponent;
+    'use strict';
 
+    var MultilineChartComponent,
+        Flotr = require('flotr2'),
+        dataFormatter = require('orochart/js/data_formatter'),
+        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
-     *
-     * @class orochart.app.components.BarCharComponent
-     * @extends orochart.app.components.BaseCharComponent
-     * @exports orochart/app/components/BarCharComponent
+     * @class orochart.app.components.MultilineChartComponent
+     * @extends orochart.app.components.BaseChartComponent
+     * @exports orochart/app/components/multiline-chart-component
      */
-    BarChartComponent = BaseChartComponent.extend({
-        /**
-         *
-         * @overrides
-         * @param {object} options
-         */
-        initialize: function(options) {
-            BaseChartComponent.prototype.initialize.call(this, options);
-
-            this.update();
-        },
-
+    MultilineChartComponent = BaseChartComponent.extend({
         /**
          * Draw chart
          *
@@ -175,5 +164,5 @@ define(function(require) {
         }
     });
 
-    return BarChartComponent;
+    return MultilineChartComponent;
 });

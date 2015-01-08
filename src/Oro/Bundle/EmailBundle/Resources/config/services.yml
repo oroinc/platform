@@ -3,7 +3,7 @@ parameters:
     oro_email.email_folder.entity.class:          Oro\Bundle\EmailBundle\Entity\EmailFolder
     oro_email.email_folder.model.class:           Oro\Bundle\EmailBundle\Model\FolderType
     oro_email.email.cache.manager.class:          Oro\Bundle\EmailBundle\Cache\EmailCacheManager
-    oro_email.email.holder.helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
+    oro_email.email_holder_helper.class:          Oro\Bundle\EmailBundle\Tools\EmailHolderHelper
     oro_email.email.address.helper.class:         Oro\Bundle\EmailBundle\Tools\EmailAddressHelper
     oro_email.email.address.manager.class:        Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
@@ -20,7 +20,8 @@ parameters:
     oro_email.mailer.processor.class:             Oro\Bundle\EmailBundle\Mailer\Processor
     oro_email.email.activity.manager.class:       Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
-    oro_entity.twig.extension.email.class:          Oro\Bundle\EmailBundle\Twig\EmailExtension
+    oro_email.known_email_address_checker_factory.class: Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory
+    oro_email.twig.extension.email.class:         Oro\Bundle\EmailBundle\Twig\EmailExtension
 
     oro_email.emailtemplate.entity.class: Oro\Bundle\EmailBundle\Entity\EmailTemplate
 
@@ -35,6 +36,7 @@ parameters:
     oro_email.emailtemplate.variable_provider.entity.class: Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider
     oro_email.emailtemplate.variable_provider.system.class: Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider
     oro_email.emailtemplate.variable_provider.user.class: Oro\Bundle\EmailBundle\Provider\LoggedUserVariablesProvider
+    oro_email.activity_list.provider.class: Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider
 
     # Cache keys
     oro_email.cache.available_in_template_key: 'oro_email.available_in_template_fields'
@@ -84,9 +86,11 @@ services:
         arguments:
             - @oro_email.email_body_loader_selector
             - @doctrine.orm.entity_manager
+        calls:
+            - [setLogger, [@logger]]
 
-    oro_email.email.holder.helper:
-        class: %oro_email.email.holder.helper.class%
+    oro_email.email_holder_helper:
+        class: %oro_email.email_holder_helper.class%
         arguments:
             - @oro_entity_config.provider.extend
 
@@ -191,7 +195,7 @@ services:
             - @oro_email.cache
             - %oro_email.cache.available_in_template_key%
             - @oro_email.twig.email_sandbox
-            - @oro_locale.formatter.date_time
+            - @translator
             - @doctrine
         lazy: true
 
@@ -349,18 +353,45 @@ services:
         arguments:
             - @service_container
 
+    oro_email.known_email_address_checker_factory:
+        class: %oro_email.known_email_address_checker_factory.class%
+        public: false
+        scope: prototype
+        arguments:
+            - @doctrine
+            - @oro_email.email.address.manager
+            - @oro_email.email.address.helper
+            - @oro_email.email.owner.provider.storage
+            - %oro_email.email_sync_exclusions%
+
     oro_email.email.activity.manager:
         class: %oro_email.email.activity.manager.class%
         arguments:
-            - @oro_entity_config.provider.activity
+            - @oro_activity.manager
 
-    oro_entity.twig.extension.email:
-        class: %oro_entity.twig.extension.email.class%
+    oro_email.twig.extension.email:
+        class: %oro_email.twig.extension.email.class%
         arguments:
-            - @oro_email.email.holder.helper
+            - @oro_email.email_holder_helper
         tags:
             - { name: twig.extension }
+
     oro_email.listener.search_listener:
           class: %oro_email.listener.search_listener.class%
           tags:
               - { name: kernel.event_listener, event: oro_search.prepare_entity_map, method: prepareEntityMapEvent, priority: 10 }
+
+    oro_email.activity_list.provider:
+        class: %oro_email.activity_list.provider.class%
+        arguments:
+           - @oro_entity.doctrine_helper
+           - @oro_entity_config.link.entity_manager
+           - @oro_email.link.formatter.name
+           - @router
+           - @oro_entity_config.config_manager
+        tags:
+           - {name: oro_activity_list.provider, priority: 30}
+
+    oro_email.link.formatter.name:
+        tags:
+            - { name: oro_service_link,  service: oro_locale.formatter.name }

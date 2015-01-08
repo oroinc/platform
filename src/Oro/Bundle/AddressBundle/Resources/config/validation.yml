@@ -14,7 +14,7 @@ Oro\Bundle\AddressBundle\Entity\AbstractAddress:
 
         postalCode:
             - Length:
-                  max: 20
+                  max: 255
 
         country:
             - NotBlank: ~

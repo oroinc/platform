@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Bundle\FormBundle\Model\UpdateHandler;
 
 class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|Request
      */
     protected $request;
 
@@ -266,6 +269,9 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleSaveNoWid()
     {
+        $queryParameters = ['qwe' => 'rty'];
+        $this->request->query = new ParameterBag($queryParameters);
+
         $message = 'Saved';
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
@@ -292,7 +298,11 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $expected = array('redirect' => true);
         $this->router->expects($this->once())
             ->method('redirectAfterSave')
-            ->with($saveAndStayRoute, $saveAndCloseRoute, $entity)
+            ->with(
+                array_merge($saveAndStayRoute, ['parameters' => $queryParameters]),
+                array_merge($saveAndCloseRoute, ['parameters' => $queryParameters]),
+                $entity
+            )
             ->will($this->returnValue($expected));
 
         $result = $this->handler->handleUpdate(

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Entity;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Builder;
 
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Builder\HistoryItemBuilder;

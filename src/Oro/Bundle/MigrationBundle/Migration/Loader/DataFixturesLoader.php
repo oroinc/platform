@@ -8,26 +8,26 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
+use Oro\Bundle\MigrationBundle\Migration\Sorter\DataFixturesSorter;
 use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\MigrationBundle\Fixture\LoadedFixtureVersionAwareInterface;
 
 class DataFixturesLoader extends ContainerAwareLoader
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    /** @var EntityManager */
+    protected $em;
 
-    /**
-     * @var array
-     */
-    private $loadedFixtures;
+    /** @var array */
+    protected $loadedFixtures;
+
+    /** @var \ReflectionProperty */
+    protected $ref;
 
     /**
      * Constructor.
      *
-     * @param EntityManager $em
+     * @param EntityManager      $em
      * @param ContainerInterface $container
      */
     public function __construct(EntityManager $em, ContainerInterface $container)
@@ -42,7 +42,8 @@ class DataFixturesLoader extends ContainerAwareLoader
      */
     public function getFixtures()
     {
-        $fixtures = parent::getFixtures();
+        $sorter   = new DataFixturesSorter();
+        $fixtures = $sorter->sort($this->getAllFixtures());
 
         // remove already loaded fixtures
         foreach ($fixtures as $key => $fixture) {
@@ -74,6 +75,7 @@ class DataFixturesLoader extends ContainerAwareLoader
      * Determines whether the given data fixture is already loaded or not
      *
      * @param object $fixtureObject
+     *
      * @return bool
      */
     protected function isFixtureAlreadyLoaded($fixtureObject)
@@ -81,19 +83,17 @@ class DataFixturesLoader extends ContainerAwareLoader
         if (!$this->loadedFixtures) {
             $this->loadedFixtures = [];
 
-            $loadedFixtures = $this->em
-                ->getRepository('OroMigrationBundle:DataFixture')
-                ->findAll();
+            $loadedFixtures = $this->em->getRepository('OroMigrationBundle:DataFixture')->findAll();
             /** @var DataFixture $fixture */
             foreach ($loadedFixtures as $fixture) {
-                $this->loadedFixtures[$fixture->getClassName()] = $fixture->getVersion() ? : '0.0';
+                $this->loadedFixtures[$fixture->getClassName()] = $fixture->getVersion() ?: '0.0';
             }
         }
 
         $alreadyLoaded = false;
 
         if (isset($this->loadedFixtures[get_class($fixtureObject)])) {
-            $alreadyLoaded  = true;
+            $alreadyLoaded = true;
             $loadedVersion = $this->loadedFixtures[get_class($fixtureObject)];
             if ($fixtureObject instanceof VersionedFixtureInterface
                 && version_compare($loadedVersion, $fixtureObject->getVersion()) == -1
@@ -106,5 +106,18 @@ class DataFixturesLoader extends ContainerAwareLoader
         }
 
         return $alreadyLoaded;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getAllFixtures()
+    {
+        if (!$this->ref) {
+            $this->ref = new \ReflectionProperty('Doctrine\Common\DataFixtures\Loader', 'fixtures');
+            $this->ref->setAccessible(true);
+        }
+
+        return $this->ref->getValue($this);
     }
 }

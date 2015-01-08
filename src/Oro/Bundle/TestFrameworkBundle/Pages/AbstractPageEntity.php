@@ -191,4 +191,44 @@ abstract class AbstractPageEntity extends AbstractPage
         $element = $this->test->select($this->test->byXPath($this->organization));
         return trim($element->selectedLabel());
     }
+
+    public function checkActionInGroup($action, $false = true)
+    {
+        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+        $this->waitForAjax();
+        if (!$false) {
+            $this->assertElementNotPresent("//div[@class='pull-right']//a[@title='{$action}']");
+        } else {
+            $this->assertElementPresent("//div[@class='pull-right']//a[@title='{$action}']");
+        }
+
+        return $this;
+    }
+
+    public function runActionInGroup($action)
+    {
+        $this->test->byXpath("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@class='pull-right']//a[@title='{$action}']")->click();
+        $this->waitPageToLoad();
+        $this->waitForAjax();
+
+        return $this;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $value
+     * @return $this
+     */
+    public function checkEntityFieldData($fieldName, $value)
+    {
+        $this->assertElementPresent(
+            "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
+            "/following-sibling::div[contains(., '{$value}')]",
+            "Field '{$fieldName}' data are not equals '{$value}'"
+        );
+
+        return $this;
+    }
 }

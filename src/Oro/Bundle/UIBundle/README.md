@@ -12,20 +12,13 @@ User interface layouts and controls.
 - [TWIG Filters](./Resources/doc/reference/twig-filters.md)
 - [JavaScript Widgets](./Resources/doc/reference/widgets.md)
 - [Items Manager](./Resources/doc/reference/items-manager.md)
+- [Content providers](./Resources/doc/reference/content-providers.md)
 
 ## Configuration Settings
 
 - oro_ui.application_url   - application frontend URL
 - oro_ui.application_name  - application name to display in header
 - oro_ui.application_title - application title for name reference in header
-
-### Hide 'Add to favorites' and 'Minimize to the pinbar' buttons for the start page
-By default all pages have `Add to favorites` and `Minimize to the pinbar` buttons at the top right corner of a screen. If you want to remove these buttons for the start page, add the following configuration in `app/config/config.yml` file:
-
-```yaml
-oro_ui:
-    show_pin_button_on_start_page: false
-```
 
 ## Introduction to placeholders
 
@@ -69,9 +62,9 @@ oro_ui:
 
 Each placeholder item can have the following properties:
 
- - **template** or **action** - The path to TWIG template or controller action is used to rendering the item
- - **applicable** - The condition indicates whether the item can be rendered or not
- - **acl** - The ACL resource. Can be used to restrict access to the item
+ - **template** or **action** - The path to TWIG template or controller action is used to rendering the item.
+ - **applicable** - The condition indicates whether the item can be rendered or not.
+ - **acl** - The ACL resource(s). Can be a string or array of strings. Can be used to restrict access to the item. If several ACL resources are provided an access is granted only if all of them grant an access.
  - **data** - An additional data to be passed to TWIG template or controller.
 
 Each property can be a constant or some expression supported by [System Aware Resolver Component](../../Component/Config/Resources/doc/system_aware_resolver.md). Examples can be found in existing *placeholders.yml* files.

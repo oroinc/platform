@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;

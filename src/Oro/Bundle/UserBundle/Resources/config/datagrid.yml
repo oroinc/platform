@@ -3,6 +3,7 @@ datagrid:
         extended_entity_name: %oro_user.entity.class%
         options:
             entityHint: user
+            entity_pagination: true
         source:
             acl_resource: oro_user_user_view
             type: orm
@@ -129,6 +130,7 @@ datagrid:
     groups-grid:
         options:
             entityHint: group
+            entity_pagination: true
         source:
             acl_resource: oro_user_group_view
             type: orm
@@ -187,6 +189,7 @@ datagrid:
     roles-grid:
         options:
             entityHint: role
+            entity_pagination: true
         source:
             acl_resource: oro_user_role_view
             type: orm
@@ -377,18 +380,18 @@ datagrid:
                 has_group:
                     type: boolean
                     data_name: has_group
-                username:
-                    type: string
-                    data_name: u.username
-                email:
-                    type: string
-                    data_name: u.email
                 firstName:
                     type: string
                     data_name: u.firstName
                 lastName:
                     type: string
                     data_name: u.lastName
+                username:
+                    type: string
+                    data_name: u.username
+                email:
+                    type: string
+                    data_name: u.email
         sorters:
             multiple_sorting: true
             columns:

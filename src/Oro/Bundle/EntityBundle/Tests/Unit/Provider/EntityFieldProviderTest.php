@@ -528,6 +528,7 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     protected function prepare($config)
     {
         $metadata = [];
+        $fieldConfigs = [];
         foreach ($config as $entityClassName => $entityData) {
             $entityMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
                 ->disableOriginalConstructor()
@@ -540,11 +541,15 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             $fieldNames       = [];
             $fieldTypes       = [];
             $fieldIdentifiers = [];
+            $configs = [];
             foreach ($entityData['fields'] as $fieldName => $fieldData) {
                 $fieldNames[]       = $fieldName;
                 $fieldTypes[]       = [$fieldName, $fieldData['type']];
                 $fieldIdentifiers[] = [$fieldName, isset($fieldData['identifier']) ? $fieldData['identifier'] : false];
+                $configId = new FieldConfigId('extend', $entityClassName, $fieldName, $fieldData['type']);
+                $configs[] = new Config($configId);
             }
+            $fieldConfigs[$entityClassName] = $configs;
             $entityMetadata->expects($this->any())
                 ->method('getFieldNames')
                 ->will($this->returnValue($fieldNames));
@@ -606,6 +611,15 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->will($this->returnValue($em));
 
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnCallback(
+                    function ($className) use ($fieldConfigs) {
+                        return $fieldConfigs[$className];
+                    }
+                )
+            );
         $this->entityConfigProvider->expects($this->any())
             ->method('hasConfig')
             ->will(

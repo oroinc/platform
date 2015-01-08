@@ -121,6 +121,34 @@
 {% endmacro %}
 
 {#
+    Render html property block. HTML rendering may be switched off with system config.
+    Parameters:
+        title - property title
+        data  - property data
+#}
+{% macro renderSwitchableHtmlProperty(title, data) %}
+    {% if not oro_config_value('oro_form.wysiwyg_enabled') %}
+        {% set data = data|striptags('<a>')|raw|nl2br %}
+    {% endif %}
+
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+{% endmacro %}
+
+{#
+    Render color property block
+    Parameters:
+        title - property title
+        data  - property data
+        empty - a value which should be used if data is empty
+#}
+{% macro renderColorProperty(title, data, empty) %}
+    {% if data is not none %}
+       {% set data = '<i class="color hide-text" title="' ~ data ~ '" style="background-color: ' ~ data ~ ';">' ~ data ~ '</i>' %}
+    {% endif %}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default(empty)|default('oro.ui.empty'|trans) ~ '</div>') }}
+{% endmacro %}
+
+{#
     Create the link
     Parameters - array:
         [
@@ -309,6 +337,10 @@
         'title': title,
         'label': label
     }) %}
+
+    {# Add URL parameters to button path #}
+    {% set parameters = parameters|merge({ 'path' : oro_url_add_query(parameters['path']) }) %}
+
     {{ _self.button(parameters) }}
 {% endmacro %}
 
@@ -480,7 +512,8 @@
 {% endmacro %}
 
 {% macro renderWidgetDataAttributes(options) %}
-    {{ _self.renderAttributes(options, 'widget') }}
+    data-page-component-module="oroui/js/app/components/widget-component"
+    data-page-component-options="{{ options|json_encode(constant('JSON_FORCE_OBJECT')) }}"
 {% endmacro %}
 
 {% macro renderAttributes(options, prefix) %}
@@ -725,7 +758,7 @@
         <label class="control-label">{{ label }}</label>
         <div class="controls">
             <div class="row-oro">
-                <div class="collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
+                <div class="oro-item-collection collection-fields-list" data-prototype="{{ _self.collection_prototype(field)|escape }}">
                     {% for emailField in field.children %}
                         {{ _self.collection_prototype(emailField) }}
                     {% endfor %}
@@ -768,7 +801,7 @@
                 {% set ownerName = entity.owner.name %}
             {% endif %}
             {% if ownerName is defined %}
-                {{ 'oro.ui.owner'|trans }}:
+                {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
                 {% if ownerPath is defined %}
                     <a href="{{ ownerPath }}">{{ ownerName }}</a>
                 {% else %}

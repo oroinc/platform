@@ -9,8 +9,8 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
         fieldName:
             - NotBlank: ~
             - Regex:
-                pattern: "/^[a-z]+[a-z0-9_]*$/"
-                message: "This value should contain only lower case alphabetic symbols, underscore and numbers."
+                pattern: "/^[a-z]+[a-z0-9_]*$/i"
+                message: "This value should contain only alphabetic symbols, underscore and numbers."
             - Regex:
                 pattern: "/^id$/i"
                 match:   false

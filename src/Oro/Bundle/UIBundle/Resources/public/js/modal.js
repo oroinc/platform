@@ -2,8 +2,9 @@
 define([
     'underscore',
     'backbone',
+    'orotranslation/js/translator',
     'backbone-bootstrap-modal'
-], function (_, Backbone) {
+], function (_, Backbone, __) {
     'use strict';
 
     var Modal, $;
@@ -18,8 +19,34 @@ define([
      * @extends Backbone.BootstrapModal
      */
     Modal = Backbone.BootstrapModal.extend({
+        defaults: {
+            okText: __('OK'),
+            cancelText: __('Cancel'),
+            handleClose: false
+        },
+
         /** @property {String} */
         className: 'modal',
+
+        initialize: function (options) {
+            options = options || {};
+            _.defaults(options, this.defaults);
+
+            if (options.handleClose) {
+                this.events = _.extend({}, this.events, {'click .close': _.bind(this.onClose, this)});
+            }
+            Modal.__super__.initialize.call(this, options);
+        },
+
+        onClose: function(event) {
+            event.preventDefault();
+
+            this.trigger('close');
+
+            if (this.options.content && this.options.content.trigger) {
+                this.options.content.trigger('close', this);
+            }
+        },
 
         /**
          * Renders and shows the modal
@@ -71,7 +98,11 @@ define([
                 });
 
                 $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function (e) {
-                    e.which === 27 && self.trigger('cancel');
+                    if (self.options.handleClose) {
+                        e.which === 27 && self.trigger('close');
+                    } else {
+                        e.which === 27 && self.trigger('cancel');
+                    }
 
                     if (self.options.content && self.options.content.trigger) {
                         e.which === 27 && self.options.content.trigger('shown', self);
@@ -80,6 +111,10 @@ define([
             }
 
             this.once('cancel', function () {
+                self.close();
+            });
+
+            this.once('close', function () {
                 self.close();
             });
 

@@ -4,6 +4,9 @@ namespace Oro\Bundle\EntityBundle\Form\Guesser;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\Form\Guess\TypeGuess;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
 class FormConfigGuesser extends AbstractFormGuesser
@@ -14,7 +17,7 @@ class FormConfigGuesser extends AbstractFormGuesser
     protected $formConfigProvider;
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry         $managerRegistry
      * @param ConfigProviderInterface $entityConfigProvider
      * @param ConfigProviderInterface $formConfigProvider
      */
@@ -33,28 +36,44 @@ class FormConfigGuesser extends AbstractFormGuesser
     public function guessType($class, $property)
     {
         $metadata = $this->getMetadataForClass($class);
-        if (!$metadata) {
-            return $this->createDefaultTypeGuess();
-        }
-
-        if (!$this->formConfigProvider->hasConfig($class, $property)) {
+        if (!$metadata || !$this->formConfigProvider->hasConfig($class, $property)) {
             return $this->createDefaultTypeGuess();
         }
 
         $formConfig = $this->formConfigProvider->getConfig($class, $property);
-        if (!$formConfig->has('form_type')) {
-            // try to find form config for target class
-            if ($property && $metadata->hasAssociation($property) && $metadata->isSingleValuedAssociation($property)) {
-                return $this->guessType($metadata->getAssociationTargetClass($property), null);
-            }
 
-            return $this->createDefaultTypeGuess();
+        $isSingleValuedAssoc = $property && $metadata->hasAssociation($property) &&
+            $metadata->isSingleValuedAssociation($property);
+        $hasNoFormType       = !$formConfig->has('form_type');
+
+        if ($hasNoFormType && $isSingleValuedAssoc) {
+            // try to find form config for target class
+            $guess = $this->guessType($metadata->getAssociationTargetClass($property), null);
+        } elseif ($hasNoFormType) {
+            $guess = $this->createDefaultTypeGuess();
+        } else {
+            $guess = $this->getTypeGuess($formConfig, $class, $property);
         }
 
-        $formType = $formConfig->get('form_type');
+        return $guess;
+    }
+
+    /**
+     * @param ConfigInterface $formConfig
+     * @param string          $class
+     * @param string          $property
+     *
+     * @return TypeGuess
+     */
+    protected function getTypeGuess(ConfigInterface $formConfig, $class, $property)
+    {
+        $formType    = $formConfig->get('form_type');
         $formOptions = $formConfig->has('form_options') ? $formConfig->get('form_options') : array();
         $formOptions = $this->addLabelOption($formOptions, $class, $property);
 
-        return $this->createTypeGuess($formType, $formOptions);
+        // fallback guess from recursive call must be with low confidence
+        return is_null($property) ?
+            $this->createTypeGuess($formType, $formOptions, TypeGuess::LOW_CONFIDENCE) :
+            $this->createTypeGuess($formType, $formOptions);
     }
 }

@@ -14,12 +14,15 @@ parameters:
 
     oro_dataaudit.placeholder.filter.class:         Oro\Bundle\DataAuditBundle\Placeholder\AuditableFilter
 
+    oro_dataaudit.audit.manager.api.class:                Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+
 services:
     oro_dataaudit.loggable.loggable_manager:
         class:                                      %oro_dataaudit.loggable.loggable_manager.class%
         arguments:
             - %oro_dataaudit.loggable.entity.class%
             - @oro_entity_config.provider.dataaudit
+            - @security.context.link
 
     oro_dataaudit.metadata.metadata_factory:
         class:                                      %oro_dataaudit.metadata.metadata_factory.class%
@@ -64,3 +67,10 @@ services:
         class: %oro_dataaudit.placeholder.filter.class%
         arguments:
             - @oro_entity_config.provider.dataaudit
+
+    oro_dataaudit.audit.manager.api:
+        class: %oro_dataaudit.audit.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_dataaudit.loggable.entity.class%
+            - @doctrine.orm.entity_manager

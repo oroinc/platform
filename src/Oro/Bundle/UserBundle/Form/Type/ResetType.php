@@ -42,6 +42,7 @@ class ResetType extends AbstractType
         $resolver->setDefaults(array(
             'data_class' => $this->class,
             'intention'  => 'reset',
+            'dynamic_fields_disabled' => true
         ));
     }
 

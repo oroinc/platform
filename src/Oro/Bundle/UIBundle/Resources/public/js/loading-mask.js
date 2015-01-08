@@ -50,10 +50,10 @@ define([
          */
         initialize: function (options) {
             var updateProxy,
-                opts = options || {};
+                options = options || {};
 
-            if (_.has(opts, 'liveUpdate')) {
-                this.liveUpdate = opts.liveUpdate;
+            if (_.has(options, 'liveUpdate')) {
+                this.liveUpdate = options.liveUpdate;
             }
 
             if (this.liveUpdate) {
@@ -62,6 +62,7 @@ define([
                     .on('resize.' + this.cid, updateProxy)
                     .on('scroll.' + this.cid, updateProxy);
             }
+            this.loadingElement = options.loadingElement;
             LoadingMaskView.__super__.initialize.apply(this, arguments);
         },
 
@@ -69,6 +70,10 @@ define([
          * @inheritDoc
          */
         dispose: function () {
+            if (this.loadingElement) {
+                this.loadingElement.data('loading-mask-visible', false);
+                this.loadingElement.removeClass('hide-overlays');
+            }
             $(window).off('.' + this.cid);
             LoadingMaskView.__super__.dispose.call(this);
         },
@@ -80,6 +85,9 @@ define([
          */
         show: function () {
             this.$el.show();
+            if (this.loadingElement) {
+                this.loadingElement.addClass('hide-overlays');
+            }
             this.displayed = true;
             this.resetPos().updatePos();
             return this;
@@ -145,6 +153,9 @@ define([
          */
         hide: function () {
             this.$el.hide();
+            if (this.loadingElement) {
+                this.loadingElement.removeClass('hide-overlays');
+            }
             this.displayed = false;
             this.resetPos();
             return this;

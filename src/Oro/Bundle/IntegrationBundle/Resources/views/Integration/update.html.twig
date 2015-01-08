@@ -35,9 +35,9 @@
             'aCss': 'no-hash remove-button',
             'id': 'btn-remove-channel',
             'dataId': entity.id,
-            'entity_label': 'oro.integration.integration.entity_label'|trans,
-            'dataMessage': 'oro.integration.delete_sync_integration.content',
-            'successMessage': 'oro.integration.delete_sync_integration.success'
+            'entity_label':   'oro.integration.integration.entity_label'|trans,
+            'dataMessage':    'oro.integration.delete_sync_integration.content'|trans,
+            'successMessage': 'oro.integration.delete_sync_integration.success'|trans
         }) }}
         {{ UI.buttonSeparator() }}
     {% endif %}
@@ -46,12 +46,23 @@
 
     {% if entity.id %}
         {% if not isEditModeDissalow %}
-            {% set toogleStatusLabel = entity.enabled == true ? 'oro.integration.deactivate': 'oro.integration.activate' %}
-            {{ UI.button({
+            {% if entity.enabled %}
+                {{ UI.button({
+                'aCss':  'btn-danger',
+                'iCss':  'icon-remove',
+                'label': 'oro.integration.deactivate'|trans,
                 'path': path('oro_integration_toggle', {'id': entity.id}),
-                'title' : toogleStatusLabel|trans,
-                'label' : toogleStatusLabel|trans,
-            }) }}
+                'title': 'oro.integration.deactivate'|trans,
+                }) }}
+            {% else %}
+                {{ UI.button({
+                'aCss':  'btn-success',
+                'iCss':  'icon-ok',
+                'label': 'oro.integration.activate'|trans,
+                'path': path('oro_integration_toggle', {'id': entity.id}),
+                'title': 'oro.integration.activate'|trans,
+                }) }}
+            {% endif %}
             {{ UI.buttonSeparator() }}
         {% endif %}
 

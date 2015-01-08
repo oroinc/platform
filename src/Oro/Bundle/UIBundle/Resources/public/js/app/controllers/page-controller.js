@@ -6,8 +6,9 @@ define([
     'chaplin',
     'orotranslation/js/translator',
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/models/page-model'
-], function ($, _, Chaplin, __, BaseController, PageModel) {
+    'oroui/js/app/models/page-model',
+    'oroui/js/app/components/base/component-container-mixin'
+], function ($, _, Chaplin, __, BaseController, PageModel, componentContainerMixin) {
     'use strict';
 
     var document, location, history, console, utils, mediator, PageController;
@@ -19,8 +20,9 @@ define([
     utils = Chaplin.utils;
     mediator = Chaplin.mediator;
 
-    PageController = BaseController.extend({
-
+    PageController = BaseController.extend({});
+    _.extend(PageController.prototype, componentContainerMixin);
+    _.extend(PageController.prototype, {
         /**
          * Creates page model
          * @override
@@ -156,7 +158,7 @@ define([
 
             // dispose all components, in case it's page update with the same controller instance
             // (eg. POST data submitted and page data received instead of redirect)
-            this._disposeComponents();
+            this.disposePageComponents();
 
             attributes = model.getAttributes();
             this.adjustTitle(attributes.title);
@@ -172,7 +174,7 @@ define([
          * @param {Object} options
          */
         onPageUpdated: function (model, resp, options) {
-            var initialization, self;
+            var initPromise, self;
             // suppress 'page:afterChange' event, on server redirection
             if (options.redirection) {
                 return;
@@ -180,20 +182,10 @@ define([
 
             self = this;
 
-            // init components
-            initialization = mediator.execute('layout:init', document.body);
-            initialization.done(function (components) {
-                // attach created components to controller, to get them disposed together
-                _.each(components, function (component) {
-                    if (typeof component.dispose === 'function') {
-                        self['component-' + component.cid || _.uniqueId('component')] = component;
-                    }
-                });
-
-                _.defer(function () {
-                    self.publishEvent('page:afterChange');
-                });
-            });
+            initPromise = mediator.execute('layout:init', document.body, this);
+            initPromise.done(_.debounce(function () {
+                self.publishEvent('page:afterChange');
+            }, 0));
         },
 
         /**
@@ -379,20 +371,6 @@ define([
             options.actionArgs = options.actionArgs || {};
             _.defaults(options.actionArgs, {params: {}, route: {}, options: {}});
             this.model.save(null, options);
-        },
-
-        /**
-         * Disposes all attached page components
-         *
-         * @private
-         */
-        _disposeComponents: function () {
-            _.each(this, function (component, name) {
-                if ('component-' === name.substr(0, 10)) {
-                    component.dispose();
-                    delete this[name];
-                }
-            }, this);
         }
     });
 

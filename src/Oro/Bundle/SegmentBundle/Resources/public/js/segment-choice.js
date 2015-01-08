@@ -61,8 +61,7 @@ define(['jquery', 'underscore', 'routing', 'jquery-ui', 'jquery.select2'
             var url = this.options.select2.ajax && routing.generate(
                 this.options.select2.ajax.url,
                 {
-                    entityName: this.options.entity.replace(/\\/g, '_'),
-                    _format: 'json'
+                    entityName: this.options.entity.replace(/\\/g, '_')
                 }
             );
 

@@ -1,0 +1,18 @@
+oro.entity_pagination:
+    pager_of_%total%_record|pager_of_%total%_records: 'of %total% Record|of %total% Records'
+    first: 'First'
+    last: 'Last'
+
+    message:
+        stats_number_view_%count%_record|stats_number_view_%count%_records: 'You are now viewing %count% record.|You are now viewing %count% records.'
+        stats_number_edit_%count%_record|stats_number_edit_%count%_records: 'You are now editing %count% record.|You are now editing %count% records.'
+        not_available: 'Some of the records are no longer available.'
+        not_accessible: 'You do not have sufficient permissions to access records.'
+        stats_changed_view_to_edit: 'You do not have sufficient permissions to edit all selected records.'
+
+    system_configuration:
+        fields:
+            enabled:
+                label: 'Record Pagination'
+            limit:
+                label: 'Record Pagination limit'

@@ -2,58 +2,25 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
+use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
+use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
-use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
-use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 
-class ReverseSyncProcessor
+class ReverseSyncProcessor extends AbstractSyncProcessor
 {
-    /** @var ProcessorRegistry */
-    protected $processorRegistry;
-
-    /** @var Executor */
-    protected $jobExecutor;
-
-    /** @var TypesRegistry */
-    protected $registry;
-
-    /** @var LoggerStrategy */
-    protected $logger;
-
-    /**
-     * @param ProcessorRegistry $processorRegistry
-     * @param Executor          $jobExecutor
-     * @param TypesRegistry     $registry
-     * @param LoggerStrategy    $logger
-     */
-    public function __construct(
-        ProcessorRegistry $processorRegistry,
-        Executor $jobExecutor,
-        TypesRegistry $registry,
-        LoggerStrategy $logger
-    ) {
-        $this->processorRegistry = $processorRegistry;
-        $this->jobExecutor       = $jobExecutor;
-        $this->registry          = $registry;
-        $this->logger            = $logger;
-    }
-
     /**
      * Process channel synchronization
      *
      * @param Integration $integration Integration object
      * @param string      $connector   Connector name
      * @param array       $parameters  Connector additional parameters
-     *
-     * @return $this
      */
     public function process(Integration $integration, $connector, array $parameters)
     {
-        if (!$integration->getEnabled()) {
-            return $this;
+        if (!$integration->isEnabled()) {
+            return;
         }
 
         try {
@@ -62,11 +29,13 @@ class ReverseSyncProcessor
             $realConnector = $this->getRealConnector($integration, $connector);
 
             if (!($realConnector instanceof TwoWaySyncConnectorInterface)) {
-                throw new LogicException('This connector doesn`t support two-way sync.');
+                throw new LogicException('This connector does not support reverse sync.');
             }
 
         } catch (\Exception $e) {
-            return $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage());
+
+            return;
         }
 
         $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
@@ -87,72 +56,47 @@ class ReverseSyncProcessor
         ];
 
         $this->processExport($realConnector->getExportJobName(), $configuration);
-
-        return $this;
     }
 
     /**
-     * Get logger strategy
-     *
-     * @return LoggerStrategy
+     * @param string $jobName
+     * @param array $configuration
      */
-    public function getLoggerStrategy()
+    protected function processExport($jobName, array $configuration)
     {
-        return $this->logger;
-    }
+        $event = new SyncEvent($jobName, $configuration);
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
+        $configuration = $event->getConfiguration();
 
-    /**
-     * @param $jobName
-     * @param $configuration
-     *
-     * @return $this
-     */
-    protected function processExport($jobName, $configuration)
-    {
         $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_EXPORT, $jobName, $configuration);
 
-        $context = $jobResult->getContext();
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_AFTER, new SyncEvent($jobName, $configuration, $jobResult));
 
-        $counts = [];
+        /** @var ContextInterface $contexts */
+        $context = $jobResult->getContext();
+        $errors  = [];
         if ($context) {
-            $counts['process'] = $counts['warnings'] = 0;
-            $counts['read']    = $context->getReadCount();
-            $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['update'] = $context->getUpdateCount();
-            $counts['process'] += $counts['delete'] = $context->getDeleteCount();
+            $errors = $context->getErrors();
         }
 
         $exceptions = $jobResult->getFailureExceptions();
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
-        if (!$isSuccess) {
+        $message = $this->formatResultMessage($context);
+        $this->logger->info($message);
+
+        if ($isSuccess) {
+            if ($errors) {
+                $warningsText = 'Some entities were skipped due to warnings:' . PHP_EOL;
+                $warningsText .= implode($errors, PHP_EOL);
+                $this->logger->warning($warningsText);
+            }
+        } else {
             $this->logger->error('Errors were occurred:');
             $exceptions = implode(PHP_EOL, $exceptions);
-            $this->logger->error(
-                $exceptions,
-                ['exceptions' => $jobResult->getFailureExceptions()]
-            );
-        } else {
-            if ($context->getErrors()) {
-                $this->logger->warning('Some entities were skipped due to warnings:');
-                foreach ($context->getErrors() as $error) {
-                    $this->logger->warning($error);
-                }
-            }
 
-            $message = sprintf(
-                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
-                $counts['read'],
-                $counts['process'],
-                $counts['update'],
-                $counts['add'],
-                $counts['delete'],
-                $context->getErrorEntriesCount()
-            );
-            $this->logger->info($message);
+            $this->logger->error($exceptions);
         }
-
-        return $this;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\ORM;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\Exception;
@@ -59,7 +60,12 @@ class DoctrineHelper
         $result = null;
         if (count($entityIdentifier) > 1) {
             if ($triggerException) {
-                throw new Exception\InvalidEntityException('Can\'t get single identifier for the entity');
+                throw new Exception\InvalidEntityException(
+                    sprintf(
+                        'Can\'t get single identifier for "%s" entity.',
+                        $this->getEntityClass($entity)
+                    )
+                );
             }
         } else {
             $result = $entityIdentifier ? current($entityIdentifier) : null;
@@ -92,10 +98,43 @@ class DoctrineHelper
         $result = null;
         if (count($fieldNames) > 1) {
             if ($triggerException) {
-                throw new Exception\InvalidEntityException('Can\'t get single identifier field name for the entity');
+                throw new Exception\InvalidEntityException(
+                    sprintf(
+                        'Can\'t get single identifier field name for "%s" entity.',
+                        $this->getEntityClass($entityOrClass)
+                    )
+                );
             }
         } else {
             $result = $fieldNames ? current($fieldNames) : null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param object|string $entityOrClass
+     * @param bool          $triggerException
+     * @return string|null
+     * @throws Exception\InvalidEntityException
+     */
+    public function getSingleEntityIdentifierFieldType($entityOrClass, $triggerException = true)
+    {
+        $metadata   = $this->getEntityMetadata($entityOrClass);
+        $fieldNames = $metadata->getIdentifierFieldNames();
+
+        $result = null;
+        if (count($fieldNames) !== 1) {
+            if ($triggerException) {
+                throw new Exception\InvalidEntityException(
+                    sprintf(
+                        'Can\'t get single identifier field type for "%s" entity.',
+                        $this->getEntityClass($entityOrClass)
+                    )
+                );
+            }
+        } else {
+            $result = $metadata->getTypeOfField(current($fieldNames));
         }
 
         return $result;
@@ -142,6 +181,18 @@ class DoctrineHelper
         }
 
         return $entityManager;
+    }
+
+    /**
+     * @param string|object $entityOrClass
+     * @return EntityRepository
+     */
+    public function getEntityRepository($entityOrClass)
+    {
+        $entityClass   = $this->getEntityClass($entityOrClass);
+        $entityManager = $this->getEntityManager($entityClass);
+
+        return $entityManager->getRepository($entityClass);
     }
 
     /**

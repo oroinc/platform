@@ -95,6 +95,7 @@ datagrid:
         action_configuration: Oro\Bundle\IntegrationBundle\Datagrid\ActionConfiguration::getIsSyncAvailableCondition()
         options:
             entityHint: channel
+            entity_pagination: true
     oro-integration-status-grid:
         source:
             type: orm

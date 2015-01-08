@@ -12,12 +12,12 @@
     </script>
 {% endblock %}
 
-{% block title %}Available Packages{% endblock %}
+{% block title %}{{ 'oro.distribution.package.available'|trans }}{% endblock %}
 
 {% block menu %}
     <a id="back-to-installed" href="{{ path('oro_distribution_package_listinstalled') }}">
         <i class="icon icon-reply"></i>
-        Back to Installed Packages
+        {{ 'Back to Installed Packages'|trans }}
     </a>
 {% endblock %}
 
@@ -31,11 +31,11 @@
         <col width="15%" valign="top"/>
         <thead>
         <tr>
-            <th>Package</th>
-            <th>Type</th>
-            <th>License</th>
-            <th>Author</th>
-            <th>Version</th>
+            <th>{{ 'oro.distribution.package.package'|trans }}</th>
+            <th>{{ 'oro.distribution.package.type'|trans }}</th>
+            <th>{{ 'oro.distribution.package.license'|trans }}</th>
+            <th>{{ 'oro.distribution.package.author'|trans }}</th>
+            <th>{{ 'oro.distribution.package.version'|trans }}</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -52,7 +52,7 @@
                     {% for license in package.license %}
                         {{ license }}
                     {% else %}
-                        <em>unknown</em>
+                        <em>{{ 'oro.distribution.package.unknown'|trans }}</em>
                     {% endfor %}
                 </td>
                 <td>
@@ -65,7 +65,7 @@
                             {% endif %}
                         </div>
                     {% else %}
-                        <em>unknown</em>
+                        <em>{{ 'oro.distribution.package.unknown'|trans }}</em>
                     {% endfor %}
                 </td>
                 <td>
@@ -75,13 +75,13 @@
                     {% if notWritableSystemPaths|length == 0 %}
                         <a href="#" class="btn btn-success ajax install"
                            data-action="install"
-                           data-params='{"packageName": "{{ package.prettyName }}"}'>Install</a>
+                           data-params='{"packageName": "{{ package.prettyName }}"}'>{{ 'oro.distribution.action.install'|trans }}</a>
                     {% endif %}
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="2"><em>Nothing available</em></td>
+                <td colspan="2"><em>{{ 'oro.distribution.package.nothing_installed'|trans }}</em></td>
             </tr>
         {% endfor %}
 

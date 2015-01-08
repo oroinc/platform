@@ -7,7 +7,7 @@ define(['jquery', 'oroui/js/mediator', 'orotranslation/js/translator', '../conte
         var $header = $('.navigation.navbar-extra'),
             $container = $header.find('.title-buttons-container'),
             options = {
-                moreLabel: __('More'),
+                moreLabel: __('oro.ui.page_header.button.more'),
                 minItemQuantity: 1
             },
             label = $container.find('.btn').slice(0,2).text().replace(/\s{2,}/g, ' ');

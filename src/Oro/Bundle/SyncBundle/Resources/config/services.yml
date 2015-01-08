@@ -28,6 +28,7 @@ services:
         arguments:
             - "@oro_wamp.publisher"
             - "@oro_security.security_facade"
+            - "@logger"
         tags:
             - { name: kernel.event_listener, event: maintenance.on, method: onModeOn }
             - { name: kernel.event_listener, event: maintenance.off, method: onModeOff }

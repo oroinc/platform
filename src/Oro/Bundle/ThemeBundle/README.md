@@ -65,7 +65,7 @@ with all used files.
 Adding a theme using a bundle
 -----------------------------
 
-Theme could be added in any bundle, place a file in _Resources/public/theme/<theme_name>/settings.yml path inside of bundle.
+Theme could be added in any bundle, place a file in _Resources/public/themes/\<theme_name\>/settings.yml_ path inside of bundle.
 This file contains same configuration like in app/config.yml:
 
 ```
@@ -82,7 +82,7 @@ Overriding a theme
 ------------------
 
 All themes settings are collected and merged at compile time of DI container. Bundle could override others bundle theme
-by placing a file with theme _Resources/public/theme/<theme_name>/settings.yml in settings.yml path.
+by placing a file with theme _Resources/public/themes/\<theme_name\>/settings.yml_ in settings.yml path.
 
 
 Loading styles of theme

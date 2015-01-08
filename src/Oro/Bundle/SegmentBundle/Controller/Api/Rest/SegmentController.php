@@ -5,7 +5,7 @@ namespace Oro\Bundle\SegmentBundle\Controller\Api\Rest;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -32,21 +32,26 @@ class SegmentController extends RestController implements ClassResourceInterface
     /**
      * Get entity segments.
      *
-     * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
+     * @QueryParam(
+     *      name="entityName",
+     *      requirements="((\w+)_)+(\w+)",
+     *      nullable=false,
+     *      description=" Entity full class name; backslashes (\) should be replaced with underscore (_)."
+     * )
      * @QueryParam(
      *      name="term", nullable=true, strict=false, default="",
-     *      description="Search term")
-     *
-     * @Get(name="oro_api_get_segment_items", requirements={"entityName"="((\w+)_)+(\w+)"})
+     *      description="Search term"
+     * )
      * @ApiDoc(
      *      description="Get entity segments",
      *      resource=true
      * )
      * @return Response
      */
-    public function getItemsAction($entityName)
+    public function getItemsAction()
     {
-        $entityName = str_replace('_', '\\', $entityName);
+        $entityName = $this->get('oro_entity.routing_helper')
+            ->decodeClassName($this->getRequest()->get('entityName'));
         $page = $this->getRequest()->query->get('page', 1);
         $term = $this->getRequest()->query->get('term');
         $currentSegment = $this->getRequest()->query->get('currentSegment', null);
@@ -59,7 +64,7 @@ class SegmentController extends RestController implements ClassResourceInterface
             $result = $manager->getSegmentByEntityName($entityName, $term, (int)$page, $currentSegment);
         } catch (InvalidEntityException $ex) {
             $statusCode = Codes::HTTP_NOT_FOUND;
-            $result     = ['message' => $ex->getMessage()];
+            $result = ['message' => $ex->getMessage()];
         }
 
         return $this->handleView($this->view($result, $statusCode));

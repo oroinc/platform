@@ -12,6 +12,7 @@ oro_system_configuration:
         oro_data_grid.default_per_page:
             data_type: integer
             type: choice
+            priority: 200
             options:
                 label: oro.grid.system_configuration.fields.default_per_page.label
                 choices:

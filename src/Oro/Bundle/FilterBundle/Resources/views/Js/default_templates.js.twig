@@ -62,9 +62,9 @@
     <div>
         <%= parts.join('') %>
         <div>
-            <input type="text" class="<%= inputClass %>" value="<%= value.value.start %>" name="start" placeholder="from">
+            <input type="text" class="<%= inputClass %>" value="<%= value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
             <span class="filter-separator">-</span>
-            <input type="text" class="<%= inputClass %>" value="<%= value.value.end %>" name="end" placeholder="to">
+            <input type="text" class="<%= inputClass %>" value="<%= value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
         </div>
         <div class="oro-action">
             <div class="btn-group">

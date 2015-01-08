@@ -64,52 +64,40 @@ class MessageParamsProviderTest extends \PHPUnit_Framework_TestCase
         $expectedExpireAt          = new \DateTime();
         $expectedFormattedExpireAt = 'formatted date time';
         $expectedUrl               = 'www.tests.com';
+        $expectedIdentifier        = 'test_template_identifier';
+        $expectedClassName         = 'Tasks';
 
         $reminder = $this->getMock('Oro\Bundle\ReminderBundle\Entity\Reminder');
-        $reminder->expects($this->any())->method('getExpireAt')->will($this->returnValue(new \DateTime()));
-        $reminder->expects($this->once())
-            ->method('getId')
-            ->will($this->returnValue($expectedId));
-        $reminder->expects($this->once())
-            ->method('getSubject')
-            ->will($this->returnValue($expectedSubject));
-        $reminder->expects($this->exactly(2))
-            ->method('getExpireAt')
-            ->will($this->returnValue($expectedExpireAt));
+        $reminder->expects($this->exactly(2))->method('getExpireAt')->willReturn($expectedExpireAt);
+        $reminder->expects($this->exactly(2))->method('getRelatedEntityClassName')->willReturn($expectedClassName);
+        $reminder->expects($this->once())->method('getId')->willReturn($expectedId);
+        $reminder->expects($this->once())->method('getSubject')->willReturn($expectedSubject);
 
-        $this->dateTimeFormatter
-            ->expects($this->at(0))
-            ->method('formatDate')
-            ->will($this->returnValue(new \DateTime()));
-
-        $this->dateTimeFormatter->expects($this->once())
-            ->method('format')
-            ->with($expectedExpireAt)
-            ->will($this->returnValue($expectedFormattedExpireAt));
+        $this->dateTimeFormatter->expects($this->exactly(2))->method('formatDate')
+            ->withConsecutive(
+                [$this->identicalTo($expectedExpireAt), \IntlDateFormatter::SHORT],
+                [$this->isInstanceOf('\DateTime'), \IntlDateFormatter::SHORT]
+            )
+            ->willReturnOnConsecutiveCalls($currentDate = '2014-02-03', $reminderExpiredDate = '2014-02-01');
+        $this->dateTimeFormatter->expects($this->once())->method('format')->with($expectedExpireAt)
+            ->willReturn($expectedFormattedExpireAt);
 
         $this->urlProvider->expects($this->once())->method('getUrl')->will($this->returnValue($expectedUrl));
 
-        $expectedIdentifier       = 'test_template_identifier';
-        $expectedRelatedClassName = 'Tasks';
-
-        $reminder->expects($this->exactly(2))
-            ->method('getRelatedEntityClassName')
-            ->will($this->returnValue($expectedRelatedClassName));
-
         $configInterface = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $configInterface->expects($this->once())->method('get')->will($this->returnValue($expectedIdentifier));
-        $this->configProvider->expects($this->once())
-            ->method('getConfig')
-            ->with($expectedRelatedClassName)
-            ->will($this->returnValue($configInterface));
+        $configInterface->expects($this->once())->method('get')->willReturn($expectedIdentifier);
+        $this->configProvider->expects($this->once())->method('getConfig')->with($expectedClassName)
+            ->willReturn($configInterface);
 
-        $params = $this->messageParamsProvider->getMessageParams($reminder);
+        $result = $this->messageParamsProvider->getMessageParams($reminder);
 
-        $this->assertEquals($expectedId, $params['id']);
-        $this->assertEquals($expectedUrl, $params['url']);
-        $this->assertEquals($expectedSubject, $params['subject']);
-        $this->assertEquals($expectedFormattedExpireAt, $params['expireAt']);
-        $this->assertEquals($expectedIdentifier, $params['templateId']);
+        $this->assertEquals($expectedId, $result['id']);
+        $this->assertEquals($expectedUrl, $result['url']);
+        $this->assertEquals($expectedSubject, $result['subject']);
+        $this->assertEquals($expectedFormattedExpireAt, $result['expireAt']);
+        $this->assertEquals($expectedIdentifier, $result['templateId']);
+        $this->assertArrayHasKey('uniqueId', $result);
+        $this->assertInternalType('string', $result['uniqueId']);
     }
 
     public function testGetMessageParamsForRemindersSetupCorrectParams()

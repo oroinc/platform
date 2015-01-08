@@ -5,12 +5,13 @@ namespace Oro\Bundle\NotificationBundle\Provider;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 
-class DoctrineListener
+class DoctrineListener implements OptionalListenerInterface
 {
     /**
      * @var EventDispatcherInterface
@@ -23,6 +24,11 @@ class DoctrineListener
     protected $entityPool;
 
     /**
+     * @var bool
+     */
+    protected $enabled = true;
+
+    /**
      * @param EntityPool $entityPool
      * @param EventDispatcherInterface $eventDispatcher
      */
@@ -33,6 +39,14 @@ class DoctrineListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
      * Persist and flush entities from spool: jobs and email spool items.
      *
      * @param PostFlushEventArgs $args
@@ -40,6 +54,10 @@ class DoctrineListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->entityPool->persistAndFlush($args->getEntityManager());
 
         return $this;
@@ -53,6 +71,10 @@ class DoctrineListener
      */
     public function postUpdate(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->eventDispatcher
             ->dispatch('oro.notification.event.entity_post_update', $this->getNotificationEvent($args));
 
@@ -67,6 +89,10 @@ class DoctrineListener
      */
     public function postPersist(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->eventDispatcher
             ->dispatch('oro.notification.event.entity_post_persist', $this->getNotificationEvent($args));
 
@@ -81,6 +107,10 @@ class DoctrineListener
      */
     public function postRemove(LifecycleEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->eventDispatcher
             ->dispatch('oro.notification.event.entity_post_remove', $this->getNotificationEvent($args));
 

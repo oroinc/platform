@@ -11,7 +11,8 @@
   .dropdown:hover > .dropdown-menu { /* Opens on hover for all 2+ levels */
     display: block;
   }
-  > li.dropdown {
+  > li.dropdown,
+  > li.single {
     .dropdown-menu { /* All 2+ level */
       border: 1px solid #e8e8e8;
       width: auto;
@@ -96,6 +97,47 @@
   &:after {
     content: '';
     clear: both;
+  }
+  > li.single {
+    margin: 0 3px;
+    > a {
+      position: relative;
+      margin: 2px 1px;
+      padding: 3px 10px;
+      font-size: @baseFontSize;
+      font-weight: bold;
+      color: @menuItemFirstLevelTextColor;
+      text-shadow:none;
+      i[class^=icon-] {
+        display: none !important;
+      }
+    }
+    &.active {
+      > a {
+        margin: 2px 0;
+        padding: 2px 10px;
+        border: 1px solid darken(#354150,7%);
+        border-bottom-color: darken(#354150,20%);
+        .border-radius(4px);
+        background: #5e6772;
+        #gradient > .vertical(lighten(@headerIconButtonColorStart, 5%), lighten(@headerIconButtonColorEnd, 1%));
+      }
+    }
+    &:not(.only-icon):hover,
+    &:not(.only-icon):focus {
+      > a {
+        margin: 2px 0 0;
+        padding: 2px 10px 4px;
+        border: 1px solid #fff;
+        background: #fff;
+        .border-radius(4px);
+        color:#444;
+        &:hover {
+          background:#fff;
+          color:#444;
+        }
+      }
+    }
   }
   > li.dropdown {
     margin: 0 3px;
@@ -210,6 +252,41 @@
         i[class^=icon-] {
           display: none !important;
         }
+      }
+    }
+  }
+  > li.single.only-icon {
+    > a {
+      font-size: 0;
+      color: transparent;
+      i[class^=icon-] {
+        vertical-align: middle;
+        vertical-align: -webkit-baseline-middle;
+        display: inline-block !important;
+        color: @menuItemFirstLevelTextColor;
+        font-size: @baseFontSize;
+      }
+    }
+    &:hover,
+    &:focus {
+      > a {
+        margin: 2px 1px;
+        background-color: inherit;
+        border-color: transparent;
+        i[class^=icon-] {
+          color: #fff;
+        }
+        &:hover {
+          background-color: inherit;
+          color: inherit;
+        }
+      }
+    }
+    &.active {
+      > a {
+        margin: 2px 0;
+        border-color: darken(#354150,7%);
+        #gradient > .vertical(lighten(@headerIconButtonColorStart, 2%), @headerIconButtonColorEnd);
       }
     }
   }

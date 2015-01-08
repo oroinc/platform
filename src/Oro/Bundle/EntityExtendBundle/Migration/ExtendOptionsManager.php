@@ -110,7 +110,9 @@ class ExtendOptionsManager
             }
             if (isset($this->options[$objectKey][$scope]) && is_array($values)) {
                 foreach ($values as $attrName => $val) {
-                    if ($this->isAppend($objectKey, $scope, $attrName)) {
+                    if ($this->isAppend($objectKey, $scope, $attrName)
+                        && isset($this->options[$objectKey][$scope][$attrName])
+                    ) {
                         $this->options[$objectKey][$scope][$attrName] = array_merge(
                             (array)$this->options[$objectKey][$scope][$attrName],
                             (array)$val

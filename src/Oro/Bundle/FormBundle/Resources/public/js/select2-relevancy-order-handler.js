@@ -1,5 +1,5 @@
 /*global define*/
-define([], function(){
+define(['oroui/js/tools'], function(tools){
     /**
      * @export  oroform/js/select2-relevancy-order-handler
      * @class   oroform.select2RelevancyOrderHandler
@@ -15,7 +15,7 @@ define([], function(){
                 if (!query.term || query.term.length < 1) {
                     return results;
                 }
-                var expression = new RegExp(query.term, 'im');
+                var expression = tools.safeRegExp(query.term, 'im');
 
                 var sortIteratorDelegate = function (first, second) {
                     var inFirst = first.text.search(expression);

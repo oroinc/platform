@@ -81,6 +81,9 @@ class RelationBuilder
                 'target_entity'   => $targetEntityName,
                 'target_field_id' => false,
             ];
+            if (isset($options['extend']['cascade'])) {
+                $relations[$relationKey]['cascade'] = $options['extend']['cascade'];
+            }
             $sourceEntityConfig->set('relation', $relations);
 
             $extendConfigProvider = $this->configManager->getProvider('extend');
@@ -145,6 +148,9 @@ class RelationBuilder
                 'target_entity'   => $targetEntityName,
                 'target_field_id' => false
             ];
+            if (isset($options['extend']['cascade'])) {
+                $relations[$relationKey]['cascade'] = $options['extend']['cascade'];
+            }
             $sourceEntityConfig->set('relation', $relations);
 
             $extendConfigProvider = $this->configManager->getProvider('extend');

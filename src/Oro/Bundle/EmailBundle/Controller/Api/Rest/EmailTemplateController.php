@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Delete;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
@@ -48,9 +48,7 @@ class EmailTemplateController extends RestController
      *      class="OroEmailBundle:EmailTemplate",
      *      permission="DELETE"
      * )
-     * @Delete(requirements={"id"="\d+"},
-     *      name="oro_api_delete_emailtemplate"
-     * )
+     * @Delete(requirements={"id"="\d+"})
      *
      * @return Response
      */
@@ -86,8 +84,7 @@ class EmailTemplateController extends RestController
      * )
      * @AclAncestor("oro_email_emailtemplate_index")
      * @Get("/emailtemplates/list/{entityName}",
-     *      requirements={"entityName"="\w+"},
-     *      name="oro_api_get_emailtemplates"
+     *      requirements={"entityName"="\w+"}
      * )
      *
      * @return Response
@@ -105,7 +102,7 @@ class EmailTemplateController extends RestController
         $token        = $securityContext->getToken();
         $organization = $token->getOrganizationContext();
 
-        $entityName = str_replace('_', '\\', $entityName);
+        $entityName = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         /** @var $emailTemplateRepository EmailTemplateRepository */
         $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
@@ -124,9 +121,7 @@ class EmailTemplateController extends RestController
      *     resource=true
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
-     * @Get("/emailtemplates/variables",
-     *      name="oro_api_get_emailtemplate_variables"
-     * )
+     * @Get("/emailtemplates/variables")
      *
      * @return Response
      */
@@ -158,8 +153,7 @@ class EmailTemplateController extends RestController
      * )
      * @AclAncestor("oro_email_emailtemplate_view")
      * @Get("/emailtemplates/compiled/{id}/{entityId}",
-     *      requirements={"id"="\d+", "entityId"="\d*"},
-     *      name="oro_api_get_emailtemplate_compiled"
+     *      requirements={"id"="\d+", "entityId"="\d*"}
      * )
      * @ParamConverter("emailTemplate", class="OroEmailBundle:EmailTemplate")
      *

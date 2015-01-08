@@ -468,7 +468,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 'oro:migration:data:load',
                 array(
                     '--process-isolation' => true,
-                    '--fixtures-type'     => 'demo'
+                    '--fixtures-type'     => 'demo',
                 )
             );
         }

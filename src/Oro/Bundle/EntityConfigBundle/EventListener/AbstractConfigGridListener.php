@@ -158,6 +158,20 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     );
                 }
 
+                if (isset($item['options']['indexed_type']) && $item['options']['indexed_type'] !== 'scalar') {
+                    if ($item['grid']['type'] !== 'html' || !isset($item['grid']['template'])) {
+                        throw new LogicException(
+                            sprintf(
+                                'If the value of option "indexed_type" not "scalar" grid type should ' .
+                                'be set to "html" and grid template for rendering such value should be defined ' .
+                                'for property "%s" in scope "%s".',
+                                $code,
+                                $provider->getScope()
+                            )
+                        );
+                    }
+                }
+
                 $fieldName    = $provider->getScope() . '_' . $code;
                 $item['grid'] = $provider->getPropertyConfig()->initConfig($item['grid']);
                 $item['grid'] = $this->mapEntityConfigTypes($item['grid']);

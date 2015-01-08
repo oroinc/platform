@@ -45,7 +45,7 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->addrManager   = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->addrChecker   = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker')
+        $this->addrChecker   = $this->getMockBuilder('Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface')
             ->disableOriginalConstructor()
             ->getMock();
         $this->imapManager   = $this->getMockBuilder('Oro\Bundle\ImapBundle\Manager\ImapEmailManager')
@@ -151,7 +151,13 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $processor = $this->getProcessorMock();
+        $processor = new ImapEmailSynchronizationProcessor(
+            $this->em,
+            $this->entityBuilder,
+            $this->addrChecker,
+            $this->imapManager
+        );
+        $processor->setLogger($this->logger);
 
         $srcFolders = ReflectionUtil::callProtectedMethod($processor, 'getFolders', []);
         $this->assertEquals(
@@ -167,18 +173,19 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getProcessorMock(array $methods = [])
     {
-        return $this->getMock(
+        $processor = $this->getMock(
             'Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor',
             $methods,
             [
-                $this->logger,
                 $this->em,
                 $this->entityBuilder,
-                $this->addrManager,
                 $this->addrChecker,
                 $this->imapManager
             ]
         );
+        $processor->setLogger($this->logger);
+
+        return $processor;
     }
 
     /**

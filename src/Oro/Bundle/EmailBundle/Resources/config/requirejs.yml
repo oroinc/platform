@@ -1,7 +1,7 @@
 config:
     paths:
-        'oroemail/js/email/template/collection': 'bundles/oroemail/js/email/template/collection.js'
-        'oroemail/js/email/template/model': 'bundles/oroemail/js/email/template/model.js'
-        'oroemail/js/email/template/view': 'bundles/oroemail/js/email/template/view.js'
-        'oroemail/js/email/variable/model': 'bundles/oroemail/js/email/variable/model.js'
-        'oroemail/js/email/variable/view': 'bundles/oroemail/js/email/variable/view.js'
+        'oroemail/js/app/models/email-template-collection': 'bundles/oroemail/js/app/models/email-template-collection.js'
+        'oroemail/js/app/models/email-template-model': 'bundles/oroemail/js/app/models/email-template-model.js'
+        'oroemail/js/app/views/email-template-view': 'bundles/oroemail/js/app/views/email-template-view.js'
+
+        'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'

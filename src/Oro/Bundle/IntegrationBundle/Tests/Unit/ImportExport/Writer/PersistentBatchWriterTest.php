@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\ImportExport\Writer;
 
+use Psr\Log\LoggerInterface;
+
 use Akeneo\Bundle\BatchBundle\Entity\JobExecution;
 use Akeneo\Bundle\BatchBundle\Entity\JobInstance;
 
@@ -27,17 +29,19 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
     /** @var PersistentBatchWriter */
     protected $writer;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     protected function setUp()
     {
         $this->registry        = $this->getMock('Symfony\Bridge\Doctrine\RegistryInterface');
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
         $this->contextRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextRegistry');
+        $this->logger          = $this->getMock('Psr\Log\LoggerInterface');
         $this->entityManager   = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
-        $this->registry->expects($this->atLeastOnce())
-            ->method('getManager')
+        $this->registry->expects($this->atLeastOnce())->method('getManager')
             ->will($this->returnValue($this->entityManager));
     }
 
@@ -48,24 +52,18 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
      */
     public function testWrite(array $configuration)
     {
-        $this->entityManager->expects($this->at(1))
-            ->method('beginTransaction');
+        $this->entityManager->expects($this->once())->method('beginTransaction');
 
         $fooItem = $this->getMock('FooItem');
         $barItem = $this->getMock('BarItem');
 
-        $this->entityManager->expects($this->at(2))
-            ->method('persist')
-            ->with($fooItem);
+        $this->entityManager->expects($this->exactly(2))->method('persist')
+            ->with($this->logicalOr($this->equalTo($fooItem), $this->equalTo($barItem)));
 
-        $this->entityManager->expects($this->at(3))
-            ->method('persist')
-            ->with($barItem);
-
-        $this->entityManager->expects($this->at(4))
+        $this->entityManager->expects($this->once())
             ->method('flush');
 
-        $this->entityManager->expects($this->at(5))
+        $this->entityManager->expects($this->once())
             ->method('commit');
 
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
@@ -97,39 +95,23 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
      */
     public function testWriteRollback($couldBeSkipped)
     {
-        $this->entityManager->expects($this->at(1))
-            ->method('beginTransaction');
-
         $fooItem = $this->getMock('FooItem');
         $barItem = $this->getMock('BarItem');
 
-        $this->entityManager->expects($this->at(2))
-            ->method('persist')
-            ->with($fooItem);
-
-        $this->entityManager->expects($this->at(3))
-            ->method('persist')
-            ->with($barItem);
-
-        $this->entityManager->expects($this->at(4))
+        $this->entityManager->expects($this->once())->method('beginTransaction');
+        $this->entityManager->expects($this->exactly(2))->method('persist')
+            ->with($this->logicalOr($this->equalTo($fooItem), $this->equalTo($barItem)));
+        $this->entityManager->expects($this->once())
             ->method('flush')
             ->will($this->throwException(new \Exception('error')));
+        $this->entityManager->expects($this->once())->method('rollback');
 
-        $this->entityManager->expects($this->at(5))
-            ->method('rollback');
-
-        $this->entityManager->expects($this->at(6))
-            ->method('isOpen')
+        $this->entityManager->expects($this->once())->method('isOpen')
             ->will($this->returnValue(false));
 
-        $this->entityManager->expects($this->at(7))
-            ->method('isOpen')
-            ->will($this->returnValue(true));
-
-
         $stepExecution = $this->getMockBuilder('Akeneo\Bundle\BatchBundle\Entity\StepExecution')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
+
         $this->expectGetJobName($stepExecution);
 
         $this->eventDispatcher->expects($this->at(0))
@@ -147,7 +129,6 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
         } else {
             $this->setExpectedException('Exception');
         }
-
 
         $writer = $this->getWriter();
         $writer->setStepExecution($stepExecution);
@@ -223,6 +204,11 @@ class PersistentBatchWriterTest extends \PHPUnit_Framework_TestCase
             ->method('isOpen')
             ->will($this->returnValue($isManagerOpen));
 
-        return new PersistentBatchWriter($this->registry, $this->eventDispatcher, $this->contextRegistry);
+        return new PersistentBatchWriter(
+            $this->registry,
+            $this->eventDispatcher,
+            $this->contextRegistry,
+            $this->logger
+        );
     }
 }

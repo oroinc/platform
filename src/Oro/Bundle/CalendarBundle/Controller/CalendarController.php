@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -39,7 +38,7 @@ class CalendarController extends Controller
         /** @var CalendarRepository $repo */
         $repo     = $em->getRepository('OroCalendarBundle:Calendar');
 
-        $calendar = $repo->findByUserAndOrganization($user->getId(), $organization->getId());
+        $calendar = $repo->findDefaultCalendar($user->getId(), $organization->getId());
 
         return $this->forward(
             'OroCalendarBundle:Calendar:view',
@@ -71,14 +70,14 @@ class CalendarController extends Controller
         $dateRange = $calendarConfigProvider->getDateRange();
 
         $result = array(
-            'event_form' => $this->get('oro_calendar.calendar_event.form')->createView(),
+            'event_form' => $this->get('oro_calendar.calendar_event.form.template')->createView(),
             'user_select_form' => $this->get('form.factory')
                 ->createNamed(
-                    'new_calendar_owner',
+                    'new_calendar',
                     'oro_user_select',
                     null,
                     array(
-                        'autocomplete_alias' => 'acl_users',
+                        'autocomplete_alias' => 'user_calendars',
 
                         'configs' => array(
                             'entity_id'               => $calendar->getId(),
@@ -87,11 +86,11 @@ class CalendarController extends Controller
                             'extra_config'            => 'acl_user_autocomplete',
                             'permission'              => 'VIEW',
                             'placeholder'             => 'oro.calendar.form.choose_user_to_add_calendar',
-                            'result_template_twig'    => 'OroUserBundle:User:Autocomplete/result.html.twig',
-                            'selection_template_twig' => 'OroUserBundle:User:Autocomplete/selection.html.twig',
+                            'result_template_twig'    => 'OroCalendarBundle:Calendar:Autocomplete/result.html.twig',
+                            'selection_template_twig' => 'OroCalendarBundle:Calendar:Autocomplete/selection.html.twig',
                         ),
 
-                        'grid_name' => 'users-select-grid-exclude-owner',
+                        'grid_name' => 'users-calendar-select-grid-exclude-owner',
                         'random_id' => false,
                         'required'  => true,
                     )

@@ -199,6 +199,8 @@ abstract class AbstractConfigModel
     {
         if (is_bool($value)) {
             $value = (int)$value;
+        } elseif (is_array($value)) {
+            $value = json_encode($value);
         }
         $value = (string)$value;
 

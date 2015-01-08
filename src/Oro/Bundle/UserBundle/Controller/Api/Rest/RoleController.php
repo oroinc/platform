@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use FOS\Rest\Util\Codes;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-
+use FOS\RestBundle\Routing\ClassResourceInterface;
+use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -146,7 +144,7 @@ class RoleController extends RestController implements ClassResourceInterface
      */
     public function getBynameAction($name)
     {
-        $entity = $this->getManager()->getRepository()->findOneBy(array('label' => $name));
+        $entity = $this->getManager()->getRepository()->findOneBy(['label' => $name]);
 
         return $this->handleView(
             $this->view(
@@ -164,10 +162,10 @@ class RoleController extends RestController implements ClassResourceInterface
         switch ($field) {
             case 'owner':
                 if ($value) {
-                    $value = array(
+                    $value = [
                         'id' => $value->getId(),
                         'name' => $value->getName()
-                    );
+                    ];
                 }
                 break;
             default:

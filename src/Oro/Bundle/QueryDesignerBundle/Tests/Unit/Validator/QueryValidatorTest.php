@@ -85,18 +85,19 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject $datasource
-     * @param bool                                     $useOrmDatasorce
+     * @param bool                                     $useOrmDatasource
      * @param \Exception                               $exception
+     * @param \Exception                               $configurationException
+     * @param int                                      $expectsCount
      *
      * @dataProvider validateDataProvider
      */
-    public function testValidate($datasource, $useOrmDatasorce, $exception)
+    public function testValidate($datasource, $useOrmDatasource, $exception, $configurationException, $expectsCount)
     {
         $provider = $this
             ->getMockBuilder('Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider')
             ->disableOriginalConstructor()
             ->getMock();
-
         $builder = $this
             ->getMockBuilder('Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder')
             ->disableOriginalConstructor()
@@ -106,71 +107,76 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('isApplicable')
             ->will($this->returnValue(true));
-
         $provider
             ->expects($this->once())
             ->method('getBuilder')
             ->will($this->returnValue($builder));
-
-        $configuration = $this
-            ->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $builder
-            ->expects($this->once())
-            ->method('getConfiguration')
-            ->will($this->returnValue($configuration));
-
-        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
-
-        $this->gridBuilder
-            ->expects($this->once())
-            ->method('build')
-            ->will($this->returnValue($datagrid));
-
-        $datagrid
-            ->expects($this->once())
-            ->method('getDatasource')
-            ->will($this->returnValue($datasource));
-
-        $qb = $this
-            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $datasource
-            ->expects($this->once())
-            ->method('getQueryBuilder')
-            ->will($this->returnValue($qb));
-
-        if ($useOrmDatasorce) {
-            $qb
-                ->expects($this->once())
-                ->method('setMaxResults')
-                ->will($this->returnSelf());
-        }
-
-        if ($exception) {
-            $datasource
-                ->expects($this->once())
-                ->method('getResults')
-                ->will($this->throwException($exception));
-        } else {
-            $datasource
-                ->expects($this->once())
-                ->method('getResults')
-                ->will($this->returnValue([]));
-        }
-
         $this->chainConfigurationProvider
             ->expects($this->once())
             ->method('getProviders')
             ->will($this->returnValue([$provider, new \stdClass()]));
 
-        $this->context
-            ->expects($exception ? $this->once() : $this->never())
-            ->method('addViolation');
+        if ($configurationException) {
+            $builder
+                ->expects($this->once())
+                ->method('getConfiguration')
+                ->will($this->throwException($configurationException));
+        } else {
+            $configuration = $this
+                ->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $builder
+                ->expects($this->once())
+                ->method('getConfiguration')
+                ->will($this->returnValue($configuration));
+        }
+        $datagrid = $this->getMock('Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface');
+
+        $this->gridBuilder
+            ->expects($this->exactly($expectsCount))
+            ->method('build')
+            ->will($this->returnValue($datagrid));
+        $datagrid
+            ->expects($this->exactly($expectsCount))
+            ->method('getDatasource')
+            ->will($this->returnValue($datasource));
+        $qb = $this
+            ->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $datasource
+            ->expects($this->exactly($expectsCount))
+            ->method('getQueryBuilder')
+            ->will($this->returnValue($qb));
+
+        if ($useOrmDatasource) {
+            $qb
+                ->expects($this->exactly($expectsCount))
+                ->method('setMaxResults')
+                ->will($this->returnSelf());
+        }
+        if ($exception) {
+            $datasource
+                ->expects($this->exactly($expectsCount))
+                ->method('getResults')
+                ->will($this->throwException($exception));
+        } else {
+            $datasource
+                ->expects($this->exactly($expectsCount))
+                ->method('getResults')
+                ->will($this->returnValue([]));
+        }
+
+        if ($exception || $configurationException) {
+            $this->context
+                ->expects($this->once())
+                ->method('addViolation');
+        } else {
+            $this->context
+                ->expects($this->never())
+                ->method('addViolation');
+        }
 
         $this->validator->validate(new Segment(), $this->constraint);
     }
@@ -184,17 +190,45 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
             [
                 $this->getDataSourceInterfaceMock(),
                 false,
-                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql')
+                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql'),
+                null,
+                1
             ],
-            [$this->getDataSourceInterfaceMock(), false, new InvalidConfigurationException()],
-            [$this->getDataSourceInterfaceMock(), false, null],
+            [
+                $this->getDataSourceInterfaceMock(),
+                false,
+                new InvalidConfigurationException(),
+                null,
+                1
+            ],
+            [
+                $this->getDataSourceInterfaceMock(),
+                false,
+                null,
+                null,
+                1
+            ],
             [
                 $this->getOrmDataSourceInterfaceMock(),
                 true,
-                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql')
+                DBALException::driverExceptionDuringQuery(new \Exception('failed'), 'sql'),
+                null,
+                1
             ],
-            [$this->getOrmDataSourceInterfaceMock(), true, new InvalidConfigurationException()],
-            [$this->getOrmDataSourceInterfaceMock(), true, null],
+            [
+                $this->getOrmDataSourceInterfaceMock(),
+                true,
+                new InvalidConfigurationException(),
+                null,
+                1
+            ],
+            [
+                $this->getOrmDataSourceInterfaceMock(),
+                false,
+                null,
+                new InvalidConfigurationException(),
+                0
+            ]
         ];
     }
 

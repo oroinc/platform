@@ -72,6 +72,13 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
             $value->expects($this->once())
                 ->method('getValue')
                 ->will($this->returnValue('test'));
+            $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
+            $value->expects($this->once())
+                ->method('getCreatedAt')
+                ->will($this->returnValue($datetime));
+            $value->expects($this->once())
+                ->method('getUpdatedAt')
+                ->will($this->returnValue($datetime));
 
             $scope = $this->getMock('Oro\Bundle\ConfigBundle\Entity\Config');
             $scope->expects($this->once())
@@ -102,6 +109,8 @@ class ConfigRepositoryTest extends \PHPUnit_Framework_TestCase
         if ($isScope) {
             $this->assertArrayHasKey('oro_user', $settings);
             $this->assertEquals('test', $settings['oro_user']['level']['value']);
+            $this->assertEquals($datetime, $settings['oro_user']['level']['createdAt']);
+            $this->assertEquals($datetime, $settings['oro_user']['level']['updatedAt']);
         } else {
             $this->assertEmpty($settings);
         }

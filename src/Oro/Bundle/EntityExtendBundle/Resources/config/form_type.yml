@@ -18,6 +18,7 @@ parameters:
     oro_entity_extend.type.association.text.class:              Oro\Bundle\EntityExtendBundle\Form\Type\TextAssociationPropertyType
     oro_entity_extend.type.association.textarea.class:          Oro\Bundle\EntityExtendBundle\Form\Type\TextareaAssociationPropertyType
     oro_entity_extend.type.association.choice.class:            Oro\Bundle\EntityExtendBundle\Form\Type\ChoiceAssociationPropertyType
+    oro_entity_extend.type.multiple_entity.class:               Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType
 
     oro_entity_extend.type.unique_key_collection_type.class:    Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType
 
@@ -30,6 +31,8 @@ parameters:
     oro_entity_extend.type.enum_choice.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType
     oro_entity_extend.type.enum_select.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType
     oro_entity_extend.type.enum_filter.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType
+
+    oro_entity_extend.form.guesser.extend_field.class:          Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser
 
 services:
     oro_entity_extend.type.entity:
@@ -51,7 +54,7 @@ services:
     oro_entity_extend.type.relation:
         class:                                                  %oro_entity_extend.type.relation.class%
         arguments:
-            - @oro_entity_config.provider.extend
+            - @oro_entity_config.config_manager
         tags:
             - { name: form.type, alias: oro_entity_relation_type }
 
@@ -227,3 +230,47 @@ services:
             - @doctrine
         tags:
             - { name: form.type, alias: oro_enum_filter }
+
+    oro_entity_extend.form.guesser.extend_field:
+        class: %oro_entity_extend.form.guesser.extend_field.class%
+        arguments:
+            - @doctrine
+            - @oro_entity_config.provider.entity
+            - @oro_entity_config.provider.form
+            - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.enum
+        calls:
+            - [addExtendTypeMapping, ["string", "text"]]
+            - [addExtendTypeMapping, ["integer", "text"]] # integers should be text to make validation work
+            - [addExtendTypeMapping, ["smallint", "integer", { precision: 0 }]]
+            - [addExtendTypeMapping, ["bigint", "integer", { precision: 0 }]]
+            - [addExtendTypeMapping, ["decimal", "number"]]
+            - [addExtendTypeMapping, ["date", "oro_date"]]
+            - [addExtendTypeMapping, ["time", "time", { model_timezone: "UTC", view_timezone: "UTC" }]]
+            - [addExtendTypeMapping, ["datetime", "oro_datetime"]]
+            - [addExtendTypeMapping, ["datetimetz", "oro_datetime"]]
+            - [addExtendTypeMapping, ["text", "textarea"]]
+            - [addExtendTypeMapping, ["float", "number"]]
+            - [addExtendTypeMapping, ["guid", "text"]]
+            # custom types
+            - [addExtendTypeMapping, ["percent", "oro_percent"]]
+            - [addExtendTypeMapping, ["money", "oro_money"]]
+            - [addExtendTypeMapping, ["boolean", "choice"]] # extended boolean fields should be choice type
+
+            - [addExtendTypeMapping, ["file", "oro_file"]]
+            - [addExtendTypeMapping, ["image", "oro_image"]]
+            - [addExtendTypeMapping, ["manyToOne", "oro_entity_select"]]
+            - [addExtendTypeMapping, ["oneToMany", "oro_entity_extend_multiple_entity"]]
+            - [addExtendTypeMapping, ["manyToMany", "oro_entity_extend_multiple_entity"]]
+            - [addExtendTypeMapping, ["optionSet", "oro_option_select"]]
+            - [addExtendTypeMapping, ["enum", "oro_enum_select"]]
+            - [addExtendTypeMapping, ["multiEnum", "oro_enum_choice"]]
+        tags:
+            - { name: form.type_guesser, priority: 15 }
+
+    oro_entity_extend.type.multiple_entity:
+        class: %oro_entity_extend.type.multiple_entity.class%
+        arguments:
+            - @router
+        tags:
+            - { name: form.type, alias: oro_entity_extend_multiple_entity }

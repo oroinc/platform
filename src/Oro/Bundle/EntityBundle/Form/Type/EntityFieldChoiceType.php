@@ -64,7 +64,6 @@ class EntityFieldChoiceType extends AbstractType
         };
 
         $defaultConfigs = array(
-            'is_translated_option'    => true,
             'placeholder'             => 'oro.entity.form.choose_entity_field',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
             'selection_template_twig' => 'OroEntityBundle:Choice:entity_field/selection.html.twig',
@@ -88,7 +87,8 @@ class EntityFieldChoiceType extends AbstractType
                 'empty_value'         => '',
                 'skip_load_entities'  => false,
                 'skip_load_data'      => false,
-                'configs'             => $defaultConfigs
+                'configs'             => $defaultConfigs,
+                'translatable_options' => false
             )
         );
         $resolver->setNormalizers(

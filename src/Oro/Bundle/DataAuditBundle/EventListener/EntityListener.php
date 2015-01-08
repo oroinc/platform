@@ -8,8 +8,9 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\DataAuditBundle\Loggable\LoggableManager;
 use Oro\Bundle\DataAuditBundle\Metadata\ExtendMetadataFactory;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
-class EntityListener
+class EntityListener implements OptionalListenerInterface
 {
     /**
      * @var ExtendMetadataFactory
@@ -22,6 +23,11 @@ class EntityListener
     protected $loggableManager;
 
     /**
+     * @var bool
+     */
+    protected $enabled = true;
+
+    /**
      * @param LoggableManager       $loggableManager
      * @param ExtendMetadataFactory $metadataFactory
      */
@@ -32,10 +38,22 @@ class EntityListener
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
+    }
+
+    /**
      * @param OnFlushEventArgs $event
      */
     public function onFlush(OnFlushEventArgs $event)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->loggableManager->handleLoggable($event->getEntityManager());
     }
 
@@ -56,6 +74,10 @@ class EntityListener
      */
     public function postPersist(LifecycleEventArgs $event)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $this->loggableManager->handlePostPersist($event->getEntity(), $event->getEntityManager());
     }
 }

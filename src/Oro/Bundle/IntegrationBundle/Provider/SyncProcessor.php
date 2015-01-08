@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -11,44 +13,32 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
-use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Event\SyncEvent;
 
-class SyncProcessor
+class SyncProcessor extends AbstractSyncProcessor
 {
-    /** @var RegistryInterface */
+    /** @var ManagerRegistry */
     protected $doctrineRegistry;
 
-    /** @var ProcessorRegistry */
-    protected $processorRegistry;
-
-    /** @var Executor */
-    protected $jobExecutor;
-
-    /** @var TypesRegistry */
-    protected $registry;
-
-    /** @var LoggerStrategy */
-    protected $logger;
-
     /**
-     * @param RegistryInterface $doctrineRegistry
-     * @param ProcessorRegistry $processorRegistry
-     * @param Executor          $jobExecutor
-     * @param TypesRegistry     $registry
-     * @param LoggerStrategy    $logger
+     * @param ManagerRegistry          $doctrineRegistry
+     * @param ProcessorRegistry        $processorRegistry
+     * @param Executor                 $jobExecutor
+     * @param TypesRegistry            $registry
+     * @param LoggerStrategy           $logger
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
-        RegistryInterface $doctrineRegistry,
+        ManagerRegistry $doctrineRegistry,
         ProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
         TypesRegistry $registry,
-        LoggerStrategy $logger
+        EventDispatcherInterface $eventDispatcher,
+        LoggerStrategy $logger = null
     ) {
-        $this->doctrineRegistry  = $doctrineRegistry;
-        $this->processorRegistry = $processorRegistry;
-        $this->jobExecutor       = $jobExecutor;
-        $this->registry          = $registry;
-        $this->logger            = $logger;
+        $this->doctrineRegistry = $doctrineRegistry;
+
+        parent::__construct($processorRegistry, $jobExecutor, $registry, $eventDispatcher, $logger);
     }
 
     /**
@@ -114,16 +104,6 @@ class SyncProcessor
     }
 
     /**
-     * Get logger strategy
-     *
-     * @return LoggerStrategy
-     */
-    public function getLoggerStrategy()
-    {
-        return $this->logger;
-    }
-
-    /**
      * Process integration connector
      *
      * @param Integration $integration Integration object
@@ -139,7 +119,7 @@ class SyncProcessor
         array $parameters = [],
         $saveStatus = true
     ) {
-        if (!$integration->getEnabled()) {
+        if (!$integration->isEnabled()) {
             return false;
         }
 
@@ -175,7 +155,8 @@ class SyncProcessor
                     [
                         'processorAlias' => reset($processorAliases),
                         'entityName'     => $realConnector->getImportEntityFQCN(),
-                        'channel'        => $integration->getId()
+                        'channel'        => $integration->getId(),
+                        'channelType'    => $integration->getType(),
                     ],
                     $parameters
                 ),
@@ -195,66 +176,55 @@ class SyncProcessor
      */
     protected function processImport($connector, $jobName, $configuration, Integration $integration, $saveStatus)
     {
+        $event = new SyncEvent($jobName, $configuration);
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
+        $configuration = $event->getConfiguration();
+
         $jobResult = $this->jobExecutor->executeJob(ProcessorRegistry::TYPE_IMPORT, $jobName, $configuration);
+
+        $this->eventDispatcher->dispatch(SyncEvent::SYNC_AFTER, new SyncEvent($jobName, $configuration, $jobResult));
 
         /** @var ContextInterface $contexts */
         $context = $jobResult->getContext();
 
-        $counts = [];
+        $connectorData = $errors = [];
         if ($context) {
-            $counts['process'] = $counts['warnings'] = 0;
-            $counts['read']    = $context->getReadCount();
-            $counts['process'] += $counts['add'] = $context->getAddCount();
-            $counts['process'] += $counts['update'] = $context->getUpdateCount();
-            $counts['process'] += $counts['delete'] = $context->getDeleteCount();
+            $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
+            $errors        = $context->getErrors();
         }
+        $exceptions = $jobResult->getFailureExceptions();
+        $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
-        $exceptions    = $jobResult->getFailureExceptions();
-        $isSuccess     = $jobResult->isSuccessful() && empty($exceptions);
-        $connectorData = $context->getValue(ConnectorInterface::CONTEXT_CONNECTOR_DATA_KEY);
-        $status        = new Status();
+        $status = new Status();
         $status->setConnector($connector);
+        $status->setData(is_array($connectorData) ? $connectorData : []);
 
-        if (is_array($connectorData)) {
-            $status->setData($connectorData);
-        }
+        $message = $this->formatResultMessage($context);
+        $this->logger->info($message);
 
-        if (!$isSuccess) {
-            $this->logger->error('Errors were occurred:');
-            $exceptions = implode(PHP_EOL, $exceptions);
-            $this->logger->error(
-                $exceptions,
-                ['exceptions' => $jobResult->getFailureExceptions()]
-            );
-            $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
-        } else {
-            $message = '';
-            if ($context->getErrors()) {
-                $message = 'Some entities were skipped due to warnings:';
-                foreach ($context->getErrors() as $error) {
-                    $message .= $error . PHP_EOL;
-                }
+        if ($isSuccess) {
+            if ($errors) {
+                $warningsText = 'Some entities were skipped due to warnings:' . PHP_EOL;
+                $warningsText .= implode($errors, PHP_EOL);
+                $this->logger->warning($warningsText);
 
-                $this->logger->warning($message);
+                $message .= PHP_EOL . $warningsText;
             }
 
-            $message .= sprintf(
-                "Stats: read [%d], process [%d], updated [%d], added [%d], delete [%d], invalid entities: [%d]",
-                $counts['read'],
-                $counts['process'],
-                $counts['update'],
-                $counts['add'],
-                $counts['delete'],
-                $context->getErrorEntriesCount()
-            );
-            $this->logger->info($message);
-
             $status->setCode(Status::STATUS_COMPLETED)->setMessage($message);
+        } else {
+            $this->logger->error('Errors were occurred:');
+            $exceptions = implode(PHP_EOL, $exceptions);
+
+            $this->logger->error($exceptions);
+            $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         }
+
         if ($saveStatus) {
             $this->doctrineRegistry
                 ->getRepository('OroIntegrationBundle:Channel')
                 ->addStatus($integration, $status);
+
             if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
                 $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
             }

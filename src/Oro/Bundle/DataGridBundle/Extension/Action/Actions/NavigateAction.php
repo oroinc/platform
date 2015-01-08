@@ -9,7 +9,7 @@ class NavigateAction extends AbstractAction
      */
     protected $requiredOptions = ['link'];
 
-    protected static $additionalOptions = [
+    protected static $defaultOptions = [
         'launcherOptions' => [
             'onClickReturnValue' => false,
             'runAction'          => true,
@@ -20,7 +20,8 @@ class NavigateAction extends AbstractAction
     public function getOptions()
     {
         $options = parent::getOptions();
-        $options->merge(self::$additionalOptions);
+        $finalOptions = array_replace_recursive(self::$defaultOptions, $options->toArray());
+        $options->merge($finalOptions);
 
         return $options;
     }

@@ -210,7 +210,16 @@ class WindowsExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedOutput = 'RENDERED';
         $httpKernelExtension->expects($this->once())
             ->method('renderFragment')
-            ->with($expectedUrl)
+            ->with(
+                $this->callback(
+                    function ($url) use ($expectedUrl) {
+                        $count = 0;
+                        $cleanUrl = preg_replace('/&_wid=([a-z0-9]*)-([a-z0-9]*)/', '', $url, -1, $count);
+
+                        return ($count === 1 && $cleanUrl == $expectedUrl);
+                    }
+                )
+            )
             ->will($this->returnValue($expectedOutput));
 
         $this->entityManager->expects($this->never())->method($this->anything());

@@ -1,6 +1,8 @@
 oro:
     dataaudit:
         module_label:           "Data audit"
+        change_history:         "Change History"
+        change_history.title:   "%item% change history"
 
         menu:
             audit_list.label:       "Data Audit"

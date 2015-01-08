@@ -18,6 +18,13 @@ class WidgetDefinitionRegistryTest extends \PHPUnit_Framework_TestCase
         $actual = $registry->getWidgetDefinitionsByPlacement($placement);
         $this->assertInstanceOf('Doctrine\Common\Collections\Collection', $actual);
         $this->assertEquals($expected, $actual->toArray());
+
+        $additionalDefinition = ['last' => ['icon' => 'icon.png']];
+        $registry->setWidgetDefinitions($additionalDefinition);
+        $this->assertEquals(
+            array_merge($definitions, $additionalDefinition),
+            $registry->getWidgetDefinitions()->toArray()
+        );
     }
 
     /**

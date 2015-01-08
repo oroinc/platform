@@ -24,15 +24,15 @@ class FormUtils
         array $modifyOptions = [],
         array $unsetOptions = []
     ) {
-        $field  = $form->get($fieldName);
-        $config = $field->getConfig()->getOptions();
+        $config  = $form->get($fieldName)->getConfig();
+        $options = $config->getOptions();
 
-        if (array_key_exists('auto_initialize', $config)) {
-            $config['auto_initialize'] = false;
+        if (array_key_exists('auto_initialize', $options)) {
+            $options['auto_initialize'] = false;
         }
-        $config = array_merge($config, $modifyOptions);
-        $config = array_diff_key($config, array_flip($unsetOptions));
-        $form->add($fieldName, $field->getConfig()->getType()->getName(), $config);
+        $options = array_merge($options, $modifyOptions);
+        $options = array_diff_key($options, array_flip($unsetOptions));
+        $form->add($fieldName, $config->getType()->getName(), $options);
     }
 
     /**

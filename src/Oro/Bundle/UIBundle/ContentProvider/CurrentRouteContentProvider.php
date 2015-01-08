@@ -27,7 +27,7 @@ class CurrentRouteContentProvider extends AbstractContentProvider
     public function getContent()
     {
         if ($this->request) {
-            return $this->request->attributes->get('_route');
+            return $this->request->attributes->get('_master_request_route');
         }
 
         return null;

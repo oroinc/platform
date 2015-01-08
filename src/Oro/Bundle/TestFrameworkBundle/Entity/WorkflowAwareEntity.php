@@ -13,7 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @ORM\Entity
  * @Config
  */
-class WorkflowAwareEntity
+class WorkflowAwareEntity implements TestFrameworkEntityInterface
 {
     /**
      * @var integer $id

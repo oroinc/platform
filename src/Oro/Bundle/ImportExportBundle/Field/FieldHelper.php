@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ImportExportBundle\Field;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -18,8 +20,14 @@ class FieldHelper
     /** @var EntityFieldProvider */
     protected $fieldProvider;
 
-    /** @var  FieldTypeHelper */
+    /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
+
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
+
+    /** @var array */
+    protected $fieldsCache = array();
 
     /**
      * @param EntityFieldProvider     $fieldProvider
@@ -55,15 +63,21 @@ class FieldHelper
         $applyExclusions = false,
         $translate = true
     ) {
-        return $this->fieldProvider->getFields(
-            $entityName,
-            $withRelations,
-            $withVirtualFields,
-            $withEntityDetails,
-            $withUnidirectional,
-            $applyExclusions,
-            $translate
-        );
+        $args = func_get_args();
+        $cacheKey = implode(':', $args);
+        if (!array_key_exists($cacheKey, $this->fieldsCache)) {
+            $this->fieldsCache[$cacheKey] = $this->fieldProvider->getFields(
+                $entityName,
+                $withRelations,
+                $withVirtualFields,
+                $withEntityDetails,
+                $withUnidirectional,
+                $applyExclusions,
+                $translate
+            );
+        }
+
+        return $this->fieldsCache[$cacheKey];
     }
 
     /**
@@ -166,15 +180,12 @@ class FieldHelper
     public function getObjectValue($object, $fieldName)
     {
         try {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-
-            return $propertyAccessor->getValue($object, $fieldName);
+            return $this->getPropertyAccessor()->getValue($object, $fieldName);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
             if (property_exists($class, $fieldName)) {
                 $reflection = new \ReflectionProperty($class, $fieldName);
                 $reflection->setAccessible(true);
-
                 return $reflection->getValue($object);
             } else {
                 throw $e;
@@ -191,8 +202,7 @@ class FieldHelper
     public function setObjectValue($object, $fieldName, $value)
     {
         try {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-            $propertyAccessor->setValue($object, $fieldName, $value);
+            $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
             if (property_exists($class, $fieldName)) {
@@ -221,5 +231,39 @@ class FieldHelper
         }
 
         return !empty($data[$fieldName]) ? $data[$fieldName] : array();
+    }
+
+    /**
+     * @param object $entity
+     * @return array
+     */
+    public function getIdentityValues($entity)
+    {
+        $entityName = ClassUtils::getClass($entity);
+        $fields = $this->getFields($entityName, true);
+
+        $identityValues = array();
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)
+                && $this->getConfigValue($entityName, $fieldName, 'identity', false)
+            ) {
+                $identityValues[$fieldName] = $this->getObjectValue($entity, $fieldName);
+            }
+        }
+
+        return $identityValues;
+    }
+
+    /**
+     * @return PropertyAccessor
+     */
+    protected function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

@@ -1,0 +1,14 @@
+placeholders:
+    view_before_content_addition:
+        items:
+            entity_pagination_view:
+                order: 100
+    update_before_content_addition:
+        items:
+            entity_pagination_edit:
+                order: 100
+items:
+    entity_pagination_view:
+        template: OroEntityPaginationBundle:Placeholder:viewPagination.html.twig
+    entity_pagination_edit:
+        template: OroEntityPaginationBundle:Placeholder:editPagination.html.twig

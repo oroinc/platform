@@ -19,14 +19,23 @@
     ]
 
 #}
+{% set lableTrans = {
+    'data_schema': {
+        'label': {
+            'label': options.data_schema.label.label|trans
+        },
+        'value': {
+            'label': options.data_schema.value.label|trans
+        }
+    }
+}%}
+{% set options = options|merge_recursive(lableTrans) %}
 {% if data|length > 0  %}
     {{ chart.renderChart(data, options, config, isMobileVersion()) }}
 {% else %}
-    <div class="container-fluid grid-container-parent">
-        <div class="grid-container">
-            <div class="clearfix no-data">
-                <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
-            </div>
+    <div class="container-fluid">
+        <div class="clearfix no-data">
+            <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
         </div>
     </div>
 {% endif %}

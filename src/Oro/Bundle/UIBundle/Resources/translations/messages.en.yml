@@ -5,6 +5,11 @@
 "Edit": "Edit"
 "Refresh": "Refresh"
 "Reset": "Reset"
+"Continue": "Continue"
+"Go": "Go"
+"Search": "Search"
+"Search results": "Search results"
+"View more...": "View more..."
 "All": "All"
 "Any": "Any"
 "Expand All": "Expand All"
@@ -22,9 +27,11 @@ oro.age: "{0} newborn|]0,Inf[age %count%"
 
 oro:
     ui:
-        actions:        %entityName% Actions
+        actions:          %entityName% Actions
+        actions.activity: More actions
         create:         Create
         create_entity:  Create %entityName%
+        update_entity:  Update %entityName%
         created_at:     Created At
         delete:         Delete
         delete_confirm: Are you sure you want to delete this %entity_label%?
@@ -32,6 +39,8 @@ oro:
         delete_message: %entity_label% deleted
         edit:           Edit
         edit_entity:    Edit %entityName%
+        view:           View
+        view_entity:    View %entityName%
         empty:          N/A
         item:           item
         owner:          Owner
@@ -48,3 +57,57 @@ oro:
                     choices:
                         top: 'Top'
                         left: 'Left'
+        http_codes:
+            226: 'IM Used'
+            300: 'Multiple Choices'
+            301: 'Moved Permanently'
+            302: 'Found'
+            303: 'See Other'
+            304: 'Not Modified'
+            305: 'Use Proxy'
+            306: 'Reserved'
+            307: 'Temporary Redirect'
+            308: 'Permanent Redirect'
+            400: 'Bad Request'
+            401: 'Unauthorized'
+            402: 'Payment Required'
+            403: 'Forbidden'
+            404: 'Not Found'
+            405: 'Method Not Allowed'
+            406: 'Not Acceptable'
+            407: 'Proxy Authentication Required'
+            408: 'Request Timeout'
+            409: 'Conflict'
+            410: 'Gone'
+            411: 'Length Required'
+            412: 'Precondition Failed'
+            413: 'Request Entity Too Large'
+            414: 'Request-URI Too Long'
+            415: 'Unsupported Media Type'
+            416: 'Requested Range Not Satisfiable'
+            417: 'Expectation Failed'
+            418: "I'm a teapot"
+            422: 'Unprocessable Entity'
+            423: 'Locked'
+            424: 'Failed Dependency'
+            425: 'Reserved for WebDAV advanced collections expired proposal'
+            426: 'Upgrade Required'
+            428: 'Precondition Required'
+            429: 'Too Many Requests'
+            431: 'Request Header Fields Too Large'
+            500: 'Internal Server Error'
+            501: 'Not Implemented'
+            502: 'Bad Gateway'
+            503: 'Service Unavailable'
+            504: 'Gateway Timeout'
+            505: 'HTTP Version Not Supported'
+            506: 'Variant Also Negotiates (Experimental)'
+            507: 'Insufficient Storage'
+            508: 'Loop Detected'
+            510: 'Not Extended'
+            511: 'Network Authentication Required'
+        http_error_messages:
+            404: 'The page you requested could not be found. Please make sure the path you used is correct.'
+            403: "You don't have permission to access this page."
+            maintenance: 'The System is currently under maintenance and should be available in a few minutes.'
+'Click to go back': 'Click to go back'

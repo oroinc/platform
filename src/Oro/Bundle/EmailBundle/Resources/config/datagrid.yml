@@ -194,10 +194,10 @@ datagrid:
                     data_name: t.entityName
                     null_value: _empty_
                     options:
-                        is_translated_choices: true
                         field_options:
                             multiple:       true
                             choices:        @oro_email.emailtemplate.datagrid_helper->getEntityNames
+                            translatable_options: false
                 name:
                     type:      string
                     data_name: t.name
@@ -238,7 +238,8 @@ datagrid:
                 acl_resource: oro_email_emailtemplate_delete
                 icon:         trash
                 link:         delete_link
-
+        options:
+            entity_pagination: true
         action_configuration: @oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure
         views_list : @oro_email.emailtemplate.datagrid_view_list
         options: { entityHint: email template }

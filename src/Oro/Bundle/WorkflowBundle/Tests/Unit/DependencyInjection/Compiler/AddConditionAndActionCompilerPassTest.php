@@ -47,7 +47,7 @@ class AddConditionAndActionCompilerPassTest extends \PHPUnit_Framework_TestCase
         $definitionValueMap = array();
         $definitionBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
-            ->setMethods(array('setScope', 'replaceArgument'));
+            ->setMethods(array('setScope', 'replaceArgument', 'getClass'));
 
         // service definitions
         foreach (array_keys(array_merge($this->conditionServices, $this->actionServices)) as $serviceId) {
@@ -55,7 +55,12 @@ class AddConditionAndActionCompilerPassTest extends \PHPUnit_Framework_TestCase
             $definition->expects($this->once())
                 ->method('setScope')
                 ->with(ContainerInterface::SCOPE_PROTOTYPE);
-
+            $definition->expects($this->once())
+                ->method('getClass')
+                ->willReturn('Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action\Stub\DispatcherAwareAction');
+            $definition->expects($this->any())
+                ->method('addMethodCall')
+                ->with('setDispatcher');
             $definitionValueMap[$serviceId] = $definition;
         }
 

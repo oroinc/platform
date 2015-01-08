@@ -135,7 +135,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
             );
         }
 
-        $entityName = substr($entityClassName, strlen(ExtendConfigDumper::ENTITY));
+        $entityName = substr($entityClassName, strlen(ExtendHelper::ENTITY_NAMESPACE));
         if (empty($entityName) || !preg_match('/^[A-Za-z][\w]+$/', $entityName)) {
             throw new \InvalidArgumentException(sprintf('Invalid entity name. Class: %s.', $entityClassName));
         }

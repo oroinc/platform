@@ -58,29 +58,25 @@ class FileEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
                 if (in_array($fieldConfigId->getFieldType(), ['file', 'image'])) {
-                    // create a relation
-                    $relationKey = $this->relationBuilder->addManyToOneRelation(
+                    $cascade = $fieldConfig->get('cascade', false, []);
+                    if (!in_array('persist', $cascade, true)) {
+                        $cascade[] = 'persist';
+                    }
+                    $this->relationBuilder->addManyToOneRelation(
                         $entityConfig,
                         'Oro\Bundle\AttachmentBundle\Entity\File',
                         $fieldConfigId->getFieldName(),
                         'id',
                         [
+                            'extend'       => [
+                                'cascade' => $cascade
+                            ],
                             'importexport' => [
                                 'process_as_scalar' => true
                             ]
                         ],
                         $fieldConfigId->getFieldType()
                     );
-
-                    // set cascade persist
-                    $relations                          = $entityConfig->get('relation');
-                    $cascade                            = isset($relations[$relationKey]['cascade'])
-                        ? $relations[$relationKey]['cascade']
-                        : [];
-                    $cascade[]                          = 'persist';
-                    $relations[$relationKey]['cascade'] = $cascade;
-                    $entityConfig->set('relation', $relations);
-                    $extendConfigProvider->persist($entityConfig);
                 }
             }
         }

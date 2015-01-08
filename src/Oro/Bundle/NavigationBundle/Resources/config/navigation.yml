@@ -59,7 +59,6 @@ oro_menu_config:
         dots_menu:
             type: dots_menu
             children:
-                pinbar: ~
                 history: ~
                 favorite: ~
                 mostviewed: ~
@@ -70,3 +69,10 @@ oro_menu_config:
 oro_titles:
     oro_shortcut_actionslist: 'Shortcut Actions List'
     oro_pinbar_help: 'How To Use Pinbar'
+
+oro_navigation_elements:
+    pinButton:
+        default: true
+
+    favoriteButton:
+        default: true

@@ -1,0 +1,117 @@
+parameters:
+    # entity
+    oro_activity_list.entity.class:  Oro\Bundle\ActivityListBundle\Entity\ActivityList
+
+    # managers
+    oro_activity_list.manager.class:     Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager
+    oro_activity_list.collect_manager.class: Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager
+    oro_activity_list.manager.api.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+
+    oro_activity_list.event_listener.actitity_list_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListListener
+    oro_activity_list.event_listener.actitity_list_changes_listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListChangesListener
+    oro_activity_list.provider.chain.class: Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider
+
+    oro_activity_list.entity_config_dumper.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension
+    oro_activity_list.entity_generator.extension.class: Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityGeneratorExtension
+    oro_activity_list.migration.extension.activity_list: Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension
+    oro_activity_list.migration.activity_list.post_up.listener.class: Oro\Bundle\ActivityListBundle\EventListener\ActivityListPostUpMigrationListener
+
+    oro_activity_list.placeholder.filter.class: Oro\Bundle\ActivityListBundle\Placeholder\PlaceholderFilter
+
+    oro_activity_list.filter.helper.class: Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper
+
+services:
+    oro_activity_list.manager:
+        class: %oro_activity_list.manager.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_locale.formatter.name
+            - @oro_datagrid.extension.pager.orm.pager
+            - @oro_config.user
+            - @oro_activity_list.provider.chain
+            - @oro_activity_list.filter.helper
+            - @oro_comment.comment.api_manager
+
+    oro_activity_list.collect_manager:
+        class: %oro_activity_list.collect_manager.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+
+    oro_activity_list.manager.api:
+        class: %oro_activity_list.manager.api.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_activity_list.entity.class%
+            - @doctrine.orm.entity_manager
+
+    oro_activity_list.placeholder.filter:
+        class: %oro_activity_list.placeholder.filter.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+            - @doctrine
+            - @oro_entity.doctrine_helper
+
+    oro_activity_list.event_listener.actitity_list_listener:
+        class:  %oro_activity_list.event_listener.actitity_list_listener.class%
+        arguments:
+            - @oro_activity_list.collect_manager
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
+
+    oro_activity_list.event_listener.actitity_list_changes_listener:
+        class:  %oro_activity_list.event_listener.actitity_list_changes_listener.class%
+        arguments:
+            - @oro_security.security_facade.link
+        tags:
+            - { name: doctrine.event_listener, event: prePersist }
+            - { name: doctrine.event_listener, event: preUpdate }
+
+    oro_activity_list.provider.chain:
+        class: %oro_activity_list.provider.chain.class%
+        arguments:
+           - @oro_entity.doctrine_helper
+           - @oro_entity_config.config_manager
+           - @translator
+           - @oro_entity.routing_helper
+
+    oro_activity_list.entity_config_dumper.extension:
+        class: %oro_activity_list.entity_config_dumper.extension.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.association_builder
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_activity_list.entity_generator.extension:
+        class: %oro_activity_list.entity_generator.extension.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension }
+
+    oro_activity_list.migration.extension.activity_list:
+        class: %oro_activity_list.migration.extension.activity_list%
+        tags:
+            - { name: oro_migration.extension, extension_name: activity_list }
+
+    oro_activity_list.migration.activity_list.post_up.listener:
+        class: %oro_activity_list.migration.activity_list.post_up.listener.class%
+        arguments:
+            - @oro_activity_list.provider.chain
+            - @oro_activity_list.migration.extension.activity_list
+            - @oro_entity_extend.migration.entity_metadata_helper
+            - @oro_migration.db_id_name_generator
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -110 }
+
+    oro_activity_list.filter.helper:
+        class: %oro_activity_list.filter.helper.class%
+        arguments:
+            - @oro_filter.datetime_range_filter
+            - @oro_filter.choice_filter
+            - @oro_entity.routing_helper
+            - @oro_activity_list.provider.chain

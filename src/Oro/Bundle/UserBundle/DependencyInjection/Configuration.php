@@ -42,7 +42,7 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(
                         array(
                             'entity'=>array(
-                                'label' => 'Entity',
+                                'label' => 'oro.user.privileges.entity.label',
                                 'view_type' => 'grid',
                                 'types' => array('entity'),
                                 'field_type' => 'oro_acl_access_level_selector',
@@ -51,7 +51,7 @@ class Configuration implements ConfigurationInterface
                                 'show_default' => true,
                             ),
                             'action'=>array(
-                                'label' => 'Capabilities',
+                                'label' => 'oro.user.privileges.action.label',
                                 'view_type' => 'list',
                                 'types' => array('action'),
                                 'field_type' => 'oro_acl_access_level_selector',

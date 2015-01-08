@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 
 class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
@@ -65,27 +66,11 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->helper = new DatabaseHelper($registry, $this->doctrineHelper);
-    }
+        $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-    public function testFindOneBy()
-    {
-        $entity = new \stdClass();
-        $criteria = ['id' => 1];
-
-        $this->repository->expects($this->once())
-            ->method('findOneBy')
-            ->with($criteria)
-            ->will($this->returnValue($entity));
-
-        // findOneBy executed two times to check internal cache
-        $this->assertEquals($entity, $this->helper->findOneBy(self::TEST_CLASS, $criteria));
-        $this->assertEquals($entity, $this->helper->findOneBy(self::TEST_CLASS, $criteria));
-
-        // test clearing of internal cache
-        $this->assertAttributeNotEmpty('entities', $this->helper);
-        $this->helper->onClear();
-        $this->assertAttributeEmpty('entities', $this->helper);
+        $this->helper = new DatabaseHelper($registry, $this->doctrineHelper, $fieldHelper);
     }
 
     public function testFind()
@@ -180,5 +165,92 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fieldName));
 
         $this->helper->resetIdentifier($entity);
+    }
+
+    /**
+     * @param array $association
+     * @param string $expectedField
+     * @dataProvider getInversedRelationFieldNameDataProvider
+     */
+    public function testGetInversedRelationFieldName(array $association, $expectedField)
+    {
+        $fieldName = 'relation';
+
+        $this->metadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with($fieldName)
+            ->will($this->returnValue($association));
+
+        $this->assertEquals($expectedField, $this->helper->getInversedRelationFieldName(self::TEST_CLASS, $fieldName));
+    }
+
+    /**
+     * @return array
+     */
+    public function getInversedRelationFieldNameDataProvider()
+    {
+        return array(
+            'mapped by field' => array(
+                'association' => array('mappedBy' => 'field'),
+                'expectedField' => 'field',
+            ),
+            'inversed by field' => array(
+                'association' => array('inversedBy' => 'field'),
+                'expectedField' => 'field',
+            ),
+            'no inversed field' => array(
+                'association' => array(),
+                'expectedField' => null,
+            ),
+        );
+    }
+
+    /**
+     * @param string $type
+     * @param bool $expected
+     * @dataProvider isSingleInversedRelationDataProvider
+     */
+    public function testIsSingleInversedRelation($type, $expected)
+    {
+        $fieldName = 'relation';
+
+        $this->metadata->expects($this->once())
+            ->method('getAssociationMapping')
+            ->with($fieldName)
+            ->will($this->returnValue(array('type' => $type)));
+
+        $this->assertEquals($expected, $this->helper->isSingleInversedRelation(self::TEST_CLASS, $fieldName));
+    }
+
+    /**
+     * @return array
+     */
+    public function isSingleInversedRelationDataProvider()
+    {
+        return array(
+            'one to one'   => array(ClassMetadata::ONE_TO_ONE, true),
+            'one to many'  => array(ClassMetadata::ONE_TO_MANY, true),
+            'many to one'  => array(ClassMetadata::MANY_TO_ONE, false),
+            'many to many' => array(ClassMetadata::MANY_TO_MANY, false),
+        );
+    }
+
+    public function testGetEntityReference()
+    {
+        $entity = new \stdClass();
+        $reference = new \stdClass();
+        $entityName = get_class($entity);
+        $identifier = 1;
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($entity)
+            ->will($this->returnValue($identifier));
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityReference')
+            ->with($entityName, $identifier)
+            ->will($this->returnValue($reference));
+
+        $this->assertEquals($reference, $this->helper->getEntityReference($entity));
     }
 }

@@ -55,6 +55,9 @@ UPGRADE FROM 1.3 to 1.4
 - `Manager\DTO\Email` now is extended by `Oro\Bundle\EmailBundle\Model\EmailHeader`
 - In `Manager\ImapEmailManager` new method `hasCapability` has been added
 
+####ImportExportBundle:
+- Added console command `oro:import:csv` to perform import from CSV file using CLI
+
 ####InstallerBundle:
 - New option `symlink` has been added into `Command\InstallCommand` and `Command\PlatformUpdateCommand`
 
@@ -70,6 +73,11 @@ UPGRADE FROM 1.3 to 1.4
 - `Entity\Organization` now is extendable and implement  `\Serializable`
 - In `Entity\Repository\BusinessUnitRepository` new method `getOrganizationBusinessUnitsTree` has been added
 
+####PlatformBundle:
+- Some doctrine listeners can be disabled for console commands, see command `oro.platform.optional_listeners` for
+full list of optional listeners, listener manager `Manager/OptionalListenerManager` and console listener
+`EventListener/Console/OptionalListenersListener` for implementation
+
 ####QueryDesignerBundle:
 - In `QueryDesigner\JoinIdentifierHelper` new methods `isUnidirectionalJoinWithCondition` and `getUnidirectionalJoinEntityName` have been added
 
@@ -82,6 +90,8 @@ UPGRADE FROM 1.3 to 1.4
 ####SecurityBundle:
 - New method `setConfigProvider` has been added into `Acl\Voter\AclVoter`
 - New method `setClass` has been added into `Annotation\Acl`
+- New listener `EventListener\ConsoleContextListener` that allows to specify current user and organization in
+console commands
 
 ####SoapBundle:
 - New argument `$filters` in `Controller\Api\Rest\RestApiReadInterface` method `handleGetListRequest` has been added

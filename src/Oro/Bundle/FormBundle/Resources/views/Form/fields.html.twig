@@ -284,7 +284,7 @@
                 ) }}
             {%- endif -%}
 
-            {%- if is_translated_label is defined and is_translated_label -%}
+            {%- if translatable_label is defined and not translatable_label -%}
                 {{ label }}
             {%- elseif raw_label is defined and raw_label -%}
                 {{ label|raw }}
@@ -298,7 +298,7 @@
 
 {% block oro_money_row %}
     {% set label = label|trans({}, translation_domain) ~ ' (' ~ currency_symbol ~')' %}
-    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
+    {{ form_row(form, {'type': 'text', 'label': label, 'translatable_label': false}) }}
 {% endblock %}
 
 {% block oro_money_widget %}
@@ -308,7 +308,7 @@
 
 {% block percent_row %}
     {% set label = label|trans({}, translation_domain) ~ ' (%)' %}
-    {{ form_row(form, {'type': 'text', 'label': label, 'is_translated_label': true}) }}
+    {{ form_row(form, {'type': 'text', 'label': label, 'translatable_label': false}) }}
 {% endblock %}
 
 {% block percent_widget %}
@@ -346,7 +346,7 @@
                 altFormat: 'yy-mm-dd',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
                 showButtonPanel: true,
                 onSelect: function () {
                     var form = selector.parents('form');
@@ -405,7 +405,7 @@
                 altSeparator: 'T',
                 changeMonth: true,
                 changeYear: true,
-                yearRange: '-80:+1',
+                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
                 showButtonPanel: true,
                 onSelect: function () {
                     selector.trigger('change');
@@ -534,7 +534,7 @@
 
     <div class="create-select-entity-container clearfix">
         <div id="{{ btnGroupId }}" class="buttons-container">
-            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}">
+            <a href="javascript:void(0)" class="entity-select-btn" title="{{ 'Choose'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
                 <span
                     data-label="{{ 'Choose Existing'|trans }}"
                     data-alt-label-view="{{ 'Choose Another'|trans }}"
@@ -547,11 +547,11 @@
                 </span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}">
+            <a href="javascript:void(0)" class="entity-create-btn" title="{{ 'Create New'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
                 <span>{{ 'Create New'|trans }}</span>
             </a>
 
-            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}">
+            <a href="javascript:void(0)" class="entity-cancel-btn" title="{{ 'Cancel'|trans }}"{% if disabled or read_only %} disabled="disabled"{% endif %}>
                 <span>{{ 'Cancel'|trans }}</span>
             </a>
         </div>
@@ -624,10 +624,10 @@
     <div id="{{ id }}-el" class="entity-create-or-select-container {% if form.vars.create_enabled %}entity-create-enabled{% endif %}">
         <div class="input-append">
             {{ form_widget(form) }}
-            <button class="add-on btn entity-select-btn"><i class="icon-bars"></i></button>
+            <button class="add-on btn entity-select-btn"{% if disabled or read_only %} disabled="disabled"{% endif %}><i class="icon-bars"></i></button>
 
             {% if form.vars.create_enabled %}
-                <button class="btn entity-create-btn"><i class="icon-plus"></i></button>
+                <button class="btn entity-create-btn"{% if disabled or read_only %} disabled="disabled"{% endif %}><i class="icon-plus"></i></button>
             {% endif %}
         </div>
     </div>
@@ -678,9 +678,72 @@
 {% endblock %}
 
 {% block oro_link_type_widget %}
-    {% if resource_granted(acl) %}
-        <a href="{{ path(route, routeParameters) }}">
-            {{ title|trans }}
-        </a>
+    {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
+        {# @todo after BAP-4696 implementation remove link class #}
+        {% if value is defined and value is iterable%}
+            {% for fileName, route in value %}
+                <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                    {{ fileName }}
+                </a>
+            {% endfor %}
+        {% else %}
+            <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                {{ title|trans }}
+            </a>
+        {% endif %}
     {% endif %}
+{% endblock %}
+
+{% block oro_simple_color_picker_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_simple_color_picker_widget %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-picker-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
+    {% set type = 'hidden' %}
+    {{ block('form_widget_simple') }}
+{% endblock %}
+
+{% block oro_simple_color_choice_widget %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/simple-color-choice-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
+    {% if required and empty_value is none and not empty_value_in_choices and not multiple -%}
+        {% set required = false %}
+    {%- endif -%}
+    <select {{ block('widget_attributes') }}{% if multiple %} multiple="multiple"{% endif %}>
+        {% if allow_empty_color -%}
+            <option value="" class="empty-color"{% if required and value is empty %} selected="selected"{% endif %}>{{ empty_value|trans({}, translation_domain) }}</option>
+            <optgroup label="---"></optgroup>
+        {%- endif %}
+        {% set options = choices -%}
+        {{- block('oro_simple_color_choice_widget_options') -}}
+    </select>
+{% endblock %}
+
+{% block oro_simple_color_choice_widget_options %}
+    {% for group_label, choice in options %}
+        {%- if choice is iterable -%}
+            <optgroup label="{{ group_label }}"></optgroup>
+        {%- else -%}
+            <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>{{ translatable ? choice.label|trans({}, translation_domain) : choice.label }}</option>
+        {%- endif -%}
+    {% endfor %}
+{% endblock %}
+
+{% block oro_color_table_row %}
+    {{ block('form_row') }}
+{% endblock %}
+
+{% block oro_color_table_widget %}
+    {% set attr = {
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': {'view': 'oroform/js/app/views/color-table-view'}|merge(configs)|json_encode
+    }|merge(attr) %}
+    {% set type = 'hidden' %}
+    {{ block('form_widget_simple') }}
 {% endblock %}

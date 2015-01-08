@@ -24,11 +24,19 @@ class WidgetDefinitionRegistry
     /**
      * @param array $definitions
      */
-    protected function setWidgetDefinitions(array $definitions)
+    public function setWidgetDefinitions(array $definitions)
     {
         foreach ($definitions as $name => $definition) {
             $this->widgetDefinitions->set($name, $definition);
         }
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getWidgetDefinitions()
+    {
+        return $this->widgetDefinitions;
     }
 
     /**

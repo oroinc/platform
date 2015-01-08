@@ -5,6 +5,11 @@
 {% if entity_class is defined %}
     {% set buttonsPlaceholderData = {'entity_class': entity_class} %}
 {% endif %}
+
+{% block before_content_addition %}
+    {% placeholder index_before_content_addition %}
+{% endblock before_content_addition %}
+
 {% block content %}
     <div class="container-fluid page-title">
         <div class="navigation clearfix navbar-extra navbar-extra-right">

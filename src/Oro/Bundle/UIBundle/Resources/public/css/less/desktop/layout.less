@@ -1,4 +1,4 @@
-@import "mixins";
+@import "../mixins";
 html, body, #page, #top-page {
   height: 100%;
   overflow-y: visible; // prevents scroll bar appearance
@@ -9,14 +9,21 @@ html{
 .responsive-block{
   min-width: 350px;
 }
-.responsive-cell {
-  .forScreenWithSideBar(@smallScreen, float, left);
-  .forScreenWithSideBar(@smallScreen, width, 100%);
-}
 #left-panel,
 #right-panel {
   overflow: visible;
 }
 #left-panel, #right-panel, #main {
   float: left;
+}
+.desktop-version .oro-page {
+  &.collapsible-sidebar {
+    .oro-page-sidebar {
+      .dropdown-menu {
+        display: block !important;
+        z-index: inherit;
+        width: 100%;
+      }
+    }
+  }
 }

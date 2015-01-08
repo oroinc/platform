@@ -6,6 +6,7 @@
 "Requires update": "Requires update"
 "Active": "Active"
 "Deleted": "Deleted"
+"Field successfully deleted": "Field successfully deleted"
 
 oro:
     entity_extend:
@@ -50,6 +51,12 @@ oro:
             field_name.label:       Field name
             name.label:             Name
             key.label:              Key
+            target_entity:          Target entity
+            target_field:           Target field
+            relation:
+                entity_data_fields: Related entity data fields
+                entity_info_title:  Related entity info title
+                entity_detailed:    Related entity detailed
 
         enum_name:    Option Set Name
         enum_public:  Public

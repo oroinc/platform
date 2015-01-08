@@ -11,6 +11,7 @@ use JMS\Serializer\Annotation as Serializer;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
+use Oro\Bundle\WorkflowBundle\Model\EntityAwareInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
@@ -44,7 +45,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  * @ORM\HasLifecycleCallbacks()
  * @Serializer\ExclusionPolicy("all")
  */
-class WorkflowItem
+class WorkflowItem implements EntityAwareInterface
 {
     /**
      * @var integer
@@ -366,7 +367,7 @@ class WorkflowItem
     }
 
     /**
-     * @return object
+     * {@inheritdoc}
      */
     public function getEntity()
     {
@@ -458,7 +459,7 @@ class WorkflowItem
      */
     public function setAclIdentities($aclIdentities)
     {
-        $newAttributeSteps = array();
+        $newAttributeSteps = [];
         foreach ($aclIdentities as $aclIdentity) {
             $newAttributeSteps[] = $aclIdentity->getAclAttributeStepKey();
         }

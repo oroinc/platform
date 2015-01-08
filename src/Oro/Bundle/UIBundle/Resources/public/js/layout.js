@@ -10,19 +10,19 @@ define(function (require) {
         bootstrap = require('bootstrap'),
         __ = require('orotranslation/js/translator'),
         scrollspy = require('oroui/js/scrollspy'),
-        widgetControlInitializer = require('oroui/js/widget-control-initializer'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
     require('jquery-ui');
     require('jquery-ui-timepicker');
     require('jquery.uniform');
+    require('oroui/js/responsive-jquery-widget');
 
     document = window.document;
     console = window.console;
     pageRenderedCbPool = [];
 
     layout = {
-        init: function (container) {
+        init: function (container, parent) {
             var promise;
             container = $(container);
             this.styleForm(container);
@@ -31,54 +31,103 @@ define(function (require) {
 
             container.find('[data-toggle="tooltip"]').tooltip();
 
-            this.initPopover(container.find('form label'));
-            widgetControlInitializer.init(container);
+            this.initPopover(container.find('label'));
 
-            promise = this.initPageComponents(container);
+            promise = this.initPageComponents(container, parent);
             return promise;
         },
 
-        initPageComponents: function (container) {
-            var loads, initialized;
-            loads = [];
-            initialized = $.Deferred();
+        /**
+         * Initializes components defined in HTML of the container
+         * and attaches them to passed parent instance
+         *
+         * @param {jQuery.Element} container
+         * @param {Backbone.View|Chaplin.View|PageController} parent
+         * @returns {jQuery.Promise}
+         */
+        initPageComponents: function (container, parent) {
+            var loadPromises, initDeferred, pageComponentNodes, preloadQueue;
+            // console.groupCollapsed('container', container.attr('class'), {html: container.clone().html('')[0].outerHTML});
+            loadPromises = [];
+            initDeferred = $.Deferred(),
+            pageComponentNodes = container.find('[data-page-component-module]');
 
-            container.find('[data-page-component-module]').each(function () {
-                var $elem, module, options, loaded;
+            if (pageComponentNodes.length) {
+                preloadQueue = [];
+                pageComponentNodes.each(function () {
+                    var $elem, module, name, options, loadDeferred, $separateLayout;
 
-                $elem = $(this);
-                module = $elem.data('pageComponentModule');
-                options = $elem.data('pageComponentOptions');
-                options._sourceElement = $elem;
-                $elem
-                    .removeData('pageComponentModule')
-                    .removeData('pageComponentOptions')
-                    .removeAttr('data-page-component-module')
-                    .removeAttr('data-page-component-options');
-                loaded = $.Deferred();
-
-                require([module], function (component) {
-                    if (typeof component.init === "function") {
-                        loaded.resolve(component.init(options));
-                    } else {
-                        loaded.resolve(component(options));
+                    $elem = $(this);
+                    module = $elem.data('pageComponentModule');
+                    // find nearest marked container with separate layout
+                    $separateLayout = $elem.closest('[data-layout="separate"]');
+                    // if it placed inside container - prevent component creation from here
+                    if ($separateLayout.length && $.contains(container[0], $separateLayout[0])) {
+                        // optimize load time - push components to preload queue
+                        preloadQueue.push(module);
+                        return;
                     }
-                }, function () {
-                    loaded.resolve();
+
+                    // console.log('pageComponent', container.attr('class'), {html: $elem.clone().html('')[0].outerHTML});
+                    name = $elem.data('pageComponentName');
+                    options = $elem.data('pageComponentOptions') || {};
+                    options._sourceElement = $elem;
+                    if (name) {
+                        options.name = name;
+                    }
+                    options.parent = parent;
+
+                    $elem
+                        .attr('data-bound-component', module)
+                        .removeData('pageComponentModule')
+                        .removeData('pageComponentOptions')
+                        .removeAttr('data-page-component-module')
+                        .removeAttr('data-page-component-options');
+                    loadDeferred = $.Deferred();
+
+                    require([module], function (component) {
+                        if (typeof component.init === "function") {
+                            loadDeferred.resolve(component.init(options));
+                        } else {
+                            loadDeferred.resolve(component(options));
+                        }
+                    }, function (e) {
+                        var e2;
+                        if (tools.debug) {
+                            try {
+                                // rethrow of exception will not show stack - try to show it manually
+                                console.log(e.stack)
+                            } catch (e2) {
+                                // have no access to stack information, suppress
+                            }
+                            throw e;
+                        } else {
+                            // prevent interface from blocking by loader in production mode
+                            mediator.execute('showMessage', 'error',
+                                __('Cannot load module ') + '"' + e.requireModules[0] + '"'
+                            );
+                            loadDeferred.resolve();
+                        }
+                    });
+
+                    loadPromises.push(loadDeferred.promise());
                 });
 
-                loads.push(loaded.promise());
-            });
+                // optimize load time - preload components in separate layouts
+                require(preloadQueue, function (){});
 
-            $.when.apply($, loads).always(function () {
-                var initializes = _.flatten(_.toArray(arguments), true);
-                $.when.apply($, initializes).always(function () {
-                    var components = _.compact(_.flatten(_.toArray(arguments), true));
-                    initialized.resolve(components);
+                $.when.apply($, loadPromises).always(function () {
+                    var initPromises = _.flatten(_.toArray(arguments), true);
+                    $.when.apply($, initPromises).always(function () {
+                        var components = _.compact(_.flatten(_.toArray(arguments), true));
+                        initDeferred.resolve(components);
+                    });
                 });
-            });
-
-            return initialized.promise();
+            } else {
+                initDeferred.resolve();
+            }
+            // console.groupEnd();
+            return initDeferred.promise();
         },
 
         initPopover: function (container) {
@@ -144,7 +193,7 @@ define(function (require) {
             var $elements;
             if ($.isPlainObject($.uniform)) {
                 // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)');
                 $elements.uniform();
                 if ($elements.is('.error:not([multiple])')) {
                     $elements.removeClass('error').closest('.selector').addClass('error');
@@ -152,7 +201,10 @@ define(function (require) {
 
                 // bind uniform plugin to input:file elements
                 $elements = $container.find('input:file');
-                $elements.uniform({fileDefaultHtml: __('Please select a file...')});
+                $elements.uniform({
+                    fileDefaultHtml: __('Please select a file...'),
+                    fileButtonHtml: __('Choose File')
+                });
                 if ($elements.is('.error')) {
                     $elements.removeClass('error').closest('.uploader').addClass('error');
                 }
@@ -169,7 +221,7 @@ define(function (require) {
 
             // removes uniform plugin from elements
             if ($.isPlainObject($.uniform)) {
-                $elements = $container.find('select:not(.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)');
                 $.uniform.restore($elements);
             }
 
@@ -210,16 +262,17 @@ define(function (require) {
             });
 
             pageRenderedCbPool = [];
+        },
+
+        /**
+         * Update modificators of responsive elements according to their containers size
+         */
+        updateResponsiveLayout: function() {
+            _.defer(function() {
+                $(document).responsive();
+            });
         }
     };
-
-    mediator.on('grid_load:complete', function (collection, element) {
-        widgetControlInitializer.init(element);
-    });
-
-    mediator.on('grid_render:complete', function (element) {
-        widgetControlInitializer.init(element);
-    });
 
     return layout;
 });

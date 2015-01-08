@@ -13,8 +13,12 @@ parameters:
     oro_form.type.encoded_password.class:                        Oro\Bundle\FormBundle\Form\Type\OroEncodedPasswordType
     oro_form.type.textlist.class:                                Oro\Bundle\FormBundle\Form\Type\OroTextListType
     oro_form.type.oro_entity_create_or_select_inline.class:      Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
+    oro_form.type.simple_color_picker.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorPickerType
+    oro_form.type.simple_color_choice.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType
+    oro_form.type.color_table.class:                             Oro\Bundle\FormBundle\Form\Type\OroColorTableType
     oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
     oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\AbstractApiType
+    oro_form.type.rich_text.class:                               Oro\Bundle\FormBundle\Form\Type\OroRichTextType
 
     oro_form.extension.data_block.class:                         Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension
     oro_form.extension.client_validation.class:                  Oro\Bundle\FormBundle\Form\Extension\ClientValidationExtension
@@ -36,8 +40,6 @@ services:
 
     oro_form.type.datetime:
         class: %oro_form.type.datetime.class%
-        arguments:
-            - @oro_locale.settings
         tags:
             - { name: form.type, alias: oro_datetime }
 
@@ -84,7 +86,6 @@ services:
     oro_form.type.multiple_entity:
         class: %oro_form.type.multiple_entity.class%
         arguments:
-            - @doctrine.orm.entity_manager
             - @oro_security.security_facade
         tags:
             - { name: form.type, alias: oro_multiple_entity }
@@ -100,6 +101,35 @@ services:
             - @oro_entity.doctrine_helper
         tags:
             - { name: form.type, alias: oro_entity_create_or_select }
+
+    oro_form.type.simple_color_picker:
+        class: %oro_form.type.simple_color_picker.class%
+        arguments:
+            - @oro_config.global
+            - @translator
+        tags:
+            - { name: form.type, alias: oro_simple_color_picker }
+
+    oro_form.type.simple_color_choice:
+        class: %oro_form.type.simple_color_choice.class%
+        arguments:
+            - @oro_config.global
+        tags:
+            - { name: form.type, alias: oro_simple_color_choice }
+
+    oro_form.type.color_table:
+        class: %oro_form.type.color_table.class%
+        tags:
+            - { name: form.type, alias: oro_color_table }
+
+    oro_form.type.rich_text:
+        class: %oro_form.type.rich_text.class%
+        arguments:
+            - @oro_config.global
+        calls:
+            - [setAssetHelper, ["@?templating.helper.assets="]]
+        tags:
+            - { name: form.type, alias: oro_rich_text }
 
     # Form extensions
     oro_form.extension.data_block:

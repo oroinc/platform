@@ -29,14 +29,10 @@
 {% macro tagSortActions() %}
     <ul class="tag-sort-actions inline">
         <li>
-            <a href="javascript:void(0);" class="no-hash active">
-                {% trans %}All tags{% endtrans %}
-            </a>
+            <a href="javascript:void(0);" class="no-hash active">{{ 'oro.tag.menu.all_tags'|trans }}</a>
         </li>
         <li>
-            <a href="javascript:void(0);" data-type="owner" class="no-hash">
-                {% trans %}My tags{% endtrans %}
-            </a>
+            <a href="javascript:void(0);" data-type="owner" class="no-hash">{{ 'oro.tag.menu.my_tags'|trans }}</a>
         </li>
     </ul>
 {% endmacro %}

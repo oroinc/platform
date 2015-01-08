@@ -29,6 +29,10 @@ class StartWorkflowTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new StartWorkflow(new ContextAccessor(), $this->workflowManager);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     protected function tearDown()

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
@@ -40,17 +41,23 @@ class EmailTypeTest extends TypeTestCase
         $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
         $emailTemplateList = new EmailTemplateSelectType();
 
-        return array(
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $richTextType = new OroRichTextType($configManager);
+
+        return [
             new PreloadedExtension(
                 [
                     TranslatableEntityType::NAME  => $translatableType,
                     $select2ChoiceType->getName() => $select2ChoiceType,
                     $emailTemplateList->getName() => $emailTemplateList,
                     $emailAddressType->getName()  => $emailAddressType,
+                    $richTextType->getName()      => $richTextType
                 ],
                 []
             )
-        );
+        ];
     }
 
     public function testSubmitValidData()

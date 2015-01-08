@@ -15,9 +15,11 @@
     width: 60%;
     height: 420px;
   }
-  .map-address-list, .map-visual-frame {
-    .forScreen(@smallScreen, width, 100%);
-    .forScreen(@smallScreen, height, auto);
+  .responsive-small & {
+    .map-address-list, .map-visual-frame {
+      width: 100%;
+      height: auto;
+    }
   }
   .map-visual {
     height: 420px;

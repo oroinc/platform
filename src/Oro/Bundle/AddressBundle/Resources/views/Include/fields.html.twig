@@ -68,6 +68,12 @@
             </label>
         </div>
         {{ form_errors(form.email) }}
+        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+            <div class="collection-element-other clearfix">
+                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+            </div>
+            {{ form_errors(child) }}
+        {% endfor %}
     </div>
     {{ form_rest(form) }}
 {%  endblock %}
@@ -81,6 +87,12 @@
             </label>
         </div>
         {{ form_errors(form.phone) }}
+        {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+            <div class="collection-element-other clearfix">
+                {{ form_widget(child, {'attr': {'title': child.vars.label}}) }}
+            </div>
+            {{ form_errors(child) }}
+        {% endfor %}
     </div>
     {{ form_rest(form) }}
 {%  endblock %}
@@ -125,6 +137,7 @@
 {%  endblock %}
 
 {% block oro_address_collection_widget %}
+    {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-address-collection' }) %}
     {{ block('oro_collection_widget') }}
     {% set id = id ~ '_collection' %}
     {{ _self.oro_collection_validate_types_js(_context) }}

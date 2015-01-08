@@ -22,6 +22,7 @@ Table of Contents
  - [Tree Executor](#tree-executor)
  - [Foreach](#foreach)
  - [Configurable](#configurable)
+ - [Flash Message](#flash-message)
 
 Add Custom Action
 ----------------------
@@ -607,4 +608,29 @@ $configuration = array(
 $configurableAction = $actionFactory->create(Configurable::ALIAS, $configuration);
 
 $configurableAction->execute($context); // build list of actions and execute them
+```
+
+Flash Message
+-------------
+
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage
+
+**Alias:** flash_message
+
+**Parameters:**
+ - message - message itself, will be passed to translator. Required.
+ - message_parameters - message parameters, that will be passed to translator as second argument. Optional.
+ - type - message type applicable for Flash Bag. Optional, info by default.
+
+**Description:** Add flash message to session flash bag. Provides ability to show flash messages on frontend.
+Messages are passed through translator.
+
+**Configuration Example**
+```
+@flash_message:
+    message: 'Message %parameter_one%, %parameter_two%'
+    type: 'info'
+    message_parameters:
+        parameter_one: 'test'
+        parameter_two: $someEntity.name
 ```

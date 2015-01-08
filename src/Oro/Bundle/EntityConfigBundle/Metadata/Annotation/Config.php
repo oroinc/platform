@@ -17,6 +17,7 @@ class Config
     public $mode = ConfigModelManager::MODE_DEFAULT;
     public $routeName = '';
     public $routeView = '';
+    public $routeCreate = '';
     public $defaultValues = array();
 
     public function __construct(array $data)
@@ -33,6 +34,10 @@ class Config
 
         if (isset($data['routeView'])) {
             $this->routeView = $data['routeView'];
+        }
+
+        if (isset($data['routeCreate'])) {
+            $this->routeCreate = $data['routeCreate'];
         }
 
         if (isset($data['defaultValues'])) {

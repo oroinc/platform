@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\SearchBundle\EventListener;
 
+use Doctrine\ORM\Event\OnClearEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class IndexListener
+class IndexListener implements OptionalListenerInterface
 {
     /**
      * @var DoctrineHelper
@@ -42,6 +44,11 @@ class IndexListener
     protected $deletedEntities = [];
 
     /**
+     * @var bool
+     */
+    protected $enabled = true;
+
+    /**
      * @param DoctrineHelper $doctrineHelper
      * @param EngineInterface $searchEngine
      */
@@ -49,6 +56,14 @@ class IndexListener
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->searchEngine   = $searchEngine;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
     }
 
     /**
@@ -72,6 +87,10 @@ class IndexListener
      */
     public function onFlush(OnFlushEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         $entityManager = $args->getEntityManager();
         $unitOfWork = $entityManager->getUnitOfWork();
 
@@ -105,9 +124,27 @@ class IndexListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
+
         if ($this->hasEntitiesToIndex()) {
             $this->indexEntities();
         }
+    }
+
+    /**
+     * Clear object storage when error was occurred during UOW#Commit
+     *
+     * @param OnClearEventArgs $args
+     */
+    public function onClear(OnClearEventArgs $args)
+    {
+        if (!($this->enabled && $this->hasEntitiesToIndex())) {
+            return;
+        }
+
+        $this->savedEntities = $this->deletedEntities = [];
     }
 
     /**

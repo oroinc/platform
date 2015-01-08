@@ -15,7 +15,9 @@ parameters:
     oro_user.group.manager.class:                 Oro\Bundle\UserBundle\Entity\Manager\GroupManager
     oro_user.group.manager.api.class:             Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_user.autocomplete.user.search_handler:    Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
+    oro_user.autocomplete.user.search_without_current_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserWithoutCurrentHandler
     oro_user.autocomplete.user.search_acl_handler.class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
+    oro_user.autocomplete.user.organization_search_handler.class: Oro\Bundle\UserBundle\Autocomplete\OrganizationUsersHandler
     oro_user.email.owner.provider.class:          Oro\Bundle\UserBundle\Entity\Provider\EmailOwnerProvider
     oro_user.gender_provider.class:               Oro\Bundle\UserBundle\Provider\GenderProvider
     oro_user.change_password.subscriber.class:    Oro\Bundle\UserBundle\Form\EventListener\ChangePasswordSubscriber
@@ -97,20 +99,25 @@ services:
             - @doctrine.orm.entity_manager
 
     # Autocomplete acl user search handler
-    oro_user.autocomplete.user.search_acl_handler:
+    oro_user.autocomplete.user.search_acl_handler.abstract:
+        abstract: true
         class: %oro_user.autocomplete.user.search_acl_handler.class%
         arguments:
             - @doctrine.orm.entity_manager
             - @oro_attachment.manager
             - %oro_user.entity.class%
-            - ["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
             - @oro_entity_config.link.security_context
             - @oro_security.ownership_tree_provider
             - @?security.acl.voter.basic_permissions
         calls:
             - [ setNameFormatter, [@oro_locale.formatter.name] ]
+
+    oro_user.autocomplete.user.search_acl_handler:
+        parent: oro_user.autocomplete.user.search_acl_handler.abstract
+        calls:
+            - [ setProperties, [["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]] ]
         tags:
-            - { name: oro_form.autocomplete.search_handler, alias: acl_users, acl_resource: oro_user_user_view }
+            - { name: oro_form.autocomplete.search_handler, alias: acl_users }
         lazy: true
 
     # Autocomplete search handler
@@ -123,6 +130,26 @@ services:
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
+
+    # Autocomplite search user handler limit by current organization
+    oro_user.autocomplete.user.organization_search_handler:
+        class: %oro_user.autocomplete.user.organization_search_handler.class%
+        parent: oro_user.autocomplete.user.search_handler
+        calls:
+           - [setSecurityFacade, [@oro_security.security_facade]]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: organization_users, acl_resource: oro_user_user_view }
+
+    oro_user.autocomplete.user.search_without_current_handler:
+        class: %oro_user.autocomplete.user.search_without_current_handler.class%
+        parent: oro_form.autocomplete.full_name.search_handler
+        arguments:
+            - @oro_security.security_facade
+            - @oro_attachment.manager
+            - %oro_user.entity.class%
+            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
 
     oro_user.gender_provider:
         class: %oro_user.gender_provider.class%

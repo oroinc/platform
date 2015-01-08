@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\OrganizationBundle\ImportExport\TemplateFixture;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OrganizationFixture extends AbstractTemplateRepository
 {
     /**
-     * @var ManagerRegistry
+     * @var SecurityFacade
      */
-    protected $registry;
+    protected $securityFacade;
 
     /**
      * @var Organization
@@ -20,11 +19,11 @@ class OrganizationFixture extends AbstractTemplateRepository
     protected $defaultOrganization;
 
     /**
-     * @param ManagerRegistry $registry
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(SecurityFacade $securityFacade)
     {
-        $this->registry = $registry;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -44,19 +43,6 @@ class OrganizationFixture extends AbstractTemplateRepository
     }
 
     /**
-     * @return Organization
-     */
-    protected function getDefaultOrganization()
-    {
-        if (!$this->defaultOrganization) {
-            $repository = $this->registry->getRepository('OroOrganizationBundle:Organization');
-            $this->defaultOrganization = $repository->findOneBy([], ['id' => 'asc']);
-        }
-
-        return $this->defaultOrganization;
-    }
-
-    /**
      * @param string       $key
      * @param Organization $entity
      */
@@ -64,7 +50,10 @@ class OrganizationFixture extends AbstractTemplateRepository
     {
         switch ($key) {
             case 'default':
-                $entity->setName($this->getDefaultOrganization()->getName());
+                $organization = $this->securityFacade->getOrganization();
+                if ($organization) {
+                    $entity->setName($organization->getName());
+                }
                 return;
         }
 

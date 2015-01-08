@@ -1,11 +1,11 @@
 {% extends 'OroDistributionBundle::base_inner.html.twig' %}
 
-{% block title %}Composer Settings{% endblock %}
+{% block title %}{{ 'oro.distribution.menu.composer_settings'|trans }}{% endblock %}
 
 {% block menu %}
     <a id="back-to-installed" href="{{ path('oro_distribution_package_listinstalled') }}">
         <i class="icon icon-reply"></i>
-        Back to Installed Packages
+        {{ 'Back to Installed Packages'|trans }}
     </a>
 {% endblock %}
 
@@ -14,7 +14,7 @@
         <div class="alert fade in alert-success">
             <i class="icon icon-success"></i>
             <button type="button" class="close" data-dismiss="alert">&times;</button>
-            The settings were saved.
+            {{ 'oro.distribution.messages.settings_saved'|trans }}
         </div>
     {% endif %}
 

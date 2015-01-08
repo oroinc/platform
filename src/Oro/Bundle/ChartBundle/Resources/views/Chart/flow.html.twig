@@ -1,35 +1,11 @@
 {% import 'OroChartBundle::macros.html.twig' as chart %}
 
 {% if data|length>0  %}
-    {% if isDesktopVersion() %}
-        {# for desktop version #}
-        {{ chart.renderChart(data, options, config, isMobileVersion()) }}
-    {% else %}
-        {# for mobile version #}
-        <div class="funnel-data">
-            <ul>
-                {% for item in data %}
-                    {% if item.isNozzle %}
-                        <li>{{ item.label }}: <b>{{ item.value|oro_format_currency }}</b></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-            <h5>{{ 'from'|trans }} {{ options.settings.quarterDate|oro_format_date }}</h5>
-            <ul>
-                {% for item in data %}
-                    {% if item.isNozzle %}
-                        <li>{{ item.label }}: <b>{{ item.value|oro_format_currency }}</b></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </div>
-    {% endif %}
+    {{ chart.renderChart(data, options, config, isMobileVersion()) }}
 {% else %}
-    <div class="container-fluid grid-container-parent">
-        <div class="grid-container">
-            <div class="clearfix no-data">
-                <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
-            </div>
+    <div class="container-fluid">
+        <div class="clearfix no-data">
+            <span>{{ 'oro.dashboard.no_data_found'|trans }}</span>
         </div>
     </div>
 {% endif %}

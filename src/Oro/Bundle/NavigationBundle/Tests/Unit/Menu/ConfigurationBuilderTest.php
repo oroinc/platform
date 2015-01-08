@@ -4,16 +4,12 @@ namespace Oro\Bundle\NavigationBundle\Tests\Unit\Menu;
 
 use Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension;
 use Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder;
-use Symfony\Component\DependencyInjection\Container;
+use Oro\Component\Config\Resolver\SystemAwareResolver;
+
 use Knp\Menu\MenuItem;
 
 class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Container $container
-     */
-    protected $container;
-
     /**
      * @var ConfigurationBuilder $configurationBuilder
      */
@@ -26,8 +22,8 @@ class ConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->container = new Container();
-        $this->configurationBuilder = new ConfigurationBuilder();
+        $resolver = new SystemAwareResolver();
+        $this->configurationBuilder = new ConfigurationBuilder($resolver);
 
         $this->factory = $this->getMockBuilder('Knp\Menu\MenuFactory')
             ->setMethods(array('getRouteInfo', 'processRoute'))

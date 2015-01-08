@@ -33,27 +33,27 @@ class TranslationServiceProvider
     protected $databasePersister;
 
     /** @var string */
-    protected $rootDir;
+    protected $cacheDir;
 
     /**
      * @param AbstractAPIAdapter  $adapter
      * @param JsTranslationDumper $jsTranslationDumper
      * @param TranslationLoader   $translationLoader
      * @param DatabasePersister   $databasePersister
-     * @param string              $rootDir
+     * @param string              $cacheDir
      */
     public function __construct(
         AbstractAPIAdapter $adapter,
         JsTranslationDumper $jsTranslationDumper,
         TranslationLoader $translationLoader,
         DatabasePersister $databasePersister,
-        $rootDir
+        $cacheDir
     ) {
         $this->adapter             = $adapter;
         $this->jsTranslationDumper = $jsTranslationDumper;
         $this->translationLoader   = $translationLoader;
         $this->databasePersister   = $databasePersister;
-        $this->rootDir             = $rootDir;
+        $this->cacheDir            = $cacheDir;
 
         $this->setLogger(new NullLogger());
     }
@@ -119,10 +119,10 @@ class TranslationServiceProvider
         $finder = Finder::create()->files()->name('*.yml')->in($dir);
 
         /** $file \SplFileInfo */
-        $files = array();
+        $files = [];
         foreach ($finder->files() as $file) {
             // crowdin understand only "/" as directory separator :)
-            $apiPath         = str_replace(array($dir, DIRECTORY_SEPARATOR), array('', '/'), (string)$file);
+            $apiPath         = str_replace([$dir, DIRECTORY_SEPARATOR], ['', '/'], (string)$file);
             $files[$apiPath] = (string)$file;
         }
 
@@ -310,10 +310,14 @@ class TranslationServiceProvider
      *
      * @return string
      */
-    protected function getTmpDir($prefix)
+    public function getTmpDir($prefix)
     {
-        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $path = $path . ltrim(uniqid($prefix), DIRECTORY_SEPARATOR);
+        $pathParts = [
+            rtrim($this->cacheDir, DIRECTORY_SEPARATOR),
+            'translations',
+            ltrim(uniqid($prefix), DIRECTORY_SEPARATOR)
+        ];
+        $path = implode(DIRECTORY_SEPARATOR, $pathParts);
 
         if (!is_dir($path)) {
             mkdir($path, 0777, true);

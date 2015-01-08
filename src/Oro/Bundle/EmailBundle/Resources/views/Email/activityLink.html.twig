@@ -1,0 +1,28 @@
+{{ UI.clientLink({
+    'dataUrl': path(
+        'oro_email_email_create', {
+            to: oro_get_email(entity),
+            entityClass: oro_class_name(entity, true),
+            entityId: entity.id
+    }),
+    'aCss': 'no-hash',
+    'iCss': 'icon-envelope',
+    'dataId': entity.id,
+    'label' : 'oro.email.send_email'|trans,
+    'widget' : {
+        'type' : 'dialog',
+        'multiple' : true,
+        'refresh-widget-alias': 'activity-list-widget',
+        'options' : {
+            'alias': 'email-dialog',
+            'dialogOptions' : {
+                'title' : 'oro.email.send_email'|trans,
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 1000
+            }
+        }
+    }
+}) }}

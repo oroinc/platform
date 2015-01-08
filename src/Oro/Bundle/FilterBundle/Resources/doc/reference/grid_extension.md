@@ -25,6 +25,8 @@ For example:
                 SOME_FITLER_NAME: # uses for query param, and for setting default filters
                     type: string  # Filter type, list of available types described below
                     data_name: g.id
+                    enabled: true|false #whether filter enabled or not. If filter is not enabled it will not be displayed in filter list but will be accessible in filter management.
+                    disabled: true|false #If filter is disabled it will not be displayed in filter list and will not be available in filter management.
 
 ```
 

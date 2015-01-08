@@ -1,8 +1,8 @@
 {% if isDesktopVersion() %}
-    {% placeholder organization_selector %}
+    <div id="organization-switcher">{% placeholder organization_selector %}</div>
 {% else %}
     <span id="main-menu-toggle">
         <i class="icon-menu-bars"></i>
     </span>
-    {% placeholder organization_selector %}
+    <div id="organization-switcher">{% placeholder organization_selector %}</div>
 {% endif %}

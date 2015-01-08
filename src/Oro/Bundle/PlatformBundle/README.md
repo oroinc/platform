@@ -88,3 +88,22 @@ doctrine:
 ```
 
 Please note that setting added through _app.yml_ can be overwrote in _app/config.yml_. So, you can consider settings in _app.yml_ as default ones.
+
+
+## Optional Doctrine listeners ##
+
+Doctrine listeners can be a very slow processes. And during console command execution, you can disable this listeners.
+
+Each console command have additional option `disabled_listeners`. Using this option, you can disable some of doctrine listeners.
+
+As value, this option takes `all` string or array of optional doctrine listener services. In the first case, will be disabled all optional listeners. In the second case, will be disabled only the specified listeners. For example:
+
+```
+ app/console some.command --disabled_listeners=first_listener --disabled_listeners=second_listener
+```
+
+In this case, command will be run with disabled doctrine listeners: first_listener and second_listener.
+
+See the list of optional listeners you can by run command `oro:platform:optional-listeners`.
+
+To mark your doctrine listener as optional, your listener must implement `Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface` interface and set skips in your code if $enabled = false.

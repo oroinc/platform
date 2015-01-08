@@ -76,9 +76,6 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $extendConfigProvider->expects($this->once())
-            ->method('persist')
-            ->with($this->identicalTo($entityConfig));
 
         $this->configManager->expects($this->once())
             ->method('getProvider')
@@ -94,6 +91,9 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                 $fieldName,
                 'id',
                 [
+                    'extend'       => [
+                        'cascade' => ['persist']
+                    ],
                     'importexport' => [
                         'process_as_scalar' => true
                     ]
@@ -103,11 +103,63 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($relationKey));
 
         $this->extension->preUpdate();
+    }
 
-        $this->assertEquals(
-            ['persist'],
-            $entityConfig->get('relation')[$relationKey]['cascade']
-        );
+    /**
+     * @dataProvider preUpdateProvider
+     */
+    public function testPreUpdateWithCascade($fieldType)
+    {
+        $entityClass = 'Test\Entity';
+        $fieldName   = 'test_field';
+
+        $entityConfig = new Config(new EntityConfigId('extend', $entityClass));
+        $entityConfig->set('is_extend', true);
+
+        $fieldConfig = new Config(new FieldConfigId('extend', $entityClass, $fieldName, $fieldType));
+        $fieldConfig->set('state', ExtendScope::STATE_NEW);
+        $fieldConfig->set('cascade', ['persist', 'remove']);
+
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$entityConfig]],
+                        [$entityClass, false, [$fieldConfig]],
+                    ]
+                )
+            );
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
+
+        $relationKey = 'test_relation_key';
+        $this->relationBuilder->expects($this->once())
+            ->method('addManyToOneRelation')
+            ->with(
+                $this->identicalTo($entityConfig),
+                'Oro\Bundle\AttachmentBundle\Entity\File',
+                $fieldName,
+                'id',
+                [
+                    'extend'       => [
+                        'cascade' => ['persist', 'remove']
+                    ],
+                    'importexport' => [
+                        'process_as_scalar' => true
+                    ]
+                ],
+                $fieldType
+            )
+            ->will($this->returnValue($relationKey));
+
+        $this->extension->preUpdate();
     }
 
     public function preUpdateProvider()

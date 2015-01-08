@@ -4,6 +4,22 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
     ], function (_, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
+    var PageableCollection, stateShortKeys;
+
+    /**
+     * Object declares state keys that will be involved in URL-state saving with their shorthands
+     *
+     * @property {Object}
+     */
+    stateShortKeys = {
+        currentPage: 'i',
+        pageSize: 'p',
+        sorters: 's',
+        filters: 'f',
+        gridView: 'v',
+        gridParams: 'g'
+    };
+
     /**
      * Pageable collection
      *
@@ -16,7 +32,7 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
      * @class   orodatagrid.PageableCollection
      * @extends Backbone.PageableCollection
      */
-    var PageableCollection = BackbonePageableCollection.extend({
+    PageableCollection = BackbonePageableCollection.extend({
         /**
          * Basic model to store row data
          *
@@ -581,8 +597,78 @@ define(['underscore', 'backbone', 'backbone-pageable-collection', 'oroui/js/tool
             newCollection.state = tools.deepClone(this.state);
             newCollection.initialState = tools.deepClone(this.initialState);
             return newCollection;
+        },
+
+        /**
+         * Fetches value for a state hash
+         *  - this value is used to preserve collection state in URL
+         *
+         * @param {boolean=} purge If true, clears value from initial state
+         * @param {Object|null} gridParams
+         * @returns {string|null}
+         */
+        stateHashValue: function (purge, gridParams) {
+            var hash;
+            hash = PageableCollection.encodeStateData(this.state);
+            if (purge && hash === PageableCollection.encodeStateData(this.initialState)) {
+                // if the state is the same as initial, remove URL param for grid state
+                hash = null;
+            }
+            if (gridParams) {
+                this.state.gridParams = gridParams;
+                hash = PageableCollection.encodeStateData(this.state);
+            }
+
+            return hash;
+        },
+
+        /**
+         * Fetches key for a state hash
+         *
+         * @returns {string}
+         */
+        stateHashKey: function () {
+            return PageableCollection.stateHashKey(this.inputName);
         }
     });
+
+    /**
+     * Generates name of URL parameter for collection state
+     *
+     * @static
+     * @param {string} inputName
+     * @returns {string}
+     */
+    PageableCollection.stateHashKey = function (inputName) {
+        return 'grid[' + inputName + ']';
+    };
+
+    /**
+     * Encode state object to string
+     *
+     * @static
+     * @param {Object} stateObject
+     * @return {string}
+     */
+    PageableCollection.encodeStateData = function (stateObject) {
+        var data;
+        data = _.pick(stateObject, _.keys(stateShortKeys));
+        data = tools.invertKeys(data, stateShortKeys);
+        return tools.packToQueryString(data);
+    };
+
+    /**
+     * Decode state object from string, operation is invert for encodeStateData.
+     *
+     * @static
+     * @param {string} stateString
+     * @return {Object}
+     */
+    PageableCollection.decodeStateData = function (stateString) {
+        var data = tools.unpackFromQueryString(stateString);
+        data = tools.invertKeys(data, _.invert(stateShortKeys));
+        return data;
+    };
 
     return PageableCollection;
 });

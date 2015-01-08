@@ -16,7 +16,6 @@
         'oro_config_configuration_system',
         {activeGroup: activeGroup, activeSubGroup: activeSubGroup}
     ) %}
-
     <form
         id="{{ form.vars.name }}"
         {{ form_enctype(form) }}
@@ -41,7 +40,7 @@
                     $checkboxes = $form.find('.parent-scope-checkbox input'),
                     confirm = new Modal({
                         title: __('Confirmation'),
-                        okText: __('Ok'),
+                        okText: __('OK'),
                         cancelText: __('Cancel'),
                         content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
                         className: 'modal modal-primary',

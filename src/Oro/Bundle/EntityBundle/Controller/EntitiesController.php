@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -42,7 +42,7 @@ class EntitiesController extends Controller
      */
     public function indexAction($entityName)
     {
-        $entityClass = str_replace('_', '\\', $entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -83,7 +83,7 @@ class EntitiesController extends Controller
      */
     public function detailedAction($id, $entityName, $fieldName)
     {
-        $entityClass = str_replace('_', '\\', $entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -154,7 +154,7 @@ class EntitiesController extends Controller
      */
     public function relationAction($id, $entityName, $fieldName)
     {
-        $entityClass = str_replace('_', '\\', $entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -202,7 +202,7 @@ class EntitiesController extends Controller
      */
     public function viewAction($entityName, $id)
     {
-        $entityClass = str_replace('_', '\\', $entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -246,7 +246,7 @@ class EntitiesController extends Controller
      */
     public function updateAction(Request $request, $entityName, $id)
     {
-        $entityClass = str_replace('_', '\\', $entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();
@@ -269,7 +269,7 @@ class EntitiesController extends Controller
             'custom_entity_type',
             $record,
             array(
-                'class_name'   => $entityClass,
+                'data_class'   => $entityClass,
                 'block_config' => array(
                     'general' => array(
                         'title' => 'General'
@@ -324,7 +324,7 @@ class EntitiesController extends Controller
      */
     public function deleteAction($entityName, $id)
     {
-        $entityClass = str_replace('_', '\\', $entityName);
+        $entityClass = $this->get('oro_entity.routing_helper')->decodeClassName($entityName);
 
         if (!class_exists($entityClass)) {
             throw $this->createNotFoundException();

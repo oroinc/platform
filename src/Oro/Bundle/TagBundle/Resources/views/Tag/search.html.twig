@@ -17,45 +17,48 @@
 
 {% block content %}
     <div class="container-fluid search-header clearfix">
-        <h2 style="width: auto">
-            {% trans with {'%name%': tag.name|escape} %}Records tagged as "%name%"{% endtrans %}
-        </h2>
+        <h2 style="width: auto">{{ 'oro.tag.datagrid.search_result'|trans({'%name%': tag.name|escape})|raw }}</h2>
     </div>
 
     {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
-    <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-            <td class="search-entity-types-column">
+        <div class="oro-page collapsible-sidebar clearfix">
+            <div class="oro-page-sidebar search-entity-types-column dropdown">
+                <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-filter"></i>
+                    {% if selectedResult.class %}{{ selectedResult.label }}{% else %}{{ 'oro.search.result.all'|trans }}{% endif %}
+                    ({{ selectedResult.count }}) <i class="icon-sort-down"></i>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                 {% for alias, type in groupedResults %}
-                    {% set selected, label, iconClass = alias == from, type.label, type.icon %}
-
-                    {% if alias == '' %}
-                        {% set label, iconClass = 'All', 'icon-search' %}
+                    {% set selected = alias == from %}
+                    {% if type.class %}
+                        {% set label = type.label %}
+                        {% set iconClass = type.icon %}
+                    {% else %}
+                        {% set label = 'oro.search.result.all'|trans %}
+                        {% set iconClass = 'icon-search' %}
                     {% endif %}
 
-                    <div class="entity-type{% if selected %} selected{% endif %}">
-                        {% if selected %}
-                            {{ label }} ({{ type.count }})
+                    {% if iconClass is empty %}
+                        {% set iconClass = 'icon-file' %}
+                    {% endif %}
+
+                    <li class="entity-type{% if selected %} selected{% endif %}">
+                        <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
+                            {% if selected %}<i class="icon-chevron-right arrow"></i>{% endif %}
                             <i class="{{ iconClass }}"></i>
-                            <div class="arrow">
-                              <i class="icon-chevron-right"></i>
-                            </div>
-                        {% else %}
-                            <a href="{{ path('oro_tag_search', { from: alias, id: tag.id }) }}">
-                              <i class="{{ iconClass }}"></i>
-                              {{ label }} ({{ type.count }})
-                            </a>
-                        {% endif %}
-                    </div>
+                            {{ label }} ({{ type.count }})
+                        </a>
+                    </li>
                 {% endfor %}
-            </td>
-            <td class="tag-search-results-column">
+                </ul>
+            </div>
+            <div class="oro-page-body search-results-column">
                 <div id="tag-search-results-grid">
                     {{ dataGrid.renderGrid(gridName, {from: from, tag_id: tag.id}, { cssClass: 'tag-search-grid' }) }}
                 </div>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
     {% else %}
     <div class="search-no-results">
         {% trans %}No results were found.{% endtrans %}

@@ -139,10 +139,10 @@ class SearchHandler implements SearchHandlerInterface
             $items = array_slice($items, 0, $perPage - 1);
         }
 
-        return array(
+        return [
             'results' => $this->convertItems($items),
             'more'    => $hasMore
-        );
+        ];
     }
 
     /**
@@ -167,17 +167,27 @@ class SearchHandler implements SearchHandlerInterface
     {
         $entityIds = $this->searchIds($search, $firstResult, $maxResults);
 
-        $resultEntities = array();
+        $resultEntities = [];
 
         if ($entityIds) {
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = $this->entityRepository->createQueryBuilder('e');
-            $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-            $query = $this->aclHelper->apply($queryBuilder, 'ASSIGN');
-            $resultEntities = $query->getResult();
+            $resultEntities = $this->getEntitiesByIds($entityIds);
         }
 
         return $resultEntities;
+    }
+
+    /**
+     * @param array $entityIds
+     * @return array
+     */
+    protected function getEntitiesByIds(array $entityIds)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->entityRepository->createQueryBuilder('e');
+        $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
+        $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
+
+        return $query->getResult();
     }
 
     /**
@@ -191,7 +201,7 @@ class SearchHandler implements SearchHandlerInterface
         $result   = $this->indexer->simpleSearch($search, $firstResult, $maxResults, $this->entitySearchAlias);
         $elements = $result->getElements();
 
-        $ids = array();
+        $ids = [];
         foreach ($elements as $element) {
             $ids[] = $element->getRecordId();
         }
@@ -208,11 +218,7 @@ class SearchHandler implements SearchHandlerInterface
      */
     protected function findById($query)
     {
-        $items = [
-            $this->entityRepository->find($query)
-        ];
-
-        return $items;
+        return $this->getEntitiesByIds(explode(',', $query));
     }
 
 
@@ -222,7 +228,7 @@ class SearchHandler implements SearchHandlerInterface
      */
     protected function convertItems(array $items)
     {
-        $result = array();
+        $result = [];
         foreach ($items as $item) {
             $result[] = $this->convertItem($item);
         }
@@ -234,7 +240,7 @@ class SearchHandler implements SearchHandlerInterface
      */
     public function convertItem($item)
     {
-        $result = array();
+        $result = [];
 
         if ($this->idFieldName) {
             $result[$this->idFieldName] = $this->getPropertyValue($this->idFieldName, $item);

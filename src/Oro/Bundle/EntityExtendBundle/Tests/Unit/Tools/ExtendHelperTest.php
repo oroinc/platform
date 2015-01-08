@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendHelperTest extends \PHPUnit_Framework_TestCase
@@ -252,10 +251,10 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     public static function buildEnumValueClassNameProvider()
     {
         return [
-            ['test', ExtendConfigDumper::ENTITY . 'EV_Test'],
-            ['test_123', ExtendConfigDumper::ENTITY . 'EV_Test_123'],
-            ['test_enum', ExtendConfigDumper::ENTITY . 'EV_Test_Enum'],
-            ['testenum', ExtendConfigDumper::ENTITY . 'EV_Testenum'],
+            ['test', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test'],
+            ['test_123', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_123'],
+            ['test_enum', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum'],
+            ['testenum', ExtendHelper::ENTITY_NAMESPACE . 'EV_Testenum'],
         ];
     }
 
@@ -322,6 +321,31 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             ['Oro\Bundle\TestBundle\Entity\Test', 'Test'],
             ['Acme\Bundle\TestBundle\Entity\Test', 'Test'],
             ['Test', 'Test'],
+        ];
+    }
+
+    /**
+     * @dataProvider getExtendEntityProxyClassNameProvider
+     */
+    public function testGetExtendEntityProxyClassName($className, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ExtendHelper::getExtendEntityProxyClassName($className)
+        );
+    }
+
+    public static function getExtendEntityProxyClassNameProvider()
+    {
+        return [
+            [
+                'Oro\Bundle\EntityExtendBundle\Model\ExtendTestClass',
+                ExtendHelper::ENTITY_NAMESPACE . 'EX_OroEntityExtendBundle_TestClass'
+            ],
+            [
+                'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\ExtendTestClass',
+                ExtendHelper::ENTITY_NAMESPACE . 'EX_OroEntityExtendBundle_Tests_Unit_Fixtures_TestClass'
+            ],
         ];
     }
 }

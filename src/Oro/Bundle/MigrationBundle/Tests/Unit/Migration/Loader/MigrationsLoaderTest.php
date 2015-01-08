@@ -4,6 +4,7 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Loader;
 
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Event\PreMigrationEvent;
+use Oro\Bundle\MigrationBundle\Migration\MigrationState;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPackageTest1Bundle;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
 
@@ -87,16 +88,24 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedMigrationClasses, $migrationClasses);
     }
 
+    /**
+     * @param MigrationState[] $migrations
+     *
+     * @return string[]
+     */
     protected function getMigrationClasses(array $migrations)
     {
         return array_map(
             function ($migration) {
-                return get_class($migration);
+                return get_class($migration->getMigration());
             },
             $migrations
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function getMigrationsProvider()
     {
         $testPackage = 'Oro\\Bundle\\MigrationBundle\\Tests\\Unit\\Fixture\\TestPackage\\';
@@ -191,7 +200,9 @@ class MigrationsLoaderTest extends \PHPUnit_Framework_TestCase
                     ['bundle' => 'TestPackageTest1Bundle', 'version' => 'v1_1'],
                     ['bundle' => 'TestPackageTest2Bundle', 'version' => 'v1_1'],
                 ],
-                []
+                [
+                    'Oro\Bundle\MigrationBundle\Migration\UpdateBundleVersionMigration',
+                ]
             ],
         ];
     }

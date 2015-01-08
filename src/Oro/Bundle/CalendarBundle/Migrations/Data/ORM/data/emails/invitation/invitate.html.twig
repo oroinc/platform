@@ -1,0 +1,14 @@
+@name = calendar_invitation_invite
+@entityName = Oro\Bundle\CalendarBundle\Entity\CalendarEvent
+@subject = Invitation: {{ entity.title }}
+@isSystem = 1
+@isEditable = 1
+
+<h1>{{ entity.title }}</h1>
+<div>
+    {{ entity.parent.calendar.owner|oro_format_name|default('N/A') }} has sent you an invitation to {{ entity.title }}.
+    <p><i>Start date:</i> {{ entity.start|date('F j, Y, g:i A') }}</p>
+    <p><i>End date:</i> {{ entity.end|date('F j, Y, g:i A') }}</p>
+    <p><i>Description:</i>{{ entity.description }}</p>
+    <p>Please follow this link to respond to invitation in OroCRM: <a href="{{ oro_config_value('oro_ui.application_url') }}{{ path('oro_calendar_event_view', {'id': entity.id}) }}">respond</a></p>
+</div>

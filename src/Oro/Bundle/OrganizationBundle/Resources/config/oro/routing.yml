@@ -12,3 +12,16 @@ oro_organziation_api:
         _format:  json
     defaults:
         version:  latest
+
+# deprecated API route
+oro_api_post_businessunit_deprecated:
+    path:            /api/rest/{version}/businessunit.{_format}
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\OrganizationBundle\Controller\Api\Rest\BusinessUnitController::postAction
+        _format:     json
+        version:     latest
+    requirements:
+        _format:     json
+        version:     latest|v1
+

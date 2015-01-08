@@ -227,12 +227,13 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
         },
 
         renderWidget: function() {
+            var widget = this;
             if (!this.widget) {
                 var title = this.model.get('name') ? __('Edit transition') : __('Add new transition');
                 if (this.model.get('_is_clone')) {
                     title = __('Clone transition');
                 }
-                this.widget = new DialogWidget({
+                this.widget = widget = new DialogWidget({
                     'title': title,
                     'el': this.$el,
                     'stateEnabled': false,
@@ -244,7 +245,7 @@ function(_, __, Backbone, DialogWidget, Helper, AttributeFormOptionEditView, Att
                     }
                 });
                 this.listenTo(this.widget, 'renderComplete', function(el) {
-                    mediator.execute('layout:init', el);
+                    mediator.execute('layout:init', el, widget);
                 });
                 this.widget.render();
             } else {

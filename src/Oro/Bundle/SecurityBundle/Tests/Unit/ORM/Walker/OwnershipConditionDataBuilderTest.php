@@ -286,12 +286,12 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit_Framework_TestCase
                 'ORGANIZATION',
                 self::TEST_ENTITY,
                 array(
-                    'owner',
-                    array('org4'),
-                    PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION,
+                    null,
+                    null,
+                    null,
                     'organization',
                     'org4',
-                    false
+                    true
                 )
             ),
             'for the TEST entity with GLOBAL ACL, userId, grant and BUSINESS_UNIT ownerType' => array(

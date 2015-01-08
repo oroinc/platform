@@ -3,65 +3,55 @@
 namespace Oro\Bundle\NavigationBundle\Event;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\EntityBundle\Event\OroEventManager;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
-use Oro\Bundle\EntityBundle\Event\OroEventManager;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 class ResponseHistoryListener
 {
-    /**
-     * @var null|\Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
-     */
-    protected $navItemFactory = null;
+    const HISTORY_ITEM_FQCN = 'Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem';
+
+    /** ItemFactory */
+    protected $navItemFactory;
+
+    /** @var SecurityContextInterface */
+    protected $securityContext;
+
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var TitleServiceInterface */
+    protected $titleService;
 
     /**
-     * @var \Symfony\Component\Security\Core\User\User|String
+     * @param ItemFactory              $navigationItemFactory
+     * @param SecurityContextInterface $securityContext
+     * @param ManagerRegistry          $registry
+     * @param TitleServiceInterface    $titleService
      */
-    protected $user = null;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager|null
-     */
-    protected $entityManager = null;
-
-    /**
-     * @var TitleServiceInterface
-     */
-    protected $titleService = null;
-
-    /**
-     * @var Organization
-     */
-    protected $organization;
-
     public function __construct(
         ItemFactory $navigationItemFactory,
         SecurityContextInterface $securityContext,
-        EntityManager $entityManager,
+        ManagerRegistry $registry,
         TitleServiceInterface $titleService
     ) {
-        $this->navItemFactory = $navigationItemFactory;
-        $this->user           = !$securityContext->getToken() || is_string($securityContext->getToken()->getUser())
-            ? null : $securityContext->getToken()->getUser();
-
-        $token = $securityContext->getToken() ? $securityContext->getToken() : null;
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $this->organization = $securityContext->getToken()->getOrganizationContext();
-        }
-
-        $this->entityManager = $entityManager;
-        $this->titleService  = $titleService;
+        $this->navItemFactory  = $navigationItemFactory;
+        $this->securityContext = $securityContext;
+        $this->registry        = $registry;
+        $this->titleService    = $titleService;
     }
 
     /**
@@ -78,24 +68,32 @@ class ResponseHistoryListener
             return null;
         }
 
+        /** @var EntityManager $em */
+        $em       = $this->registry->getManagerForClass(self::HISTORY_ITEM_FQCN);
         $request  = $event->getRequest();
         $response = $event->getResponse();
+        $token    = $this->securityContext->getToken();
+        $user     = $organization = null;
+        if ($token instanceof TokenInterface) {
+            $user = $token->getUser();
+        }
+        if ($token instanceof OrganizationContextTokenInterface) {
+            $organization = $token->getOrganizationContext();
+        }
 
         // check if a current request can be added to a history
-        if (!$this->canAddToHistory($response, $request)) {
+        if (!$this->canAddToHistory($response, $request, $user)) {
             return false;
         }
 
-        $postArray = array(
+        $postArray = [
             'url'          => $request->getRequestUri(),
-            'user'         => $this->user,
-            'organization' => $this->organization
-        );
+            'user'         => $user,
+            'organization' => $organization
+        ];
 
         /** @var $historyItem  NavigationHistoryItem */
-        $historyItem = $this->entityManager
-            ->getRepository('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')
-            ->findOneBy($postArray);
+        $historyItem = $em->getRepository(self::HISTORY_ITEM_FQCN)->findOneBy($postArray);
 
         if (!$historyItem) {
             $routeParameters = $request->get('_route_params');
@@ -125,13 +123,13 @@ class ResponseHistoryListener
         $historyItem->doUpdate();
 
         // disable Doctrine events for history item processing
-        $eventManager = $this->entityManager->getEventManager();
+        $eventManager = $em->getEventManager();
         if ($eventManager instanceof OroEventManager) {
             $eventManager->disableListeners('^Oro');
         }
 
-        $this->entityManager->persist($historyItem);
-        $this->entityManager->flush($historyItem);
+        $em->persist($historyItem);
+        $em->flush($historyItem);
 
         if ($eventManager instanceof OroEventManager) {
             $eventManager->clearDisabledListeners();
@@ -143,20 +141,20 @@ class ResponseHistoryListener
     /**
      * Is request valid for adding to history
      *
-     * @param  Response $response
-     * @param  Request  $request
+     * @param Response $response
+     * @param Request  $request
+     * @param          $user
      *
      * @return bool
      */
-    private function canAddToHistory(Response $response, Request $request)
+    private function canAddToHistory(Response $response, Request $request, $user = null)
     {
-        $result =
-            $response->getStatusCode() == 200
+        $result = $response->getStatusCode() == 200
             && $request->getRequestFormat() == 'html'
             && $request->getMethod() == 'GET'
             && (!$request->isXmlHttpRequest()
                 || $request->headers->get(ResponseHashnavListener::HASH_NAVIGATION_HEADER))
-            && $this->user;
+            && ($user instanceof UserInterface);
 
         if ($result) {
             $route  = $request->get('_route');
@@ -165,8 +163,7 @@ class ResponseHistoryListener
 
         if ($result && $response->headers->has('Content-Disposition')) {
             $contentDisposition = $response->headers->get('Content-Disposition');
-            $result =
-                (strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_INLINE) !== 0)
+            $result             = (strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_INLINE) !== 0)
                 && (strpos($contentDisposition, ResponseHeaderBag::DISPOSITION_ATTACHMENT) !== 0);
         }
 

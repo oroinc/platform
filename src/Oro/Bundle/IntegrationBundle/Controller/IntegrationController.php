@@ -6,7 +6,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use JMS\JobQueueBundle\Entity\Job;
 
@@ -129,7 +129,7 @@ class IntegrationController extends Controller
      */
     public function toggleAction(Integration $integration)
     {
-        if ($integration->getEnabled()) {
+        if ($integration->isEnabled()) {
             $integration->setEnabled(false);
             $this->get('session')->getFlashBag()->add(
                 'success',

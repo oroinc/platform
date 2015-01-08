@@ -10,6 +10,12 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
+/**
+ * The aim of this class is to help getting an email address from an object.
+ * The following algorithm is used to get an email address:
+ * 1. check if an object has own email address
+ * 2. loop through registered target entities ordered by priority and check if they have an email address
+ */
 class EmailHolderHelper
 {
     const GET_EMAIL_METHOD = 'getEmail';
@@ -63,14 +69,17 @@ class EmailHolderHelper
             return null;
         }
 
-        $canHaveEmail = $object instanceof EmailHolderInterface
-            || method_exists($object, self::GET_EMAIL_METHOD);
-        if ($canHaveEmail) {
+        // check if an object has own email address
+        if ($object instanceof EmailHolderInterface) {
             return $object->getEmail();
+        } elseif (method_exists($object, self::GET_EMAIL_METHOD)) {
+            $email = $object->getEmail();
+            if (!is_object($email)) {
+                return $email;
+            }
         }
 
-        // check may be an entity has related entity which has an email
-        // in this case we can use this email
+        // check if an object has related object with an email address
         return $this->getEmailFromRelatedObject($object);
     }
 

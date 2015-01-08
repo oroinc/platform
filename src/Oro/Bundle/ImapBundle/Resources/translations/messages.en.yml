@@ -4,4 +4,4 @@ oro.imap:
         port.label: Port
         ssl.label: SSL
         user.label: User
-        password.label: Passowrd
+        password.label: Password

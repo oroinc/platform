@@ -43,10 +43,10 @@ class BusinessUnitType extends AbstractType
             ->add(
                 'name',
                 'text',
-                array(
+                [
                     'label'    => 'oro.organization.businessunit.name.label',
                     'required' => true,
-                )
+                ]
             )
             ->add(
                 'businessUnit',
@@ -59,66 +59,67 @@ class BusinessUnitType extends AbstractType
                     'choices' => $this->getBusinessUnitChoices(
                         $this->businessUnitManager->getBusinessUnitsTree(
                             null,
-                            $this->securityFacade->getOrganizationId()
+                            $this->getOrganizationId()
                         )
                     ),
                     'business_unit_ids' => $this->businessUnitManager->getBusinessUnitIds(
                         null,
-                        $this->securityFacade->getOrganizationId()
-                    )
+                        $this->getOrganizationId()
+                    ),
+                    'translatable_options' => false
                 ]
             )
             ->add(
                 'phone',
                 'text',
-                array(
+                [
                     'label'    => 'oro.organization.businessunit.phone.label',
                     'required' => false,
-                )
+                ]
             )
             ->add(
                 'website',
                 'text',
-                array(
+                [
                     'label'    => 'oro.organization.businessunit.website.label',
                     'required' => false,
-                )
+                ]
             )
             ->add(
                 'email',
                 'text',
-                array(
+                [
                     'label'    => 'oro.organization.businessunit.email.label',
                     'required' => false,
-                )
+                ]
             )
             ->add(
                 'fax',
                 'text',
-                array(
+                [
                     'label'    => 'oro.organization.businessunit.fax.label',
                     'required' => false,
-                )
+                ]
             )
             ->add(
                 'appendUsers',
                 'oro_entity_identifier',
-                array(
+                [
                     'class'    => 'OroUserBundle:User',
                     'required' => false,
                     'mapped'   => false,
                     'multiple' => true,
-                )
+                ]
             )
             ->add(
                 'removeUsers',
                 'oro_entity_identifier',
-                array(
+                [
                     'class'    => 'OroUserBundle:User',
                     'required' => false,
                     'mapped'   => false,
                     'multiple' => true,
-                )
+                ]
             );
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'onPreSetData']);
@@ -145,13 +146,14 @@ class BusinessUnitType extends AbstractType
                         'choices' => $this->getBusinessUnitChoices(
                             $this->businessUnitManager->getBusinessUnitsTree(
                                 null,
-                                $this->securityFacade->getOrganizationId()
+                                $this->getOrganizationId()
                             )
                         ),
                         'forbidden_business_unit_ids' => $this->businessUnitManager->getChildBusinessUnitIds(
                             $data->getId(),
-                            $this->securityFacade->getOrganizationId()
-                        )
+                            $this->getOrganizationId()
+                        ),
+                        'translatable_options' => false
                     ]
                 );
             }
@@ -164,10 +166,10 @@ class BusinessUnitType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'data_class'              => 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit',
                 'ownership_disabled'      => true,
-            )
+            ]
         );
     }
 
@@ -191,12 +193,22 @@ class BusinessUnitType extends AbstractType
         $choices = [];
         $blanks  = str_repeat('&nbsp;&nbsp;&nbsp;', $level);
         foreach ($options as $option) {
-            $choices += array($option['id'] => $blanks . $option['name']);
+            $choices += [$option['id'] => $blanks . $option['name']];
             if (isset($option['children'])) {
                 $choices += $this->getBusinessUnitChoices($option['children'], $level + 1);
             }
         }
 
         return $choices;
+    }
+
+    /**
+     * Return current organization id
+     *
+     * @return int|null
+     */
+    protected function getOrganizationId()
+    {
+        return $this->securityFacade->getOrganizationId();
     }
 }

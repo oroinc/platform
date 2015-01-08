@@ -32,6 +32,8 @@ resetting:
 
 oro:
     user:
+        form:
+            access_settings.label: Business Units
         menu:
             system_tab.label: System
             user_list.description: List of system users
@@ -120,3 +122,6 @@ oro:
             has_role.label: Has role
         invite:
             label: Send an Email Invitation
+        privileges:
+            entity.label: Entity
+            action.label: Capabilities

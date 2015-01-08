@@ -2,98 +2,110 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
-use Symfony\Component\Form\FormView;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
-class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
+use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+
+use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
+use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
+
+class MultipleEntityTypeTest extends FormIntegrationTestCase
 {
     const PERMISSION_ALLOW    = 'test_permission_allow';
     const PERMISSION_DISALLOW = 'test_permission_disallow';
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    private $securityFacade;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
 
-    /**
-     * @var MultipleEntityType
-     */
-    private $type;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $em;
 
     protected function setUp()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getRepository'))
-            ->getMockForAbstractClass();
-
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
-        $this->type = new MultipleEntityType($em, $this->securityFacade);
+        $metadata               = new ClassMetadataInfo('\stdClass');
+        $metadata->identifier[] = 'id';
+
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()
+            ->getMock();
+        $this->em->expects($this->any())->method('getClassMetadata')
+            ->willReturnMap([['\stdClass', $metadata]]);
+
+        $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $this->registry->expects($this->any())->method('getManagerForClass')
+            ->willReturnMap([['\stdClass', $this->em]]);
+
+        parent::setUp();
     }
 
-    public function testGetName()
+    protected function tearDown()
     {
-        $this->assertEquals('oro_multiple_entity', $this->type->getName());
+        unset($this->securityFacade, $this->registry);
+
+        parent::tearDown();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getExtensions()
+    {
+        $types = [
+            'oro_multiple_entity'   => new MultipleEntityType($this->securityFacade),
+            'oro_entity_identifier' => new EntityIdentifierType($this->registry)
+        ];
+
+        return [
+            new PreloadedExtension($types, [])
+        ];
     }
 
     public function testBuildForm()
     {
-        $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $builder->expects($this->at(0))
-            ->method('add')
-            ->with('added', 'oro_entity_identifier', array('class' => '\stdObject', 'multiple' => true))
-            ->will($this->returnSelf());
-        $builder->expects($this->at(1))
-            ->method('add')
-            ->with('removed', 'oro_entity_identifier', array('class' => '\stdObject', 'multiple' => true))
-            ->will($this->returnSelf());
-        $this->type->buildForm($builder, array('class' => '\stdObject', 'extend' => false));
+        $form = $this->factory->create('oro_multiple_entity', null, ['class' => '\stdClass']);
+
+        $this->assertTrue($form->has('added'));
+        $this->assertTrue($form->has('removed'));
     }
 
-    public function testSetDefaultOptions()
+    public function testHasKnownOptions()
     {
-        $optionsResolver = $this->getMockBuilder('Symfony\Component\OptionsResolver\OptionsResolver')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $optionsResolver->expects($this->once())
-            ->method('setRequired')
-            ->with(array('class'));
-        $optionsResolver->expects($this->once())
-            ->method('setDefaults')
-            ->with(
-                array(
-                    'add_acl_resource'           => null,
-                    'class'                      => null,
-                    'default_element'            => null,
-                    'extend'                     => false,
-                    'grid_url'                   => null,
-                    'initial_elements'           => null,
-                    'mapped'                     => false,
-                    'selector_window_title'      => null,
-                    'extra_config'               => null,
-                    'selection_url'              => null,
-                    'selection_route'            => null,
-                    'selection_route_parameters' => array(),
-                )
-            );
-        $this->type->setDefaultOptions($optionsResolver);
+        $form = $this->factory->create('oro_multiple_entity', null, ['class' => '\stdClass']);
+
+        $knownOptions = [
+            'add_acl_resource',
+            'class',
+            'default_element',
+            'grid_url',
+            'initial_elements',
+            'selector_window_title',
+            'extra_config',
+            'selection_url',
+            'selection_route',
+            'selection_route_parameters',
+        ];
+
+        foreach ($knownOptions as $option) {
+            $this->assertTrue($form->getConfig()->hasOption($option));
+        }
     }
 
     /**
      * @dataProvider optionsDataProvider
+     *
      * @param array  $options
      * @param string $expectedKey
      * @param mixed  $expectedValue
      */
-    public function testFinishView($options, $expectedKey, $expectedValue)
+    public function testViewHasVars($options, $expectedKey, $expectedValue)
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()->getMock();
+        $form = $this->factory->create('oro_multiple_entity', null, array_merge($options, ['class' => '\stdClass']));
 
         if (isset($options['add_acl_resource'])) {
             $this->securityFacade->expects($this->once())
@@ -105,90 +117,92 @@ class MultipleEntityTypeTest extends \PHPUnit_Framework_TestCase
                 ->method('isGranted');
         }
 
-        $view = new FormView();
-        $this->type->finishView($view, $form, $options);
+        $view = $form->createView();
         $this->assertArrayHasKey($expectedKey, $view->vars);
         $this->assertEquals($expectedValue, $view->vars[$expectedKey]);
     }
 
+    /**
+     * @return array
+     */
     public function optionsDataProvider()
     {
-        return array(
-            array(
-                array(),
+        return [
+            [
+                [],
                 'allow_action',
                 true
-            ),
-            array(
-                array('add_acl_resource' => self::PERMISSION_ALLOW),
+            ],
+            [
+                ['add_acl_resource' => self::PERMISSION_ALLOW],
                 'allow_action',
                 true
-            ),
-            array(
-                array('add_acl_resource' => self::PERMISSION_DISALLOW),
+            ],
+            [
+                ['add_acl_resource' => self::PERMISSION_DISALLOW],
                 'allow_action',
                 false
-            ),
-            array(
-                array('grid_url' => '/test'),
+            ],
+            [
+                ['grid_url' => '/test'],
                 'grid_url',
                 '/test'
-            ),
-            array(
-                array(),
+            ],
+            [
+                [],
                 'grid_url',
                 null
-            ),
-            array(
-                array('initial_elements' => array()),
+            ],
+            [
+                ['initial_elements' => []],
                 'initial_elements',
-                array()
-            ),
-            array(
-                array(),
+                []
+            ],
+            [
+                [],
                 'initial_elements',
                 null
-            ),
-            array(
-                array('selector_window_title' => 'Select'),
+            ],
+            [
+                ['selector_window_title' => 'Select'],
                 'selector_window_title',
                 'Select'
-            ),
-            array(
-                array(),
+            ],
+            [
+                [],
                 'selector_window_title',
                 null
-            ),
-            array(
-                array('default_element' => 'name'),
+            ],
+            [
+                ['default_element' => 'name'],
                 'default_element',
                 'name'
-            ),
-            array(
-                array(),
+            ],
+            [
+                [],
                 'default_element',
                 null
-            ),
-            array(
-                '$formOptions'   => array('grid_url' => 'testUrl'),
+            ],
+            [
+                '$formOptions'   => ['grid_url' => 'testUrl'],
                 '$expectedKey'   => 'grid_url',
                 '$expectedValue' => 'testUrl',
-            ),
-            array(
-                '$formOptions'   => array('selection_url' => 'testUrlSelection'),
+            ],
+            [
+                '$formOptions'   => ['selection_url' => 'testUrlSelection'],
                 '$expectedKey'   => 'selection_url',
                 '$expectedValue' => 'testUrlSelection',
-            ),
-            array(
-                '$formOptions'   => array('selection_route' => 'testRoute'),
+            ],
+            [
+                '$formOptions'   => ['selection_route' => 'testRoute'],
                 '$expectedKey'   => 'selection_route',
                 '$expectedValue' => 'testRoute',
-            ),
-            array(
-                '$formOptions'   => array('selection_route_parameters' => array('testParam1')),
+            ],
+            [
+                '$formOptions'   => ['selection_route_parameters' => ['testParam1']],
                 '$expectedKey'   => 'selection_route_parameters',
-                '$expectedValue' => array('testParam1'),
-            )
-        );
+                '$expectedValue' => ['testParam1'],
+            ]
+        ];
     }
 }

@@ -15,6 +15,10 @@ use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
+/**
+ * This class should work on PHP 5.3
+ * Keep old array syntax
+ */
 abstract class OroKernel extends Kernel
 {
     /**
@@ -25,7 +29,7 @@ abstract class OroKernel extends Kernel
         parent::initializeBundles();
 
         // pass bundles to CumulativeResourceManager
-        $bundles = [];
+        $bundles = array();
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
@@ -42,7 +46,7 @@ abstract class OroKernel extends Kernel
         // clear state of CumulativeResourceManager
         CumulativeResourceManager::getInstance()->clear();
 
-        $bundles = [];
+        $bundles = array();
 
         if (!$this->getCacheDir()) {
             foreach ($this->collectBundles() as $class => $params) {
@@ -74,9 +78,9 @@ abstract class OroKernel extends Kernel
      *
      * @return array
      */
-    protected function findBundles($roots = [])
+    protected function findBundles($roots = array())
     {
-        $paths = [];
+        $paths = array();
         foreach ($roots as $root) {
             if (!is_dir($root)) {
                 continue;
@@ -120,14 +124,14 @@ abstract class OroKernel extends Kernel
     protected function collectBundles()
     {
         $files = $this->findBundles(
-            [
+            array(
                 $this->getRootDir() . '/../src',
                 $this->getRootDir() . '/../vendor'
-            ]
+            )
         );
 
-        $bundles    = [];
-        $exclusions = [];
+        $bundles    = array();
+        $exclusions = array();
         foreach ($files as $file) {
             $import  = Yaml::parse($file);
             $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
@@ -138,7 +142,7 @@ abstract class OroKernel extends Kernel
 
         $bundles = array_diff_key($bundles, $exclusions);
 
-        uasort($bundles, [$this, 'compareBundles']);
+        uasort($bundles, array($this, 'compareBundles'));
 
         return $bundles;
     }
@@ -150,7 +154,7 @@ abstract class OroKernel extends Kernel
      */
     protected function getBundlesMapping(array $bundles)
     {
-        $result = [];
+        $result = array();
         foreach ($bundles as $bundle) {
             $kernel   = false;
             $priority = 0;
@@ -163,11 +167,11 @@ abstract class OroKernel extends Kernel
                 $class = $bundle;
             }
 
-            $result[$class] = [
+            $result[$class] = array(
                 'name'     => $class,
                 'kernel'   => $kernel,
                 'priority' => $priority,
-            ];
+            );
         }
 
         return $result;
@@ -247,7 +251,7 @@ abstract class OroKernel extends Kernel
             $dumper->setProxyDumper(new ProxyDumper());
         }
 
-        $content = $dumper->dump(['class' => $class, 'base_class' => $baseClass]);
+        $content = $dumper->dump(array('class' => $class, 'base_class' => $baseClass));
         $cache->write($content, $container->getResources());
 
         if (!$this->debug) {
@@ -264,5 +268,23 @@ abstract class OroKernel extends Kernel
         $handler->registerHandlers();
 
         parent::initializeContainer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBundle($name, $first = true)
+    {
+        // if need to get this precise bundle
+        if (strpos($name, '!') === 0) {
+            $name = substr($name, 1);
+            if (isset($this->bundleMap[$name])) {
+                // current bundle is always the last
+                $bundle = end($this->bundleMap[$name]);
+                return $first ? $bundle : [$bundle];
+            }
+        }
+
+        return parent::getBundle($name, $first);
     }
 }

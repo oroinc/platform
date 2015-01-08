@@ -1,5 +1,6 @@
 datagrid:
     website-grid:
+        extended_entity_name: %oro_tracking.tracking_website.class%
         source:
             type: orm
             acl_resource: oro_tracking_website_view
@@ -109,8 +110,11 @@ datagrid:
                 label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link
+        options:
+            entity_pagination: true
 
     tracking-events-grid:
+        extended_entity_name: %oro_tracking.tracking_event.class%
         source:
             type: orm
             acl_resource: oro_tracking_website_view

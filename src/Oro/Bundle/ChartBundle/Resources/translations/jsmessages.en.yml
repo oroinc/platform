@@ -1,0 +1,6 @@
+oro:
+  chart:
+      flow_chart:
+          label_fromatter:
+              nozzle: '{{ label }} (from {{ date }}): {{ value }}'
+              tick: '{{ label }}: {{ value }}'

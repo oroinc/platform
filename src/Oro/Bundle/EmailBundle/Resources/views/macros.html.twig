@@ -1,51 +1,4 @@
 {% macro renderAvailableVariablesWidget(entityName, entityChoiceFieldId) %}
-    <script type="text/javascript">
-        require(['jquery', 'orotranslation/js/translator', 'oroemail/js/email/variable/view', 'oroemail/js/email/variable/model', 'oroui/js/delete-confirmation'],
-        function($, __, View, Model, DeleteConfirmation){
-            $(function() {
-                'use strict';
-                var model, view, entityChoice;
-
-                model = new Model({{ render(path('oro_api_get_emailtemplate_variables'))}});
-                model.setEntity({{ entityName|json_encode|raw }}, {{ oro_entity_config_value(entityName, 'label')|trans|json_encode|raw }});
-
-                view = new View({
-                    el:                      $('#oro-email-template-variables'),
-                    templateSelector:        '#oro-email-template-variables-template',
-                    sectionTemplateSelector: '#oro-email-template-variables-{sectionName}-template',
-                    sectionContentSelector:  '#oro-email-template-variables-{sectionName}',
-                    sectionTabSelector:      '#oro-email-template-variables-{sectionName}-tab',
-                    model:                   model
-                });
-
-                entityChoice = $('#{{ entityChoiceFieldId }}');
-                entityChoice.on('change', function (e) {
-                    var $el = $(e.currentTarget),
-                        entityName = $el.val(),
-                        entityLabel = $el.find(":selected").data('label');
-                    if (!view.isEmpty()) {
-                        var confirm = new DeleteConfirmation({
-                            title: __('Change Entity Confirmation'),
-                            okText: __('Yes'),
-                            content: __('oro.email.emailtemplate.change_entity_confirmation')
-                        });
-                        confirm.on('ok', function () {
-                            view.clear();
-                            model.setEntity(entityName, entityLabel);
-                        });
-                        confirm.on('cancel', function () {
-                            model.setEntity(entityName, entityLabel);
-                        });
-                        confirm.open();
-                    } else {
-                        model.setEntity(entityName, entityLabel);
-                    }
-                });
-                view.render();
-            });
-        });
-    </script>
-
     <script type="text/template" id="oro-email-template-variables-template">
         <div class="emailtemplate-variables oro-tabs tabbable">
             <ul class="nav nav-tabs">
@@ -135,7 +88,22 @@
         <% } %>
     </script>
 
-    <div id="oro-email-template-variables"></div>
+    {% set options = {
+        entityChoice: '#' ~ entityChoiceFieldId,
+        view: {
+            templateSelector:        '#oro-email-template-variables-template',
+            sectionTemplateSelector: '#oro-email-template-variables-{sectionName}-template',
+            sectionContentSelector:  '#oro-email-template-variables-{sectionName}',
+            sectionTabSelector:      '#oro-email-template-variables-{sectionName}-tab',
+        },
+        model: {
+            attributes: render(path('oro_api_get_emailtemplate_variables')),
+            entityName: entityName,
+            entityLabel: oro_entity_config_value(entityName, 'label')|trans,
+        }
+    } %}
+    <div data-page-component-module="oroemail/js/app/components/email-variable-component"
+         data-page-component-options="{{ options|json_encode }}"></div>
 {% endmacro %}
 
 {% macro renderPreviewDialog(formName, title) %}
@@ -169,7 +137,7 @@
                         var confirmModal = new Modal({
                             title: __('Preview'),
                             content: '<div class="loading-content">' + __('Loading...') + '</div>',
-                            okText: __('Ok'),
+                            okText: __('OK'),
                             className: 'modal oro-modal-normal',
                             template: _.template('<% if (title) { %>' +
                                 '<div class="modal-header">' +
@@ -228,8 +196,7 @@
 #}
 {% macro email_address_link(emailAddress, label) -%}
     {% set label = label|default(_self.email_address_text(emailAddress)) %}
-    {#- TODO: we need EntityConfig to get view url for an entity -#}
-    <a href="{{ path(emailAddress.owner.class|split('\\')|first|lower ~ '_' ~ emailAddress.owner.class|split('\\')|last|lower ~ '_view', {id:emailAddress.owner.id}) }}">{{ _self.email_address_text(emailAddress) }}</a>
+    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">{{ _self.email_address_text(emailAddress) }}</a>
 {%- endmacro -%}
 
 {#

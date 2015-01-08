@@ -44,9 +44,26 @@ class SoapClient extends BasicSoapClient
         $_SERVER['HTTP_SOAPACTION'] = $action;
         $_SERVER['CONTENT_TYPE'] = 'application/soap+xml';
         //make POST request
-        $this->client->request('POST', (string)$location, array(), array(), array(), (string)$request);
+        $this->client->request(
+            'POST',
+            (string)$location,
+            array(),
+            array(),
+            array(
+                'CONTENT_TYPE' => $_SERVER['CONTENT_TYPE']
+            ),
+            (string)$request
+        );
         unset($_SERVER['HTTP_SOAPACTION']);
         unset($_SERVER['CONTENT_TYPE']);
-        return $this->client->getResponse()->getContent();
+
+        $response = $this->client->getResponse();
+        $content = $response->getContent();
+        $statusCode = $response->getStatusCode();
+        if ($statusCode >= 500) {
+            throw new \Exception($content, $statusCode);
+        }
+
+        return $content;
     }
 }

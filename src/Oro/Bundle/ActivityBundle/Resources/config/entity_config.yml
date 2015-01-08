@@ -42,16 +42,20 @@ oro_entity_config:
                     options:
                         auditable:          false
 
-                # the widget name of the activity action. This widget must be defined in placeholders.yml
+                # the widget name of the activity action that is used for render a button
+                # this widget should be defined in placeholders.yml
                 # this attribute can be defined for activity entity
-                action_widget: # string
+                # please note that an activity should provide both action_link_widget and action_link_widget,
+                # because actions can be rendered as a button as a dropdown menu
+                action_button_widget: # string
                     options:
                         auditable:          false
 
-                # the name of a group in which the activity action is included.
+                # the widget name of the activity action that is used for render a link in dropdown menu
+                # this widget should be defined in placeholders.yml
                 # this attribute can be defined for activity entity
-                # if this attribute is not specified the activity action is rendered standalone;
-                # otherwise, it is grouped with other activity actions included in the same group
-                action_group: # string
+                # please note that an activity should provide both action_link_widget and action_link_widget,
+                # because actions can be rendered as a button as a dropdown menu
+                action_link_widget: # string
                     options:
                         auditable:          false

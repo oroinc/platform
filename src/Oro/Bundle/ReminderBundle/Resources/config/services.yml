@@ -14,7 +14,7 @@ services:
     oro_reminder.entity.manager:
         class: %oro_reminder.entity.manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity.doctrine_helper
 
     oro_reminder.sender:
         class: %oro_reminder.sender.class%

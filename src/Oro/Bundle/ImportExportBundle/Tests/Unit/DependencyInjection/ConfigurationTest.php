@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ImportExportBundle\DependencyInjection\Configuration;

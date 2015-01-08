@@ -52,11 +52,11 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setConstructorArgs(array($className))
-            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues'))
+            ->setMethods(array('getSingleIdentifierFieldName', 'getIdentifierValues'))
             ->getMock();
         $metadata->expects($this->once())
-            ->method('getIdentifierFieldNames')
-            ->will($this->returnValue(array('id')));
+            ->method('getSingleIdentifierFieldName')
+            ->will($this->returnValue('id'));
         $metadata->expects($this->once())
             ->method('getIdentifierValues')
             ->with($entity)

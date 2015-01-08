@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Controller;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -60,8 +60,7 @@ class ServiceController extends BaseController
         $service      = $this->get('oro_translation.service_provider');
         $service->setAdapter($proxyAdapter);
 
-        $path = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
-        $path = $path . ltrim(uniqid('download_'), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $code;
+        $path = $service->getTmpDir('download_' . $code);
 
         try {
             $installed = $service->download($path, $projects, $code);

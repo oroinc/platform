@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\UserBundle\Controller\Api\Rest;
 
-use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormInterface;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;

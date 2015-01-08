@@ -1,0 +1,2 @@
+classes:
+    - Oro\Bundle\CalendarBundle\Controller\Api\Soap\CalendarConnectionController

@@ -16,6 +16,15 @@ abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
         $this->setPort(intval(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT));
         $this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
         $this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL);
+        //added for xhprof tracing and works only with phantomjs
+        $this->setDesiredCapabilities(
+            array('phantomjs.page.customHeaders.PHPUNIT-SELENIUM-TEST-ID' => $this->getTestId())
+        );
+    }
+
+    public function setUpPage()
+    {
+        $this->url('/');
     }
 
     protected function tearDown()
@@ -24,15 +33,18 @@ abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
         parent::tearDown();
     }
 
-    public function prepareSession()
-    {
-        $session = parent::prepareSession();
-        if (defined('PHPUNIT_SELENIUM_COVERAGE')) {
-            $session->cookie()->remove('PHPUNIT_SELENIUM_TEST_ID');
-            $this->url('/');
-        }
-        return $session;
-    }
+//    public function prepareSession()
+//    {
+//        $session = parent::prepareSession();
+//        $session->cookie()->remove('PHPUNIT_SELENIUM_TEST_ID');
+//        $session->cookie()->add('PHPUNIT_SELENIUM_TEST_ID', $this->getTestId())->set();
+
+//        if (defined('PHPUNIT_SELENIUM_COVERAGE')) {
+//            $session->cookie()->remove('PHPUNIT_SELENIUM_TEST_ID');
+//            $this->url('/');
+//        }
+//        return $session;
+//    }
 
     /**
      * @param $userName
@@ -43,7 +55,7 @@ abstract class Selenium2TestCase extends \PHPUnit_Extensions_Selenium2TestCase
     public function login($userName = null, $password = null)
     {
         /** @var Login $login */
-        $login = new Login($this);
+        $login = new Login($this, array());
         $login->setUsername(($userName) ? $userName : PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
             ->setPassword(($password) ? $password : PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PASS)
             ->submit();

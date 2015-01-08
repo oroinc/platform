@@ -27,7 +27,9 @@ class OroBatchExtension extends Extension
         );
         $configLoader->registerResources($container);
 
-        $this->processConfiguration(new Configuration(), $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
+        $container->setParameter('oro_batch.cleanup_interval', $config['cleanup_interval']);
+        $container->setParameter('oro_batch.log_batch', $config['log_batch']);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');

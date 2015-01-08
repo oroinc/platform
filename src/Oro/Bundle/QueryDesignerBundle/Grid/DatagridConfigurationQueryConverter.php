@@ -149,8 +149,13 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
         $columnAlias,
         $columnLabel,
         $functionExpr,
-        $functionReturnType
+        $functionReturnType,
+        $isDistinct = false
     ) {
+        if ($isDistinct) {
+            $columnExpr = 'DISTINCT ' . $columnExpr;
+        }
+
         if ($functionExpr !== null) {
             $functionExpr = $this->prepareFunctionExpression(
                 $functionExpr,

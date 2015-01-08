@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;

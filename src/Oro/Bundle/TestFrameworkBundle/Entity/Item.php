@@ -9,7 +9,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * @ORM\Table(name="test_search_item")
  * @ORM\Entity
  */
-class Item
+class Item implements TestFrameworkEntityInterface
 {
     /**
      * @ORM\Id
@@ -94,6 +94,13 @@ class Item
      * @ORM\OneToMany(targetEntity="ItemValue", mappedBy="entity", cascade={"persist", "remove"})
      */
     protected $values;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="phone1", type="string", nullable=true)
+     */
+    protected $phone;
 
     /**
      * @var Organization

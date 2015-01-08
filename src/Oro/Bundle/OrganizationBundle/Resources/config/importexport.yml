@@ -11,6 +11,6 @@ services:
     oro_organization.importexport.template_fixture.organization:
         class: %oro_organization.importexport.template_fixture.organization.class%
         arguments:
-            - @doctrine
+            - @oro_security.security_facade
         tags:
             - { name: oro_importexport.template_fixture }

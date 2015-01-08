@@ -10,7 +10,6 @@ define(function (require) {
         routing = require('routing'),
         tools = require('oroui/js/tools'),
         mediator = require('oroui/js/mediator'),
-        widgetManager = require('oroui/js/widget-manager'),
         NoteView = require('../views/note-view'),
         NotesView = require('../views/notes-view'),
         NoteModel = require('../models/note-model'),
@@ -35,11 +34,11 @@ define(function (require) {
             this.processOptions(options);
 
             if (!_.isEmpty(options.modules)) {
-                this.defer = $.Deferred();
+                this._deferredInit();
                 tools.loadModules(options.modules, function (modules) {
                     _.extend(options.notesOptions, modules);
                     this.initView(options);
-                    this.defer.resolve(this);
+                    this._resolveDeferredInit();
                 }, this);
             } else {
                 this.initView(options);
@@ -93,7 +92,7 @@ define(function (require) {
 
         registerWidget: function (options) {
             var list = this.list;
-            widgetManager.getWidgetInstance(options.widgetId, function (widget) {
+            mediator.execute('widgets:getByIdAsync', options.widgetId, function (widget) {
                 widget.getAction('collapse_all', 'adopted', function (action) {
                     action.on('click', _.bind(list.collapseAll, list));
                 });

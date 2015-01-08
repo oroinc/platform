@@ -7,9 +7,13 @@ parameters:
     oro_ui.view.listener.class:                            Oro\Bundle\UIBundle\EventListener\TemplateListener
     oro_ui.format_converter.date_time.jquery_ui.class:     Oro\Bundle\UIBundle\Converter\JqueryUiDateTimeFormatConverter
 
+    oro_ui.label_provider.action_button.class:             Oro\Bundle\UIBundle\Provider\ActionButtonLabelProvider
     oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
+    oro_ui.widget_provider.action_button.class:            Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
     oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
     oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
+
+    oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
 
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
@@ -57,10 +61,22 @@ services:
         tags:
             - { name: oro_locale.format_converter.date_time, alias: jquery_ui }
 
+    oro_ui.label_provider.action_button.abstract:
+        abstract: true
+        class: %oro_ui.label_provider.action_button.class%
+        arguments:
+            - @translator
+
     oro_ui.label_provider.action_button_group:
         class: %oro_ui.label_provider.action_button_group.class%
         arguments:
             - @translator
+
+    oro_ui.widget_provider.action_button.abstract:
+        abstract: true
+        class: %oro_ui.widget_provider.action_button.class%
+        arguments:
+            - @oro_ui.placeholder.provider
 
     oro_ui.widget_provider.view_actions:
         class: %oro_ui.widget_provider.view_actions.class%
@@ -69,3 +85,8 @@ services:
 
     oro_ui.content_provider.manager:
         class: %oro_ui.content_provider.manager.class%
+
+    oro_ui.provider.widget_context:
+        class: %oro_ui.provider.widget_context.class%
+        calls:
+            - [setRequest, ["@?request="]]

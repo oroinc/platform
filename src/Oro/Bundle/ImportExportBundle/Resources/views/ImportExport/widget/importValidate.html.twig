@@ -1,5 +1,9 @@
 <div class="widget-content" id="import-validation">
     <style type="text/css">
+        #import-validation {
+            padding-bottom: 1px;
+        }
+
         .import-errors ol {
             height: 198px;
             overflow: auto;
@@ -27,8 +31,16 @@
             border-bottom: 1px solid #e5e5e5;
         }
     </style>
+
     <div class="validation-info">
-        <strong>{{ 'Import validation results'|trans }}</strong>
+        <strong>
+        {% if showStrategy %}
+            {{ 'Import validation results with strategy "%strategy%"'|trans({'%strategy%': ('oro.importexport.import.' ~ processorAlias)|trans}) }}
+        {% else %}
+            {{ 'Import validation results'|trans }}
+        {% endif %}
+        </strong>
+
         <table class="table table-condensed table-hover">
             <thead>
                 <tr>

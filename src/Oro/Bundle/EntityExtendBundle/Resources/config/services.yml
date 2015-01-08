@@ -1,7 +1,9 @@
 parameters:
     oro_entity_extend.migration.config_processor.options.path: %kernel.cache_dir%/oro_migration/extend_config_options.yml
     oro_entity_extend.entity.cache.warmer.class:              Oro\Bundle\EntityExtendBundle\Cache\EntityCacheWarmer
-    oro_entity_extend.extension.extend_entity.class:          Oro\Bundle\EntityExtendBundle\Form\Extension\ExtendEntityExtension
+    oro_entity_extend.datagrid.extension.additional_fields.class:     Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension
+    oro_entity_extend.datagrid.extension.dynamic_fields.class:        Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension
+    oro_entity_extend.form.extension.dynamic_fields.class:            Oro\Bundle\EntityExtendBundle\Form\Extension\DynamicFieldsExtension
     oro_entity_extend.tools.dumper.class:                     Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper
     oro_entity_extend.entity_config_dumper.extension.index.class:     Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\IndexEntityConfigDumperExtension
     oro_entity_extend.entity_config_dumper.extension.relation.class:  Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\RelationEntityConfigDumperExtension
@@ -28,8 +30,12 @@ parameters:
     oro_entity_extend.enum_synchronizer.class:                Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer
     oro_entity_extend.enum_filter.class:                      Oro\Bundle\EntityExtendBundle\Filter\EnumFilter
     oro_entity_extend.multi_enum_filter.class:                Oro\Bundle\EntityExtendBundle\Filter\MultiEnumFilter
+    oro_entity_extend.twig.extension.dynamic_fields.class:    Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension
     oro_entity_extend.twig.extension.enum.class:              Oro\Bundle\EntityExtendBundle\Twig\EnumExtension
     oro_entity_extend.datagrid.column_options_guesser.class:  Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser
+    oro_entity_extend.datagrid.action.type.ajaxdeletefield.class:  Oro\Bundle\EntityExtendBundle\Grid\Action\AjaxDeleteFieldAction
+    oro_entity_extend.validation_loader.class:                Oro\Bundle\EntityExtendBundle\Validator\ExtendFieldValidationLoader
+    oro_entity_extend.listener.extend_field_value_render.class:  Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -40,10 +46,30 @@ services:
         tags:
             - { name: kernel.cache_warmer,  priority: 30 }
 
-    oro_entity_extend.extension.extend_entity:
-        class: %oro_entity_extend.extension.extend_entity.class%
+    oro_entity_extend.datagrid.extension.additional_fields:
+        class: %oro_entity_extend.datagrid.extension.additional_fields.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+            - @oro_datagrid.datagrid.guesser
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_entity_extend.datagrid.extension.dynamic_fields:
+        class: %oro_entity_extend.datagrid.extension.dynamic_fields.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.orm.entity_class_resolver
+            - @oro_datagrid.datagrid.guesser
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_entity_extend.form.extension.dynamic_fields:
+        class: %oro_entity_extend.form.extension.dynamic_fields.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @router
+            - @translator
         tags:
             - { name: form.type_extension, alias: form }
 
@@ -233,6 +259,15 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: multi_enum }
 
+    oro_entity_extend.twig.extension.dynamic_fields:
+        class: %oro_entity_extend.twig.extension.dynamic_fields.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.extend.field_type_helper
+            - @event_dispatcher
+        tags:
+            - { name: twig.extension }
+
     oro_entity_extend.twig.extension.enum:
         class: %oro_entity_extend.twig.extension.enum.class%
         arguments:
@@ -246,3 +281,35 @@ services:
             - @oro_entity_config.config_manager
         tags:
             - { name: oro_datagrid.column_options_guesser }
+
+    oro_entity_extend.datagrid.action.type.ajaxdeletefield:
+        class: %oro_entity_extend.datagrid.action.type.ajaxdeletefield.class%
+        scope: prototype
+        tags:
+            - { name: oro_datagrid.extension.action.type, type: ajaxdeletefield }
+
+    oro_entity_extend.validation_loader:
+        class: %oro_entity_extend.validation_loader.class%
+        public: false
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.form
+        calls:
+            -
+                - addConstraints
+                -
+                    - integer
+                    -
+                        - Regex:
+                            pattern: "/^[\d+]*$/"
+                            message: "This value should contain only numbers."
+
+    oro_entity_extend.listener.extend_field_value_render:
+        class: %oro_entity_extend.listener.extend_field_value_render.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @router
+            - @oro_entity_extend.extend.field_type_helper
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }

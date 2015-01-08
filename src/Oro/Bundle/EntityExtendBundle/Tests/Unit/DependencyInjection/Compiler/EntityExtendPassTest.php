@@ -23,11 +23,12 @@ class EntityExtendPassTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerBuilder');
-        $container->expects($this->once())
+
+        $container->expects($this->at(1))
             ->method('hasDefinition')
             ->with(EntityExtendPass::FIELD_TYPE_HELPER_SERVICE_ID)
             ->will($this->returnValue(true));
-        $container->expects($this->once())
+        $container->expects($this->at(2))
             ->method('getDefinition')
             ->with(EntityExtendPass::FIELD_TYPE_HELPER_SERVICE_ID)
             ->will($this->returnValue($fieldTypeHelperDef));
@@ -41,6 +42,30 @@ class EntityExtendPassTest extends \PHPUnit_Framework_TestCase
                     'multiEnum' => 'manyToMany'
                 ]
             );
+
+        $loaderDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $extendLoaderDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $loaderDef->expects($this->once())
+            ->method('replaceArgument')
+            ->with(0, [$extendLoaderDef]);
+
+        $container->expects($this->at(3))
+            ->method('hasDefinition')
+            ->with(EntityExtendPass::VALIDATION_LOADER_ID)
+            ->will($this->returnValue(true));
+        $container->expects($this->at(4))
+            ->method('getDefinition')
+            ->with(EntityExtendPass::VALIDATION_LOADER_ID)
+            ->will($this->returnValue($loaderDef));
+        $container->expects($this->at(5))
+            ->method('getDefinition')
+            ->with(EntityExtendPass::EXTEND_VALIDATION_LOADER_ID)
+            ->will($this->returnValue($extendLoaderDef));
 
         $compiler = new EntityExtendPass();
         $compiler->process($container);

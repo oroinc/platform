@@ -4,7 +4,7 @@ namespace Oro\Bundle\ConfigBundle\Controller\Api\Rest;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
 
 use FOS\RestBundle\Controller\Annotations\Get;
@@ -26,9 +26,7 @@ class ConfigurationController extends FOSRestController
     /**
      * Get the list of all configuration sections
      *
-     * @Get("/configuration",
-     *      name="oro_api_get_configurations"
-     * )
+     * @Get("/configuration")
      * @ApiDoc(
      *      description="Get the list of all configuration sections",
      *      resource=true
@@ -54,7 +52,6 @@ class ConfigurationController extends FOSRestController
      * @param string $path The configuration section path. For example: look-and-feel/grid
      *
      * @Get("/configuration/{path}",
-     *      name="oro_api_get_configuration",
      *      requirements={"path"="[\w-]+[\w-\/]*"}
      * )
      * @ApiDoc(

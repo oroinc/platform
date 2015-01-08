@@ -8,29 +8,32 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
 class TargetType extends AbstractType
 {
     /**
-     * @var ConfigProvider
+     * @var ConfigManager
      */
-    protected $configProvider;
+    protected $configManager;
 
     /**
      * @var FieldConfigId
      */
     protected $configId;
 
-    public function __construct(ConfigProvider $configProvider, $configId)
+    public function __construct(ConfigManager $configManager, $configId)
     {
-        $this->configProvider = $configProvider;
+        $this->configManager = $configManager;
         $this->configId = $configId;
-        $this->targetEntity = $this->configProvider->getConfigById($this->configId)->get('target_entity');
+        $this->targetEntity = $this->configManager
+            ->getProvider('extend')
+            ->getConfigById($this->configId)
+            ->get('target_entity');
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -50,12 +53,18 @@ class TargetType extends AbstractType
                 'attr'        => array(
                     'class' => 'extend-rel-target-name'
                 ),
-                'label'       => 'Target entity',
-                'empty_value' => $this->targetEntity ? false : 'Please choice target entity...',
+                'label'       => 'oro.entity_extend.form.target_entity',
+                'empty_value' => $this->targetEntity ? null : '',
                 'read_only'   => (bool) $this->targetEntity,
                 'choices'     => $this->getEntityChoiceList(
                     $this->configId->getClassName(),
                     $this->configId->getFieldType()
+                ),
+                'configs' => array(
+                    'allowClear'              => true,
+                    'placeholder'             => 'oro.entity.form.choose_entity',
+                    'result_template_twig'    => 'OroEntityBundle:Choice:entity/result.html.twig',
+                    'selection_template_twig' => 'OroEntityBundle:Choice:entity/selection.html.twig',
                 )
             )
         );
@@ -63,20 +72,19 @@ class TargetType extends AbstractType
 
     protected function getEntityChoiceList($entityClassName, $relationType)
     {
-        $configManager = $this->configProvider->getConfigManager();
         $choices       = array();
+        $extendEntityConfig = $this->configManager->getProvider('extend');
 
-        if ($this->targetEntity) {
-            $entityIds = array($this->configProvider->getId($this->targetEntity));
-        } else {
-            $entityIds = $configManager->getIds('extend');
-        }
+        /** @var EntityConfigId[] $entityIds */
+        $entityIds = $this->targetEntity
+            ? array($extendEntityConfig->getId($this->targetEntity))
+            : $extendEntityConfig->getIds();
 
         if (in_array($relationType, array('oneToMany', 'manyToMany'))) {
             $entityIds = array_filter(
                 $entityIds,
-                function (EntityConfigId $configId) use ($configManager) {
-                    $config = $configManager->getConfig($configId);
+                function (EntityConfigId $configId) {
+                    $config = $this->configManager->getConfig($configId);
 
                     return $config->is('is_extend');
                 }
@@ -85,8 +93,8 @@ class TargetType extends AbstractType
 
         $entityIds = array_filter(
             $entityIds,
-            function (EntityConfigId $configId) use ($configManager) {
-                $config = $configManager->getConfig($configId);
+            function (EntityConfigId $configId) {
+                $config = $this->configManager->getConfig($configId);
 
                 return $config->is('is_extend', false) || !$config->is('state', ExtendScope::STATE_NEW);
             }
@@ -95,8 +103,13 @@ class TargetType extends AbstractType
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
             if ($className != $entityClassName) {
-                list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
-                $choices[$className] = $moduleName . ':' . $entityName;
+                $entityConfig        = $this->configManager->getProvider('entity')->getConfig($className);
+                $choices[$className] = new ChoiceListItem(
+                    $entityConfig->get('label'),
+                    array(
+                        'data-icon' => $entityConfig->get('icon')
+                    )
+                );
             }
         }
 
@@ -108,7 +121,7 @@ class TargetType extends AbstractType
      */
     public function getParent()
     {
-        return 'choice';
+        return 'genemu_jqueryselect2_choice';
     }
 
     /**

@@ -7,6 +7,7 @@ use Akeneo\Bundle\BatchBundle\Item\ItemReaderInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Item\InvalidItemException;
+
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
 class StepExecutor

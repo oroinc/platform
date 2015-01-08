@@ -25,6 +25,11 @@ class EntityMetadata extends MergeableClassMetadata
     /**
      * @var string
      */
+    public $routeCreate;
+
+    /**
+     * @var string
+     */
     public $mode;
 
     /**
@@ -44,6 +49,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->defaultValues = $object->defaultValues;
             $this->routeName     = $object->routeName;
             $this->routeView     = $object->routeView;
+            $this->routeCreate   = $object->routeCreate;
             $this->mode          = $object->mode;
         }
     }
@@ -59,6 +65,7 @@ class EntityMetadata extends MergeableClassMetadata
                 $this->defaultValues,
                 $this->routeName,
                 $this->routeView,
+                $this->routeCreate,
                 $this->mode,
                 parent::serialize(),
             )
@@ -75,10 +82,50 @@ class EntityMetadata extends MergeableClassMetadata
             $this->defaultValues,
             $this->routeName,
             $this->routeView,
+            $this->routeCreate,
             $this->mode,
             $parentStr
             ) = unserialize($str);
 
         parent::unserialize($parentStr);
+    }
+
+    /**
+     * @param string $routeType Route Type
+     * @param bool   $strict    Should exception be thrown if no route of given type found
+     *
+     * @return string
+     */
+    public function getRoute($routeType = 'view', $strict = false)
+    {
+        if (in_array($routeType, ['view', 'name', 'create'])) {
+            $propertyName = 'route' . ucfirst($routeType);
+
+            if ($this->{$propertyName}) {
+                return $this->{$propertyName};
+            } elseif (false === $strict) {
+                return $this->generateDefaultRoute($routeType);
+            }
+        }
+
+        throw new \LogicException(sprintf('No route "%s" found for entity "%s"', $routeType, $this->name));
+    }
+
+    /**
+     * @param string $routeType
+     *
+     * @return string
+     */
+    protected function generateDefaultRoute($routeType)
+    {
+        static $routeMap = [
+            'view'   => 'view',
+            'name'   => 'index',
+            'create' => 'create'
+        ];
+        $postfix = $routeMap[$routeType];
+        $parts   = explode('\\', $this->name);
+
+        return strtolower(reset($parts)) . '_' . strtolower(end($parts)) . '_' . $postfix;
     }
 }

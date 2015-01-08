@@ -19,7 +19,7 @@ oro:
         start_dashboard: Clone from
         start_dashboard.empty_value: Blank Dashboard
 
-        quick_launchpad_widget_descriptions: This widget gives you access to most commonly used actions and pages
+        quick_launchpad_widget_description: This widget gives you access to most commonly used actions and pages
 
         no_data_found:    No data found
 

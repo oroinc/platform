@@ -1,7 +1,7 @@
 /*jshint browser:true, nomen:true*/
 /*jslint browser:true, nomen:true*/
 /*global define*/
-define(['jquery', 'jquery.select2'], function ($) {
+define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($, __) {
     'use strict';
 
     /**
@@ -115,6 +115,12 @@ define(['jquery', 'jquery.select2'], function ($) {
                     return !option.children && matcher.apply(this, arguments);
                 };
             }
+
+            var additionalRequestParams = options.element.data('select2_query_additional_params');
+            if (additionalRequestParams && options.ajax !== undefined) {
+                options.ajax.url += (options.ajax.url.indexOf('?') == -1 ? '?' : '&') + $.param(additionalRequestParams);
+            }
+
             return prepareOpts.call(this, options);
         };
     }(window.Select2['class'].abstract.prototype));
@@ -188,4 +194,9 @@ define(['jquery', 'jquery.select2'], function ($) {
             clear.apply(this, arguments);
         };
     }(window.Select2['class'].single.prototype));
+
+    $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
+        formatSearching: function() { return __('Searching...'); },
+        formatNoMatches: function () { return __('No matches found'); }
+    });
 });

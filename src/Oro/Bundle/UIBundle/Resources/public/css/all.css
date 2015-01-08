@@ -219,3 +219,21 @@
     content: "";
     margin-right: 4px;
 }
+
+.user-status-list {
+    list-style: none;
+    display:table;
+    table-layout:fixed;
+    margin: 0 0 10px;
+}
+.user-status-list li {
+    height: 25px
+}
+.user-status-list .list-group-item {
+    width:100%;
+    display:table-row;
+}
+.user-status-list .list-group-item-text {
+    display:table-cell;
+}
+

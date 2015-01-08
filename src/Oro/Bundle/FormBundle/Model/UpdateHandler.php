@@ -161,13 +161,35 @@ class UpdateHandler
             return $result;
         } else {
             $this->session->getFlashBag()->add('success', $saveMessage);
+
             if (is_callable($saveAndStayRoute)) {
                 $saveAndStayRoute = call_user_func($saveAndStayRoute, $entity);
             }
+            $saveAndStayRoute = $this->addQueryParameters($saveAndStayRoute);
+
             if (is_callable($saveAndCloseRoute)) {
                 $saveAndCloseRoute = call_user_func($saveAndCloseRoute, $entity);
             }
+            $saveAndCloseRoute = $this->addQueryParameters($saveAndCloseRoute);
+
             return $this->router->redirectAfterSave($saveAndStayRoute, $saveAndCloseRoute, $entity);
         }
+    }
+
+    /**
+     * @param array $routeData
+     * @return array
+     */
+    protected function addQueryParameters(array $routeData)
+    {
+        $queryParts = $this->request->query->all();
+        if ($queryParts) {
+            if (!isset($routeData['parameters'])) {
+                $routeData['parameters'] = [];
+            }
+            $routeData['parameters'] = array_merge($queryParts, $routeData['parameters']);
+        }
+
+        return $routeData;
     }
 }

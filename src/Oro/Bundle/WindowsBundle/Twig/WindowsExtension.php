@@ -125,7 +125,8 @@ class WindowsExtension extends \Twig_Extension
 
         if (isset($data['cleanUrl'])) {
             if (isset($data['type'])) {
-                $uri = $this->getUrlWithContainer($data['cleanUrl'], $data['type']);
+                $wid = isset($data['wid']) ? $data['wid'] : $this->getUniqueIdentifier();
+                $uri = $this->getUrlWithContainer($data['cleanUrl'], $data['type'], $wid);
             } else {
                 $uri = $data['cleanUrl'];
             }
@@ -168,11 +169,18 @@ class WindowsExtension extends \Twig_Extension
         return $user;
     }
 
-    protected function getUrlWithContainer($url, $container)
+    /**
+     * @param string $url
+     * @param string $container
+     * @param string $wid
+     *
+     * @return string
+     */
+    protected function getUrlWithContainer($url, $container, $wid)
     {
         if (strpos($url, '_widgetContainer=') === false) {
             $parts = parse_url($url);
-            $widgetPart = '_widgetContainer=' . $container;
+            $widgetPart = '_widgetContainer=' . $container. '&_wid=' . $wid;
             if (array_key_exists('query', $parts)) {
                 $separator = $parts['query'] ? '&' : '';
                 $newQuery = $parts['query'] . $separator . $widgetPart;
@@ -192,5 +200,13 @@ class WindowsExtension extends \Twig_Extension
     public function getName()
     {
         return self::EXTENSION_NAME;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUniqueIdentifier()
+    {
+        return str_replace('.', '-', uniqid('', true));
     }
 }

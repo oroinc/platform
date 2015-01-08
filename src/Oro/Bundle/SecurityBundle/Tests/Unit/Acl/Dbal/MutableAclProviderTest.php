@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Dbal;
 
 use Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider;
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
@@ -145,5 +146,67 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
             array(new UserSecurityIdentity('test', 'Acme\User'), 'test'),
             array(new RoleSecurityIdentity('ROLE_TEST'), 'ROLE_TEST'),
         );
+    }
+
+    public function testDeleteAclClass()
+    {
+        $oid = new ObjectIdentity('entity', 'Test\Class');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MutableAclProvider $provider */
+        $provider = $this->getMock(
+            'Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider',
+            ['deleteAcl'],
+            [
+                $this->connection,
+                $this->getMock('Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface'),
+                ['class_table_name' => 'acl_classes']
+            ]
+        );
+
+        $this->connection->expects($this->once())
+            ->method('beginTransaction');
+        $provider->expects($this->once())
+            ->method('deleteAcl')
+            ->with($this->identicalTo($oid));
+        $this->connection->expects($this->once())
+            ->method('executeQuery')
+            ->with('DELETE FROM acl_classes WHERE class_type = \'Test\\Class\'');
+        $this->connection->expects($this->once())
+            ->method('commit');
+
+        $provider->deleteAclClass($oid);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage some exception
+     */
+    public function testDeleteAclClassFailure()
+    {
+        $oid = new ObjectIdentity('entity', 'Test\Class');
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|MutableAclProvider $provider */
+        $provider = $this->getMock(
+            'Oro\Bundle\SecurityBundle\Acl\Dbal\MutableAclProvider',
+            ['deleteAcl'],
+            [
+                $this->connection,
+                $this->getMock('Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface'),
+                ['class_table_name' => 'acl_classes']
+            ]
+        );
+
+        $this->connection->expects($this->once())
+            ->method('beginTransaction');
+        $provider->expects($this->once())
+            ->method('deleteAcl')
+            ->with($this->identicalTo($oid));
+        $this->connection->expects($this->once())
+            ->method('executeQuery')
+            ->will($this->throwException(new \Exception('some exception')));
+        $this->connection->expects($this->once())
+            ->method('rollBack');
+
+        $provider->deleteAclClass($oid);
     }
 }

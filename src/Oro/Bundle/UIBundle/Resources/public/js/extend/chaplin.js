@@ -57,6 +57,24 @@ define([
     };
 
     /**
+     * Added force flag that allows to retrieve even stale composition
+     *
+     * @param {string} name
+     * @param {boolean=} force
+     * @returns {*}
+     * @override
+     */
+    Chaplin.Composer.prototype.retrieve = function(name, force) {
+        var active;
+        active = this.compositions[name];
+        if (active && (force || !active.stale())) {
+            return active.item;
+        } else {
+            return void 0;
+        }
+    };
+
+    /**
      * Fixes issue when correspondent over options regions are not taken into account
      * @override
      */

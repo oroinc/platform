@@ -43,6 +43,10 @@
 .ui-dialog .email-form .uneditable-input {
     width: 97%;
 }
+
+.ui-dialog .email-form .mce-tinymce {
+    width: calc(~"97% + 12px");
+}
 .ui-dialog .email-form .form-horizontal .control-group .controls .validation-failed {
     margin-left: 14px;
 }

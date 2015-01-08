@@ -19,21 +19,21 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $entityIdentifierAccessor;
+    protected $entityIdAccessor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityRoutingHelper;
 
     protected function setUp()
     {
-        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager')
+        $this->activityManager     = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->securityFacade      = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator          = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->entityIdentifierAccessor = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityIdentifierAccessor')
+        $this->entityIdAccessor    = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityIdAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->entityRoutingHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper')
@@ -44,7 +44,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             $this->activityManager,
             $this->securityFacade,
             $this->translator,
-            $this->entityIdentifierAccessor,
+            $this->entityIdAccessor,
             $this->entityRoutingHelper
         );
     }
@@ -103,7 +103,7 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->entityIdentifierAccessor->expects($this->once())
+        $this->entityIdAccessor->expects($this->once())
             ->method('getIdentifier')
             ->with($this->identicalTo($entity))
             ->will($this->returnValue($entityId));
@@ -143,14 +143,14 @@ class ActivityWidgetProviderTest extends \PHPUnit_Framework_TestCase
             [
                 [
                     'widgetType' => 'block',
-                    'alias'      => 'association2',
+                    'alias'      => 'activity2_b7f8a45c_association2',
                     'label'      => 'Label 2',
                     'url'        => 'url2',
                     'priority'   => 100,
                 ],
                 [
                     'widgetType' => 'block',
-                    'alias'      => 'association3',
+                    'alias'      => 'activity3_c0ff94ca_association3',
                     'label'      => 'Label 3',
                     'url'        => 'url3',
                 ],

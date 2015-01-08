@@ -1,0 +1,23 @@
+data:
+    "1 year":
+        job_instance_codes:
+            - mage_cart_import_5bbc306c4d32_85617746
+            - mage_customer_import_5bae5ba121e0_66337945
+            - mage_customer_import_5baea148a656_63264539
+            - mage_customer_import_5baec5deb622_67435111
+            - mage_customer_import_5baf94e56536_78106529
+            - mage_customer_import_5baf9e3d3165_42542920
+            - mage_customer_import_5bb120605f72_20256260
+            - mage_customer_import_5bb935a81ac3_91215609
+            - mage_customer_import_5ceed395f8f4_18560189
+            - mage_order_import_5cfe4fc1e981_35492673
+        job_execution_pids: "1,2,3,4,5,6,7,8,9,10,12,14,16,18"
+
+    "2 weeks":
+        job_instance_codes:
+            - mage_cart_import_5bbc306c4d32_85617746
+            - mage_customer_import_5bae5ba121e0_66337945
+            - mage_customer_import_5baea148a656_63264539
+            - mage_customer_import_5baec5deb622_67435111
+            - mage_order_import_5cfe4fc1e981_35492673
+        job_execution_pids: "1,2,3,4,10,14,16,18"

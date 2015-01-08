@@ -84,18 +84,23 @@ class OrganizationBasicAuthenticationListener
         $this->logProcess($username);
 
         try {
-            $organization = $request->headers->get('PHP_AUTH_ORGANIZATION')
-                ? $this->manager->getOrganizationById($request->headers->get('PHP_AUTH_ORGANIZATION'))
-                : $this->manager->getOrganizationRepo()->getFirst();
-            $token = $this->authenticationManager->authenticate(
-                new UsernamePasswordOrganizationToken(
+            $organizationId = $request->headers->get('PHP_AUTH_ORGANIZATION');
+            if ($organizationId) {
+                $authToken = new UsernamePasswordOrganizationToken(
                     $username,
                     $request->headers->get('PHP_AUTH_PW'),
                     $this->providerKey,
-                    $organization
-                )
-            );
-            $this->securityContext->setToken($token);
+                    $this->manager->getOrganizationById($organizationId)
+                );
+            } else {
+                $authToken = new UsernamePasswordToken(
+                    $username,
+                    $request->headers->get('PHP_AUTH_PW'),
+                    $this->providerKey
+                );
+            }
+
+            $this->securityContext->setToken($this->authenticationManager->authenticate($authToken));
         } catch (AuthenticationException $failed) {
             $token = $this->securityContext->getToken();
             if ($token instanceof UsernamePasswordToken && $this->providerKey === $token->getProviderKey()) {

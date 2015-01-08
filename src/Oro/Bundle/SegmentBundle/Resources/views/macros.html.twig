@@ -118,60 +118,60 @@
     @param array    metadata
 #}
 {% macro initJsWidgets(type, form, entities, metadata, entityFieldsRouteParams = {}) %}
+    {# Rendering templates #}
     {{ _self.query_designer_segment_template('segment-template') }}
-    {% set segmentOptions = {
+
+    {# Rertrieving fields data(actually this code works for already saved entities that's going to edit)#}
+    {% set fieldsData = {} %}
+    {% if not form.entity.vars.value is empty %}
+        {% set encodedEntityName = form.entity.vars.value|replace({'\\': '_'}) %}
+        {% set routeParams       = entityFieldsRouteParams|merge({'entityName': encodedEntityName}) %}
+
+        {% set fieldsData = render(path('oro_api_querydesigner_fields_entity', routeParams)) %}
+    {% endif %}
+
+    {% set widgetOptions = {
         valueSource: '#' ~ type ~ '_form_definition',
         fieldsLoader: {
-            entityChoice: '#' ~ type ~ '_form_entity',
+            entityChoice:      '#' ~ type ~ '_form_entity',
             loadingMaskParent: '#' ~ type ~ '-designer',
-            router: 'oro_api_querydesigner_fields_entity',
-            routingParams: entityFieldsRouteParams,
-            fieldsData: [],
-            confirmMessage: type|replace('_', '.') ~ '.change_entity_confirmation',
+            router:            'oro_api_querydesigner_fields_entity',
+            routingParams:     entityFieldsRouteParams,
+            fieldsData:        fieldsData,
+            confirmMessage:    type|replace('_', '.') ~ '.change_entity_confirmation',
         },
         filters: {
-            criteriaList: '#filter-criteria-list',
+            criteriaList:     '#filter-criteria-list',
             conditionBuilder: '#' ~ type ~ '-condition-builder'
         },
         column: {
-            editor: {
-                namePattern: '^' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$'
-            },
-            form: '#' ~ type ~ '-column-form',
+            editor:        { namePattern: '^' ~ type ~ '_form\\[column\\]\\[([\\w\\W]*)\\]$' },
+            form:          '#' ~ type ~ '-column-form',
             itemContainer: '#' ~ type ~ '-column-list .item-container',
-            itemTemplate: '#' ~ type ~ '-column-row'
+            itemTemplate:  '#' ~ type ~ '-column-row'
         },
-        select2FieldChoiceTemplate: '#column-chain-template',
+        columnFieldChoiceOptions:     {},
+        select2FieldChoiceTemplate:   '#column-chain-template',
         select2SegmentChoiceTemplate: '#segment-template',
-        entities: entities,
-        metadata: metadata
+        entities:                     entities,
+        metadata:                     metadata
     } %}
-    {% if not form.entity.vars.value is empty %}
-        {% set fieldsLoaderOptions = segmentOptions.fieldsLoader|merge({'fieldsData': render(
-            path('oro_api_querydesigner_fields_entity', {
-                'entityName': form.entity.vars.value|replace({'\\': '_'})
-            }|merge(entityFieldsRouteParams))
-        )}) %}
-        {% set segmentOptions = segmentOptions|merge({'fieldsLoader': fieldsLoaderOptions}) %}
-    {% endif %}
+
     {% if type == 'oro_report' %}
-        {% set segmentOptions = segmentOptions|merge({'grouping': {
-            editor: {
-                mapping: {
-                    name: 'oro_report_form[grouping][columnNames]'
-                }
-            },
-            form: '#' ~ type ~ '-grouping-form',
-            itemContainer: '#' ~ type ~ '-grouping-list .grouping-item-container',
-            itemTemplate: '#' ~ type ~ '-grouping-item-row'
-        } }) %}
-    {% endif %}
-    {% if type == 'oro_segment' %}
-        {% set segmentOptions = segmentOptions|merge({'gridFieldChoiceOptions': {
-            exclude: ['children']
-        } }) %}
+        {% set widgetOptions = widgetOptions|merge({
+            'grouping': {
+                editor: {
+                    mapping: { name: 'oro_report_form[grouping][columnNames]' }
+                },
+                form:          '#oro_report-grouping-form',
+                itemContainer: '#oro_report-grouping-list .grouping-item-container',
+                itemTemplate:  '#oro_report-grouping-item-row'
+            }
+        }) %}
+    {% else %}
+        {% set widgetOptions = widgetOptions|merge({'columnFieldChoiceOptions': {exclude: ['relation_type']} }) %}
     {% endif %}
 
     <div data-page-component-module="orosegment/js/app/components/segment-component"
-         data-page-component-options="{{ segmentOptions|json_encode }}"></div>
+         data-page-component-options="{{ widgetOptions|json_encode }}"></div>
 {% endmacro %}

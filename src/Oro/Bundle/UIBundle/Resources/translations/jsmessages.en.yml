@@ -3,7 +3,7 @@
 "Yes, I Agree": "Yes, I Agree"
 "Yes, do it": "Yes, do it"
 "No": "No"
-"Ok, got it.": "Ok, got it."
+"OK, got it.": "OK, got it."
 "Cancel": "Cancel"
 "Delete Confirmation": "Delete Confirmation"
 "Edit": "Edit"
@@ -35,9 +35,21 @@ Microsecond: Microsecond
 "Error! Incorrect server response.": "Error! Incorrect server response."
 "Sorry, unexpected error was occurred": "Sorry, unexpected error was occurred"
 "Please select a file...": "Please select a file..."
-Ok: Ok
+"Choose File": "Choose File"
+"Searching...": "Searching..."
+"No matches found": "No matches found"
+OK: OK
+"N/A": "N/A"
+maximize: maximize
+restore: restore
+minimize: minimize
+close: close
 
 oro:
     ui:
         widget_loading_filed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
+        unexpected_error: Unexpected error occurred. Please contact system administrator.
+        page_header:
+            button:
+                more: "More"

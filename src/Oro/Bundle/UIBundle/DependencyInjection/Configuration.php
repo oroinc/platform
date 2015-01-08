@@ -28,6 +28,7 @@ class Configuration implements ConfigurationInterface
         $rootNode->children()
             ->booleanNode('show_pin_button_on_start_page')
                 ->defaultValue(true)
+                ->info('Not used since 1.5, config node is deprecated and still there only for BC')
             ->end()
             ->arrayNode('placeholders')
                 ->useAttributeAsKey('name')
@@ -99,7 +100,32 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
             ->children()
                 ->scalarNode('applicable')->end()
-                ->scalarNode('acl')->end()
+                ->variableNode('acl')
+                    ->beforeNormalization()
+                        ->ifArray()
+                        ->then(
+                            function ($v) {
+                                return count($v) === 1 ? $v[0] : $v;
+                            }
+                        )
+                    ->end()
+                    ->validate()
+                        ->ifTrue(
+                            function ($v) {
+                                return !is_null($v) && !is_string($v) && !is_array($v);
+                            }
+                        )
+                        ->thenInvalid('The "acl" must be a string or array, given %s.')
+                    ->end()
+                    ->validate()
+                        ->ifTrue(
+                            function ($v) {
+                                return empty($v);
+                            }
+                        )
+                        ->thenUnset()
+                    ->end()
+                ->end()
                 ->scalarNode('action')->end()
                 ->scalarNode('template')->end()
                 ->variableNode('data')->end()

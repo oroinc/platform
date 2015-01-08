@@ -26,32 +26,30 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $log;
 
-    /**
-     * Setup test obj and mock
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
+
     public function setUp()
     {
         $this->processorRegistry = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry');
-
-        $this->jobExecutor = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->registry    = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
-        $this->integration = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
-        $this->log         = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
-
-        $this->log->expects($this->any())
-            ->method('info')
-            ->will($this->returnValue(''));
+        $this->jobExecutor       = $this->getMockBuilder('Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor')
+            ->disableOriginalConstructor()->getMock();
+        $this->registry          = $this->getMock('Oro\Bundle\IntegrationBundle\Manager\TypesRegistry');
+        $this->integration       = $this->getMock('Oro\Bundle\IntegrationBundle\Entity\Channel');
+        $this->log               = $this->getMock('Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy');
+        $this->eventDispatcher   = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
     }
 
-    /**
-     * Tear down
-     */
     public function tearDown()
     {
-        unset($this->processorRegistry, $this->registry, $this->jobExecutor, $this->processor, $this->log);
+        unset(
+            $this->processorRegistry,
+            $this->registry,
+            $this->jobExecutor,
+            $this->processor,
+            $this->eventDispatcher,
+            $this->log
+        );
     }
 
     /**
@@ -95,7 +93,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($realConnector));
 
         $this->integration->expects($this->once())
-            ->method('getEnabled')
+            ->method('isEnabled')
             ->will($this->returnValue(true));
 
         $jobResult = new JobResult();
@@ -138,6 +136,7 @@ class ReverseSyncProcessorTest extends \PHPUnit_Framework_TestCase
                 $this->processorRegistry,
                 $this->jobExecutor,
                 $this->registry,
+                $this->eventDispatcher,
                 $this->log
             ]
         );

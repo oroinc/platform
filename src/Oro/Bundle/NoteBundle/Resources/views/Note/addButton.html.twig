@@ -1,19 +1,28 @@
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{{ UI.clientButton({
+    'dataUrl': path(
+        'oro_note_create', {
+            entityClass: oro_class_name(entity, true),
+            entityId: entity.id
+    }),
+    'aCss': 'no-hash',
+    'iCss': 'icon-comment-alt',
+    'dataId': entity.id,
+    'label': 'oro.note.action.add'|trans,
+    'widget': {
+        'type': 'dialog',
+        'multiple': false,
+        'refresh-widget-alias': 'activity-list-widget',
+        'options': {
+            'alias': 'note-dialog',
+            'dialogOptions': {
+                'title': 'oro.note.action.add'|trans,
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 1000
+            }
+        }
+    }
+}) }}
 
-{% if resource_granted('oro_note_create') %}
-    {{ UI.clientButton({
-        'id': 'add-entity-note-button',
-        'aCss': 'no-hash',
-        'iCss': 'icon-comment-alt hide-text',
-        'label' : 'oro.note.action.add'|trans
-    }) }}
-    <script type="text/javascript">
-        require(['jquery', 'oroui/js/mediator'],
-        function($, mediator){
-            $('#add-entity-note-button').on('click', function(e) {
-                e.preventDefault();
-                mediator.trigger('note:add');
-            });
-        });
-    </script>
-{% endif %}

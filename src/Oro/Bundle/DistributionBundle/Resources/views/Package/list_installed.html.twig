@@ -1,11 +1,11 @@
 {% extends 'OroDistributionBundle::base_inner.html.twig' %}
 
-{% block title %}Installed Packages{% endblock %}
+{% block title %}{{ 'oro.distribution.package.installed'|trans }}{% endblock %}
 
 {% block menu %}
     <a class="btn btn-primary btn-large" id="install-new-package" href="{{ path('oro_distribution_package_listavailable') }}">
         <i class="icon-settings"></i>
-        Install New Package
+        {{ 'oro.distribution.package.install_new'|trans }}
     </a>
 {% endblock %}
 
@@ -21,12 +21,12 @@
         <col width="15%" valign="top"/>
         <thead>
         <tr>
-            <th>Package</th>
-            <th>Type</th>
-            <th>License</th>
-            <th>Author</th>
-            <th>Current Version</th>
-            <th>Latest Version</th>
+            <th>{{ 'oro.distribution.package.package'|trans }}</th>
+            <th>{{ 'oro.distribution.package.type'|trans }}</th>
+            <th>{{ 'oro.distribution.package.license'|trans }}</th>
+            <th>{{ 'oro.distribution.package.author'|trans }}</th>
+            <th>{{ 'oro.distribution.package.current_version'|trans }}</th>
+            <th>{{ 'oro.distribution.package.latest_version'|trans }}</th>
         </tr>
         </thead>
         <tbody>
@@ -42,7 +42,7 @@
                     {% for license in item.package.license %}
                         {{ license }}
                     {% else %}
-                        <em>unknown</em>
+                        <em>{{ 'oro.distribution.package.unknown'|trans }}</em>
                     {% endfor %}
                 </td>
                 <td>
@@ -55,7 +55,7 @@
                             {% endif %}
                         </div>
                     {% else %}
-                        <em>unknown</em>
+                        <em>{{ 'oro.distribution.package.unknown'|trans }}</em>
                     {% endfor %}
                 </td>
                 <td>
@@ -70,7 +70,7 @@
                                data-action="update"
                                data-params='{"packageName": "{{ item.package.prettyName }}" }'>
                                 <i class="icon-refresh"></i>
-                                Update
+                                {{ 'oro.distribution.action.update'|trans }}
                             </a>
                         {% endif %}
                     {% endif %}
@@ -78,7 +78,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="6"><em>Nothing installed</em></td>
+                <td colspan="6"><em>{{ 'oro.distribution.package.nothing_installed'|trans }}</em></td>
             </tr>
         {% endfor %}
 

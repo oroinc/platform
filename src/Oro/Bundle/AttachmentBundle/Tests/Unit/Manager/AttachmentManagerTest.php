@@ -94,10 +94,12 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->attachment->setId(1);
         $this->attachment->setExtension('txt');
+        $this->attachment->setOriginalFilename('testFile.withForwardSlash?.txt');
         $fieldName = 'testField';
         $parentEntity = new TestClass();
-        $expectsString = 'T3JvXEJ1bmRsZVxBdHRhY2htZW50QnVuZGxlXFRlc3RzXFVuaXRcRml4dHVyZXNcVGVzdENsYXNzfHRlc3RGaW'.
-            'VsZHwxfGRvd25sb2FkfHRlc3RGaWxlLnR4dA==';
+        $expectsString = 'T3JvXEJ1bmRsZVxBdHRhY2htZW50QnVuZGxlXFRlc3RzXFVuaXRcRml4dHVyZXNcVGVzdENsYXNzfHRlc3RG'.
+            'aWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g_LnR4dA==';
+                                                                  //^Underscore should replace / character
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
@@ -119,10 +121,10 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 'testField',
                 1,
                 'download',
-                'testFile.txt'
+                'testFile.withForwardSlash?.txt'
             ],
             $this->attachmentManager->decodeAttachmentUrl(
-                'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLnR4dA=='
+                'T3JvXFRlc3RcVGVzdENsYXNzfHRlc3RGaWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g/LnR4dA=='
             )
         );
     }
@@ -257,5 +259,25 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
         $this->attachmentManager->getFilteredImageUrl($this->attachment, $filerName);
+    }
+
+    /**
+     * @dataProvider getData
+     */
+    public function testGetFileSize($value, $expected)
+    {
+        $this->assertEquals($expected, $this->attachmentManager->getFileSize($value));
+    }
+
+    public function getData()
+    {
+        return [
+            [0, '0.00 B'],
+            [pow(1024, 0), '1.00 B'],
+            [pow(1024, 1), '1.02 KB'],
+            [pow(1024, 2), '1.05 MB'],
+            [pow(1024, 3), '1.07 GB'],
+            [pow(1024, 4), pow(1024, 4)],
+        ];
     }
 }

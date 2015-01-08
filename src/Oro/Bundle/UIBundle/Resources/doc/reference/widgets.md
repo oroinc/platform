@@ -31,7 +31,7 @@ RequireJS services
  - **oro/block-widget** - Block widget
  - **oro/buttons-widget** - Buttons widget
  - **oro/dialog-widget** - Dialog widget
- - **oroui/js/widget/abstract** - Abstract widget, can not be used standalone
+ - **oroui/js/widget/abstract-widget** - Abstract widget, can not be used standalone
 
 Widgets
 =======
@@ -68,7 +68,6 @@ Containers
 -   Dialog window - shown widget content in dialog window
 -   Button - show only included content without title and actions
 -   Block - display embedded widget content on page
-
 
 
 API
@@ -343,7 +342,7 @@ Parameters:
 
 Name |  Type |  Description
 -----|-------|-------------
-widget | oro.AbstractWidget | widget instance
+widget | oroui.widget.AbstractWidget | widget instance
 
 #### getWidgetInstance(wid, callback)
 
@@ -376,3 +375,24 @@ Parameters:
 Name |  Type |  Description
 -----|-------|-------------
 wid | string | unique widget identifier
+
+
+Backend-end
+============
+
+Widget context provider
+-----------------------
+
+Provide possibility to know current context of application during rendering. It allows you to customize application based on current context.
+It registered as DI service named `oro_ui.provider.widget_context`. Possible to inject it as global variable for twig templates.
+ 
+API
+---
+
+#### isActive
+ 
+ Returns whether current **widget context** is in active state. 
+ 
+#### getWid
+
+ Returns unique widget identifier if **widget context** is active or `FALSE` otherwise.

@@ -6,6 +6,7 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
+use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Oro\Bundle\SearchBundle\Entity\Item;
@@ -47,10 +48,19 @@ class Orm extends AbstractEngine
     {
         if (null === $class) {
             $this->clearAllSearchIndexes();
-            $entityNames = $this->mapper->getEntities();
+            $entityNames = $this->mapper->getEntities([Mode::NORMAL, Mode::WITH_DESCENDANTS]);
         } else {
-            $this->clearSearchIndexForEntity($class);
-            $entityNames = array($class);
+            $entityNames = [$class];
+            $mode        = $this->mapper->getEntityModeConfig($class);
+            if ($mode === Mode::WITH_DESCENDANTS) {
+                $entityNames = array_merge($entityNames, $this->mapper->getRegisteredDescendants($class));
+            } elseif ($mode === Mode::ONLY_DESCENDANTS) {
+                $entityNames = $this->mapper->getRegisteredDescendants($class);
+            }
+
+            foreach ($entityNames as $class) {
+                $this->clearSearchIndexForEntity($class);
+            }
         }
 
         // index data by mapping config
@@ -244,10 +254,8 @@ class Orm extends AbstractEngine
      */
     protected function getIndexRepository()
     {
-        if (!$this->indexRepository) {
-            $this->indexRepository = $this->registry->getRepository('OroSearchBundle:Item');
-            $this->indexRepository->setDriversClasses($this->drivers);
-        }
+        $this->indexRepository = $this->registry->getRepository('OroSearchBundle:Item');
+        $this->indexRepository->setDriversClasses($this->drivers);
 
         return $this->indexRepository;
     }

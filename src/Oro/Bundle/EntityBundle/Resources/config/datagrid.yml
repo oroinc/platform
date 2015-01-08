@@ -4,6 +4,7 @@ datagrid:
             base_datagrid_class: Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid
             entityHint: entity
             export: true
+            entity_pagination: true
         source:
             acl_resource: ~
             type: orm

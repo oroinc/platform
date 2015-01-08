@@ -39,7 +39,11 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          "activity"={
  *              "route"="oro_email_activity_view",
  *              "acl"="oro_email_view",
- *              "action_widget"="oro_send_email_button"
+ *              "action_button_widget"="oro_send_email_button",
+ *              "action_link_widget"="oro_send_email_link"
+ *          },
+ *          "comment"={
+ *              "applicable"=true
  *          }
  *      }
  * )

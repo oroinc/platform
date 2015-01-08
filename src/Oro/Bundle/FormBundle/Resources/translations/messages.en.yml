@@ -1,9 +1,258 @@
-oro.form.choose_value: Choose a value...
-oro.form.click_here_to_select: Click here to select...
 "Choose Existing": Choose Existing
 "Choose Another": Choose Another
 Choose: Choose
 "Create New": Create New
 Cancel: Cancel
-oro.form.tooltip.read_more: Read more
 "Please select": "Please select"
+oro:
+    form:
+        choose_value: Choose a value...
+        click_here_to_select: Click here to select...
+        tooltip.read_more: Read more
+        color:
+            custom:         Custom color...
+            bold_blue:      Bold blue
+            blue:           Blue
+            turquoise:      Turquoise
+            green:          Green
+            bold_green:     Bold green
+            yellow:         Yellow
+            orange:         Orange
+            red:            Red
+            bold_red:       Bold red
+            purple:         Purple
+            gray:           Gray
+        icon_select:
+            adjust: adjust
+            anchor: anchor
+            archive: archive
+            asterisk: asterisk
+            ban-circle: ban circle
+            bar-chart: bar chart
+            barcode: barcode
+            beaker: beaker
+            beer: beer
+            bell: bell
+            bell-alt: bell alt
+            bolt: bolt
+            book: book
+            bookmark: bookmark
+            bookmark-empty: bookmark empty
+            briefcase: briefcase
+            bug: bug
+            building: building
+            bullhorn: bullhorn
+            bullseye: bullseye
+            calendar: calendar
+            calendar-empty: calendar empty
+            camera: camera
+            camera-retro: camera retro
+            certificate: certificate
+            check: check
+            check-empty: check empty
+            check-minus: check minus
+            check-sign: check sign
+            circle: circle
+            circle-blank: circle blank
+            cloud: cloud
+            cloud-download: cloud download
+            cloud-upload: cloud upload
+            code: code
+            code-fork: code fork
+            coffee: coffee
+            cog: cog
+            cogs: cogs
+            collapse: collapse
+            collapse-alt: collapse alt
+            collapse-top: collapse top
+            comment: comment
+            comment-alt: comment alt
+            comments: comments
+            comments-alt: comments alt
+            compass: compass
+            credit-card: credit card
+            crop: crop
+            dashboard: dashboard
+            desktop: desktop
+            download: download
+            download-alt: download alt
+            edit: edit
+            edit-sign: edit sign
+            ellipsis-horizontal: ellipsis horizontal
+            ellipsis-vertical: ellipsis vertical
+            envelope: envelope
+            envelope-alt: envelope alt
+            eraser: eraser
+            exchange: exchange
+            exclamation: exclamation
+            exclamation-sign: exclamation sign
+            expand: expand
+            expand-alt: expand alt
+            external-link: external link
+            external-link-sign: external link sign
+            eye-close: eye close
+            eye-open: eye open
+            facetime-video: facetime video
+            female: female
+            fighter-jet: fighter jet
+            film: film
+            filter: filter
+            fire: fire
+            fire-extinguisher: fire extinguisher
+            flag: flag
+            flag-alt: flag alt
+            flag-checkered: flag checkered
+            folder-close: folder close
+            folder-close-alt: folder close alt
+            folder-open: folder open
+            folder-open-alt: folder open alt
+            food: food
+            frown: frown
+            gamepad: gamepad
+            gear: gear
+            gears: gears
+            gift: gift
+            glass: glass
+            globe: globe
+            group: group
+            hdd: hdd
+            headphones: headphones
+            heart: heart
+            heart-empty: heart empty
+            home: home
+            inbox: inbox
+            info: info
+            info-sign: info sign
+            key: key
+            keyboard: keyboard
+            laptop: laptop
+            leaf: leaf
+            legal: legal
+            lemon: lemon
+            level-down: level down
+            level-up: level up
+            lightbulb: lightbulb
+            list-alt: list alt
+            location-arrow: location arrow
+            lock: lock
+            magic: magic
+            magnet: magnet
+            mail-forward: mail forward
+            mail-reply: mail reply
+            mail-reply-all: mail reply all
+            male: male
+            map-marker: map marker
+            meh: meh
+            microphone: microphone
+            microphone-off: microphone off
+            minus: minus
+            minus-sign: minus sign
+            minus-sign-alt: minus sign alt
+            mobile-phone: mobile phone
+            money: money
+            moon: moon
+            move: move
+            music: music
+            off: off
+            ok: ok
+            ok-circle: ok circle
+            ok-sign: ok sign
+            pencil: pencil
+            phone: phone
+            phone-sign: phone sign
+            picture: picture
+            plane: plane
+            plus: plus
+            plus-sign: plus sign
+            plus-sign-alt: plus sign alt
+            power-off: power off
+            print: print
+            pushpin: pushpin
+            puzzle-piece: puzzle piece
+            qrcode: qrcode
+            question: question
+            question-sign: question sign
+            quote-left: quote left
+            quote-right: quote right
+            random: random
+            refresh: refresh
+            remove: remove
+            remove-circle: remove circle
+            remove-sign: remove sign
+            reorder: reorder
+            reply: reply
+            reply-all: reply all
+            resize-horizontal: resize horizontal
+            resize-vertical: resize vertical
+            retweet: retweet
+            road: road
+            rocket: rocket
+            rss: rss
+            rss-sign: rss sign
+            screenshot: screenshot
+            search: search
+            share: share
+            share-alt: share alt
+            share-sign: share sign
+            shield: shield
+            shopping-cart: shopping cart
+            sign-blank: sign blank
+            signal: signal
+            signin: signin
+            signout: signout
+            sitemap: sitemap
+            smile: smile
+            sort: sort
+            sort-by-alphabet: sort by alphabet
+            sort-by-alphabet-alt: sort by alphabet alt
+            sort-by-attributes: sort by attributes
+            sort-by-attributes-alt: sort by attributes alt
+            sort-by-order: sort by order
+            sort-by-order-alt: sort by order alt
+            sort-down: sort down
+            sort-up: sort up
+            spinner: spinner
+            star: star
+            star-empty: star empty
+            star-half: star half
+            star-half-empty: star half empty
+            star-half-full: star half full
+            subscript: subscript
+            suitcase: suitcase
+            sun: sun
+            superscript: superscript
+            tablet: tablet
+            tag: tag
+            tags: tags
+            tasks: tasks
+            terminal: terminal
+            thumbs-down: thumbs down
+            thumbs-down-alt: thumbs down alt
+            thumbs-up: thumbs up
+            thumbs-up-alt: thumbs up alt
+            ticket: ticket
+            time: time
+            tint: tint
+            trash: trash
+            trophy: trophy
+            truck: truck
+            umbrella: umbrella
+            unchecked: unchecked
+            unlock: unlock
+            unlock-alt: unlock alt
+            upload: upload
+            upload-alt: upload alt
+            user: user
+            volume-down: volume down
+            volume-off: volume off
+            volume-up: volume up
+            warning-sign: warning sign
+            wrench: wrench
+            zoom-in: zoom in
+            zoom-out: zoom out
+        system_configuration:
+            groups:
+                wysiwyg_settings.title: 'WYSIWYG settings'
+            fields:
+                wysiwyg_enabled:
+                    label: 'Enable WYSIWYG editor'

@@ -7,6 +7,7 @@ parameters:
     oro_note.entity_generator.extension.class:          Oro\Bundle\NoteBundle\Tools\NoteEntityGeneratorExtension
     oro_note.manager.class:                             Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
     oro_note.manager.api.class:                         Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
+    oro_note.activity_list.provider.class:              Oro\Bundle\NoteBundle\Provider\NoteActivityListProvider
 
 services:
     oro_note.note_lifecycle_listener:
@@ -54,3 +55,18 @@ services:
         class: %oro_note.migration.extension.note.class%
         tags:
             - { name: oro_migration.extension, extension_name: note }
+
+    oro_note.widget_provider.actions:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_add_note_button
+            - oro_add_note_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity, priority: -100 }
+
+    oro_note.activity_list.provider:
+        class: %oro_note.activity_list.provider.class%
+        arguments:
+           - @oro_entity.doctrine_helper
+        tags:
+           - {name: oro_activity_list.provider, priority: 40}

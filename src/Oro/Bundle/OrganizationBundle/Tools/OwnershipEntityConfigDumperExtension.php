@@ -81,7 +81,7 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
             ) {
                 $this->createOwnerRelation(
                     $entityConfig,
-                    $this->getOwnerTargetEntityClassName($ownerType),
+                    $this->ownershipMetadataProvider->getOrganizationClass(),
                     $ownershipConfig->get('organization_field_name')
                 );
             }

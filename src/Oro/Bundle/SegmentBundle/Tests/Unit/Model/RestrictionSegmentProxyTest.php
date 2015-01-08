@@ -74,7 +74,8 @@ class RestrictionSegmentProxyTest extends SegmentDefinitionTestCase
                 [
                     'columns' => [
                         [
-                            'name' => self::TEST_IDENTIFIER_NAME,
+                            'name'     => self::TEST_IDENTIFIER_NAME,
+                            'distinct' => true
                         ]
                     ],
                     'filters' => [

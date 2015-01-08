@@ -1,0 +1,83 @@
+{% macro calendar_event_view_template(id) %}
+<script type="text/html" id="{{ id }}">
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <div class="widget-content">
+        <div class="row-fluid form-horizontal">
+            <div class="responsive-block">
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.title.label'|trans, '<%= formatter.string(title) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, '<%= formatter.text(description) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+            </div>
+            <div class="widget-actions form-actions" style="display: none;">
+                <% if (id != null && removable) { %>
+                {{
+                    UI.deleteButton({
+                        'aCss': 'no-hash',
+                        'id': 'btn-remove-calendarevent',
+                        'dataMessage': 'oro.calendar.delete_event.confirmation'|trans,
+                        'title': 'oro.calendar.delete_event.title'|trans,
+                        'label': 'Delete'|trans,
+                        'data': {'action-name': 'delete'}
+                    })
+                }}
+                <% } %>
+                <% if (id == null || (id != null && editable)) { %>
+                <button class="btn" type="button" data-action-name="edit">{{ 'oro.ui.edit'|trans }}</button>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</script>
+{% endmacro %}
+
+{% macro calendar_event_form_template(id, form) %}
+<script type="text/html" id="{{ id }}">
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
+    {% set data = [
+            form_row(form.title),
+            form_row(form.description),
+            form_row(form.start),
+            form_row(form.end),
+            form_row(form.allDay),
+            form_row(form.backgroundColor),
+            form.calendarUid is defined ? form_row(form.calendarUid) : null,
+            form_row(form.childEvents)|replace({'childEvents': 'invitedUsers'}),
+            form_row(form.reminders),
+            form_row(form.notifyInvitedUsers)
+        ]
+    %}
+    <div class="widget-content">
+        <div class="alert alert-error" style="display: none;"></div>
+        <form id="{{ form.vars.name }}" action="#">
+            <fieldset class="form-horizontal">
+                {{ UI.scrollSubblock(null, data, true, false)|oro_js_template_content|raw }}
+                <% if (typeof notifiable !== 'undefined' && notifiable) { %>
+                    {{ invitations.notifyGuestsComponent() }}
+                <% } %>
+                <div class="widget-actions form-actions" style="display: none;">
+                    <% if (id != null && removable) { %>
+                    {{
+                        UI.deleteButton({
+                            'aCss': 'no-hash',
+                            'id': 'btn-remove-calendarevent',
+                            'dataMessage': 'oro.calendar.delete_event.confirmation'|trans,
+                            'title': 'oro.calendar.delete_event.title'|trans,
+                            'label': 'Delete'|trans,
+                            'data': {'action-name': 'delete'}
+                        })
+                    }}
+                    <% } %>
+                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                    <% if (id == null || (id != null && editable)) { %>
+                    <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                    <% } %>
+                </div>
+            </fieldset>
+        </form>
+        {{ oro_form_js_validation(form)|oro_js_template_content|raw }}
+    </div>
+</script>
+{% endmacro %}

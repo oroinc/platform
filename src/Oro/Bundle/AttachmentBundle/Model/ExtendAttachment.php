@@ -15,6 +15,19 @@ class ExtendAttachment
     }
 
     /**
+     * Checks if this attachment can be associated with the given target entity type
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportTarget($targetClass)
+    {
+        return false;
+    }
+
+    /**
      * Gets the entity this attachment is associated with
      * The real implementation of this method is auto generated.
      *

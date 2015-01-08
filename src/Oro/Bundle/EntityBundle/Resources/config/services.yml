@@ -1,8 +1,6 @@
 parameters:
     oro_entity.listener.navigation_listener.class:                 Oro\Bundle\EntityBundle\EventListener\NavigationListener
     oro_entity.owner.entity_config_subscriber.class:               Oro\Bundle\EntityBundle\EventListener\EntityConfigSubscriber
-    oro_entity.datagrid.extension.dynamic_fields.class:            Oro\Bundle\EntityBundle\Grid\DynamicFieldsExtension
-    oro_entity.datagrid.extension.additional_fields.class:         Oro\Bundle\EntityBundle\Grid\AdditionalFieldsExtension
     oro_entity.datagrid_helper.class:                              Oro\Bundle\EntityBundle\Grid\GridHelper
     oro_entity.event_listener.custom_entity_grid_listener.class:   Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
     oro_entity.event_listener.entity_relation_grid_listener.class: Oro\Bundle\EntityBundle\EventListener\EntityRelationGridListener
@@ -17,7 +15,7 @@ parameters:
     oro_entity.entity_provider.class:                              Oro\Bundle\EntityBundle\Provider\EntityProvider
     oro_entity.entity_field_provider.class:                        Oro\Bundle\EntityBundle\Provider\EntityFieldProvider
     oro_entity.entity_field_list_provider.class:                   Oro\Bundle\EntityBundle\Provider\EntityWithFieldsProvider
-    oro_entity.twig.extension.class_name.class:                    Oro\Bundle\EntityBundle\Twig\ClassNameExtension
+    oro_entity.twig.extension.entity.class:                        Oro\Bundle\EntityBundle\Twig\EntityExtension
     oro_entity.routing_helper.class:                               Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
     oro_entity.extension.unique_entity_extension.class:            Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
 
@@ -32,8 +30,7 @@ services:
         class: %oro_entity.listener.navigation_listener.class%
         arguments:
             - @oro_security.security_facade
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.extend
+            - @oro_entity_config.config_manager
             - @translator
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
@@ -51,24 +48,6 @@ services:
         class: %oro_entity.owner.entity_config_subscriber.class%
         tags:
             - { name: kernel.event_subscriber }
-
-    oro_entity.datagrid.extension.dynamic_fields:
-        class: %oro_entity.datagrid.extension.dynamic_fields.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity.orm.entity_class_resolver
-            - @oro_datagrid.datagrid.guesser
-        tags:
-            - { name: oro_datagrid.extension }
-
-    oro_entity.datagrid.extension.additional_fields:
-        class: %oro_entity.datagrid.extension.additional_fields.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity.orm.entity_class_resolver
-            - @oro_datagrid.datagrid.guesser
-        tags:
-            - { name: oro_datagrid.extension }
 
     oro_entity.datagrid_helper:
         class: %oro_entity.datagrid_helper.class%
@@ -172,8 +151,11 @@ services:
             - @oro_entity.entity_field_provider
             - @oro_entity.entity_provider
 
-    oro_entity.twig.extension.class_name:
-        class: %oro_entity.twig.extension.class_name.class%
+    oro_entity.twig.extension.entity:
+        class: %oro_entity.twig.extension.entity.class%
+        arguments:
+            - @oro_entity.entity_identifier_accessor
+            - @oro_entity.routing_helper
         tags:
             - { name: twig.extension }
 

@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table(name="test_search_product")
  */
-class Product
+class Product implements TestFrameworkEntityInterface
 {
     /**
      * @var integer $id

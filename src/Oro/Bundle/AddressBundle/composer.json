@@ -10,7 +10,7 @@
         "symfony/symfony": "2.3.*",
         "doctrine/orm": ">=2.2.3,<2.5-dev",
         "doctrine/doctrine-bundle": "1.1.*",
-        "friendsofsymfony/rest-bundle": "0.11.*",
+        "friendsofsymfony/rest-bundle": "1.5.0-RC2",
         "friendsofsymfony/jsrouting-bundle": "1.1.*@dev",
         "nelmio/api-doc-bundle": "dev-master",
         "oro/form-bundle": "dev-master",

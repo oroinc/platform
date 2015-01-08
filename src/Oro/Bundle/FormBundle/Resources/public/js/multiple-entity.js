@@ -45,6 +45,8 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             if (this.options.defaultElement) {
                 this.listenTo(this.getCollection(), 'defaultChange', this.updateDefault);
                 this.$defaultEl = this.$el.closest('form').find('[name$="[' + this.options.defaultElement + ']"]');
+            } else {
+                this.$defaultEl = $();
             }
 
             this.initialCollectionItems = [];

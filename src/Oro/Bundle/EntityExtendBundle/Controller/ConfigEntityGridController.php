@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Controller;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 
@@ -98,7 +98,7 @@ class ConfigEntityGridController extends Controller
         $configManager = $this->get('oro_entity_config.config_manager');
 
         if ($request->getMethod() == 'POST') {
-            $className = ExtendConfigDumper::ENTITY . $request->request->get(
+            $className = ExtendHelper::ENTITY_NAMESPACE . $request->request->get(
                 'oro_entity_config_type[model][className]',
                 null,
                 true
@@ -109,6 +109,7 @@ class ConfigEntityGridController extends Controller
             $extendConfig->set('owner', ExtendScope::OWNER_CUSTOM);
             $extendConfig->set('state', ExtendScope::STATE_NEW);
             $extendConfig->set('upgradeable', false);
+            $extendConfig->set('origin', ExtendScope::ORIGIN_CUSTOM);
             $extendConfig->set('is_extend', true);
 
             $config = $configManager->getProvider('security')->getConfig($className);
@@ -193,7 +194,7 @@ class ConfigEntityGridController extends Controller
         $configManager->persist($entityConfig);
         $configManager->flush();
 
-        return new JsonResponse(array('message' => 'Item was removed', 'successful' => true), Codes::HTTP_OK);
+        return new JsonResponse(array('message' => 'Item deleted', 'successful' => true), Codes::HTTP_OK);
     }
 
     /**

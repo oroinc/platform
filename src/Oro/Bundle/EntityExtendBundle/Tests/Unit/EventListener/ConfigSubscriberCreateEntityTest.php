@@ -64,15 +64,10 @@ class ConfigSubscriberCreateEntityTest extends \PHPUnit_Framework_TestCase
         /** @var ConfigManager $cm */
         $cm = $event->getConfigManager();
 
-        /**
-         * value of persisted config should have:
-         *  - is_extend -> true
-         *  - extend_class -> 'Extend\Entity\ExtendTestClass'
-         */
         $this->assertEquals(
             [
                 'is_extend' => true,
-                'extend_class' => 'Extend\Entity\ExtendTestClass'
+                'extend_class' => 'Extend\Entity\EX_OroEntityExtendBundle_Tests_Unit_Fixtures_TestClass'
             ],
             $entityConfig->all()
         );

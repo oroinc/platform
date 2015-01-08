@@ -7,6 +7,7 @@ How to enable activity association using migrations
 ---------------------------------------------------
 
 Usually you do not need to provide predefined set of associations between the activity entity and other entities, rather it is the administrator chose to do this. But it is possible to create this type of association using migrations if you need. The following example shows how it can be done:
+
 ``` php
 <?php
 
@@ -57,16 +58,17 @@ class OroUserBundle implements Migration, ActivityExtensionAwareInterface
 How to make an entity as activity
 ---------------------------------
 
-If you created the new entity and want to make it as the activity one you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class, for example:
+If you created the new entity and want to make it as the activity you need to make it the extended and include it in `activity` group. To make the entity extended you need create a base abstract class. The name of this class should start with `Extend` word and this class should implement [ActivityInterface](/Model/ActivityInterface.php). An example:
 
 ``` php
 <?php
 
 namespace Oro\Bundle\EmailBundle\Model;
 
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Model\ExtendActivity;
 
-class ExtendEmail
+class ExtendEmail implements ActivityInterface
 {
     use ExtendActivity;
 
@@ -173,7 +175,9 @@ Please note that in the above example we use `route` attribute to specify contro
 
 To add activity button on the view page of the entity your activity can be assigned, you need to do the following:
 
-Create TWIG template responsible to render the button, for example:
+Create two TWIG templates responsible to render a button and a link in dropdown menu. Please note that you should provide both templates, because an action can be rendered as a button as a link and it can depends on a number of actions, UI theme, device (desktop/mobile) and so on. An example of TWIG templates:
+
+activityButton.html.twig
 
 ``` twig
 {{ UI.clientButton({
@@ -206,16 +210,52 @@ Create TWIG template responsible to render the button, for example:
 }) }}
 ```
 
-Register this template in *placeholders.yml*, for example:
+activityLink.html.twig
+
+``` twig
+{{ UI.clientLink({
+    'dataUrl': path(
+        'oro_email_email_create', {
+            to: oro_get_email(entity),
+            entityClass: oro_class_name(entity, true),
+            entityId: entity.id
+    }),
+    'aCss': 'no-hash',
+    'iCss': 'icon-envelope',
+    'dataId': entity.id,
+    'label' : 'oro.email.send_email'|trans,
+    'widget' : {
+        'type' : 'dialog',
+        'multiple' : true,
+        'reload-grid-name' : 'activity-email-grid',
+        'options' : {
+            'alias': 'email-dialog',
+            'dialogOptions' : {
+                'title' : 'oro.email.send_email'|trans,
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'width': 1000
+            }
+        }
+    }
+}) }}
+```
+
+Register these templates in *placeholders.yml*, for example:
 
 ``` yml
 items:
     oro_send_email_button:
         template: OroEmailBundle:Email:activityButton.html.twig
         acl: oro_email_create
+    oro_send_email_link:
+        template: OroEmailBundle:Email:activityLink.html.twig
+        acl: oro_email_create
 ```
 
-Bind the item declared in *placeholders.yml* to the activity entity using `action_widget` attribute. For example:
+Bind items declared in *placeholders.yml* to the activity entity using `action_button_widget` and `action_link_widget` attribute. For example:
 
 ``` php
 /**
@@ -225,7 +265,8 @@ Bind the item declared in *placeholders.yml* to the activity entity using `actio
  *      "activity"={
  *          "route"="oro_email_activity_view",
  *          "acl"="oro_email_view",
- *          "action_widget"="oro_send_email_button"
+ *          "action_button_widget"="oro_send_email_button"
+ *          "action_link_widget"="oro_send_email_link"
  *      }
  *  }
  * )

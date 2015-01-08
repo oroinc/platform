@@ -1,0 +1,19 @@
+oro:
+    activitylist:
+        edit_title:   Update activity item
+        delete_title: Delete activity item
+
+        item_saved:   Activity item saved
+        item_removed: Activity item deleted
+
+        delete_confirmation: Are you sure you want to delete this activity item?
+        delete_error:        Sorry, the activity item deleting was failed.
+
+        load_error:      Sorry, activity list was not loaded correctly.
+        forbidden_error: You do not have permission to perform this action.
+        widget:
+            filter:
+                date_picker.title: Date Range
+                activity.title: Activity Type
+        comment:
+            quantity_label: Comments quantity

@@ -24,11 +24,13 @@ interface ConfigProviderInterface
      * Filters configuration data of all classes (if $className is not specified)
      * or all fields of the given $className using the given callback function.
      *
-     * @param callable $callback The callback function to use
+     * @param callable    $callback The callback function to use
      * @param string|null $className
-     * @return array|ConfigInterface[]
+     * @param bool        $withHidden
+     *
+     * @return array|\Oro\Bundle\EntityConfigBundle\Config\ConfigInterface[]
      */
-    public function filter($callback, $className = null);
+    public function filter($callback, $className = null, $withHidden = false);
 
     /**
      * Gets configuration data for the given class or field.

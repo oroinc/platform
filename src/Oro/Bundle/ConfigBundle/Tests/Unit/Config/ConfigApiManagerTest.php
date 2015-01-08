@@ -71,6 +71,9 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
         $subSection1->addSubSection($subSection11);
         $subSection11->addVariable(new VariableDefinition('acme.item2', 'integer'));
         $subSection11->addVariable(new VariableDefinition('acme.item3', 'array'));
+        $subSection11->addVariable(new VariableDefinition('acme.item4', 'boolean'));
+        $subSection11->addVariable(new VariableDefinition('acme.item5', 'boolean'));
+        $subSection11->addVariable(new VariableDefinition('acme.item6', 'integer'));
 
         $this->configProvider->expects($this->once())
             ->method('getApiTree')
@@ -84,15 +87,68 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
                         ['acme.item1', false, false, 'val1'],
                         ['acme.item2', false, false, 123],
                         ['acme.item3', false, false, ['val1' => 1, 'val2' => true]],
+                        ['acme.item4', false, false, false],
+                        ['acme.item5', false, false, ""],
+                        ['acme.item6', false, false, "123"],
+                    ]
+                )
+            );
+        $datetime = new \DateTime('now', new \DateTimeZone('UTC'));
+        $this->configManager->expects($this->any())
+            ->method('getInfo')
+            ->will(
+                $this->returnValue(
+                    [
+                        'createdAt' => $datetime,
+                        'updatedAt' => $datetime,
                     ]
                 )
             );
 
         $this->assertSame(
             [
-                ['key' => 'acme.item1', 'type' => 'string', 'value' => 'val1'],
-                ['key' => 'acme.item2', 'type' => 'integer', 'value' => 123],
-                ['key' => 'acme.item3', 'type' => 'array', 'value' => ['val1' => 1, 'val2' => true]],
+                [
+                    'key' => 'acme.item1',
+                    'type' => 'string',
+                    'value' => 'val1',
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
+                [
+                    'key' => 'acme.item2',
+                    'type' => 'integer',
+                    'value' => 123,
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
+                [
+                    'key' => 'acme.item3',
+                    'type' => 'array',
+                    'value' => ['val1' => 1, 'val2' => true],
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
+                [
+                    'key' => 'acme.item4',
+                    'type' => 'boolean',
+                    'value' => false,
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
+                [
+                    'key' => 'acme.item5',
+                    'type' => 'boolean',
+                    'value' => false,
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
+                [
+                    'key' => 'acme.item6',
+                    'type' => 'integer',
+                    'value' => 123,
+                    'createdAt' => $datetime,
+                    'updatedAt' => $datetime,
+                ],
             ],
             $this->manager->getData($path)
         );

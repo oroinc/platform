@@ -2,6 +2,10 @@
 {% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
 {% import 'OroUIBundle::macros.html.twig' as UI %}
 
+{% block before_content_addition %}
+    {% placeholder view_before_content_addition with {entity: entity} %}
+{% endblock before_content_addition %}
+
 {% block content %}
 <div class="layout-content">
     <div class="container-fluid page-title">
@@ -25,7 +29,7 @@
                                         {% if breadcrumbs.indexLabel is defined %}
                                         <div class="sub-title">
                                         {%- if breadcrumbs.indexPath is defined -%}
-                                            <a href="{{ breadcrumbs.indexPath }}">{{ breadcrumbs.indexLabel }}</a>
+                                            <a href="{{ oro_url_add_query(breadcrumbs.indexPath) }}">{{ breadcrumbs.indexLabel }}</a>
                                         {%- else -%}
                                             {{ breadcrumbs.indexLabel }}
                                         {%- endif -%}
@@ -34,7 +38,7 @@
                                         {% endif %}
                                         {% if breadcrumbs.additional is defined %}
                                             {% for breadcrumb in breadcrumbs.additional %}
-                                                <div class="sub-title"><a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a></div>
+                                                <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumb.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
                                                 <span class="separator">/</span>
                                             {% endfor %}
                                         {% endif %}
@@ -52,7 +56,7 @@
                                     {% if isMobileVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
                                 </ul>
@@ -73,25 +77,29 @@
                         <div class="inline-decorate-container">
                             <ul class="inline-decorate">
                                 {% block pageActions %}
+                                    {% placeholder view_pageActions_before with {entity: entity} %}
+
                                     {% if isDesktopVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
-                                {% endblock pageActions %}
 
-                                {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : entity.id|default %}
-                                {% if audit_entity_id %}
-                                    {% placeholder change_history_block with {
-                                        'entity': entity,
-                                        'entity_class': audit_entity_class|default(null),
-                                        'id': audit_entity_id,
-                                        'title': audit_title|default(entity),
-                                        'audit_path': audit_path|default('oro_dataaudit_history'),
-                                        'audit_show_change_history': audit_show_change_history|default(false)
-                                    } %}
-                                {% endif %}
+                                    {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : entity.id|default %}
+                                    {% if audit_entity_id %}
+                                        {% placeholder change_history_block with {
+                                            'entity': entity,
+                                            'entity_class': audit_entity_class|default(null),
+                                            'id': audit_entity_id,
+                                            'title': audit_title|default(entity.__toString is defined ? entity : null),
+                                            'audit_path': audit_path|default('oro_dataaudit_history'),
+                                            'audit_show_change_history': audit_show_change_history|default(false)
+                                        } %}
+                                    {% endif %}
+
+                                    {% placeholder view_pageActions_after with {entity: entity} %}
+                                {% endblock pageActions %}
                             </ul>
                         </div>
                     </div>
@@ -153,6 +161,22 @@
                         ]
                     }]) %}
                 {% endif %}
+
+                {%- set commentsData  -%}
+                    {% placeholder view_content_data_comments with {entity: entity} %}
+                {%- endset -%}
+
+                {% if commentsData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'oro.comment.entity_plural_label'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'responsive-cell activity-list-widget',
+                                'data': [commentsData]
+                            }
+                        ]
+                    }]) %}
+                {% endif  %}
 
                 {% set data = data|merge({'dataBlocks': dataBlocks}) %}
             {% endif %}

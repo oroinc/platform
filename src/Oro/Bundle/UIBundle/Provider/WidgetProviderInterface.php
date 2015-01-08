@@ -8,20 +8,20 @@ namespace Oro\Bundle\UIBundle\Provider;
 interface WidgetProviderInterface
 {
     /**
-     * Determines whether this provider is applicable for the given entity
+     * Determines whether this provider is applicable for the given object
      *
-     * @param object $entity The entity object
+     * @param object $object
      *
-     * @return bool TRUE if the provider supports the given entity; otherwise, FALSE
+     * @return bool TRUE if the provider supports the given object; otherwise, FALSE
      */
-    public function supports($entity);
+    public function supports($object);
 
     /**
      * Returns widgets
      *
-     * @param object $entity The entity object
+     * @param object $object
      *
      * @return array
      */
-    public function getWidgets($entity);
+    public function getWidgets($object);
 }

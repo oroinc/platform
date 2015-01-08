@@ -75,7 +75,7 @@ define(['jquery', 'underscore'], function ($, _) {
          * @protected
          */
         decodeUriComponent: function(string) {
-            var result = string.replace('+', '%20');
+            var result = string.replace(/\+/g, '%20');
             result = decodeURIComponent(result);
             return result;
         },
@@ -165,19 +165,34 @@ define(['jquery', 'underscore'], function ($, _) {
         /**
          * Loads dynamic list of modules and execute callback function with passed modules
          *
-         * @param {Object.<string, string>} modules where keys are formal module names and values are actual
+         * @param {Object.<string, string>|Array.<string>|string} modules
+         *  - Object: where keys are formal module names and values are actual
+         *  - Array: module names,
+         *  - string: single module name
          * @param {function(Object)} callback
          * @param {Object=} context
          */
         loadModules: function (modules, callback, context) {
-            var requirements = _.values(modules);
-            // load all dependencies and build grid
-            require(requirements, function () {
-                _.each(modules, _.bind(function (value, key) {
-                    modules[key] = this[value];
-                }, _.object(requirements, _.toArray(arguments))));
-                callback.call(context || null, modules);
-            });
+            var requirements, onLoadHandler;
+            if (_.isObject(modules)) {
+                // if modules is an object of {formal_name: module_name}
+                requirements = _.values(modules);
+                onLoadHandler = function () {
+                    // maps loaded modules into original object
+                    _.each(modules, _.bind(function (value, key) {
+                        modules[key] = this[value];
+                    }, _.object(requirements, _.toArray(arguments))));
+                    callback.call(context || null, modules);
+                };
+            } else {
+                // if modules is an array of module_names or single module_name
+                requirements = !_.isArray(modules) ? [modules] : modules;
+                onLoadHandler = function () {
+                    callback.apply(context || null, arguments);
+                }
+            }
+            // loads requirements and execute onLoadHandler handler
+            require(requirements, onLoadHandler);
         },
 
         /**
@@ -186,6 +201,19 @@ define(['jquery', 'underscore'], function ($, _) {
          */
         isErrorPage: function () {
             return Boolean($('meta[name=error]').length);
+        },
+
+        /**
+         * Creates safe regexp expression from string
+         *
+         * @param {string} str
+         * @param {string} flags
+         */
+        safeRegExp: function (str, flags) {
+            var expression;
+            str = str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            expression = new RegExp(str, flags);
+            return expression;
         }
     };
 });

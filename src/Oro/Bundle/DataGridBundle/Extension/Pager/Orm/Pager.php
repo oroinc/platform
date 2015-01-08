@@ -34,6 +34,9 @@ class Pager extends AbstractPager implements PagerInterface
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
 
+    /** @var string */
+    protected $aclPermission = 'VIEW';
+
     public function __construct(
         AclHelper $aclHelper,
         CountQueryBuilderOptimizer $countQueryOptimizer,
@@ -55,6 +58,7 @@ class Pager extends AbstractPager implements PagerInterface
     public function setQueryBuilder(QueryBuilder $qb)
     {
         $this->qb = $qb;
+        $this->isTotalCalculated = false;
 
         return $this;
     }
@@ -77,7 +81,7 @@ class Pager extends AbstractPager implements PagerInterface
         $countQb = $this->countQueryBuilderOptimizer->getCountQueryBuilder($this->getQueryBuilder());
         $query = $countQb->getQuery();
         if (!$this->skipAclCheck) {
-            $query = $this->aclHelper->apply($query);
+            $query = $this->aclHelper->apply($query, $this->aclPermission);
         }
 
         $useWalker = null;
@@ -93,6 +97,21 @@ class Pager extends AbstractPager implements PagerInterface
     public function getResults($hydrationMode = Query::HYDRATE_OBJECT)
     {
         return $this->getQueryBuilder()->getQuery()->execute([], $hydrationMode);
+    }
+
+    /**
+     * Get result which are filtered by ACL
+     *
+     * @param int $hydrationMode
+     *
+     * @return array
+     */
+    public function getAppliedResult($hydrationMode = Query::HYDRATE_OBJECT)
+    {
+        $qb    = $this->getQueryBuilder();
+        $query = $this->aclHelper->apply($qb);
+
+        return $query->execute([], $hydrationMode);
     }
 
     /**
@@ -200,6 +219,14 @@ class Pager extends AbstractPager implements PagerInterface
     public function setSkipCountWalker($skipCountWalker)
     {
         $this->skipCountWalker = $skipCountWalker;
+    }
+
+    /**
+     * @param string $permission
+     */
+    public function setAclPermission($permission)
+    {
+        $this->aclPermission = $permission;
     }
 
     /**

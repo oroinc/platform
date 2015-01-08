@@ -1,6 +1,6 @@
 {% extends 'OroDistributionBundle::base_inner.html.twig' %}
 
-{% block title %}List of available updates{% endblock %}
+{% block title %}{{ 'oro.distribution.package.list_of_updates'|trans }}{% endblock %}
 
 {% block body %}
 
@@ -11,9 +11,9 @@
         <col width="10%" valign="top"/>
         <thead>
         <tr>
-            <th>Package name</th>
-            <th>Installed version</th>
-            <th>Up to date version</th>
+            <th>{{ 'oro.distribution.package.name'|trans }}</th>
+            <th>{{ 'oro.distribution.package.installed_version'|trans }}</th>
+            <th>{{ 'oro.distribution.package.up_to_date_version'|trans }}</th>
             <th>&nbsp;</th>
         </tr>
         </thead>
@@ -23,11 +23,11 @@
                 <td>{{ update.packageName }}</td>
                 <td>{{ update.currentVersionString }}</td>
                 <td>{{ update.upToDateVersionString }}</td>
-                <td><a href="#" class="ajax update" data-params='{"packageName": "{{ update.packageName }}" }'>Update</a></td>
+                <td><a href="#" class="ajax update" data-params='{"packageName": "{{ update.packageName }}" }'>{{ 'oro.distribution.action.update'|trans }}</a></td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4"><em>Nothing to update</em></td>
+                <td colspan="4"><em>{{ 'oro.distribution.package.nothing_to_update'|trans }}</em></td>
             </tr>
         {% endfor %}
         </tbody>

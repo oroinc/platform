@@ -12,10 +12,6 @@ parameters:
 services:
     oro_entity.form.type.custom_entity:
         class: %oro_entity.form.type.custom_entity.class%
-        arguments:
-            - @oro_entity_config.config_manager
-            - @router
-            - @translator
         tags:
             - { name: form.type, alias: custom_entity_type }
 
@@ -62,6 +58,7 @@ services:
         class: %oro_entity.form.handler.entity_select.class%
         calls:
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
+            - [setAclHelper, ["@oro_security.acl_helper"]]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: entity_select, acl_resource: oro_search }
 
@@ -82,7 +79,7 @@ services:
         calls:
             # default types
             - [addDoctrineTypeMapping, ["string", "text"]]
-            - [addDoctrineTypeMapping, ["integer", "integer", { precision: 0 }]]
+            - [addDoctrineTypeMapping, ["integer", "text"]] # to be able validate numbers properly, we need text input
             - [addDoctrineTypeMapping, ["smallint", "integer", { precision: 0 }]]
             - [addDoctrineTypeMapping, ["bigint", "integer", { precision: 0 }]]
             - [addDoctrineTypeMapping, ["boolean", "checkbox"]]

@@ -243,6 +243,228 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedTestFieldConfig, $testFieldConfig);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testAddManyToOneRelationWithCascade()
+    {
+        $relationName    = 'testRelation';
+        $relationKey     = 'manyToOne|Test\SourceEntity|Test\TargetEntity|testRelation';
+        $targetFieldName = 'field1';
+
+        $extendConfig      = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $extendFieldConfig = new Config(new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'));
+        $testFieldConfig   = new Config(new FieldConfigId('test', self::SOURCE_CLASS, $relationName, 'manyToOne'));
+
+        $expectedExtendConfig = new Config($extendConfig->getId());
+        $expectedExtendConfig->set(
+            'relation',
+            [
+                $relationKey => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
+                    'owner'           => true,
+                    'target_entity'   => self::TARGET_CLASS,
+                    'target_field_id' => false,
+                    'cascade'         => ['persist', 'remove']
+                ]
+            ]
+        );
+
+        $expectedExtendFieldConfig = new Config($extendFieldConfig->getId());
+        $expectedExtendFieldConfig->setValues(
+            [
+                'owner'         => ExtendScope::OWNER_CUSTOM,
+                'is_extend'     => true,
+                'state'         => ExtendScope::STATE_NEW,
+                'relation_key'  => $relationKey,
+                'target_entity' => self::TARGET_CLASS,
+                'target_field'  => $targetFieldName,
+                'cascade'       => ['persist', 'remove']
+            ]
+        );
+
+        $expectedTestFieldConfig = new Config($testFieldConfig->getId());
+        $expectedTestFieldConfig->setValues(
+            [
+                'test_attr' => 123
+            ]
+        );
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOURCE_CLASS, $relationName)
+            ->will($this->returnValue($extendFieldConfig));
+        $extendConfigProvider->expects($this->at(1))
+            ->method('persist')
+            ->with($this->identicalTo($extendFieldConfig));
+        $extendConfigProvider->expects($this->at(2))
+            ->method('persist')
+            ->with($this->identicalTo($extendConfig));
+
+        $testConfigProvider = $this->getConfigProviderMock();
+        $testConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOURCE_CLASS, $relationName)
+            ->will($this->returnValue($testFieldConfig));
+        $testConfigProvider->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($testFieldConfig));
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfigFieldModel')
+            ->with(self::SOURCE_CLASS, $relationName)
+            ->will($this->returnValue(false));
+        $this->configManager->expects($this->once())
+            ->method('createConfigFieldModel')
+            ->with(self::SOURCE_CLASS, $relationName, 'manyToOne');
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $extendConfigProvider],
+                        ['test', $testConfigProvider],
+                    ]
+                )
+            );
+
+        $this->builder->addManyToOneRelation(
+            $extendConfig,
+            self::TARGET_CLASS,
+            $relationName,
+            $targetFieldName,
+            [
+                'extend' => [
+                    'owner'   => ExtendScope::OWNER_CUSTOM,
+                    'cascade' => ['persist', 'remove']
+                ],
+                'test'   => [
+                    'test_attr' => 123
+                ]
+            ]
+        );
+
+        $this->assertEquals($expectedExtendConfig, $extendConfig);
+        $this->assertEquals($expectedExtendFieldConfig, $extendFieldConfig);
+        $this->assertEquals($expectedTestFieldConfig, $testFieldConfig);
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testAddManyToManyRelationWithCascade()
+    {
+        $relationName            = 'testRelation';
+        $relationKey             = 'manyToMany|Test\SourceEntity|Test\TargetEntity|testRelation';
+        $targetTitleFieldName    = 'field1';
+        $targetDetailedFieldName = 'field2';
+        $targetGridFieldName     = 'field3';
+
+        $extendConfig      = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $extendFieldConfig = new Config(new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToMany'));
+        $testFieldConfig   = new Config(new FieldConfigId('test', self::SOURCE_CLASS, $relationName, 'manyToOne'));
+
+        $expectedExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $expectedExtendConfig->set(
+            'relation',
+            [
+                $relationKey => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToMany'),
+                    'owner'           => true,
+                    'target_entity'   => self::TARGET_CLASS,
+                    'target_field_id' => false,
+                    'cascade'         => ['persist', 'remove']
+                ]
+            ]
+        );
+
+        $expectedExtendFieldConfig = new Config($extendFieldConfig->getId());
+        $expectedExtendFieldConfig->setValues(
+            [
+                'owner'           => ExtendScope::OWNER_CUSTOM,
+                'is_extend'       => true,
+                'state'           => ExtendScope::STATE_NEW,
+                'relation_key'    => $relationKey,
+                'target_entity'   => self::TARGET_CLASS,
+                'target_title'    => [$targetTitleFieldName],
+                'target_detailed' => [$targetDetailedFieldName],
+                'target_grid'     => [$targetGridFieldName],
+                'cascade'         => ['persist', 'remove']
+            ]
+        );
+
+        $expectedTestFieldConfig = new Config($testFieldConfig->getId());
+        $expectedTestFieldConfig->setValues(
+            [
+                'test_attr' => 123
+            ]
+        );
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOURCE_CLASS, $relationName)
+            ->will($this->returnValue($extendFieldConfig));
+        $extendConfigProvider->expects($this->at(1))
+            ->method('persist')
+            ->with($this->identicalTo($extendFieldConfig));
+        $extendConfigProvider->expects($this->at(2))
+            ->method('persist')
+            ->with($this->identicalTo($extendConfig));
+
+        $testConfigProvider = $this->getConfigProviderMock();
+        $testConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::SOURCE_CLASS, $relationName)
+            ->will($this->returnValue($testFieldConfig));
+        $testConfigProvider->expects($this->once())
+            ->method('persist')
+            ->with($this->identicalTo($testFieldConfig));
+
+        $this->configManager->expects($this->once())
+            ->method('hasConfigFieldModel')
+            ->with(self::SOURCE_CLASS, $relationName)
+            ->will($this->returnValue(false));
+        $this->configManager->expects($this->once())
+            ->method('createConfigFieldModel')
+            ->with(self::SOURCE_CLASS, $relationName, 'manyToMany');
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $extendConfigProvider],
+                        ['test', $testConfigProvider],
+                    ]
+                )
+            );
+
+        $this->builder->addManyToManyRelation(
+            $extendConfig,
+            self::TARGET_CLASS,
+            $relationName,
+            [$targetTitleFieldName],
+            [$targetDetailedFieldName],
+            [$targetGridFieldName],
+            [
+                'extend' => [
+                    'owner'   => ExtendScope::OWNER_CUSTOM,
+                    'cascade' => ['persist', 'remove']
+                ],
+                'test'   => [
+                    'test_attr' => 123
+                ]
+            ]
+        );
+
+        $this->assertEquals($expectedExtendConfig, $extendConfig);
+        $this->assertEquals($expectedExtendFieldConfig, $extendFieldConfig);
+        $this->assertEquals($expectedTestFieldConfig, $testFieldConfig);
+    }
+
     public function testAddManyToOneRelationForAlreadyExistRelationWithDifferentFieldType()
     {
         $relationName    = 'testRelation';

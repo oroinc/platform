@@ -37,6 +37,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected['entity'], $definition->getRelatedEntity());
         $this->assertEquals($expected['enabled'], $definition->isEnabled());
         $this->assertEquals($expected['order'], $definition->getExecutionOrder());
+        $this->assertEquals($expected['exclude_definitions'], $definition->getExcludeDefinitions());
         $this->assertEquals($expected['actions_configuration'], $definition->getActionsConfiguration());
     }
 
@@ -90,6 +91,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'entity' => 'My\Entity',
                     'enabled' => true,
                     'order' => 0,
+                    'exclude_definitions' => array(),
                     'actions_configuration' => array(),
                 ),
             ),
@@ -100,6 +102,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
+                    'exclude_definitions' => array('test_definition'),
                     'actions_configuration' => array('key' => 'value'),
                 ),
                 'expected' => array(
@@ -107,6 +110,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'enabled' => false,
                     'entity' => 'My\Entity',
                     'order' => 10,
+                    'exclude_definitions' => array('test_definition'),
                     'actions_configuration' => array('key' => 'value'),
                 ),
             ),

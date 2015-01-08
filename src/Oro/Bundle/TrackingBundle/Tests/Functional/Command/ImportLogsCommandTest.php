@@ -9,7 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 /**
  * @dbIsolation
  */
-class UpdateSchemaListenerTest extends WebTestCase
+class ImportLogsCommandTest extends WebTestCase
 {
     /**
      * @var Filesystem

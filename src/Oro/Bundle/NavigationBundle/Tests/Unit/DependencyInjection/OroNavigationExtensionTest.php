@@ -157,7 +157,8 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         )
                     ),
                     'templates' => array(),
-                    'settings' => $settings
+                    'settings' => $settings,
+                    'oro_navigation_elements' => array()
                 ),
                 'expectedTitles' => array()
             ),
@@ -246,7 +247,23 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
                         )
                     ),
                     'templates' => array(),
-                    'settings' => $settings
+                    'settings'                => $settings,
+                    'oro_navigation_elements' => array(
+                        'favoriteButton' => array(
+                            'default' => true,
+                            'routes'  => array(
+                                'call_list'  => false,
+                                'some_route' => false
+                            )
+                        ),
+                        'shortcutsPanel' => array(
+                            'default' => true,
+                            'routes'  => array(
+                                'call_list'  => true,
+                                'some_route' => false
+                            )
+                        ),
+                    )
                 ),
                 'expectedTitles' => array(
                     'orocrm_call_index' => 'Calls'

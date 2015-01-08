@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Parser;
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -138,7 +139,7 @@ class Indexer
      */
     public function query(Query $query)
     {
-        $this->applyAclToQuery($query);
+        $this->prepareQuery($query);
         // we haven't allowed entities, so return null search result
         if (count($query->getFrom()) == 0) {
             return new Result($query, array(), 0);
@@ -158,6 +159,17 @@ class Indexer
         $parser = new Parser($this->mapper->getMappingConfig());
 
         return $this->query($parser->getQueryFromString($searchString));
+    }
+
+    /**
+     * Do query manipulations such as ACL apply etc.
+     *
+     * @param Query $query
+     */
+    protected function prepareQuery(Query $query)
+    {
+        $this->applyModesBehavior($query);
+        $this->applyAclToQuery($query);
     }
 
     /**
@@ -182,6 +194,56 @@ class Indexer
             $query->from($queryFromEntities);
         } elseif ($allowedEntities != $this->mapper->getEntitiesListAliases()) {
             $query->from($allowedEntities);
+        }
+    }
+
+    /**
+     * Apply special behavior of class inheritance processing
+     *
+     * @param Query $query
+     */
+    protected function applyModesBehavior(Query $query)
+    {
+        // process abstract indexes
+        // make hashes increasing performance
+        $fromParts   = (array)$query->getFrom();
+        $fromHash    = array_combine($fromParts, $fromParts);
+        $aliases     = $this->mapper->getEntitiesListAliases();
+        $aliasesHash = array_flip($aliases);
+
+        if (!isset($fromHash['*'])) {
+            foreach ($fromParts as $part) {
+                $entityName = $part;
+                $isAlias    = false;
+                if (isset($aliasesHash[$part])) {
+                    // find real name by alias
+                    $entityName = $aliasesHash[$part];
+                    $isAlias    = true;
+                }
+
+                $mode        = $this->mapper->getEntityModeConfig($entityName);
+                $descendants = $this->mapper->getRegisteredDescendants($entityName);
+                if (false !== $descendants) {
+                    // add descendants to from clause
+                    foreach ($descendants as $fromPart) {
+                        if ($isAlias) {
+                            $fromPart = $aliases[$fromPart];
+                        }
+                        if (!isset($fromHash[$fromPart])) {
+                            $fromHash[$fromPart] = $fromPart;
+                        }
+                    }
+                }
+
+                if ($mode === Mode::ONLY_DESCENDANTS) {
+                    unset($fromHash[$part]);
+                }
+            }
+        }
+
+        $collectedParts = array_values($fromHash);
+        if ($collectedParts !== $fromParts) {
+            $query->from($collectedParts);
         }
     }
 

@@ -45,7 +45,7 @@ class EmailType extends AbstractType
             )
             ->add('to', 'oro_email_email_address', ['required' => true, 'multiple' => true])
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
-            ->add('body', 'textarea', ['required' => false, 'label' => 'oro.email.email_body.label'])
+            ->add('body', 'oro_rich_text', ['required' => false, 'label' => 'oro.email.email_body.label'])
             ->add(
                 'template',
                 'oro_email_template_list',
@@ -64,7 +64,7 @@ class EmailType extends AbstractType
                 [
                     'label'      => 'oro.email.type.label',
                     'required'   => true,
-                    'data'       => 'txt',
+                    'data'       => 'html',
                     'choices'  => [
                         'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
                         'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Exception;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 
-class EmailBodyNotFoundException extends \RuntimeException
+class EmailBodyNotFoundException extends LoadEmailBodyException
 {
     /**
      * @param Email $email

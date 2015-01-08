@@ -46,7 +46,7 @@ abstract class IteratorBasedReader extends AbstractReader
      *
      * @param \Iterator $sourceIterator
      */
-    protected function setSourceIterator(\Iterator $sourceIterator)
+    public function setSourceIterator(\Iterator $sourceIterator)
     {
         $this->sourceIterator = $sourceIterator;
         $this->rewound        = false;
@@ -57,7 +57,7 @@ abstract class IteratorBasedReader extends AbstractReader
      *
      * @return \Iterator|null
      */
-    protected function getSourceIterator()
+    public function getSourceIterator()
     {
         return $this->sourceIterator;
     }

@@ -1,0 +1,3 @@
+css:
+    oroactivitylist:
+        - 'bundles/oroactivitylist/css/less/activity-list.less'

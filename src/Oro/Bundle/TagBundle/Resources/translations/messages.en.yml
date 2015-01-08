@@ -4,6 +4,8 @@ oro:
             shortcut_new_tag.label: Create new tag
             shortcut_new_tag.description: Create new tag
             tag_list.description: Tags list
+            all_tags: All tags
+            my_tags: My tags
 
         controller:
             tag.saved.message: "Tag saved"
@@ -13,6 +15,7 @@ oro:
         datagrid:
             usage_count: Usage Count
             search:      Search by tag
+            search_result: Records tagged as "%name%"
 
         created_by.label:    Created By
         entity_description:  Show records tagged by this tag

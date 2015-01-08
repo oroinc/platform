@@ -90,3 +90,7 @@
 .ui-dialog-minimized {
     margin: 4px 2px 0px 2px !important;
 }
+
+.hide-overlays .ui-widget-overlay{
+    display: none;
+}

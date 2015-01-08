@@ -20,7 +20,7 @@ class OroIntegrationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -29,6 +29,7 @@ class OroIntegrationBundleInstaller implements Installation
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
+        $this->createOroIntegrationFieldsChangesTable($schema);
         $this->createOroIntegrationChannelTable($schema);
         $this->createOroIntegrationChannelStatusTable($schema);
         $this->createOroIntegrationTransportTable($schema);
@@ -36,6 +37,22 @@ class OroIntegrationBundleInstaller implements Installation
         /** Foreign keys generation **/
         $this->addOroIntegrationChannelForeignKeys($schema);
         $this->addOroIntegrationChannelStatusForeignKeys($schema);
+    }
+
+    /**
+     * Create oro_integration_change_set table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroIntegrationFieldsChangesTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_integration_fields_changes');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('entity_class', 'string', ['length' => 255]);
+        $table->addColumn('entity_id', 'integer', []);
+        $table->addColumn('changed_fields', 'array', ['comment' => '(DC2Type:array)']);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['entity_id', 'entity_class'], 'oro_integration_fields_changes_idx', []);
     }
 
     /**

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Knp\Menu\ItemInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -69,17 +70,31 @@ class NavigationListener
                 $this->addDivider($reportsMenuItem);
                 $reportMenuData = [];
                 foreach ($reports as $report) {
-                    $config      = $this->entityConfigProvider->getConfig($report->getEntity());
-                    $entityLabel = $config->get('plural_label');
-                    if (!isset ($reportMenuData[$entityLabel])) {
-                        $reportMenuData[$entityLabel] = [];
+                    $config = $this->entityConfigProvider->getConfig($report->getEntity());
+                    if ($this->checkAvailability($config)) {
+                        $entityLabel = $config->get('plural_label');
+                        if (!isset ($reportMenuData[$entityLabel])) {
+                            $reportMenuData[$entityLabel] = [];
+                        }
+                        $reportMenuData[$entityLabel][$report->getId()] = $report->getName();
                     }
-                    $reportMenuData[$entityLabel][$report->getId()] = $report->getName();
                 }
                 ksort($reportMenuData);
                 $this->buildReportMenu($reportsMenuItem, $reportMenuData);
             }
         }
+    }
+
+    /**
+     * Checks whether an entity with given config could be shown within navigation of reports
+     *
+     * @param Config $config
+     *
+     * @return bool
+     */
+    protected function checkAvailability(Config $config)
+    {
+        return true;
     }
 
     /**

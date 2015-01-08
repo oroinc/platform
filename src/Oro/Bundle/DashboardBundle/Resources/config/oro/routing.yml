@@ -22,3 +22,15 @@ oro_dashboard_api:
         _format: json
     defaults:
         version: latest
+
+# deprecated API route
+oro_api_post_dashboard_widget_add_widget_deprecated:
+    path:            /api/rest/{version}/dashboard/widget/add/widget.{_format}
+    methods:         [POST]
+    defaults:
+        _controller: Oro\Bundle\DashboardBundle\Controller\Api\Rest\WidgetController::postAddWidgetAction
+        _format:     json
+        version:     latest
+    requirements:
+        _format:     json|html
+        version:     latest|v1

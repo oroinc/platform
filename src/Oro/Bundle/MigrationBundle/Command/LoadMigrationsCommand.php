@@ -76,8 +76,8 @@ class LoadMigrationsCommand extends ContainerAwareCommand
             $migrations      = $migrationLoader->getMigrations();
             if (!empty($migrations)) {
                 if ($input->getOption('dry-run') && !$input->getOption('show-queries')) {
-                    foreach ($migrations as $migration) {
-                        $output->writeln(sprintf('  <comment>> %s</comment>', get_class($migration)));
+                    foreach ($migrations as $item) {
+                        $output->writeln(sprintf('  <comment>> %s</comment>', get_class($item->getMigration())));
                     }
                 } else {
                     $logger      = new OutputLogger($output, true, null, '  ');

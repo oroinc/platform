@@ -27,8 +27,7 @@
 .filter-select.filter-default-value .select-filter-widget {
     display: none;
 }
-
-.multiselect-filter-widget, .filter-select.filter-default-value .multiselect-filter-widget {
+.filter-select.filter-default-value .multiselect-filter-widget {
     display: inline-block;
 }
 .multiselect-filter-placeholder, .filter-select.filter-default-value .multiselect-filter-placeholder {

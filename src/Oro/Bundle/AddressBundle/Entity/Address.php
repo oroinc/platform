@@ -4,6 +4,7 @@ namespace Oro\Bundle\AddressBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\AddressBundle\Model\ExtendAddress;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
@@ -28,6 +29,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class Address extends AbstractAddress
+class Address extends ExtendAddress
 {
 }

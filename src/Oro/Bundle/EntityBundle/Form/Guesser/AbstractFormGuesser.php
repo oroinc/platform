@@ -24,12 +24,12 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
     protected $entityConfigProvider;
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry         $managerRegistry
      * @param ConfigProviderInterface $entityConfigProvider
      */
     public function __construct(ManagerRegistry $managerRegistry, ConfigProviderInterface $entityConfigProvider)
     {
-        $this->managerRegistry = $managerRegistry;
+        $this->managerRegistry      = $managerRegistry;
         $this->entityConfigProvider = $entityConfigProvider;
     }
 
@@ -59,6 +59,7 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
 
     /**
      * @param string $class
+     *
      * @return ClassMetadata|null
      */
     protected function getMetadataForClass($class)
@@ -73,12 +74,17 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
 
     /**
      * @param string $formType
-     * @param array $formOptions
+     * @param array  $formOptions
+     * @param int    $confidence
+     *
      * @return TypeGuess
      */
-    protected function createTypeGuess($formType, array $formOptions = array())
-    {
-        return new TypeGuess($formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+    protected function createTypeGuess(
+        $formType,
+        array $formOptions = array(),
+        $confidence = TypeGuess::HIGH_CONFIDENCE
+    ) {
+        return new TypeGuess($formType, $formOptions, $confidence);
     }
 
     /**
@@ -90,10 +96,11 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @param array $options
-     * @param string $class
+     * @param array       $options
+     * @param string      $class
      * @param string|null $field
-     * @param bool $multiple
+     * @param bool        $multiple
+     *
      * @return array
      */
     protected function addLabelOption(array $options, $class, $field = null, $multiple = false)
@@ -103,7 +110,7 @@ abstract class AbstractFormGuesser implements FormTypeGuesserInterface
         }
 
         $entityConfig = $this->entityConfigProvider->getConfig($class, $field);
-        $labelOption = $multiple ? 'plural_label' : 'label';
+        $labelOption  = $multiple ? 'plural_label' : 'label';
         if ($entityConfig->has($labelOption)) {
             $options['label'] = $entityConfig->get($labelOption);
         }

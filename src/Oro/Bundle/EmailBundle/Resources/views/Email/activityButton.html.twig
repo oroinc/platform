@@ -4,7 +4,7 @@
             to: oro_get_email(entity),
             entityClass: oro_class_name(entity, true),
             entityId: entity.id
-    }) ,
+    }),
     'aCss': 'no-hash',
     'iCss': 'icon-envelope',
     'dataId': entity.id,
@@ -12,7 +12,7 @@
     'widget' : {
         'type' : 'dialog',
         'multiple' : true,
-        'reload-grid-name' : 'activity-email-grid',
+        'refresh-widget-alias': 'activity-list-widget',
         'options' : {
             'alias': 'email-dialog',
             'dialogOptions' : {

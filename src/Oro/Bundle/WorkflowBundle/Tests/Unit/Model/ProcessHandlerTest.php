@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+use Oro\Bundle\WorkflowBundle\Event\ProcessEvents;
 use Oro\Bundle\WorkflowBundle\Model\ProcessHandler;
 
 class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
@@ -16,6 +17,11 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $logger;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $eventDispatcher;
 
     /**
      * @var ProcessHandler
@@ -32,7 +38,9 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->handler = new ProcessHandler($this->factory, $this->logger);
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $this->handler = new ProcessHandler($this->factory, $this->logger, $this->eventDispatcher);
     }
 
     /**
@@ -89,6 +97,35 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('debug')
             ->with('Process executed', $processTrigger, $processData);
 
+        $this->eventDispatcher->expects($this->exactly(2))
+            ->method('dispatch');
+        $this->eventDispatcher->expects($this->at(0))
+            ->method('dispatch')
+            ->with(
+                ProcessEvents::HANDLE_BEFORE,
+                $this->callback(
+                    function ($event) use ($processTrigger, $processData) {
+                        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent', $event);
+                        $this->assertAttributeSame($processTrigger, 'processTrigger', $event);
+                        $this->assertAttributeSame($processData, 'processData', $event);
+                        return true;
+                    }
+                )
+            );
+        $this->eventDispatcher->expects($this->at(1))
+            ->method('dispatch')
+            ->with(
+                ProcessEvents::HANDLE_AFTER,
+                $this->callback(
+                    function ($event) use ($processTrigger, $processData, $process) {
+                        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent', $event);
+                        $this->assertAttributeSame($processTrigger, 'processTrigger', $event);
+                        $this->assertAttributeSame($processData, 'processData', $event);
+                        return true;
+                    }
+                )
+            );
+
         return $processTrigger;
     }
 
@@ -127,5 +164,59 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
                 ))
             ),
         );
+    }
+
+    public function testFinishTrigger()
+    {
+        $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
+        $processData = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessData')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                ProcessEvents::HANDLE_AFTER_FLUSH,
+                $this->callback(
+                    function ($event) use ($processTrigger, $processData) {
+                        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent', $event);
+                        $this->assertAttributeSame($processTrigger, 'processTrigger', $event);
+                        $this->assertAttributeSame($processData, 'processData', $event);
+                        return true;
+                    }
+                )
+            );
+
+        $this->handler->finishTrigger($processTrigger, $processData);
+    }
+
+    public function testFinishJob()
+    {
+        $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
+        $processData = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessData')
+            ->disableOriginalConstructor()->getMock();
+
+        $processJob = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessJob');
+        $processJob->expects($this->once())
+            ->method('getProcessTrigger')
+            ->will($this->returnValue($processTrigger));
+        $processJob->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($processData));
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                ProcessEvents::HANDLE_AFTER_FLUSH,
+                $this->callback(
+                    function ($event) use ($processTrigger, $processData) {
+                        $this->assertInstanceOf('Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent', $event);
+                        $this->assertAttributeSame($processTrigger, 'processTrigger', $event);
+                        $this->assertAttributeSame($processData, 'processData', $event);
+                        return true;
+                    }
+                )
+            );
+
+        $this->handler->finishJob($processJob);
     }
 }

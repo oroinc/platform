@@ -1,0 +1,49 @@
+oro:
+    distribution:
+        package:
+            package: Package
+            name: Package Name
+            type: Type
+            license: License
+            author: Author
+            version: Version
+            current_version: 'Current Version'
+            latest_version: 'Latest Version'
+            installed: 'Installed Packages'
+            available: 'Available Packages'
+            nothing_installed: 'Nothing installed'
+            nothing_to_update: 'Nothing to update'
+            list_of_updates: 'List of available updates'
+            installed_version: 'Installed version'
+            up_to_date_version: 'Up to date version'
+            install_new: 'Install New Package'
+            unknown: unknown
+        action:
+            install: Install
+            update: Update
+            delete: Delete
+            save: Save
+        menu:
+            get_help: Get help
+            sign_out: Sign Out
+            composer_settings: 'Composer Settings'
+        security:
+            login: Login
+            username: Username
+            password: Password
+            username_or_email: 'Username or Email'
+            remember_me: 'Remember me on this computer'
+            log_in: 'Log in'
+        messages:
+            settings_saved: 'The settings were saved.'
+            unexpected_error: 'Following unexpected error(s) occurred'
+            not_writable: 'Following directories/files have to be writable by web user'
+            enter_package_name: 'Please enter the package name'
+            ajax_error: 'Ajax error'
+        settings:
+            repositories: Repositories
+            add_repository: 'Add a repository'
+        installer: 'Oro Installer'
+
+'ORO Business Application Platform': 'ORO Business Application Platform'
+'Back to Installed Packages': 'Back to Installed Packages'

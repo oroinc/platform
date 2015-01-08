@@ -32,7 +32,9 @@ class ConfigRepository extends EntityRepository
             $settings[$value->getSection()][$value->getName()] = [
                 'value'                  => $value->getValue(),
                 'scope'                  => $scope->getScopedEntity(),
-                'use_parent_scope_value' => false
+                'use_parent_scope_value' => false,
+                'createdAt'              => $value->getCreatedAt(),
+                'updatedAt'              => $value->getUpdatedAt(),
             ];
         }
 

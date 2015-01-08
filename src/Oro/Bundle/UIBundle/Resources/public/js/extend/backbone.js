@@ -2,16 +2,20 @@
 /*global define*/
 define([
     'underscore',
-    'backbone'
-], function (_, Backbone) {
+    'backbone',
+    'oroui/js/app/components/base/component-container-mixin'
+], function (_, Backbone, componentContainerMixin) {
     'use strict';
 
+    _.extend(Backbone.View.prototype, componentContainerMixin);
     Backbone.View.prototype.disposed = false;
     Backbone.View.prototype.dispose = function () {
         var prop, properties, subview, _i, _j, _len, _len1, _ref;
         if (this.disposed) {
             return;
         }
+
+        this.disposePageComponents();
 
         _ref = _.toArray(this.subviews);
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -31,6 +35,7 @@ define([
             prop = properties[_j];
             delete this[prop];
         }
+
         this.disposed = true;
         return typeof Object.freeze === "function" ? Object.freeze(this) : void 0;
     };

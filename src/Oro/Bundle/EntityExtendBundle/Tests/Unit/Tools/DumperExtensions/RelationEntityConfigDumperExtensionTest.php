@@ -211,6 +211,99 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
     }
 
     /**
+     *  Test create new field (relation type [1:*] + cascade option)
+     */
+    public function testCreateSelfRelationOneToManyWithCascade()
+    {
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('is_extend', true);
+
+        $fieldsConfigs = [
+            $this->getConfigNewField(
+                [
+                    'state'         => ExtendScope::STATE_NEW,
+                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'cascade'       => ['persist', 'remove']
+                ],
+                'oneToMany'
+            ),
+        ];
+
+        $selfConfig   = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $targetConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['TestClass', null, $selfConfig],
+                        ['Oro\Bundle\UserBundle\Entity\User', null, $targetConfig],
+                    ]
+                )
+            );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals(
+            [
+                'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\UserBundle\Entity\User',
+                        'testclass_testFieldName',
+                        'manyToOne'
+                    ),
+                    'owner'           => true,
+                    'target_entity'   => 'TestClass',
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'oneToMany'
+                    )
+                ],
+            ],
+            $targetConfig->get('relation')
+        );
+
+        $this->assertEquals(
+            [
+                'oneToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'oneToMany'
+                    ),
+                    'owner'           => false,
+                    'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\UserBundle\Entity\User',
+                        'testclass_testFieldName',
+                        'manyToOne'
+                    ),
+                    'cascade'         => ['persist', 'remove']
+                ],
+            ],
+            $selfConfig->get('relation')
+        );
+    }
+
+    /**
      *  Test create new field (relation type [*:1])
      */
     public function testCreateSelfRelationManyToOne()
@@ -285,6 +378,89 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                     'owner'           => true,
                     'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
                     'target_field_id' => false,
+                ],
+            ],
+            $selfConfig->get('relation')
+        );
+    }
+
+    /**
+     *  Test create new field (relation type [*:1] + cascade option)
+     */
+    public function testCreateSelfRelationManyToOneWithCascade()
+    {
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('is_extend', true);
+
+        $fieldsConfigs = [
+            $this->getConfigNewField(
+                [
+                    'state'         => ExtendScope::STATE_NEW,
+                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'cascade'       => ['persist', 'remove']
+                ],
+                'manyToOne'
+            ),
+        ];
+
+        $selfConfig   = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $targetConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['TestClass', null, $selfConfig],
+                        ['Oro\Bundle\UserBundle\Entity\User', null, $targetConfig],
+                    ]
+                )
+            );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals(
+            [
+                'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'field_id'        => false,
+                    'owner'           => false,
+                    'target_entity'   => 'TestClass',
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'manyToOne'
+                    ),
+                ],
+            ],
+            $targetConfig->get('relation')
+        );
+
+        $this->assertEquals(
+            [
+                'manyToOne|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'manyToOne'
+                    ),
+                    'owner'           => true,
+                    'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
+                    'target_field_id' => false,
+                    'cascade'         => ['persist', 'remove']
                 ],
             ],
             $selfConfig->get('relation')
@@ -375,6 +551,98 @@ class RelationEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCas
                         'testclass_testFieldName',
                         'manyToMany'
                     ),
+                ],
+            ],
+            $selfConfig->get('relation')
+        );
+    }
+
+    /**
+     *  Test create new field (relation type [*:*] + cascade option)
+     */
+    public function testCreateSelfRelationManyToManyWithCascade()
+    {
+        $config = new Config(new EntityConfigId('extend', 'TestClass'));
+        $config->set('is_extend', true);
+
+        $fieldsConfigs = [
+            $this->getConfigNewField(
+                [
+                    'target_entity' => 'Oro\Bundle\UserBundle\Entity\User',
+                    'cascade'       => ['persist', 'remove']
+                ],
+                'manyToMany'
+            ),
+        ];
+
+        $selfConfig   = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+        $targetConfig = $this->getEntityConfig(['state' => ExtendScope::STATE_ACTIVE]);
+
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfigs')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [null, false, [$config]],
+                        ['TestClass', false, $fieldsConfigs],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['TestClass', null, $selfConfig],
+                        ['Oro\Bundle\UserBundle\Entity\User', null, $targetConfig],
+                    ]
+                )
+            );
+
+        $this->extension->preUpdate();
+
+        $this->assertEquals(
+            [
+                'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'owner'           => false,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\UserBundle\Entity\User',
+                        'testclass_testFieldName',
+                        'manyToMany'
+                    ),
+                    'target_entity'   => 'TestClass',
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'manyToMany'
+                    ),
+                ],
+            ],
+            $targetConfig->get('relation')
+        );
+
+        $this->assertEquals(
+            [
+                'manyToMany|TestClass|Oro\Bundle\UserBundle\Entity\User|testFieldName' => [
+                    'assign'          => false,
+                    'field_id'        => new FieldConfigId(
+                        'extend',
+                        'TestClass',
+                        'testFieldName',
+                        'manyToMany'
+                    ),
+                    'owner'           => true,
+                    'target_entity'   => 'Oro\Bundle\UserBundle\Entity\User',
+                    'target_field_id' => new FieldConfigId(
+                        'extend',
+                        'Oro\Bundle\UserBundle\Entity\User',
+                        'testclass_testFieldName',
+                        'manyToMany'
+                    ),
+                    'cascade'         => ['persist', 'remove']
                 ],
             ],
             $selfConfig->get('relation')

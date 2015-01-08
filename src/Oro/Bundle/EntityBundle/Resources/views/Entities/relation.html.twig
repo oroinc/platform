@@ -4,8 +4,8 @@
 
     {% set gridParams = {
         '_parameters' : {
-            'data_in': app.request.get('added')|split(','),
-            'data_not_in': app.request.get('removed')|split(','),
+            'data_in': app.request.get('added') ? app.request.get('added')|split(',') : [],
+            'data_not_in': app.request.get('removed') ? app.request.get('removed')|split(',') : []
         },
         'class_name': entity_class,
         'field_name': field_name,

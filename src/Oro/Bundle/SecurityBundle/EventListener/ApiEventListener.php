@@ -29,15 +29,21 @@ class ApiEventListener
     protected $aclHelper;
 
     /**
-     * @param Request        $request
      * @param SecurityFacade $securityFacade
      * @param AclHelper      $aclHelper
      */
-    public function __construct(Request $request, SecurityFacade $securityFacade, AclHelper $aclHelper)
+    public function __construct(SecurityFacade $securityFacade, AclHelper $aclHelper)
     {
-        $this->request = $request;
         $this->securityFacade = $securityFacade;
         $this->aclHelper = $aclHelper;
+    }
+
+    /**
+     * @param Request|null $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 
     /**
@@ -47,6 +53,10 @@ class ApiEventListener
      */
     public function onGetListBefore(GetListBefore $event)
     {
+        if (!$this->request) {
+            return;
+        }
+
         $acl = $this->securityFacade->getRequestAcl($this->request, true);
         if ($acl && $event->getClassName() === $acl->getClass()) {
             $event->setCriteria(
@@ -66,6 +76,10 @@ class ApiEventListener
      */
     public function onFindAfter(FindAfter $event)
     {
+        if (!$this->request) {
+            return;
+        }
+
         $this->checkObjectAccess($event->getEntity());
     }
 

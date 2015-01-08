@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * This class allows to get parent entities/mapped superclasses for any configurable entity
@@ -87,7 +87,7 @@ class EntityHierarchyProvider
                 $parents = array_filter(
                     $parents,
                     function ($parentClassName) {
-                        return strpos($parentClassName, ExtendConfigDumper::ENTITY) !== 0;
+                        return strpos($parentClassName, ExtendHelper::ENTITY_NAMESPACE) !== 0;
                     }
                 );
                 if (empty($parents)) {
@@ -112,10 +112,10 @@ class EntityHierarchyProvider
         if ($parentClass) {
             $parentClassName = $parentClass->getName();
             $em              = $this->doctrine->getManagerForClass($className);
-            if (!$em->getMetadataFactory()->isTransient($parentClassName)) {
+            if ($em && !$em->getMetadataFactory()->isTransient($parentClassName)) {
                 $result[] = $parentClassName;
             }
-            $this->loadParents($result, $parentClassName, $em);
+            $this->loadParents($result, $parentClassName);
         }
     }
 }

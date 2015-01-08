@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 interface RestApiReadInterface
 {
+    const ACTION_LIST = 'list';
+    const ACTION_READ = 'read';
+
     /**
      * Get paginated items list
      *

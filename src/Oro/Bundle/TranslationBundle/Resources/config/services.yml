@@ -42,7 +42,7 @@ services:
             - @oro_translation.js_dumper
             - @translation.loader
             - @oro_translation.database_translation.persister
-            - %kernel.root_dir%
+            - %kernel.cache_dir%
         lazy: true
 
     oro_translation.statistic_provider:

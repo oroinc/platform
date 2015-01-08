@@ -1,7 +1,8 @@
+/*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'orocalendar/js/calendar/event/model'
-], function (_, Backbone, __, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, EventModel) {
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
+    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
+], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -13,19 +14,32 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
      */
     return Backbone.View.extend({
         /** @property {Object} */
-        selectors: {
-            loadingMaskContent: '.loading-content'
+        options: {
+            calendar: null,
+            connections: null,
+            colorManager: null,
+            widgetRoute: null,
+            widgetOptions: null
         },
 
-        options: {
-            formTemplateSelector: null,
-            calendar: null
+        /** @property {Object} */
+        selectors: {
+            loadingMaskContent: '.loading-content',
+            backgroundColor: 'input[name$="[backgroundColor]"]',
+            calendarUid: '[name*="calendarUid"]',
+            invitedUsers: 'input[name$="[invitedUsers]"]'
         },
+
+        /** @property {Array} */
+        userCalendarOnlyFields: [
+            {fieldName: 'reminders', emptyValue: {}, selector: '.reminders-collection'},
+            {fieldName: 'invitedUsers', emptyValue: '', selector: 'input[name$="[invitedUsers]"]'}
+        ],
 
         initialize: function (options) {
-            this.options = _.defaults(options || {}, this.options);
-            var templateHtml = $(this.options.formTemplateSelector).html();
-            this.template = _.template(templateHtml);
+            this.options = _.defaults(_.pick(options || {}, _.keys(this.options)), this.options);
+            this.viewTemplate = _.template($(options.viewTemplateSelector).html());
+            this.template = _.template($(options.formTemplateSelector).html());
 
             this.listenTo(this.model, 'sync', this.onModelSave);
             this.listenTo(this.model, 'destroy', this.onModelDelete);
@@ -49,50 +63,64 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         render: function () {
-            var modelData, eventForm, onDelete;
-            // create a dialog
-            if (!this.model) {
-                this.model = new EventModel();
-            }
-            modelData = this.model.toJSON();
-            eventForm = this.template(modelData);
-            eventForm = this.fillForm(eventForm, modelData);
-
-            this.eventDialog = new DialogWidget({
-                el: eventForm,
-                title: this.model.isNew() ? __('Add New Event') : __('Edit Event'),
-                stateEnabled: false,
-                incrementalPosition: false,
-                loadingMaskEnabled: false,
-                dialogOptions: {
-                    modal: true,
-                    resizable: false,
-                    width: 475,
-                    autoResize: true,
-                    close: _.bind(this.remove, this)
+            var widgetOptions = this.options.widgetOptions || {},
+                defaultOptions = {
+                    title: this.model.isNew() ? __('Add New Event') : __('View Event'),
+                    stateEnabled: false,
+                    incrementalPosition: false,
+                    dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
+                        modal: true,
+                        resizable: false,
+                        width: 475,
+                        autoResize: true,
+                        close: _.bind(this.remove, this)
+                    }),
+                    submitHandler: _.bind(this.saveModel, this)
                 },
-                submitHandler: _.bind(function () {
-                    this.saveModel();
-                }, this)
-            });
+                onDelete = _.bind(function (e) {
+                    var $el = $(e.currentTarget),
+                        deleteUrl = $el.data('url'),
+                        confirm = new DeleteConfirmation({
+                            content: $el.data('message')
+                        });
+                    e.preventDefault();
+                    confirm.on('ok', _.bind(function () {
+                        this.deleteModel(deleteUrl);
+                    }, this));
+                    confirm.open();
+                }, this),
+                onEdit = _.bind(function (e) {
+                    this.eventDialog.setTitle(__('Edit Event'));
+                    this.eventDialog.setContent(this.getEventForm());
+                    // subscribe to 'delete event' event
+                    this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
+                        deleteAction.on('click', onDelete);
+                    });
+                }, this);
+
+            if (this.options.widgetRoute) {
+                defaultOptions.el = $('<div></div>');
+                defaultOptions.url = routing.generate(this.options.widgetRoute, {id: this.model.originalId});
+                defaultOptions.type = 'Calendar';
+            } else {
+                defaultOptions.el = this.model.isNew() ? this.getEventForm() : this.getEventView();
+                defaultOptions.loadingMaskEnabled = false;
+            }
+
+            this.eventDialog = new DialogWidget(_.defaults(
+                _.omit(widgetOptions, ['dialogOptions']),
+                defaultOptions
+            ));
             this.eventDialog.render();
 
             // subscribe to 'delete event' event
-            onDelete = _.bind(function (e) {
-                var el, confirm;
-                e.preventDefault();
-                el = $(e.target);
-                confirm = new DeleteConfirmation({
-                    content: el.data('message')
-                });
-                confirm.on('ok', _.bind(this.deleteModel, this));
-                confirm.open();
-            }, this);
             this.eventDialog.getAction('delete', 'adopted', function (deleteAction) {
                 deleteAction.on('click', onDelete);
             });
-
-            eventForm.find('[name]').uniform('update');
+            // subscribe to 'switch to edit' event
+            this.eventDialog.getAction('edit', 'adopted', function (editAction) {
+                editAction.on('click', onEdit);
+            });
 
             // init loading mask control
             this.loadingMask = new LoadingMask();
@@ -102,29 +130,37 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         saveModel: function () {
-            this.showSavingMask();
-            try {
-                var data = this.getEventFormData();
-                data.calendar = this.options.calendar;
-                this.model.set(
-                    {reminders: {}}
-                );
-                this.model.save(data, {
-                    wait: true,
-                    error: _.bind(this._handleResponseError, this)
+            var errors;
+            this.model.set(this.getEventFormData());
+            if (this.model.isValid()) {
+                this.showSavingMask();
+                try {
+                    this.model.save(null, {
+                        wait: true,
+                        error: _.bind(this._handleResponseError, this)
+                    });
+                } catch (err) {
+                    this.showError(err);
+                }
+            } else {
+                errors = _.map(this.model.validationError, function (message) {
+                    return __(message);
                 });
-            } catch (err) {
-                this.showError(err);
+                this.showError({errors: errors});
             }
         },
 
-        deleteModel: function () {
+        deleteModel: function (deleteUrl) {
             this.showDeletingMask();
             try {
-                this.model.destroy({
+                var options = {
                     wait: true,
                     error: _.bind(this._handleResponseError, this)
-                });
+                };
+                if (deleteUrl) {
+                    options.url = deleteUrl;
+                }
+                this.model.destroy(options);
             } catch (err) {
                 this.showError(err);
             }
@@ -136,6 +172,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
 
         showDeletingMask: function () {
             this._showMask(__('Deleting...'));
+        },
+
+        showLoadingMask: function () {
+            this._showMask(__('Loading...'));
         },
 
         _showMask: function (message) {
@@ -173,6 +213,13 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             var inputs = form.find('[name]');
             var fieldNameRegex = /\[(\w+)\]/g;
 
+            // show loading mask if child events users should be updated
+            if (!_.isEmpty(modelData.invitedUsers)) {
+                this.eventDialog.once('renderComplete', function() {
+                    self.showLoadingMask();
+                });
+            }
+
             _.each(inputs, function (input) {
                 input = $(input);
                 var name = input.attr('name'),
@@ -186,11 +233,22 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                 if (matches.length) {
                     var value = self.getValueByPath(modelData, matches);
                     if (input.is(':checkbox')) {
-                        input.prop('checked', value);
+                        if (value === false || value === true) {
+                            input.prop('checked', value);
+                        } else {
+                            input.prop('checked', input.val() == value);
+                        }
                     } else {
                         input.val(value);
                     }
                     input.change();
+                }
+
+                // hide loading mask if child events users should be updated
+                if (name.indexOf('[invitedUsers]') !== -1 && !_.isEmpty(modelData.invitedUsers)) {
+                    input.on('select2-data-loaded', function () {
+                        self._hideMask();
+                    });
                 }
             });
 
@@ -207,10 +265,8 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                         var prototype = container.data('prototype');
                         if (prototype) {
                             _.each(value, function (collectionValue, collectionKey) {
-                                var collectionContent = prototype.replace(/__name__/g, collectionKey);
-
-                                container.append(collectionContent);
-                            }, prototype);
+                                container.append(prototype.replace(/__name__/g, collectionKey));
+                            });
                         }
                     }
 
@@ -219,8 +275,47 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
             });
         },
 
+        getEventView: function () {
+            return this.viewTemplate(_.extend(this.model.toJSON(), {
+                formatter: fieldFormatter
+            }));
+        },
+
+        getEventForm: function () {
+            var modelData = this.model.toJSON(),
+                templateData = _.extend(this.getEventFormTemplateData(!modelData.id), modelData),
+                form = this.fillForm(this.template(templateData), modelData),
+                calendarColors = this.options.colorManager.getCalendarColors(this.model.get('calendarUid'));
+
+            form.find(this.selectors.backgroundColor)
+                .data('page-component-options').emptyColor = calendarColors.backgroundColor;
+            if (modelData.calendarAlias !== 'user') {
+                this._showUserCalendarOnlyFields(form, false);
+            }
+            this._toggleCalendarUidByInvitedUsers(form);
+
+            form.find(this.selectors.calendarUid).on('change', _.bind(function (e) {
+                var $emptyColor = form.find('.empty-color'),
+                    $selector = $(e.currentTarget),
+                    tagName = $selector.prop('tagName').toUpperCase(),
+                    calendarUid = tagName === 'SELECT' || $selector.is(':checked') ? $selector.val() : this.model.get('calendarUid'),
+                    colors = this.options.colorManager.getCalendarColors(calendarUid),
+                    newCalendar = this.parseCalendarUid(calendarUid);
+                $emptyColor.css({'background-color': colors.backgroundColor, 'color': colors.color});
+                if (newCalendar.calendarAlias === 'user') {
+                    this._showUserCalendarOnlyFields(form);
+                } else {
+                    this._showUserCalendarOnlyFields(form, false);
+                }
+            }, this));
+            form.find(this.selectors.invitedUsers).on('change', _.bind(function (e) {
+                this._toggleCalendarUidByInvitedUsers(form);
+            }, this));
+
+            return form;
+        },
+
         getEventFormData: function () {
-            var self = this;
             var fieldNameRegex = /\[(\w+)\]/g,
                 data = {},
                 formData = this.eventDialog.form.serializeArray();
@@ -235,21 +330,87 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
                 }
 
                 if (matches.length) {
-                    self.setValueByPath(data, dataItem.value, matches);
+                    this.setValueByPath(data, dataItem.value, matches);
                 }
-            });
+            }, this);
+
+            if (data.hasOwnProperty('calendarUid')) {
+                if (data.calendarUid) {
+                    _.extend(data, this.parseCalendarUid(data.calendarUid));
+                    if (data.calendarAlias !== 'user') {
+                        _.each(this.userCalendarOnlyFields, function (item) {
+                            if (item.fieldName) {
+                                data[item.fieldName] = item.emptyValue;
+                            }
+                        });
+                    }
+                }
+                delete data.calendarUid;
+            }
+
+            if (data.hasOwnProperty('invitedUsers')) {
+                data.invitedUsers = _.map(data.invitedUsers ? data.invitedUsers.split(',') : [], function (item) {
+                    return parseInt(item);
+                });
+            }
 
             return data;
         },
 
-        setValueByPath: function (obj, value, path) {
-            var parent = obj;
+        parseCalendarUid: function (calendarUid) {
+            return {
+                calendarAlias: calendarUid.substr(0, calendarUid.lastIndexOf('_')),
+                calendar: parseInt(calendarUid.substr(calendarUid.lastIndexOf('_') + 1))
+            };
+        },
 
-            for (var i = 0; i < path.length - 1; i += 1) {
+        _showUserCalendarOnlyFields: function (form, visible) {
+            _.each(this.userCalendarOnlyFields, function (item) {
+                if (item.selector) {
+                    if (_.isUndefined(visible) || visible) {
+                        form.find(item.selector).closest('.control-group').show();
+                    } else {
+                        form.find(item.selector).closest('.control-group').hide();
+                    }
+                }
+            });
+        },
+
+        _toggleCalendarUidByInvitedUsers: function (form) {
+            var $calendarUid = form.find(this.selectors.calendarUid);
+            if (!$calendarUid.length) {
+                return;
+            }
+            if (form.find(this.selectors.invitedUsers).val()) {
+                $calendarUid.attr('disabled', 'disabled');
+                $calendarUid.parent().attr('title', __("The calendar cannot be changed because the event has guests"));
+                // fix select2 dynamic change disabled
+                if (!$calendarUid.parent().hasClass('disabled')) {
+                    $calendarUid.parent().addClass('disabled');
+                }
+                if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
+                    $calendarUid.parent().find('label').addClass('disabled');
+                }
+            } else {
+                $calendarUid.removeAttr('disabled');
+                $calendarUid.removeAttr('title');
+                // fix select2 dynamic change disabled
+                if ($calendarUid.parent().hasClass('disabled')) {
+                    $calendarUid.parent().removeClass('disabled');
+                }
+                if ($calendarUid.prop('tagName').toUpperCase() !== 'SELECT') {
+                    $calendarUid.parent().find('label').removeClass('disabled');
+                }
+            }
+        },
+
+        setValueByPath: function (obj, value, path) {
+            var parent = obj, i;
+
+            for (i = 0; i < path.length - 1; i++) {
                 if (parent[path[i]] === undefined) {
                     parent[path[i]] = {};
                 }
-
                 parent = parent[path[i]];
             }
 
@@ -257,16 +418,53 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'oro/dialog-wi
         },
 
         getValueByPath: function (obj, path) {
-            var current = obj;
+            var current = obj, i;
 
-            for (var i = 0; i < path.length; ++i) {
+            for (i = 0; i < path.length; i++) {
                 if (current[path[i]] == undefined) {
                     return undefined;
+                }
+                current = current[path[i]];
+            }
+
+            return current;
+        },
+
+        getEventFormTemplateData: function (isNew) {
+            var templateType = '',
+                calendars = [],
+                ownCalendar = null,
+                isOwnCalendar = function (item) {
+                    return (item.get('calendarAlias') === 'user' && item.get('calendar') === item.get('targetCalendar'));
+                };
+
+            this.options.connections.each(function (item) {
+                var calendar;
+                if (item.get('canAddEvent')) {
+                    calendar = {uid: item.get('calendarUid'), name: item.get('calendarName')};
+                    if (!ownCalendar && isOwnCalendar(item)) {
+                        ownCalendar = calendar;
+                    } else {
+                        calendars.push(calendar);
+                    }
+                }
+            }, this);
+
+            if (calendars.length) {
+                if (isNew && calendars.length === 1) {
+                    templateType = 'single';
                 } else {
-                    current = current[path[i]];
+                    if (ownCalendar) {
+                        calendars.unshift(ownCalendar);
+                    }
+                    templateType = 'multiple';
                 }
             }
-            return current;
+
+            return {
+                calendarUidTemplateType: templateType,
+                calendars: calendars
+            };
         }
     });
 });

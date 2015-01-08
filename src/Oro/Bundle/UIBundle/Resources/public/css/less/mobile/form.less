@@ -1,9 +1,5 @@
 .controls{
   .selector{
-    width: 100% !important;
-    span{
-      width: 100% !important;
-    }
     select{
       width: 100% !important;
       box-sizing: border-box;
@@ -21,12 +17,13 @@
     -webkit-box-sizing: border-box;
     height: 30px;
   }
-  textarea{
+  textarea, .mce-tinymce {
     width: 100% !important;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
   }
+
 }
 .form-horizontal{
   & > .span6 {
@@ -42,12 +39,45 @@
     max-width: 100%;
   }
 }
+.select2-container.select2-allowclear{
+  .select2-arrow{
+    right: 36px;
+  }
+  .select2-search-choice-close{
+    border-left: 1px solid #CCC;
+    height: 28px;
+    width: 28px;
+    top: 0px;
+    right: 0px;
+    color: #666;
+    &:before{
+      content: "\f00d";
+      font: normal 12px FontAwesome;
+      top: 8px;
+      right: 8px;
+    }
+  }
+}
 .select2-container-multi .select2-choices li {
   float: none;
 }
-.oro-multiselect-holder{
+.oro-item-collection {
   input[type="email"],
   input[type="text"]{
     width: 225px !important;
   }
+}
+.oro-address-collection.oro-item-collection {
+  &>div {
+    padding: 10px 15px 0;
+  }
+}
+h5.user-fieldset {
+  margin: 7px 0;
+}
+.well {
+  margin-bottom: 7px;
+}
+.tags-overlay .well {
+  margin-bottom: 0;
 }

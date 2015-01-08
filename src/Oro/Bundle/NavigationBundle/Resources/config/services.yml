@@ -1,6 +1,7 @@
 parameters:
     oro_menu.factory.acl_extension.class:                      Oro\Bundle\NavigationBundle\Menu\AclAwareMenuFactoryExtension
     oro_menu.factory.class:                                    Knp\Menu\MenuFactory
+    oro_menu.configuration_resolver.class:                     Oro\Component\Config\Resolver\SystemAwareResolver
     oro_menu.builder_chain.class:                              Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
     oro_menu.configuration_builder.class:                      Oro\Bundle\NavigationBundle\Menu\ConfigurationBuilder
     oro_menu.twig.extension.class:                             Oro\Bundle\NavigationBundle\Twig\MenuExtension
@@ -17,7 +18,8 @@ parameters:
 
     oro_navigation.event.response_history.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHistoryListener
     oro_navigation.event.response_hashnav.listener.class:      Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener
-    oro_navigation.event.doctrine_tag_listener.class:        Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener
+    oro_navigation.event.doctrine_tag_listener.class:          Oro\Bundle\NavigationBundle\Event\DoctrineTagEventListener
+    oro_navigation.event.master_request_route_listener.class:  Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener
 
     oro_navigation.menu.matcher.voter.request:                 Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RequestVoter
     oro_navigation.menu.matcher.voter.routepattern:            Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
@@ -71,8 +73,15 @@ services:
         tags:
             - { name: knp_menu.provider }
 
+    oro_menu.configuration_resolver:
+        class: %oro_menu.configuration_resolver.class%
+        arguments:
+            - @service_container
+
     oro_menu.configuration_builder:
         class: %oro_menu.configuration_builder.class%
+        arguments:
+            - @oro_menu.configuration_resolver
         tags:
             - { name: oro_menu.builder }
 
@@ -179,7 +188,7 @@ services:
         arguments:
             - @oro_navigation.item.factory
             - @security.context
-            - @doctrine.orm.entity_manager
+            - @doctrine
             - @oro_navigation.title_service
 
     oro_navigation.event.doctrine_tag_listener:
@@ -201,12 +210,18 @@ services:
             - { name: doctrine.event_listener, event: onFlush, connection: default }
             - { name: doctrine.event_listener, event: postFlush, connection: default }
 
+    oro_navigation.event.master_request_route_listener:
+        class: %oro_navigation.event.master_request_route_listener.class%
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
+
     oro_navigation.content.topic_sender:
         class: %oro_navigation.content.topic_sender.class%
         arguments:
             - @oro_wamp.publisher
             - @oro_navigation.content.tag_generator_chain.link
             - @oro_navigation.content.security.context.linksss
+            - @logger
 
     oro_navigation.content.tag_generator_chain.link:
         tags:

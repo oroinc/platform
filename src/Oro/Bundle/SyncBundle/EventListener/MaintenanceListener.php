@@ -5,6 +5,8 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SyncBundle\Wamp\TopicPublisher;
 
+use Psr\Log\LoggerInterface;
+
 class MaintenanceListener
 {
     /**
@@ -18,26 +20,46 @@ class MaintenanceListener
     protected $securityFacade;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @param TopicPublisher $publisher
      * @param SecurityFacade $securityFacade
+     * @param LoggerInterface $logger
      */
-    public function __construct(TopicPublisher $publisher, SecurityFacade $securityFacade)
-    {
-        $this->publisher = $publisher;
+    public function __construct(
+        TopicPublisher $publisher,
+        SecurityFacade $securityFacade,
+        LoggerInterface $logger
+    ) {
+        $this->publisher      = $publisher;
         $this->securityFacade = $securityFacade;
+        $this->logger         = $logger;
     }
 
     public function onModeOn()
     {
-        $userId = $this->securityFacade->getLoggedUserId();
-
-        $this->publisher->send('oro/maintenance', array('isOn' => true, 'userId' => $userId));
+        $this->onMode(true);
     }
 
     public function onModeOff()
     {
+        $this->onMode(false);
+    }
+
+    /**
+     * @param bool $isOn
+     */
+    protected function onMode($isOn)
+    {
         $userId = $this->securityFacade->getLoggedUserId();
 
-        $this->publisher->send('oro/maintenance', array('isOn' => false, 'userId' => $userId));
+        try {
+            $this->publisher->send('oro/maintenance', array('isOn' => (bool)$isOn, 'userId' => $userId));
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+        }
     }
 }

@@ -13,7 +13,6 @@ use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsParser;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -44,7 +43,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     [
                         ['table1', 'Acme\AcmeBundle\Entity\Entity1'],
                         ['table2', 'Acme\AcmeBundle\Entity\Entity2'],
-                        ['oro_enum_test_enum', ExtendConfigDumper::ENTITY . 'EV_Test_Enum'],
+                        ['oro_enum_test_enum', ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum'],
                     ]
                 )
             );
@@ -106,7 +105,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->createCustomEntityTable(
             $schema,
-            ExtendConfigDumper::ENTITY . 'Entity1'
+            ExtendHelper::ENTITY_NAMESPACE . 'Entity1'
         );
     }
 
@@ -215,19 +214,19 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('registerEntityClass')
             ->with(
                 ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity_1',
-                ExtendConfigDumper::ENTITY . 'Entity_1'
+                ExtendHelper::ENTITY_NAMESPACE . 'Entity_1'
             );
         $this->entityMetadataHelper->expects($this->at(1))
             ->method('registerEntityClass')
             ->with(
                 ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity2',
-                ExtendConfigDumper::ENTITY . 'Entity2'
+                ExtendHelper::ENTITY_NAMESPACE . 'Entity2'
             );
         $this->entityMetadataHelper->expects($this->at(2))
             ->method('registerEntityClass')
             ->with(
                 ExtendDbIdentifierNameGenerator::CUSTOM_TABLE_PREFIX . 'entity3',
-                ExtendConfigDumper::ENTITY . 'Entity3'
+                ExtendHelper::ENTITY_NAMESPACE . 'Entity3'
             );
 
         $extension->createCustomEntityTable(
@@ -270,7 +269,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertExtendOptions(
             $schema,
             [
-                ExtendConfigDumper::ENTITY . 'Entity_1' => [
+                ExtendHelper::ENTITY_NAMESPACE . 'Entity_1' => [
                     'configs' => [
                         'extend' => [
                             'owner'     => ExtendScope::OWNER_CUSTOM,
@@ -278,7 +277,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         ]
                     ],
                 ],
-                ExtendConfigDumper::ENTITY . 'Entity2'  => [
+                ExtendHelper::ENTITY_NAMESPACE . 'Entity2'  => [
                     'configs' => [
                         'extend' => [
                             'owner'     => ExtendScope::OWNER_CUSTOM,
@@ -287,7 +286,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                         'entity' => ['icon' => 'icon2'],
                     ],
                 ],
-                ExtendConfigDumper::ENTITY . 'Entity3'  => [
+                ExtendHelper::ENTITY_NAMESPACE . 'Entity3'  => [
                     'configs' => [
                         'extend' => [
                             'owner'     => ExtendScope::OWNER_CUSTOM,
@@ -305,7 +304,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = $this->getExtendExtension();
 
         $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
-        $expectedClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Status';
+        $expectedClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Status';
 
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
@@ -399,7 +398,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = $this->getExtendExtension();
 
         $expectedTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . 'test_status';
-        $expectedClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Status';
+        $expectedClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Status';
 
         $this->entityMetadataHelper->expects($this->once())
             ->method('registerEntityClass')
@@ -506,7 +505,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $enumCode      = 'test_enum';
         $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
-        $enumClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Enum';
+        $enumClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum';
 
         $enumTable = $schema->createTable($enumTableName);
         $enumTable->addColumn('id', 'string', ['length' => 32]);
@@ -570,7 +569,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
         $enumCode      = 'test_enum';
         $enumTableName = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX . $enumCode;
-        $enumClassName = ExtendConfigDumper::ENTITY . 'EV_Test_Enum';
+        $enumClassName = ExtendHelper::ENTITY_NAMESPACE . 'EV_Test_Enum';
 
         $enumTable = $schema->createTable($enumTableName);
         $enumTable->addColumn('id', 'string', ['length' => 32]);

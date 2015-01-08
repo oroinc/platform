@@ -1583,7 +1583,7 @@ class User extends ExtendUser implements
     }
 
     /**
-     *
+     * Whether user in specified organization
      *
      * @param Organization $organization
      * @return bool

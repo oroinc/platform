@@ -72,17 +72,15 @@
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
+    position: relative;
 
-    .actions-container.collapse-expand-action-container {
-      position: relative;
-      top: 1px;
-      padding: 10px 5px;
-      border-bottom: 1px solid #ddd;
+    .actions-container .collapse-expand-action-container {
+      margin-top: -1px;
     }
     
     .actions-container {
-      position: relative;
-      top: -32px;
+      position: absolute;
+      top: 10px;
       height: 0px;
       .collapse-action{
         color: #727272;
@@ -111,11 +109,11 @@
     }
 
     .actions-container.pull-left {
-      top: 10px;
+      left: 0;
     }
 
     .actions-container.pull-right {
-      top: -32px;
+      right: 0;
     }
 
     .default-actions-container {
@@ -147,7 +145,7 @@
 
     .title {
       padding-left: 28px;
-      padding-right: 0;
+      padding-right: 90px;
     }
 
     .row-fluid {
@@ -155,7 +153,21 @@
     }
 
     .dashboard-widget-content {
-      padding-top: 12px;
+      margin-top: 0;
+
+      .grid-container {
+        .grid {
+          margin: 0 0 10px 0;
+        }
+
+        .no-data {
+          margin-top: 0px;
+        }
+      }
+
+      .tab-container {
+        padding-top: 10px;
+      }
     }
   }
 
@@ -216,7 +228,7 @@
     }
     .tab-content{
       .no-data{
-        background-color: #fff;
+        background-color: #f9f9f9;
       }
     }
   }
@@ -321,29 +333,37 @@
 .chart-container {
   position: relative;
   overflow-x: visible;
+  margin-top: 5px;
+  &.wrapped-chart-legend {
+    margin: 0 auto;
+  }
   &>.clearfix {
     margin: 0 auto;
-    .pie-chart {
-      z-index: 1;
-    }
-    .bar-chart{
-      margin-top: 20px;
-    }
-    .pie-chart-legend {
+    .chart-legend {
       position: relative;
+      min-width: 250px; // to wrap legend event if it's empty yet
+      height: auto !important;
+      padding-bottom: 20px;
       table {
-        position: absolute;
+        position: relative;
         top: 0;
         left: 0;
         bottom: 0;
         right: 0;
         margin: auto 0 auto 30px;
-        width: 50%;
+        width: 90%;
         height: auto;
         td {
           padding-bottom: 7px;
         }
+        .flotr-legend-color-box {
+          width: 30px;
+        }
       }
+    }
+    .funnel-label {
+      position: absolute;
+      padding-bottom: .5em;
     }
   }
 }
@@ -496,15 +516,5 @@
 .navigation {
   .dashboard-widgets-add {
     margin: 0 0 0 11px;
-  }
-}
-
-.mobile-version .dashboard-widget {
-  .title {
-    height: 70px;
-  }
-
-  .action-wrapper.sortable {
-    display: none;
   }
 }

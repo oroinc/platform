@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -241,14 +241,17 @@ abstract class WebTestCase extends BaseWebTestCase
             );
 
             $client = $this->getClientInstance();
-            $client->request('GET', $wsdl);
-            $status = $client->getResponse()->getStatusCode();
-            $statusText = Response::$statusTexts[$status];
-            if ($status >= 400) {
-                throw new \Exception($statusText, $status);
+            if ($options['soap_version'] == SOAP_1_2) {
+                $contentType = 'application/soap+xml';
+            } else {
+                $contentType = 'text/xml';
             }
-
+            $client->request('GET', $wsdl, [], [], ['CONTENT_TYPE' => $contentType]);
+            $status = $client->getResponse()->getStatusCode();
             $wsdl = $client->getResponse()->getContent();
+            if ($status >= 400) {
+                throw new \Exception($wsdl, $status);
+            }
             //save to file
             $file = tempnam(sys_get_temp_dir(), date("Ymd") . '_') . '.xml';
             $fl = fopen($file, "w");
@@ -273,14 +276,25 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected static function runCommand($name, array $params = array())
     {
-        array_unshift($params, $name);
-
         $kernel = self::getContainer()->get('kernel');
 
         $application = new Application($kernel);
         $application->setAutoExit(false);
 
-        $input = new ArrayInput($params);
+        $argv = ['application', $name];
+        foreach ($params as $k => $v) {
+            if (is_bool($v)) {
+                if ($v) {
+                    $argv[] = $k;
+                }
+            } else {
+                if (!is_int($k)) {
+                    $argv[] = $k;
+                }
+                $argv[] = $v;
+            }
+        }
+        $input = new ArgvInput($argv);
         $input->setInteractive(false);
 
         $fp = fopen('php://temp/maxmemory:' . (1024 * 1024 * 1), 'r+');

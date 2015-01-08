@@ -18,6 +18,12 @@ config:
         'jquery.select2':
             deps:
                 - 'jquery'
+        'jquery.simplecolorpicker':
+            deps:
+                - 'jquery'
+        'jquery.minicolors':
+            deps:
+                - 'jquery'
         'jquery.jstree':
             deps:
                 - 'jquery'
@@ -45,6 +51,7 @@ config:
             'jquery': 'oroui/js/extend/jquery'
             'jquery.select2': 'oroui/js/extend/select2'
             'chaplin': 'oroui/js/extend/chaplin'
+            'underscore': 'oroui/js/extend/underscore'
             'backbone': 'oroui/js/extend/backbone'
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
@@ -57,6 +64,8 @@ config:
             'jquery-ui': 'jquery-ui'
         'oroui/js/extend/chaplin':
             'chaplin': 'chaplin'
+        'oroui/js/extend/underscore':
+            'underscore': 'underscore'
         'oroui/js/extend/backbone':
             'backbone': 'backbone'
         'oroui/js/extend/bootstrap':
@@ -77,6 +86,8 @@ config:
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
         'jquery.uniform': 'bundles/oroui/lib/jquery/jquery.uniform.min.js'
         'jquery.select2': 'bundles/oroui/lib/jquery/select2.js'
+        'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
+        'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
         'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
@@ -87,13 +98,17 @@ config:
         'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
 
+        'ready': 'bundles/oroui/js/requirejs/ready.js'
+        'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
         'controllers/page-controller': 'bundles/oroui/js/app/controllers/page-controller.js'
-        'oroui/js/app/modules/layout': 'bundles/oroui/js/app/modules/layout.js'
-        'oroui/js/app/modules/views': 'bundles/oroui/js/app/modules/views.js'
-        'oroui/js/app/modules/messenger': 'bundles/oroui/js/app/modules/messenger.js'
+        'oroui/js/app/modules/layout-module': 'bundles/oroui/js/app/modules/layout-module.js'
+        'oroui/js/app/modules/messenger-module': 'bundles/oroui/js/app/modules/messenger-module.js'
+        'oroui/js/app/modules/views-module': 'bundles/oroui/js/app/modules/views-module.js'
+        'oroui/js/app/modules/widgets-module': 'bundles/oroui/js/app/modules/widgets-module.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
+        'oroui/js/app/views/page/before-content-addition-view': 'bundles/oroui/js/app/views/page/before-content-addition-view.js'
         'oroui/js/app/views/page/breadcrumb-view': 'bundles/oroui/js/app/views/page/breadcrumb-view.js'
         'oroui/js/app/views/page/content-view': 'bundles/oroui/js/app/views/page/content-view.js'
         'oroui/js/app/views/page/main-menu-view': 'bundles/oroui/js/app/views/page/main-menu-view.js'
@@ -113,12 +128,14 @@ config:
         'oroui/js/messenger': 'bundles/oroui/js/messenger.js'
         'oroui/js/modal': 'bundles/oroui/js/modal.js'
         'oroui/js/scrollspy': 'bundles/oroui/js/scrollspy.js'
-        'oroui/js/widget-control-initializer': 'bundles/oroui/js/widget-control-initializer.js'
-        'oroui/js/widget-manager': 'bundles/oroui/js/widget-manager.js'
-        'oroui/js/widget/abstract': 'bundles/oroui/js/widget/abstract.js'
-        'oro/block-widget': 'bundles/oroui/js/widget/block.js'
-        'oro/page-widget': 'bundles/oroui/js/widget/page.js'
-        'oro/buttons-widget': 'bundles/oroui/js/widget/buttons.js'
+        'oroui/js/app/components/hidden-redirect-component': 'bundles/oroui/js/app/components/hidden-redirect-component.js'
+        'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
+        'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
+        'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
+        'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
+        'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
+        'oro/page-widget': 'bundles/oroui/js/widget/page-widget.js'
+        'oro/buttons-widget': 'bundles/oroui/js/widget/buttons-widget.js'
         'oroui/js/mobile/layout': 'bundles/oroui/js/mobile/layout.js'
         'oroui/js/mobile/page-header': 'bundles/oroui/js/mobile/page-header.js'
         'oroui/js/mobile/side-menu': 'bundles/oroui/js/mobile/side-menu.js'
@@ -132,9 +149,10 @@ config:
 
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
     appmodules:
-        - oroui/js/app/modules/layout
-        - oroui/js/app/modules/views
-        - oroui/js/app/modules/messenger
+        - oroui/js/app/modules/layout-module
+        - oroui/js/app/modules/messenger-module
+        - oroui/js/app/modules/views-module
+        - oroui/js/app/modules/widgets-module
 
 build:
     paths:

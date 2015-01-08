@@ -71,7 +71,9 @@ class EntitySelectHandler extends SearchHandler
         $queryBuilder->setMaxResults($maxResults);
         $queryBuilder->setFirstResult($firstResult);
 
-        return $queryBuilder->getQuery()->getArrayResult();
+        $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
+
+        return $query->getArrayResult();
     }
 
     /**

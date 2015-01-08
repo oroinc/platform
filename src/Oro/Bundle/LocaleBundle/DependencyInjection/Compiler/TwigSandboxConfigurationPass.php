@@ -14,6 +14,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
     const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
     const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.email_renderer';
     const DATE_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.date_time';
+    const NAME_FORMAT_EXTENSION_SERVICE_KEY = 'oro_locale.twig.name';
     const INTL_EXTENSION_SERVICE_KEY = 'twig.extension.intl';
 
     /**
@@ -35,6 +36,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
                     'oro_format_date',
                     'oro_format_time',
                     'oro_format_datetime',
+                    'oro_format_name',
                     'date'
                 )
             );
@@ -42,6 +44,7 @@ class TwigSandboxConfigurationPass implements CompilerPassInterface
             // register an twig extension implements these filters
             $rendererDef = $container->getDefinition(self::EMAIL_TEMPLATE_RENDERER_SERVICE_KEY);
             $rendererDef->addMethodCall('addExtension', array(new Reference(self::DATE_FORMAT_EXTENSION_SERVICE_KEY)));
+            $rendererDef->addMethodCall('addExtension', array(new Reference(self::NAME_FORMAT_EXTENSION_SERVICE_KEY)));
             // register Intl twig extension required for our date format extension
             $rendererDef->addMethodCall('addExtension', array(new Reference(self::INTL_EXTENSION_SERVICE_KEY)));
         }

@@ -211,19 +211,37 @@ class EntityFieldProvider
             $this->addVirtualFields($result, $metadata, $applyExclusions, $translate);
         }
         // add regular fields
-        $fieldNames = $metadata->getFieldNames();
-        foreach ($fieldNames as $fieldName) {
+        $configs = $this->extendConfigProvider->getConfigs($metadata->getName());
+        foreach ($configs as $fieldConfig) {
+            $fieldConfigId = $fieldConfig->getId();
+            $fieldName = $fieldConfigId->getFieldName();
+
+            $fieldType = $this->fieldTypeHelper->getUnderlyingType(
+                $fieldConfigId->getFieldType()
+            );
+            if ($this->fieldTypeHelper->isRelation($fieldType)) {
+                // skip because this field is relation
+                continue;
+            }
+
             if (isset($result[$fieldName])) {
                 // skip because a field with this name is already added, it could be a virtual field
                 continue;
             }
+
             if (!$this->entityConfigProvider->hasConfig($metadata->getName(), $fieldName)) {
                 // skip non configurable field
                 continue;
             }
+
             if ($this->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
+
+            if ($fieldConfig->is('is_deleted')) {
+                continue;
+            }
+
             if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
                 continue;
             }
@@ -231,7 +249,7 @@ class EntityFieldProvider
             $this->addField(
                 $result,
                 $fieldName,
-                $metadata->getTypeOfField($fieldName),
+                $fieldConfigId->getFieldType(),
                 $this->getFieldLabel($className, $fieldName),
                 $metadata->isIdentifier($fieldName),
                 $translate
@@ -291,11 +309,6 @@ class EntityFieldProvider
     {
         // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
         if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
-            return true;
-        }
-        // skip a field if it was deleted
-        $fieldConfig = $this->extendConfigProvider->getConfig($metadata->getName(), $fieldName);
-        if ($fieldConfig->is('is_deleted')) {
             return true;
         }
 
@@ -443,7 +456,8 @@ class EntityFieldProvider
                 $this->getRelationType($fieldType),
                 $relatedClassName,
                 $withEntityDetails,
-                $translate
+                $translate,
+                false
             );
         }
     }
@@ -528,14 +542,15 @@ class EntityFieldProvider
     /**
      * Adds a relation to $result
      *
-     * @param array  $result
-     * @param string $name
-     * @param string $type
-     * @param string $label
-     * @param string $relationType
-     * @param string $relatedEntityName
-     * @param bool   $withEntityDetails
-     * @param bool   $translate
+     * @param array     $result
+     * @param string    $name
+     * @param string    $type
+     * @param string    $label
+     * @param string    $relationType
+     * @param string    $relatedEntityName
+     * @param bool      $withEntityDetails
+     * @param bool      $translate
+     * @param bool|null $translateLabel
      */
     protected function addRelation(
         array &$result,
@@ -545,9 +560,13 @@ class EntityFieldProvider
         $relationType,
         $relatedEntityName,
         $withEntityDetails,
-        $translate
+        $translate,
+        $translateLabel = null
     ) {
-        if ($translate) {
+        if ($translateLabel === null) {
+            $translateLabel = $translate;
+        }
+        if ($translateLabel) {
             $label = $this->translator->trans($label);
         }
 

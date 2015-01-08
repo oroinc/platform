@@ -42,7 +42,7 @@ services:
 
     oro_attachment.twig.file_extension:
         class: %oro_attachment.twig.file_extension.class%
-        arguments: [@oro_attachment.manager, @oro_entity_config.config_manager]
+        arguments: [@oro_attachment.manager, @oro_entity_config.config_manager, @doctrine]
         tags:
             - { name: twig.extension }
 
@@ -93,11 +93,16 @@ services:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.attachment-grid, method: onBuildAfter }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.attachment-grid, method: onBuildBefore }
 
-    #
-    #Datagrid
-    #
     oro_attachment.datagrid.action.dialog:
         class: %oro_attachment.datagrid.action.dialog.class%
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: dialog }
+
+    oro_attachment.widget_provider.actions:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_add_attachment_button
+            - oro_add_attachment_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity, priority: -90 }

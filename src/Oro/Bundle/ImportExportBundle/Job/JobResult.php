@@ -57,6 +57,7 @@ class JobResult
 
     /**
      * @param boolean $successful
+     *
      * @return JobResult
      */
     public function setSuccessful($successful)
@@ -67,6 +68,7 @@ class JobResult
 
     /**
      * @param string $failureException
+     *
      * @return JobResult
      */
     public function addFailureException($failureException)
@@ -76,7 +78,19 @@ class JobResult
     }
 
     /**
+     * @param array $exceptions
+     *
+     * @return $this
+     */
+    public function setFailureExceptions(array $exceptions)
+    {
+        $this->failureExceptions = $exceptions;
+        return $this;
+    }
+
+    /**
      * @param ContextInterface $context
+     *
      * @return JobResult
      */
     public function setContext(ContextInterface $context)
@@ -87,6 +101,7 @@ class JobResult
 
     /**
      * @param int $jobId
+     *
      * @return JobResult
      */
     public function setJobId($jobId)
@@ -105,6 +120,7 @@ class JobResult
 
     /**
      * @param string $jobCode
+     *
      * @return JobResult
      */
     public function setJobCode($jobCode)

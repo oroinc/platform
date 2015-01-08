@@ -8,8 +8,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendConfigProcessor;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -247,7 +247,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateCustomEntity()
     {
-        $testClassName = ExtendConfigDumper::ENTITY . 'TestEntity';
+        $testClassName = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
         $configs       = [
             $testClassName => [
                 'configs' => [

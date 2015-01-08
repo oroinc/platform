@@ -95,7 +95,7 @@ class IntegrationSelectType extends AbstractType
         foreach ($view->vars['choices'] as $choiceView) {
             /** @var Integration $integration */
             $integration = $choiceView->data;
-            $attributes  = ['data-status' => $integration->getEnabled()];
+            $attributes  = ['data-status' => $integration->isEnabled()];
             if (isset($typeData[$integration->getType()], $typeData[$integration->getType()]['icon'])) {
                 $attributes['data-icon'] = $this->assetHelper->getUrl($typeData[$integration->getType()]['icon']);
             }

@@ -1,19 +1,17 @@
 /*jslint nomen:true*/
 /*global define*/
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/app/views/base/collection-view',
-    'oroui/js/mediator',
-    'oroui/js/loading-mask',
-    'oro/dialog-widget',
-    'oroui/js/delete-confirmation'
-], function ($, _, __, BaseCollectionView, mediator,
-    LoadingMask, DialogWidget, DeleteConfirmation) {
+define(function (require) {
     'use strict';
 
-    var NotesView;
+    var NotesView,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
+        mediator = require('oroui/js/mediator'),
+        LoadingMask = require('oroui/js/loading-mask'),
+        DialogWidget = require('oro/dialog-widget'),
+        DeleteConfirmation = require('oroui/js/delete-confirmation'),
+        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     NotesView = BaseCollectionView.extend({
         options: {
@@ -38,6 +36,9 @@ define([
             'toDelete collection': '_deleteItem'
         },
 
+        /**
+         * @inheritDoc
+         */
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
 
@@ -58,6 +59,18 @@ define([
             mediator.on(this.options.itemAddEvent, this._addItem, this);
 
             NotesView.__super__.initialize.call(this, options);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            delete this.itemEditDialog;
+            delete this.$loadingMaskContainer;
+            NotesView.__super__.dispose.call(this);
         },
 
         render: function () {
@@ -199,15 +212,9 @@ define([
                     }
                 });
                 this.itemEditDialog.render();
-                mediator.once('page:request', _.bind(function () {
-                    if (this.itemEditDialog) {
-                        this.itemEditDialog.remove();
-                    }
-                }, this));
                 this.itemEditDialog.on('formSave', _.bind(function (response) {
                     var model, insertPosition;
                     this.itemEditDialog.remove();
-                    delete this.itemEditDialog;
                     mediator.execute('showFlashMessage', 'success', this._getMessage('itemSaved'));
                     model = this.collection.get(response.id);
                     if (model) {
@@ -232,7 +239,7 @@ define([
         _hideLoading: function () {
             if (this.loadingMask) {
                 this.$loadingMaskContainer.data('loading-mask-visible', false);
-                this.loadingMask.remove();
+                this.loadingMask.dispose();
                 this.loadingMask = null;
             }
         },

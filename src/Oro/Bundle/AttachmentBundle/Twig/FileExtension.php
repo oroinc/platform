@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Twig;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -24,14 +26,18 @@ class FileExtension extends \Twig_Extension
     /** @var ConfigProvider */
     protected $attachmentConfigProvider;
 
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
     /**
      * @param AttachmentManager $manager
      * @param ConfigManager     $configManager
      */
-    public function __construct(AttachmentManager $manager, ConfigManager $configManager)
+    public function __construct(AttachmentManager $manager, ConfigManager $configManager, ManagerRegistry $doctrine)
     {
         $this->manager                  = $manager;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -41,6 +47,7 @@ class FileExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('file_url', [$this, 'getFIleUrl']),
+            new \Twig_SimpleFunction('file_size', [$this, 'getFIleSize']),
             new \Twig_SimpleFunction('resized_image_url', [$this, 'getResizedImageUrl']),
             new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
@@ -87,6 +94,17 @@ class FileExtension extends \Twig_Extension
     }
 
     /**
+     * Get human readable file size
+     *
+     * @param integer $bytes
+     * @return string
+     */
+    public function getFileSize($bytes)
+    {
+        return $this->manager->getFileSize($bytes);
+    }
+
+    /**
      * Get resized attachment image url
      *
      * @param File $attachment
@@ -128,6 +146,12 @@ class FileExtension extends \Twig_Extension
         $fieldName,
         $attachment = null
     ) {
+        /**
+         * @todo: should be refactored in BAP-5637
+         */
+        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
+            $attachment = $this->getFileById($attachment);
+        }
         if ($attachment && $attachment->getFilename()) {
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
@@ -146,7 +170,7 @@ class FileExtension extends \Twig_Extension
      *
      * @param \Twig_Environment $environment
      * @param object            $parentEntity
-     * @param File              $attachment
+     * @param mixed             $attachment
      * @param string|object     $entityClass
      * @param string            $fieldName
      * @return string
@@ -154,10 +178,17 @@ class FileExtension extends \Twig_Extension
     public function getImageView(
         \Twig_Environment $environment,
         $parentEntity,
-        File $attachment = null,
+        $attachment = null,
         $entityClass = null,
         $fieldName = ''
     ) {
+        /**
+         * @todo: should be refactored in BAP-5637
+         */
+        if (filter_var($attachment, FILTER_VALIDATE_INT)) {
+            $attachment = $this->getFileById($attachment);
+        }
+
         if ($attachment && $attachment->getFilename()) {
             $width  = self::DEFAULT_THUMB_SIZE;
             $height = self::DEFAULT_THUMB_SIZE;
@@ -215,5 +246,15 @@ class FileExtension extends \Twig_Extension
     public function getFilteredImageUrl(File $attachment, $filterName)
     {
         return $this->manager->getFilteredImageUrl($attachment, $filterName);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return File
+     */
+    protected function getFileById($id)
+    {
+        return $this->doctrine->getRepository('OroAttachmentBundle:File')->find($id);
     }
 }

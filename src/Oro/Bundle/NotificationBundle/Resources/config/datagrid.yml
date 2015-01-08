@@ -2,6 +2,7 @@ datagrid:
     email-notification-grid:
         options:
             entityHint: transactional email
+            entity_pagination: true
         source:
             acl_resource: oro_notification_emailnotification_view
             type: orm
@@ -97,10 +98,10 @@ datagrid:
                     type: choice
                     data_name: e.entityName
                     options:
-                        is_translated_choices: true
                         field_options:
                             multiple: true
                             choices: @oro_entity.datagrid_helper->getEntityNames
+                            translatable_options: false
 
                 eventName:
                     filter_by_having: true

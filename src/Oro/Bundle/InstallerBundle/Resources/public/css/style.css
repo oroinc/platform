@@ -548,7 +548,6 @@ a.button:hover {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     height: 32px;
-    line-height: 32px;
     padding: 0 5px;
     -webkit-border-radius: 3px;
     border-radius: 3px

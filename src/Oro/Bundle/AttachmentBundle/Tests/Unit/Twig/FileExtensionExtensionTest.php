@@ -20,6 +20,9 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $attachmentConfigProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
     /** @var TestAttachment */
     protected $attachment;
 
@@ -34,12 +37,15 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
         $configManager->expects($this->once())
             ->method('getProvider')
             ->with('attachment')
             ->will($this->returnValue($this->attachmentConfigProvider));
 
-        $this->extension = new FileExtension($this->manager, $configManager);
+        $this->extension = new FileExtension($this->manager, $configManager, $this->doctrine);
         $this->attachment = new TestAttachment();
     }
 
@@ -48,6 +54,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $result = $this->extension->getFunctions();
         $functions = [
             'file_url',
+            'file_size',
             'resized_image_url',
             'filtered_image_url',
             'oro_configured_image_url',
@@ -210,5 +217,36 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($this->attachment, 45, 45);
 
         $this->extension->getConfiguredImageUrl($parent, 'testField', $this->attachment);
+    }
+
+    public function testGetImageViewWIthIntegerAttachmentParameter()
+    {
+        $parentEntity = new TestClass();
+        $this->attachment->setFilename('test.doc');
+        $attachmentId = 1;
+        $repo = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->will($this->returnValue($repo));
+        $repo->expects($this->once())
+            ->method('find')
+            ->with($attachmentId)
+            ->will($this->returnValue($this->attachment));
+        $environment = $this->getMockBuilder('\Twig_Environment')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $template = new TestTemplate(new \Twig_Environment());
+        $environment->expects($this->once())
+            ->method('loadTemplate')
+            ->will($this->returnValue($template));
+        $this->manager->expects($this->once())
+            ->method('getResizedImageUrl')
+            ->with($this->attachment, 16, 16);
+        $this->manager->expects($this->once())
+            ->method('getFileUrl');
+
+        $this->extension->getImageView($environment, $parentEntity, $attachmentId);
     }
 }

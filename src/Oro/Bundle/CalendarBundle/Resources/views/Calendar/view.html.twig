@@ -1,14 +1,20 @@
 {% extends 'OroUIBundle:actions:view.html.twig' %}
-{% import 'OroCalendarBundle::macros.html.twig' as c %}
+{% import 'OroCalendarBundle::templates.html.twig' as calendarTemplates %}
 
 {% set name = entity.owner|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name, "%calendarname%": entity.name|default(name) }}) %}
 
-{% block head_script %}
-    {{ parent() }}
-{% endblock %}
-
 {% block navButtons %}
+    {% if resource_granted('oro_calendar_event_view') %}
+        <div class="btn-group">
+            {{ UI.button({
+                'path' : path('oro_calendar_event_index'),
+                'iCss': 'icon-time',
+                'label': 'oro.calendar.view_events'|trans,
+                'title': 'oro.calendar.view_events'|trans
+            }) }}
+        </div>
+    {% endif %}
 {% endblock navButtons %}
 
 {% block breadcrumb %}
@@ -29,19 +35,47 @@
 {% block stats %}{% endblock stats %}
 
 {% block content_data %}
-    <div class="row-fluid" id="calendar">
-        <div class="span2">
+    {% set calendarOptions = {
+            calendar: entity.id,
+            calendarOptions: calendar,
+            eventsItemsJson: render(path('oro_api_get_calendarevents', {calendar: entity.id, start: startDate|date('c'), end: endDate|date('c'), subordinate: true})),
+            connectionsItemsJson: render(path('oro_api_get_calendar_connections', {id: entity.id})),
+            date: 'now'|date('c'),
+            eventsOptions: {
+                'containerSelector': '.calendar-events',
+                'itemViewTemplateSelector': '#template-view-calendar-event',
+                'itemFormTemplateSelector': '#template-calendar-event',
+                'leftHeader': 'prev,next today title',
+                'centerHeader': '',
+                'rightHeader': 'month,agendaWeek,agendaDay',
+            },
+            connectionsOptions: {
+                'containerSelector': '.calendar-connections',
+                'containerTemplateSelector': '#template-calendar-connections',
+                'itemTemplateSelector': '#template-calendar-connection-item',
+            },
+            colorManagerOptions: {
+                colors: oro_config_value('oro_calendar.calendar_colors')
+            }
+        }
+    %}
+    <div class="row-fluid" id="calendar"
+         data-page-component-module="orocalendar/js/app/components/calendar-component"
+         data-page-component-options="{{ calendarOptions | json_encode }}">
+        <div class="span2 scrollable-container">
             <div class="calendars">
                 <div class="calendar-connections"></div>
-                {% if resource_granted('oro_calendar_connection_view') %}
-                    <form action="#">
-                        {{ form_row(user_select_form) }}
-                    </form>
-                {% endif %}
+                <form action="#">
+                    {{ form_row(user_select_form) }}
+                </form>
             </div>
         </div>
         <div class="span10 calendar-events scrollable-container"></div>
     </div>
+
+    <script type="text/html" id="template-calendar-menu">
+        {{ oro_menu_render('calendar_menu') }}
+    </script>
 
     <script type="text/html" id="template-calendar-connections">
         <ul class="media-list connection-container">
@@ -49,46 +83,28 @@
     </script>
 
     <script type="text/html" id="template-calendar-connection-item">
-        <li class="media connection-item" >
-                <span class="calendar-color" <% if (!_.isEmpty(backgroundColor)) { %>
-                style="background-color: #<%- backgroundColor %>; border-color: #<%- backgroundColor %>"
-            <% } %> ></span>
-            <div class="media-body">
-                <div
-                    <% if (!_.isEmpty(color)) { %> style="color: #<%- color %>"<% } %>
-                    class="user-calendar"
-                    title="<%- calendarName %>"
-                >
-                    <%- calendarName %>
-                </div>
-                <% if (removable) { %>
-                    <div class="pull-right icons-holder">
-                        <a
-                            href="javascript: void(0);"
-                            class="icons-holder-text no-hash remove-connection-button"
-                            title="{{ 'oro.calendar.form.exclude_calendar'|trans }}"
-                        >
-                                <i class="icon-remove hide-text"></i>
-                        </a>
-                    </div>
+        <li class="media connection-item<% if (visible) { %> active<% } %>" >
+            <span
+                <% if (visible) { %>
+                class="calendar-color"
+                    <% if (!_.isEmpty(backgroundColor)) { %>
+                    style="background-color: <%- backgroundColor %>; border-color: <%- backgroundColor %>"
+                    <% } %>
+                <% } else { %>
+                    class="calendar-color un-color"
                 <% } %>
+            ></span>
+            <div class="media-body">
+                <div class="user-calendar" title="<%- calendarName %>"><%- calendarName %></div>
+                <div class="pull-right icons-holder">
+                    <a href="javascript: void(0);" class="icons-holder-text no-hash context-menu-button">
+                        <i class="icon-ellipsis-horizontal"></i>
+                    </a>
+                </div>
             </div>
         </li>
     </script>
 
-    {% set connectionsOptions = {
-        'containerSelector': '.calendar-connections',
-        'containerTemplateSelector': '#template-calendar-connections',
-        'itemTemplateSelector': '#template-calendar-connection-item',
-    } %}
-    {% set eventsOptions = {
-        'containerSelector': '.calendar-events',
-        'itemFormTemplateSelector': '#template-calendar-event',
-        'leftHeader': 'prev,next today title',
-        'centerHeader': '',
-        'rightHeader': 'month,agendaWeek,agendaDay',
-    } %}
-    {{ c.calendar_event_form_template('template-calendar-event', event_form) }}
-    {{ c.renderCalendar('#calendar', entity, startDate, endDate, calendar, eventsOptions, connectionsOptions) }}
-
+    {{ calendarTemplates.calendar_event_view_template('template-view-calendar-event') }}
+    {{ calendarTemplates.calendar_event_form_template('template-calendar-event', event_form) }}
 {% endblock content_data %}

@@ -44,11 +44,12 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->request = new Request();
-        $this->listener = new ApiEventListener($this->request, $this->securityFacade, $this->aclHelper);
+        $this->listener = new ApiEventListener($this->securityFacade, $this->aclHelper);
     }
 
     public function testOnGetListBefore()
     {
+        $this->listener->setRequest($this->request);
         $acl = new Acl(['id' => 5, 'class' => 'OroTestBundle:Test', 'type' => 'entity', 'permission' => 'TEST_PERM']);
         $criteria = new Criteria();
         $newCriteria = new Criteria();
@@ -68,18 +69,28 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($newCriteria, $event->getCriteria());
     }
 
+    public function testOnGetListBeforeNoRequest()
+    {
+        $this->securityFacade->expects($this->never())
+            ->method($this->anything());
+
+        $event = new GetListBefore(new Criteria(), 'OroTestBundle:Test');
+        $this->listener->onGetListBefore($event);
+    }
+
     /**
      * @dataProvider onFindAfterProvider
      */
-    public function testOnFindAfter($isGranted, $throwExeption)
+    public function testOnFindAfter($isGranted, $throwException)
     {
+        $this->listener->setRequest($this->request);
         $object = new \stdClass();
         $this->securityFacade->expects($this->once())
             ->method('isRequestObjectIsGranted')
             ->with($this->request, $object)
             ->will($this->returnValue($isGranted));
 
-        if ($throwExeption) {
+        if ($throwException) {
             $this->setExpectedException('Symfony\Component\Security\Core\Exception\AccessDeniedException');
         }
         $event = new FindAfter($object);
@@ -93,5 +104,15 @@ class ApiEventListenerTest extends \PHPUnit_Framework_TestCase
             [0, false],
             [1, false],
         ];
+    }
+
+    public function testOnFindAfterNoRequest()
+    {
+        $this->securityFacade->expects($this->never())
+            ->method($this->anything());
+
+        $object = new \stdClass();
+        $event = new FindAfter($object);
+        $this->listener->onFindAfter($event);
     }
 }

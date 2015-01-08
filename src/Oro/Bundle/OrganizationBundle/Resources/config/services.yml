@@ -9,12 +9,12 @@ parameters:
 
     oro_organization.twig.get_owner.class:                     Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension
     oro_organization.twig.business_units.class:                Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension
-    oro_organization.twig.organization.class:                  Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
 
     oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
     oro_organization.listener.config_subscriber.class:         Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber
     oro_organization.entity_ownership.listener.class:          Oro\Bundle\OrganizationBundle\Event\RecordOwnerDataListener
     oro_organization.business_unit.listener.class:             Oro\Bundle\OrganizationBundle\Event\BusinessUnitListener
+    oro_organization.import_strategy.listener.class:           Oro\Bundle\OrganizationBundle\Event\ImportStrategyListener
 
     oro_organization.provider.business_units.class:            Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
 
@@ -28,6 +28,8 @@ parameters:
     oro_organization.event.business_unit_grid_listener.class:  Oro\Bundle\OrganizationBundle\Event\BusinessUnitGridListener
 
     oro_organization.autocomplete.organization_search_handler.class: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
+
+    oro_organization.provider.phone.business_unit.class:       Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
 
 services:
     #
@@ -102,13 +104,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_organization.twig.organization:
-        class: %oro_organization.twig.organization.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-        tags:
-            - { name: twig.extension }
-
     oro_organization.link.security_context:
         tags:
             - { name: oro_service_link,  service: security.context }
@@ -131,6 +126,16 @@ services:
         class: %oro_organization.listener.config_subscriber.class%
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_organization.import_strategy.listener:
+        class: %oro_organization.import_strategy.listener.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade.link
+            - @oro_security.owner.ownership_metadata_provider.link
+        tags:
+            - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
+            - { name: doctrine.event_listener, event: onClear }
 
     #
     # DataGrid
@@ -172,3 +177,8 @@ services:
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: user_organizations }
         lazy: true
+
+    oro_organization.provider.phone.business_unit:
+        class: %oro_organization.provider.phone.business_unit.class%
+        tags:
+            - { name: oro_address.phone_provider, class: %oro_organization.business_unit.entity.class% }

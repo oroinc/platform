@@ -5,3 +5,6 @@ css:
         - 'bundles/oroui/css/all.css'
         - 'bundles/oroui/lib/jstree/themes/default/style.css'
         - 'bundles/oroui/lib/font-awesome/css/font-awesome.css'
+        - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
+        - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
+        - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'

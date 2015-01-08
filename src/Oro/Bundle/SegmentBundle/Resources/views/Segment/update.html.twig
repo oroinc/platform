@@ -52,11 +52,6 @@
 {% endblock pageHeader %}
 
 {% block content_data %}
-    <style type="text/css">
-        {# TODO: Remove hiding of pin block after fixing of https://magecore.atlassian.net/browse/CRM-907 #}
-        #pin-button-div {display: none !important}
-    </style>
-
     {% set id = 'segment-profile' %}
     {% set ownerDataBlock = {
         'dataBlocks': [{
@@ -87,9 +82,8 @@
                     'title': '',
                     'data': [
                         form_row(form.entity, {'label': 'oro.segment.entity.label'}),
-                        form_row(form.type, {'label': 'oro.segment.type.label'}),
-                        ownerDataBlock.dataBlocks[0].subblocks[0].data[0]
-                    ]
+                        form_row(form.type, {'label': 'oro.segment.type.label'})
+                    ] | merge(ownerDataBlock.dataBlocks[0].subblocks[0].data)
                 }
             ]
         }]
@@ -141,5 +135,5 @@
     {{ UI.scrollData(id, data, form) }}
 
     {{ QD.query_designer_column_chain_template('column-chain-template') }}
-    {{ segmentQD.initJsWidgets(type, form, entities, metadata, {'with-relations': false}) }}
+    {{ segmentQD.initJsWidgets(type, form, entities, metadata) }}
 {% endblock content_data %}

@@ -24,5 +24,7 @@ class OroFormExtension extends Extension
         $loader->load('form_type.yml');
         $loader->load('importexport.yml');
         $loader->load('services.yml');
+
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
     }
 }

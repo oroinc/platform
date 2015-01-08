@@ -139,7 +139,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
         $this->setFormConfig($class, $property, array('form_type' => $formType));
 
         $guess = $this->guesser->guessType($class, $property);
-        $this->assertTypeGuess($guess, $formType, array(), TypeGuess::VERY_HIGH_CONFIDENCE);
+        $this->assertTypeGuess($guess, $formType, array(), TypeGuess::HIGH_CONFIDENCE);
     }
 
     public function testGuessOnlyFormTypeWithLabel()
@@ -155,7 +155,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
         $this->setEntityConfig($class, $property, array('label' => $label));
 
         $guess = $this->guesser->guessType($class, $property);
-        $this->assertTypeGuess($guess, $formType, array('label' => $label), TypeGuess::VERY_HIGH_CONFIDENCE);
+        $this->assertTypeGuess($guess, $formType, array('label' => $label), TypeGuess::HIGH_CONFIDENCE);
     }
 
     public function testGuessFormTypeWithOptions()
@@ -174,7 +174,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
         $this->setEntityConfig($class, $property, array('label' => 'Not used label'));
 
         $guess = $this->guesser->guessType($class, $property);
-        $this->assertTypeGuess($guess, $formType, $formOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+        $this->assertTypeGuess($guess, $formType, $formOptions, TypeGuess::HIGH_CONFIDENCE);
     }
 
     public function testGuessByAssociationClass()
@@ -256,7 +256,7 @@ class FormConfigGuesserTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($associationEntityConfig));
 
         $guess = $this->guesser->guessType($class, $property);
-        $this->assertTypeGuess($guess, $associationFormType, $associationFormOptions, TypeGuess::VERY_HIGH_CONFIDENCE);
+        $this->assertTypeGuess($guess, $associationFormType, $associationFormOptions, TypeGuess::LOW_CONFIDENCE);
     }
 
     /**

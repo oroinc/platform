@@ -20,36 +20,47 @@ class NotesTest extends Selenium2TestCase
         /** @var Users $login */
         $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
-            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+            ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN]);
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNoteButtonNotAvailable();
     }
 
     /**
-     * Test Notes functionality set On and add new Note to User entity
+     * Test Notes functionality set On
      * @depends testAddNoteNotAvailable
      * @return string
      */
-    public function testAddNoteOn()
+    public function testNoteOn()
     {
-        $note = 'Some note_' . mt_rand();
         $entityName = 'User';
 
         $login = $this->login();
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->filterBy('Name', $entityName)
-            ->open(array($entityName))
+            ->open([$entityName])
             ->edit()
             ->enableNotes()
             ->save()
             ->updateSchema()
             ->assertMessage('Schema updated');
+    }
+
+    /**
+     * Test add new Note to User entity
+     * @depends testNoteOn
+     * @return string
+     */
+    public function testAddNote()
+    {
+        $note = 'Some note_' . mt_rand();
+
+        $login = $this->login();
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
-            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+            ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN]);
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNote()
@@ -63,7 +74,7 @@ class NotesTest extends Selenium2TestCase
 
     /**
      * Test editing of existing Note
-     * @depends testAddNoteOn
+     * @depends testAddNote
      * @param $note
      * @return string
      */
@@ -75,7 +86,7 @@ class NotesTest extends Selenium2TestCase
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
-            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+            ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN]);
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->editNote($note)
@@ -98,16 +109,16 @@ class NotesTest extends Selenium2TestCase
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
-            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+            ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN]);
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->deleteNote($note)
-            ->assertMessage('Note deleted');
+            ->assertMessage('Activity item deleted');
     }
 
     /**
      * Test turn Off Notes functionality at user entity
-     * @depends testAddNoteOn
+     * @depends testAddNote
      */
     public function testAddNoteOff()
     {
@@ -117,7 +128,7 @@ class NotesTest extends Selenium2TestCase
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
             ->filterBy('Name', $entityName)
-            ->open(array($entityName))
+            ->open([$entityName])
             ->edit()
             ->enableNotes('No')
             ->save()
@@ -125,7 +136,7 @@ class NotesTest extends Selenium2TestCase
         /** @var Users $login */
         $login = $login->openUsers('Oro\Bundle\UserBundle')
             ->filterBy('Username', PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN)
-            ->open(array(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN));
+            ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN]);
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNoteButtonNotAvailable();

@@ -88,6 +88,7 @@ namespace OroCRM\Bundle\SalesBundle\Migrations\Schema\v1_0;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -103,7 +104,7 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('orocrm_sales_lead');
-        $extendExtension->addManyToOneRelation(
+        $this->extendExtension->addManyToOneRelation(
             $schema,
             $table,
             'users',
@@ -134,6 +135,7 @@ namespace OroCRM\Bundle\SalesBundle\Migrations\Schema\v1_0;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -149,7 +151,7 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('orocrm_sales_lead');
-        $extendExtension->addEnumField(
+        $this->extendExtension->addEnumField(
             $schema,
             $table,
             'source', // field name
@@ -164,7 +166,8 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
 }
 ```
 
-Please pay attention on the enum code parameter. Each option set should have code and it should be unique system wide.
+Please pay attention on the enum code parameter. Each option set should have code and it should be unique system wide and it's length should be no more than 21 characters (due to dynamic name generation and prefix).
+Same principle applied to field name, in case above - it should be less than 27 symbols, due to suffix _id will be applied (30-3).
 To load a list of options you can use data fixtures, for example:
 
 ``` php
@@ -239,6 +242,7 @@ namespace Acme\Bundle\TestBundle\Migrations\Schema\v1_0;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -310,3 +314,85 @@ The following command removes all data related to entity extend functionality fr
 php app/console oro:entity-extend:cache:clear --no-warmup
 ```
 To reload all cached data just run this command without `--no-warmup` option.
+
+Custom form type and options
+---------------------
+
+To configure custom form type and options for extended field, read [Custom form type and options](Resources/doc/custom_form_type.md)
+
+Validation for extended fields
+---------------------
+By default all extended fields are not validated. In general extended fields rendered as usual forms, same way as not extended,
+but there's a way to define validation constraints for all extended fields by their type.
+This is done through the configuration of oro_entity_extend.validation_loader:
+
+```yaml
+    oro_entity_extend.validation_loader:
+        class: %oro_entity_extend.validation_loader.class%
+        public: false
+        arguments:
+            - @oro_entity_config.provider.extend
+            - @oro_entity_config.provider.form
+        calls:
+            -
+                - addConstraints
+                -
+                    - integer
+                    -
+                        - NotNull: ~
+                        - Regex:
+                            pattern: "/^[\d+]*$/"
+                            message: "This value should contain only numbers."
+
+            - [addConstraints, ["boolean", [{ NotBlank: ~ }]]]
+```
+
+To pass constraints there are two ways:
+- use compiler pass to add 'addConstraints' call with necessary constraint configuration
+- directly call service
+
+Pay attention to the fact that all constraints defined here applied to all extended fields with corresponding type.
+
+Another point to keep in mind - integer fields should be rendered as text. Because html5 validation works only in case 
+when form submitted directly by user, and platform use javascript to submit forms. 
+Platform relates on jQuery validation, but due to the nature of input[type=number] - it's not possible to get it's raw value when it's not number.
+
+
+Extend Fields View
+---------------------
+
+Before extend fields rendering in view page, event "oro.entity_extend_event.before_value_render" fired. 
+There is possibility for customize field rendering using this event.
+
+As example you can create Event Listener. Example:
+
+    oro_entity_extend.listener.extend_field_value_render:
+        class: %oro_entity_extend.listener.extend_field_value_render.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @router
+            - @oro_entity_extend.extend.field_type_helper
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
+
+Each event listener try to made decision how we need to show field value and if it know how value need to be shown, he use `$event->setFieldViewValue($viewData);` to change field view value. Example:
+
+    $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
+        if ($value && $underlyingFieldType == 'manyToOne') {
+            $viewData = $this->getValueForManyToOne(
+                $value,
+                $this->extendProvider->getConfigById($event->getFieldConfigId())
+            );
+
+            $event->setFieldViewValue($viewData);
+        }
+
+In this code we: 
+
+
+- check if value not null and field type is "manyToOne". 
+- calculate field view value and set it using `$event->setFieldViewValue($viewData);` 
+
+In variable `$viewData` can be simple string or array `[ 'link' => 'example.com', 'title' => 'some text representation']`. In case of string it will be formatted in twig template automatically based on field type. In case of array we show field with text equal to `'title'`. Also title will be escaped. If `'link'` option exists we show field as link with href equal to `'link'` option value.
+

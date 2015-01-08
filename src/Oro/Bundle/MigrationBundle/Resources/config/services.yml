@@ -1,15 +1,16 @@
 parameters:
-    oro_migration.db_id_name_generator.class:          Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
-    oro_migration.data_fixtures.loader.class:          Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
-    oro_migration.migrations.loader.class:             Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
-    oro_migration.migrations.query_executor.class:     Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor
-    oro_migration.migrations.executor.class:           Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator
-    oro_migration.migration.pre_up.listener.class:     Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
-    oro_migration.migrations.extension_manager.class:  Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
-    oro_migration.migration.extension.rename.class:    Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
-    oro_migration.listener.release_data_fixture.class: Oro\Bundle\MigrationBundle\EventListener\ReleaseDataFixtureListener
-    oro_migration.tools.schema_dumper.class:           Oro\Bundle\MigrationBundle\Tools\SchemaDumper
-    oro_migration.twig.schema_dumper.class:            Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
+    oro_migration.db_id_name_generator.class:            Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator
+    oro_migration.data_fixtures.loader.class:            Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
+    oro_migration.migrations.loader.class:               Oro\Bundle\MigrationBundle\Migration\Loader\MigrationsLoader
+    oro_migration.migrations.query_executor.class:       Oro\Bundle\MigrationBundle\Migration\MigrationQueryExecutor
+    oro_migration.migrations.executor.class:             Oro\Bundle\MigrationBundle\Migration\MigrationExecutorWithNameGenerator
+    oro_migration.migration.pre_up.listener.class:       Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
+    oro_migration.migrations.extension_manager.class:    Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
+    oro_migration.migration.extension.rename.class:      Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
+    oro_migration.listener.release_data_fixture.class:   Oro\Bundle\MigrationBundle\EventListener\ReleaseDataFixtureListener
+    oro_migration.tools.schema_dumper.class:             Oro\Bundle\MigrationBundle\Tools\SchemaDumper
+    oro_migration.twig.schema_dumper.class:              Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
+    oro_migration.migration.extension.data_strore.class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
 services:
     oro_migration.db_id_name_generator:
         class: %oro_migration.db_id_name_generator.class%
@@ -63,6 +64,11 @@ services:
         class: %oro_migration.migration.extension.rename.class%
         tags:
             - { name: oro_migration.extension, extension_name: rename }
+
+    oro_migration.migration.extension.data_strore:
+        class: %oro_migration.migration.extension.data_strore.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: data_store }
 
     oro_migration.tools.schema_dumper:
         class: %oro_migration.tools.schema_dumper.class%

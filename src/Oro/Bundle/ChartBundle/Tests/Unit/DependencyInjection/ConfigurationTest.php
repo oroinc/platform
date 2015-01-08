@@ -26,6 +26,10 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $processor->processConfiguration($configuration, $configs));
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
     public function processConfigurationDataProvider()
     {
         return array(
@@ -120,6 +124,90 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                         'default_settings' => array(),
                         'template' => 'BarTemplate.html.twig',
                     ),
+                )
+            ),
+            'with type' => array(
+                'configs'  => array(
+                    array(
+                        'type_chart' => array(
+                            'label' => 'Type',
+                            'data_schema' => array(
+                                array(
+                                    'name' => 'label',
+                                    'label' => 'Category (X axis)',
+                                    'required' => true,
+                                    'default_type' => 'decimal',
+                                    'type' => 'month'
+                                ),
+                                array(
+                                    'name' => 'value',
+                                    'label' => 'Value (Y axis)',
+                                    'required' => true,
+                                    'default_type' => 'string',
+                                    'type' => 'currency'
+                                ),
+                            ),
+                            'settings_schema' => array(
+                                array(
+                                    'name' => 'connect_dots_with_line',
+                                    'label' => 'Connect line with dots',
+                                    'type' => 'boolean'
+                                ),
+                                array(
+                                    'name' => 'advanced_option',
+                                    'label' => 'Advanced option',
+                                    'type' => 'string',
+                                    'options' => array(
+                                        'foo' => 'bar'
+                                    )
+                                ),
+                            ),
+                            'data_transformer' => 'foo_data_transformer_service',
+                            'template' => 'FooTemplate.html.twig'
+                        )
+                    )
+                ),
+                'expected' => array(
+                    'type_chart' => array(
+                        'label' => 'Type',
+                        'data_schema' => array(
+                            array(
+                                'label' => 'Category (X axis)',
+                                'name' => 'label',
+                                'required' => true,
+                                'type_filter' => [],
+                                'default_type' => 'decimal',
+                                'type' => 'month'
+                            ),
+                            array(
+                                'label' => 'Value (Y axis)',
+                                'name' => 'value',
+                                'required' => true,
+                                'type_filter' => [],
+                                'default_type' => 'string',
+                                'type' => 'currency'
+                            ),
+                        ),
+                        'settings_schema' => array(
+                            array(
+                                'name' => 'connect_dots_with_line',
+                                'label' => 'Connect line with dots',
+                                'type' => 'boolean',
+                                'options' => array(),
+                            ),
+                            array(
+                                'name' => 'advanced_option',
+                                'label' => 'Advanced option',
+                                'type' => 'string',
+                                'options' => array(
+                                    'foo' => 'bar'
+                                ),
+                            ),
+                        ),
+                        'data_transformer' => 'foo_data_transformer_service',
+                        'template' => 'FooTemplate.html.twig',
+                        'default_settings' => array(),
+                    )
                 )
             )
         );

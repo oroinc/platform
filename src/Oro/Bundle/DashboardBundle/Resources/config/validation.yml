@@ -6,4 +6,6 @@ Oro\Bundle\DashboardBundle\Entity\Dashboard:
                 max: 255
         owner:
             - NotBlank: ~
+        organization:
+            - NotBlank: ~
 

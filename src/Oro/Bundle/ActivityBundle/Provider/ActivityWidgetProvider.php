@@ -6,9 +6,10 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivityManager;
-use Oro\Bundle\EntityBundle\ORM\EntityIdentifierAccessor;
+use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 
@@ -23,58 +24,64 @@ class ActivityWidgetProvider implements WidgetProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var EntityIdentifierAccessor */
-    protected $entityIdentifierAccessor;
+    /** @var EntityIdAccessor */
+    protected $entityIdAccessor;
 
     /** @var EntityRoutingHelper */
     protected $entityRoutingHelper;
 
     /**
-     * @param ActivityManager          $activityManager
-     * @param SecurityFacade           $securityFacade
-     * @param TranslatorInterface      $translator
-     * @param EntityIdentifierAccessor $entityIdentifierAccessor
-     * @param EntityRoutingHelper      $entityRoutingHelper
+     * @param ActivityManager     $activityManager
+     * @param SecurityFacade      $securityFacade
+     * @param TranslatorInterface $translator
+     * @param EntityIdAccessor    $entityIdAccessor
+     * @param EntityRoutingHelper $entityRoutingHelper
      */
     public function __construct(
         ActivityManager $activityManager,
         SecurityFacade $securityFacade,
         TranslatorInterface $translator,
-        EntityIdentifierAccessor $entityIdentifierAccessor,
+        EntityIdAccessor $entityIdAccessor,
         EntityRoutingHelper $entityRoutingHelper
     ) {
-        $this->activityManager          = $activityManager;
-        $this->securityFacade           = $securityFacade;
-        $this->translator               = $translator;
-        $this->entityIdentifierAccessor = $entityIdentifierAccessor;
-        $this->entityRoutingHelper      = $entityRoutingHelper;
+        $this->activityManager     = $activityManager;
+        $this->securityFacade      = $securityFacade;
+        $this->translator          = $translator;
+        $this->entityIdAccessor    = $entityIdAccessor;
+        $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports($entity)
+    public function supports($object)
     {
-        return $this->activityManager->hasActivityAssociations(ClassUtils::getClass($entity));
+        return $this->activityManager->hasActivityAssociations(ClassUtils::getClass($object));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getWidgets($entity)
+    public function getWidgets($object)
     {
         $result = [];
 
-        $entityClass = ClassUtils::getClass($entity);
-        $entityId    = $this->entityIdentifierAccessor->getIdentifier($entity);
+        $entityClass = ClassUtils::getClass($object);
+        $entityId    = $this->entityIdAccessor->getIdentifier($object);
 
         $items = $this->activityManager->getActivityAssociations($entityClass);
         foreach ($items as $item) {
             if (empty($item['acl']) || $this->securityFacade->isGranted($item['acl'])) {
                 $url    = $this->entityRoutingHelper->generateUrl($item['route'], $entityClass, $entityId);
+                $alias  = sprintf(
+                    '%s_%s_%s',
+                    strtolower(ExtendHelper::getShortClassName($item['className'])),
+                    dechex(crc32($item['className'])),
+                    $item['associationName']
+                );
                 $widget = [
                     'widgetType' => 'block',
-                    'alias'      => $item['associationName'],
+                    'alias'      => $alias,
                     'label'      => $this->translator->trans($item['label']),
                     'url'        => $url
                 ];

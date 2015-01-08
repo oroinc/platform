@@ -24,7 +24,7 @@ oro:
         type:
             dynamic: Dynamic
             label:   Type
-            static:  On demand
+            static:  Manual
 
         form:
             choose_segment_type:    Choose segment type

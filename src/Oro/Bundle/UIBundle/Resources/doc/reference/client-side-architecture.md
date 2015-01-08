@@ -74,13 +74,13 @@ App modules are declared in `requirejs.yml` configuration file, in custom sectio
 ```
 config:
     appmodules:
-        - oroui/js/app/modules/views
-        - oroui/js/app/modules/messenger
+        - oroui/js/app/modules/views-module
+        - oroui/js/app/modules/messenger-module
 ```
 This approach allows to define in each bundle code which should be executed on the application start.
 
 ##### Example 1
-`oroui/js/app/modules/views` - declares global views which will be instantiated right before an action point of controller gains control
+`oroui/js/app/modules/views-module` - declares global views which will be instantiated right before an action point of controller gains control
 ```javascript
 require([
     'oroui/js/app/controllers/base/controller'
@@ -102,7 +102,7 @@ require([
 });
 ```
 ##### Example 2
-`oroui/js/app/modules/messenger` - registers messenger's public methods as handlers in `mediator`
+`oroui/js/app/modules/messenger-module` - registers messenger's public methods as handlers in `mediator`
 ```javascript
 require([
     'oroui/js/mediator',

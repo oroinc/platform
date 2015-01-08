@@ -4,7 +4,7 @@ namespace Oro\Bundle\SoapBundle\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityNotFoundException;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Util\ClassUtils;
@@ -22,51 +22,53 @@ abstract class RestController extends RestGetController implements
     /**
      * Edit entity
      *
-     * @param  mixed    $id
+     * @param  mixed $id
+     *
      * @return Response
      */
     public function handleUpdateRequest($id)
     {
         $entity = $this->getManager()->find($id);
-        if (!$entity) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
-        }
 
-        if ($this->processForm($entity)) {
-            $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+        if ($entity) {
+            if ($this->processForm($entity)) {
+                $view = $this->view(null, Codes::HTTP_NO_CONTENT);
+            } else {
+                $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+            }
         } else {
-            $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
         }
 
-        return $this->handleView($view);
+        return $this->buildResponse($view, self::ACTION_UPDATE, ['id' => $id, 'entity' => $entity]);
     }
 
     /**
      * Create new
      *
      * @param mixed $_ [optional] Arguments will be passed to createEntity method
+     *
      * @return Response
      */
-    public function handleCreateRequest()
+    public function handleCreateRequest($_ = null)
     {
-        $entity = call_user_func_array(array($this, 'createEntity'), func_get_args());
+        $entity      = call_user_func_array(array($this, 'createEntity'), func_get_args());
         $isProcessed = $this->processForm($entity);
 
         if ($isProcessed) {
-            $entityClass = ClassUtils::getRealClass($entity);
-            $classMetadata = $this->getManager()->getObjectManager()->getClassMetadata($entityClass);
-            $view = $this->view($classMetadata->getIdentifierValues($entity), Codes::HTTP_CREATED);
+            $view = $this->view($this->createResponseData($entity), Codes::HTTP_CREATED);
         } else {
             $view = $this->view($this->getForm(), Codes::HTTP_BAD_REQUEST);
         }
 
-        return $this->handleView($view);
+        return $this->buildResponse($view, self::ACTION_CREATE, ['success' => $isProcessed, 'entity' => $entity]);
     }
 
     /**
      * Create new entity
      *
      * @param mixed $_ [optional] Arguments will be passed to createEntity method of manager (result of getManager)
+     *
      * @return mixed
      */
     protected function createEntity()
@@ -77,33 +79,39 @@ abstract class RestController extends RestGetController implements
     /**
      * Delete entity
      *
-     * @param  mixed    $id
+     * @param  mixed $id
+     *
      * @return Response
      */
     public function handleDeleteRequest($id)
     {
+        $isProcessed = false;
+
         try {
             $this->getDeleteHandler()->handleDelete($id, $this->getManager());
+
+            $isProcessed = true;
+            $view        = $this->view(null, Codes::HTTP_NO_CONTENT);
         } catch (EntityNotFoundException $notFoundEx) {
-            return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
+            $view = $this->view(null, Codes::HTTP_NOT_FOUND);
         } catch (ForbiddenException $forbiddenEx) {
-            return $this->handleView(
-                $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN)
-            );
+            $view = $this->view(['reason' => $forbiddenEx->getReason()], Codes::HTTP_FORBIDDEN);
         }
 
-        return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
+        return $this->buildResponse($view, self::ACTION_DELETE, ['id' => $id, 'success' => $isProcessed]);
     }
 
     /**
      * Process form.
      *
      * @param  mixed $entity
+     *
      * @return bool
      */
     protected function processForm($entity)
     {
         $this->fixRequestAttributes($entity);
+
         return $this->getFormHandler()->process($entity);
     }
 
@@ -114,9 +122,9 @@ abstract class RestController extends RestGetController implements
      */
     protected function fixRequestAttributes($entity)
     {
-        $request = $this->container->get('request');
+        $request  = $this->container->get('request');
         $formName = $this->getForm()->getName();
-        $data = empty($formName)
+        $data     = empty($formName)
             ? $request->request->all()
             : $request->request->get($formName);
 
@@ -143,10 +151,26 @@ abstract class RestController extends RestGetController implements
     }
 
     /**
+     * Creates data returned if an entity has been successfully created
+     *
+     * @param mixed $entity
+     *
+     * @return array
+     */
+    protected function createResponseData($entity)
+    {
+        $entityClass   = ClassUtils::getRealClass($entity);
+        $classMetadata = $this->getManager()->getObjectManager()->getClassMetadata($entityClass);
+
+        return $classMetadata->getIdentifierValues($entity);
+    }
+
+    /**
      * Fixes form data
      *
      * @param array $data
      * @param mixed $entity
+     *
      * @return bool true if any changes in $data array was made; otherwise, false.
      */
     protected function fixFormData(array &$data, $entity)

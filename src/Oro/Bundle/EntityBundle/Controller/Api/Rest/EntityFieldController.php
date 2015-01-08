@@ -10,7 +10,7 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
@@ -40,7 +40,7 @@ class EntityFieldController extends FOSRestController implements ClassResourceIn
      * @QueryParam(
      *      name="with-unidirectional", requirements="(1)|(0)", nullable=true, strict=true, default="0",
      *      description="Indicates whether Unidirectional association fields should be returned.")
-     * @Get(name="oro_api_get_entity_fields", requirements={"entityName"="((\w+)_)+(\w+)"})
+     * @Get(requirements={"entityName"="((\w+)_)+(\w+)"})
      * @QueryParam(
      *      name="apply-exclusions", requirements="(1)|(0)", nullable=true, strict=true, default="1",
      *      description="Indicates whether exclusion logic should be applied.")

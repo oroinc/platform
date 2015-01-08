@@ -17,7 +17,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
-use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
+use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -38,7 +38,7 @@ class EmailController extends Controller
         $templateVars = array('entity' => $entity, 'noBodyFound' => false);
         try {
             $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
-        } catch (EmailBodyNotFoundException $e) {
+        } catch (LoadEmailBodyException $e) {
             $templateVars['noBodyFound'] = true;
         }
 

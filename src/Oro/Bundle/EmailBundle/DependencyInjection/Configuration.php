@@ -19,7 +19,18 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('oro_email');
+        $rootNode    = $treeBuilder->root('oro_email');
+
+        $rootNode
+            ->children()
+                ->arrayNode('email_sync_exclusions')
+                    ->info('Determines which email address owners should be excluded during synchronization.')
+                    ->example(['Oro\Bundle\UserBundle\Entity\User'])
+                    ->treatNullLike([])
+                    ->prototype('scalar')->end()
+                ->end()
+            ->end()
+        ->end();
 
         return $treeBuilder;
     }

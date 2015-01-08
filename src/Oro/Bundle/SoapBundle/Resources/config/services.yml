@@ -1,6 +1,11 @@
 parameters:
-    oro_soap.loader.class:            Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
-    oro_soap.handler.delete.class:    Oro\Bundle\SoapBundle\Handler\DeleteHandler
+    oro_soap.loader.class:                        Oro\Bundle\SoapBundle\ServiceDefinition\Loader\OroSoapLoader
+    oro_soap.handler.delete.class:                Oro\Bundle\SoapBundle\Handler\DeleteHandler
+    oro_soap.handler.include_delegate.class:      Oro\Bundle\SoapBundle\Handler\DelegateIncludeHandler
+    oro_soap.handler.include_total_header.class:  Oro\Bundle\SoapBundle\Handler\TotalHeaderHandler
+
+    oro_soap.provider.metadata.chain.class:       Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider
+    oro_soap.provider.metadata.entity.class:      Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider
 
 services:
     oro_soap.loader:
@@ -25,3 +30,32 @@ services:
         abstract: true
         calls:
             - [setEventDispatcher, [@event_dispatcher]]
+
+    oro_soap.handler.include_delegate:
+        class: %oro_soap.handler.include_delegate.class%
+        arguments:
+            - @service_container
+
+    oro_soap.handler.include:
+        alias: oro_soap.handler.include_delegate
+
+    oro_soap.handler.include_total_header:
+        class: %oro_soap.handler.include_total_header.class%
+        arguments:
+            - @oro_batch.orm.query_builder.count_query_optimizer
+        tags:
+            - { name: oro_soap.include_handler, alias: totalCount }
+
+    oro_soap.provider.metadata.chain:
+        class: %oro_soap.provider.metadata.chain.class%
+
+    oro_soap.provider.metadata.entity:
+        class: %oro_soap.provider.metadata.entity.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @translator
+        tags:
+            - { name: oro_soap.metadata_provider }
+
+    oro_soap.provider.metadata:
+        alias: oro_soap.provider.metadata.chain

@@ -12,15 +12,15 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class RelationType extends AbstractType
 {
     /**
-     * @var ConfigProvider
+     * @var ConfigManager
      */
-    protected $configProvider;
+    protected $configManager;
 
     /**
      * @var Config
@@ -32,19 +32,21 @@ class RelationType extends AbstractType
      */
     protected $formFactory;
 
-    public function __construct(ConfigProvider $configProvider)
+    public function __construct(ConfigManager $configManager)
     {
-        $this->configProvider = $configProvider;
+        $this->configManager = $configManager;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->config      = $this->configProvider->getConfigById($options['config_id']);
+        $this->config      = $this->configManager
+            ->getProvider('extend')
+            ->getConfigById($options['config_id']);
         $this->formFactory = $builder->getFormFactory();
 
         $builder->add(
             'target_entity',
-            new TargetType($this->configProvider, $options['config_id']),
+            new TargetType($this->configManager, $options['config_id']),
             [
                 'constraints' => [new Assert\NotBlank()]
             ]
@@ -79,7 +81,7 @@ class RelationType extends AbstractType
                     'target_grid',
                     $targetEntity,
                     $this->getArrayValue($data, 'target_grid'),
-                    'Related entity data fields',
+                    'oro.entity_extend.form.relation.entity_data_fields',
                     true
                 );
                 $this->addTargetField(
@@ -87,7 +89,7 @@ class RelationType extends AbstractType
                     'target_title',
                     $targetEntity,
                     $this->getArrayValue($data, 'target_title'),
-                    'Related entity info title',
+                    'oro.entity_extend.form.relation.entity_info_title',
                     true
                 );
                 $this->addTargetField(
@@ -95,7 +97,7 @@ class RelationType extends AbstractType
                     'target_detailed',
                     $targetEntity,
                     $this->getArrayValue($data, 'target_detailed'),
-                    'Related entity detailed',
+                    'oro.entity_extend.form.relation.entity_detailed',
                     true
                 );
             }
@@ -149,7 +151,7 @@ class RelationType extends AbstractType
         $form->add(
             $this->formFactory->createNamed(
                 $name,
-                new TargetFieldType($this->configProvider, $targetEntityClass),
+                new TargetFieldType($this->configManager, $targetEntityClass),
                 $data,
                 $options
             )

@@ -60,8 +60,6 @@
             {%- endif -%}
             {%- endset -%}
             {{ UI.renderHtmlProperty('oro.tracking.trackingwebsite.owner.label'|trans, ownerData) }}
-
-            {{ entityConfig.renderDynamicFields(entity) }}
         </div>
         <div class="responsive-block">
             {{ entityConfig.renderDynamicFields(entity) }}
@@ -72,6 +70,9 @@
     <div class="row-fluid form-horizontal">
         <div class="responsive-block">
             <p>{{ 'oro.tracking.help.event_tooltip'|trans }}</p>
+            {% if not app.request.secure %}
+                <p><strong>{{ 'oro.tracking.help.secure'|trans }}</strong></p>
+            {% endif %}
             <textarea class="code code-script">
                 {%- include 'OroTrackingBundle:TrackingWebsite:script.js.twig' -%}
             </textarea>

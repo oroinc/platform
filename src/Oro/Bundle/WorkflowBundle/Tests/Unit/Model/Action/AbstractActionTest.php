@@ -18,6 +18,10 @@ class AbstractActionTest extends \PHPUnit_Framework_TestCase
         $this->action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction')
             ->setConstructorArgs(array(new ContextAccessor()))
             ->getMockForAbstractClass();
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     protected function tearDown()

@@ -29,7 +29,7 @@ class FormUtilsTest extends \PHPUnit_Framework_TestCase
         $rootForm->expects($this->once())->method('get')->with($testFieldName)
             ->will($this->returnValue($childForm));
 
-        $childForm->expects($this->exactly(2))->method('getConfig')
+        $childForm->expects($this->once())->method('getConfig')
             ->will($this->returnValue($formConfig));
 
         $formConfig->expects($this->once())->method('getType')

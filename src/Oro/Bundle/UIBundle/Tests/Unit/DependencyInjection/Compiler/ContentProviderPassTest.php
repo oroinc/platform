@@ -2,38 +2,44 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
 
 class ContentProviderPassTest extends \PHPUnit_Framework_TestCase
 {
     public function testProcess()
     {
-        $definition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $containerBuilder->expects($this->once())
-            ->method('hasDefinition')
-            ->with(ContentProviderPass::CONTENT_PROVIDER_MANAGER_SERVICE)
-            ->will($this->returnValue(true));
-        $containerBuilder->expects($this->once())
-            ->method('getDefinition')
-            ->with(ContentProviderPass::CONTENT_PROVIDER_MANAGER_SERVICE)
-            ->will($this->returnValue($definition));
+        $managerDefinition = new Definition('\Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager');
+        $providerDefinition = new Definition('\FooBundle\FooProvider');
+        $twigDefinition = new Definition('\Twig_Engine');
+        $providerDefinition->addTag(ContentProviderPass::CONTENT_PROVIDER_TAG);
 
-        $services = array('testId' => array(array('enabled' => false)));
-        $containerBuilder->expects($this->once())
-            ->method('findTaggedServiceIds')
-            ->with(ContentProviderPass::CONTENT_PROVIDER_TAG)
-            ->will($this->returnValue($services));
-        $definition->expects($this->once())
-            ->method('addMethodCall')
-            ->with('addContentProvider', array(new Reference('testId'), false));
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->setDefinition(ContentProviderPass::CONTENT_PROVIDER_MANAGER_SERVICE, $managerDefinition);
+        $containerBuilder->setDefinition('testId', $providerDefinition);
+        $containerBuilder->setDefinition(ContentProviderPass::TWIG_SERVICE_KEY, $twigDefinition);
 
         $pass = new ContentProviderPass();
         $pass->process($containerBuilder);
+
+        $calls = $managerDefinition->getMethodCalls();
+        $this->assertNotEmpty($calls);
+        $this->assertEquals(array_pop($calls), ['addContentProvider', [new Reference('testId'), true]]);
+
+        $calls = $twigDefinition->getMethodCalls();
+        $this->assertNotEmpty($calls);
+        $this->assertEquals(
+            array_pop($calls),
+            [
+                'addGlobal',
+                [
+                    'oro_ui_content_provider_manager',
+                    new Reference(ContentProviderPass::CONTENT_PROVIDER_MANAGER_SERVICE)
+                ]
+            ]
+        );
     }
 }

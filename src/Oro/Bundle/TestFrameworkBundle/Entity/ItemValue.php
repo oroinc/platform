@@ -2,13 +2,12 @@
 namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Table(name="test_search_item_value")
  * @ORM\Entity
  */
-class ItemValue
+class ItemValue implements TestFrameworkEntityInterface
 {
     /**
      * @ORM\Id

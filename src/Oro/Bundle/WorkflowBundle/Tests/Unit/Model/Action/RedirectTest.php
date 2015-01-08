@@ -30,6 +30,10 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(array($this, 'generateTestUrl')));
 
         $this->action = new Redirect(new ContextAccessor(), $this->router, self::REDIRECT_PATH);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     protected function tearDown()

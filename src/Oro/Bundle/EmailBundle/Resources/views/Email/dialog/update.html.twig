@@ -31,14 +31,20 @@
         {% endif %}
         <div class="form-container">
             <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post">
-                <fieldset class="form-horizontal">
+                {%
+                    set emailEditorOptions = {entityId: entity.entityId}
+                %}
+                <fieldset class="form-horizontal"
+                          data-page-component-module="oroemail/js/app/components/email-editor-component"
+                          data-page-component-options="{{ emailEditorOptions | json_encode }}"
+                        >
                     {{ form_row(form.gridName) }}
                     {{ form_row(form.from) }}
                     {{ form_row(form.to) }}
                     {{ form_row(form.subject) }}
                     {{ form_row(form.template) }}
                     {{ form_row(form.type) }}
-                    {{ form_row(form.body, {'attr': {'class': 'email-body'} }) }}
+                    {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
@@ -48,40 +54,6 @@
             </form>
             {{ oro_form_js_validation(form) }}
         </div>
-        <script type="text/javascript">
-            require(['jquery', 'orotranslation/js/translator', 'routing', 'oroui/js/messenger', 'oroui/js/mediator'],
-                    function ($, __, routing, messenger, mediator) {
-                        $(function () {
-                            $('#{{ form.template.vars.id }}').change(function (e) {
-                                if (!$(this).val()) {
-                                    return;
-                                }
-                                var url = routing.generate(
-                                    'oro_api_get_emailtemplate_compiled',
-                                    {'id': $(this).val(), 'entityId': Number('{{ entity.entityId }}')}
-                                );
-
-                                mediator.execute('showLoading');
-
-                                $.ajax(url, {
-                                    success: function (res) {
-                                        $('#{{ form.subject.vars.id }}').val(res.subject);
-                                        $('#{{ form.body.vars.id }}').val(res.body);
-                                        $('#{{ form.type.vars.id }}')
-                                            .find('input[value='+res.type+']')
-                                            .prop('checked', true);
-                                    },
-                                    error: function () {
-                                        messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
-                                    },
-                                    dataType: 'json'
-                                }).always(function () {
-                                    mediator.execute('hideLoading');
-                                });
-                            });
-                        });
-                    });
-        </script>
     {% endif %}
 </div>
 {% endblock %}

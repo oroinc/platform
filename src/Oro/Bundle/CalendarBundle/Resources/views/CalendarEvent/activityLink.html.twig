@@ -1,0 +1,25 @@
+{{ UI.clientLink({
+    'dataUrl': path('oro_calendar_event_create', oro_action_params(entity, 'activity')),
+    'aCss': 'no-hash',
+    'iCss': 'icon-time',
+    'dataId': entity.id,
+    'label' : 'oro.calendar.add_event'|trans,
+    'title' : 'oro.calendar.add_event.title'|trans,
+    'widget' : {
+        'type' : 'dialog',
+        'multiple' : true,
+        'refresh-widget-alias': 'activity-list-widget',
+        'options' : {
+            'alias': 'calendar-event-dialog',
+            'dialogOptions' : {
+                'title' : 'oro.calendar.add_event'|trans,
+                'allowMaximize': true,
+                'allowMinimize': true,
+                'dblclick': 'maximize',
+                'maximizedHeightDecreaseBy': 'minimize-bar',
+                'autoResize': true,
+                'width': 475
+            }
+        }
+    }
+}) }}

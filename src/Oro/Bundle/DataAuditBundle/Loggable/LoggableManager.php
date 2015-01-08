@@ -1,7 +1,9 @@
 <?php
+
 namespace Oro\Bundle\DataAuditBundle\Loggable;
 
 use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\EntityManager;
@@ -14,6 +16,8 @@ use Oro\Bundle\DataAuditBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -54,16 +58,22 @@ class LoggableManager
     /** @var ConfigProvider */
     protected $auditConfigProvider;
 
+    /** @var ServiceLink  */
+    protected $securityContextLink;
+
     /**
-     * @param                     $logEntityClass
-     * @param ConfigProvider      $auditConfigProvider
+     * @param string $logEntityClass
+     * @param ConfigProvider $auditConfigProvider
+     * @param ServiceLink $securityContextLink
      */
     public function __construct(
         $logEntityClass,
-        ConfigProvider $auditConfigProvider
+        ConfigProvider $auditConfigProvider,
+        ServiceLink $securityContextLink
     ) {
         $this->auditConfigProvider = $auditConfigProvider;
         $this->logEntityClass      = $logEntityClass;
+        $this->securityContextLink = $securityContextLink;
     }
 
     /**
@@ -104,11 +114,23 @@ class LoggableManager
     }
 
     /**
-     * @param $organization
+     * @return null|Organization
      */
-    public function setOrganization(Organization $organization)
+    protected function getOrganization()
     {
-        $this->organization = $organization;
+        /** @var SecurityContextInterface $securityContext */
+        $securityContext = $this->securityContextLink->getService();
+
+        $token = $securityContext->getToken();
+        if (!$token) {
+            return null;
+        }
+
+        if (!$token instanceof OrganizationContextTokenInterface) {
+            return null;
+        }
+
+        return $token->getOrganizationContext();
     }
 
     /**
@@ -167,18 +189,21 @@ class LoggableManager
             $identifiers = $uow->getEntityIdentifier($entity);
 
             foreach ($this->pendingRelatedEntities[$oid] as $props) {
-                $logEntry              = $props['log'];
-                $oldData               = $data = $logEntry->getData();
-                $data[$props['field']] = $identifiers;
-                $logEntry->setData($data);
+                /** @var Audit $logEntry */
+                $logEntry = $props['log'];
+                $oldData  = $data = $logEntry->getData();
+                if (empty($data[$props['field']]['new'])) {
+                    $data[$props['field']]['new'] = $identifiers;
+                    $logEntry->setData($data);
 
-                $uow->scheduleExtraUpdate(
-                    $logEntry,
-                    array(
-                        'data' => array($oldData, $data)
-                    )
-                );
-                $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $data);
+                    $uow->scheduleExtraUpdate(
+                        $logEntry,
+                        array(
+                            'data' => array($oldData, $data)
+                        )
+                    );
+                    $uow->setOriginalEntityProperty(spl_object_hash($logEntry), 'objectId', $data);
+                }
             }
 
             unset($this->pendingRelatedEntities[$oid]);
@@ -265,7 +290,7 @@ class LoggableManager
         $logEntry->setObjectClass($meta->name);
         $logEntry->setLoggedAt();
         $logEntry->setUser($user);
-        $logEntry->setOrganization($this->organization);
+        $logEntry->setOrganization($this->getOrganization());
         $logEntry->setObjectName(method_exists($entity, '__toString') ? $entity->__toString() : $meta->name);
 
         $entityId = $this->getIdentifier($entity);

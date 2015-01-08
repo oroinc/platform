@@ -16,29 +16,24 @@ class Notes extends AbstractPageEntity
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tagName;
 
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-    }
-
     /**
      * @return $this
      */
     public function addNote()
     {
-        $this->assertElementPresent(
-            "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
-            'Add Note button not available'
-        );
-        $this->test->byXPath(
-            "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']"
-        )->click();
-        $this->waitForAjax();
-        $this->assertElementPresent(
-            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
-            "/span[normalize-space(.)='Add note']",
-            'Add Note window is not opened'
-        );
+        if ($this->isElementPresent("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")) {
+            $this->runActionInGroup('Add note');
+        } else {
+            $this->test->byXPath(
+                "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']"
+            )->click();
+            $this->waitForAjax();
+            $this->assertElementPresent(
+                "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
+                "/span[normalize-space(.)='Add note']",
+                'Add Note window is not opened'
+            );
+        }
 
         return $this;
     }
@@ -49,9 +44,24 @@ class Notes extends AbstractPageEntity
      */
     public function setNoteMessage($note)
     {
-        $this->$note = $this->test->byId('oro_note_form_message');
-        $this->$note->clear();
-        $this->$note->value($note);
+        $this->test->waitUntil(
+            function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
+                return $testCase->execute(
+                    [
+                        'script' => 'return tinyMCE.activeEditor.initialized',
+                        'args' => [],
+                    ]
+                );
+            },
+            intval(MAX_EXECUTION_TIME)
+        );
+
+        $this->test->execute(
+            [
+                'script' => sprintf('tinyMCE.activeEditor.setContent(\'%s\')', $note),
+                'args' => [],
+            ]
+        );
 
         return $this;
     }
@@ -72,10 +82,14 @@ class Notes extends AbstractPageEntity
      */
     public function addNoteButtonAvailable()
     {
-        $this->assertElementPresent(
-            "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
-            'Add Note button not available'
-        );
+        if ($this->isElementPresent("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")) {
+            $this->checkActionInGroup('Add note');
+        } else {
+            $this->assertElementPresent(
+                "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
+                'Add Note button not available'
+            );
+        }
 
         return $this;
     }
@@ -85,10 +99,14 @@ class Notes extends AbstractPageEntity
      */
     public function addNoteButtonNotAvailable()
     {
-        $this->assertElementNotPresent(
-            "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
-            'Add Note button is available'
-        );
+        if ($this->isElementPresent("//div[@class='pull-right']//a[@class='btn dropdown-toggle']")) {
+            $this->checkActionInGroup('Add note', false);
+        } else {
+            $this->assertElementNotPresent(
+                "//div[@class='pull-right title-buttons-container']//a[@id='add-entity-note-button']",
+                'Add Note button is available'
+            );
+        }
 
         return $this;
     }
@@ -100,8 +118,7 @@ class Notes extends AbstractPageEntity
     public function checkNote($note)
     {
         $this->assertElementPresent(
-            "//div[@class='title'][span[normalize-space(.)='Notes']]/following-sibling::div".
-            "//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]",
+            "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]",
             'Note not found'
         );
 
@@ -114,15 +131,19 @@ class Notes extends AbstractPageEntity
      */
     public function editNote($note)
     {
-        $this->test->byXPath(
-            "//div[@class='title'][span[normalize-space(.)='Notes']]/following-sibling::div".
-            "//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]".
-            "/preceding-sibling::div/div[@class='actions']/button[@title='Edit note']"
-        )->click();
+        $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
+            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions']//a[contains(., '...')]";
+        $editAction =
+            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu']".
+            "//a[@title='Update Note']";
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($editAction)->click();
         $this->waitForAjax();
         $this->assertElementPresent(
             "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
-            "/span[normalize-space(.)='Update note']",
+            "/span[normalize-space(.)='{$note}']",
             'Update Note window is not opened'
         );
 
@@ -135,11 +156,15 @@ class Notes extends AbstractPageEntity
      */
     public function deleteNote($note)
     {
-        $this->test->byXPath(
-            "//div[@class='title'][span[normalize-space(.)='Notes']]/following-sibling::div".
-            "//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]".
-            "/preceding-sibling::div/div[@class='actions']/button[@title='Remove note']"
-        )->click();
+        $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
+            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions']//a[contains(., '...')]";
+        $deleteAction =
+            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu']".
+            "//a[@title='Delete Note']";
+        // hover will show menu, 1st click - will hide, 2nd - will show again
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($actionMenu)->click();
+        $this->test->byXPath($deleteAction)->click();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitForAjax();
 

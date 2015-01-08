@@ -176,19 +176,28 @@ class ConfigProvider implements ConfigProviderInterface
      *
      * @param callable    $callback The callback function to run for configuration data for each object
      * @param string|null $className
-     * @return array|ConfigInterface[]
+     * @param bool        $withHidden
+     *
+     * @return array|\Oro\Bundle\EntityConfigBundle\Config\ConfigInterface[]
      */
-    public function map(\Closure $callback, $className = null)
+    public function map(\Closure $callback, $className = null, $withHidden = false)
     {
-        return array_map($callback, $this->getConfigs($className));
+        return array_map($callback, $this->getConfigs($className, $withHidden));
     }
 
     /**
-     * {@inheritdoc}
+     * Applies the filtering callback to configuration data of all classes (if $className is not specified)
+     * or all fields of the given $className.
+     *
+     * @param callable    $callback The callback function to run for configuration data for each object
+     * @param string|null $className
+     * @param bool        $withHidden
+     *
+     * @return array|\Oro\Bundle\EntityConfigBundle\Config\ConfigInterface[]
      */
-    public function filter($callback, $className = null)
+    public function filter($callback, $className = null, $withHidden = false)
     {
-        return array_filter($this->getConfigs($className), $callback);
+        return array_filter($this->getConfigs($className, $withHidden), $callback);
     }
 
     /**

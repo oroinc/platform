@@ -11,15 +11,22 @@
         </h2>
         <form method="get" action="{{ path('oro_search_results') }}" class="form-inline search-form">
             <input type="hidden" name="from" value="" />
-            <input type="text" id="search" class="span2 search" name="search" value="{{ searchString }}" />
-            <button type="submit" class="btn btn-search btn-primary">{{ 'Search'|trans }}</button>
+            <div class="input-append">
+                <input type="text" id="search" class="span2 search" name="search" value="{{ searchString }}" />
+                <button type="submit" class="btn btn-search btn-primary">{{ 'Search'|trans }}</button>
+            </div>
         </form>
     </div>
 
     {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
-    <table width="100%" cellpadding="0" cellspacing="0">
-        <tr>
-            <td class="search-entity-types-column">
+        <div class="oro-page collapsible-sidebar clearfix">
+            <div class="oro-page-sidebar search-entity-types-column dropdown">
+                <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-filter"></i>
+                    {% if selectedResult.class %}{{ selectedResult.label }}{% else %}{{ 'oro.search.result.all'|trans }}{% endif %}
+                    ({{ selectedResult.count }}) <i class="icon-sort-down"></i>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
                 {% for alias, type in groupedResults %}
                     {% set selected = alias == from %}
                     {% if type.class %}
@@ -34,26 +41,22 @@
                         {% set iconClass = 'icon-file' %}
                     {% endif %}
 
-                    <div class="entity-type{% if selected %} selected{% endif %}">
-                        <i class="{{ iconClass }}"></i>
-                        {% if selected %}
+                    <li class="entity-type{% if selected %} selected{% endif %}">
+                        <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
+                            {% if selected %}<i class="icon-chevron-right arrow"></i>{% endif %}
+                            <i class="{{ iconClass }}"></i>
                             {{ label }} ({{ type.count }})
-                            <div class="arrow"><i class="icon-chevron-right"></i></div>
-                        {% else %}
-                            <a href="{{ path('oro_search_results', { from: alias, search: searchString }) }}">
-                                {{ label }} ({{ type.count }})
-                            </a>
-                        {% endif %}
-                    </div>
+                        </a>
+                    </li>
                 {% endfor %}
-            </td>
-            <td class="search-results-column">
+                </ul>
+            </div>
+            <div class="oro-page-body search-results-column">
                 <div id="search-result-grid">
-                    {{ dataGrid.renderGrid(gridName, {from: from, search: searchString}, { cssClass: 'search-grid' }) }}
+                    {{ dataGrid.renderGrid(gridName, {from: from, search: searchString}, { cssClass: 'search-grid grid-without-header' }) }}
                 </div>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
     {% else %}
     <div class="search-no-results">
         {% trans %}No results were found to match your search.{% endtrans %}

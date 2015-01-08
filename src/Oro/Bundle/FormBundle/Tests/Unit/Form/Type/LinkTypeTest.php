@@ -84,7 +84,9 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
                     'route'           => 'route',
                     'acl'             => 'acl',
                     'title'           => 'title',
-                    'routeParameters' => []
+                    'routeParameters' => [],
+                    'isPath'          => false,
+                    'class'           => ''
                 ],
                 [
                     'value'           => null,
@@ -92,7 +94,9 @@ class LinkTypeTest extends \PHPUnit_Framework_TestCase
                     'route'           => 'route',
                     'acl'             => 'acl',
                     'title'           => 'title',
-                    'routeParameters' => []
+                    'routeParameters' => [],
+                    'isPath'          => false,
+                    'class'           => ''
                 ]
             ]
         ];

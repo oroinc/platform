@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Controller;
 
-use FOS\Rest\Util\Codes;
+use FOS\RestBundle\Util\Codes;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -11,9 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
@@ -65,6 +63,16 @@ class NoteController extends Controller
     }
 
     /**
+     * @Route("/widget/info/{id}", name="oro_note_widget_info", requirements={"id"="\d+"})
+     * @Template
+     * @AclAncestor("oro_note_view")
+     */
+    public function infoAction(Note $entity)
+    {
+        return array('entity' => $entity);
+    }
+
+    /**
      * @Route("/create/{entityClass}/{entityId}", name="oro_note_create")
      *
      * @Template("OroNoteBundle:Note:update.html.twig")
@@ -80,7 +88,14 @@ class NoteController extends Controller
         $noteEntity = new Note();
         $noteEntity->setTarget($entity);
 
-        $formAction = $entityRoutingHelper->generateUrl('oro_note_create', $entityClass, $entityId);
+        $formAction = $entityRoutingHelper->generateUrlByRequest(
+            'oro_note_create',
+            $this->getRequest(),
+            [
+                'entityClass' => $entityClass,
+                'entityId' => $entityId
+            ]
+        );
 
         return $this->update($noteEntity, $formAction);
     }

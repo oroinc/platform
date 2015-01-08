@@ -1,0 +1,9 @@
+placeholders:
+    view_content_data_activities:
+        items:
+            oro_activity_list: ~
+
+items:
+    oro_activity_list:
+        applicable: @oro_activity_list.placeholder.filter->isApplicable($entity$)
+        template: OroActivityListBundle:ActivityList:activities.html.twig
