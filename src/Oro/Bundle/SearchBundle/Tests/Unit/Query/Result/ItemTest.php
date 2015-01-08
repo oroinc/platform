@@ -14,7 +14,6 @@ class ItemTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         if (!interface_exists('Doctrine\Common\Persistence\ObjectManager')) {
-
             $this->markTestSkipped('Doctrine Common has to be installed for this test to run.');
         }
 

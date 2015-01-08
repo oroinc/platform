@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker\Condition;
 
-
 class JoinAclCondition extends AclCondition
 {
     /**

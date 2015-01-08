@@ -106,7 +106,6 @@ class ActionExtension extends AbstractExtension
         foreach ($actions as $name => $action) {
             $action = $this->getActionObject($name, $action);
             if ($action !== false) {
-
                 $metadata          = $action->getOptions()->toArray([], static::$excludeParams);
                 $metadata['label'] = isset($metadata['label'])
                     ? $this->translator->trans($metadata['label']) : null;

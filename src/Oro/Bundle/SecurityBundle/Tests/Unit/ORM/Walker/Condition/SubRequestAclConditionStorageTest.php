@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker\Condition;
 
-
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;

@@ -137,12 +137,14 @@ class ConfigFieldGridController extends Controller
         // check if a field type is complex, for example reverse relation or public enum
         $fieldTypeParts = explode('||', $fieldType);
         if (count($fieldTypeParts) > 1) {
-            if (in_array($fieldTypeParts[0], ['enum', 'multiEnum'])) { // enum
+            if (in_array($fieldTypeParts[0], ['enum', 'multiEnum'])) {
+            // enum
                 $fieldType = $fieldTypeParts[0];
                 $fieldOptions['enum']['enum_code'] = $fieldTypeParts[1];
             } else {
                 $firstPartItems = explode('|', $fieldTypeParts[0]);
-                if (count($firstPartItems) === 4) { // reverse relation
+                if (count($firstPartItems) === 4) {
+                // reverse relation
                     $fieldType = ExtendHelper::getReverseRelationType($firstPartItems[0]);
                     $relationKey = $fieldTypeParts[0];
                     $fieldOptions['extend']['relation_key'] = $relationKey;

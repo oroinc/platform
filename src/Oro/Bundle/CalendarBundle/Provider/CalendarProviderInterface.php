@@ -44,6 +44,7 @@ interface CalendarProviderInterface
      * @param array     $connections    The list of connected calendars
      *                                  key = connected calendar id
      *                                  value = visibility flag (true/false)
+     * @param array     $extraField     Additional fields to select
      *
      * @return array Each item of this array should contains all properties of a calendar event.
      *               There are several additional properties you can return as well:
@@ -52,5 +53,5 @@ interface CalendarProviderInterface
      *                  notifiable - indicated whether there are child events to be notified. defaults to false
      *                  reminders - the list of attached reminders. defaults to empty
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections);
+    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraField);
 }

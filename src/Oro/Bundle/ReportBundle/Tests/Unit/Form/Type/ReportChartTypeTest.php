@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Form\Type;
 
-
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 

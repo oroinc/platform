@@ -61,7 +61,6 @@ class PhpCodeExtractor implements ExtractorInterface
                             && strcmp($messageToCheck[0], $vendorName) === 0
                             && !$this->container->has($message)
                             && !$this->container->hasParameter($message)) {
-
                             $catalog->set($message, $this->prefix . $message);
                         }
                     }
