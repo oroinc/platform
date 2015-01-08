@@ -327,61 +327,73 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             $schema,
             [
                 $expectedClassName => [
-                    'mode'    => ConfigModelManager::MODE_HIDDEN,
                     'configs' => [
-                        'entity'     => [
+                        'entity' => [
                             'label'        => 'oro.entityextend.enums.test_status.entity_label',
                             'plural_label' => 'oro.entityextend.enums.test_status.entity_plural_label',
                             'description'  => 'oro.entityextend.enums.test_status.entity_description',
                         ],
-                        'extend'     => [
+                        'extend' => [
                             'owner'     => ExtendScope::OWNER_SYSTEM,
                             'is_extend' => true,
                             'table'     => 'oro_enum_test_status',
                             'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                         ],
-                        'enum'       => [
+                        'enum'   => [
                             'code'     => 'test_status',
                             'public'   => false,
                             'multiple' => false
                         ],
                     ],
+                    'mode'    => ConfigModelManager::MODE_HIDDEN,
                     'fields'  => [
                         'id'       => [
-                            'type'    => 'string',
                             'configs' => [
                                 'entity' => [
                                     'label'       => 'oro.entityextend.enumvalue.id.label',
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ]
-                            ]
+                            ],
+                            'type'    => 'string'
                         ],
                         'name'     => [
-                            'type'    => 'string',
                             'configs' => [
-                                'entity' => [
+                                'entity'       => [
                                     'label'       => 'oro.entityextend.enumvalue.name.label',
                                     'description' => 'oro.entityextend.enumvalue.name.description',
+                                ],
+                                'datagrid'     => [
+                                    'is_visible' => false
+                                ],
+                                'importexport' => [
+                                    'identity' => true
                                 ]
-                            ]
+                            ],
+                            'type'    => 'string'
                         ],
                         'priority' => [
-                            'type'    => 'integer',
                             'configs' => [
-                                'entity' => [
+                                'entity'   => [
                                     'label'       => 'oro.entityextend.enumvalue.priority.label',
                                     'description' => 'oro.entityextend.enumvalue.priority.description',
+                                ],
+                                'datagrid' => [
+                                    'is_visible' => false
                                 ]
-                            ]
+                            ],
+                            'type'    => 'integer',
                         ],
                         'default'  => [
-                            'type'    => 'boolean',
                             'configs' => [
-                                'entity' => [
+                                'entity'   => [
                                     'label'       => 'oro.entityextend.enumvalue.default.label',
                                     'description' => 'oro.entityextend.enumvalue.default.description',
+                                ],
+                                'datagrid' => [
+                                    'is_visible' => false
                                 ]
-                            ]
+                            ],
+                            'type'    => 'boolean',
                         ],
                     ]
                 ],
@@ -432,7 +444,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
             $schema,
             [
                 $expectedClassName => [
-                    'mode'    => ConfigModelManager::MODE_HIDDEN,
                     'configs' => [
                         'entity'     => [
                             'label'        => 'oro.entityextend.enums.test_status.entity_label',
@@ -455,42 +466,55 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                             'test_attr' => 'test'
                         ],
                     ],
+                    'mode'    => ConfigModelManager::MODE_HIDDEN,
                     'fields'  => [
                         'id'       => [
-                            'type'    => 'string',
                             'configs' => [
                                 'entity' => [
                                     'label'       => 'oro.entityextend.enumvalue.id.label',
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ]
-                            ]
+                            ],
+                            'type'    => 'string',
                         ],
                         'name'     => [
-                            'type'    => 'string',
                             'configs' => [
-                                'entity' => [
+                                'entity'       => [
                                     'label'       => 'oro.entityextend.enumvalue.name.label',
                                     'description' => 'oro.entityextend.enumvalue.name.description',
+                                ],
+                                'datagrid'     => [
+                                    'is_visible' => false
+                                ],
+                                'importexport' => [
+                                    'identity' => true
                                 ]
-                            ]
+                            ],
+                            'type'    => 'string',
                         ],
                         'priority' => [
-                            'type'    => 'integer',
                             'configs' => [
-                                'entity' => [
+                                'entity'   => [
                                     'label'       => 'oro.entityextend.enumvalue.priority.label',
                                     'description' => 'oro.entityextend.enumvalue.priority.description',
+                                ],
+                                'datagrid' => [
+                                    'is_visible' => false
                                 ]
-                            ]
+                            ],
+                            'type'    => 'integer',
                         ],
                         'default'  => [
-                            'type'    => 'boolean',
                             'configs' => [
-                                'entity' => [
+                                'entity'   => [
                                     'label'       => 'oro.entityextend.enumvalue.default.label',
                                     'description' => 'oro.entityextend.enumvalue.default.description',
+                                ],
+                                'datagrid' => [
+                                    'is_visible' => false
                                 ]
-                            ]
+                            ],
+                            'type'    => 'boolean',
                         ],
                     ]
                 ],

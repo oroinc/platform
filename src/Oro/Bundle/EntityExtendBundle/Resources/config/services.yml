@@ -191,6 +191,7 @@ services:
         class: %oro_entity_extend.migration.update_indices.post_up.listener.class%
         arguments:
             - @oro_entity_extend.migration.entity_metadata_helper
+            - @oro_entity_extend.extend.field_type_helper
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -120 }
 

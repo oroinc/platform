@@ -203,7 +203,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
+                    ],
+                    'datagrid' => [
+                        'is_visible' => false
+                    ],
+                    'importexport' => [
+                        'identity' => true
                     ]
+
                 ]
             ]
         );
@@ -215,6 +222,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'entity' => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
+                    ],
+                    'datagrid' => [
+                        'is_visible' => false
                     ]
                 ]
             ]
@@ -228,6 +238,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'entity'                                => [
                         'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
+                    ],
+                    'datagrid' => [
+                        'is_visible' => false
                     ]
                 ]
             ]
