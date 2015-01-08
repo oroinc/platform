@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
@@ -86,12 +87,7 @@ class ActivityListManager
      */
     public function getList($entityClass, $entityId, $filter, $page)
     {
-        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
-            $entityClass,
-            $entityId,
-            $this->config->get('oro_activity_list.sorting_field'),
-            $this->config->get('oro_activity_list.sorting_direction')
-        );
+        $qb = $this->getBaseQB($entityClass, $entityId);
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
 
@@ -113,12 +109,7 @@ class ActivityListManager
      */
     public function getListCount($entityClass, $entityId, $filter)
     {
-        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
-            $entityClass,
-            $entityId,
-            $this->config->get('oro_activity_list.sorting_field'),
-            $this->config->get('oro_activity_list.sorting_direction')
-        );
+        $qb = $this->getBaseQB($entityClass, $entityId);
 
         $qb->select('COUNT(activity.id)');
         $qb->resetDQLPart('orderBy');
@@ -208,5 +199,21 @@ class ActivityListManager
         ];
 
         return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $entityId
+     *
+     * @return QueryBuilder
+     */
+    protected function getBaseQB($entityClass, $entityId)
+    {
+        return $this->getRepository()->getBaseActivityListQueryBuilder(
+            $entityClass,
+            $entityId,
+            $this->config->get('oro_activity_list.sorting_field'),
+            $this->config->get('oro_activity_list.sorting_direction')
+        );
     }
 }
