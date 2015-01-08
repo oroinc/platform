@@ -75,7 +75,7 @@ class UserCalendarProvider implements CalendarProviderInterface
     {
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, $extraFields);
+        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
 
         $visibleIds = [];
         foreach ($connections as $id => $visible) {

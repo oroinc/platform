@@ -97,6 +97,7 @@ class PublicCalendarProvider implements CalendarProviderInterface
         $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder(
             $start,
             $end,
+            [],
             $extraFields
         );
         $invisibleIds = [];

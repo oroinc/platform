@@ -115,6 +115,7 @@ class SystemCalendarProvider implements CalendarProviderInterface
         $qb = $repo->getSystemEventListByTimeIntervalQueryBuilder(
             $start,
             $end,
+            [],
             $extraFields
         )
             ->andWhere('c.organization = :organizationId')

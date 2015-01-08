@@ -112,7 +112,9 @@ class CalendarEventRepository extends EntityRepository
                 . ' e.backgroundColor, e.createdAt, e.updatedAt'
             );
         if ($extraFields) {
-            $qb->addSelect(implode(', ', $extraFields));
+            foreach ($extraFields as $field) {
+                $qb->addSelect('e.' . $field);
+            }
         }
         return $qb;
     }
