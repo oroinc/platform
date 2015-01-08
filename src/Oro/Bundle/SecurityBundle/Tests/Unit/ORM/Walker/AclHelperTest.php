@@ -57,7 +57,10 @@ class AclHelperTest extends OrmTestCase
                 )
             );
         $criteria = new Criteria();
-        $helper = new AclHelper($conditionBuilder);
+
+        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
+        $helper = new AclHelper($conditionBuilder, $eventDispatcher);
 
         $result = $helper->applyAclToCriteria('oroTestClass', $criteria, 'TEST_PERMISSION');
         $whereExpression = $result->getWhereExpression();
@@ -81,6 +84,8 @@ class AclHelperTest extends OrmTestCase
      */
     public function testApply(QueryBuilder $queryBuilder, $conditions, $resultHandler, $walkerResult, $exception)
     {
+        $eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
         $this->conditionBuilder = $this->getMockBuilder(
             'Oro\Bundle\SecurityBundle\ORM\Walker\OwnershipConditionDataBuilder'
         )
@@ -101,7 +106,7 @@ class AclHelperTest extends OrmTestCase
                 )
             );
 
-        $this->helper = new AclHelper($this->conditionBuilder);
+        $this->helper = new AclHelper($this->conditionBuilder, $eventDispatcher);
         $query        = $this->helper->apply($queryBuilder);
         $this->$resultHandler($query->getHints());
 
