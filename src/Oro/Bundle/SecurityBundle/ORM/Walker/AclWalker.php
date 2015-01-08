@@ -113,7 +113,7 @@ class AclWalker extends TreeWalkerAdapter
             $fromClause = $AST->fromClause;
         }
         foreach ($joinConditions as $condition) {
-            if ($condition instanceof JoinAssociationCondition) {
+            if ($condition instanceof AclCondition) {
                 /** @var Join $join */
                 $join = $fromClause
                     ->identificationVariableDeclarations[$condition->getFromKey()]
