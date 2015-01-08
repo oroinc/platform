@@ -113,34 +113,36 @@ class AclWalker extends TreeWalkerAdapter
             $fromClause = $AST->fromClause;
         }
         foreach ($joinConditions as $condition) {
-            /** @var Join $join */
-            $join = $fromClause
-                ->identificationVariableDeclarations[$condition->getFromKey()]
-                ->joins[$condition->getJoinKey()];
-            if (!($condition instanceof JoinAssociationCondition)) {
-                $aclConditionalFactors = [];
-                $this->addConditionFactors($aclConditionalFactors, $condition);
-                if (!empty($aclConditionalFactors)) {
-                    if ($join->conditionalExpression instanceof ConditionalPrimary) {
-                        array_unshift($aclConditionalFactors, $join->conditionalExpression);
-                        $join->conditionalExpression = new ConditionalTerm(
-                            $aclConditionalFactors
-                        );
-                    } else {
-                        $join->conditionalExpression->conditionalFactors = array_merge(
-                            $join->conditionalExpression->conditionalFactors,
-                            $aclConditionalFactors
-                        );
+            if ($condition instanceof JoinAssociationCondition) {
+                /** @var Join $join */
+                $join = $fromClause
+                    ->identificationVariableDeclarations[$condition->getFromKey()]
+                    ->joins[$condition->getJoinKey()];
+                if (!($condition instanceof JoinAssociationCondition)) {
+                    $aclConditionalFactors = [];
+                    $this->addConditionFactors($aclConditionalFactors, $condition);
+                    if (!empty($aclConditionalFactors)) {
+                        if ($join->conditionalExpression instanceof ConditionalPrimary) {
+                            array_unshift($aclConditionalFactors, $join->conditionalExpression);
+                            $join->conditionalExpression = new ConditionalTerm(
+                                $aclConditionalFactors
+                            );
+                        } else {
+                            $join->conditionalExpression->conditionalFactors = array_merge(
+                                $join->conditionalExpression->conditionalFactors,
+                                $aclConditionalFactors
+                            );
+                        }
                     }
-                }
-            } else {
-                $conditionalFactors = [];
-                $this->addConditionFactors($conditionalFactors, $condition);
-                if (!empty($conditionalFactors)) {
-                    $join->conditionalExpression = new ConditionalTerm($conditionalFactors);
-                    $fromClause
-                        ->identificationVariableDeclarations[$condition->getFromKey()]
-                        ->joins[$condition->getJoinKey()] = $join;
+                } else {
+                    $conditionalFactors = [];
+                    $this->addConditionFactors($conditionalFactors, $condition);
+                    if (!empty($conditionalFactors)) {
+                        $join->conditionalExpression          = new ConditionalTerm($conditionalFactors);
+                        $fromClause
+                            ->identificationVariableDeclarations[$condition->getFromKey()]
+                            ->joins[$condition->getJoinKey()] = $join;
+                    }
                 }
             }
         }
