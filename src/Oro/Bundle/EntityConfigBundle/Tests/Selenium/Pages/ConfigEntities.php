@@ -21,6 +21,9 @@ class ConfigEntities extends AbstractPageFilteredGrid
         parent::__construct($testCase, $redirect);
     }
 
+    /**
+     * @return ConfigEntity
+     */
     public function add()
     {
         $this->test->byXPath("//a[@title='Create entity']")->click();

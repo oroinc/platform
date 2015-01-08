@@ -8,8 +8,12 @@ use Oro\Bundle\LocaleBundle\Model\MiddleNameInterface;
 use Oro\Bundle\LocaleBundle\Model\NamePrefixInterface;
 use Oro\Bundle\LocaleBundle\Model\NameSuffixInterface;
 
-class PersonAllNamePartsStub implements FirstNameInterface, MiddleNameInterface, LastNameInterface, NamePrefixInterface,
- NameSuffixInterface
+class PersonAllNamePartsStub implements
+    FirstNameInterface,
+    MiddleNameInterface,
+    LastNameInterface,
+    NamePrefixInterface,
+    NameSuffixInterface
 {
     /**
      * @return string

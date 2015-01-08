@@ -282,7 +282,6 @@ class EntitiesController extends Controller
             $form->submit($request);
 
             if ($form->isValid()) {
-
                 $em->persist($record);
                 $em->flush();
 

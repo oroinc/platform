@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension;
 
-
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 

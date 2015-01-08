@@ -331,7 +331,6 @@ class AttributeGuesser
             $entityConfig = $this->entityConfigProvider->getConfig($metadata->getName(), $field);
             $fieldType = $entityConfig->getId()->getFieldType();
             if (!FieldTypeHelper::isRelation($fieldType)) {
-
                 return $this->formatResult(
                     $entityConfig->get('label'),
                     $this->doctrineTypeMapping[$fieldType]['type'],

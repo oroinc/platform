@@ -143,7 +143,6 @@ class StepExecutor
         try {
             $stopExecution = false;
             while (!$stopExecution) {
-
                 try {
                     $readItem = $this->reader->read();
                     if (null === $readItem) {
@@ -159,7 +158,6 @@ class StepExecutor
 
                 $processedItem = $this->process($readItem, $warningHandler);
                 if (null !== $processedItem) {
-
                     $itemsToWrite[] = $processedItem;
                     $writeCount++;
                     if (0 === $writeCount % $this->batchSize) {

@@ -23,7 +23,6 @@ class LoadSegmentSnapshotData extends AbstractFixture implements DependentFixtur
             $randomEnd = rand($randomStart, $entityCount - $randomStart);
             /** @var WorkflowAwareEntity $entity */
             foreach ($entities as $key => $entity) {
-
                 if ($key < $randomStart) {
                     continue;
                 }

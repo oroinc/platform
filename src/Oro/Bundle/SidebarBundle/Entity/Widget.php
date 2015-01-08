@@ -85,7 +85,7 @@ class Widget
     /**
      * Get id
      *
-     * @return integer 
+     * @return integer
      */
     public function getId()
     {
@@ -108,7 +108,7 @@ class Widget
     /**
      * Get position
      *
-     * @return integer 
+     * @return integer
      */
     public function getPosition()
     {
@@ -131,7 +131,7 @@ class Widget
     /**
      * Get settings
      *
-     * @return string 
+     * @return string
      */
     public function getSettings()
     {

@@ -86,15 +86,27 @@ class PublicCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections)
-    {
+    public function getCalendarEvents(
+        $organizationId,
+        $userId,
+        $calendarId,
+        $start,
+        $end,
+        $connections,
+        $extraFields = []
+    ) {
         if (!$this->calendarConfig->isPublicCalendarEnabled()) {
             return [];
         }
 
         /** @var CalendarEventRepository $repo */
         $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder($start, $end);
+        $qb = $repo->getPublicEventListByTimeIntervalQueryBuilder(
+            $start,
+            $end,
+            [],
+            $extraFields
+        );
         $invisibleIds = [];
         foreach ($connections as $id => $visible) {
             if (!$visible) {

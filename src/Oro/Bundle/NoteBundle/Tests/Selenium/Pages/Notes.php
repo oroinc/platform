@@ -118,7 +118,8 @@ class Notes extends AbstractPageEntity
     public function checkNote($note)
     {
         $this->assertElementPresent(
-            "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')][contains(., '{$note}')]",
+            "//div[@class='container-fluid accordion']//span[@class='message-item message']" .
+            "//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]",
             'Note not found'
         );
 
@@ -131,10 +132,11 @@ class Notes extends AbstractPageEntity
      */
     public function editNote($note)
     {
-        $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
-            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions']//a[contains(., '...')]";
+        $actionMenu = "//div[@class='container-fluid accordion']//span[@class='message-item message']" .
+            "//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]" .
+            "//ancestor::div[@class='accordion-heading']//div[@class='actions']//a[contains(., '...')]";
         $editAction =
-            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu']".
+            "//ul[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
             "//a[@title='Update Note']";
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $this->test->byXPath($actionMenu)->click();
@@ -156,10 +158,11 @@ class Notes extends AbstractPageEntity
      */
     public function deleteNote($note)
     {
-        $actionMenu = "//div[@class='container-fluid accordion']//div[starts-with(@id,'accordion-item')]".
-            "[contains(., '{$note}')]/preceding-sibling::div//div[@class='actions']//a[contains(., '...')]";
+        $actionMenu = "//div[@class='container-fluid accordion']//span[@class='message-item message']" .
+            "//a[starts-with(@href,'#accordion-item')][contains(., '{$note}')]" .
+            "//ancestor::div[@class='accordion-heading']//div[@class='actions']//a[contains(., '...')]";
         $deleteAction =
-            "//ul[@class='dropdown-menu pull-right launchers-dropdown-menu']".
+            "//ul[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
             "//a[@title='Delete Note']";
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $this->test->byXPath($actionMenu)->click();

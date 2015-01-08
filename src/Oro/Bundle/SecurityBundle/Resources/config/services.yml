@@ -343,6 +343,7 @@ services:
         class: %oro_security.acl_helper.class%
         arguments:
              - @oro_security.orm.ownership_sql_walker_builder
+             - @event_dispatcher
 
     oro_security.orm.ownership_sql_walker_builder:
         public: false

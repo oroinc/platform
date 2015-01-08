@@ -72,10 +72,7 @@ class AttachmentController extends Controller
         $formAction = $entityRoutingHelper->generateUrlByRequest(
             'oro_attachment_create',
             $this->getRequest(),
-            [
-                'entityClass' => $entityClass,
-                'entityId' => $entityId
-            ]
+            $entityRoutingHelper->getRouteParameters($entityClass, $entityId)
         );
 
         return $this->update($form, $formAction);

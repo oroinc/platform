@@ -122,7 +122,6 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
     public function testExecute(array $options, $expectedUrl)
     {
         if (!empty($options['route'])) {
-
         }
 
         $context = new ItemStub();

@@ -5,7 +5,7 @@ namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class LoadCommentData extends AbstractFixture
 {
@@ -14,22 +14,20 @@ class LoadCommentData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $user         = $manager->getRepository('OroUserBundle:User')->findOneByUsername('admin');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $calendar = $manager
+            ->getRepository('Oro\Bundle\CalendarBundle\Entity\Calendar')
+            ->findOneBy([]);
 
-        $note = new Note();
+        $event = new CalendarEvent();
+        $event->setTitle('test_title')
+            ->setCalendar($calendar)
+            ->setAllDay(true)
+            ->setStart(new \DateTime('now -2 days', new \DateTimeZone('UTC')))
+            ->setEnd(new \DateTime('now', new \DateTimeZone('UTC')));
 
-        $note->setOwner($user);
-        $note->setCreatedAt(new \DateTime('now'));
-        $note->setOrganization($organization);
-        $note->setMessage('test note');
-
-        $manager->persist($note);
-
-        $this->setReference('default_note', $note);
+        $manager->persist($event);
+        $this->setReference('default_activity', $event);
 
         $manager->flush();
-
-
     }
 }

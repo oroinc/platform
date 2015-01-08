@@ -527,7 +527,6 @@ class PackageManager
             $fetchPreviousInstalledPackageVersion = function ($packageName) use ($previousInstalled) {
                 foreach ($previousInstalled as $p) {
                     if ($p->getName() == $packageName) {
-
                         return $p->getVersion();
                     }
                 }

@@ -371,7 +371,6 @@ class TitleService implements TitleServiceInterface
 
         /** @var $entity Title */
         foreach ($dbData as $entity) {
-
             if (!array_key_exists($entity->getRoute(), $data)) {
                 // remove not existing entries
                 $this->em->remove($entity);

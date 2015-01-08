@@ -52,6 +52,18 @@ define([
         },
 
         /**
+         * Disposes page components
+         * @override
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this.disposePageComponents();
+            PageController.__super__.dispose.call(this);
+        },
+
+        /**
          * Main action point
          *  - does background work before page loading
          *  - fetches page data from server

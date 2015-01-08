@@ -51,7 +51,6 @@ class NoteSubscriber implements EventSubscriberInterface
         $fieldConfigIds = $this->extendConfigProvider->getIds($entityClass);
         foreach ($fieldConfigIds as $fieldConfigId) {
             if ($fieldConfigId->getFieldType() === 'manyToOne') {
-
                 $fieldEntityConfig = $this->entityConfigProvider->getConfigById($fieldConfigId);
                 $fieldExtendConfig = $this->extendConfigProvider->getConfigById($fieldConfigId);
 
