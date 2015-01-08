@@ -133,6 +133,34 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertTrue($qb->getQuery()->getParameter('allDay')->getValue());
     }
 
+    public function testGetUserEventListByTimeIntervalQueryBuilderWithAdditionalFields()
+    {
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->em->getRepository('OroCalendarBundle:CalendarEvent');
+
+        $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(
+            new \DateTime(),
+            new \DateTime(),
+            [],
+            ['status']
+        );
+
+        $this->assertEquals(
+            'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
+            . ' e.backgroundColor, e.createdAt, e.updatedAt, e.status,'
+            . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
+            . ' c.id as calendar'
+            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
+            . ' INNER JOIN e.calendar c'
+            . ' WHERE '
+            . '(e.start < :start AND e.end >= :start) OR '
+            . '(e.start <= :end AND e.end > :end) OR'
+            . '(e.start >= :start AND e.end < :end)'
+            . ' ORDER BY c.id, e.start ASC',
+            $qb->getQuery()->getDQL()
+        );
+    }
+
     public function testGetSystemEventListByTimeIntervalQueryBuilder()
     {
         /** @var CalendarEventRepository $repo */
