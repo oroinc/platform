@@ -92,8 +92,15 @@ class SystemCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraFields)
-    {
+    public function getCalendarEvents(
+        $organizationId,
+        $userId,
+        $calendarId,
+        $start,
+        $end,
+        $connections,
+        $extraFields = []
+    ) {
         if (!$this->calendarConfig->isSystemCalendarEnabled()
             || !$this->securityFacade->isGranted('oro_system_calendar_view')
         ) {

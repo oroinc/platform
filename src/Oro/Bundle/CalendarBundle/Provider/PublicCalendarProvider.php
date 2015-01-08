@@ -86,8 +86,15 @@ class PublicCalendarProvider implements CalendarProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getCalendarEvents($organizationId, $userId, $calendarId, $start, $end, $connections, $extraFields)
-    {
+    public function getCalendarEvents(
+        $organizationId,
+        $userId,
+        $calendarId,
+        $start,
+        $end,
+        $connections,
+        $extraFields = []
+    ) {
         if (!$this->calendarConfig->isPublicCalendarEnabled()) {
             return [];
         }
