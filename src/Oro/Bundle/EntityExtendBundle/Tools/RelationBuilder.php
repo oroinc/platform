@@ -220,7 +220,7 @@ class RelationBuilder
             $config         = $configProvider->getConfig($className, $fieldName);
             $hasChanges     = false;
             foreach ($scopeValues as $code => $val) {
-                if (!$config->has($code) || !$config->is($code, $val)) {
+                if (!$config->is($code, $val)) {
                     $config->set($code, $val);
                     $hasChanges = true;
                 }
