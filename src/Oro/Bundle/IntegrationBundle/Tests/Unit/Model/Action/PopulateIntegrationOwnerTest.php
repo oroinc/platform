@@ -76,12 +76,12 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($integration, 'integration', $this->action);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @codingStandardsIgnoreStart
      * @expectedExceptionMessage Action "populate_channel_owner" expects an entity in parameter "attribute", string is given.
-     * @codingStandardsIgnoreEnd
      */
+    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectEntity()
     {
         $context = new \stdClass();

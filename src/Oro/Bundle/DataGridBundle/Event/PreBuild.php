@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Event;
 
-
 use Symfony\Component\EventDispatcher\Event;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;

@@ -45,7 +45,6 @@ class MigrationUpdateConfigCommand extends ContainerAwareCommand
         /** @var string $optionsPath */
         $optionsPath = $this->getContainer()->getParameter('oro_entity_extend.migration.config_processor.options.path');
         if (is_file($optionsPath)) {
-
             $options = Yaml::parse(file_get_contents($optionsPath));
             /** @var ExtendOptionsParser $parser */
             $parser  = $this->getContainer()->get('oro_entity_extend.migration.options_parser');

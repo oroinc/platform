@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\PlatformBundle\EventListener;
 
-
 interface OptionalListenerInterface
 {
     /**

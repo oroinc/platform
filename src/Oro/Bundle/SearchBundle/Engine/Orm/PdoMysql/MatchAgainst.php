@@ -56,7 +56,6 @@ class MatchAgainst extends FunctionNode
             ") AGAINST (" . $this->needle->dispatch($sqlWalker);
 
         if ($this->mode) {
-
             $query .= " " . str_replace('\'', '', $this->mode->dispatch($sqlWalker)) . " )";
         } else {
             $query .= " )";

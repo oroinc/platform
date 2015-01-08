@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Form\Type;
 
-
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;

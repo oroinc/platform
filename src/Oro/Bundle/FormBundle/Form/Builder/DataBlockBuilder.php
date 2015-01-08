@@ -55,7 +55,6 @@ class DataBlockBuilder
 
         foreach ($form->children as $name => $child) {
             if (isset($child->vars['block']) || isset($child->vars['subblock'])) {
-
                 $block = null;
                 if ($this->formConfig->hasBlock($child->vars['block'])) {
                     $block = $this->formConfig->getBlock($child->vars['block']);

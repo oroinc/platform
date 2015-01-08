@@ -93,7 +93,6 @@ class AclHelperTest extends OrmTestCase
                 $this->returnCallback(
                     function ($entityName, $permission) use ($conditions) {
                         if (isset($conditions[$entityName])) {
-
                             return $conditions[$entityName];
                         }
 

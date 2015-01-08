@@ -282,7 +282,6 @@ class RootBasedAclProviderTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function ($oid, $sids) use ($findAcl) {
                         if (isset($findAcl[$this->getOidKey($oid)])) {
-
                             return $findAcl[$this->getOidKey($oid)];
                         }
                         throw new AclNotFoundException('Acl not found');

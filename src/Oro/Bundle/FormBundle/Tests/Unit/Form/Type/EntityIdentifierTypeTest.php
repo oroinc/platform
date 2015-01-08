@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 
-use  Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;

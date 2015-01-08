@@ -89,7 +89,8 @@ class FormConfigTest extends \PHPUnit_Framework_TestCase
                     'class'       => 'Oro\Bundle\UserBundle\Entity\User',
                     'subblocks'   => $subblocksArray,
                     'description' => null
-            )),
+                )
+            ),
             $this->formConfig->toArray()
         );
 

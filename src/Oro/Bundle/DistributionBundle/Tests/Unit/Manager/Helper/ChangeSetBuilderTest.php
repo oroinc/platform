@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Manager\Helper;
 
-
 use Composer\Package\PackageInterface;
 use Oro\Bundle\DistributionBundle\Manager\Helper\ChangeSetBuilder;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Tests\Unit\Manager;
 
-
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 
 class EmbeddedFormManagerTest extends \PHPUnit_Framework_TestCase

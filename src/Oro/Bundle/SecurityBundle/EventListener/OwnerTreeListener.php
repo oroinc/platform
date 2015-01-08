@@ -69,7 +69,6 @@ class OwnerTreeListener
     {
         foreach ($entities as $entity) {
             if (in_array(ClassUtils::getClass($entity), $this->securityClasses)) {
-
                 return true;
             }
         }
