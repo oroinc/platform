@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -105,21 +106,20 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     protected function isIndexRequired($className, $fieldName, $fieldType)
     {
         $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-        if (in_array($underlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
-            // relation fields already have an index
-            return false;
-        }
 
-        $result = false;
+        /**
+         * Check for relation fields.
+         * They already has an index, so we should not process them.
+         */
+        if (!$this->fieldTypeHelper->isRelation($underlyingType)) {
+            $datagridConfigProvider = $this->configManager->getProvider('datagrid');
+            if ($datagridConfigProvider->hasConfig($className, $fieldName)) {
+                $datagridConfig = $datagridConfigProvider->getConfig($className, $fieldName);
 
-        $datagridConfigProvider = $this->configManager->getProvider('datagrid');
-        if ($datagridConfigProvider->hasConfig($className, $fieldName)) {
-            $datagridConfig = $datagridConfigProvider->getConfig($className, $fieldName);
-            if ($datagridConfig->get('is_visible')) {
-                $result = true;
+                return $datagridConfig->get('is_visible', false, false);
             }
         }
 
-        return $result;
+        return false;
     }
 }
