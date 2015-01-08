@@ -22,6 +22,10 @@ define(function (require) {
             statusbar : false
         },
 
+        events: {
+            'set-focus': 'setFocus'
+        },
+
         initialize: function (options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
@@ -74,6 +78,7 @@ define(function (require) {
                         delete self.renderDeffered;
                     }
                 }, this.options));
+                this.$el.attr('data-focusable', true);
                 this.tinymceConnected = true;
             }
             this.firstRender = false;
@@ -85,6 +90,11 @@ define(function (require) {
             }
             this.enabled = enabled;
             this.render();
+        },
+
+        setFocus: function (e) {
+            e.stopPropagation();
+            this.tinymceInstance.focus();
         },
 
         dispose: function () {

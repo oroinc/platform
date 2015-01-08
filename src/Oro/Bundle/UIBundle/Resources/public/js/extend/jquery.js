@@ -40,7 +40,31 @@ define(['jquery'], function ($) {
             elem.selectionEnd = elemLen;
             $(elem).focus();
         } // if
-    }
+    };
+
+    /**
+     * Sets focus on first form field
+     */
+    $.fn.focusFirstInput = function () {
+        var $empty,
+            $input = this.find(':input:visible, [data-focusable]')
+                .not(':checkbox, :radio, :button, :submit, :disabled, :file');
+
+        // filters field with no value, if it's possible
+        $empty = $input.filter(function () {
+            return $(this).val() === ''
+        });
+
+        // empty fields are in priority to get focus
+        $input = ($empty.length ? $empty : $input ).first();
+
+        if ($input.data('focusable') === true) {
+            // input has own implementation to set focus
+            $input.trigger('set-focus');
+        } else {
+            $input.focus();
+        }
+    };
 
     return $;
 });
