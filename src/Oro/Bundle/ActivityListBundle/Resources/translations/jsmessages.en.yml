@@ -11,6 +11,7 @@ oro:
 
         load_error:      Sorry, activity list was not loaded correctly.
         forbidden_error: You do not have permission to perform this action.
+        forbidden_activity_data_view_error: You do not have permission to view this activity record's data
         widget:
             filter:
                 date_picker.title: Date Range

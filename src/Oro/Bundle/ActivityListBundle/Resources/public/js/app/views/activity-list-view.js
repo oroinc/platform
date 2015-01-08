@@ -49,7 +49,8 @@ define(function (require) {
                 deleteItemError: __('oro.activitylist.delete_error'),
 
                 loadItemsError: __('oro.activitylist.load_error'),
-                forbiddenError: __('oro.activitylist.forbidden_error')
+                forbiddenError: __('oro.activitylist.forbidden_error'),
+                forbiddenActivityDataError: __('oro.activitylist.forbidden_activity_data_view_error')
             });
 
             this.template = _.template($(this.options.template).html());
@@ -246,7 +247,17 @@ define(function (require) {
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
                         that._hideLoading();
                     })
-                    .fail(_.bind(this._showLoadItemsError, this));
+                    .fail(
+                        _.bind(function (response) {
+                            if (!_.isUndefined(response.status) && response.status === 403) {
+                                this._showForbiddenActivityDataError(response.responseJSON || {});
+                                currentModel.set('is_loaded', true);
+                            } else {
+                                this._showLoadItemsError(response.responseJSON || {});
+                            }
+                            this._hideLoading();
+                        }, this)
+                    );
             }
         },
 
@@ -359,6 +370,10 @@ define(function (require) {
 
         _showDeleteItemError: function (err) {
             this._showError(this.options.messages.deleteItemError, err);
+        },
+
+        _showForbiddenActivityDataError: function (err) {
+            this._showError(this.options.messages.forbiddenActivityDataError, err);
         },
 
         _showForbiddenError: function (err) {
