@@ -23,9 +23,7 @@ class UpdateCustomEntitiesWithOrganization extends UpdateWithOrganization implem
     DependentFixtureInterface,
     ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     /**

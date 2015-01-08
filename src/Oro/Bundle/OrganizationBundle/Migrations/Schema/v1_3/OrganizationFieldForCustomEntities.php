@@ -10,9 +10,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+
+use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
+
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 
 /**
  * Update all custom entities. Add organization field for entities with ownership type User and Organization
@@ -22,9 +24,7 @@ use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
  */
 class OrganizationFieldForCustomEntities implements Migration, ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     /**
