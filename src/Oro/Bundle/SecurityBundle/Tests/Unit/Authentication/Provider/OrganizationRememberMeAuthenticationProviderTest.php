@@ -84,10 +84,15 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
         $this->assertSame($organization, $resultToken->getOrganizationContext());
     }
 
+    /**
+     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage You don't have access to organization 'Inactive Org'
+     */
     public function testBadOrganizationAuthenticate()
     {
         $organization = new Organization(2);
         $organization->setEnabled(false);
+        $organization->setName('Inactive Org');
         $user = new User(1);
         $user->addOrganization($organization);
 
@@ -96,7 +101,21 @@ class OrganizationRememberMeAuthenticationProviderTest extends \PHPUnit_Framewor
         $this->userChecker->expects($this->once())
             ->method('checkPreAuth');
 
-        $this->setExpectedException('Symfony\Component\Security\Core\Exception\BadCredentialsException');
+        $this->provider->authenticate($token);
+    }
+
+    /**
+     * @expectedException        \Symfony\Component\Security\Core\Exception\BadCredentialsException
+     * @expectedExceptionMessage You don't have active organization assigned.
+     */
+    public function testNoAssignedOrganizations()
+    {
+        $user  = new User(1);
+        $token = new RememberMeToken($user, 'provider', 'testKey');
+
+        $this->userChecker->expects($this->once())
+            ->method('checkPreAuth');
+
         $this->provider->authenticate($token);
     }
 }

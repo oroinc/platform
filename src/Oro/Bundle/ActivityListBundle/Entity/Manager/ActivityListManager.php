@@ -9,6 +9,7 @@ use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
+use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
 use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
@@ -45,6 +46,7 @@ class ActivityListManager
      * @param UserConfigManager         $config
      * @param ActivityListChainProvider $provider
      * @param ActivityListFilterHelper  $activityListFilterHelper
+     * @param CommentApiManager         $commentManager
      */
     public function __construct(
         Registry $doctrine,
@@ -53,7 +55,8 @@ class ActivityListManager
         Pager $pager,
         UserConfigManager $config,
         ActivityListChainProvider $provider,
-        ActivityListFilterHelper $activityListFilterHelper
+        ActivityListFilterHelper $activityListFilterHelper,
+        CommentApiManager $commentManager
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
@@ -62,6 +65,7 @@ class ActivityListManager
         $this->config                   = $config;
         $this->chainProvider            = $provider;
         $this->activityListFilterHelper = $activityListFilterHelper;
+        $this->commentManager           = $commentManager;
     }
 
     /**
@@ -179,6 +183,11 @@ class ActivityListManager
             $editorId   = $entity->getEditor()->getId();
         }
 
+        $numberOfComments = $this->commentManager->getCommentCount(
+            $entity->getRelatedActivityClass(),
+            $entity->getRelatedActivityId()
+        );
+
         $result = [
             'id'                   => $entity->getId(),
             'owner'                => $ownerName,
@@ -194,6 +203,8 @@ class ActivityListManager
             'updatedAt'            => $entity->getUpdatedAt()->format('c'),
             'editable'             => $this->securityFacade->isGranted('EDIT', $entity),
             'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
+            'commentCount'         => $numberOfComments,
+            'commentable'          => $this->commentManager->isCommentable(),
         ];
 
         return $result;

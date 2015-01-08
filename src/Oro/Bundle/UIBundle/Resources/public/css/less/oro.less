@@ -264,25 +264,25 @@ i.color {
 .ui-widget-overlay {
   z-index: 150;
 }
-.form-horizontal-large{
-  .control-group{
+.form-horizontal-large {
+  .control-group {
     max-width: 100%;
-    .controls{
+    .controls {
       margin-left: 240px;
     }
     label.control-label {
       width: 230px;
-      text-align:right;
+      text-align: right;
     }
   }
-  .user-fieldset{
-    background: url("../../img/horizontal-divider-lite.png") repeat-x  0 50%;
-    margin-bottom: 22px;
-    span{
-      background-color: #fff;
-      padding: 0 20px 0 0;
-      display: inline-block;
-    }
+}
+.user-fieldset{
+  background: url("../../img/horizontal-divider-lite.png") repeat-x  0 50%;
+  margin-bottom: 22px;
+  span{
+    background-color: #fff;
+    padding: 0 20px 0 0;
+    display: inline-block;
   }
 }
 input[type='radio'] + label,
@@ -1306,6 +1306,9 @@ footer {
         [class^='icon-']:before {
           color:#666;
         }
+      }
+      &:focus {
+        background:#fff;
       }
     }
   }

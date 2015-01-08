@@ -1,0 +1,24 @@
+oro:
+    pagination:
+        page: Page:
+        total: of {{ pages }} | Total of {{ records }} records
+    comment:
+        plural_label: Comment
+        entity_plural_label: Comments
+        action:
+            delete: Delete Comment
+            update: Update Comment
+        from:
+            button:
+                add_comment:
+                    label: Add Comment
+                edit_comment:
+                    label: Save Comment
+                cancel_comment:
+                    label: Cancel
+        attachment:
+            tooltip: Attached file {{ filename }}
+            delete_message: The comment attachment is successfully removed
+        item:
+            added: '{{ user }} added on {{ time }}'
+            update: 'updated by {{ user }} on {{ time }}'

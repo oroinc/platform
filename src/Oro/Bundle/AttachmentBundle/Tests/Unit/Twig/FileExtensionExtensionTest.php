@@ -54,6 +54,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
         $result = $this->extension->getFunctions();
         $functions = [
             'file_url',
+            'file_size',
             'resized_image_url',
             'filtered_image_url',
             'oro_configured_image_url',

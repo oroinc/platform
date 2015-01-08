@@ -21,6 +21,11 @@ class StripTagsTransformerTest extends \PHPUnit_Framework_TestCase
             $expected,
             $transformer->transform($value)
         );
+
+        $this->assertEquals(
+            $expected,
+            $transformer->reverseTransform($value)
+        );
     }
 
     /**
@@ -49,12 +54,5 @@ class StripTagsTransformerTest extends \PHPUnit_Framework_TestCase
             'default attributes set' => ['<p>sometext</p>', '@[style]', 'sometext'],
             'default attributes set with allowed' => ['<p>sometext</p>', '@[style],p', '<p>sometext</p>']
         ];
-    }
-
-    public function testReverseTransform()
-    {
-        $transformer = new StripTagsTransformer();
-
-        $this->assertEquals('value', $transformer->reverseTransform('value'));
     }
 }

@@ -86,6 +86,7 @@ class AclHelper
      * @param Query|QueryBuilder $query
      * @param string             $permission
      * @param bool               $checkRelations
+     *
      * @return Query
      */
     public function apply($query, $permission = "VIEW", $checkRelations = true)

@@ -72,6 +72,9 @@
                     pager: pager,
                     dateRangeFilterMetadata: dateRangeFilterMetadata,
                     routes: {}
+                },
+                commentOptions: {
+                    listTemplate: '#template-activity-item-comment',
                 }
             } %}
 
@@ -83,6 +86,7 @@
             {% for activityClass, activityOptions in configuration %}
                 {% include activityOptions.template with {'id': ('template-activity-item-' ~ activityClass) } %}
             {% endfor %}
+            {% include 'OroCommentBundle:Comment/js:list.js.twig' with {'id': 'template-activity-item-comment'} %}
         {% endblock %}
     {% endblock %}
 </div>

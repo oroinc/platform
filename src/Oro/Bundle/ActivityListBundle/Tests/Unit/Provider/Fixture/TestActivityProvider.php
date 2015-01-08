@@ -4,10 +4,11 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
-class TestActivityProvider implements ActivityListProviderInterface
+class TestActivityProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS_NAME = 'Test\Entity';
 
@@ -98,5 +99,13 @@ class TestActivityProvider implements ActivityListProviderInterface
      */
     public function getOrganization($activityEntity)
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasComments(ConfigManager $configManager, $entity)
+    {
+        return true;
     }
 }
