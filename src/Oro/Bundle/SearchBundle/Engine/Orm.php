@@ -200,7 +200,16 @@ class Orm extends AbstractEngine
                     $item = $item['item'];
                 }
 
-                $results[] = new ResultItem(
+                /**
+                 * Search result can contains duplicates and we can not use HYDRATE_OBJECT because of performance issue.
+                 * @todo: update after fix BAP-7166. Remove check for existing result.
+                 */
+                $id = $item['id'];
+                if (isset($results[$id])) {
+                    continue;
+                }
+
+                $results[$id] = new ResultItem(
                     $this->registry->getManagerForClass($item['entity']),
                     $item['entity'],
                     $item['recordId'],
