@@ -38,8 +38,6 @@ class Item
     protected $recordUrl;
 
     /**
-     * @deprecated not used and need to be removed
-     *
      * @var string
      */
     protected $recordText;
