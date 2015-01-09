@@ -199,7 +199,7 @@ class Orm extends AbstractEngine
                 if (is_array($item)) {
                     $item = $item['item'];
                 }
-                /** @var $item Item  */
+
                 $results[] = new ResultItem(
                     $this->registry->getManagerForClass($item['entity']),
                     $item['entity'],
