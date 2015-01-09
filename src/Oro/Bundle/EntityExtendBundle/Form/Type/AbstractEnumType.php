@@ -92,15 +92,15 @@ abstract class AbstractEnumType extends AbstractType
         $form     = $event->getForm();
         $formData = $form->getRoot()->getData();
         if ($formData && is_object($formData) && method_exists($formData, 'getId') && $formData->getId() === null) {
-            // set initial options for new entity
             $formConfig = $form->getConfig();
 
             // Check to see if there's a value provided by the form.
             $accessor = PropertyAccess::createPropertyAccessor();
-            if (!empty($accessor->getValue($formData, $formConfig->getName()))) {
+            if (null !== $accessor->getValue($formData, $formConfig->getName())) {
                 return;
             }
 
+            // Set initial options for new entity
             /** @var EntityRepository $repo */
             $repo = $this->doctrine->getRepository($formConfig->getOption('class'));
             $data = $repo->createQueryBuilder('e')
