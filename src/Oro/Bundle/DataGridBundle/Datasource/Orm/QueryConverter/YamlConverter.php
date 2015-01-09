@@ -94,7 +94,7 @@ class YamlConverter implements QueryConverterInterface
                 $knownAliases[] = $join['alias'];
             }
         }
-        $qbTools = $this->createQueryBuilderTools($value);
+        $qbTools = new QueryBuilderTools();
 
         // Add joins ordered by used tables
         $tries = 0;
@@ -109,42 +109,6 @@ class YamlConverter implements QueryConverterInterface
             }
             $tries++;
         } while (count($usedAliases) != count($knownAliases));
-    }
-
-    /**
-     * @param array $value
-     * @return QueryBuilderTools
-     */
-    protected function createQueryBuilderTools(array $value)
-    {
-        $joinTablePaths = [];
-        if (isset($value['join']['inner'])) {
-            $joinTablePaths = array_merge($joinTablePaths, $this->getJoinTablePaths($value['join']['inner']));
-        }
-        if (isset($value['join']['left'])) {
-            $joinTablePaths = array_merge($joinTablePaths, $this->getJoinTablePaths($value['join']['left']));
-        }
-
-        $qbTools = new QueryBuilderTools();
-        $qbTools->setJoinTablePaths($joinTablePaths);
-
-        return $qbTools;
-    }
-
-    /**
-     * @param array $value
-     * @return array
-     */
-    protected function getJoinTablePaths(array $value)
-    {
-        $joinTablePaths = [];
-        foreach ($value as $join) {
-            if (!empty($join['join'])) {
-                $joinTablePaths[$join['alias']] = $join['join'];
-            }
-        }
-
-        return $joinTablePaths;
     }
 
     /**
@@ -176,7 +140,7 @@ class YamlConverter implements QueryConverterInterface
 
             $joinUsedAliases = array_merge(
                 $qbTools->getUsedTableAliases($join['join']),
-                $qbTools->getUsedTableAliases($join['condition'])
+                $this->getTablesUsedInJoinCondition($join['condition'], $qbTools, $knownAliases)
             );
             // Intersect with known aliases to prevent counting aliases from subselects
             $joinUsedAliases = array_intersect($joinUsedAliases, $knownAliases);
@@ -189,6 +153,25 @@ class YamlConverter implements QueryConverterInterface
             $qb->$joinMethod($join['join'], $join['alias'], $join['conditionType'], $join['condition']);
             $usedAliases[] = $join['alias'];
         }
+    }
+
+    /**
+     * @param string $condition
+     * @param QueryBuilderTools $qbTools
+     * @param array $knownAliases
+     * @return array
+     */
+    protected function getTablesUsedInJoinCondition($condition, QueryBuilderTools $qbTools, array $knownAliases)
+    {
+        $usedAliases = $qbTools->getUsedTableAliases($condition);
+        foreach ($knownAliases as $alias) {
+            preg_match($qbTools->getRegExpQueryForAlias($alias), $condition, $matches);
+            if (!empty($matches)) {
+                $usedAliases[] = $alias;
+            }
+        }
+
+        return array_unique($usedAliases);
     }
 
     /**
