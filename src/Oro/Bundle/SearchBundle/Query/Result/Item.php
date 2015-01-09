@@ -38,6 +38,8 @@ class Item
     protected $recordUrl;
 
     /**
+     * @deprecated not used and need to be removed
+     *
      * @var string
      */
     protected $recordText;
@@ -53,6 +55,15 @@ class Item
      */
     protected $em;
 
+    /**
+     * @param ObjectManager $em
+     * @param string|null   $entityName
+     * @param string|null   $recordId
+     * @param string|null   $recordTitle
+     * @param string|null   $recordUrl
+     * @param string        $recordText
+     * @param array         $entityConfig
+     */
     public function __construct(
         ObjectManager $em,
         $entityName = null,
