@@ -70,7 +70,7 @@ abstract class BaseDriver
 
         return $qb
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
     }
 
     /**
