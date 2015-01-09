@@ -38,7 +38,7 @@ class Item
     protected $recordUrl;
 
     /**
-     * @deprecated not used and need to be removed
+     * @deprecated deprecated since 1.5 and need to be removed in version 2.0
      *
      * @var string
      */
@@ -188,6 +188,7 @@ class Item
     /**
      * Set record string data
      *
+     * @deprecated deprecated since 1.5 and need to be removed in version 2.0
      * @param string $recordText
      *
      * @return Item
@@ -201,6 +202,8 @@ class Item
 
     /**
      * Get record string data
+     *
+     * @deprecated deprecated since 1.5 and need to be removed in version 2.0
      *
      * @return string
      */
