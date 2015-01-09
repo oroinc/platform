@@ -792,7 +792,7 @@ abstract class AbstractQueryConverter
 
         foreach ($columnJoinIds as &$columnJoinId) {
             if (!empty($this->virtualRelationsJoins[$columnJoinId])) {
-                $columnJoinId = $this->virtualRelationsJoins[$columnJoinId];
+                $columnJoinId = str_replace($mainEntityJoinId . '+', '', $this->virtualRelationsJoins[$columnJoinId]);
 
                 continue;
             }
