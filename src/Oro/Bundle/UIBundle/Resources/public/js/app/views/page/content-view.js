@@ -45,7 +45,7 @@ define([
          * Sets focus on first form field
          */
         focusFirstInput: function () {
-            this.$('form').focusFirstInput();
+            this.$('form:first').focusFirstInput();
         }
     });
 

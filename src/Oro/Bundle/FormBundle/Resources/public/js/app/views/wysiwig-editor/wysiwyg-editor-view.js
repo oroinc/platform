@@ -89,12 +89,16 @@ define(function (require) {
                 return;
             }
             this.enabled = enabled;
+            if (!this.enabled) {
+                this.$el.removeAttr('data-focusable');
+            }
             this.render();
         },
 
         setFocus: function (e) {
-            e.stopPropagation();
-            this.tinymceInstance.focus();
+            if (this.enabled) {
+                this.tinymceInstance.focus();
+            }
         },
 
         dispose: function () {
