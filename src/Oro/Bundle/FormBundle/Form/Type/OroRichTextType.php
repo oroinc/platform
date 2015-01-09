@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Templating\Asset\PackageInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\FormBundle\Form\DataTransformer\StripTagsTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 
 class OroRichTextType extends AbstractType
 {
@@ -103,7 +103,7 @@ class OroRichTextType extends AbstractType
             $allowableTags = $options['wysiwyg_options']['valid_elements'];
         }
 
-        $transformer = new StripTagsTransformer($allowableTags);
+        $transformer = new SanitizeHTMLTransformer($allowableTags);
         $builder->addModelTransformer($transformer);
     }
 
