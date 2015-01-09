@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Event;
 
-
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 

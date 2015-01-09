@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\Unit\Event;
 
-
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
 

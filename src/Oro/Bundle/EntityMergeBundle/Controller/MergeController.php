@@ -92,7 +92,6 @@ class MergeController extends Controller
         if ($this->getRequest()->isMethod('POST')) {
             $form->submit($this->getRequest());
             if ($form->isValid()) {
-
                 $merger = $this->getEntityMerger();
 
                 try {

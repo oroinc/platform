@@ -865,7 +865,7 @@ define(function (require) {
             if (currentView.name === 'agendaWeek') {
                 // week view, don't want the timeline to go the whole way across
                 dayCol = calendarElement.find('.fc-today:visible');
-                if (dayCol.position() !== null) {
+                if (dayCol.length !== 0 && dayCol.position() !== null) {
                     timelineElement.css({
                         left: (dayCol.position().left) + 'px',
                         width: (dayCol.width() + 3) + 'px'

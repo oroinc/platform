@@ -316,7 +316,8 @@ class UserAclHandler implements SearchHandlerInterface
                     $user->getId(),
                     $organization->getId()
                 );
-            } else { // AccessLevel::DEEP_LEVEL
+            } else {
+            // AccessLevel::DEEP_LEVEL
                 $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()

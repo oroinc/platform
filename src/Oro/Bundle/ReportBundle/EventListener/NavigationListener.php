@@ -60,7 +60,6 @@ class NavigationListener
         /** @var ItemInterface $reportsMenuItem */
         $reportsMenuItem = $event->getMenu()->getChild('reports_tab');
         if ($reportsMenuItem && $this->securityFacade->hasLoggedUser()) {
-
             $qb = $this->em->getRepository('OroReportBundle:Report')
                 ->createQueryBuilder('report')
                 ->orderBy('report.name', 'ASC');

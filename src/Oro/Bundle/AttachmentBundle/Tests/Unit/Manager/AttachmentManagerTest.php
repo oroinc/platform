@@ -99,7 +99,7 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $parentEntity = new TestClass();
         $expectsString = 'T3JvXEJ1bmRsZVxBdHRhY2htZW50QnVuZGxlXFRlc3RzXFVuaXRcRml4dHVyZXNcVGVzdENsYXNzfHRlc3RG'.
             'aWVsZHwxfGRvd25sb2FkfHRlc3RGaWxlLndpdGhGb3J3YXJkU2xhc2g_LnR4dA==';
-                                                                  //^Underscore should replace / character
+        //Underscore should replace / character
         $this->router->expects($this->once())
             ->method('generate')
             ->with(

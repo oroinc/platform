@@ -250,7 +250,6 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
         $userBusinessUnitIds = $this->treeProvider->getTree()->getUserBusinessUnitIds($userId, $organizationId);
         $familiarBusinessUnits = array_intersect($userBusinessUnitIds, $ownerBusinessUnitIds);
         if (!empty($familiarBusinessUnits)) {
-
             return true;
         }
         if ($deep) {
@@ -260,7 +259,6 @@ class EntityOwnershipDecisionMaker implements OwnershipDecisionMakerInterface
                     $ownerBusinessUnitIds
                 );
                 if (!empty($familiarBusinessUnits)) {
-
                     return true;
                 }
             }

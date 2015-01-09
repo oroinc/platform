@@ -227,7 +227,6 @@ abstract class WebTestCase extends BaseWebTestCase
     protected function initSoapClient($wsdl = null, array $options = array(), $force = false)
     {
         if (!self::$soapClientInstance || $force) {
-
             if ($wsdl === null) {
                 $wsdl = "http://localhost/api/soap";
             }

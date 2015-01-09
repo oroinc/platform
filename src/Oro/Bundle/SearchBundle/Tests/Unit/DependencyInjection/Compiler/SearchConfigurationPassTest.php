@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\DependencyInjection\Compiler;
 
-
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\SearchConfigurationPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

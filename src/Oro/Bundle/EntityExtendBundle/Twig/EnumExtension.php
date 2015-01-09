@@ -109,14 +109,14 @@ class EnumExtension extends \Twig_Extension
 
         if (!isset($this->localCache[$enumValueEntityClassOrEnumCode])) {
             $items      = [];
-            $priorities = [];
             /** @var AbstractEnumValue[] $values */
             $values = $this->doctrine->getRepository($enumValueEntityClassOrEnumCode)->findAll();
+            usort($values, function($value1, $value2) {
+                return $value1->getPriority() >= $value2->getPriority();
+            });
             foreach ($values as $value) {
                 $items[$value->getId()] = $value->getName();
-                $priorities[]           = $value->getPriority();
             }
-            array_multisort($priorities, $items);
             $this->localCache[$enumValueEntityClassOrEnumCode] = $items;
         }
 
