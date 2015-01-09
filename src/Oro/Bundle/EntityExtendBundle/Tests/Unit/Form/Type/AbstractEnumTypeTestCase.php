@@ -63,6 +63,37 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $type->preSetData($event);
     }
 
+    public function doTestPreSetDataForNewEntityKeepExistingValue(AbstractType $type)
+    {
+        $enumValueClassName = 'Test\EnumValue';
+
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+
+        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('value')); // name of property TestEntity::$value
+        $formConfig->expects($this->never())
+            ->method('getOption');
+
+        $form->expects($this->once())
+            ->method('getConfig')
+            ->will($this->returnValue($formConfig));
+
+        $entity = new TestEntity();
+        $entity->setValue($this->getMock($enumValueClassName));
+
+        $event = $this->getFormEventMock($entity, $form);
+
+        $this->doctrine->expects($this->never())
+            ->method('anything');
+
+        $event->expects($this->never())
+            ->method('setData');
+
+        $type->preSetData($event);
+    }
+
     public function doTestPreSetDataForNewEntity(AbstractType $type)
     {
         $enumValueClassName = 'Test\EnumValue';
@@ -70,6 +101,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
         $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('value')); // name of property TestEntity::$value
         $formConfig->expects($this->exactly(2))
             ->method('getOption')
             ->will(
@@ -105,6 +139,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
         $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formConfig->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('value')); // name of property TestEntity::$value
         $formConfig->expects($this->exactly(2))
             ->method('getOption')
             ->will(
