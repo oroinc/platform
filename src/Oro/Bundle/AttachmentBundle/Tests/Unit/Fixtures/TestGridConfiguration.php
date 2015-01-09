@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures;
 
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 
 class TestGridConfiguration extends DatagridConfiguration

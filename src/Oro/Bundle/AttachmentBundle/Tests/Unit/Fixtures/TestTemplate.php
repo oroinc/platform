@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures;
 
-
 class TestTemplate extends \Twig_Template
 {
     /**

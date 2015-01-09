@@ -4,9 +4,11 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
@@ -23,32 +25,31 @@ class UpdateExtendIndicesMigration implements
     NameGeneratorAwareInterface,
     RenameExtensionAwareInterface
 {
-    /**
-     * @var AbstractPlatform
-     */
+    /** @var AbstractPlatform */
     protected $platform;
 
-    /**
-     * @var ExtendDbIdentifierNameGenerator
-     */
+    /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
-    /**
-     * @var RenameExtension
-     */
+    /** @var RenameExtension */
     protected $renameExtension;
 
-    /**
-     * @var EntityMetadataHelper
-     */
+    /** @var EntityMetadataHelper */
     protected $entityMetadataHelper;
+
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
 
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
+     * @param FieldTypeHelper      $fieldTypeHelper
      */
-    public function __construct(EntityMetadataHelper $entityMetadataHelper)
-    {
+    public function __construct(
+        EntityMetadataHelper $entityMetadataHelper,
+        FieldTypeHelper $fieldTypeHelper
+    ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
+        $this->fieldTypeHelper      = $fieldTypeHelper;
     }
 
     /**
@@ -86,7 +87,7 @@ class UpdateExtendIndicesMigration implements
 
             foreach ($extendOptions as $key => $options) {
                 $pair = explode('!', $key);
-                if ($pair === 2) {
+                if (count($pair) === 2) {
                     $tableName  = $pair[0];
                     $columnName = $pair[1];
                     $this->processColumn($toSchema, $queries, $tableName, $columnName, $options);
@@ -112,22 +113,33 @@ class UpdateExtendIndicesMigration implements
     protected function processColumn(Schema $schema, QueryBag $queries, $tableName, $columnName, $options)
     {
         $className = $this->entityMetadataHelper->getEntityClassByTableName($tableName);
-        $table     = $schema->getTable($tableName);
+        if (null === $className) {
+            return;
+        }
+
+        $table = $schema->getTable($tableName);
+        if (!$table->hasColumn($columnName)) {
+            return;
+        }
 
         if (!isset($options[ExtendOptionsManager::NEW_NAME_OPTION])) {
             if (isset($options[ExtendOptionsManager::TYPE_OPTION])) {
-                $columnType = $options[ExtendOptionsManager::TYPE_OPTION];
-                if (!in_array($columnType, ['oneToMane', 'manyToMany', 'manyToOne', 'optionSet'])) {
-                    $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
-                        $className,
-                        $columnName
-                    );
-                    $enabled   = !isset($options['datagrid']['is_visible']) || $options['datagrid']['is_visible'];
-                    if ($enabled && !$table->hasIndex($indexName)) {
-                        $table->addIndex([$columnName], $indexName);
-                    } elseif (!$enabled && $table->hasIndex($indexName)) {
-                        $table->dropIndex($indexName);
-                    }
+                $columnType = $this->fieldTypeHelper->getUnderlyingType($options[ExtendOptionsManager::TYPE_OPTION]);
+                if ($this->fieldTypeHelper->isRelation($columnType)
+                    || in_array($columnType, [Type::TEXT])
+                ) {
+                    return;
+                }
+
+                $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
+                    $className,
+                    $columnName
+                );
+                $enabled   = !isset($options['datagrid']['is_visible']) || $options['datagrid']['is_visible'];
+                if ($enabled && !$table->hasIndex($indexName)) {
+                    $table->addIndex([$columnName], $indexName);
+                } elseif (!$enabled && $table->hasIndex($indexName)) {
+                    $table->dropIndex($indexName);
                 }
             }
         } else {

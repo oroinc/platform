@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity;
 
-
 class Entity
 {
     protected $owner;

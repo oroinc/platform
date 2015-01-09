@@ -44,8 +44,9 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
                 new AnnotationReader(),
                 new ArrayCache()
             );
-        } else { // if (version_compare(Version::VERSION, '2.2.0-DEV', '>='))
-            // Register the ORM Annotations in the AnnotationRegistry
+        } else {
+         // if (version_compare(Version::VERSION, '2.2.0-DEV', '>='))
+         // Register the ORM Annotations in the AnnotationRegistry
             $reader = new \Doctrine\Common\Annotations\SimpleAnnotationReader();
             $reader->addNamespace('Doctrine\ORM\Mapping');
             $reader = new \Doctrine\Common\Annotations\CachedReader($reader, new ArrayCache());

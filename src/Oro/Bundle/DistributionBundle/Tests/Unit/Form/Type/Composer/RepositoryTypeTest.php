@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Form\Type\Composer;
 
-
 use Oro\Bundle\DistributionBundle\Form\Type\Composer\RepositoryType;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\MockHelperTrait;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;

@@ -90,7 +90,6 @@ class Runner
             }
         }
         if (!$output) {
-
             return null;
         }
 

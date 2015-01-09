@@ -30,7 +30,6 @@ class TestListener implements \PHPUnit_Framework_TestListener
     private function storeAScreenshot(\PHPUnit_Framework_Test $test)
     {
         if ($test instanceof \PHPUnit_Extensions_Selenium2TestCase) {
-
             $className = explode('\\', get_class($test));
             try {
                 $file = getcwd() . DIRECTORY_SEPARATOR . $this->directory . DIRECTORY_SEPARATOR . end($className);

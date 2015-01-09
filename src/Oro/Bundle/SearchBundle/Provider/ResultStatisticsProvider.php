@@ -74,7 +74,6 @@ class ResultStatisticsProvider
             $alias  = $config['alias'];
 
             if (!isset($result[$alias])) {
-
                 $group = array(
                     'count'  => 0,
                     'class'  => $item->getEntityName(),

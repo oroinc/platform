@@ -78,7 +78,6 @@ class PrepareResultItemListener
             $routeData = array();
 
             if ($this->isParametersDefined($routeParameters)) {
-
                 /**
                  * NOTE: possible to generate url without entity object if only identifier field needed
                  */

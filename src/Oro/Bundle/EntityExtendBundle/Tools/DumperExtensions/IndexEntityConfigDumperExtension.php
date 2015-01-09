@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -94,7 +95,9 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     }
 
     /**
-     * Determines whether the index for the given field is needed or not
+     * Determines whether the index for the given field is needed or not.
+     * All relation type fields should be excluded.
+     * Index requirement is determined by visibility of a field on a grid.
      *
      * @param string $className
      * @param string $fieldName
@@ -105,21 +108,15 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
     protected function isIndexRequired($className, $fieldName, $fieldType)
     {
         $underlyingType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-        if (in_array($underlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
-            // relation fields already have an index
-            return false;
-        }
+        if (!$this->fieldTypeHelper->isRelation($underlyingType)) {
+            $datagridConfigProvider = $this->configManager->getProvider('datagrid');
+            if ($datagridConfigProvider->hasConfig($className, $fieldName)) {
+                $datagridConfig = $datagridConfigProvider->getConfig($className, $fieldName);
 
-        $result = false;
-
-        $datagridConfigProvider = $this->configManager->getProvider('datagrid');
-        if ($datagridConfigProvider->hasConfig($className, $fieldName)) {
-            $datagridConfig = $datagridConfigProvider->getConfig($className, $fieldName);
-            if ($datagridConfig->get('is_visible')) {
-                $result = true;
+                return $datagridConfig->get('is_visible', false, false);
             }
         }
 
-        return $result;
+        return false;
     }
 }

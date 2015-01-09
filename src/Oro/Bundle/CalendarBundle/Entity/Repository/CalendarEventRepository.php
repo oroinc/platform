@@ -15,12 +15,13 @@ class CalendarEventRepository extends EntityRepository
      * @param \DateTime      $endDate
      * @param array|Criteria $filters   Additional filtering criteria, e.g. ['allDay' => true, ...]
      *                                  or \Doctrine\Common\Collections\Criteria
+     * @param array          $extraFields
      *
      * @return QueryBuilder
      */
-    public function getUserEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
+    public function getUserEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [], $extraFields = [])
     {
-        $qb = $this->getUserEventListQueryBuilder($filters);
+        $qb = $this->getUserEventListQueryBuilder($filters, $extraFields);
         $this->addTimeIntervalFilter($qb, $startDate, $endDate);
 
         return $qb;
@@ -31,12 +32,13 @@ class CalendarEventRepository extends EntityRepository
      *
      * @param array|Criteria $filters Additional filtering criteria, e.g. ['allDay' => true, ...]
      *                                or \Doctrine\Common\Collections\Criteria
+     * @param array          $extraFields
      *
      * @return QueryBuilder
      */
-    public function getUserEventListQueryBuilder($filters = [])
+    public function getUserEventListQueryBuilder($filters = [], $extraFields = [])
     {
-        $qb = $this->getEventListQueryBuilder()
+        $qb = $this->getEventListQueryBuilder($extraFields)
             ->addSelect('e.invitationStatus, IDENTITY(e.parent) AS parentEventId, c.id as calendar')
             ->innerJoin('e.calendar', 'c');
 
@@ -52,12 +54,13 @@ class CalendarEventRepository extends EntityRepository
      * @param \DateTime      $endDate
      * @param array|Criteria $filters   Additional filtering criteria, e.g. ['allDay' => true, ...]
      *                                  or \Doctrine\Common\Collections\Criteria
+     * @param array          $extraFields
      *
      * @return QueryBuilder
      */
-    public function getSystemEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
+    public function getSystemEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [], $extraFields = [])
     {
-        $qb = $this->getEventListQueryBuilder()
+        $qb = $this->getEventListQueryBuilder($extraFields)
             ->addSelect('c.id as calendar')
             ->innerJoin('e.systemCalendar', 'c')
             ->andWhere('c.public = :public')
@@ -76,12 +79,13 @@ class CalendarEventRepository extends EntityRepository
      * @param \DateTime      $endDate
      * @param array|Criteria $filters   Additional filtering criteria, e.g. ['allDay' => true, ...]
      *                                  or \Doctrine\Common\Collections\Criteria
+     * @param array          $extraFields
      *
      * @return QueryBuilder
      */
-    public function getPublicEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [])
+    public function getPublicEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [], $extraFields = [])
     {
-        $qb = $this->getEventListQueryBuilder()
+        $qb = $this->getEventListQueryBuilder($extraFields)
             ->addSelect('c.id as calendar')
             ->innerJoin('e.systemCalendar', 'c')
             ->andWhere('c.public = :public')
@@ -96,15 +100,23 @@ class CalendarEventRepository extends EntityRepository
     /**
      * Returns a base query builder which can be used to get a list of calendar events
      *
+     * @param array $extraFields
+     *
      * @return QueryBuilder
      */
-    public function getEventListQueryBuilder()
+    public function getEventListQueryBuilder($extraFields = [])
     {
-        return $this->createQueryBuilder('e')
+        $qb = $this->createQueryBuilder('e')
             ->select(
                 'e.id, e.title, e.description, e.start, e.end, e.allDay,'
                 . ' e.backgroundColor, e.createdAt, e.updatedAt'
             );
+        if ($extraFields) {
+            foreach ($extraFields as $field) {
+                $qb->addSelect('e.' . $field);
+            }
+        }
+        return $qb;
     }
 
     /**

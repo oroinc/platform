@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Entity\Security;
 
-
 use Oro\Bundle\DistributionBundle\Entity\Security\Role;
 use Oro\Bundle\DistributionBundle\Test\PhpUnit\Helper\ReflectionHelperTrait;
 
