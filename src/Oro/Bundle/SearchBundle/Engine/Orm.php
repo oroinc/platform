@@ -209,15 +209,15 @@ class Orm extends AbstractEngine
                 if (is_array($item)) {
                     $item = $item['item'];
                 }
-                /** @var $item Item  */
+
                 $results[] = new ResultItem(
-                    $this->registry->getManagerForClass($item->getEntity()),
-                    $item->getEntity(),
-                    $item->getRecordId(),
-                    $item->getTitle(),
+                    $this->registry->getManagerForClass($item['entity']),
+                    $item['entity'],
+                    $item['recordId'],
+                    $item['title'],
                     null,
-                    $item->getRecordText(),
-                    $this->mapper->getEntityConfig($item->getEntity())
+                    null,
+                    $this->mapper->getEntityConfig($item['entity'])
                 );
             }
         }
