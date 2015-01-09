@@ -756,16 +756,16 @@ abstract class AbstractQueryConverter
         $this->aliases[$aliasKey] = $mainEntityJoinAlias;
 
         if (isset($query['join'])) {
-            $this->processVirtualColumnJoins($joins, $aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
-            $this->processVirtualColumnJoins($joins, $aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
-            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $aliases);
+            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
+            $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
             foreach ($joins as &$item) {
                 $this->registerVirtualColumnTableAlias($joins, $item, $mainEntityJoinId);
             }
         }
         $columnExpr = $this->replaceTableAliasesInVirtualColumnSelect(
             $query['select']['expr'],
-            $aliases
+            $this->aliases
         );
         $this->virtualColumnExpressions[$columnName] = $columnExpr;
         $key = sprintf('%s::%s', $className, $fieldName);
@@ -860,8 +860,25 @@ abstract class AbstractQueryConverter
      */
     protected function addColumnAliasesForVirtualRelation($columnName, array $joinIds)
     {
-        $fieldName = $this->getFieldName($columnName);
+        if (!empty($this->virtualColumnExpressions[$columnName])) {
+            return;
+        }
+
+        if (!$this->virtualRelationsJoins) {
+            return;
+        }
+
+        $hasVirtualRelation = false;
+        foreach ($joinIds as $columnJoinId) {
+            $hasVirtualRelation = $hasVirtualRelation || array_search($columnJoinId, $this->virtualRelationsJoins);
+        }
+
+        if (!$hasVirtualRelation) {
+            return;
+        }
+
         $joinId = end($joinIds);
+        $fieldName = $this->getFieldName($columnName);
 
         $this->virtualColumnExpressions[$columnName] = sprintf(
             '%s.%s',
