@@ -838,17 +838,18 @@ abstract class AbstractQueryConverter
             $virtualJoinId = self::ROOT_ALIAS_KEY;
             foreach ($joins as &$item) {
                 $tableAlias = $item['alias'];
-                $virtualJoinId .= $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
+                $virtualJoinId = $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
 
-                $this->tableAliases[$virtualJoinId] = $tableAlias;
-                $this->joins[$tableAlias] = $virtualJoinId;
-
-                $virtualJoinId .= '+';
+                if (empty($this->tableAliases[$virtualJoinId])) {
+                    $this->tableAliases[$virtualJoinId] = $tableAlias;
+                    $this->joins[$tableAlias] = $virtualJoinId;
+                }
             }
 
-            $this->virtualRelationsJoins[$columnJoinId] = trim($virtualJoinId, '+');
-            $columnJoinId = $this->virtualRelationsJoins[$columnJoinId];
-            $mainEntityJoinId = $columnJoinId;
+            $this->virtualRelationsJoins[$columnJoinId] = $virtualJoinId;
+            $virtualJoinId = str_replace($mainEntityJoinId . '+', '', $virtualJoinId);
+            $columnJoinId = $virtualJoinId;
+            $mainEntityJoinId = $virtualJoinId;
         }
 
         return implode('+', $columnJoinIds);

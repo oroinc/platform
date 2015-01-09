@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-
 class ConfigVirtualFieldProvider extends AbstractConfigVirtualProvider implements VirtualFieldProviderInterface
 {
     /**
