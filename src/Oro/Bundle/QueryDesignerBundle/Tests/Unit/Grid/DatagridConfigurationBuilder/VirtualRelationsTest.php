@@ -339,9 +339,9 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                         'inner' => [
                             [
                                 'join' => 'Oro\Bundle\TrackingBundle\Entity\ListItem',
-                                'alias' => 't3',
+                                'alias' => 't4',
                                 'conditionType' => 'WITH',
-                                'condition' => 't3.List = t4 AND t2.id = t3.entityId',
+                                'condition' => 't4.List = t3 AND t2.id = t4.entityId',
                             ],
                         ],
                         'left' => [
@@ -351,9 +351,9 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                             ],
                             [
                                 'join' => 'Oro\Bundle\TrackingBundle\Entity\List',
-                                'alias' => 't4',
+                                'alias' => 't3',
                                 'conditionType' => 'WITH',
-                                'condition' => 't4.entity = \'Acme\Entity\TestEntity\'',
+                                'condition' => 't3.entity = \'Acme\Entity\TestEntity\'',
                             ],
                             [
                                 'join' => 't4.website',
