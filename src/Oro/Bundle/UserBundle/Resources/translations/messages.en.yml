@@ -125,3 +125,9 @@ oro:
         privileges:
             entity.label: Entity
             action.label: Capabilities
+        password:
+            dropdown.label: Password
+            reset.label: Reset
+            change.label: Change
+        action:
+            password_management: Manage users' passwords
