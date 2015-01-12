@@ -147,7 +147,10 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 'toolbar' => $toolbar,
                 'valid_elements' => implode(',', $elements),
                 'menubar' => false,
-                'statusbar' => false
+                'statusbar' => false,
+                'relative_urls' => false,
+                'remove_script_host' => false,
+                'convert_urls' => true,
             ]
         ];
 
