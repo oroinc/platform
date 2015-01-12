@@ -22,6 +22,10 @@ define(function (require) {
             statusbar : false
         },
 
+        events: {
+            'set-focus': 'setFocus'
+        },
+
         initialize: function (options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
@@ -75,6 +79,9 @@ define(function (require) {
                     }
                 }, this.options));
                 this.tinymceConnected = true;
+                this.$el.attr('data-focusable', true);
+            } else {
+                this.$el.removeAttr('data-focusable');
             }
             this.firstRender = false;
         },
@@ -85,6 +92,12 @@ define(function (require) {
             }
             this.enabled = enabled;
             this.render();
+        },
+
+        setFocus: function (e) {
+            if (this.enabled) {
+                this.tinymceInstance.focus();
+            }
         },
 
         dispose: function () {
