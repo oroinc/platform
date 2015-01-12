@@ -78,8 +78,10 @@ define(function (require) {
                         delete self.renderDeffered;
                     }
                 }, this.options));
-                this.$el.attr('data-focusable', true);
                 this.tinymceConnected = true;
+                this.$el.attr('data-focusable', true);
+            } else {
+                this.$el.removeAttr('data-focusable');
             }
             this.firstRender = false;
         },
@@ -89,9 +91,6 @@ define(function (require) {
                 return;
             }
             this.enabled = enabled;
-            if (!this.enabled) {
-                this.$el.removeAttr('data-focusable');
-            }
             this.render();
         },
 
