@@ -10,15 +10,23 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityFacade;
+
     /** @var  CommentPlaceholderFilter */
     protected $filter;
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager  = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->filter        = new CommentPlaceholderFilter($this->configManager);
+
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->filter         = new CommentPlaceholderFilter($this->configManager, $this->securityFacade);
     }
 
     /**
@@ -30,7 +38,7 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider commentProvider
      */
-    public function testIsApplicable($entity, $callsCount, $callsProviderCount, $isApplicable, $expected)
+    public function testIsApplicable($entity, $callsCount, $callsProviderCount, $isApplicable, $isGranted, $expected)
     {
         $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
             ->disableOriginalConstructor()
@@ -46,6 +54,10 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->will($this->returnValue($config));
 
+        $this->securityFacade->expects($this->any())
+            ->method('isGranted')
+            ->with('oro_comment_view')
+            ->will($this->returnValue($isGranted));
         $this->configManager->expects($this->exactly($callsProviderCount))
             ->method('getProvider')
             ->will($this->returnValue($provider));
@@ -63,10 +75,10 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
     {
         $entity = new ItemStub();
         return [
-            'is null'                 => [null, 0, 0, false, false],
-            'is null with enabled on' => [null, 0, 0, true, false],
-            'applicable entity'       => [$entity, 1, 2, true, true],
-            'not applicable entity'   => [$entity, 1, 1, false, false],
+            'is null'                 => [null, 0, 0, false, true, false],
+            'is null with enabled on' => [null, 0, 0, true, true, false],
+            'applicable entity'       => [$entity, 1, 2, true, true, true],
+            'not applicable entity'   => [$entity, 1, 1, false, true, false],
         ];
     }
 }

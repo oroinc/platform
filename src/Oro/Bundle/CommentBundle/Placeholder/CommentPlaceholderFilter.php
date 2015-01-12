@@ -5,18 +5,24 @@ namespace Oro\Bundle\CommentBundle\Placeholder;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class CommentPlaceholderFilter
 {
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager     $configManager
+     * @param SecurityFacade    $securityFacade
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, SecurityFacade $securityFacade)
     {
-        $this->configManager = $configManager;
+        $this->configManager  = $configManager;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -28,7 +34,7 @@ class CommentPlaceholderFilter
      */
     public function isApplicable($entity = null)
     {
-        if (!is_object($entity)) {
+        if (!is_object($entity) || !$this->securityFacade->isGranted('oro_comment_view')) {
             return false;
         }
 
