@@ -8,6 +8,10 @@
 }
 
 /* new version of loading mask */
+.loader-mask {
+  // hide all nested loaders
+  display: none;
+}
 .loading {
   position: relative;
   >.loader-mask {
@@ -39,10 +43,6 @@
       background: #ffffff url('../../img/loader.gif') no-repeat center left;
       padding-left: 30px;
     }
-  }
-  .loader-mask {
-    // hide all nested loaders
-    display: none;
   }
   >.loader-mask.shown {
     // show only first level loaders
