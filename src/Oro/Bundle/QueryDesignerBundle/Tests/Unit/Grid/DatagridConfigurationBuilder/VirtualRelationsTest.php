@@ -370,7 +370,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                             'campaign+%s+%s+%s+%s',
                             'Oro\Bundle\TrackingBundle\Entity\Campaign::trackingEvent',
                             'Oro\Bundle\TrackingBundle\Entity\TrackingEvent::website',
-                            'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite::identifier',
+                            'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite::list',
                             'Oro\Bundle\TrackingBundle\Entity\List::code'
                         ),
                         'label' => 'code',
@@ -392,7 +392,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                         ],
                     ],
                     'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite' => [
-                        'identifier' => [
+                        'list' => [
                             'join' => [
                                 'left' => [
                                     [
@@ -406,7 +406,39 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                         ],
                     ],
                 ],
-                'expected' => [],
+                'expected' => [
+                    'select' => ['t5.code as c1'],
+                    'from' => [
+                        [
+                            'table' => 'Acme\Entity\TestEntity',
+                            'alias' => 't1',
+                        ],
+                    ],
+                    'join' => [
+                        'left' => [
+                            [
+                                'join' => 't1.campaign',
+                                'alias' => 't2',
+                            ],
+                            [
+                                'join' => 'Oro\Bundle\TrackingBundle\Entity\TrackingEvent',
+                                'alias' => 't3',
+                                'conditionType' => 'WITH',
+                                'condition' => 't3.code = t2.code',
+                            ],
+                            [
+                                'join' => 't3.website',
+                                'alias' => 't4',
+                            ],
+                            [
+                                'join' => 'Oro\Bundle\TrackingBundle\Entity\List',
+                                'alias' => 't5',
+                                'conditionType' => 'WITH',
+                                'condition' => 't5.code = t4.code',
+                            ]
+                        ],
+                    ],
+                ],
             ],
         ];
     }

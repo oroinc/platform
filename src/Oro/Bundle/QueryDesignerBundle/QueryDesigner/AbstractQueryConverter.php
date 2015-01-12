@@ -792,16 +792,33 @@ abstract class AbstractQueryConverter
 
         foreach ($columnJoinIds as &$columnJoinId) {
             if (!empty($this->virtualRelationsJoins[$columnJoinId])) {
-                $columnJoinId = str_replace($mainEntityJoinId . '+', '', $this->virtualRelationsJoins[$columnJoinId]);
+                $prevMainEntityJoinId = $mainEntityJoinId;
+                $mainEntityJoinId = $this->virtualRelationsJoins[$columnJoinId];
+                $columnJoinId = trim(str_replace($prevMainEntityJoinId, '', $mainEntityJoinId), '+');
 
                 continue;
+            }
+
+            if (!empty($this->virtualRelationsJoins[$mainEntityJoinId])) {
+                $mainEntityJoinId = $this->virtualRelationsJoins[$mainEntityJoinId];
             }
 
             $className = $this->getEntityClassName($columnJoinId);
             $fieldName = $this->getFieldName($columnJoinId);
 
             if (!$this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
-                $mainEntityJoinId = $columnJoinId;
+                $joinId = $columnJoinId;
+                if ($mainEntityJoinId) {
+                    $joinId = $mainEntityJoinId . '+' . $columnJoinId;
+                }
+
+                if (empty($this->tableAliases[$joinId])) {
+                    $tableAlias = $this->generateTableAlias();
+                    $this->tableAliases[$joinId] = $tableAlias;
+                    $this->joins[$tableAlias] = $joinId;
+                }
+
+                $mainEntityJoinId = $joinId;
 
                 continue;
             }
@@ -847,9 +864,8 @@ abstract class AbstractQueryConverter
             }
 
             $this->virtualRelationsJoins[$columnJoinId] = $virtualJoinId;
-            $virtualJoinId = str_replace($mainEntityJoinId . '+', '', $virtualJoinId);
-            $columnJoinId = $virtualJoinId;
-            $mainEntityJoinId = $virtualJoinId;
+            $columnJoinId = trim(str_replace($mainEntityJoinId, '', $virtualJoinId), '+');
+            $mainEntityJoinId = $columnJoinId;
         }
 
         return implode('+', $columnJoinIds);
