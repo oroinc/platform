@@ -161,9 +161,14 @@ define(['jquery', 'underscore', 'oroui/js/tools'
                 currentValue = [currentValue];
             }
 
+            var selectedData = element.data('selected-data');
+            if (!_.isArray(selectedData) && selectedData !== undefined) {
+                selectedData = [selectedData];
+            }
+
             // elementData must have name
             var elementData = _.filter(
-                element.data('selected-data'),
+                selectedData,
                 function (item) {
                     return item.name !== undefined && item.name !== null;
                 }
