@@ -22,6 +22,10 @@ define(function (require) {
             statusbar : false
         },
 
+        events: {
+            'set-focus': 'setFocus'
+        },
+
         initialize: function (options) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
@@ -68,6 +72,17 @@ define(function (require) {
                 this.renderDeffered = $.Deferred();
                 this.$el.tinymce(_.extend({
                     init_instance_callback: function (editor) {
+                        /**
+                         * fix of https://magecore.atlassian.net/browse/BAP-7130
+                         * "WYSWING editor does not work with IE"
+                         * Please check if it's still required after tinyMCE update
+                         */
+                        setTimeout(function () {
+                            var focusedElement = $(':focus');
+                            editor.focus();
+                            focusedElement.focus();
+                        }, 0);
+
                         loadingMask.dispose();
                         self.tinymceInstance = editor;
                         self.renderDeffered.resolve();
@@ -75,6 +90,9 @@ define(function (require) {
                     }
                 }, this.options));
                 this.tinymceConnected = true;
+                this.$el.attr('data-focusable', true);
+            } else {
+                this.$el.removeAttr('data-focusable');
             }
             this.firstRender = false;
         },
@@ -85,6 +103,12 @@ define(function (require) {
             }
             this.enabled = enabled;
             this.render();
+        },
+
+        setFocus: function (e) {
+            if (this.enabled) {
+                this.tinymceInstance.focus();
+            }
         },
 
         dispose: function () {

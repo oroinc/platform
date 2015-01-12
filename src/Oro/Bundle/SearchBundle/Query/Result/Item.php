@@ -38,6 +38,8 @@ class Item
     protected $recordUrl;
 
     /**
+     * @deprecated deprecated since 1.5.1 will be removed in 1.7
+     *
      * @var string
      */
     protected $recordText;
@@ -53,6 +55,15 @@ class Item
      */
     protected $em;
 
+    /**
+     * @param ObjectManager $em
+     * @param string|null   $entityName
+     * @param string|null   $recordId
+     * @param string|null   $recordTitle
+     * @param string|null   $recordUrl
+     * @param string        $recordText
+     * @param array         $entityConfig
+     */
     public function __construct(
         ObjectManager $em,
         $entityName = null,
@@ -177,6 +188,7 @@ class Item
     /**
      * Set record string data
      *
+     * @deprecated deprecated since 1.5.1 will be removed in 1.7
      * @param string $recordText
      *
      * @return Item
@@ -190,6 +202,8 @@ class Item
 
     /**
      * Get record string data
+     *
+     * @deprecated deprecated since 1.5.1 will be removed in 1.7
      *
      * @return string
      */
