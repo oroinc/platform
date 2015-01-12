@@ -14,7 +14,7 @@ define(function (require) {
 
         listSelector: 'ul.comments-list',
         itemSelector: 'li.comment-item',
-        loadingSelector: '.loading-mask',
+        loadingContainerSelector: '.comments-block-inner',
 
         listen: {
             // once collection is synced -- recheck items views
