@@ -7,6 +7,8 @@ define(function (require) {
         template = require('text!../../../templates/loading-mask-view.html');
 
     LoadingMaskView = BaseView.extend({
+        autoRender: true,
+
         /** @property {string|Function} */
         template: template,
 

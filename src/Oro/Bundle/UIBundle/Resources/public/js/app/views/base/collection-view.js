@@ -57,12 +57,12 @@ define([
          * @returns {jQuery}
          * @override
          */
-        initLoadingIndicator: function() {
-            var loading;
-            if (this.loadingContainerSelector) {
+        initLoadingIndicator: function () {
+            var loading, loadingContainer;
+            loadingContainer = this._getLoadingContainer();
+            if (loadingContainer) {
                 loading = new LoadingMaskView({
-                    autoRender: true,
-                    container: this.$(this.loadingContainerSelector).first()
+                    container: loadingContainer
                 });
                 this.subview('loading', loading);
                 this.loadingSelector = loading.$el;
@@ -70,6 +70,19 @@ define([
             return BaseCollectionView.__super__.initLoadingIndicator.apply(this, arguments);
         },
 
+        /**
+         * Fetches loading container element
+         *
+         * @returns {HTMLElement|undefined}
+         * @protected
+         */
+        _getLoadingContainer: function () {
+            var loadingContainer;
+            if (this.loadingContainerSelector) {
+                loadingContainer = this.$(this.loadingContainerSelector).get(0);
+            }
+            return loadingContainer;
+        },
 
         /**
          * Toggles loading indicator

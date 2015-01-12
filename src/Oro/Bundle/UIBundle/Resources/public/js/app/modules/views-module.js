@@ -80,7 +80,6 @@ require([
             compose: function () {
                 var view;
                 view = new PageLoadingMaskView({
-                    autoRender: true,
                     container: '#page'
                 });
                 mediator.setHandler('showLoading', view.show, view);
