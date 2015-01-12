@@ -64,3 +64,9 @@ public function hasComments(ConfigManager $configManager, $entity)
 ...
 ```
 The comment widget will be rendered into ```div.message .comment``` node of js/activityItemTemplate.js.twig template.
+
+Attachment configuration
+------------------------
+
+Comment attachment MIME types can be configured by change section System > Configuration > Upload Settings > File Mime Types.
+Maximum file size can be configured in section Comment Entity Configuration by set 'File Size' field value for Attachment field.
