@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Templating\Asset\PackageInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\FormBundle\Form\DataTransformer\StripTagsTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 
 class OroRichTextType extends AbstractType
 {
@@ -36,12 +36,11 @@ class OroRichTextType extends AbstractType
      */
     protected $allowedElements = [
         '@[style|class]',
-        'style[type="text/css"]',
-        'table[cellspacing|cellpadding|border|align|width|height|background|bgcolor]',
-        'thead[align|valign|bgcolor]',
-        'tbody[align|valign|bgcolor]',
-        'tr[align|valign|bordercolor|bgcolor]',
-        'td[align|valign|rowspan|colspan|bgcolor|background|nowrap|width|height]',
+        'table[cellspacing|cellpadding|border|align|width]',
+        'thead[align|valign]',
+        'tbody[align|valign]',
+        'tr[align|valign]',
+        'td[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
         'a[!href|target=_blank|title]',
         'dl',
         'dt',
@@ -54,7 +53,7 @@ class OroRichTextType extends AbstractType
         'p',
         'font[color]',
         'i',
-        'br[data-mce-bogus]',
+        'br',
         'span',
         'img[src|width|height|alt]',
         'h1',
@@ -103,7 +102,7 @@ class OroRichTextType extends AbstractType
             $allowableTags = $options['wysiwyg_options']['valid_elements'];
         }
 
-        $transformer = new StripTagsTransformer($allowableTags);
+        $transformer = new SanitizeHTMLTransformer($allowableTags);
         $builder->addModelTransformer($transformer);
     }
 
