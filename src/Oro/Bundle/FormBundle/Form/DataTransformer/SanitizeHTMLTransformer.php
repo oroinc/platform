@@ -4,10 +4,10 @@ namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
+use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
+
 class SanitizeHTMLTransformer implements DataTransformerInterface
 {
-    const DELIMITER = ',';
-
     /**
      * @var string|null
      */
@@ -19,18 +19,6 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     public function __construct($allowedElements = null)
     {
         $this->allowedElements = $allowedElements;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getAllowedElements()
-    {
-        if ($this->allowedElements) {
-            return $this->prepareAllowedElements($this->allowedElements);
-        }
-
-        return $this->allowedElements;
     }
 
     /**
@@ -57,23 +45,15 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
     protected function sanitize($value)
     {
         $config = \HTMLPurifier_Config::createDefault();
+        $converter = new TagDefinitionConverter();
 
         if ($this->allowedElements) {
-            $config->set('HTML.Allowed', $this->getAllowedElements());
+            $config->set('HTML.AllowedElements', $converter->getElements($this->allowedElements));
+            $config->set('HTML.AllowedAttributes', $converter->getAttributes($this->allowedElements));
         }
 
         $purifier = new \HTMLPurifier($config);
 
         return $purifier->purify($value);
-    }
-
-    /**
-     * Prepare list of allowable tags based on tinymce valid tags syntax.
-     *
-     * @param string $allowedElements
-     * @return string
-     */
-    protected function prepareAllowedElements($allowedElements)
-    {
     }
 }
