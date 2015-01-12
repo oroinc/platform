@@ -281,7 +281,7 @@ abstract class OroKernel extends Kernel
             if (isset($this->bundleMap[$name])) {
                 // current bundle is always the last
                 $bundle = end($this->bundleMap[$name]);
-                return $first ? $bundle : [$bundle];
+                return $first ? $bundle : array($bundle);
             }
         }
 
