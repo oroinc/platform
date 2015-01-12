@@ -72,6 +72,17 @@ define(function (require) {
                 this.renderDeffered = $.Deferred();
                 this.$el.tinymce(_.extend({
                     init_instance_callback: function (editor) {
+                        /**
+                         * fix of https://magecore.atlassian.net/browse/BAP-7130
+                         * "WYSWING editor does not work with IE"
+                         * Please check if it's still required after tinyMCE update
+                         */
+                        setTimeout(function () {
+                            var focusedElement = $(':focus');
+                            editor.focus();
+                            focusedElement.focus();
+                        }, 0);
+
                         loadingMask.dispose();
                         self.tinymceInstance = editor;
                         self.renderDeffered.resolve();
