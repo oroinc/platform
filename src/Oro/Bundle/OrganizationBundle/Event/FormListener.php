@@ -55,6 +55,9 @@ class FormListener
          */
         if (!empty($data['dataBlocks'])) {
             if (isset($data['dataBlocks'][0]['subblocks'])) {
+                if (!isset($data['dataBlocks'][0]['subblocks'][0])) {
+                    $data['dataBlocks'][0]['subblocks'][0] = ['data' => []];
+                }
                 array_unshift($data['dataBlocks'][0]['subblocks'][0]['data'], $ownerField);
             }
         }

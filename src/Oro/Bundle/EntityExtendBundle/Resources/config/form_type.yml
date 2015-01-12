@@ -2,6 +2,7 @@ parameters:
     oro_entity_extend.type.entity.class:                        Oro\Bundle\EntityExtendBundle\Form\Type\EntityType
     oro_entity_extend.type.field.class:                         Oro\Bundle\EntityExtendBundle\Form\Type\FieldType
     oro_entity_extend.type.relation.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\RelationType
+    oro_entity_extend.type.target_field_type.class:             Oro\Bundle\EntityExtendBundle\Form\Type\TargetFieldType
 
     oro_entity_extend.type.option_set.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetType
     oro_entity_extend.type.option_set_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetCollectionType
@@ -55,8 +56,17 @@ services:
         class:                                                  %oro_entity_extend.type.relation.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity_extend.type.target_field_type
         tags:
             - { name: form.type, alias: oro_entity_relation_type }
+
+    oro_entity_extend.type.target_field_type:
+        class: %oro_entity_extend.type.target_field_type.class%
+        arguments:
+            - @oro_entity_config.config_manager
+            - @oro_entity.entity_field_provider
+        tags:
+            - { name: form.type, alias: oro_entity_target_field_type}
 
     oro_entity_extend.type.option_set:
         class:                                                  %oro_entity_extend.type.option_set.class%
