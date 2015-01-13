@@ -209,23 +209,26 @@ class QueryBuilderTools
      * Get list of table aliases mentioned in condition.
      *
      * @param string|object|array $where
+     * @param bool                $replace
      *
      * @return array
      */
-    public function getUsedTableAliases($where)
+    public function getUsedTableAliases($where, $replace = true)
     {
         $aliases = [];
 
         if (is_array($where)) {
             foreach ($where as $wherePart) {
-                $aliases = array_merge($aliases, $this->getUsedTableAliases($wherePart));
+                $aliases = array_merge($aliases, $this->getUsedTableAliases($wherePart, $replace));
             }
         } else {
             $where = (string) $where;
 
             if ($where) {
-                $where  = $this->replaceAliasesWithJoinPaths($where);
-                $where  = $this->replaceAliasesWithFields($where);
+                if ($replace) {
+                    $where  = $this->replaceAliasesWithJoinPaths($where);
+                    $where  = $this->replaceAliasesWithFields($where);
+                }
                 $fields = $this->getFields($where);
                 foreach ($fields as $field) {
                     if (strpos($field, '.') !== false) {
@@ -307,7 +310,7 @@ class QueryBuilderTools
      * @param string $alias
      * @return string
      */
-    public function getRegExpQueryForAlias($alias)
+    protected function getRegExpQueryForAlias($alias)
     {
         // Do not match string if it is part of another string or parameter (starts with :)
         $searchRegExpParts = [
@@ -335,5 +338,23 @@ class QueryBuilderTools
         }
 
         return $fields;
+    }
+
+    /**
+     * @param string $condition
+     * @param array $knownAliases
+     * @return array
+     */
+    public function getTablesUsedInJoinCondition($condition, array $knownAliases)
+    {
+        $usedAliases = $this->getUsedTableAliases($condition, false);
+        foreach ($knownAliases as $alias) {
+            preg_match($this->getRegExpQueryForAlias($alias), $condition, $matches);
+            if (!empty($matches)) {
+                $usedAliases[] = $alias;
+            }
+        }
+
+        return array_unique($usedAliases);
     }
 }

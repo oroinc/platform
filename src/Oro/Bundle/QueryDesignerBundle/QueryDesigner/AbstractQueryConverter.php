@@ -4,6 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Doctrine\ORM\Query\Expr\Join;
 
+use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
@@ -22,6 +23,7 @@ abstract class AbstractQueryConverter
     const COLUMN_ALIAS_TEMPLATE = 'c%d';
     const TABLE_ALIAS_TEMPLATE  = 't%d';
     const ROOT_ALIAS_KEY = '';
+    const MAX_ITERATIONS = 100;
 
     /**
      * @var JoinIdentifierHelper
@@ -104,6 +106,16 @@ abstract class AbstractQueryConverter
     protected $aliases = [];
 
     /**
+     * @var array
+     */
+    protected $queryAliases = [];
+
+    /**
+     * @var QueryBuilderTools
+     */
+    protected $qbTools;
+
+    /**
      * Constructor
      *
      * @param FunctionProviderInterface     $functionProvider
@@ -115,6 +127,7 @@ abstract class AbstractQueryConverter
     ) {
         $this->functionProvider     = $functionProvider;
         $this->virtualFieldProvider = $virtualFieldProvider;
+        $this->qbTools = new QueryBuilderTools();
     }
 
     /**
@@ -743,7 +756,6 @@ abstract class AbstractQueryConverter
         );
         $mainEntityJoinAlias = $this->tableAliases[$mainEntityJoinId];
         $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
-        $joins = [];
         /** @var array $aliasMap
          *      key   = local alias (defined in virtual column query definition)
          *      value = alias
@@ -756,8 +768,7 @@ abstract class AbstractQueryConverter
         $this->aliases[$aliasKey] = $mainEntityJoinAlias;
 
         if (isset($query['join'])) {
-            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
-            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
+            $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
             foreach ($joins as &$item) {
                 $this->registerVirtualColumnTableAlias($joins, $item, $mainEntityJoinId);
@@ -829,22 +840,7 @@ abstract class AbstractQueryConverter
             }
             $this->aliases[$aliasKey] = $mainEntityJoinAlias;
 
-            $joins = [];
-
-            $this->processVirtualColumnJoins(
-                $joins,
-                $this->aliases,
-                $query,
-                Join::INNER_JOIN,
-                $mainEntityJoinId
-            );
-            $this->processVirtualColumnJoins(
-                $joins,
-                $this->aliases,
-                $query,
-                Join::LEFT_JOIN,
-                $mainEntityJoinId
-            );
+            $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
 
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
 
@@ -862,6 +858,37 @@ abstract class AbstractQueryConverter
         }
 
         return implode('+', $columnJoinIds);
+    }
+
+    /**
+     * @param array  $query
+     * @param string $mainEntityJoinId
+     *
+     * @return array
+     */
+    protected function buildVirtualJoins(array $query, $mainEntityJoinId)
+    {
+        $joins = [];
+        $iterations = 0;
+
+        $this->buildQueryAliases($query);
+
+        do {
+            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::INNER_JOIN, $mainEntityJoinId);
+            $this->processVirtualColumnJoins($joins, $this->aliases, $query, Join::LEFT_JOIN, $mainEntityJoinId);
+
+            if ($iterations > self::MAX_ITERATIONS) {
+                throw new \RuntimeException(
+                    'Could not reorder joins correctly. Number of tries has exceeded maximum allowed.'
+                );
+            }
+
+            $iterations++;
+        } while (count($this->aliases) != count($this->queryAliases));
+
+        $this->queryAliases = [];
+
+        return $joins;
     }
 
     /**
@@ -1003,6 +1030,26 @@ abstract class AbstractQueryConverter
     }
 
     /**
+     * @param array $query
+     */
+    protected function buildQueryAliases(array $query)
+    {
+        $queryAliases = array_keys($this->aliases);
+
+        foreach ([Join::INNER_JOIN, Join::LEFT_JOIN] as $type) {
+            if (empty($query['join'][strtolower($type)])) {
+                continue;
+            }
+
+            foreach ($query['join'][strtolower($type)] as $join) {
+                $queryAliases[] = $join['alias'];
+            }
+        }
+
+        $this->queryAliases = array_unique($queryAliases);
+    }
+
+    /**
      * Processes all virtual column join declarations of $joinType type
      *
      * @param array  $joins
@@ -1017,6 +1064,19 @@ abstract class AbstractQueryConverter
 
         if (isset($query['join'][$joinType])) {
             foreach ($query['join'][$joinType] as $item) {
+                $condition = $this->getDefinitionJoinCondition($item);
+                if ($condition) {
+                    $usedAliases = $this->qbTools->getTablesUsedInJoinCondition($condition, $this->queryAliases);
+                    $unknownAliases = array_diff(
+                        $usedAliases,
+                        array_merge(array_keys($this->aliases), [$item['alias']])
+                    );
+
+                    if ($unknownAliases) {
+                        continue;
+                    }
+                }
+
                 $item['type'] = $joinType;
                 $delimiterPos = strpos($item['join'], '.');
                 if (false !== $delimiterPos) {
@@ -1033,22 +1093,11 @@ abstract class AbstractQueryConverter
                 }
                 $item['alias'] = $aliases[$alias];
 
-                if (isset($item['conditionType'])) {
-                    $conditionType = $item['conditionType'];
-                } else {
-                    $conditionType = null;
-                }
-
-                if (isset($item['condition'])) {
-                    $condition = $item['condition'];
-                } else {
-                    $condition = null;
-                }
                 $itemJoinId = $this->joinIdHelper->buildJoinIdentifier(
                     $item['join'],
                     $parentJoinId,
                     $item['type'],
-                    $conditionType,
+                    $this->getJoinDefinitionConditionType($item),
                     $condition
                 );
 
@@ -1060,6 +1109,34 @@ abstract class AbstractQueryConverter
                 $joins[] = $item;
             }
         }
+    }
+
+    /**
+     * @param array $join
+     * @return string|null
+     */
+    protected function getJoinDefinitionConditionType(array $join)
+    {
+        $conditionType = null;
+        if (isset($join['conditionType'])) {
+            $conditionType = $join['conditionType'];
+        }
+
+        return $conditionType;
+    }
+
+    /**
+     * @param array $join
+     * @return string|null
+     */
+    protected function getDefinitionJoinCondition(array $join)
+    {
+        $conditionType = null;
+        if (isset($join['condition'])) {
+            $conditionType = $join['condition'];
+        }
+
+        return $conditionType;
     }
 
     /**
