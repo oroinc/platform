@@ -812,11 +812,7 @@ abstract class AbstractQueryConverter
                     $joinId = $mainEntityJoinId . '+' . $columnJoinId;
                 }
 
-                if (empty($this->tableAliases[$joinId])) {
-                    $tableAlias = $this->generateTableAlias();
-                    $this->tableAliases[$joinId] = $tableAlias;
-                    $this->joins[$tableAlias] = $joinId;
-                }
+                $this->registerAliases($joinId);
 
                 $mainEntityJoinId = $joinId;
 
@@ -857,10 +853,7 @@ abstract class AbstractQueryConverter
                 $tableAlias = $item['alias'];
                 $virtualJoinId = $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
 
-                if (empty($this->tableAliases[$virtualJoinId])) {
-                    $this->tableAliases[$virtualJoinId] = $tableAlias;
-                    $this->joins[$tableAlias] = $virtualJoinId;
-                }
+                $this->registerAliases($virtualJoinId, $tableAlias);
             }
 
             $this->virtualRelationsJoins[$columnJoinId] = $virtualJoinId;
@@ -869,6 +862,22 @@ abstract class AbstractQueryConverter
         }
 
         return implode('+', $columnJoinIds);
+    }
+
+    /**
+     * @param string      $joinId
+     * @param string|null $tableAlias
+     */
+    protected function registerAliases($joinId, $tableAlias = null)
+    {
+        if (!isset($this->tableAliases[$joinId])) {
+            if (!$tableAlias) {
+                $tableAlias = $this->generateTableAlias();
+            }
+
+            $this->tableAliases[$joinId] = $joinId;
+            $this->joins[$tableAlias] = $joinId;
+        }
     }
 
     /**
@@ -914,11 +923,7 @@ abstract class AbstractQueryConverter
         foreach ($joinIds as &$joinId) {
             $joinId = $this->replaceJoinsForVirtualRelation($joinId);
 
-            if (!isset($this->tableAliases[$joinId])) {
-                $tableAlias                  = $this->generateTableAlias();
-                $this->joins[$tableAlias]    = $joinId;
-                $this->tableAliases[$joinId] = $tableAlias;
-            }
+            $this->registerAliases($joinId);
         }
     }
 
@@ -938,8 +943,7 @@ abstract class AbstractQueryConverter
 
         $joinId = $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
 
-        $this->joins[$tableAlias] = $joinId;
-        $this->tableAliases[$joinId] = $tableAlias;
+        $this->registerAliases($joinId, $tableAlias);
     }
 
     /**
