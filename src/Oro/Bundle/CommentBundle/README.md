@@ -69,4 +69,4 @@ Attachment configuration
 ------------------------
 
 MIME types of comment attachments can be configured at `System` > `Configuraton` > `Upload settings` > `File Mime Types`.
-Maximum file size will be taken from `System` > `Entity Management` > `Comment` > `Attachment` Field > File Size`.
+Maximum file size will be taken from `System` > `Entity Management` > `Comment` > `Attachment` Field > `File Size`.
