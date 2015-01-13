@@ -844,17 +844,18 @@ abstract class AbstractQueryConverter
 
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
 
+            $baseMainEntityJoinId = $mainEntityJoinId;
             $virtualJoinId = self::ROOT_ALIAS_KEY;
             foreach ($joins as &$item) {
                 $tableAlias = $item['alias'];
                 $virtualJoinId = $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
 
                 $this->registerAliases($virtualJoinId, $tableAlias);
+                $mainEntityJoinId = $virtualJoinId;
             }
 
             $this->virtualRelationsJoins[$columnJoinId] = $virtualJoinId;
-            $columnJoinId = trim(str_replace($mainEntityJoinId, '', $virtualJoinId), '+');
-            $mainEntityJoinId = $columnJoinId;
+            $columnJoinId = trim(str_replace($baseMainEntityJoinId, '', $mainEntityJoinId), '+');
         }
 
         return implode('+', $columnJoinIds);
@@ -1063,7 +1064,11 @@ abstract class AbstractQueryConverter
         $joinType = strtolower($joinType);
 
         if (isset($query['join'][$joinType])) {
-            foreach ($query['join'][$joinType] as $item) {
+            foreach ($query['join'][$joinType] as &$item) {
+                if (!empty($item['processed'])) {
+                    continue;
+                }
+
                 $condition = $this->getDefinitionJoinCondition($item);
                 if ($condition) {
                     $usedAliases = $this->qbTools->getTablesUsedInJoinCondition($condition, $this->queryAliases);
@@ -1106,6 +1111,7 @@ abstract class AbstractQueryConverter
                     $aliases[$alias] = $this->tableAliases[$itemJoinId];
                 }
 
+                $item['processed'] = true;
                 $joins[] = $item;
             }
         }
