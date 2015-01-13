@@ -117,7 +117,10 @@ class OroRichTextType extends AbstractType
             'skin_url' => 'bundles/oroform/css/tinymce',
             'valid_elements' => implode(',', $this->allowedElements),
             'menubar' => false,
-            'statusbar' => false
+            'statusbar' => false,
+            'relative_urls' => false,
+            'remove_script_host' => false,
+            'convert_urls' => true,
         ];
 
         $defaults = [
