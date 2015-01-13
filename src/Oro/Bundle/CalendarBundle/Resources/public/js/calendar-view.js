@@ -383,14 +383,16 @@ define(function (require) {
                 end: fcEvent.end ? fcEvent.end.clone() : null
             }
         },
+
         onFcEventDrop: function (fcEvent, dateDiff, undo, jsEvent) {
             var realDuration,
+                currentView = this.getCalendarElement().fullCalendar('getView'),
                 oldState = fcEvent._beforeDragState,
                 // please do not change accessing _milliseconds property to milliseconds() call
                 // that will cause issues
                 isDroppedOnDayGrid =
                     fcEvent.start.time()._milliseconds === 0
-                    && (fcEvent.end === null || fcEvent.end.time()._milliseconds === 0);
+                        && (fcEvent.end === null || fcEvent.end.time()._milliseconds === 0);
 
             // when on week view all-day event is dropped at 12AM to hour view
             // previous condition gives false positive result
@@ -398,7 +400,7 @@ define(function (require) {
                 isDroppedOnDayGrid = !$(jsEvent.target).parents(".fc-time-grid-event").length;
             }
 
-            fcEvent.allDay = isDroppedOnDayGrid;
+            fcEvent.allDay = (currentView.name === 'month') ? oldState.allDay : isDroppedOnDayGrid;
             if (isDroppedOnDayGrid) {
                 if (oldState.allDay) {
                     if (fcEvent.end === null && oldState.end === null) {
@@ -407,7 +409,11 @@ define(function (require) {
                         realDuration = oldState.end.diff(oldState.start);
                     }
                 } else {
-                    realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
+                    if (currentView.name === 'month') {
+                        realDuration = oldState.end ? oldState.end.diff(oldState.start) : oldState.start;
+                    } else {
+                        realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
+                    }
                 }
             } else {
                 if (oldState.allDay) {
@@ -737,7 +743,6 @@ define(function (require) {
             };
             options.axisFormat = timeFormat;
 
-
             self = this;
             options.eventAfterAllRender = function () {
                 _.delay(_.bind(self.setTimeline, self));
@@ -956,11 +961,13 @@ define(function (require) {
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
         },
+
         disablePageScroll: function () {
             var $scrollableParents = this.getCalendarElement().parents('.scrollable-container');
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
         },
+
         enablePageScroll: function () {
             this.getCalendarElement().parents('.scrollable-container').removeClass('disable-scroll');
         }
