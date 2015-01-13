@@ -4,8 +4,9 @@ define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
+    'oroui/js/mediator',
     './app/views/base/view'
-], function ($, _, __, BaseView) {
+], function ($, _, __, mediator, BaseView) {
     'use strict';
 
     var LoadingMaskView;
@@ -15,6 +16,7 @@ define([
      *
      * @export oroui/js/loading-mask
      * @name   oroui.LoadingMask
+     * @deprecated since version 1.6
      */
     LoadingMaskView = BaseView.extend({
 
@@ -51,6 +53,10 @@ define([
         initialize: function (options) {
             var updateProxy,
                 options = options || {};
+
+            if (mediator.execute('retrieveOption', 'debug') && window.console) {
+                console.warn('Module "oroui/js/loading-mask" is deprecated, use "oroui/js/app/views/loading-mask-view" instead');
+            }
 
             if (_.has(options, 'liveUpdate')) {
                 this.liveUpdate = options.liveUpdate;

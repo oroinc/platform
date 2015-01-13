@@ -9,7 +9,8 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         __ = require('orotranslation/js/translator'),
         BaseView = require('oroui/js/app/views/base/view'),
-        template = require('text!../../../templates/comment/comment-item-view.html');
+        template = require('text!../../../templates/comment/comment-item-view.html'),
+        DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     CommentItemView = BaseView.extend({
         template: template,
@@ -74,7 +75,17 @@ define(function (require) {
 
         removeModel: function (e) {
             e.stopPropagation();
-            this.model.destroy();
+
+            var model   = this.model;
+            var confirm = new DeleteConfirmation({
+                content: __('oro.comment.deleteConfirmation')
+            });
+
+            confirm.on('ok', _.bind(function () {
+                model.destroy();
+            }, this));
+
+            confirm.open();
         },
 
         removeAttachment: function(e) {

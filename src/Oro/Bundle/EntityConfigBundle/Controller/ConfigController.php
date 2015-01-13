@@ -14,6 +14,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -266,36 +268,21 @@ class ConfigController extends Controller
     {
         $fields = [];
         if ($id) {
-            $id = $this->getRoutingHelper()->decodeClassName($id);
+            $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+            $className = $entityRoutingHelper->decodeClassName($id);
 
-            /** @var EntityConfigModel $entity */
-            $entity = $this->getDoctrine()->getRepository(EntityConfigModel::ENTITY_NAME)
-                ->findOneBy(['className' => $id]);
+            /** @var EntityFieldProvider $fieldProvider */
+            $fieldProvider = $this->get('oro_entity.entity_field_provider');
 
-            if ($entity) {
-                /** @var ConfigProvider $entityConfigProvider */
-                $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-
-                /** @var FieldConfigModel $fields */
-                $entityFields = $this->getDoctrine()->getRepository(FieldConfigModel::ENTITY_NAME)
-                    ->findBy(
-                        [
-                            'entity' => $entity->getId(),
-                            'type'   => ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
-                        ]
-                    );
-
-                /** @var Translator $translator */
-                $translator = $this->get('translator');
-
-                foreach ($entityFields as $field) {
-                    $label = $entityConfigProvider->getConfig($id, $field->getFieldName())->get('label');
-                    if (!$label) {
-                        $label = $field->getFieldName();
-                    }
-
-                    $fields[$field->getFieldName()] = $translator->trans($label);
+            $entityFields = $fieldProvider->getFields($className);
+            foreach ($entityFields as $field) {
+                if (!in_array(
+                    $field['type'],
+                    ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
+                )) {
+                    continue;
                 }
+                $fields[$field['name']] = $field['label'] ? : $field['name'];
             }
         }
 
