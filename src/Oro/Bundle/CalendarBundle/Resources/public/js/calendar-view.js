@@ -71,7 +71,7 @@ define(function (require) {
                 itemFormDeleteButtonSelector: null,
                 calendar: null,
                 subordinate: true,
-                defaultTimedEventDuration: moment.duration('02:00:00'),
+                defaultTimedEventDuration: moment.duration('00:30:00'),
                 defaultAllDayEventDuration: moment.duration('24:00:00'),
                 header: {
                     ignoreTimezone: false,
@@ -410,7 +410,7 @@ define(function (require) {
                     }
                 } else {
                     if (currentView.name === 'month') {
-                        realDuration = oldState.end ? oldState.end.diff(oldState.start) : oldState.start;
+                        realDuration = oldState.end ? oldState.end.diff(oldState.start) : moment.duration(0);
                     } else {
                         realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
                     }
@@ -419,7 +419,7 @@ define(function (require) {
                 if (oldState.allDay) {
                     realDuration = this.options.eventsOptions.defaultTimedEventDuration;
                 } else {
-                    realDuration = oldState.end.diff(oldState.start);
+                    realDuration = oldState.end ? oldState.end.diff(oldState.start) : moment.duration(0);
                 }
             }
             fcEvent.end = fcEvent.start.clone().add(realDuration);
