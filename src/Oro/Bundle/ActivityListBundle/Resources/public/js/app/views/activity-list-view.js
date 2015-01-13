@@ -9,7 +9,6 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         routing = require('routing'),
         mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
         DialogWidget = require('oro/dialog-widget'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
@@ -79,18 +78,11 @@ define(function (require) {
             }
 
             delete this.itemEditDialog;
-            delete this.$loadingMaskContainer;
 
             mediator.off('widget:doRefresh:activity-list-widget', this._reload, this );
             mediator.off('widget_success:activity_list:item:update', this._reload, this);
 
             ActivityListView.__super__.dispose.call(this);
-        },
-
-        render: function () {
-            ActivityListView.__super__.render.apply(this, arguments);
-            this.$loadingMaskContainer = this.$('.loading-mask');
-            return this;
         },
 
         initItemView: function(model) {
@@ -121,6 +113,29 @@ define(function (require) {
             }
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+        },
+
+        /**
+         * Fetches loading container element
+         *
+         *  - returns loading container passed over options,
+         *    or the view element as default loading container
+         *
+         * @returns {HTMLElement|undefined}
+         * @protected
+         * @override
+         */
+        _getLoadingContainer: function () {
+            var loadingContainer = this.options.loadingContainer;
+            if (loadingContainer instanceof $) {
+                // fetches loading container from options
+                loadingContainer = loadingContainer.get(0);
+            }
+            if (!loadingContainer) {
+                // uses the element as default loading container
+                loadingContainer = this.$el.get(0);
+            }
+            return loadingContainer;
         },
 
         goto_previous: function () {
@@ -348,20 +363,11 @@ define(function (require) {
         },
 
         _showLoading: function () {
-            if (!this.$loadingMaskContainer.data('loading-mask-visible')) {
-                this.loadingMask = new LoadingMask();
-                this.$loadingMaskContainer.data('loading-mask-visible', true);
-                this.$loadingMaskContainer.append(this.loadingMask.render().$el);
-                this.loadingMask.show();
-            }
+            this.subview('loading').show();
         },
 
         _hideLoading: function () {
-            if (this.loadingMask) {
-                this.$loadingMaskContainer.data('loading-mask-visible', false);
-                this.loadingMask.dispose();
-                this.loadingMask = null;
-            }
+            this.subview('loading').hide();
         },
 
         _showLoadItemsError: function (err) {

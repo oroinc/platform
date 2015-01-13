@@ -5,6 +5,7 @@
         'relatedEntityId': entity.id,
         'relatedEntityClassName': oro_class_name(entity, true),
         'listTemplate': '#template-activity-item-comment',
+        'canCreate': resource_granted('oro_comment_create')
     } %}
     <div class="comment"
          data-page-component-module="orocomment/js/app/components/comment-component"
