@@ -5,37 +5,52 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class TargetFieldType extends AbstractType
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var string
-     */
-    protected $entityClass;
+    /** @var string|null */
+    protected $entityClass = null;
 
-    public function __construct(ConfigManager $configManager, $entityClass)
+    /** @var EntityFieldProvider */
+    protected $entityFieldProvider;
+
+    /**
+     * @param ConfigManager       $configManager
+     * @param EntityFieldProvider $entityFieldProvider
+     */
+    public function __construct(ConfigManager $configManager, EntityFieldProvider $entityFieldProvider)
     {
-        $this->configManager = $configManager;
-        $this->entityClass   = $entityClass;
+        $this->configManager       = $configManager;
+        $this->entityFieldProvider = $entityFieldProvider;
     }
 
+    /**
+     * @param string $entityClass
+     */
+    public function setEntityClass($entityClass)
+    {
+        $this->entityClass = $entityClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
-                'attr'            => array('class' => 'extend-rel-target-field'),
+            [
+                'attr'            => ['class' => 'extend-rel-target-field'],
                 'label'           => 'oro.entity_extend.form.target_field',
                 'empty_value'     => 'oro.entity.form.choose_entity_field',
                 'choices'         => $this->getPropertyChoiceList(),
                 'auto_initialize' => false
-            )
+            ]
         );
     }
 
@@ -44,29 +59,22 @@ class TargetFieldType extends AbstractType
      */
     protected function getPropertyChoiceList()
     {
-        $choices = array();
+        $choices = [];
 
         if (!$this->entityClass) {
             return $choices;
         }
 
-        $fields = $this->configManager->getProvider('extend')->filter(
-            function (Config $config) {
-                return
-                    in_array(
-                        $config->getId()->getFieldType(),
-                        ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
-                    )
-                    && $config->is('is_deleted', false);
-            },
-            $this->entityClass
-        );
-
-        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $fields = $this->entityFieldProvider->getFields($this->entityClass);
         foreach ($fields as $field) {
-            $label = $entityConfigProvider->getConfigById($field->getId())->get('label');
+            if (!in_array(
+                $field['type'],
+                ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
+            )) {
+                continue;
+            }
+            $choices[$field['name']] = $field['label'] ? : $field['name'];
 
-            $choices[$field->getId()->getFieldName()] = $label ? : $field->getId()->getFieldName();
         }
 
         return $choices;
