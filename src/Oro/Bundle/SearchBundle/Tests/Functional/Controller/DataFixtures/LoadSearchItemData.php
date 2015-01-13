@@ -78,13 +78,15 @@ class LoadSearchItemData extends AbstractFixture implements OrderedFixtureInterf
             //array
             $item->arrayValue = [$ind];
             //datetime
-            $date = new \DateTime('now', new \DateTimeZone('UTC'));
+            $date = new \DateTime('2014-12-01', new \DateTimeZone('UTC'));
             $date->add(new \DateInterval("P{$ind}Y"));
             $item->datetimeValue = $date;
             //guid
             $item->guidValue = Uuid::uuid4();
             //object
             $item->objectValue = new \stdClass();
+            //phone
+            $item->phone = sprintf($ind % 2 ? '123-456-%s00' : '%s00987654', $ind);
 
             $manager->persist($item);
         }

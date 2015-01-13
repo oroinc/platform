@@ -118,6 +118,8 @@ fos_rest:
 
 ####OroSearchBundle:
 - Added possibility to search within hierarchy of entities using parent search alias. `mode` parameter was added to configuration.
+- `Oro\Bundle\SearchBundle\Query\Result\Item` entity field `recordText` marked as deprecated and will be removed in 1.7 version.
+- `Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver::search` return an array filled with array representation of `Oro\Bundle\SearchBundle\Entity\Item`
 
 ####OroWorkflowBundle:
 - Added `multiple` option for `entity` attribute to allow use many-to-many relations in workflows. Example of usage of Multi-Select type (in this example it is supposed that Opportunity entity has `Multi-Select` field named `interested_in` and `enum_code` of this type is `opportunity_interested_in`):
