@@ -9,7 +9,7 @@ define(function (require) {
         Backgrid = require('backgrid'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
+        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         GridHeader = require('./header'),
         GridBody = require('./body'),
         GridFooter = require('./footer'),
@@ -48,11 +48,10 @@ define(function (require) {
         template: _.template(
             '<div class="toolbar"></div>' +
                 '<div class="container-fluid grid-container-parent">' +
-                '<div class="grid-container">' +
-                '<table class="grid table-hover table table-bordered table-condensed"></table>' +
-                '<div class="no-data"></div>' +
-                '</div>' +
-                '<div class="loading-mask"></div>' +
+                    '<div class="grid-container">' +
+                        '<table class="grid table-hover table table-bordered table-condensed"></table>' +
+                        '<div class="no-data"></div>' +
+                    '</div>' +
                 '</div>'
         ),
 
@@ -64,8 +63,8 @@ define(function (require) {
             grid:        '.grid',
             toolbar:     '.toolbar',
             noDataBlock: '.no-data',
-            loadingMask: '.loading-mask',
-            filterBox:   '.filter-box'
+            filterBox:   '.filter-box',
+            loadingMaskContainer: '.grid-container-parent'
         },
 
         /** @property {orodatagrid.datagrid.Header} */
@@ -80,8 +79,8 @@ define(function (require) {
         /** @property {orodatagrid.datagrid.Toolbar} */
         toolbar: Toolbar,
 
-        /** @property {oroui.LoadingMask} */
-        loadingMask: LoadingMask,
+        /** @property {LoadingMaskView|null} */
+        loadingMask: null,
 
         /** @property {orodatagrid.datagrid.column.ActionColumn} */
         actionsColumn: ActionColumn,
@@ -158,7 +157,6 @@ define(function (require) {
                 opts.columns.unshift(this._createSelectRowColumn());
             }
 
-            this.loadingMask = this._createLoadingMask();
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
             Grid.__super__.initialize.apply(this, arguments);
@@ -260,16 +258,6 @@ define(function (require) {
          */
         resetSelectionState: function () {
             this.collection.trigger('backgrid:selectNone');
-        },
-
-        /**
-         * Creates loading mask
-         *
-         * @return {oroui.LoadingMask}
-         * @private
-         */
-        _createLoadingMask: function () {
-            return new this.loadingMask();
         },
 
         /**
@@ -556,8 +544,12 @@ define(function (require) {
          * Renders loading mask.
          */
         renderLoadingMask: function () {
-            this.$(this.selectors.loadingMask).append(this.loadingMask.render().$el);
-            this.loadingMask.hide();
+            if (this.loadingMask) {
+                this.loadingMask.dispose();
+            }
+            this.loadingMask = new LoadingMaskView({
+                container: this.$(this.selectors.loadingMaskContainer)
+            });
         },
 
         /**
