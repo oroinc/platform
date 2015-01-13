@@ -68,5 +68,5 @@ The comment widget will be rendered into ```div.message .comment``` node of js/a
 Attachment configuration
 ------------------------
 
-Comment attachment MIME types can be configured by change section System > Configuration > Upload Settings > File Mime Types.
-Maximum file size can be configured in section Comment Entity Configuration by set 'File Size' field value for Attachment field.
+MIME types of comment attachments can be configured at `System` > `Configuraton` > `Upload settings` > `File Mime Types`.
+Maximum file size will be taken from `System` > `Entity Management` > `Comment` > `Attachment` Field > File Size`.
