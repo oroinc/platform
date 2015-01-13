@@ -34,6 +34,7 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
      * @param int   $callsCount
      * @param int   $callsProviderCount
      * @param bool  $isApplicable
+     * @param bool  $isGranted
      * @param bool  $expected
      *
      * @dataProvider commentProvider
@@ -77,8 +78,9 @@ class CommentPlaceholderTest extends \PHPUnit_Framework_TestCase
         return [
             'is null'                 => [null, 0, 0, false, true, false],
             'is null with enabled on' => [null, 0, 0, true, true, false],
-            'applicable entity'       => [$entity, 1, 2, true, true, true],
+            'applicable not granted'  => [$entity, 0, 0, true, false, false],
             'not applicable entity'   => [$entity, 1, 1, false, true, false],
+            'applicable entity'       => [$entity, 1, 2, true, true, true],
         ];
     }
 }
