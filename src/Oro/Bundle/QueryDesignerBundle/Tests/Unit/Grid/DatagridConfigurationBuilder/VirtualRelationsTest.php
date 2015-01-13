@@ -61,6 +61,19 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                     }
                 )
             );
+        $virtualRelationProvider->expects($this->any())
+            ->method('getTargetJoinAlias')
+            ->will(
+                $this->returnCallback(
+                    function ($className, $fieldName) use ($virtualRelationQuery) {
+                        if (empty($virtualRelationQuery[$className][$fieldName]['target_join_alias'])) {
+                            return null;
+                        }
+
+                        return $virtualRelationQuery[$className][$fieldName]['target_join_alias'];
+                    }
+                )
+            );
 
         $builder->setVirtualRelationProvider($virtualRelationProvider);
 
@@ -230,16 +243,16 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                 'columns' => [
                     'identifier' => [
                         'name' => sprintf(
-                            'ListItem_virtual+%s+%s',
-                            'Oro\Bundle\TrackingBundle\Entity\ListItem::List',
-                            'Oro\Bundle\TrackingBundle\Entity\List::name'
+                            'campaign+%s+%s',
+                            'Oro\Bundle\TrackingBundle\Entity\Campaign::listItem',
+                            'Oro\Bundle\TrackingBundle\Entity\ListItem::name'
                         ),
                         'label' => 'name',
                     ],
                 ],
                 'virtualRelationQuery' => [
-                    'Oro\Bundle\TrackingBundle\Entity\ListItem' => [
-                        'List' => [
+                    'Oro\Bundle\TrackingBundle\Entity\Campaign' => [
+                        'listItem' => [
                             'join' => [
                                 'left' => [
                                     [
@@ -271,7 +284,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                     'join' => [
                         'left' => [
                             [
-                                'join' => 't1.ListItem_virtual',
+                                'join' => 't1.campaign',
                                 'alias' => 't2',
                             ],
                             [
@@ -290,21 +303,81 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                     ],
                 ],
             ],
+            'selects from first join' => [
+                'columns' => [
+                    'identifier' => [
+                        'name' => sprintf(
+                            'list+%s',
+                            'Oro\Bundle\TrackingBundle\Entity\List::name'
+                        ),
+                        'label' => 'list',
+                    ],
+                ],
+                'virtualRelationQuery' => [
+                    'Acme\Entity\TestEntity' => [
+                        'list' => [
+                            'target_join_alias' => 'List',
+                            'join' => [
+                                'left' => [
+                                    [
+                                        'join' => 'Oro\Bundle\TrackingBundle\Entity\List',
+                                        'alias' => 'List',
+                                        'conditionType' => 'WITH',
+                                        'condition' => 'List.entity = \'Acme\Entity\TestEntity\'',
+                                    ],
+                                    [
+                                        'join' => 'Oro\Bundle\TrackingBundle\Entity\ListItem',
+                                        'alias' => 'ListItem_virtual',
+                                        'conditionType' => 'WITH',
+                                        'condition' => 'ListItem_virtual.List = List'
+                                            . ' AND entity.id = ListItem_virtual.entityId',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    'select' => ['t2.name as c1'],
+                    'from' => [
+                        [
+                            'table' => 'Acme\Entity\TestEntity',
+                            'alias' => 't1',
+                        ],
+                    ],
+                    'join' => [
+                        'left' => [
+                            [
+                                'join' => 'Oro\Bundle\TrackingBundle\Entity\List',
+                                'alias' => 't2',
+                                'conditionType' => 'WITH',
+                                'condition' => 't2.entity = \'Acme\Entity\TestEntity\'',
+                            ],
+                            [
+                                'join' => 'Oro\Bundle\TrackingBundle\Entity\ListItem',
+                                'alias' => 't3',
+                                'conditionType' => 'WITH',
+                                'condition' => 't3.List = t2 AND t1.id = t3.entityId',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
             'multiple joins in the middle' => [
                 'columns' => [
                     'identifier' => [
                         'name' => sprintf(
-                            'ListItem_virtual+%s+%s+%s',
-                            'Oro\Bundle\TrackingBundle\Entity\ListItem::List',
-                            'Oro\Bundle\TrackingBundle\Entity\List::website',
+                            'campaign+%s+%s+%s',
+                            'Oro\Bundle\TrackingBundle\Entity\Campaign::listItem',
+                            'Oro\Bundle\TrackingBundle\Entity\ListItem::website',
                             'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite::identifier'
                         ),
                         'label' => 'identifier',
                     ],
                 ],
                 'virtualRelationQuery' => [
-                    'Oro\Bundle\TrackingBundle\Entity\ListItem' => [
-                        'List' => [
+                    'Oro\Bundle\TrackingBundle\Entity\Campaign' => [
+                        'listItem' => [
                             'join' => [
                                 'left' => [
                                     [
@@ -346,7 +419,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                         ],
                         'left' => [
                             [
-                                'join' => 't1.ListItem_virtual',
+                                'join' => 't1.campaign',
                                 'alias' => 't2',
                             ],
                             [

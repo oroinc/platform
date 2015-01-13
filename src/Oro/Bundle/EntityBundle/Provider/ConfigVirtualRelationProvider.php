@@ -45,4 +45,22 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
 
         return $this->items[$className];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetJoinAlias($className, $fieldName)
+    {
+        $this->ensureVirtualFieldsInitialized();
+
+        if (empty($this->items[$className][$fieldName])) {
+            return null;
+        }
+
+        if (empty($this->items[$className][$fieldName]['target_join_alias'])) {
+            return null;
+        }
+
+        return $this->items[$className][$fieldName]['target_join_alias'];
+    }
 }

@@ -875,7 +875,7 @@ abstract class AbstractQueryConverter
                 $tableAlias = $this->generateTableAlias();
             }
 
-            $this->tableAliases[$joinId] = $joinId;
+            $this->tableAliases[$joinId] = $tableAlias;
             $this->joins[$tableAlias] = $joinId;
         }
     }
@@ -903,14 +903,19 @@ abstract class AbstractQueryConverter
             return;
         }
 
-        $joinId = end($joinIds);
-        $fieldName = $this->getFieldName($columnName);
+        $parentJoinId = $this->getParentJoinIdentifier($this->joinIdHelper->buildColumnJoinIdentifier($columnName));
+        $fieldName = $this->getFieldName($parentJoinId);
+        $className = $this->getEntityClassName($parentJoinId);
+        $targetJoinAlias = $this->virtualRelationProvider->getTargetJoinAlias($className, $fieldName);
 
-        $this->virtualColumnExpressions[$columnName] = sprintf(
-            '%s.%s',
-            $this->tableAliases[$joinId],
-            $fieldName
-        );
+        if ($targetJoinAlias) {
+            $tableAlias = $this->aliases[$targetJoinAlias];
+        } else {
+            $joinId = end($joinIds);
+            $tableAlias = $this->tableAliases[$joinId];
+        }
+
+        $this->virtualColumnExpressions[$columnName] = sprintf('%s.%s', $tableAlias, $this->getFieldName($columnName));
     }
 
     /**

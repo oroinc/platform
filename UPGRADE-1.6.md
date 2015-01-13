@@ -18,7 +18,5 @@ UPGRADE FROM 1.5 to 1.6
     `ClassMetadataInfo $metadata` => `ClassMetadata $metadata`
 - `getUnidirectionalRelations` method signature changed
     `EntityManager $em` removed
-- `generateTableAlias` method signature changed
-    `$offset` added
 ####OroOrganizationBundle:
 - Removed Twig/OrganizationExtension as organization selector has been removed from login screen
