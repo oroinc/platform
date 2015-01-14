@@ -116,3 +116,9 @@ table.grid .select-row-cell input[type=checkbox] {
 .grid-views {
     margin-left: 15px;
 }
+
+.grid-container {
+    overflow: auto;
+    width: 100%;
+    height: 300px;
+}
