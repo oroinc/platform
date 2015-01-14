@@ -94,6 +94,8 @@ class Configuration implements ConfigurationInterface
                             'virtual_relation1' => [
                                 'relation_type' => 'manyToOne',
                                 'related_entity_name' => 'Acme\Bundle\Entity\GroupEntity',
+                                // required if you need to join on specific join alias
+                                'target_join_alias' => 'group_entity',
                                 'label' => 'Group',
                                 'query' => [
                                     'join' => [
@@ -123,6 +125,8 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('related_entity_name')
                                 ->isRequired()
                                 ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('target_join_alias')
                             ->end()
                             ->scalarNode('label')
                             ->end()

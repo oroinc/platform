@@ -27,3 +27,8 @@ UPGRADE FROM 1.5 to 1.6
 
 ####OroUIBundle:
  - "oroui/js/loading-mask" module marked as deprecated and will be removed in 1.8 version. Use "oroui/js/app/views/loading-mask-view" module instead.
+
+####BatchBundle:
+- `Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools` method signature changed
+    `prepareFieldAliases($selects)` to `prepareFieldAliases(array $selects)`
+    `__construct(array $selects = null, $joins = null)` to `__construct(array $selects = null, array $joins = null)`

@@ -34,6 +34,15 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
                         'select' => ['select expression'],
                         'join' => ['join expression']
                     ]
+                ],
+                'virtual_relation2' => [
+                    'relation_type' => 'oneToMany',
+                    'related_entity_name' => 'OtherEntity',
+                    'target_join_alias' => 'join_alias',
+                    'query' => [
+                        'select' => ['select expression'],
+                        'join' => ['join expression']
+                    ]
                 ]
             ]
         ];
@@ -67,6 +76,19 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $this->configurationVirtualRelation['AbstractEntity']['virtual_relation']['query'],
             $this->configVirtualRelationProvider->getVirtualRelationQuery('TestEntity', 'virtual_relation')
+        );
+    }
+
+    public function testGetTargetJoinAlias()
+    {
+        $this->assertEquals(
+            $this->configurationVirtualRelation['AbstractEntity']['virtual_relation2']['target_join_alias'],
+            $this->configVirtualRelationProvider->getTargetJoinAlias('TestEntity', 'virtual_relation2')
+        );
+
+        $this->assertEquals(
+            null,
+            $this->configVirtualRelationProvider->getTargetJoinAlias('TestEntity', 'virtual_relation')
         );
     }
 }

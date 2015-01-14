@@ -5,68 +5,12 @@ namespace Oro\Bundle\BatchBundle\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-class QueryBuilderTools
+class QueryBuilderTools extends AbstractQueryBuilderTools
 {
-    /** @var array */
-    protected $fieldAliases = [];
-
-    /** @var array */
-    protected $joinTablePaths = [];
-
     /**
-     * @param array $selects
-     * @param array  $joins
+     * {@inheritdoc}
      */
-    public function __construct(array $selects = null, $joins = null)
-    {
-        if (null !== $selects) {
-            $this->prepareFieldAliases($selects);
-        }
-        if (null !== $joins) {
-            $this->prepareJoinTablePaths($selects);
-        }
-    }
-
-    /**
-     * Get field by alias.
-     *
-     * @param string $alias
-     * @return null|string
-     */
-    public function getFieldByAlias($alias)
-    {
-        if (isset($this->fieldAliases[$alias])) {
-            return $this->fieldAliases[$alias];
-        }
-
-        return null;
-    }
-
-    /**
-     * Reset field aliases.
-     */
-    public function resetFieldAliases()
-    {
-        $this->fieldAliases = [];
-    }
-
-    /**
-     * Get field aliases.
-     *
-     * @return array
-     */
-    public function getFieldAliases()
-    {
-        return $this->fieldAliases;
-    }
-
-    /**
-     * Get mapping of filed aliases to real field expressions.
-     *
-     * @param array $selects DQL parts
-     * @return array
-     */
-    public function prepareFieldAliases($selects)
+    public function prepareFieldAliases(array $selects)
     {
         $this->resetFieldAliases();
 
@@ -83,37 +27,7 @@ class QueryBuilderTools
     }
 
     /**
-     * Reset join table paths
-     */
-    public function resetJoinTablePaths()
-    {
-        $this->joinTablePaths = [];
-    }
-
-    /**
-     * Get join table paths
-     *
-     * @return array
-     */
-    public function getJoinTablePaths()
-    {
-        return $this->joinTablePaths;
-    }
-
-    /**
-     * Set join table paths.
-     *
-     * @param array $joinTablePaths
-     */
-    public function setJoinTablePaths(array $joinTablePaths)
-    {
-        $this->joinTablePaths = $joinTablePaths;
-    }
-
-    /**
-     * Prepares an array of state passes by alias used in join WITH|ON condition
-     *
-     * @param array $joins
+     * {@inheritdoc}
      */
     public function prepareJoinTablePaths(array $joins)
     {
@@ -224,20 +138,18 @@ class QueryBuilderTools
         } else {
             $where = (string) $where;
 
-            if ($where) {
-                if ($replace) {
-                    $where  = $this->replaceAliasesWithJoinPaths($where);
-                    $where  = $this->replaceAliasesWithFields($where);
-                }
-                $fields = $this->getFields($where);
-                foreach ($fields as $field) {
-                    if (strpos($field, '.') !== false) {
-                        $data = explode('.', $field, 2);
-                        $aliases[] = $data[0];
-                    }
-                }
-                $aliases = array_merge($aliases, $this->getUsedAliases($where));
+            if ($replace) {
+                $where  = $this->replaceAliasesWithJoinPaths($where);
+                $where  = $this->replaceAliasesWithFields($where);
             }
+            $fields = $this->getFields($where);
+            foreach ($fields as $field) {
+                if (strpos($field, '.') !== false) {
+                    $data = explode('.', $field, 2);
+                    $aliases[] = $data[0];
+                }
+            }
+            $aliases = array_merge($aliases, $this->getUsedAliases($where));
         }
 
         return array_unique($aliases);
