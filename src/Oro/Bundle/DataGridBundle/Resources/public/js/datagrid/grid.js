@@ -517,8 +517,16 @@ define(function (require) {
             mediator.trigger('grid_render:complete', this.$el);
             mediator.execute('layout:init', this.$el, this);
 
-            this.$(this.selectors.grid).floatThead();
-
+            var $grid = this.$(this.selectors.grid);
+            $grid.floatThead({
+                scrollContainer: function($table){
+                    return $table.closest('.grid-container');
+                },
+                useAbsolutePositioning: false
+            });
+            setTimeout(function () {
+                $grid.floatThead('reflow');
+            }, 500);
             return this;
         },
 
