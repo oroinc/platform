@@ -100,6 +100,11 @@ define(function (require) {
 
             activityOptions.collection = collection;
 
+            if (activityOptions.loadingContainerSelector) {
+                activityOptions.loadingContainer = this.options._sourceElement
+                    .closest(activityOptions.loadingContainerSelector).first();
+            }
+
             // bind template for item view
             activityOptions.itemView = activityOptions.itemView.extend({
                 template: _.template($(activityOptions.itemTemplate).html())

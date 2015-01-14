@@ -41,5 +41,16 @@ class QuarterTypeTest extends FormIntegrationTestCase
         $this->assertTrue(isset($options['input']));
         $this->assertEquals('array', $options['input']);
         $this->assertEquals('dMMMy', $options['format']);
+
+        $this->assertFalse($form->has('year'));
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @expectedExceptionMessage The option "input" has the value "timestamp", but is expected to be one of "array"
+     */
+    public function testBuildFormTryingToChangeInputType()
+    {
+        $this->factory->create($this->formType, null, ['input' => 'timestamp']);
     }
 }

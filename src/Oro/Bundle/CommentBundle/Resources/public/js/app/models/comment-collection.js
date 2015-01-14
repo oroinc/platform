@@ -22,7 +22,7 @@ define(function (require) {
         },
 
         initialize: function (models, options) {
-            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName']));
+            _.extend(this, _.pick(options, ['relatedEntityId', 'relatedEntityClassName', 'canCreate']));
 
             // create own state property
             this.state = _.extend({}, this.state);
@@ -39,6 +39,7 @@ define(function (require) {
             var options = {
                 relationId:    this.relatedEntityId,
                 relationClass: this.relatedEntityClassName,
+                canCreate:     this.canCreate,
                 page:          this.getPage()
             };
             return routing.generate(this.route, options);

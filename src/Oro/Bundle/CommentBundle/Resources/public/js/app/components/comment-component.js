@@ -24,7 +24,7 @@ define(function (require) {
             var collectionOptions;
 
             this.options = options || {};
-            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName']);
+            collectionOptions = _.pick(this.options, ['relatedEntityId', 'relatedEntityClassName', 'canCreate']);
 
             this.collection = new CommentCollection([], collectionOptions);
 
@@ -35,7 +35,9 @@ define(function (require) {
             });
 
             this.formTemplate = options.listTemplate + '-form';
-            this.addFormView();
+            if (this.options.canCreate) {
+                this.addFormView();
+            }
 
             this.collection.fetch();
         },
