@@ -122,9 +122,10 @@ table.grid .select-row-cell input[type=checkbox] {
     z-index: 899 !important;
 }
 
-.floatThead-wrapper table {
+.floatThead-wrapper .grid {
     border: none !important;
     border-radius: 0 !important;
+    margin: -1px;
 }
 .floatThead-wrapper table th{
     border-bottom-left-radius: 0 !important;
@@ -140,6 +141,7 @@ table.grid .select-row-cell input[type=checkbox] {
 }
 .floatThead-wrapper .floatThead-container .grid{
     border-bottom: 1px solid rgb(221, 221, 221) !important;
+    margin: 0;
 }
 .floatThead-wrapper .grid {
     margin-bottom: 0
