@@ -706,10 +706,19 @@ abstract class AbstractQueryConverter
     /**
      * Generates and saves aliases for the given column and all its parent joins
      *
-     * @param string $columnName
+     * @param string $columnName String with specified format
+     *                           rootEntityField+Class\Name::joinedEntityRelation+Relation\Class::fieldToSelect
      */
     protected function addTableAliasesForColumn($columnName)
     {
+        /**
+         * joinIds - array of joins with parent definition but without select field join definition(last one)
+         *
+         * For `rootEntityField+Class\Name::joinedEntityRelation+Relation\Class::fieldToSelect` column name will be
+         *
+         * - `Root\Class::rootEntityField`
+         * - `Root\Class::rootEntityField+Class\Name::joinedEntityRelation`
+         */
         $joinIds = $this->joinIdHelper->explodeColumnName($columnName);
         $this->addTableAliasesForJoinIdentifiers($joinIds);
         $this->addColumnAliasesForVirtualRelation($columnName, $joinIds);
@@ -791,6 +800,8 @@ abstract class AbstractQueryConverter
      * @param string $joinId
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function replaceJoinsForVirtualRelation($joinId)
     {
@@ -798,10 +809,36 @@ abstract class AbstractQueryConverter
             return $joinId;
         }
 
+        /**
+         * mainEntityJoinId - parent join definition
+         *
+         * For `Root\Class::rootEntityField+Class\Name::joinedEntityRelation` parent is `Root\Class::rootEntityField`
+         */
         $mainEntityJoinId = self::ROOT_ALIAS_KEY;
+
+        /**
+         * columnJoinIds - array of joins path
+         *
+         * For `Root\Class::rootEntityField+Class\Name::joinedEntityRelation` will be
+         *
+         * - `Root\Class::rootEntityField`
+         * - `Class\Name::joinedEntityRelation`
+         */
         $columnJoinIds = explode('+', $joinId);
 
+        /**
+         * Walk over $columnJoinIds and replace virtual relations joins using query configuration
+         */
         foreach ($columnJoinIds as &$columnJoinId) {
+            /**
+             * Check existing join definition. Full definition stored
+             *
+             * Relation - `Class\Name::joinedEntityRelation`
+             * Relation Join - `Root\Class::rootEntityField+Join\Class::someField+Rel\Class|left|WITH|alias.code = 1`
+             *
+             * mainEntityJoinId contains full definition for next iteration - Relation Join
+             * columnJoinId will be replaced with `Join\Class::someField+Rel\Class|left|WITH|alias.code = 1`
+             */
             if (!empty($this->virtualRelationsJoins[$columnJoinId])) {
                 $prevMainEntityJoinId = $mainEntityJoinId;
                 $mainEntityJoinId = $this->virtualRelationsJoins[$columnJoinId];
@@ -810,14 +847,13 @@ abstract class AbstractQueryConverter
                 continue;
             }
 
-            if (!empty($this->virtualRelationsJoins[$mainEntityJoinId])) {
-                $mainEntityJoinId = $this->virtualRelationsJoins[$mainEntityJoinId];
-            }
-
             $className = $this->getEntityClassName($columnJoinId);
             $fieldName = $this->getFieldName($columnJoinId);
 
             if (!$this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
+                /**
+                 * For non virtual join we register aliases with replaced virtual relations joins in path
+                 */
                 $joinId = $columnJoinId;
                 if ($mainEntityJoinId) {
                     $joinId = $mainEntityJoinId . '+' . $columnJoinId;
@@ -840,24 +876,64 @@ abstract class AbstractQueryConverter
             }
             $this->aliases[$aliasKey] = $mainEntityJoinAlias;
 
+            /**
+             * Get virtual joins definitions according to aliased dependencies
+             *
+             * idx => [
+             *      join => Join\Class
+             *      alias => t2
+             *      conditionType => WITH
+             *      condition => alias.code = 1
+             * ]
+             */
             $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
 
             $this->replaceTableAliasesInVirtualColumnJoinConditions($joins, $this->aliases);
 
+            /**
+             * Store mainEntityJoinId to build columnJoinId after virtual relations joins build
+             *
+             * `Root\Class::rootEntityField`
+             */
             $baseMainEntityJoinId = $mainEntityJoinId;
             $virtualJoinId = self::ROOT_ALIAS_KEY;
             foreach ($joins as &$item) {
                 $tableAlias = $item['alias'];
+
+                /**
+                 * Build virtual relation join including parent one and register it
+                 *
+                 * For joins:
+                 *
+                 * `Join\Class::someField' => `Root\Class::rootEntityField+Join\Class::someField`
+                 * `Rel\Class|left|WITH|alias.code = 1`
+                 *      => `Root\Class::rootEntityField+Join\Class::someField+Rel\Class|left|WITH|alias.code = 1`
+                 */
                 $virtualJoinId = $this->buildVirtualColumnJoinIdentifier($joins, $item, $mainEntityJoinId);
 
                 $this->registerAliases($virtualJoinId, $tableAlias);
                 $mainEntityJoinId = $virtualJoinId;
             }
 
+            /**
+             * Store join built definition
+             *
+             * `Class\Name::joinedEntityRelation`
+             *      => `Root\Class::rootEntityField+Join\Class::someField+Rel\Class|left|WITH|alias.code = 1`
+             */
             $this->virtualRelationsJoins[$columnJoinId] = $virtualJoinId;
+
+            /**
+             * Replace columnJoinId with virtual relation join with its built definition
+             * Class\Name::joinedEntityRelation` => `Join\Class::someField+Rel\Class|left|WITH|alias.code = 1`
+             */
             $columnJoinId = trim(str_replace($baseMainEntityJoinId, '', $mainEntityJoinId), '+');
         }
 
+        /**
+         * Join columnJoinIds back into path. All virtual relation joins replaced with joins according to query
+         * definition
+         */
         return implode('+', $columnJoinIds);
     }
 
