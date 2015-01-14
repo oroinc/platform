@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
@@ -95,14 +96,14 @@ abstract class AbstractAssociationEntityConfigDumperExtension extends AbstractEn
     protected function createAssociation($sourceEntityClass, $targetEntityClass)
     {
         switch ($this->getAssociationType()) {
-            case 'manyToOne':
+            case RelationType::MANY_TO_ONE:
                 $this->associationBuilder->createManyToOneAssociation(
                     $sourceEntityClass,
                     $targetEntityClass,
                     $this->getAssociationKind()
                 );
                 break;
-            case 'manyToMany':
+            case RelationType::MANY_TO_MANY:
                 $this->associationBuilder->createManyToManyAssociation(
                     $sourceEntityClass,
                     $targetEntityClass,

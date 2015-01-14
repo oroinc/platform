@@ -33,6 +33,7 @@ oro:
                 float:              Float
                 money:              Currency
                 percent:            Percent
+                oneToOne:           One to one
                 oneToMany:          One to many
                 manyToOne:          Many to one
                 manyToMany:         Many to many

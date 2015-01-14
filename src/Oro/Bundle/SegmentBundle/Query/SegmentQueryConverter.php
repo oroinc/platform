@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bridge\Doctrine\ManagerRegistry;
@@ -47,6 +48,22 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function saveTableAliases($tableAliases)
+    {
+        // nothing to do
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function saveColumnAliases($columnAliases)
+    {
+        // nothing to do
+    }
+
+    /**
      * Process convert
      *
      * @param AbstractQueryDesigner $source
@@ -64,7 +81,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
     /**
      * {@inheritdoc}
      */
-    protected function generateTableAlias()
+    protected function generateTableAlias($offset = 1)
     {
         return sprintf(static::TABLE_ALIAS_TEMPLATE, mt_rand());
     }
@@ -116,7 +133,7 @@ class SegmentQueryConverter extends GroupingOrmQueryConverter
      */
     protected function addJoinStatement($joinType, $join, $joinAlias, $joinConditionType, $joinCondition)
     {
-        if ('left' === $joinType) {
+        if (Join::LEFT_JOIN === $joinType) {
             $this->qb->leftJoin($join, $joinAlias, $joinConditionType, $joinCondition);
         } else {
             $this->qb->innerJoin($join, $joinAlias, $joinConditionType, $joinCondition);
