@@ -853,9 +853,22 @@ abstract class AbstractQueryConverter
              * columnJoinId will be replaced with `Join\Class::someField+Rel\Class|left|WITH|alias.code = 1`
              */
             if (!empty($this->virtualRelationsJoins[$columnJoinId])) {
-                $prevMainEntityJoinId = $mainEntityJoinId;
-                $mainEntityJoinId = $this->virtualRelationsJoins[$columnJoinId];
-                $columnJoinId = trim(str_replace($prevMainEntityJoinId, '', $mainEntityJoinId), '+');
+                $columnJoinId = trim(
+                    str_replace($mainEntityJoinId, '', $this->virtualRelationsJoins[$columnJoinId]),
+                    '+'
+                );
+                $relationColumnJoinIds = explode('+', $columnJoinId);
+                $fullRelationColumnJoinId = self::ROOT_ALIAS_KEY;
+                foreach ($relationColumnJoinIds as $relationColumnJoinId) {
+                    $mainEntityJoinId = trim($mainEntityJoinId . '+' . $relationColumnJoinId, '+');
+                    $fullRelationColumnJoinId = trim($fullRelationColumnJoinId . '+' . $relationColumnJoinId, '+');
+                    $tableAlias = null;
+                    if (!empty($this->tableAliases[$fullRelationColumnJoinId])) {
+                        $tableAlias = $this->tableAliases[$fullRelationColumnJoinId];
+                    }
+
+                    $this->registerAliases($mainEntityJoinId, $tableAlias);
+                }
 
                 continue;
             }
@@ -867,14 +880,8 @@ abstract class AbstractQueryConverter
                 /**
                  * For non virtual join we register aliases with replaced virtual relations joins in path
                  */
-                $joinId = $columnJoinId;
-                if ($mainEntityJoinId) {
-                    $joinId = $mainEntityJoinId . '+' . $columnJoinId;
-                }
-
-                $this->registerAliases($joinId);
-
-                $mainEntityJoinId = $joinId;
+                $mainEntityJoinId = trim($mainEntityJoinId . '+' . $columnJoinId, '+');
+                $this->registerAliases($mainEntityJoinId);
 
                 continue;
             }
@@ -1156,57 +1163,56 @@ abstract class AbstractQueryConverter
     {
         $joinType = strtolower($joinType);
 
-        if (isset($query['join'][$joinType])) {
-            foreach ($query['join'][$joinType] as &$item) {
-                if (!empty($item['processed'])) {
-                    continue;
-                }
+        if (!isset($query['join'][$joinType])) {
+            return;
+        }
 
-                $condition = $this->getDefinitionJoinCondition($item);
-                if ($condition) {
-                    $usedAliases = $this->qbTools->getTablesUsedInJoinCondition($condition, $this->queryAliases);
-                    $unknownAliases = array_diff(
-                        $usedAliases,
-                        array_merge(array_keys($this->aliases), [$item['alias']])
-                    );
+        foreach ($query['join'][$joinType] as &$item) {
+            if (!empty($item['processed'])) {
+                continue;
+            }
 
-                    if ($unknownAliases) {
-                        continue;
-                    }
-                }
+            $condition = $this->getDefinitionJoinCondition($item);
+            $usedAliases = $this->qbTools->getTablesUsedInJoinCondition($condition, $this->queryAliases);
+            $unknownAliases = array_diff(
+                $usedAliases,
+                array_merge(array_keys($this->aliases), [$item['alias']])
+            );
+            if ($unknownAliases) {
+                continue;
+            }
 
-                $item['type'] = $joinType;
-                $delimiterPos = strpos($item['join'], '.');
-                if (false !== $delimiterPos) {
-                    $alias = substr($item['join'], 0, $delimiterPos);
-                    if (!isset($aliases[$alias])) {
-                        $aliases[$alias] = $this->generateTableAlias();
-                    }
-                    $item['join'] = $aliases[$alias] . substr($item['join'], $delimiterPos);
-                }
-
-                $alias = $item['alias'];
+            $item['type'] = $joinType;
+            $delimiterPos = strpos($item['join'], '.');
+            if (false !== $delimiterPos) {
+                $alias = substr($item['join'], 0, $delimiterPos);
                 if (!isset($aliases[$alias])) {
                     $aliases[$alias] = $this->generateTableAlias();
                 }
-                $item['alias'] = $aliases[$alias];
-
-                $itemJoinId = $this->joinIdHelper->buildJoinIdentifier(
-                    $item['join'],
-                    $parentJoinId,
-                    $item['type'],
-                    $this->getJoinDefinitionConditionType($item),
-                    $condition
-                );
-
-                if (isset($this->tableAliases[$itemJoinId])) {
-                    $item['alias']   = $this->tableAliases[$itemJoinId];
-                    $aliases[$alias] = $this->tableAliases[$itemJoinId];
-                }
-
-                $item['processed'] = true;
-                $joins[] = $item;
+                $item['join'] = $aliases[$alias] . substr($item['join'], $delimiterPos);
             }
+
+            $alias = $item['alias'];
+            if (!isset($aliases[$alias])) {
+                $aliases[$alias] = $this->generateTableAlias();
+            }
+            $item['alias'] = $aliases[$alias];
+
+            $itemJoinId = $this->joinIdHelper->buildJoinIdentifier(
+                $item['join'],
+                $parentJoinId,
+                $item['type'],
+                $this->getJoinDefinitionConditionType($item),
+                $condition
+            );
+
+            if (isset($this->tableAliases[$itemJoinId])) {
+                $item['alias']   = $this->tableAliases[$itemJoinId];
+                $aliases[$alias] = $this->tableAliases[$itemJoinId];
+            }
+
+            $item['processed'] = true;
+            $joins[] = $item;
         }
     }
 
@@ -1230,12 +1236,12 @@ abstract class AbstractQueryConverter
      */
     protected function getDefinitionJoinCondition(array $join)
     {
-        $conditionType = null;
+        $condition = null;
         if (isset($join['condition'])) {
-            $conditionType = $join['condition'];
+            $condition = $join['condition'];
         }
 
-        return $conditionType;
+        return $condition;
     }
 
     /**

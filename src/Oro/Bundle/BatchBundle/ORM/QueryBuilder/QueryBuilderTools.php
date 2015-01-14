@@ -259,6 +259,10 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
      */
     public function getTablesUsedInJoinCondition($condition, array $knownAliases)
     {
+        if (!$condition) {
+            return [];
+        }
+
         $usedAliases = $this->getUsedTableAliases($condition, false);
         foreach ($knownAliases as $alias) {
             preg_match($this->getRegExpQueryForAlias($alias), $condition, $matches);
