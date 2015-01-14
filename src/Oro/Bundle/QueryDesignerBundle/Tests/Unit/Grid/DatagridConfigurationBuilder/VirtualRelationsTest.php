@@ -530,8 +530,8 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                 ],
                 'virtualRelationQuery' => [
                     'Acme\Entity\TestEntity' => [
-                        'target_join_alias' => 'List',
                         'list_virtual' => [
+                            'target_join_alias' => 'List',
                             'join' => [
                                 'left' => [
                                     [
@@ -578,7 +578,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                                 'join' => 'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite',
                                 'alias' => 't4',
                                 'conditionType' => 'WITH',
-                                'condition' => 't4.list = t3',
+                                'condition' => 't4.list = t2',
                             ],
                         ],
                     ],

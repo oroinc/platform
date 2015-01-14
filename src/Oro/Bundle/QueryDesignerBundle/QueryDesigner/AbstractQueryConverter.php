@@ -514,7 +514,20 @@ abstract class AbstractQueryConverter
     {
         foreach ($this->tableAliases as $joinId => $joinAlias) {
             if (!empty($joinId)) {
-                $joinTableAlias = $this->tableAliases[$this->getParentJoinIdentifier($joinId)];
+                $parentJoinId = $this->getParentJoinIdentifier($joinId);
+                $joinTableAlias = $this->tableAliases[$parentJoinId];
+
+                $virtualRelation = array_search($parentJoinId, $this->virtualRelationsJoins);
+                if (false !== $virtualRelation) {
+                    $className = $this->getEntityClassName($virtualRelation);
+                    $fieldName = $this->getFieldName($virtualRelation);
+
+                    $relationJoinAlias = $this->virtualRelationProvider->getTargetJoinAlias($className, $fieldName);
+
+                    if ($relationJoinAlias) {
+                        $joinTableAlias = $this->aliases[$relationJoinAlias];
+                    }
+                }
 
                 if ($this->joinIdHelper->isUnidirectionalJoin($joinId)) {
                     $entityClassName = $this->getEntityClassName($joinId);
