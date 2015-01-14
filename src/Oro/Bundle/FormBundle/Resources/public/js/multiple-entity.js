@@ -165,10 +165,17 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
             this.$entitiesContainer.append(entityView.render().$el);
         },
 
-        addEntities: function() {
+        addEntities: function(e) {
+            debugger;
             if (!this.selectorDialog) {
+                var url = this._getSelectionWidgetUrl();
+                var route_additional_params = $(e.target).data('route_additional_params');
+                if (route_additional_params) {
+                    url = url + (url.indexOf('?') == -1 ? '?' : '&') + $.param(route_additional_params);
+                }
+
                 this.selectorDialog = new DialogWidget({
-                    url:   this._getSelectionWidgetUrl(),
+                    url:   url,
                     title: this.options.selectorWindowTitle,
                     stateEnabled: false,
                     dialogOptions: {
