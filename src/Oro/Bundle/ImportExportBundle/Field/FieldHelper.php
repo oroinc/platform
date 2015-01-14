@@ -27,7 +27,7 @@ class FieldHelper
     protected $propertyAccessor;
 
     /** @var array */
-    protected $fieldsCache = array();
+    protected $fieldsCache = [];
 
     /**
      * @param EntityFieldProvider     $fieldProvider
@@ -144,7 +144,7 @@ class FieldHelper
             $this->isRelation($field)
             && in_array(
                 $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
-                array('ref-one', 'manyToOne')
+                ['ref-one', 'manyToOne']
             );
     }
 
@@ -158,7 +158,7 @@ class FieldHelper
             $this->isRelation($field)
             && in_array(
                 $this->fieldTypeHelper->getUnderlyingType($field['relation_type']),
-                array('ref-many', 'oneToMany', 'manyToMany')
+                ['ref-many', 'oneToMany', 'manyToMany']
             );
     }
 
@@ -168,7 +168,7 @@ class FieldHelper
      */
     public function isDateTimeField(array $field)
     {
-        return !empty($field['type']) && in_array($field['type'], array('datetime', 'date', 'time'));
+        return !empty($field['type']) && in_array($field['type'], ['datetime', 'date', 'time']);
     }
 
     /**
@@ -223,14 +223,14 @@ class FieldHelper
     public function getItemData($data, $fieldName = null)
     {
         if (!is_array($data)) {
-            return array();
+            return [];
         }
 
         if (null === $fieldName) {
             return $data;
         }
 
-        return !empty($data[$fieldName]) ? $data[$fieldName] : array();
+        return !empty($data[$fieldName]) ? $data[$fieldName] : [];
     }
 
     /**
@@ -242,7 +242,7 @@ class FieldHelper
         $entityName = ClassUtils::getClass($entity);
         $fields = $this->getFields($entityName, true);
 
-        $identityValues = array();
+        $identityValues = [];
         foreach ($fields as $field) {
             $fieldName = $field['name'];
             if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)

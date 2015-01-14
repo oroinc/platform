@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 
@@ -54,7 +55,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                 $cascade       = !empty($relation['cascade']) ? $relation['cascade'] : [];
 
                 switch ($fieldId->getFieldType()) {
-                    case 'manyToOne':
+                    case RelationType::MANY_TO_ONE:
                         $cascade[] = 'detach';
                         $this->buildManyToOneRelation(
                             $metadataBuilder,
@@ -64,7 +65,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                             $cascade
                         );
                         break;
-                    case 'oneToMany':
+                    case RelationType::ONE_TO_MANY:
                         $cascade[] = 'detach';
                         $this->buildOneToManyRelation(
                             $metadataBuilder,
@@ -74,7 +75,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
                             $cascade
                         );
                         break;
-                    case 'manyToMany':
+                    case RelationType::MANY_TO_MANY:
                         if ($relation['owner']) {
                             $this->buildManyToManyOwningSideRelation(
                                 $metadataBuilder,
