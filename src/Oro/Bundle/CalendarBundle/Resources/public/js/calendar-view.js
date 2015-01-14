@@ -315,7 +315,7 @@ define(function (require) {
 
         onFcSelect: function (start, end) {
             var attrs = {
-                allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
+                allDay: start.time().as('ms') === 0 && end.time().as('ms') === 0,
                 start: start.clone(),
                 end: end.clone()
             }
@@ -388,15 +388,13 @@ define(function (require) {
             var realDuration,
                 currentView = this.getCalendarElement().fullCalendar('getView'),
                 oldState = fcEvent._beforeDragState,
-                // please do not change accessing _milliseconds property to milliseconds() call
-                // that will cause issues
                 isDroppedOnDayGrid =
-                    fcEvent.start.time()._milliseconds === 0
-                        && (fcEvent.end === null || fcEvent.end.time()._milliseconds === 0);
+                    fcEvent.start.time().as('ms') === 0
+                        && (fcEvent.end === null || fcEvent.end.time().as('ms') === 0);
 
             // when on week view all-day event is dropped at 12AM to hour view
             // previous condition gives false positive result
-            if (fcEvent.end === null && isDroppedOnDayGrid === true && fcEvent.start.time()._milliseconds === 0) {
+            if (fcEvent.end === null && isDroppedOnDayGrid === true && fcEvent.start.time().as('ms') === 0) {
                 isDroppedOnDayGrid = !$(jsEvent.target).parents(".fc-time-grid-event").length;
             }
 
@@ -410,7 +408,7 @@ define(function (require) {
                     }
                 } else {
                     if (currentView.name === 'month') {
-                        realDuration = oldState.end ? oldState.end.diff(oldState.start) : moment.duration(0);
+                        realDuration = oldState.end ? oldState.end.diff(oldState.start) : 0;
                     } else {
                         realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
                     }
@@ -419,7 +417,7 @@ define(function (require) {
                 if (oldState.allDay) {
                     realDuration = this.options.eventsOptions.defaultTimedEventDuration;
                 } else {
-                    realDuration = oldState.end ? oldState.end.diff(oldState.start) : moment.duration(0);
+                    realDuration = oldState.end ? oldState.end.diff(oldState.start) : 0;
                 }
             }
             fcEvent.end = fcEvent.start.clone().add(realDuration);
@@ -563,28 +561,24 @@ define(function (require) {
          */
         createViewModel: function (eventModel) {
             var fcEvent = _.pick(
-                eventModel.attributes,
-                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
-            );
-            this.prepareViewModel(fcEvent);
-            this.applyTzCorrection(1, fcEvent);
-            return fcEvent;
-        },
+                    eventModel.attributes,
+                    ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
+                ),
+                colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
 
-        /**
-         * Prepares event entry for rendering in calendar plugin
-         *
-         * @param {Object} fcEvent
-         */
-        prepareViewModel: function (fcEvent) {
             // set an event text and background colors the same as the owning calendar
-            var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
             fcEvent.color = colors.backgroundColor;
             if (fcEvent.backgroundColor) {
                 fcEvent.textColor = colorUtil.getContrastColor(fcEvent.backgroundColor);
             } else {
                 fcEvent.textColor = colors.color;
             }
+
+            this.applyTzCorrection(1, fcEvent);
+            if (fcEvent.end && fcEvent.end.diff(fcEvent.start) === 0) {
+                fcEvent.end = null;
+            }
+            return fcEvent;
         },
 
         /**
