@@ -6,6 +6,7 @@ parameters:
     oro_query_designer.validator.query_validator.class:             Oro\Bundle\QueryDesignerBundle\Validator\QueryValidator
     oro_query_designer.validator.grouping_validator.class:          Oro\Bundle\QueryDesignerBundle\Validator\GroupingValidator
     oro_query_designer.grid.datagrid_configuration_builder.class:   Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder
+    oro_query_designer.group_by_helper.class:                       Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper
 services:
     oro_query_designer.query_designer.manager:
         class: %oro_query_designer.query_designer.manager.class%
@@ -88,3 +89,7 @@ services:
             - @translator
         tags:
             - { name: validator.constraint_validator, alias: oro_query_designer.grouping_validator }
+
+    oro_query_designer.group_by_helper:
+        class: %oro_query_designer.group_by_helper.class%
+
