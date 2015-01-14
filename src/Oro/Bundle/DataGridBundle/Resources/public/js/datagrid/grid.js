@@ -529,9 +529,11 @@ define(function (require) {
                         return $table.closest('.grid-container');
                     }
                 });
+
                 $grid.parent().css({
                     height: 'calc(100vh - ' + ($grid[0].getBoundingClientRect().top + 10) + 'px)'
                 });
+
                 this.floatTheadConnected = true;
             }
             this.$(this.selectors.grid).floatThead('reflow');
