@@ -30,19 +30,43 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
                 'virtual_relation' => [
                     'relation_type' => 'oneToMany',
                     'related_entity_name' => 'OtherEntity',
+                    'target_join_alias' => 'configured_alias',
                     'query' => [
                         'select' => ['select expression'],
-                        'join' => ['join expression']
+                        'join' => ['inner' => [['join' => 'join', 'alias' => 'configured_alias']]]
                     ]
                 ],
-                'virtual_relation2' => [
+                'single_join' => [
                     'relation_type' => 'oneToMany',
                     'related_entity_name' => 'OtherEntity',
-                    'target_join_alias' => 'join_alias',
                     'query' => [
                         'select' => ['select expression'],
-                        'join' => ['join expression']
+                        'join' => ['inner' => [['join' => 'join', 'alias' => 'alias']]]
                     ]
+                ],
+                'single_join_without_alias' => [
+                    'relation_type' => 'oneToMany',
+                    'related_entity_name' => 'OtherEntity',
+                    'query' => [
+                        'select' => ['select expression'],
+                        'join' => ['inner' => [['join' => 'join']]]
+                    ]
+                ],
+                'multiple_joins' => [
+                    'relation_type' => 'oneToMany',
+                    'related_entity_name' => 'OtherEntity',
+                    'query' => [
+                        'select' => ['select expression'],
+                        'join' => [
+                            'inner' => [['join' => 'join', 'alias' => 'alias']],
+                            'left' => [['join' => 'join2', 'alias' => 'alias2']]
+                        ]
+                    ]
+                ],
+                'without_query' => [
+                    'relation_type' => 'oneToMany',
+                    'related_entity_name' => 'OtherEntity',
+                    'query' => []
                 ]
             ]
         ];
@@ -79,16 +103,60 @@ class ConfigVirtualRelationProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetTargetJoinAlias()
+    /**
+     * @param string $className
+     * @param string $fieldName
+     * @param mixed  $expected
+     *
+     * @dataProvider targetJoinAliasProvider
+     */
+    public function testGetTargetJoinAlias($className, $fieldName, $expected)
     {
-        $this->assertEquals(
-            $this->configurationVirtualRelation['AbstractEntity']['virtual_relation2']['target_join_alias'],
-            $this->configVirtualRelationProvider->getTargetJoinAlias('TestEntity', 'virtual_relation2')
-        );
+        if (is_array($expected)) {
+            list($exception, $message) = $expected;
+            $this->setExpectedException($exception, $message);
+        }
 
         $this->assertEquals(
-            null,
-            $this->configVirtualRelationProvider->getTargetJoinAlias('TestEntity', 'virtual_relation')
+            $expected,
+            $this->configVirtualRelationProvider->getTargetJoinAlias($className, $fieldName)
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function targetJoinAliasProvider()
+    {
+        return [
+            'not existing' => [
+                'TestEntity',
+                'not_existing',
+                ['\InvalidArgumentException', 'Not a virtual relation "TestEntity::not_existing"']
+            ],
+            'configured option' => ['TestEntity', 'virtual_relation', 'configured_alias'],
+            'without query' => [
+                'TestEntity',
+                'without_query',
+                ['\InvalidArgumentException', 'Query configuration is empty for "TestEntity::without_query"']
+            ],
+            'single join' => ['TestEntity', 'single_join', 'alias'],
+            'single join without alias' => [
+                'TestEntity',
+                'single_join_without_alias',
+                [
+                    '\InvalidArgumentException',
+                    'Alias for join is not configured for "TestEntity::single_join_without_alias"'
+                ]
+            ],
+            'multiple joins' => [
+                'TestEntity',
+                'multiple_joins',
+                [
+                    '\InvalidArgumentException',
+                    'Please configure "target_join_alias" option for "TestEntity::multiple_joins"'
+                ]
+            ],
+        ];
     }
 }

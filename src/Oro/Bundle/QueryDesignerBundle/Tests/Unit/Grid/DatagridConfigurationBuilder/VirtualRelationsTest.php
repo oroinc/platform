@@ -66,11 +66,22 @@ class VirtualRelationsTest extends OrmQueryConverterTest
             ->will(
                 $this->returnCallback(
                     function ($className, $fieldName) use ($virtualRelationQuery) {
-                        if (empty($virtualRelationQuery[$className][$fieldName]['target_join_alias'])) {
-                            return null;
+                        if (!empty($virtualRelationQuery[$className][$fieldName]['target_join_alias'])) {
+                            return $virtualRelationQuery[$className][$fieldName]['target_join_alias'];
                         }
 
-                        return $virtualRelationQuery[$className][$fieldName]['target_join_alias'];
+                        $joins = [];
+                        foreach ($virtualRelationQuery[$className][$fieldName]['join'] as $typeJoins) {
+                            $joins = array_merge($joins, $typeJoins);
+                        }
+
+                        if (1 === count($joins)) {
+                            $join = reset($joins);
+
+                            return $join['alias'];
+                        }
+
+                        return null;
                     }
                 )
             );
@@ -253,6 +264,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                 'virtualRelationQuery' => [
                     'Oro\Bundle\TrackingBundle\Entity\Campaign' => [
                         'listItem' => [
+                            'target_join_alias' => 'ListItem_virtual',
                             'join' => [
                                 'left' => [
                                     [
@@ -378,6 +390,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                 'virtualRelationQuery' => [
                     'Oro\Bundle\TrackingBundle\Entity\Campaign' => [
                         'listItem' => [
+                            'target_join_alias' => 'List',
                             'join' => [
                                 'left' => [
                                     [
@@ -429,7 +442,7 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                                 'condition' => 't3.entity = \'Acme\Entity\TestEntity\'',
                             ],
                             [
-                                'join' => 't4.website',
+                                'join' => 't3.website',
                                 'alias' => 't5',
                             ],
                         ],
