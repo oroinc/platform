@@ -1,5 +1,8 @@
 <div class="clearfix">
     <div class="clearfix">
+        <div class="pull-right">
+            <a href="javascript:void(0)" class="remove-btn" title="<%= _.__('Remove') %>"><i class="icon-remove"></i></a>
+        </div>
         <% if (hasDefault) { %>
         <div class="pull-left" style="margin-right: 10px;">
             <input type="radio" class="default-selector"
@@ -14,9 +17,6 @@
         <% } %>
         <div class="pull-left">
             <h4><a href="<%= link %>" class="entity-info"><%= _.escape(label) %></a></h4>
-        </div>
-        <div class="pull-right">
-            <a href="javascript:void(0)" class="remove-btn" title="<%= _.__('Remove') %>"><i class="icon-remove"></i></a>
         </div>
     </div>
     <div class="extra-info">

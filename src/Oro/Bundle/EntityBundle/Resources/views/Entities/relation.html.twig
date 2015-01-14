@@ -69,7 +69,7 @@
                                         'oro_entity_detailed',
                                         {
                                             id: model.get('id'),
-                                            entityName: '{{ relation.get('target_entity')|replace('\\', '_') }}',
+                                            entityName: '{{ entity_class|replace('\\', '_') }}',
                                             fieldName: '{{ relation.getId().getFieldName() }}'
                                         }
                                 ),
