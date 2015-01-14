@@ -18,9 +18,11 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_3\OroUserBundle as UserEmailActiv
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_4\AttachmentOwner;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as EmailTemplateOwner;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class OroUserBundleInstaller implements
     Installation,
@@ -38,7 +40,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -100,6 +102,8 @@ class OroUserBundleInstaller implements
         UserOrganization::addOrganizationFields($schema);
         UserOrganization::oroUserOrganizationTable($schema);
         UserOrganization::oroUserOrganizationForeignKeys($schema);
+
+        ExtendTitle::addTitleColumn($schema);
     }
 
     /**
