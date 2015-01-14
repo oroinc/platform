@@ -1536,11 +1536,11 @@ i.mce-i-checkbox {
 }
 
 .mce-menu-item-normal.mce-active:hover .mce-text, .mce-menu-item-normal.mce-active:hover .mce-ico {
-    color: #fff
+    color: #444
 }
 
 .mce-menu-item-normal.mce-active:focus .mce-text, .mce-menu-item-normal.mce-active:focus .mce-ico {
-    color: #fff
+    color: #444
 }
 
 .mce-menu-item:hover, .mce-menu-item.mce-selected, .mce-menu-item:focus {
