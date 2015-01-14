@@ -55,6 +55,13 @@ class EmailTemplateHandler
      */
     public function process(EmailTemplate $entity)
     {
+        // always use "en" locale during template edit in order to allow update of default locale
+        $entity->setLocale('en');
+        if ($entity->getId()) {
+            // refresh translations
+            $this->manager->refresh($entity);
+        }
+
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {

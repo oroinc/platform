@@ -36,7 +36,7 @@
 
                     <li {% if (app.request.locale == locale) %}class="active"{% endif %}>
                         <a href="javascript:void(0);" data-target=".emailtemplate-translatation-fields-{{ locale }}" data-toggle="tab">
-                            {{ translationsLocales.parent.vars.labels[locale]|capitalize }} {% if isDefaultLocale %}[Default]{% endif %}
+                            {{ translationsLocales.parent.vars.labels[locale]|capitalize }} {% if isDefaultLocale %}{% trans %}[Default]{% endtrans %}{% endif %}
                         </a>
                     </li>
                 {% endfor %}
