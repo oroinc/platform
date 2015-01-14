@@ -118,6 +118,29 @@ table.grid .select-row-cell input[type=checkbox] {
 }
 
 .floatThead-container {
-    /* float thead should be under loading mask */
-    z-index: 998 !important;
+    /* float thead should be under loading mask and submenus */
+    z-index: 899 !important;
+}
+
+.floatThead-wrapper table {
+    border: none !important;
+    border-radius: 0 !important;
+}
+.floatThead-wrapper table th{
+    border-bottom-left-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+.floatThead-wrapper .grid-container{
+    border: 1px solid rgb(221, 221, 221);
+}
+.floatThead-wrapper .floatThead-container{
+    margin-top: 1px !important;
+}
+.floatThead-wrapper .floatThead-container .grid{
+    border-bottom: 1px solid rgb(221, 221, 221) !important;
+}
+.floatThead-wrapper .grid {
+    margin-bottom: 0
 }
