@@ -94,6 +94,7 @@ class YamlConverter implements QueryConverterInterface
                 $knownAliases[] = $join['alias'];
             }
         }
+        $knownAliases = array_unique($knownAliases);
         $qbTools = new QueryBuilderTools();
 
         // Add joins ordered by used tables
