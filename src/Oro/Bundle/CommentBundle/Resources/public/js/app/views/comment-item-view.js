@@ -26,7 +26,7 @@ define(function (require) {
         },
 
         listen: {
-            'change:updatedAt model': 'render'
+            'synced model': 'render'
         },
 
         accordionId: null,
