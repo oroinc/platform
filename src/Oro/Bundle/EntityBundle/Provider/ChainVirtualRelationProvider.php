@@ -25,6 +25,44 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
      */
     public function getVirtualRelationQuery($className, $fieldName)
     {
+        return $this->findProvider($className, $fieldName)->getVirtualRelationQuery($className, $fieldName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVirtualRelations($className)
+    {
+        /** @var VirtualRelationProviderInterface[] $providers */
+        $providers = $this->getProviders();
+        $result = [];
+
+        foreach ($providers as $provider) {
+            $virtualRelations = $provider->getVirtualRelations($className);
+            if (!empty($virtualRelations)) {
+                $result = array_merge($result, $virtualRelations);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTargetJoinAlias($className, $fieldName)
+    {
+        return $this->findProvider($className, $fieldName)->getTargetJoinAlias($className, $fieldName);
+    }
+
+    /**
+     * @param string $className
+     * @param string $fieldName
+     *
+     * @return VirtualRelationProviderInterface
+     */
+    protected function findProvider($className, $fieldName)
+    {
         $foundProvider = null;
         /** @var VirtualRelationProviderInterface[] $providers */
         $providers = $this->getProviders();
@@ -45,25 +83,6 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
             );
         }
 
-        return $foundProvider->getVirtualRelationQuery($className, $fieldName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVirtualRelations($className)
-    {
-        /** @var VirtualRelationProviderInterface[] $providers */
-        $providers = $this->getProviders();
-        $result = [];
-
-        foreach ($providers as $provider) {
-            $virtualRelations = $provider->getVirtualRelations($className);
-            if (!empty($virtualRelations)) {
-                $result = array_merge($result, $virtualRelations);
-            }
-        }
-
-        return $result;
+        return $foundProvider;
     }
 }

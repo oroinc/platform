@@ -29,4 +29,13 @@ interface VirtualRelationProviderInterface
      * @return array
      */
     public function getVirtualRelations($className);
+
+    /**
+     * Gets a target alias
+     *
+     * @param string $className
+     * @param string $fieldName
+     * @return string
+     */
+    public function getTargetJoinAlias($className, $fieldName);
 }

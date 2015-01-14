@@ -94,6 +94,7 @@ class YamlConverter implements QueryConverterInterface
                 $knownAliases[] = $join['alias'];
             }
         }
+        $knownAliases = array_unique($knownAliases);
         $qbTools = new QueryBuilderTools();
 
         // Add joins ordered by used tables
@@ -140,7 +141,7 @@ class YamlConverter implements QueryConverterInterface
 
             $joinUsedAliases = array_merge(
                 $qbTools->getUsedTableAliases($join['join']),
-                $this->getTablesUsedInJoinCondition($join['condition'], $qbTools, $knownAliases)
+                $qbTools->getTablesUsedInJoinCondition($join['condition'], $knownAliases)
             );
             // Intersect with known aliases to prevent counting aliases from subselects
             $joinUsedAliases = array_intersect($joinUsedAliases, $knownAliases);
@@ -153,25 +154,6 @@ class YamlConverter implements QueryConverterInterface
             $qb->$joinMethod($join['join'], $join['alias'], $join['conditionType'], $join['condition']);
             $usedAliases[] = $join['alias'];
         }
-    }
-
-    /**
-     * @param string $condition
-     * @param QueryBuilderTools $qbTools
-     * @param array $knownAliases
-     * @return array
-     */
-    protected function getTablesUsedInJoinCondition($condition, QueryBuilderTools $qbTools, array $knownAliases)
-    {
-        $usedAliases = $qbTools->getUsedTableAliases($condition);
-        foreach ($knownAliases as $alias) {
-            preg_match($qbTools->getRegExpQueryForAlias($alias), $condition, $matches);
-            if (!empty($matches)) {
-                $usedAliases[] = $alias;
-            }
-        }
-
-        return array_unique($usedAliases);
     }
 
     /**
