@@ -9,6 +9,7 @@ define(function (require) {
         tools = require('oroui/js/tools'),
         mediator = require('oroui/js/mediator'),
         formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
+        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
 
@@ -48,7 +49,10 @@ define(function (require) {
         },
 
         render: function () {
+            var loading;
+
             CommentFormView.__super__.render.call(this);
+
             this.$('form')
                 .addClass(this.model ? 'edit-form' : 'add-form')
                 .validate({invalidHandler: function(event, validator) {
@@ -58,6 +62,12 @@ define(function (require) {
             if (this.model) {
                 this.bindData();
             }
+
+            loading = new LoadingMaskView({
+                container: this.$el
+            });
+            this.subview('loading', loading);
+
             return this;
         },
 
@@ -84,6 +94,7 @@ define(function (require) {
             options.success = _.bind(this.onSuccessResponse, this);
             options.error = _.bind(this.onErrorResponse, this);
             this.trigger('submit', attrs, options);
+            this.subview('loading').show();
         },
 
         onReset: function (e) {
@@ -107,12 +118,14 @@ define(function (require) {
         },
 
         onSuccessResponse: function () {
+            this.subview('loading').hide();
             if (!this.model) {
                 this._clearFrom();
             }
         },
 
         onErrorResponse: function (model, jqxhr, options) {
+            this.subview('loading').hide();
             if (jqxhr.status === 400 &&
                 jqxhr.responseJSON && jqxhr.responseJSON.errors) {
                 this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
