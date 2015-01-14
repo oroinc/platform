@@ -21,6 +21,8 @@ define(function (require) {
         ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
         ExportAction = require('oro/datagrid/action/export-action');
 
+    require('orodatagrid/lib/jquery.floatThead');
+
     /**
      * Basic grid class.
      *
@@ -514,6 +516,8 @@ define(function (require) {
              */
             mediator.trigger('grid_render:complete', this.$el);
             mediator.execute('layout:init', this.$el, this);
+
+            this.$(this.selectors.grid).floatThead();
 
             return this;
         },
