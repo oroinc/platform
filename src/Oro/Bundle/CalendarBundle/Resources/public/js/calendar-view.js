@@ -32,7 +32,6 @@ define(function (require) {
      */
     return Backbone.View.extend({
         MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
-        CALENDAR_BOTTOM_PADDING: 10,
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
@@ -81,8 +80,7 @@ define(function (require) {
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
-                minimalHeightForFullScreenLayout: 500 // chrome 768px height and a lot
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
             },
             connectionsOptions: {
                 collection: null,
@@ -138,12 +136,6 @@ define(function (require) {
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
-
-            this.devToolbarHeight = 0;
-            var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
-            if (devToolbarComposition && devToolbarComposition.view) {
-                this.devToolbarHeight = devToolbarComposition.view.$el.height();
-            }
         },
 
         /**
@@ -901,14 +893,7 @@ define(function (require) {
         },
 
         getAvailableHeight: function () {
-            var $calendarEl = this.getCalendarElement(),
-                $scrollableParents = $calendarEl.parents('.scrollable-container'),
-                $viewEl = $calendarEl.find('.fc-view:first'),
-                heightDiff = $(document).height() - $viewEl[0].getBoundingClientRect().top;
-            $scrollableParents.each(function () {
-                heightDiff += this.scrollTop;
-            });
-            return heightDiff - this.devToolbarHeight - this.CALENDAR_BOTTOM_PADDING;
+            return mediator.execute('layout:getAvailableHeight', this.getCalendarElement().find('.fc-view:first'))
         },
 
         checkLayout: function () {
@@ -917,11 +902,7 @@ define(function (require) {
                 // do nothing
                 return;
             }
-            if (this.getAvailableHeight() > this.options.eventsOptions.minimalHeightForFullScreenLayout) {
-                this.setLayout('fullscreen');
-            } else {
-                this.setLayout('scroll');
-            }
+            this.setLayout(mediator.execute('layout:getPreferredLayout', this.getCalendarElement().find('.fc-view:first')));
         },
 
         setLayout: function (newLayout) {
@@ -937,16 +918,16 @@ define(function (require) {
                 height = '';
             switch (newLayout) {
                 case 'fullscreen':
-                    this.disablePageScroll();
+                    mediator.execute('layout:disablePageScroll', $calendarEl);
                     contentHeight = this.getAvailableHeight();
                     break;
                 case 'scroll':
                     height = 'auto';
                     contentHeight = 'auto';
-                    this.enablePageScroll();
+                    mediator.execute('layout:enablePageScroll', $calendarEl);
                     break;
                 case 'default':
-                    this.enablePageScroll();
+                    mediator.execute('layout:enablePageScroll', $calendarEl);
                     // default values
                     break;
                 default:
@@ -954,16 +935,6 @@ define(function (require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
-        },
-
-        disablePageScroll: function () {
-            var $scrollableParents = this.getCalendarElement().parents('.scrollable-container');
-            $scrollableParents.scrollTop(0);
-            $scrollableParents.addClass('disable-scroll');
-        },
-
-        enablePageScroll: function () {
-            this.getCalendarElement().parents('.scrollable-container').removeClass('disable-scroll');
         }
     });
 });

@@ -94,13 +94,14 @@ define(function (require) {
          * @property {Object} Default properties values
          */
         defaults: {
-            rowClickActionClass: 'row-click-action',
-            rowClassName:        '',
-            toolbarOptions:      {addResetAction: true, addRefreshAction: true},
-            rowClickAction:      undefined,
-            multipleSorting:     true,
-            rowActions:          [],
-            massActions:         []
+            rowClickActionClass:    'row-click-action',
+            rowClassName:           '',
+            toolbarOptions:         {addResetAction: true, addRefreshAction: true},
+            rowClickAction:         undefined,
+            multipleSorting:        true,
+            rowActions:             [],
+            massActions:            [],
+            enableFullScreenLayout: false
         },
 
         /**
@@ -168,7 +169,7 @@ define(function (require) {
             this._listenToBodyEvents();
             this._listenToCommands();
 
-            this.listenTo(mediator, 'layout:reposition', this.reflow, this);
+            this.listenTo(mediator, 'layout:reposition', this.checkLayout, this);
         },
 
         /**
@@ -523,14 +524,13 @@ define(function (require) {
              */
             mediator.trigger('grid_render:complete', this.$el);
 
-            this.setFloatThead(true);
+            this.checkLayout();
 
             return this;
         },
 
         reflow: function () {
             // for test
-            window.gridD = this;
             var $grid;
             if (this.floatThead) {
                 this.$(this.selectors.grid).floatThead('reflow');
@@ -714,6 +714,42 @@ define(function (require) {
             var state = this.collection.state;
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
+            }
+        },
+
+
+        getAvailableHeight: function () {
+            return mediator.execute('layout:getAvailableHeight', this.$(this.selectors.grid));
+        },
+
+        checkLayout: function () {
+            if (!this.enableFullScreenLayout) {
+                this.setLayout('default');
+                // do nothing
+                return;
+            }
+            this.setLayout(mediator.execute('layout:getPreferredLayout', this.$(this.selectors.grid)));
+        },
+
+        setLayout: function (newLayout) {
+            if (newLayout === this.layout) {
+                this.reflow();
+                return;
+            }
+            this.layout = newLayout;
+            var $table = this.$(this.selectors.grid);
+            switch (newLayout) {
+                case 'fullscreen':
+                    mediator.execute('layout:disablePageScroll', $table);
+                    this.setFloatThead(true);
+                    break;
+                case 'scroll':
+                case 'default':
+                    this.setFloatThead(false);
+                    mediator.execute('layout:enablePageScroll', $table);
+                    break;
+                default:
+                    throw new Error('Unknown grid layout');
             }
         }
     });

@@ -22,7 +22,8 @@
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
             builders: metaData.requireJSModules,
             metadata: metaData,
-            data: data
+            data: data,
+            enableFullScreenLayout: params.enableFullScreenLayout
         } %}
 
         <div id="{{ gridId }}"

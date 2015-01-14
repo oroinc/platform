@@ -22,6 +22,20 @@ define(function (require) {
     pageRenderedCbPool = [];
 
     layout = {
+        BOTTOM_PADDING: 10,
+        minimalHeightForFullScreenLayout: 500, // chrome 768px height and a lot
+        devToolbarHeight: undefined,
+        getDevToolbarHeight: function () {
+            if (!this.devToolbarHeight) {
+                var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
+                if (devToolbarComposition && devToolbarComposition.view) {
+                    this.devToolbarHeight = devToolbarComposition.view.$el.height();
+                } else {
+                    this.devToolbarHeight = 0;
+                }
+            }
+            return this.devToolbarHeight;
+        },
         init: function (container, parent) {
             var promise;
             container = $(container);
@@ -271,6 +285,33 @@ define(function (require) {
             _.defer(function() {
                 $(document).responsive();
             });
+        },
+
+        getAvailableHeight: function ($mainEl) {
+            var $scrollableParents = $mainEl.parents('.scrollable-container'),
+                heightDiff = $(document).height() - $mainEl[0].getBoundingClientRect().top;
+            $scrollableParents.each(function () {
+                heightDiff += this.scrollTop;
+            });
+            return heightDiff - this.getDevToolbarHeight() - this.BOTTOM_PADDING;
+        },
+
+        getPreferredLayout: function ($mainEl) {
+            if (this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
+                return 'fullscreen';
+            } else {
+                return 'scroll';
+            }
+        },
+
+        disablePageScroll: function ($mainEl) {
+            var $scrollableParents = $mainEl.parents('.scrollable-container');
+            $scrollableParents.scrollTop(0);
+            $scrollableParents.addClass('disable-scroll');
+        },
+
+        enablePageScroll: function ($mainEl) {
+            $mainEl.parents('.scrollable-container').removeClass('disable-scroll');
         }
     };
 

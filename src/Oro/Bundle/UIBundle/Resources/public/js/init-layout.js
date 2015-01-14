@@ -217,6 +217,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         if (tools.isMobile()) {
             adjustHeight = function () {
                 layout.updateResponsiveLayout();
+                mediator.trigger('layout:reposition');
             }
         } else {
             /* dynamic height for central column */
@@ -243,7 +244,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
 
                 // set width for #main container
                 $main.width($topPage.width() - $leftPanel.width() - $rightPanel.width());
-                layout.updateResponsiveLayout();
 
                 var debugBarHeight = $('.sf-toolbar:visible').height() || 0;
                 var anchorTop = anchor.position().top;
@@ -273,6 +273,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                     'margin-bottom': footersHeight
                 });
 
+                layout.updateResponsiveLayout();
                 mediator.trigger('layout:reposition');
             };
 

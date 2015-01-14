@@ -32,11 +32,13 @@
             {% if gridScope is defined %}
                 {% set gridName = oro_datagrid_build_fullname(gridName, gridScope) %}
             {% endif %}
+
             {% if params is defined %}
-                {{ dataGrid.renderGrid(gridName, params) }}
+                {% set params = params|merge({'enableFullScreenLayout': true }) %}
             {% else %}
-                {{ dataGrid.renderGrid(gridName) }}
+                {% set params = {'enableFullScreenLayout': true } %}
             {% endif %}
+            {{ dataGrid.renderGrid(gridName, params) }}
             {# Only grids on index pages will be tagged #}
             <script type="text/javascript">
                 require(['oronavigation/js/content/grid-builder'], function (GridTagBuilder) {
