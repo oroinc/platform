@@ -166,7 +166,6 @@ define(['underscore', 'routing', 'backbone', './multiple-entity/view', './multip
         },
 
         addEntities: function(e) {
-            debugger;
             if (!this.selectorDialog) {
                 var url = this._getSelectionWidgetUrl();
                 var route_additional_params = $(e.target).data('route_additional_params');
