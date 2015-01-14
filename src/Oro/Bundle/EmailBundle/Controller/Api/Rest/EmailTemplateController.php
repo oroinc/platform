@@ -203,9 +203,7 @@ class EmailTemplateController extends RestController
     }
 
     /**
-     * Get entity Manager
-     *
-     * @return ApiEntityManager
+     * {@inheritdoc}
      */
     public function getManager()
     {
@@ -213,18 +211,18 @@ class EmailTemplateController extends RestController
     }
 
     /**
-     * @return FormInterface
+     * {@inheritdoc}
      */
     public function getForm()
     {
-        return $this->get('oro_email.form.type.emailtemplate.api');
+        throw new \BadMethodCallException('Form is not available.');
     }
 
     /**
-     * @return ApiFormHandler
+     * {@inheritdoc}
      */
     public function getFormHandler()
     {
-        return $this->get('oro_email.form.handler.emailtemplate.api');
+        throw new \BadMethodCallException('FormHandler is not available.');
     }
 }

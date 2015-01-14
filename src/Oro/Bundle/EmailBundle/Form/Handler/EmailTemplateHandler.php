@@ -6,41 +6,40 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
 class EmailTemplateHandler
 {
-    /**
-     * @var FormInterface
-     */
+    /** @var FormInterface */
     protected $form;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     protected $request;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $manager;
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var string */
+    protected $defaultLocale = 'en';
+
     /**
-     * @param FormInterface $form
-     * @param Request       $request
-     * @param ObjectManager $manager
-     * @param Translator    $translator
+     * @param FormInterface       $form
+     * @param Request             $request
+     * @param ObjectManager       $manager
+     * @param TranslatorInterface $translator
      */
-    public function __construct(FormInterface $form, Request $request, ObjectManager $manager, Translator $translator)
-    {
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        ObjectManager $manager,
+        TranslatorInterface $translator
+    ) {
         $this->form       = $form;
         $this->request    = $request;
         $this->manager    = $manager;
@@ -51,12 +50,13 @@ class EmailTemplateHandler
      * Process form
      *
      * @param  EmailTemplate $entity
+     *
      * @return bool True on successful processing, false otherwise
      */
     public function process(EmailTemplate $entity)
     {
-        // always use "en" locale during template edit in order to allow update of default locale
-        $entity->setLocale('en');
+        // always use default" locale during template edit in order to allow update of default locale
+        $entity->setLocale($this->defaultLocale);
         if ($entity->getId()) {
             // refresh translations
             $this->manager->refresh($entity);
@@ -89,5 +89,13 @@ class EmailTemplateHandler
         }
 
         return false;
+    }
+
+    /**
+     * @param string $locale
+     */
+    public function setDefaultLocale($locale)
+    {
+        $this->defaultLocale = $locale;
     }
 }
