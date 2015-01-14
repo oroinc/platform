@@ -10,7 +10,6 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -18,14 +17,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-
-use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
-use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
-use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
-
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Provider\VariablesProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 
 /**
  * @RouteResource("emailtemplate")
@@ -54,6 +49,7 @@ class EmailTemplateController extends RestController
      */
     public function deleteAction($id)
     {
+        /** @var EmailTemplate $entity */
         $entity = $this->getManager()->find($id);
         if (!$entity) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
