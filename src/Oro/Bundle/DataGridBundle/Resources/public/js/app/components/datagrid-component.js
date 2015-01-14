@@ -66,6 +66,7 @@ define(function (require) {
             $.when.apply($, promises).always(function () {
                 $(options.el).html(options.$el.children());
                 self.subComponents = _.compact(arguments);
+                self.grid.reflow();
                 self._resolveDeferredInit();
             });
         },

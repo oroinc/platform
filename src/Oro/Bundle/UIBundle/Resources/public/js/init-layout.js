@@ -272,6 +272,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 $('.sidebar').css({
                     'margin-bottom': footersHeight
                 });
+
+                mediator.trigger('layout:reposition');
             };
 
             if (!anchor.length) {
