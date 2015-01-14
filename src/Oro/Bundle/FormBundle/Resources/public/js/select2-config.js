@@ -162,7 +162,7 @@ define(['jquery', 'underscore', 'oroui/js/tools'
             }
 
             var selectedData = element.data('selected-data');
-            if (!_.isArray(selectedData) && selectedData !== undefined) {
+            if (!_.isArray(selectedData)) {
                 selectedData = [selectedData];
             }
 
@@ -170,11 +170,11 @@ define(['jquery', 'underscore', 'oroui/js/tools'
             var elementData = _.filter(
                 selectedData,
                 function (item) {
-                    return item.name !== undefined && item.name !== null;
+                    return item !== undefined && item.name !== undefined && item.name !== null;
                 }
             );
 
-            if (_.isArray(elementData) && elementData.length > 0) {
+            if (elementData.length > 0) {
                 var dataIds = _.map(elementData, function(item) {
                     return item.id;
                 });
