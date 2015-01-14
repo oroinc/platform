@@ -141,7 +141,7 @@ define(function (require) {
          * Handles content load event and sets focus on first form input
          */
         onContentUpdated: function () {
-            this.$el.focusFirstInput();
+            this.$('form:first').focusFirstInput();
         },
 
         /**
