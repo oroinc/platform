@@ -180,6 +180,10 @@ define(function (require) {
                 return;
             }
 
+            if(this.floatTheadConnected) {
+                this.$('table:first').floatThead('destroy');
+            }
+
             _.each(this.columns.models, function (column) {
                 column.dispose();
             });
@@ -285,6 +289,7 @@ define(function (require) {
 
         /**
          * Get actions of toolbar
+         *
          *
          * @return {Array}
          * @private
@@ -518,25 +523,43 @@ define(function (require) {
              */
             mediator.trigger('grid_render:complete', this.$el);
 
+            this.setFloatThead(true);
+
             return this;
         },
 
         reflow: function () {
-            if (!this.floatTheadConnected) {
-                var $grid = this.$(this.selectors.grid);
-                $grid.floatThead({
-                    scrollContainer: function($table){
-                        return $table.closest('.grid-container');
-                    }
-                });
-
+            // for test
+            window.gridD = this;
+            var $grid;
+            if (this.floatThead) {
+                this.$(this.selectors.grid).floatThead('reflow');
+                $grid = this.$(this.selectors.grid);
                 $grid.parent().css({
-                    height: 'calc(100vh - ' + ($grid[0].getBoundingClientRect().top + 10) + 'px)'
+                    maxHeight: 'calc(100vh - ' + ($grid.parents('.grid-container-parent:first')[0].getBoundingClientRect().top + 20) + 'px)'
                 });
-
-                this.floatTheadConnected = true;
             }
-            this.$(this.selectors.grid).floatThead('reflow');
+        },
+
+        setFloatThead: function (newValue) {
+            var $grid;
+            if (newValue !== this.floatThead) {
+                this.floatThead = newValue;
+                $grid = this.$(this.selectors.grid);
+                if (newValue) {
+                    $grid.floatThead({
+                        scrollContainer: function($table){
+                            return $table.closest('.grid-container');
+                        }
+                    });
+                    this.reflow();
+                } else {
+                    $grid.floatThead('destroy');
+                    $grid.parent().css({
+                        maxHeight: ''
+                    });
+                }
+            }
         },
 
         /**
@@ -612,6 +635,7 @@ define(function (require) {
                  */
                 mediator.trigger("grid_load:complete", this.collection, this.$el);
                 mediator.execute('layout:init', this.$el, this);
+                this.reflow();
             }
         },
 

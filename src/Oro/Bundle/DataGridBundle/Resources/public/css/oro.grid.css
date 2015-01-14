@@ -146,3 +146,7 @@ table.grid .select-row-cell input[type=checkbox] {
 .floatThead-wrapper .grid {
     margin-bottom: 0
 }
+
+.floatThead-wrapper .grid.table-bordered tr > th:first-child {
+    border-left: none !important;
+}
