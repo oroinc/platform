@@ -167,6 +167,8 @@ define(function (require) {
             this._listenToCollectionEvents();
             this._listenToBodyEvents();
             this._listenToCommands();
+
+            this.listenTo(mediator, 'layout:reposition', this.reflow, this);
         },
 
         /**
@@ -515,19 +517,24 @@ define(function (require) {
              * @event grid_render:complete
              */
             mediator.trigger('grid_render:complete', this.$el);
-            mediator.execute('layout:init', this.$el, this);
 
-            var $grid = this.$(this.selectors.grid);
-            $grid.floatThead({
-                scrollContainer: function($table){
-                    return $table.closest('.grid-container');
-                },
-                useAbsolutePositioning: false
-            });
-            setTimeout(function () {
-                $grid.floatThead('reflow');
-            }, 500);
             return this;
+        },
+
+        reflow: function () {
+            if (!this.floatTheadConnected) {
+                var $grid = this.$(this.selectors.grid);
+                $grid.floatThead({
+                    scrollContainer: function($table){
+                        return $table.closest('.grid-container');
+                    }
+                });
+                $grid.parent().css({
+                    height: 'calc(100vh - ' + ($grid[0].getBoundingClientRect().top + 10) + 'px)'
+                });
+                this.floatTheadConnected = true;
+            }
+            this.$(this.selectors.grid).floatThead('reflow');
         },
 
         /**
