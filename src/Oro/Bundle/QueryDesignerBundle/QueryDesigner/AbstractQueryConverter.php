@@ -934,7 +934,11 @@ abstract class AbstractQueryConverter
         $parentJoinId = $this->getParentJoinIdentifier($this->joinIdHelper->buildColumnJoinIdentifier($columnName));
         $fieldName = $this->getFieldName($parentJoinId);
         $className = $this->getEntityClassName($parentJoinId);
-        $targetJoinAlias = $this->virtualRelationProvider->getTargetJoinAlias($className, $fieldName);
+
+        $targetJoinAlias = null;
+        if ($this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
+            $targetJoinAlias = $this->virtualRelationProvider->getTargetJoinAlias($className, $fieldName);
+        }
 
         if ($targetJoinAlias) {
             $tableAlias = $this->aliases[$targetJoinAlias];

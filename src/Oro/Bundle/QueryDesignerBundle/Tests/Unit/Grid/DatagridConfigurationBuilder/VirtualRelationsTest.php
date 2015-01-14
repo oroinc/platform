@@ -513,6 +513,77 @@ class VirtualRelationsTest extends OrmQueryConverterTest
                     ],
                 ],
             ],
+            'unidirectional join' => [
+                'columns' => [
+                    'identifier' => [
+                        'name' => sprintf(
+                            'list_virtual+%s+%s',
+                            sprintf(
+                                '%s::%s',
+                                'Oro\Bundle\TrackingBundle\Entity\List',
+                                'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite::list'
+                            ),
+                            'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite::identifier'
+                        ),
+                        'label' => 'identifier',
+                    ],
+                ],
+                'virtualRelationQuery' => [
+                    'Acme\Entity\TestEntity' => [
+                        'target_join_alias' => 'List',
+                        'list_virtual' => [
+                            'join' => [
+                                'left' => [
+                                    [
+                                        'join' => 'Oro\Bundle\TrackingBundle\Entity\List',
+                                        'alias' => 'List',
+                                        'conditionType' => 'WITH',
+                                        'condition' => 'List.entity = \'Acme\Entity\TestEntity\'',
+                                    ],
+                                    [
+                                        'join' => 'Oro\Bundle\TrackingBundle\Entity\ListItem',
+                                        'alias' => 'ListItem_virtual',
+                                        'conditionType' => 'WITH',
+                                        'condition' => 'ListItem_virtual.List = List'
+                                            . ' AND entity.id = ListItem_virtual.entityId',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    'select' => ['t4.identifier as c1'],
+                    'from' => [
+                        [
+                            'table' => 'Acme\Entity\TestEntity',
+                            'alias' => 't1',
+                        ],
+                    ],
+                    'join' => [
+                        'left' => [
+                            [
+                                'join' => 'Oro\Bundle\TrackingBundle\Entity\List',
+                                'alias' => 't2',
+                                'conditionType' => 'WITH',
+                                'condition' => 't2.entity = \'Acme\Entity\TestEntity\'',
+                            ],
+                            [
+                                'join' => 'Oro\Bundle\TrackingBundle\Entity\ListItem',
+                                'alias' => 't3',
+                                'conditionType' => 'WITH',
+                                'condition' => 't3.List = t2 AND t1.id = t3.entityId',
+                            ],
+                            [
+                                'join' => 'Oro\Bundle\TrackingBundle\Entity\TrackingWebsite',
+                                'alias' => 't4',
+                                'conditionType' => 'WITH',
+                                'condition' => 't4.list = t3',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
     }
 }
