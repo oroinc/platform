@@ -10,6 +10,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
+use Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper;
 
 class YamlConverter implements QueryConverterInterface
 {
@@ -46,8 +47,9 @@ class YamlConverter implements QueryConverterInterface
             $qb->distinct((bool)$value['distinct']);
         }
 
-        if (isset($value['groupBy'])) {
-            $qb->groupBy($value['groupBy']);
+        $groupByFields = $this->getGroupByFields($value);
+        if ($groupByFields) {
+            $qb->groupBy(implode(',', $groupByFields));
         }
 
         if (isset($value['having'])) {
@@ -59,6 +61,29 @@ class YamlConverter implements QueryConverterInterface
         $this->addOrder($qb, $value);
 
         return $qb;
+    }
+
+    /**
+     * @param array $value
+     * @return array
+     */
+    protected function getGroupByFields(array $value)
+    {
+        $groupByHelper = new GroupByHelper();
+
+        if (isset($value['groupBy'])) {
+            $groupBy = $value['groupBy'];
+        } else {
+            $groupBy = [];
+        }
+
+        if (isset($value['select'])) {
+            $select = $value['select'];
+        } else {
+            $select = [];
+        }
+
+        return $groupByHelper->getGroupByFields($groupBy, $select);
     }
 
     /**
