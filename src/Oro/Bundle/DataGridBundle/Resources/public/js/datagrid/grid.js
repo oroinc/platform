@@ -560,7 +560,9 @@ define(function (require) {
                 if (dropdownOpened) {
                     $('body > .floatThead-dynamic-dropdown').remove();
                 }
-                $.each(dropdownsToReset, function (){ $(this).css({display: ''}) });
+                $.each(dropdownsToReset, function (){
+                    $(this).css({display: ''}).off('.floatThead-' + self.cid);
+                });
                 dropdownOpened = false;
             }
 
@@ -608,14 +610,14 @@ define(function (require) {
 
                             $dropdownMenuCopy.show();
 
-                            $dropdownMenuCopy.on('mouseenter', function expandContainer() {
+                            $dropdownMenuCopy.on('mouseenter.floatThead-' + self.cid, function expandContainer() {
                                 $container.css({
                                     height: self.getCssHeightCalcExpression()
                                 });
                                 $dropdownMenuCopy.hide();
                                 $dropdownMenu.show();
                             });
-                            $dropdownMenu.on('mouseleave', function collapseContainer() {
+                            $dropdownMenu.on('mouseleave.floatThead-' + self.cid, function collapseContainer() {
                                 $dropdownMenu.hide();
                                 $dropdownMenuCopy.show();
                                 $container.css({
