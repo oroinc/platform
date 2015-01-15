@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class ExtendOptionsBuilder
@@ -92,7 +93,7 @@ class ExtendOptionsBuilder
         $columnMode           = $this->getAndRemoveOption($options, ExtendOptionsManager::MODE_OPTION);
         $columnUnderlyingType = $this->fieldTypeHelper->getUnderlyingType($columnType);
 
-        if (in_array($columnUnderlyingType, ['oneToMany', 'manyToOne', 'manyToMany'])) {
+        if (in_array($columnUnderlyingType, RelationType::$anyToAnyRelations)) {
             if (!isset($options['extend'])) {
                 $options['extend'] = [];
             }

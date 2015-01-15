@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\UserBundle\Entity\User;
@@ -24,18 +25,22 @@ class AclPermissionController extends Controller
      *  defaults={"_format"="json"}
      * )
      * @Template
+     *
+     * @param string $oid
+     *
+     * @return array
      */
     public function aclAccessLevelsAction($oid)
     {
         if (strpos($oid, 'entity:') === 0) {
-            $oid = str_replace('_', '\\', $oid);
+            $oid = $this->get('oro_entity.routing_helper')->decodeClassName($oid);
         }
 
         $levels = $this
             ->get('oro_security.acl.manager')
             ->getAccessLevels($oid);
 
-        return array('levels' => $levels);
+        return ['levels' => $levels];
     }
 
     /**
@@ -43,21 +48,27 @@ class AclPermissionController extends Controller
      *      "/switch-organization/{id}",
      *      name="oro_security_switch_organization", defaults={"id"=0}
      * )
+     *
      * @param Organization $organization
      *
-     * @throws AccessDeniedException, \RuntimeException
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse , AccessDeniedException
      */
     public function switchOrganizationAction(Organization $organization)
     {
         $token = $this->container->get('security.context')->getToken();
         $user  = $token->getUser();
 
-        if (!($token instanceof OrganizationContextTokenInterface && $user instanceof User)) {
-            $message = sprintf('Impossible to change organization context for "%s" token', get_class($token));
-
-            throw new \RuntimeException($message);
+        if (!$token instanceof OrganizationContextTokenInterface ||
+            !$token->getUser() instanceof User ||
+            !$organization->isEnabled() ||
+            !$token->getUser()->getOrganizations()->contains($organization)
+        ) {
+            throw new AccessDeniedException(
+                $this->get('translator')->trans(
+                    'oro.security.organization.access_denied',
+                    ['%organization_name%' => $organization->getName()]
+                )
+            );
         }
 
         $event = new OrganizationSwitchBefore($user, $token->getOrganizationContext(), $organization);

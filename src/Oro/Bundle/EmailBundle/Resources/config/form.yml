@@ -47,29 +47,8 @@ services:
             - @request
             - @doctrine.orm.entity_manager
             - @translator
-
-    oro_email.form.type.emailtemplate.api:
-        class: %oro_email.form.type.emailtemplate.api.class%
-        arguments:
-            - @oro_config.user
-            - @oro_locale.settings
-        tags:
-            - { name: form.type, alias: oro_email_emailtemplate_api }
-
-    oro_email.form.emailtemplate.api:
-        class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
-        arguments: ["oro_email_emailtemplate_api", "oro_email_emailtemplate_api", null]
-
-    oro_email.form.handler.emailtemplate.api:
-        class: %oro_email.form.handler.emailtemplate.class%
-        scope: request
-        arguments:
-            - @oro_email.form.emailtemplate.api
-            - @request
-            - @doctrine.orm.entity_manager
-            - @translator
+        calls:
+            - [setDefaultLocale, [%stof_doctrine_extensions.default_locale%]]
 
     oro_email.form.handler.email:
         class: %oro_email.form.handler.email.class%

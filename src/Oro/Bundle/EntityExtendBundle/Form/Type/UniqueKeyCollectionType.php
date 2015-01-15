@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueKeys;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 
 class UniqueKeyCollectionType extends AbstractType
 {
@@ -37,7 +38,7 @@ class UniqueKeyCollectionType extends AbstractType
 
         /** @var FieldConfigId $fieldConfigId */
         foreach ($fieldConfigIds as $fieldConfigId) {
-            if ($fieldConfigId->getFieldType() === 'ref-many') {
+            if ($fieldConfigId->getFieldType() === RelationTypeBase::TO_MANY) {
                 continue;
             }
 

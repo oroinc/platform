@@ -9,6 +9,7 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder()
     {
@@ -74,6 +75,63 @@ class Configuration implements ConfigurationInterface
                                             ->booleanNode('filter_by_id')->end()
                                         ->end()
                                     ->end()
+                                    ->arrayNode('join')
+                                        ->prototype('array')
+                                            ->prototype('variable')->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+            ->arrayNode('virtual_relations')
+                ->info('Entity virtual relations definitions')
+                ->example(
+                    [
+                        'Acme\Bundle\Entity\SomeEntity' => [
+                            'virtual_relation1' => [
+                                'relation_type' => 'manyToOne',
+                                'related_entity_name' => 'Acme\Bundle\Entity\GroupEntity',
+                                // required if you need to join on specific join alias
+                                'target_join_alias' => 'group_entity',
+                                'label' => 'Group',
+                                'query' => [
+                                    'join' => [
+                                        'left' => [
+                                            [
+                                                'join' => 'Acme\Bundle\Entity\GroupEntity',
+                                                'alias' => 'group_entity',
+                                                'conditionType' => 'WITH',
+                                                'condition' => 'group_entity.code = entity.group_code'
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                )
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('relation_type')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('related_entity_name')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                            ->end()
+                            ->scalarNode('target_join_alias')
+                            ->end()
+                            ->scalarNode('label')
+                            ->end()
+                            ->arrayNode('query')
+                                ->children()
                                     ->arrayNode('join')
                                         ->prototype('array')
                                             ->prototype('variable')->end()

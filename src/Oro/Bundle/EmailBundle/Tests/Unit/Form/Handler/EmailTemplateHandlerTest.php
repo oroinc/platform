@@ -137,4 +137,54 @@ class EmailTemplateHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->handler->process($this->entity));
     }
+
+    /**
+     * @dataProvider localeDataProvider
+     *
+     * @param string|null $defaultLocale
+     * @param int|null    $id
+     * @param bool        $expectedRefresh
+     */
+    public function testShouldPresetDefaultLocale($defaultLocale, $id, $expectedRefresh)
+    {
+        $this->form->expects($this->once())->method('setData')->with($this->entity);
+
+        $this->manager->expects($expectedRefresh ? $this->once() : $this->never())->method('refresh')
+            ->with($this->entity);
+
+        $this->setEntityId($id);
+        $this->handler->setDefaultLocale($defaultLocale);
+        $this->handler->process($this->entity);
+
+        $this->assertSame($defaultLocale, $this->entity->getLocale());
+    }
+
+    /**
+     * @return array
+     */
+    public function localeDataProvider()
+    {
+        return [
+            'Should preset default locale '                   => [
+                '$defaultLocale'   => 'ru_RU',
+                '$id'              => null,
+                '$expectedRefresh' => false
+            ],
+            'Should preset default locale and refresh entity' => [
+                '$defaultLocale'   => 'ru_RU',
+                '$id'              => null,
+                '$expectedRefresh' => false
+            ],
+        ];
+    }
+
+    /**
+     * @param int|null $id
+     */
+    protected function setEntityId($id)
+    {
+        $ref = new \ReflectionProperty(get_class($this->entity), 'id');
+        $ref->setAccessible(true);
+        $ref->setValue($this->entity, $id);
+    }
 }
