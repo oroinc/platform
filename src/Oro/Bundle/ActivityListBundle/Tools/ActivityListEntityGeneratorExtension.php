@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Tools;
 
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 
 class ActivityListEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
@@ -41,6 +42,6 @@ class ActivityListEntityGeneratorExtension extends AbstractAssociationEntityGene
      */
     protected function getAssociationType()
     {
-        return 'manyToMany';
+        return RelationType::MANY_TO_MANY;
     }
 }

@@ -23,8 +23,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Table(name="oro_email_template",
  *      uniqueConstraints={@ORM\UniqueConstraint(name="UQ_NAME", columns={"name", "entityName"})},
  *      indexes={@ORM\Index(name="email_name_idx", columns={"name"}),
- *          @ORM\Index(name="email_is_system_idx", columns={"isSystem"}),
- *          @ORM\Index(name="email_entity_name_idx", columns={"entityName"})})
+ * @ORM\Index(name="email_is_system_idx", columns={"isSystem"}),
+ * @ORM\Index(name="email_entity_name_idx", columns={"entityName"})})
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository")
  * @Gedmo\TranslationEntity(class="Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation")
  * @Config(
@@ -153,7 +153,9 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     protected $type;
 
     /**
-     * @Gedmo\Locale
+     * @var string
+     *
+     * @Gedmo\Locale()
      */
     protected $locale;
 
@@ -176,11 +178,10 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     protected $organization;
 
     /**
-     * @param $name
+     * @param        $name
      * @param string $content
      * @param string $type
-     * @param bool $isSystem
-     * @internal param $entityName
+     * @param bool   $isSystem
      */
     public function __construct($name = '', $content = '', $type = 'html', $isSystem = false)
     {
@@ -191,16 +192,16 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
         // isEditable can be overridden from email template
         $this->isEditable = false;
 
-        $boolParams = array('isSystem', 'isEditable');
+        $boolParams     = array('isSystem', 'isEditable');
         $templateParams = array('name', 'subject', 'entityName', 'isSystem', 'isEditable');
         foreach ($templateParams as $templateParam) {
             if (preg_match('#@' . $templateParam . '\s?=\s?(.*)\n#i', $content, $match)) {
                 $val = trim($match[1]);
                 if (isset($boolParams[$templateParam])) {
-                    $val = (bool) $val;
+                    $val = (bool)$val;
                 }
                 $this->$templateParam = $val;
-                $content = trim(str_replace($match[0], '', $content));
+                $content              = trim(str_replace($match[0], '', $content));
             }
         }
 
@@ -209,8 +210,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
             $this->isEditable = true;
         }
 
-        $this->type = $type;
-        $this->content = $content;
+        $this->type         = $type;
+        $this->content      = $content;
         $this->translations = new ArrayCollection();
     }
 
@@ -228,6 +229,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Set name
      *
      * @param string $name
+     *
      * @return EmailTemplate
      */
     public function setName($name)
@@ -335,6 +337,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Set entityName
      *
      * @param string $entityName
+     *
      * @return EmailTemplate
      */
     public function setEntityName($entityName)
@@ -358,6 +361,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Set a flag indicates whether a template is system or not.
      *
      * @param boolean $isSystem
+     *
      * @return EmailTemplate
      */
     public function setIsSystem($isSystem)
@@ -382,6 +386,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Get a flag indicates whether a template can be changed.
      *
      * @param boolean $isEditable
+     *
      * @return EmailTemplate
      */
     public function setIsEditable($isEditable)
@@ -406,7 +411,8 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     /**
      * Set locale
      *
-     * @param mixed $locale
+     * @param string $locale
+     *
      * @return EmailTemplate
      */
     public function setLocale($locale)
@@ -419,7 +425,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     /**
      * Get locale
      *
-     * @return mixed
+     * @return string
      */
     public function getLocale()
     {
@@ -430,6 +436,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Set template type
      *
      * @param string $type
+     *
      * @return EmailTemplate
      */
     public function setType($type)
@@ -453,6 +460,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * Set translations
      *
      * @param ArrayCollection $translations
+     *
      * @return EmailTemplate
      */
     public function setTranslations($translations)
@@ -463,6 +471,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
         }
 
         $this->translations = $translations;
+
         return $this;
     }
 
@@ -477,14 +486,38 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     }
 
     /**
+     * Set organization
+     *
+     * @param Organization $organization
+     *
+     * @return EmailTemplate
+     */
+    public function setOrganization(Organization $organization = null)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return Organization
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
      * Clone template
      */
     public function __clone()
     {
         // cloned entity will be child
-        $this->parent = $this->id;
-        $this->id = null;
-        $this->isSystem = false;
+        $this->parent     = $this->id;
+        $this->id         = null;
+        $this->isSystem   = false;
         $this->isEditable = true;
 
         if ($this->getTranslations() instanceof ArrayCollection) {
@@ -503,29 +536,6 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      */
     public function __toString()
     {
-        return (string) $this->getName();
-    }
-
-    /**
-     * Set organization
-     *
-     * @param Organization $organization
-     * @return EmailTemplate
-     */
-    public function setOrganization(Organization $organization = null)
-    {
-        $this->organization = $organization;
-
-        return $this;
-    }
-
-    /**
-     * Get organization
-     *
-     * @return Organization
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
+        return (string)$this->getName();
     }
 }
