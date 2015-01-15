@@ -104,6 +104,12 @@ define(['jquery'], function ($) {
                     }
                 }
                 clone.css(el.getStyleObject());
+                // IE fix
+                if (clone.is("[class*='icon-']")) {
+                    clone.css({
+                        'font-family' : ''
+                    });
+                }
                 result.append(clone);
             });
             return result.find('>*');

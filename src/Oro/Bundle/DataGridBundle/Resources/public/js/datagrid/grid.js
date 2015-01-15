@@ -592,8 +592,9 @@ define(function (require) {
                                 return;
                             }
                             var position = $dropdownMenu.offset(),
-                                // not native clone
-                                $dropdownMenuCopy = $dropdownMenu.cloneWithStyles();
+                                $dropdownMenuCopy = $dropdownMenu.cloneWithStyles(),
+                                // required in IE, it counts width and height incorrectly
+                                clientRect = $dropdownMenu[0].getBoundingClientRect();
 
                             $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
                             $('body').append($dropdownMenuCopy);
@@ -601,7 +602,9 @@ define(function (require) {
                             $dropdownMenuCopy.css({
                                 position: 'absolute',
                                 top: position.top + 1, // not sure why but required to add 1 px to exactly match position
-                                left: position.left
+                                left: position.left,
+                                width: clientRect.width,
+                                height: clientRect.height
                             });
 
                             $dropdownMenu.hide();
