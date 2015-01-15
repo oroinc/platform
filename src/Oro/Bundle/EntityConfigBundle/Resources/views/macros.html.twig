@@ -43,7 +43,7 @@
     {% set type  = item.type %}
 
     {% if type == 'text' %}
-        {% set value = value|escape|nl2br %}
+        {% set value = value|raw|nl2br %}
     {% elseif type == 'boolean' %}
         {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}
@@ -68,7 +68,7 @@
             {{ oro_image_view(entity, value, entityInfo, field_name) }}
         {% endset %}
     {% else %}
-        {% set value = value|escape %}
+        {% set value = value %}
     {% endif %}
 
     {{ value|default('N/A'|trans) }}
