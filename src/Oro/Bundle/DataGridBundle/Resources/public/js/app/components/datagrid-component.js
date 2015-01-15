@@ -98,7 +98,7 @@ define(function (require) {
                 options: {},
                 state: {},
                 rowActions: {},
-                massActions: {},
+                massActions: {}
             });
             this.modules = {};
 
