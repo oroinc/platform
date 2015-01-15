@@ -269,7 +269,7 @@ class ConfigController extends Controller
         $fields = [];
         if ($id) {
             $entityRoutingHelper = $this->get('oro_entity.routing_helper');
-            $className = $entityRoutingHelper->decodeClassName($id);
+            $className           = $entityRoutingHelper->decodeClassName($id);
 
             /** @var EntityFieldProvider $fieldProvider */
             $fieldProvider = $this->get('oro_entity.entity_field_provider');
@@ -279,18 +279,19 @@ class ConfigController extends Controller
                 if (!in_array(
                     $field['type'],
                     ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
-                )) {
+                )
+                ) {
                     continue;
                 }
                 $fields[$field['name']] = $field['label'] ? : $field['name'];
             }
+        }
 
-            /**
-             * in case no fields were found - add empty_value into result
-             */
-            if (empty($fields)) {
-                $fields[''] = $this->get('translator')->trans('oro.entity.form.choose_entity_field');
-            }
+        /**
+         * in case no fields were found - add empty_value into result
+         */
+        if (empty($fields)) {
+            $fields[''] = $this->get('translator')->trans('oro.entity.form.choose_entity_field');
         }
 
         return new Response(json_encode($fields));
