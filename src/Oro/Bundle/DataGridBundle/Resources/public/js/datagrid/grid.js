@@ -553,7 +553,16 @@ define(function (require) {
                 containerClass = '.grid-container',
                 floatTheadContainerClass = '.floatThead-container',
                 dropdownOpened = false,
-                self = this;
+                self = this,
+                dropdownsToReset = [];
+
+            function removeDropdowns() {
+                if (dropdownOpened) {
+                    $('body > .floatThead-dynamic-dropdown').remove();
+                }
+                $.each(dropdownsToReset, function (){ $(this).css({display: ''}) });
+                dropdownOpened = false;
+            }
 
             if (newValue !== this.floatThead) {
                 this.floatThead = newValue;
@@ -567,12 +576,7 @@ define(function (require) {
                     });
                     this.reflow();
                     $container = $grid.parent().find(floatTheadContainerClass);
-                    $(document).on('click.floatThead-' + this.cid, function () {
-                        if (dropdownOpened) {
-                            $('body > .floatThead-dynamic-dropdown').remove();
-                        }
-                        dropdownOpened = false;
-                    });
+                    $(document).on('click.floatThead-' + this.cid, removeDropdowns);
                     this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
                         dropdownOpened = true;
 
@@ -581,6 +585,10 @@ define(function (require) {
 
                         // let bootstrap show menu
                         _.defer(function () {
+                            if (!$dropdown.hasClass('open')) {
+                                removeDropdowns();
+                                return;
+                            }
                             var position = $dropdownMenu.offset(),
                                 // not native clone
                                 $dropdownMenuCopy = $dropdownMenu.cloneWithStyles();
@@ -593,7 +601,13 @@ define(function (require) {
                                 top: position.top + 1, // not sure why but required to add 1 px to exactly match position
                                 left: position.left
                             });
+
+                            $dropdownMenu.hide();
+                            // need to reset after dropdown remove
+                            dropdownsToReset.push($dropdownMenu);
+
                             $dropdownMenuCopy.show();
+
                             $dropdownMenuCopy.on('mouseenter', function expandContainer() {
                                 $container.css({
                                     height: self.getCssHeightCalcExpression()
