@@ -27,6 +27,7 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
 
     protected $om;
     protected $repository;
+    protected $cm;
 
     protected function setUp()
     {
@@ -39,6 +40,10 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->om         = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $this->repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $this->cm = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock()
+        ;
 
         $this->om
             ->expects($this->any())
@@ -56,7 +61,7 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue(static::USER_CLASS));
 
-        $this->userManager = new UserManager(static::USER_CLASS, $this->om, $ef);
+        $this->userManager = new UserManager(static::USER_CLASS, $this->om, $ef, $this->cm);
     }
 
     public function testGetClass()
@@ -202,6 +207,192 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(array()));
 
         $this->userManager->loadUserByUsername(self::TEST_NAME);
+    }
+
+    /**
+     * @expectedException Exception
+     * @expectedExceptionMessage SSO is not enabled
+     */
+    public function testLoadUserByOAuthUserResponseShouldThrowExceptionIfSSOIsDisabled()
+    {
+        $this->cm
+            ->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->will($this->returnValue(false));
+
+        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+
+        $this->userManager->loadUserByOAuthUserResponse($userResponse);
+    }
+
+    public function testLoadUserByOAuthShouldReturnUserByOauthIdIfFound()
+    {
+        $this->cm
+            ->expects($this->any())
+            ->method('get')
+            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->will($this->returnValue(true));
+
+        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse
+            ->expects($this->any())
+            ->method('getUsername')
+            ->will($this->returnValue('username'));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getResourceOwner')
+            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue('username@example.com'));
+
+        $user = new User();
+        $user->addRole(new Role());
+
+        $this->repository
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with($this->equalTo(array('Id' => 'username')))
+            ->will($this->returnValue($user))
+        ;
+
+        $loadedUser = $this->userManager->loadUserByOAuthUserResponse($userResponse);
+        $this->assertSame($user, $loadedUser);
+    }
+
+    public function testLoadUserByOAuthShouldToFindUserByEmailIfLoadingByOauthIdFails()
+    {
+        $this->cm
+            ->expects($this->at(0))
+            ->method('get')
+            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->will($this->returnValue(true));
+
+        $this->cm
+            ->expects($this->at(1))
+            ->method('get')
+            ->with($this->equalTo('oro_user.google_sso_domain'))
+            ->will($this->returnValue(''));
+
+        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse
+            ->expects($this->any())
+            ->method('getUsername')
+            ->will($this->returnValue('username'));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getResourceOwner')
+            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue('username@example.com'));
+
+        $this->repository
+            ->expects($this->at(0))
+            ->method('findOneBy')
+            ->with($this->equalTo(array('Id' => 'username')))
+        ;
+
+        $user = new User();
+        $user->addRole(new Role());
+
+        $this->repository
+            ->expects($this->at(1))
+            ->method('findOneBy')
+            ->with($this->equalTo(array('email' => 'username@example.com')))
+            ->will($this->returnValue($user))
+        ;
+
+        $loadedUser = $this->userManager->loadUserByOAuthUserResponse($userResponse);
+        $this->assertSame($user, $loadedUser);
+    }
+
+    public function testLoadUserByOAuthShouldFindUserByEmailWithRestrictedEmailDomainIfLoadingByOauthIdFails()
+    {
+        $this->cm
+            ->expects($this->at(0))
+            ->method('get')
+            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->will($this->returnValue(true));
+
+        $this->cm
+            ->expects($this->at(1))
+            ->method('get')
+            ->with($this->equalTo('oro_user.google_sso_domain'))
+            ->will($this->returnValue('example.com'));
+
+        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse
+            ->expects($this->any())
+            ->method('getUsername')
+            ->will($this->returnValue('username'));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getResourceOwner')
+            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue('username@example.com'));
+
+        $this->repository
+            ->expects($this->at(0))
+            ->method('findOneBy')
+            ->with($this->equalTo(array('Id' => 'username')))
+        ;
+
+        $user = new User();
+        $user->addRole(new Role());
+
+        $this->repository
+            ->expects($this->at(1))
+            ->method('findOneBy')
+            ->with($this->equalTo(array('email' => 'username@example.com')))
+            ->will($this->returnValue($user))
+        ;
+
+        $loadedUser = $this->userManager->loadUserByOAuthUserResponse($userResponse);
+        $this->assertSame($user, $loadedUser);
+    }
+
+    /**
+     * @expectedException Oro\Bundle\UserBundle\Security\Core\Exception\EmailDomainNotAllowedException
+     */
+    public function testLoadUserByOAuthShouldThrowExceptionIfEmailDomainIsDisabled()
+    {
+        $this->cm
+            ->expects($this->at(0))
+            ->method('get')
+            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->will($this->returnValue(true));
+
+        $this->cm
+            ->expects($this->at(1))
+            ->method('get')
+            ->with($this->equalTo('oro_user.google_sso_domain'))
+            ->will($this->returnValue('google.com'));
+
+        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse
+            ->expects($this->any())
+            ->method('getUsername')
+            ->will($this->returnValue('username'));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getResourceOwner')
+            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+
+        $this->userManager->loadUserByOAuthUserResponse($userResponse);
     }
 
     protected function getUser()

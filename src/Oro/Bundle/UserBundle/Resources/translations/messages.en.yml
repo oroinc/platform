@@ -32,6 +32,8 @@ resetting:
 
 oro:
     user:
+        login:
+            alternative.label: Or login using
         form:
             access_settings.label: Business Units
         menu:
@@ -56,6 +58,13 @@ oro:
             user.message.saved: "User saved"
             status.message.saved: "Status saved"
             invite.fail.message: An invitation email sending was failed
+        system_configuration:
+            groups:
+                google_settings.title: Google settings
+                google_integration_settings.title: Google integration settings
+            fields:
+                enable_google_sso.label: Enable SSO
+                google_sso_domain.label: Domain
         #
         # Oro/Bundle/UserBundle/Entity/User
         #

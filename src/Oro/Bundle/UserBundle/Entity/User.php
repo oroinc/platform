@@ -359,6 +359,13 @@ class User extends ExtendUser implements
     protected $loginCount;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="google_id", type="string", nullable=true)
+     */
+    protected $googleId;
+
+    /**
      * @var BusinessUnit
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\BusinessUnit", cascade={"persist"})
      * @ORM\JoinColumn(name="business_unit_owner_id", referencedColumnName="id", onDelete="SET NULL")
@@ -1722,5 +1729,21 @@ class User extends ExtendUser implements
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getGoogleId()
+    {
+        return $this->googleId;
+    }
+
+    /**
+     * @param string|null $googleId
+     */
+    public function setGoogleId($googleId = null)
+    {
+        $this->googleId = $googleId;
     }
 }

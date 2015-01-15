@@ -20,6 +20,7 @@ oro:
             groups:
                 platform.title: "System configuration"
                 general_setup.title: "General setup"
+                integration_setup.title: "Integration"
             use_default: "Use default"
 
     dashboard:

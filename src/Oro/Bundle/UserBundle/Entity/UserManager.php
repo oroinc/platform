@@ -12,9 +12,15 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Security\Core\Exception\EmailDomainNotAllowedException;
 
-class UserManager implements UserProviderInterface
+use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
+use HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException;
+use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
+
+class UserManager implements UserProviderInterface, OAuthAwareUserProviderInterface
 {
     /**
      * @var string
@@ -32,17 +38,23 @@ class UserManager implements UserProviderInterface
     protected $encoderFactory;
 
     /**
+     * @var ConfigManager
+     */
+    protected $cm;
+
+    /**
      * Constructor
      *
      * @param string                  $class          Entity name
      * @param ObjectManager           $om             Object manager
      * @param EncoderFactoryInterface $encoderFactory
      */
-    public function __construct($class, ObjectManager $om, EncoderFactoryInterface $encoderFactory)
+    public function __construct($class, ObjectManager $om, EncoderFactoryInterface $encoderFactory, ConfigManager $cm)
     {
         $this->class          = $class;
         $this->om             = $om;
         $this->encoderFactory = $encoderFactory;
+        $this->cm             = $cm;
     }
 
     /**
@@ -313,5 +325,72 @@ class UserManager implements UserProviderInterface
     public function getApi(User $user, Organization $organization)
     {
         return $this->getStorageManager()->getRepository('OroUserBundle:UserApi')->getApi($user, $organization);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadUserByOAuthUserResponse(UserResponseInterface $response)
+    {
+        if (!$this->cm->get('oro_user.enable_google_sso')) {
+            throw new \Exception('SSO is not enabled');
+        }
+
+        $username = $response->getUsername();
+        if ($username === null) {
+            throw new AccountNotLinkedException(sprintf("User '%s' not found.", $username));
+        }
+
+        $user = $this->findUserBy(array($this->getOAuthProperty($response) => $username));
+        if (!$user && !$this->isEmailEnabledForOauth($response->getEmail())) {
+            throw new EmailDomainNotAllowedException();
+        }
+
+        if (!$user) {
+            $user = $this->findUserByEmail($response->getEmail());
+            if ($user) {
+                $user->setGoogleId($username);
+                $this->updateUser($user);
+            }
+        }
+
+        if (!$user) {
+            throw new AccountNotLinkedException(sprintf("User '%s' not found.", $username));
+        }
+
+        return $user;
+    }
+
+    /**
+     * Returns if given email can be used for oauth
+     *
+     * @param string $email
+     *
+     * @return boolean
+     */
+    protected function isEmailEnabledForOauth($email)
+    {
+        $enabledDomain = $this->cm->get('oro_user.google_sso_domain');
+        if (!$enabledDomain) {
+            return true;
+        }
+
+        return (bool) preg_match(sprintf('/@%s$/', $enabledDomain), $email);
+    }
+
+    /**
+     * Gets the property for the response.
+     *
+     * @param UserResponseInterface $response
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    protected function getOAuthProperty(UserResponseInterface $response)
+    {
+        $resourceOwnerName = $response->getResourceOwner()->getName();
+
+        return sprintf('%sId', $resourceOwnerName);
     }
 }
