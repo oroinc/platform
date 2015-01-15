@@ -85,11 +85,6 @@ class User extends ExtendUser implements
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
     const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
 
-    protected $excludeChangeSet = [
-        'lastLogin' => null,
-        'loginCount' => null
-    ];
-
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
@@ -1352,7 +1347,12 @@ class User extends ExtendUser implements
      */
     public function preUpdate(PreUpdateEventArgs $event)
     {
-        if (array_diff_key($event->getEntityChangeSet(), $this->excludeChangeSet)) {
+        $excludeChangeSet = [
+            'lastLogin' => null,
+            'loginCount' => null
+        ];
+
+        if (array_diff_key($event->getEntityChangeSet(), $excludeChangeSet)) {
             $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         }
     }
