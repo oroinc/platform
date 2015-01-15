@@ -122,44 +122,35 @@ table.grid .select-row-cell input[type=checkbox] {
     z-index: 899 !important;
 }
 
-.floatThead-container .table-bordered th{
-    border-left: none;
-}
-
-.floatThead-wrapper .grid {
+.floatThead-connected .grid {
     border: none !important;
     border-radius: 0 !important;
-    margin: -1px;
 }
 
-.floatThead-wrapper table th{
+.floatThead-connected table th{
     border-bottom-left-radius: 0 !important;
     border-top-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     border-top-right-radius: 0 !important;
 }
 
-.floatThead-wrapper .grid-container {
+.floatThead-connected .grid-container {
     border: 1px solid rgb(221, 221, 221);
 }
 
-.no-data-visible .floatThead-wrapper .grid-container {
+.no-data-visible .floatThead-connected .grid-container {
     border: none;
 }
 
-.floatThead-wrapper .floatThead-container{
-    margin-top: 1px !important;
-}
-
-.floatThead-wrapper .floatThead-container .grid{
+.floatThead-connected .floatThead-container .grid{
     border-bottom: 1px solid rgb(221, 221, 221) !important;
     margin: 0;
 }
 
-.floatThead-wrapper .grid {
+.floatThead-connected .grid {
     margin-bottom: 0
 }
 
-.floatThead-wrapper .grid.table-bordered tr > th:first-child {
+.floatThead-connected .grid.table-bordered tr > th:first-child {
     border-left: none !important;
 }

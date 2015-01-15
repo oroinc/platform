@@ -567,6 +567,7 @@ define(function (require) {
                 this.floatThead = newValue;
                 $grid = this.$(this.selectors.grid);
                 if (newValue) {
+                    this.$el.addClass('floatThead-connected');
                     $grid.floatThead({
                         useAbsolutePositioning: false,
                         scrollContainer: function($table){
@@ -576,6 +577,7 @@ define(function (require) {
                     this.reflow();
                     this.addFloatTheadDropdownsSupport();
                 } else {
+                    this.$el.removeClass('floatThead-connected');
                     $grid.floatThead('destroy');
                     $grid.parent().css({
                         maxHeight: ''
