@@ -33,6 +33,9 @@ abstract class AbstractQueryConverter
      */
     protected $virtualFieldProvider;
 
+    /** @var int */
+    protected $tableAliasesCount = 0;
+
     /**
      * @var string
      */
@@ -1125,7 +1128,8 @@ abstract class AbstractQueryConverter
      */
     protected function generateTableAlias()
     {
-        return sprintf(static::TABLE_ALIAS_TEMPLATE, count($this->tableAliases) + 1);
+        $this->tableAliasesCount++;
+        return sprintf(static::TABLE_ALIAS_TEMPLATE, $this->tableAliasesCount);
     }
 
     /**
