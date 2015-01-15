@@ -15,6 +15,9 @@
             {% set metadataOptions = metadataOptions|merge({'routerEnabled': renderParams.routerEnabled}) %}
             {% set metaData = metaData|merge({'options': metadataOptions}) %}
         {% endif %}
+        {% if params.enableFullScreenLayout is defined %}
+            {% set metaData = metaData|merge({'enableFullScreenLayout': params.enableFullScreenLayout}) %}
+        {% endif %}
         {% set data     = oro_datagrid_data(datagrid) %}
         {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
         {% set options  = {
@@ -22,8 +25,7 @@
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
             builders: metaData.requireJSModules,
             metadata: metaData,
-            data: data,
-            enableFullScreenLayout: params.enableFullScreenLayout
+            data: data
         } %}
 
         <div id="{{ gridId }}"

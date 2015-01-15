@@ -61,8 +61,8 @@ define(function (require) {
             });
             parentView.subview('form', formView);
 
-            this.listenTo(formView, 'submit', this.onCommentSave, this)
-            this.listenTo(formView, 'reset', this.onCommentReset, this)
+            this.listenTo(formView, 'submit', this.onCommentSave, this);
+            this.listenTo(formView, 'reset', this.onCommentReset, this);
         },
 
         onCommentSave: function (attrs, options) {
