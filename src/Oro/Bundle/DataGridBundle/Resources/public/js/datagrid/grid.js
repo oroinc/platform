@@ -535,7 +535,6 @@ define(function (require) {
         },
 
         reflow: function () {
-            // for test
             var $grid;
             if (this.floatThead) {
                 this.$(this.selectors.grid).floatThead('reflow');
