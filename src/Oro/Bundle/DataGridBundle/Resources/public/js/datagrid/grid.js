@@ -630,6 +630,7 @@ define(function (require) {
             $(document).on('click.floatThead-' + this.cid, _.bind(this.removeFloatTheadDropdowns, this));
             $grid.parent().scroll(_.bind(this.removeFloatTheadDropdowns, this));
             this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
+                self.removeFloatTheadDropdowns();
                 self.dropdownOpened = true;
 
                 var $dropdown = $(e.target).closest('.dropdown'),
@@ -638,7 +639,6 @@ define(function (require) {
                 // let bootstrap show menu
                 _.defer(function () {
                     if (!$dropdown.hasClass('open')) {
-                        self.removeFloatTheadDropdowns();
                         return;
                     }
                     var position = $dropdownMenu.offset(),
