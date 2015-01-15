@@ -47,8 +47,6 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * @todo: bc break, move to constructor
-     *
      * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
     public function setVirtualRelationProvider($virtualRelationProvider)
@@ -68,7 +66,9 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
             $this->restrictionBuilder
         );
 
-        $converter->setVirtualRelationProvider($this->virtualRelationProvider);
+        if ($this->virtualRelationProvider) {
+            $converter->setVirtualRelationProvider($this->virtualRelationProvider);
+        }
 
         $qb = $converter->convert(
             new RestrictionSegmentProxy($segment, $this->doctrine->getManagerForClass($segment->getEntity()))

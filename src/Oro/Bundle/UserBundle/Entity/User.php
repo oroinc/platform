@@ -3,11 +3,11 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
@@ -84,6 +84,11 @@ class User extends ExtendUser implements
     const ROLE_DEFAULT = 'ROLE_USER';
     const ROLE_ADMINISTRATOR = 'ROLE_ADMINISTRATOR';
     const ROLE_ANONYMOUS = 'IS_AUTHENTICATED_ANONYMOUSLY';
+
+    protected $excludeChangeSet = [
+        'lastLogin' => null,
+        'loginCount' => null
+    ];
 
     /**
      * @ORM\Id
@@ -1345,9 +1350,11 @@ class User extends ExtendUser implements
      *
      * @ORM\PreUpdate
      */
-    public function preUpdate()
+    public function preUpdate(PreUpdateEventArgs $event)
     {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        if (array_diff_key($event->getEntityChangeSet(), $this->excludeChangeSet)) {
+            $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        }
     }
 
     /**
