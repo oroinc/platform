@@ -44,20 +44,28 @@ class AclWalker extends TreeWalkerAdapter
             $aclCondition = $query->getHint(self::ORO_ACL_CONDITION);
 
             if (!$aclCondition->isEmpty()) {
-                $whereConditions = $aclCondition->getWhereConditions();
-                if (!is_null($whereConditions) && count($whereConditions)) {
-                    $this->addAclToWhereClause($AST, $whereConditions);
-                }
-                $joinConditions = $aclCondition->getJoinConditions();
-                if (!is_null($joinConditions) && count($joinConditions)) {
-                    $this->addAclToJoinClause($AST, $joinConditions);
-                }
-
+                $this->addRequestConditions($AST, $aclCondition);
                 $this->processSubRequests($AST, $aclCondition);
             }
         }
 
         return $AST;
+    }
+
+    /**
+     * @param SelectStatement|Subselect                         $AST
+     * @param AclConditionStorage|SubRequestAclConditionStorage $aclCondition
+     */
+    protected function addRequestConditions($AST, $aclCondition)
+    {
+        $whereConditions = $aclCondition->getWhereConditions();
+        if (count($whereConditions)) {
+            $this->addAclToWhereClause($AST, $whereConditions);
+        }
+        $joinConditions = $aclCondition->getJoinConditions();
+        if (count($joinConditions)) {
+            $this->addAclToJoinClause($AST, $joinConditions);
+        }
     }
 
     /**
@@ -77,28 +85,50 @@ class AclWalker extends TreeWalkerAdapter
                     ->whereClause
                     ->conditionalExpression;
 
-                if (isset($conditionalExpression->conditionalFactors)) {
-                    $subselect = $conditionalExpression->conditionalFactors[$subRequest->getFactorId()]
-                        ->simpleConditionalExpression
-                        ->subselect;
-                } elseif (isset($conditionalExpression->conditionalTerms)) {
-                    $subselect = $conditionalExpression->conditionalTerms[$subRequest->getFactorId()]
-                        ->simpleConditionalExpression
-                        ->subselect;
-                } else {
-                    $subselect = $conditionalExpression->simpleConditionalExpression->subselect;
+                $subSelect = null;
+
+                if (isset($conditionalExpression->conditionalFactors)
+                    && isset($conditionalExpression->conditionalFactors[0])) {
+                    $subSelect = $this->getSubSelectFromFactor(
+                        $conditionalExpression->conditionalFactors[0],
+                        $subRequest->getFactorId()
+                    );
+                } elseif (isset($conditionalExpression->simpleConditionalExpression)) {
+                    $subSelect = $conditionalExpression->simpleConditionalExpression->subselect;
                 }
 
-                $whereConditions = $subRequest->getWhereConditions();
-                if (!is_null($whereConditions) && count($whereConditions)) {
-                    $this->addAclToWhereClause($subselect, $whereConditions);
-                }
-                $joinConditions = $subRequest->getJoinConditions();
-                if (!is_null($joinConditions) && count($joinConditions)) {
-                    $this->addAclToJoinClause($subselect, $joinConditions);
+                if ($subSelect) {
+                    $this->addRequestConditions($subSelect, $subRequest);
                 }
             }
         }
+    }
+
+
+    /**
+     * @param ConditionalPrimary $factor
+     * @param int $factorId
+     * @return Subselect
+     */
+    protected function getSubSelectFromFactor(ConditionalPrimary $factor, $factorId)
+    {
+        if (isset($factor->conditionalExpression->conditionalFactors)) {
+            $subSelect = $factor
+                ->conditionalExpression
+                ->conditionalFactors[$factorId]
+                ->simpleConditionalExpression
+                ->subselect;
+        } elseif (isset($factor->conditionalExpression->conditionalTerms)) {
+            $subSelect = $factor
+                ->conditionalExpression
+                ->conditionalTerms[$factorId]
+                ->simpleConditionalExpression
+                ->subselect;
+        } else {
+            $subSelect = $factor->simpleConditionalExpression->subselect;
+        }
+
+        return $subSelect;
     }
 
     /**
@@ -148,6 +178,10 @@ class AclWalker extends TreeWalkerAdapter
         }
     }
 
+    /**
+     * @param array        $aclConditionalFactors
+     * @param AclCondition $condition
+     */
     protected function addConditionFactors(&$aclConditionalFactors, AclCondition $condition)
     {
         $conditionalFactor = $this->getConditionalFactor($condition);
@@ -192,10 +226,10 @@ class AclWalker extends TreeWalkerAdapter
                             $aclConditionalFactors
                         );
                     } else {
-                        $AST->whereClause->conditionalExpression->conditionalTerms = array_merge(
-                            $AST->whereClause->conditionalExpression->conditionalTerms,
-                            $aclConditionalFactors
-                        );
+                        $conditionalPrimary = new ConditionalPrimary();
+                        $conditionalPrimary->conditionalExpression = $AST->whereClause->conditionalExpression;
+                        array_unshift($aclConditionalFactors, $conditionalPrimary);
+                        $AST->whereClause->conditionalExpression = new ConditionalTerm($aclConditionalFactors);
                     }
                 }
             }
