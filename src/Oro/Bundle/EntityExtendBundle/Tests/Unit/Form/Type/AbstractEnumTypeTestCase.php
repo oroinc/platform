@@ -103,7 +103,8 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
         $formConfig->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('value')); // name of property TestEntity::$value
+            // name of property TestEntity::$value
+            ->will($this->returnValue('value'));
         $formConfig->expects($this->exactly(2))
             ->method('getOption')
             ->will(
@@ -141,7 +142,8 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
         $formConfig->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('value')); // name of property TestEntity::$value
+            // name of property TestEntity::$value
+            ->will($this->returnValue('value'));
         $formConfig->expects($this->exactly(2))
             ->method('getOption')
             ->will(

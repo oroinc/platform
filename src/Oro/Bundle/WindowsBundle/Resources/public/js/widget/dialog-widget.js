@@ -40,6 +40,7 @@ define(function (require) {
         listen: {
             'adoptedFormResetClick': 'remove',
             'widgetRender': '_initAdjustHeight',
+            'contentLoad': 'onContentUpdated',
             'page:request mediator': 'onPageChange'
         },
 
@@ -134,6 +135,13 @@ define(function (require) {
             }
 
             DialogWidget.__super__.dispose.call(this);
+        },
+
+        /**
+         * Handles content load event and sets focus on first form input
+         */
+        onContentUpdated: function () {
+            this.$el.focusFirstInput();
         },
 
         /**

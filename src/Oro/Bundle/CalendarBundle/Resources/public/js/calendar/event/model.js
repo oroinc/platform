@@ -70,7 +70,7 @@ define(['underscore', 'backbone', 'routing'
                 ),
                 attrs || {}
             );
-            modelData.invitedUsers = modelData.invitedUsers.join(',');
+            modelData.invitedUsers = modelData.invitedUsers ? modelData.invitedUsers.join(',') : undefined;
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);

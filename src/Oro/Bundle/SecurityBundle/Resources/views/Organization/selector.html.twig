@@ -49,7 +49,7 @@
                             {% if oro_theme_logo() %}
                                 <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
                             {% else %}
-                                {{ organization_name }}
+                                {{- organization_name -}}
                             {% endif %}
                         </a>
                         <span class="caret"></span>
@@ -59,7 +59,7 @@
                     {% for organization in organizations %}
                         <li {% if curr_organization and curr_organization.getId() == organization.id %}class="current"{% endif %}>
                             <a href="{{ path('oro_security_switch_organization', {'id': organization.id}) }}" class="no-hash">
-                                {{ organization.name }}
+                                {{ organization.name|raw }}
                             </a>
                         </li>
                     {% endfor %}
@@ -76,7 +76,7 @@
                     {% if oro_theme_logo() %}
                         <img src="{{ asset(oro_theme_logo()) }}" alt="{{ organization_name|striptags|trim }}">
                     {% else %}
-                        {{ organization_name }}
+                        {{- organization_name -}}
                     {% endif %}
                 </a>
             </span>

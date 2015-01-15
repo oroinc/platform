@@ -210,7 +210,7 @@ define([
          * @protected
          */
         _hasForm: function () {
-            return Boolean($('form[data-collect=true]').length);
+            return Boolean(this.$('form[data-collect=true]').length);
         },
 
         /**
