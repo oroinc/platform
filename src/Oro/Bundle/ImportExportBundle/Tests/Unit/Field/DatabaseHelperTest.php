@@ -3,7 +3,11 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestEntity;
+use Oro\Bundle\ImportExportBundle\Tests\Unit\Fixtures\TestOrganization;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 
 class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,6 +32,22 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $doctrineHelper;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $securityFacade;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $ownershipMetadataProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fieldHelperService;
+
 
     /**
      * @var DatabaseHelper
@@ -69,8 +89,43 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
         $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->fieldHelperService = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->disableOriginalConstructor()
+            ->getMock('getService');
+        $fieldHelper->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->fieldHelperService);
 
-        $this->helper = new DatabaseHelper($registry, $this->doctrineHelper, $fieldHelper);
+        $securityFacadeLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $ownershipMetadataProviderLink = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->ownershipMetadataProvider = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $securityFacadeLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->securityFacade);
+        $ownershipMetadataProviderLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->ownershipMetadataProvider);
+
+        $this->helper = new DatabaseHelper(
+            $registry,
+            $this->doctrineHelper,
+            $fieldHelper,
+            $securityFacadeLink,
+            $ownershipMetadataProviderLink
+        );
     }
 
     public function testFind()
@@ -84,6 +139,48 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entity));
 
         $this->assertEquals($entity, $this->helper->find(self::TEST_CLASS, $identifier));
+    }
+
+    public function testFindObjectFromEnotherOrganization()
+    {
+        $entityOrganization = new TestOrganization();
+        $entityOrganization->setId(2);
+        $entity = new TestEntity();
+        $entity->getOrganization($entityOrganization);
+        $identifier = 1;
+        $entity->setId($identifier);
+
+        $currentOrganization = new TestOrganization();
+        $currentOrganization->setId(1);
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganization')
+            ->willReturn($currentOrganization);
+        $this->securityFacade->expects($this->any())
+            ->method('getOrganizationId')
+            ->willReturn($currentOrganization->getId());
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntity')
+            ->with(self::TEST_CLASS, $identifier)
+            ->will($this->returnValue($entity));
+
+        $metadata = new OwnershipMetadata(
+            'USER',
+            'owner',
+            'owner',
+            'organization',
+            'organization'
+        );
+
+        $this->fieldHelperService->expects($this->once())
+            ->method('getObjectValue')
+            ->willReturn($entity->getOrganization());
+        
+        $this->ownershipMetadataProvider->expects($this->any())
+            ->method('getMetadata')
+            ->willReturn($metadata);
+
+        $this->assertNull($this->helper->find(self::TEST_CLASS, $identifier));
     }
 
     public function testGetIdentifier()
@@ -133,7 +230,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function isCascadePersistDataProvider()
     {
-        return array(
+        return [
             'no cascade operations' => [
                 'mapping'   => [],
                 'isCascade' => false,
@@ -146,7 +243,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
                 'mapping'   => ['cascade' => ['persist']],
                 'isCascade' => true,
             ],
-        );
+        ];
     }
 
     public function testResetIdentifier()
@@ -189,20 +286,20 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function getInversedRelationFieldNameDataProvider()
     {
-        return array(
-            'mapped by field' => array(
-                'association' => array('mappedBy' => 'field'),
+        return [
+            'mapped by field' => [
+                'association' => ['mappedBy' => 'field'],
                 'expectedField' => 'field',
-            ),
-            'inversed by field' => array(
-                'association' => array('inversedBy' => 'field'),
+            ],
+            'inversed by field' => [
+                'association' => ['inversedBy' => 'field'],
                 'expectedField' => 'field',
-            ),
-            'no inversed field' => array(
-                'association' => array(),
+            ],
+            'no inversed field' => [
+                'association' => [],
                 'expectedField' => null,
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -217,7 +314,7 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
         $this->metadata->expects($this->once())
             ->method('getAssociationMapping')
             ->with($fieldName)
-            ->will($this->returnValue(array('type' => $type)));
+            ->will($this->returnValue(['type' => $type]));
 
         $this->assertEquals($expected, $this->helper->isSingleInversedRelation(self::TEST_CLASS, $fieldName));
     }
@@ -227,12 +324,12 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function isSingleInversedRelationDataProvider()
     {
-        return array(
-            'one to one'   => array(ClassMetadata::ONE_TO_ONE, true),
-            'one to many'  => array(ClassMetadata::ONE_TO_MANY, true),
-            'many to one'  => array(ClassMetadata::MANY_TO_ONE, false),
-            'many to many' => array(ClassMetadata::MANY_TO_MANY, false),
-        );
+        return [
+            'one to one'   => [ClassMetadata::ONE_TO_ONE, true],
+            'one to many'  => [ClassMetadata::ONE_TO_MANY, true],
+            'many to one'  => [ClassMetadata::MANY_TO_ONE, false],
+            'many to many' => [ClassMetadata::MANY_TO_MANY, false],
+        ];
     }
 
     public function testGetEntityReference()
