@@ -66,7 +66,8 @@ define(function (require) {
             toolbar:     '.toolbar',
             noDataBlock: '.no-data',
             filterBox:   '.filter-box',
-            loadingMaskContainer: '.grid-container-parent'
+            loadingMaskContainer: '.grid-container-parent',
+            floatTheadContainerClass: '.floatThead-container'
         },
 
         /** @property {orodatagrid.datagrid.Header} */
@@ -550,7 +551,6 @@ define(function (require) {
             var $grid,
                 $container,
                 containerClass = '.grid-container',
-                floatTheadContainerClass = '.floatThead-container',
                 dropdownOpened = false,
                 self = this,
                 dropdownsToReset = [];
@@ -580,68 +580,103 @@ define(function (require) {
                         }
                     });
                     this.reflow();
-                    $container = $grid.parent().find(floatTheadContainerClass);
-                    $(document).on('click.floatThead-' + this.cid, removeDropdowns);
-                    this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
-                        dropdownOpened = true;
-
-                        var $dropdown = $(e.target).closest('.dropdown'),
-                            $dropdownMenu = $dropdown.find('.dropdown-menu');
-
-                        // let bootstrap show menu
-                        _.defer(function () {
-                            if (!$dropdown.hasClass('open')) {
-                                removeDropdowns();
-                                return;
-                            }
-                            var position = $dropdownMenu.offset(),
-                                $dropdownMenuCopy = $dropdownMenu.cloneWithStyles(),
-                                // required in IE, it counts width and height incorrectly
-                                clientRect = $dropdownMenu[0].getBoundingClientRect();
-
-                            $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
-                            $('body').append($dropdownMenuCopy);
-
-                            $dropdownMenuCopy.css({
-                                position: 'absolute',
-                                top: position.top + 1, // required to add 1px to exactly match position
-                                left: position.left,
-                                width: clientRect.width,
-                                height: clientRect.height
-                            });
-
-                            $dropdownMenu.hide();
-                            // need to reset after dropdown remove
-                            dropdownsToReset.push($dropdownMenu);
-
-                            $dropdownMenuCopy.show();
-
-                            $dropdownMenuCopy.on('mouseenter.floatThead-' + self.cid, function expandContainer() {
-                                $container.css({
-                                    height: self.getCssHeightCalcExpression()
-                                });
-                                $dropdownMenuCopy.hide();
-                                $dropdownMenu.show();
-                            });
-                            $dropdownMenu.on('mouseleave.floatThead-' + self.cid, function collapseContainer() {
-                                $dropdownMenu.hide();
-                                $dropdownMenuCopy.show();
-                                $container.css({
-                                    height: ''
-                                });
-                            });
-                        });
-                    });
+                    this.addFloatTheadDropdownsSupport();
                 } else {
                     $grid.floatThead('destroy');
                     $grid.parent().css({
                         maxHeight: ''
                     });
-                    this.$el.off('.floatThead-' + this.cid);
-                    $(document).off('.floatThead-' + this.cid);
-                    $('body > .floatThead-dynamic-dropdown').remove();
+                    this.removeFloatTheadDropdownsSupport();
                 }
             }
+        },
+
+        dropdownOpened: false,
+        dropdownsToReset: [],
+
+        removeFloatTheadDropdowns: function () {
+            var self = this,
+                $grid = this.$(this.selectors.grid),
+                $container = $grid.parent().find(this.selectors.floatTheadContainerClass);
+            if (this.dropdownOpened) {
+                $('body > .floatThead-dynamic-dropdown').remove();
+            }
+            $.each(this.dropdownsToReset, function (){
+                $(this).css({display: ''}).off('.floatThead-' + self.cid)
+                    .closest('.dropdown').removeClass('open');
+            });
+            this.dropdownOpened = false;
+
+            $container.css({
+                height: ''
+            });
+        },
+
+        addFloatTheadDropdownsSupport: function () {
+            var self = this,
+                $grid = this.$(this.selectors.grid),
+                $container = $grid.parent().find(this.selectors.floatTheadContainerClass);
+            $(document).on('click.floatThead-' + this.cid, _.bind(this.removeFloatTheadDropdowns, this));
+            $grid.parent().scroll(_.bind(this.removeFloatTheadDropdowns, this));
+            this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
+                self.dropdownOpened = true;
+
+                var $dropdown = $(e.target).closest('.dropdown'),
+                    $dropdownMenu = $dropdown.find('.dropdown-menu');
+
+                // let bootstrap show menu
+                _.defer(function () {
+                    if (!$dropdown.hasClass('open')) {
+                        self.removeFloatTheadDropdowns();
+                        return;
+                    }
+                    var position = $dropdownMenu.offset(),
+                        $dropdownMenuCopy = $dropdownMenu.cloneWithStyles(),
+                    // required in IE, it counts width and height incorrectly
+                        clientRect = $dropdownMenu[0].getBoundingClientRect();
+
+                    $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
+                    $('body').append($dropdownMenuCopy);
+
+                    $dropdownMenuCopy.css({
+                        position: 'absolute',
+                        top: position.top + 1, // required to add 1px to exactly match position
+                        left: position.left,
+                        width: clientRect.width,
+                        height: clientRect.height
+                    });
+
+                    $dropdownMenu.hide();
+                    // need to reset after dropdown remove
+                    self.dropdownsToReset.push($dropdownMenu);
+
+                    $dropdownMenuCopy.show();
+
+                    /**
+                     * NOTE: This code switches menus between copy and real dropdown on mouseEnter and mouseLeave
+                     */
+                    $dropdownMenuCopy.on('mouseenter.floatThead-' + self.cid, function expandContainer() {
+                        $container.css({
+                            height: self.getCssHeightCalcExpression()
+                        });
+                        $dropdownMenuCopy.hide();
+                        $dropdownMenu.show();
+                    });
+                    $dropdownMenu.on('mouseleave.floatThead-' + self.cid, function collapseContainer() {
+                        $dropdownMenu.hide();
+                        $dropdownMenuCopy.show();
+                        $container.css({
+                            height: ''
+                        });
+                    });
+                });
+            });
+        },
+
+        removeFloatTheadDropdownsSupport: function () {
+            this.$el.off('.floatThead-' + this.cid);
+            $(document).off('.floatThead-' + this.cid);
+            this.removeFloatTheadDropdowns();
         },
 
         /**
