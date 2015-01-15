@@ -123,6 +123,7 @@ define(function (require) {
         initialize: function (options) {
             var opts = options || {};
             this.subviews = [];
+            this.cid = _.uniqueId('grid-');
 
             // Check required options
             if (!opts.collection) {
@@ -181,9 +182,7 @@ define(function (require) {
                 return;
             }
 
-            if(this.floatTheadConnected) {
-                this.$('table:first').floatThead('destroy');
-            }
+            this.setLayout('default');
 
             _.each(this.columns.models, function (column) {
                 column.dispose();
@@ -529,6 +528,12 @@ define(function (require) {
             return this;
         },
 
+        getCssHeightCalcExpression: function () {
+            var $grid;
+            $grid = this.$(this.selectors.grid);
+            return 'calc(100vh - ' + ($grid.parents('.grid-container-parent:first')[0].getBoundingClientRect().top + 20) + 'px)';
+        },
+
         reflow: function () {
             // for test
             var $grid;
@@ -536,28 +541,83 @@ define(function (require) {
                 this.$(this.selectors.grid).floatThead('reflow');
                 $grid = this.$(this.selectors.grid);
                 $grid.parent().css({
-                    maxHeight: 'calc(100vh - ' + ($grid.parents('.grid-container-parent:first')[0].getBoundingClientRect().top + 20) + 'px)'
+                    maxHeight: this.getCssHeightCalcExpression()
                 });
+                $('body > .floatThead-dynamic-dropdown').remove();
             }
         },
 
         setFloatThead: function (newValue) {
-            var $grid;
+            var $grid,
+                $container,
+                containerClass = '.grid-container',
+                floatTheadContainerClass = '.floatThead-container',
+                dropdownOpened = false,
+                self = this;
+
             if (newValue !== this.floatThead) {
                 this.floatThead = newValue;
                 $grid = this.$(this.selectors.grid);
                 if (newValue) {
                     $grid.floatThead({
+                        useAbsolutePositioning: false,
                         scrollContainer: function($table){
-                            return $table.closest('.grid-container');
+                            return $table.closest(containerClass);
                         }
                     });
                     this.reflow();
+                    $container = $grid.parent().find(floatTheadContainerClass);
+                    $(document).on('click.floatThead-' + this.cid, function () {
+                        if (dropdownOpened) {
+                            $('body > .floatThead-dynamic-dropdown').remove();
+                        }
+                        dropdownOpened = false;
+                    });
+                    this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
+                        dropdownOpened = true;
+
+                        var $dropdown = $(e.target).closest('.dropdown'),
+                            $dropdownMenu = $dropdown.find('.dropdown-menu');
+
+                        // let bootstrap show menu
+                        _.defer(function () {
+                            var position = $dropdownMenu.offset(),
+                                // not native clone
+                                $dropdownMenuCopy = $dropdownMenu.cloneWithStyles();
+
+                            $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
+                            $('body').append($dropdownMenuCopy);
+
+                            $dropdownMenuCopy.css({
+                                position: 'absolute',
+                                top: position.top + 1, // not sure why but required to add 1 px to exactly match position
+                                left: position.left
+                            });
+                            $dropdownMenuCopy.show();
+                            $dropdownMenuCopy.on('mouseenter', function expandContainer() {
+                                $container.css({
+                                    height: self.getCssHeightCalcExpression()
+                                });
+                                $dropdownMenuCopy.hide();
+                                $dropdownMenu.show();
+                            });
+                            $dropdownMenu.on('mouseleave', function collapseContainer() {
+                                $dropdownMenu.hide();
+                                $dropdownMenuCopy.show();
+                                $container.css({
+                                    height: ''
+                                });
+                            });
+                        });
+                    });
                 } else {
                     $grid.floatThead('destroy');
                     $grid.parent().css({
                         maxHeight: ''
                     });
+                    this.$el.off('.floatThead-' + this.cid);
+                    $(document).off('.floatThead-' + this.cid);
+                    $('body > .floatThead-dynamic-dropdown').remove();
                 }
             }
         },
