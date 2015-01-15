@@ -284,6 +284,13 @@ class ConfigController extends Controller
                 }
                 $fields[$field['name']] = $field['label'] ? : $field['name'];
             }
+
+            /**
+             * in case no fields were found - add empty_value into result
+             */
+            if (empty($fields)) {
+                $fields[''] = $this->get('translator')->trans('oro.entity.form.choose_entity_field');
+            }
         }
 
         return new Response(json_encode($fields));
