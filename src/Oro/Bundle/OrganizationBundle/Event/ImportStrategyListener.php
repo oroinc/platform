@@ -75,10 +75,15 @@ class ImportStrategyListener
         /** @var SecurityFacade $securityFacade */
         $securityFacade = $this->securityFacadeLink->getService();
 
-        // we should allow to set organization for entity only in case of console import.
-        // if import process was run from UI (import from the grid), should be set current organization for entities.
+        /**
+         * We should allow to set organization for entity only in case of console import.
+         * If import process was executed from UI (grid's import), current organization for entities should be set.
+         */
         $organization = $this->getPropertyAccessor()->getValue($entity, $organizationField);
-        if ($organization && $securityFacade->getOrganization()) {
+        if ($organization
+            && $securityFacade->getOrganization()
+            && $organization->getId() == $securityFacade->getOrganizationId()
+        ) {
             return;
         }
 
