@@ -8,9 +8,9 @@ class GroupByHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider groupByDataProvider
-     * @param array $selects
+     * @param array  $selects
      * @param string $groupBy
-     * @param array $expected
+     * @param array  $expected
      */
     public function testGetGroupByFields($selects, $groupBy, $expected)
     {
@@ -25,39 +25,52 @@ class GroupByHelperTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'no fields' => [
-                'selects'    => [],
-                'groupBy'    => null,
-                'expected'   => [],
+                'selects' => [],
+                'groupBy' => null,
+                'expected' => [],
             ],
             'group by no fields' => [
-                'selects'    => [],
-                'groupBy'    => 'alias.existing',
-                'expected'   => ['alias.existing'],
+                'selects' => [],
+                'groupBy' => 'alias.existing',
+                'expected' => ['alias.existing'],
             ],
             'field without alias' => [
-                'selects'    => ['alias.field'],
-                'groupBy'    => null,
-                'expected'   => ['alias.field'],
+                'selects' => ['alias.field'],
+                'groupBy' => 'alias.field',
+                'expected' => ['alias.field'],
             ],
-            'aliases and without' => [
-                'selects'    => ['alias.field', 'alias.matchedFields  as  c1', 'alias.secondMatched aS someAlias3'],
-                'groupBy'    => null,
-                'expected'   => ['alias.field', 'c1', 'someAlias3'],
+            'aliases and without group by' => [
+                'selects' => ['alias.field', 'alias.matchedFields  as  c1', 'alias.secondMatched aS someAlias3'],
+                'groupBy' => null,
+                'expected' => [],
             ],
             'mixed fields and group by' => [
-                'selects'    => ['alias.field', 'alias.matchedFields as c1'],
-                'groupBy'    => 'alias.existing',
-                'expected'   => ['alias.existing', 'alias.field', 'c1'],
+                'selects' => ['alias.field', 'alias.matchedFields as c1'],
+                'groupBy' => 'alias.existing',
+                'expected' => ['alias.existing'],
             ],
             'wrong field definition' => [
-                'selects'    => ['alias.matchedFields wrongas c1'],
-                'groupBy'    => null,
-                'expected'   => [],
+                'selects' => ['alias.matchedFields wrongas c1'],
+                'groupBy' => null,
+                'expected' => [],
             ],
             'with aggregate' => [
-                'selects'    => ['MAX(t1.f0)', 'AvG(t10.F19) as agF1', 'alias.matchedFields AS c1'],
-                'groupBy'    => null,
-                'expected'   => ['c1'],
+                'selects' => [
+                    'MAX(t1.f0)',
+                    'AvG(t10.F19) as agF1',
+                    'alias.field',
+                    'alias.field2',
+                    'alias.matchedFields  as  c1',
+                    'alias.secondMatched aS someAlias3',
+                    'alias.matchedFields wrongas c1'
+                ],
+                'groupBy' => 'alias.field2',
+                'expected' => ['alias.field2', 'alias.field', 'c1', 'someAlias3'],
+            ],
+            'without group by' => [
+                'selects' => ['t1.f0', 't10.F19 as agF1', 'alias.matchedFields AS c1'],
+                'groupBy' => null,
+                'expected' => [],
             ],
         ];
     }
