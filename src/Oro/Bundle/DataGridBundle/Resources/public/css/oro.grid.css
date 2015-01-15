@@ -138,7 +138,7 @@ table.grid .select-row-cell input[type=checkbox] {
     border: 1px solid rgb(221, 221, 221);
 }
 
-.no-data-visible .floatThead-connected .grid-container {
+.no-data-visible.floatThead-connected .grid-container {
     border: none;
 }
 
