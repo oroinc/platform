@@ -290,7 +290,6 @@ define(function (require) {
         /**
          * Get actions of toolbar
          *
-         *
          * @return {Array}
          * @private
          */
@@ -522,6 +521,7 @@ define(function (require) {
              * @event grid_render:complete
              */
             mediator.trigger('grid_render:complete', this.$el);
+            mediator.execute('layout:init', this.$el, this);
 
             this.checkLayout();
 
@@ -564,6 +564,10 @@ define(function (require) {
                     $(this).css({display: ''}).off('.floatThead-' + self.cid);
                 });
                 dropdownOpened = false;
+
+                $container.css({
+                    height: ''
+                });
             }
 
             if (newValue !== this.floatThead) {
@@ -601,7 +605,7 @@ define(function (require) {
 
                             $dropdownMenuCopy.css({
                                 position: 'absolute',
-                                top: position.top + 1, // not sure why but required to add 1 px to exactly match position
+                                top: position.top + 1, // required to add 1px to exactly match position
                                 left: position.left,
                                 width: clientRect.width,
                                 height: clientRect.height
@@ -804,12 +808,11 @@ define(function (require) {
         },
 
         checkLayout: function () {
-            if (!this.enableFullScreenLayout) {
-                this.setLayout('default');
-                // do nothing
-                return;
+            var layout = 'default';
+            if (this.enableFullScreenLayout) {
+                layout = mediator.execute('layout:getPreferredLayout', this.$(this.selectors.grid));
             }
-            this.setLayout(mediator.execute('layout:getPreferredLayout', this.$(this.selectors.grid)));
+            this.setLayout(layout);
         },
 
         setLayout: function (newLayout) {
