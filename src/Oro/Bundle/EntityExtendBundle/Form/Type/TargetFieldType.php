@@ -73,8 +73,8 @@ class TargetFieldType extends AbstractType
             )) {
                 continue;
             }
-            $choices[$field['name']] = $field['label'] ? : $field['name'];
 
+            $choices[$field['name']] = $field['label'] ? : $field['name'];
         }
 
         return $choices;

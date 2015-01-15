@@ -75,7 +75,7 @@ class EmailTemplateType extends AbstractType
 
         $lang              = $this->localeSettings->getLanguage();
         $notificationLangs = $this->userConfig->get('oro_locale.languages');
-        $notificationLangs = array_merge($notificationLangs, [$lang]);
+        $notificationLangs = array_unique(array_merge($notificationLangs, [$lang]));
         $localeLabels      = $this->localeSettings->getLocalesByCodes($notificationLangs, $lang);
         $builder->add(
             'translations',

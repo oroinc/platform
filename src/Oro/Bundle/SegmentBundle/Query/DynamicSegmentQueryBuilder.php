@@ -5,10 +5,11 @@ namespace Oro\Bundle\SegmentBundle\Query;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
-use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\Manager;
-use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilder;
+use Oro\Bundle\SegmentBundle\Entity\Segment;
+use Oro\Bundle\SegmentBundle\Model\RestrictionSegmentProxy;
 
 class DynamicSegmentQueryBuilder implements QueryBuilderInterface
 {
@@ -20,6 +21,12 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
 
     /** @var ManagerRegistry */
     protected $doctrine;
+
+    /** @var VirtualFieldProviderInterface */
+    protected $virtualFieldProvider;
+
+    /** @var VirtualRelationProviderInterface */
+    protected $virtualRelationProvider;
 
     /**
      * @param RestrictionBuilder            $restrictionBuilder
@@ -40,7 +47,15 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * {inheritdoc}
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     */
+    public function setVirtualRelationProvider($virtualRelationProvider)
+    {
+        $this->virtualRelationProvider = $virtualRelationProvider;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function build(Segment $segment)
     {
@@ -50,7 +65,12 @@ class DynamicSegmentQueryBuilder implements QueryBuilderInterface
             $this->doctrine,
             $this->restrictionBuilder
         );
-        $qb        = $converter->convert(
+
+        if ($this->virtualRelationProvider) {
+            $converter->setVirtualRelationProvider($this->virtualRelationProvider);
+        }
+
+        $qb = $converter->convert(
             new RestrictionSegmentProxy($segment, $this->doctrine->getManagerForClass($segment->getEntity()))
         );
 

@@ -6,6 +6,7 @@ use CG\Generator\PhpClass;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
 
 class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
@@ -60,6 +61,6 @@ class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGenerato
      */
     protected function getAssociationType()
     {
-        return 'manyToMany';
+        return RelationType::MANY_TO_MANY;
     }
 }
