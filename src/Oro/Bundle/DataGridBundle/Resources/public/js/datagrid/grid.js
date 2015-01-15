@@ -183,7 +183,7 @@ define(function (require) {
             this._listenToBodyEvents();
             this._listenToCommands();
 
-            this.listenTo(mediator, 'layout:reposition', this.checkLayout, this);
+            this.listenTo(mediator, 'layout:reposition', this.chooseLayout, this);
         },
 
         /**
@@ -536,17 +536,24 @@ define(function (require) {
             mediator.trigger('grid_render:complete', this.$el);
             mediator.execute('layout:init', this.$el, this);
 
-            this.checkLayout();
+            this.chooseLayout();
 
             return this;
         },
 
+        /**
+         * Returns css expression to set what could be used as height of some block
+         * @returns {string}
+         */
         getCssHeightCalcExpression: function () {
-            var $grid;
-            $grid = this.$(this.selectors.grid);
+            var $grid = this.$(this.selectors.grid);
             return 'calc(100vh - ' + ($grid.parents('.grid-container-parent:first')[0].getBoundingClientRect().top + 20) + 'px)';
         },
 
+        /**
+         * Reflows floatThead dependent grid parts.
+         * Must be called on resize.
+         */
         reflow: function () {
             var $grid;
             if (this.floatThead) {
@@ -555,10 +562,15 @@ define(function (require) {
                 $grid.parent().css({
                     maxHeight: this.getCssHeightCalcExpression()
                 });
-                $('body > .floatThead-dynamic-dropdown').remove();
+                this.removeFloatTheadDropdowns();
             }
         },
 
+        /**
+         * Enables or disables float thead support
+         *
+         * @param newValue {boolean}
+         */
         setFloatThead: function (newValue) {
             var $grid,
                 containerClass = '.grid-container';
@@ -587,6 +599,9 @@ define(function (require) {
             }
         },
 
+        /**
+         * Removes all opened dropdowns in float thead mode
+         */
         removeFloatTheadDropdowns: function () {
             var self = this,
                 $grid = this.$(this.selectors.grid),
@@ -605,6 +620,9 @@ define(function (require) {
             });
         },
 
+        /**
+         * Attaches logic required to support bootstrap dropdowns with float thead
+         */
         addFloatTheadDropdownsSupport: function () {
             var self = this,
                 $grid = this.$(this.selectors.grid),
@@ -666,6 +684,9 @@ define(function (require) {
             });
         },
 
+        /**
+         * Detaches logic required to support bootstrap dropdowns with float thead
+         */
         removeFloatTheadDropdownsSupport: function () {
             this.$el.off('.floatThead-' + this.cid);
             $(document).off('.floatThead-' + this.cid);
@@ -829,12 +850,10 @@ define(function (require) {
             }
         },
 
-
-        getAvailableHeight: function () {
-            return mediator.execute('layout:getAvailableHeight', this.$(this.selectors.grid));
-        },
-
-        checkLayout: function () {
+        /**
+         * Chooses layout on resize or during creation
+         */
+        chooseLayout: function () {
             var layout = 'default';
             if (this.enableFullScreenLayout) {
                 layout = mediator.execute('layout:getPreferredLayout', this.$(this.selectors.grid));
@@ -842,6 +861,9 @@ define(function (require) {
             this.setLayout(layout);
         },
 
+        /**
+         * Sets layout and perform all required operations
+         */
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 this.reflow();
