@@ -105,6 +105,18 @@ define(function (require) {
             enableFullScreenLayout: false
         },
 
+
+        /**
+         * @property {bool} becomes true if dropdown is opened when floatThead enabled
+         */
+        dropdownOpened: false,
+
+        /**
+         * @property {array} contains an array of currently opened dropdowns when floatThead enabled
+         * NOTE: All instances share this property
+         */
+        dropdownsToReset: [],
+
         /**
          * Initialize grid
          *
@@ -549,25 +561,7 @@ define(function (require) {
 
         setFloatThead: function (newValue) {
             var $grid,
-                $container,
-                containerClass = '.grid-container',
-                dropdownOpened = false,
-                self = this,
-                dropdownsToReset = [];
-
-            function removeDropdowns() {
-                if (dropdownOpened) {
-                    $('body > .floatThead-dynamic-dropdown').remove();
-                }
-                $.each(dropdownsToReset, function (){
-                    $(this).css({display: ''}).off('.floatThead-' + self.cid);
-                });
-                dropdownOpened = false;
-
-                $container.css({
-                    height: ''
-                });
-            }
+                containerClass = '.grid-container';
 
             if (newValue !== this.floatThead) {
                 this.floatThead = newValue;
@@ -590,9 +584,6 @@ define(function (require) {
                 }
             }
         },
-
-        dropdownOpened: false,
-        dropdownsToReset: [],
 
         removeFloatTheadDropdowns: function () {
             var self = this,
