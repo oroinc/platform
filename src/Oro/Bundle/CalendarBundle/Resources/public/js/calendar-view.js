@@ -737,7 +737,7 @@ define(function (require) {
             };
             options.windowResize = function () {
                 self.setTimeline();
-                _.delay(_.bind(self.checkLayout, self));
+                _.delay(_.bind(self.chooseLayout, self));
             };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
@@ -749,7 +749,7 @@ define(function (require) {
             options.timezone = "UTC";
 
             this.getCalendarElement().fullCalendar(options);
-            this.checkLayout();
+            this.chooseLayout();
             this.enableEventLoading = true;
         },
 
@@ -897,7 +897,11 @@ define(function (require) {
             return mediator.execute('layout:getAvailableHeight', $fcView)
         },
 
-        checkLayout: function () {
+
+        /**
+         * Chooses layout on resize or during creation
+         */
+        chooseLayout: function () {
             if (this.options.eventsOptions.aspectRatio) {
                 this.setLayout('default');
                 // do nothing
@@ -907,6 +911,9 @@ define(function (require) {
             this.setLayout(mediator.execute('layout:getPreferredLayout', $fcView));
         },
 
+        /**
+         * Sets layout and perform all required operations
+         */
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 if (newLayout === 'fullscreen') {

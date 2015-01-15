@@ -22,9 +22,24 @@ define(function (require) {
     pageRenderedCbPool = [];
 
     layout = {
-        BOTTOM_PADDING: 10,
+        /**
+         * Default padding to keep when calculate available height for fullscreen layout
+         */
+        PAGE_BOTTOM_PADDING: 10,
+
+        /**
+         * Minimal height for fullscreen layout
+         */
         minimalHeightForFullScreenLayout: 500, // chrome 768px height and a lot
+
+        /**
+         * Keeps calculated devToolbarHeight. Please use getDevToolbarHeight() to retrieve it
+         */
         devToolbarHeight: undefined,
+
+        /**
+         * @returns {number} development toolbar height in dev mode, 0 in production mode
+         */
         getDevToolbarHeight: function () {
             if (!this.devToolbarHeight) {
                 var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
@@ -36,6 +51,7 @@ define(function (require) {
             }
             return this.devToolbarHeight;
         },
+
         init: function (container, parent) {
             var promise;
             container = $(container);
@@ -287,15 +303,27 @@ define(function (require) {
             });
         },
 
+        /**
+         * Returns available height for element if page will be transformed to fullscreen mode
+         *
+         * @param $mainEl
+         * @returns {number}
+         */
         getAvailableHeight: function ($mainEl) {
             var $scrollableParents = $mainEl.parents('.scrollable-container'),
                 heightDiff = $(document).height() - $mainEl[0].getBoundingClientRect().top;
             $scrollableParents.each(function () {
                 heightDiff += this.scrollTop;
             });
-            return heightDiff - this.getDevToolbarHeight() - this.BOTTOM_PADDING;
+            return heightDiff - this.getDevToolbarHeight() - this.PAGE_BOTTOM_PADDING;
         },
 
+        /**
+         * Returns name of preferred layout for $mainEl
+         *
+         * @param $mainEl
+         * @returns {string}
+         */
         getPreferredLayout: function ($mainEl) {
             if (!this.hasHorizontalScroll() && this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
                 return 'fullscreen';
@@ -304,16 +332,32 @@ define(function (require) {
             }
         },
 
+        /**
+         * Disables ability to scroll of $mainEl's scrollable parents
+         *
+         * @param $mainEl
+         * @returns {string}
+         */
         disablePageScroll: function ($mainEl) {
             var $scrollableParents = $mainEl.parents('.scrollable-container');
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
         },
 
+        /**
+         * Enables ability to scroll of $mainEl's scrollable parents
+         *
+         * @param $mainEl
+         * @returns {string}
+         */
         enablePageScroll: function ($mainEl) {
             $mainEl.parents('.scrollable-container').removeClass('disable-scroll');
         },
 
+        /**
+         * Returns true if page has horizontal scroll
+         * @returns {boolean}
+         */
         hasHorizontalScroll: function () {
             return $('body').outerWidth() > $(window).width();
         }
