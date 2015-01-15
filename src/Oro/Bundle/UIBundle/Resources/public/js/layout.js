@@ -297,7 +297,7 @@ define(function (require) {
         },
 
         getPreferredLayout: function ($mainEl) {
-            if (this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
+            if (!this.hasHorizontalScroll() && this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
                 return 'fullscreen';
             } else {
                 return 'scroll';
@@ -312,6 +312,10 @@ define(function (require) {
 
         enablePageScroll: function ($mainEl) {
             $mainEl.parents('.scrollable-container').removeClass('disable-scroll');
+        },
+
+        hasHorizontalScroll: function () {
+            return $('body').outerWidth() > $(window).width();
         }
     };
 

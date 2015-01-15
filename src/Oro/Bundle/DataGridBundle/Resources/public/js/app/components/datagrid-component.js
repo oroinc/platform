@@ -101,7 +101,6 @@ define(function (require) {
                 massActions: {}
             });
             this.modules = {};
-            this.enableFullScreenLayout = options.enableFullScreenLayout;
 
             this.collectModules();
 
@@ -230,7 +229,7 @@ define(function (require) {
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
                 metadata: this.metadata,
-                enableFullScreenLayout: this.enableFullScreenLayout
+                enableFullScreenLayout: this.metadata.enableFullScreenLayout
             };
         },
         dispose: function () {
