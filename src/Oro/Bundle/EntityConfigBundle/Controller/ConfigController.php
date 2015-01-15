@@ -279,8 +279,7 @@ class ConfigController extends Controller
                 if (!in_array(
                     $field['type'],
                     ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
-                )
-                ) {
+                )) {
                     continue;
                 }
                 $fields[$field['name']] = $field['label'] ? : $field['name'];
