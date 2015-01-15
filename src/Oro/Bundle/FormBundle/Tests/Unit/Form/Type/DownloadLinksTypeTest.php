@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 use Oro\Bundle\FormBundle\Form\Type\DownloadLinksType;
 
-class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
+class DownloadLinksTypeTest extends FormIntegrationTestCase
 {
     /**
      * @var DownloadLinksType
@@ -20,9 +23,9 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        parent::setUp();
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
         $this->type = new DownloadLinksType($this->assetHelper);
     }
 
@@ -32,41 +35,31 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_download_links_type', $this->type->getName());
     }
 
-    public function testGetParent()
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @expectedExceptionMessage The required option "source" is missing.
+     */
+    public function testSetDefaultOptionsWithoutSource()
     {
-        $this->assertInternalType('string', $this->type->getParent());
-        $this->assertEquals('text', $this->type->getParent());
+        $resolver = $this->getOptionsResolver();
+        $this->type->setDefaultOptions($resolver);
+        $resolver->resolve([]);
     }
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
-
-        $resolver
-            ->expects($this->once())
-            ->method('setRequired')
-            ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
-            ->method('setOptional')
-            ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
-            ->method('setDefaults')
-            ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
-        $resolver
-            ->expects($this->once())
-            ->method('setAllowedTypes')
-            ->with($this->isType('array'))
-            ->will($this->returnSelf());
-
+        $resolver = $this->getOptionsResolver();
         $this->type->setDefaultOptions($resolver);
+
+        $options = ['source' => []];
+        $resolvedOptions = $resolver->resolve($options);
+        $this->assertEquals(
+            [
+                'source' => [],
+                'class'  => ''
+            ],
+            $resolvedOptions
+        );
     }
 
     /**
@@ -77,10 +70,9 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testFinishView(array $files, array $options, array $expected)
     {
-        $formView = $this->getMock('Symfony\Component\Form\FormView');
-        $form     = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()->getMock();
+        $view = new FormView();
 
         $valueMap = [];
         foreach ($files as $fileName) {
@@ -102,8 +94,8 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getUrl')
             ->will($this->returnValueMap($valueMap));
 
-        $this->type->finishView($formView, $form, $options);
-        $this->assertEquals($expected, $formView->vars);
+        $this->type->finishView($view, $form, $options);
+        $this->assertEquals($expected, $view->vars);
 
         foreach ($files as $fileName) {
             unlink(sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName);
@@ -116,19 +108,35 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
     public function optionsProvider()
     {
         return [
-            [
-                [
+            'no files' => [
+                'files'    => [],
+                'options'  => [
+                    'source' => [
+                        'path' => sys_get_temp_dir() . '/*.txt',
+                        'url'  => 'download/files'
+                    ],
+                    'class'  => ''
+                ],
+                'expected' => [
+                    'value'  => null,
+                    'attr'   => [],
+                    'files'  => [],
+                    'class'  => ''
+                ]
+            ],
+            'existing files' => [
+                'files'    => [
                     'file1.txt',
                     'file2.txt',
                 ],
-                [
+                'options'  => [
                     'source' => [
                         'path' => sys_get_temp_dir() . '/*.txt',
                         'url'  => 'download/files'
                     ],
                     'class'  => 'red'
                 ],
-                [
+                'expected' => [
                     'value'  => null,
                     'attr'   => [],
                     'files'  => [
@@ -139,5 +147,16 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    /**
+     * @return OptionsResolver
+     */
+    protected function getOptionsResolver()
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([]);
+
+        return $resolver;
     }
 }

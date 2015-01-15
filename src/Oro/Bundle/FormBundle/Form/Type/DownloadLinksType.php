@@ -46,14 +46,6 @@ class DownloadLinksType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getParent()
-    {
-        return 'text';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return 'oro_download_links_type';
