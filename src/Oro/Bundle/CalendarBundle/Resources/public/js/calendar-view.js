@@ -894,7 +894,8 @@ define(function (require) {
         },
 
         getAvailableHeight: function () {
-            return mediator.execute('layout:getAvailableHeight', this.getCalendarElement().find('.fc-view:first'))
+            var $fcView = this.getCalendarElement().find('.fc-view:first');
+            return mediator.execute('layout:getAvailableHeight', $fcView)
         },
 
         checkLayout: function () {
@@ -903,7 +904,8 @@ define(function (require) {
                 // do nothing
                 return;
             }
-            this.setLayout(mediator.execute('layout:getPreferredLayout', this.getCalendarElement().find('.fc-view:first')));
+            var $fcView = this.getCalendarElement().find('.fc-view:first');
+            this.setLayout(mediator.execute('layout:getPreferredLayout', $fcView));
         },
 
         setLayout: function (newLayout) {

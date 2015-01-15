@@ -131,25 +131,31 @@ table.grid .select-row-cell input[type=checkbox] {
     border-radius: 0 !important;
     margin: -1px;
 }
+
 .floatThead-wrapper table th{
     border-bottom-left-radius: 0 !important;
     border-top-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
     border-top-right-radius: 0 !important;
 }
+
 .floatThead-wrapper .grid-container {
     border: 1px solid rgb(221, 221, 221);
 }
+
 .no-data-visible .floatThead-wrapper .grid-container {
     border: none;
 }
+
 .floatThead-wrapper .floatThead-container{
     margin-top: 1px !important;
 }
+
 .floatThead-wrapper .floatThead-container .grid{
     border-bottom: 1px solid rgb(221, 221, 221) !important;
     margin: 0;
 }
+
 .floatThead-wrapper .grid {
     margin-bottom: 0
 }
