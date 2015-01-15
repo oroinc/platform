@@ -122,6 +122,10 @@ table.grid .select-row-cell input[type=checkbox] {
     z-index: 899 !important;
 }
 
+.floatThead-container .table-bordered th{
+    border-left: none;
+}
+
 .floatThead-wrapper .grid {
     border: none !important;
     border-radius: 0 !important;
