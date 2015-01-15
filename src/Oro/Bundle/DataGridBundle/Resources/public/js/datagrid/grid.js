@@ -669,11 +669,13 @@ define(function (require) {
                 this.$(this.selectors.grid).show();
                 this.$(this.selectors.filterBox).show();
                 this.$(this.selectors.noDataBlock).hide();
+                this.$el.removeClass('no-data-visible');
             } else {
                 this.$(this.selectors.grid).hide();
                 this.$(this.selectors.toolbar).hide();
                 this.$(this.selectors.filterBox).hide();
                 this.$(this.selectors.noDataBlock).show();
+                this.$el.addClass('no-data-visible');
             }
         },
 
