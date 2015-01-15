@@ -8,23 +8,32 @@ class GroupByHelper
      * Get fields that must appear in GROUP BY.
      *
      * @param string|array $groupBy
-     * @param array $selects
+     * @param array        $selects
      * @return array
      */
     public function getGroupByFields($groupBy, $selects)
     {
         $groupBy = $this->getPreparedGroupBy($groupBy);
+        $fields = [];
+        $hasAggregate = false;
 
         foreach ($selects as $select) {
             $select = trim((string)$select);
+            $selectHasAggregate = $this->hasAggregate($select);
+            $hasAggregate = $hasAggregate || $selectHasAggregate;
             // Do not add fields with aggregate functions
-            if ($this->hasAggregate($select)) {
+            if ($selectHasAggregate) {
                 continue;
             }
 
-            if ($field = $this->getFieldForGroupBy($select)) {
-                $groupBy[] = $field;
+            $field = $this->getFieldForGroupBy($select);
+            if ($field) {
+                $fields[] = $field;
             }
+        }
+
+        if ($hasAggregate) {
+            $groupBy = array_merge($groupBy, array_diff($fields, $groupBy));
         }
 
         return array_unique($groupBy);
