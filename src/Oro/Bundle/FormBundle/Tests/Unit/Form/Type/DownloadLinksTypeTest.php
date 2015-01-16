@@ -3,30 +3,24 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 use Oro\Bundle\FormBundle\Form\Type\DownloadLinksType;
 
-class DownloadLinksTypeTest extends FormIntegrationTestCase
+class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var DownloadLinksType
-     */
+    /** @var DownloadLinksType */
     protected $type;
 
-    /**
-     * @var CoreAssetsHelper
-     */
+    /** @var CoreAssetsHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $assetHelper;
 
     protected function setUp()
     {
-        parent::setUp();
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
             ->disableOriginalConstructor()->getMock();
-        $this->type = new DownloadLinksType($this->assetHelper);
+        $this->type        = new DownloadLinksType($this->assetHelper);
     }
 
     public function testGetName()
@@ -41,17 +35,17 @@ class DownloadLinksTypeTest extends FormIntegrationTestCase
      */
     public function testSetDefaultOptionsWithoutSource()
     {
-        $resolver = $this->getOptionsResolver();
+        $resolver = new OptionsResolver();
         $this->type->setDefaultOptions($resolver);
         $resolver->resolve([]);
     }
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getOptionsResolver();
+        $resolver = new OptionsResolver();
         $this->type->setDefaultOptions($resolver);
 
-        $options = ['source' => []];
+        $options         = ['source' => []];
         $resolvedOptions = $resolver->resolve($options);
         $this->assertEquals(
             [
@@ -66,12 +60,12 @@ class DownloadLinksTypeTest extends FormIntegrationTestCase
      * @param array $files
      * @param array $options
      * @param array $expected
+     *
      * @dataProvider optionsProvider
      */
     public function testFinishView(array $files, array $options, array $expected)
     {
-        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
-            ->disableOriginalConstructor()->getMock();
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $view = new FormView();
 
         $valueMap = [];
@@ -89,10 +83,8 @@ class DownloadLinksTypeTest extends FormIntegrationTestCase
             }
 
         }
-        $this->assetHelper
-            ->expects($this->exactly(count($files)))
-            ->method('getUrl')
-            ->will($this->returnValueMap($valueMap));
+        $this->assetHelper->expects($this->exactly(count($files)))->method('getUrl')
+            ->willReturnMap($valueMap);
 
         $this->type->finishView($view, $form, $options);
         $this->assertEquals($expected, $view->vars);
@@ -108,55 +100,44 @@ class DownloadLinksTypeTest extends FormIntegrationTestCase
     public function optionsProvider()
     {
         return [
-            'no files' => [
+            'no files'       => [
                 'files'    => [],
                 'options'  => [
                     'source' => [
-                        'path' => sys_get_temp_dir() . '/*.txt',
+                        'path' => sys_get_temp_dir() . '/*.download_file',
                         'url'  => 'download/files'
                     ],
                     'class'  => ''
                 ],
                 'expected' => [
-                    'value'  => null,
-                    'attr'   => [],
-                    'files'  => [],
-                    'class'  => ''
+                    'value' => null,
+                    'attr'  => [],
+                    'files' => [],
+                    'class' => ''
                 ]
             ],
             'existing files' => [
                 'files'    => [
-                    'file1.txt',
-                    'file2.txt',
+                    'file1.download_file',
+                    'file2.download_file',
                 ],
                 'options'  => [
                     'source' => [
-                        'path' => sys_get_temp_dir() . '/*.txt',
+                        'path' => sys_get_temp_dir() . '/*.download_file',
                         'url'  => 'download/files'
                     ],
                     'class'  => 'red'
                 ],
                 'expected' => [
-                    'value'  => null,
-                    'attr'   => [],
-                    'files'  => [
-                        'file1.txt' => '/download/files/file1.txt',
-                        'file2.txt' => '/download/files/file2.txt'
+                    'value' => null,
+                    'attr'  => [],
+                    'files' => [
+                        'file1.download_file' => '/download/files/file1.download_file',
+                        'file2.download_file' => '/download/files/file2.download_file'
                     ],
-                    'class'  => 'red'
+                    'class' => 'red'
                 ]
             ]
         ];
-    }
-
-    /**
-     * @return OptionsResolver
-     */
-    protected function getOptionsResolver()
-    {
-        $resolver = new OptionsResolver();
-        $resolver->setDefaults([]);
-
-        return $resolver;
     }
 }
