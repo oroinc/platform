@@ -68,21 +68,25 @@ define(function (require) {
         },
 
         onFormSubmit: function (formView) {
-            var model, itemView, options;
+            var model, listView, options;
 
+            listView = this.listView;
             model = formView.model;
-            options = formView.fetchAjaxOptions();
 
             if (model.isNew()) {
                 this.collection.add(model, {at: 0});
-            } else {
-                itemView = this.listView.getItemView(model);
-                options.success = function () {
-                    itemView.render();
-                }
             }
 
-            options.url = model.url();
+            model.once('sync', function () {
+                var itemView = listView.getItemView(model);
+                if (itemView) {
+                    itemView.render();
+                }
+            });
+
+            options = formView.fetchAjaxOptions({
+                url: model.url()
+            });
             model.save(null, options);
         },
 
