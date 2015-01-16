@@ -82,6 +82,7 @@ class PasswordManager
 
     /**
      * @param User $user
+     * @param boolean $check
      *
      * @return bool
      */
