@@ -96,7 +96,9 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getService')
             ->willReturn($this->fieldHelperService);
 
-        $securityFacadeLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $securityFacadeLink = $this->getMockBuilder(
+            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
+        )
             ->disableOriginalConstructor()
             ->getMock();
         $ownershipMetadataProviderLink = $this
