@@ -17,7 +17,7 @@ parameters:
     oro_form.type.simple_color_choice.class:                     Oro\Bundle\FormBundle\Form\Type\OroSimpleColorChoiceType
     oro_form.type.color_table.class:                             Oro\Bundle\FormBundle\Form\Type\OroColorTableType
     oro_form.type.link.class:                                    Oro\Bundle\FormBundle\Form\Type\LinkType
-    oro_form.type.download_links.class:                           Oro\Bundle\FormBundle\Form\Type\DownloadLinksType
+    oro_form.type.download_links.class:                          Oro\Bundle\FormBundle\Form\Type\DownloadLinksType
     oro_form.type.api.class:                                     Oro\Bundle\FormBundle\Form\Type\AbstractApiType
     oro_form.type.rich_text.class:                               Oro\Bundle\FormBundle\Form\Type\OroRichTextType
 

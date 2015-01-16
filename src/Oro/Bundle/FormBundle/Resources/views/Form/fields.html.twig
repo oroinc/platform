@@ -671,11 +671,13 @@
 {% endblock %}
 
 {% block oro_download_links_type_widget %}
-    {% for fileName, route in files %}
-        <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
-            {{ fileName }}
-        </a>
-    {% endfor %}
+    {% spaceless %}
+        {% for fileName, route in files %}
+            <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                {{ fileName }}
+            </a>
+        {% endfor %}
+    {% endspaceless %}
 {% endblock %}
 
 {% block oro_simple_color_picker_row %}
