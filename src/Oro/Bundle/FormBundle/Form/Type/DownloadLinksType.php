@@ -68,7 +68,7 @@ class DownloadLinksType extends AbstractType
             /** @var \SplFileInfo[] $files */
             foreach ($files as $file) {
                 $resources[$file->getFilename()] = $this->assetHelper->getUrl(
-                    $source['url'] . DIRECTORY_SEPARATOR . $file->getFilename()
+                    rtrim($source['url'], '/') . '/' . $file->getFilename()
                 );
             }
         }
