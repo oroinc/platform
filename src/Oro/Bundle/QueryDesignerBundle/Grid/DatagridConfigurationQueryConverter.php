@@ -4,6 +4,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Grid;
 
 use Doctrine\ORM\Query;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
@@ -246,7 +247,7 @@ class DatagridConfigurationQueryConverter extends GroupingOrmQueryConverter
             $joinDefinition['condition'] = $joinCondition;
         }
 
-        if ('left' === $joinType) {
+        if (Join::LEFT_JOIN === $joinType) {
             $this->leftJoins[] = $joinDefinition;
         } else {
             $this->innerJoins[] = $joinDefinition;

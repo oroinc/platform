@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -23,6 +24,9 @@ class FieldType extends AbstractType
     const GROUP_FIELDS                   = 'fields';
     const GROUP_RELATIONS                = 'relations';
 
+    /**
+     * @var array
+     */
     protected $types = [
         self::GROUP_FIELDS       => [
             'string',
@@ -44,9 +48,11 @@ class FieldType extends AbstractType
             'multiEnum',
         ],
         self::GROUP_RELATIONS    => [
-            'oneToMany',
-            'manyToOne',
-            'manyToMany',
+//            BAP-5875
+//            RelationTypeBase::ONE_TO_ONE,
+            RelationTypeBase::ONE_TO_MANY,
+            RelationTypeBase::MANY_TO_ONE,
+            RelationTypeBase::MANY_TO_MANY,
         ],
     ];
 
@@ -258,7 +264,7 @@ class FieldType extends AbstractType
             if (false === (!$relation['assign']
                     && !$fieldId
                     && $targetFieldId
-                    && $targetFieldId->getFieldType() == 'manyToOne'
+                    && $targetFieldId->getFieldType() == RelationTypeBase::MANY_TO_ONE
                     && $targetEntityConfig->get('relation')
                     && $targetEntityConfig->get('relation')[$relationKey]['assign']
                 )

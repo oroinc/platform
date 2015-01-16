@@ -20,5 +20,7 @@ services:
             - @doctrine
             - @oro_entity.doctrine_helper
             - @oro_importexport.field.field_helper.link
+            - @oro_security.security_facade.link
+            - @oro_security.owner.ownership_metadata_provider.link
         tags:
             - { name: doctrine.event_listener, event: onClear }

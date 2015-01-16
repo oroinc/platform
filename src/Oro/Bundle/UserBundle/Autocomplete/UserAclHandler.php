@@ -356,6 +356,8 @@ class UserAclHandler implements SearchHandlerInterface
      * @param string $className The encoded class name
      *
      * @return string The class name
+     *
+     * @deprecated since 1.6. Will be removed in 2.0. Use oro_entity.routing_helper->decodeClassName($entityName);
      */
     public function decodeClassName($className)
     {
