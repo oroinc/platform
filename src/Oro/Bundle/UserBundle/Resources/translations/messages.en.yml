@@ -129,3 +129,6 @@ oro:
         privileges:
             entity.label: Entity
             action.label: Capabilities
+
+        reset:
+            ttl_already_requested.message:  The password for this user has already been requested within the last 24 hours
