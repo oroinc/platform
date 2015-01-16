@@ -1344,15 +1344,14 @@ class User extends ExtendUser implements
      * Invoked before the entity is updated.
      *
      * @ORM\PreUpdate
+     *
+     * @param PreUpdateEventArgs $event
      */
     public function preUpdate(PreUpdateEventArgs $event)
     {
-        $excludeChangeSet = [
-            'lastLogin' => null,
-            'loginCount' => null
-        ];
+        $excludedFields = ['lastLogin', 'loginCount'];
 
-        if (array_diff_key($event->getEntityChangeSet(), $excludeChangeSet)) {
+        if (array_diff_key($event->getEntityChangeSet(), array_flip($excludedFields))) {
             $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         }
     }
