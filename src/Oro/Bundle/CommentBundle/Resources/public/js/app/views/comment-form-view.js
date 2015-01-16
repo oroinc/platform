@@ -6,7 +6,6 @@ define(function (require) {
     var CommentFormView,
         $ = require('jquery'),
         _ = require('underscore'),
-        tools = require('oroui/js/tools'),
         mediator = require('oroui/js/mediator'),
         formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
         LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
@@ -83,18 +82,9 @@ define(function (require) {
         },
 
         onSubmit: function (e) {
-            var attrs, options;
             e.stopPropagation();
             e.preventDefault();
-            attrs = tools.unpackFromQueryString(this.$('form').serialize());
-            options = formToAjaxOptions(this.$('form'));
-            if (this.model) {
-                attrs.id = this.model.id;
-            }
-            options.success = _.bind(this.onSuccessResponse, this);
-            options.error = _.bind(this.onErrorResponse, this);
-            this.trigger('submit', attrs, options);
-            this.subview('loading').show();
+            this.trigger('submit', this);
         },
 
         onReset: function (e) {
@@ -117,18 +107,50 @@ define(function (require) {
             });
         },
 
-        onSuccessResponse: function () {
+        /**
+         * Fetches options with form-data to send it over ajax
+         *
+         * @param {Object=} options initial options
+         * @returns {Object}
+         */
+        fetchAjaxOptions: function (options) {
+            return formToAjaxOptions(this.$('form'), options);
+        },
+
+        /**
+         * Update view after request start
+         *
+         *  - shows loading mask
+         */
+        requestStarted: function () {
+            this.subview('loading').show();
+        },
+
+        /**
+         * Update view after successful request
+         *
+         *  - hides loading mask
+         *  - clears form if necessary
+         */
+        requestSucceeded: function () {
             this.subview('loading').hide();
             if (!this.model) {
                 this._clearFrom();
             }
         },
 
-        onErrorResponse: function (model, jqxhr, options) {
+        /**
+         * Update view after failed request
+         *
+         *  - hides loading mask
+         *  - shows error massages if they exist
+         *
+         * @param {Object} errors
+         */
+        requestFailed: function (errors) {
             this.subview('loading').hide();
-            if (jqxhr.status === 400 &&
-                jqxhr.responseJSON && jqxhr.responseJSON.errors) {
-                this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
+            if (errors) {
+                this.$('form').data('validator').showBackendErrors(errors);
             }
         }
     });

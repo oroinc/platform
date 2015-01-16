@@ -61,24 +61,35 @@ define(function (require) {
             });
             parentView.subview('form', formView);
 
-            this.listenTo(formView, 'submit', this.onCommentSave, this)
-            this.listenTo(formView, 'reset', this.onCommentReset, this)
+            this.listenTo(formView, 'submit', this.onFormSubmit, this);
         },
 
-        onCommentSave: function (attrs, options) {
-            var model, itemView;
-            if (attrs.id) {
-                model = this.collection.get(attrs.id);
-            } else {
+        onFormSubmit: function (formView) {
+            var model, options;
+
+            model = formView.model;
+            if (!model) {
                 model = this.collection.add({}, {at: 0});
             }
-            options.url = model.url();
-            model.save(null, options);
-        },
 
-        onCommentReset: function (model) {
-            var itemView = this.listView.getItemView(model);
-            itemView.render();
+            options = formView.fetchAjaxOptions({
+                url: model.url(),
+                beforeSend: function () {
+                    formView.requestStarted();
+                },
+                success: function () {
+                    formView.requestSucceeded();
+                },
+                error: function (model, jqxhr) {
+                    var errors;
+                    if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
+                        errors = jqxhr.responseJSON.errors;
+                    }
+                    formView.requestFailed(errors);
+                }
+            });
+
+            model.save(null, options);
         }
     });
 

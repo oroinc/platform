@@ -32,7 +32,7 @@ define(['jquery', 'jquery.form'], function ($) {
      * @returns {Object}
      */
     function fileUploadXhr(arrayData, extraData, options) {
-        var formData, data, i;
+        var formData, data, i, beforeSend;
         formData = new FormData();
 
         for (i = 0; i < arrayData.length; i += 1) {
@@ -48,6 +48,7 @@ define(['jquery', 'jquery.form'], function ($) {
             }
         }
 
+        beforeSend = options.beforeSend;
         options = $.extend(true, {}, $.ajaxSettings, options, {
             contentType: false,
             processData: false,
@@ -55,6 +56,9 @@ define(['jquery', 'jquery.form'], function ($) {
             data: null,
             beforeSend: function (xhr, options) {
                 options.data = formData;
+                if (beforeSend) {
+                    return beforeSend.apply(this, arguments);
+                }
             }
         });
 
