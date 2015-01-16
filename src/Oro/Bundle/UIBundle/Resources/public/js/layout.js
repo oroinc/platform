@@ -28,9 +28,14 @@ define(function (require) {
         PAGE_BOTTOM_PADDING: 10,
 
         /**
+         * Height of header on mobile devices
+         */
+        MOBILE_HEADER_HEIGHT: 54,
+
+        /**
          * Minimal height for fullscreen layout
          */
-        minimalHeightForFullScreenLayout: 500,
+        minimalHeightForFullScreenLayout: 450,
 
         /**
          * Keeps calculated devToolbarHeight. Please use getDevToolbarHeight() to retrieve it
@@ -310,9 +315,13 @@ define(function (require) {
          * @returns {number}
          */
         getAvailableHeight: function ($mainEl) {
-            var $scrollableParents = $mainEl.parents('.scrollable-container'),
-                heightDiff = $(document).height() - $mainEl[0].getBoundingClientRect().top;
-            $scrollableParents.each(function () {
+            var $parents = $mainEl.parents(),
+                screenHeight = $(document).height(),
+                heightDiff = screenHeight - $mainEl[0].getBoundingClientRect().top;
+            if (tools.isMobile()) {
+                heightDiff -= this.MOBILE_HEADER_HEIGHT;
+            }
+            $parents.each(function () {
                 heightDiff += this.scrollTop;
             });
             return heightDiff - this.getDevToolbarHeight() - this.PAGE_BOTTOM_PADDING;
@@ -339,7 +348,7 @@ define(function (require) {
          * @returns {string}
          */
         disablePageScroll: function ($mainEl) {
-            var $scrollableParents = $mainEl.parents('.scrollable-container');
+            var $scrollableParents = $mainEl.parents();
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
         },
@@ -351,7 +360,7 @@ define(function (require) {
          * @returns {string}
          */
         enablePageScroll: function ($mainEl) {
-            $mainEl.parents('.scrollable-container').removeClass('disable-scroll');
+            $mainEl.parents().removeClass('disable-scroll');
         },
 
         /**

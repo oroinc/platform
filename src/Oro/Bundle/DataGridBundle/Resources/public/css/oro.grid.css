@@ -125,6 +125,7 @@ table.grid .select-row-cell input[type=checkbox] {
 .floatThead-connected .grid {
     border: none !important;
     border-radius: 0 !important;
+    margin-left: -1px; /* IE fix */
 }
 
 .floatThead-connected table th{

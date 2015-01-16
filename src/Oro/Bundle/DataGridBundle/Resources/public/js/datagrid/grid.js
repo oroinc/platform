@@ -67,7 +67,7 @@ define(function (require) {
             noDataBlock: '.no-data',
             filterBox:   '.filter-box',
             loadingMaskContainer: '.grid-container-parent',
-            floatTheadContainerClass: '.floatThead-container'
+            floatTheadContainer: '.floatThead-container'
         },
 
         /** @property {orodatagrid.datagrid.Header} */
@@ -183,7 +183,7 @@ define(function (require) {
             this._listenToBodyEvents();
             this._listenToCommands();
 
-            this.listenTo(mediator, 'layout:reposition', this.chooseLayout, this);
+            this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
         },
 
         /**
@@ -536,7 +536,7 @@ define(function (require) {
             mediator.trigger('grid_render:complete', this.$el);
             mediator.execute('layout:init', this.$el, this);
 
-            this.chooseLayout();
+            this.updateLayout();
 
             return this;
         },
@@ -604,8 +604,7 @@ define(function (require) {
          */
         removeFloatTheadDropdowns: function () {
             var self = this,
-                $grid = this.$(this.selectors.grid),
-                $container = $grid.parent().find(this.selectors.floatTheadContainerClass);
+                $container = this.$(this.selectors.floatTheadContainer);
             if (this.dropdownOpened) {
                 $('body > .floatThead-dynamic-dropdown').remove();
             }
@@ -626,7 +625,7 @@ define(function (require) {
         addFloatTheadDropdownsSupport: function () {
             var self = this,
                 $grid = this.$(this.selectors.grid),
-                $container = $grid.parent().find(this.selectors.floatTheadContainerClass);
+                $container = this.$(this.selectors.floatTheadContainer);
             $(document).on('click.floatThead-' + this.cid, _.bind(this.removeFloatTheadDropdowns, this));
             $grid.parent().scroll(_.bind(this.removeFloatTheadDropdowns, this));
             this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
@@ -853,7 +852,7 @@ define(function (require) {
         /**
          * Chooses layout on resize or during creation
          */
-        chooseLayout: function () {
+        updateLayout: function () {
             var layout = 'default';
             if (this.enableFullScreenLayout) {
                 layout = mediator.execute('layout:getPreferredLayout', this.$(this.selectors.grid));

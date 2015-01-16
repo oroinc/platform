@@ -54,6 +54,19 @@ define(['jquery'], function ($) {
             ($autoFocus.length ? $autoFocus : $input).first().focus();
         },
 
+        focus: (function(orig) {
+            return function() {
+                var $elem = $(this);
+                if (!arguments.length && $elem.attr('data-focusable')) {
+                    // the element has own implementation to set focus
+                    $elem.triggerHandler('set-focus');
+                    return $elem;
+                } else {
+                    return orig.apply(this, arguments);
+                }
+            };
+        })($.fn.focus),
+
         /*
          * getStyleObject Plugin for jQuery JavaScript Library
          * From: http://upshots.org/?p=112
@@ -113,20 +126,7 @@ define(['jquery'], function ($) {
                 result.append(clone);
             });
             return result.find('>*');
-        },
-
-        focus: (function(orig) {
-            return function() {
-                var $elem = $(this);
-                if (!arguments.length && $elem.attr('data-focusable')) {
-                    // the element has own implementation to set focus
-                    $elem.triggerHandler('set-focus');
-                    return $elem;
-                } else {
-                    return orig.apply(this, arguments);
-                }
-            };
-        })($.fn.focus)
+        }
     });
 
     return $;
