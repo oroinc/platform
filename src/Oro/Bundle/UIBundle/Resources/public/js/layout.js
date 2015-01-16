@@ -318,9 +318,6 @@ define(function (require) {
             var $parents = $mainEl.parents(),
                 screenHeight = $(document).height(),
                 heightDiff = screenHeight - $mainEl[0].getBoundingClientRect().top;
-            if (tools.isMobile()) {
-                heightDiff -= this.MOBILE_HEADER_HEIGHT;
-            }
             $parents.each(function () {
                 heightDiff += this.scrollTop;
             });
