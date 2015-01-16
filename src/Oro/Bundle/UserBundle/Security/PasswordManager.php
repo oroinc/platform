@@ -92,7 +92,7 @@ class PasswordManager
         if ($user->isPasswordRequestNonExpired($this->ttl)) {
             $this->addError(
                 $this->translator->trans(
-                    'oro.user.reset.ttl_already_requested.message'
+                    'oro.user.password.reset.ttl_already_requested.message'
                 )
             );
 
