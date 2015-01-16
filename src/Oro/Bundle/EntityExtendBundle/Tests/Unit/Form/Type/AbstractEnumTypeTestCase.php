@@ -45,8 +45,21 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
     public function doTestPreSetDataForExistingEntity(AbstractType $type)
     {
-        $event = $this->getFormEventMock(new TestEntity(123));
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
+        $parentFormData = new TestEntity('123');
+
+        $parentForm = $this->expectFormWillReturnParentForm($form);
+        $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
+        $this->expectFormConfigWillReturnOptions(
+            $parentFormConfig,
+            [
+                ['data_class', null, get_class($parentFormData)]
+            ]
+        );
+        $this->expectFormWillReturnData($parentForm, $parentFormData);
+
+        $event = $this->getFormEventMock2($form);
         $event->expects($this->never())
             ->method('setData');
 
@@ -55,8 +68,39 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
     public function doTestPreSetDataForNullEntity(AbstractType $type)
     {
-        $event = $this->getFormEventMock(null);
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
 
+        $parentForm = $this->expectFormWillReturnParentForm($form);
+        $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
+        $this->expectFormConfigWillReturnOptions(
+            $parentFormConfig,
+            [
+                ['data_class', null, 'TestEntity']
+            ]
+        );
+        $this->expectFormWillReturnData($parentForm, null);
+
+        $event = $this->getFormEventMock2($form);
+        $event->expects($this->never())
+            ->method('setData');
+
+        $type->preSetData($event);
+    }
+
+    public function doTestPreSetDataForFormWithoutDataClass(AbstractType $type)
+    {
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+
+        $parentForm = $this->expectFormWillReturnParentForm($form);
+        $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
+        $this->expectFormConfigWillReturnOptions(
+            $parentFormConfig,
+            [
+                ['data_class', null, null]
+            ]
+        );
+
+        $event = $this->getFormEventMock2($form);
         $event->expects($this->never())
             ->method('setData');
 
@@ -67,23 +111,27 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     {
         $enumValueClassName = 'Test\EnumValue';
 
-        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
-
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-        $formConfig->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('value')); // name of property TestEntity::$value
-        $formConfig->expects($this->never())
-            ->method('getOption');
-
-        $form->expects($this->once())
-            ->method('getConfig')
-            ->will($this->returnValue($formConfig));
-
         $entity = new TestEntity();
         $entity->setValue($this->getMock($enumValueClassName));
 
-        $event = $this->getFormEventMock($entity, $form);
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $parentForm = $this->expectFormWillReturnParentForm($form);
+        $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
+
+        $this->expectFormConfigWillReturnOptions(
+            $parentFormConfig,
+            [
+                ['data_class', null, 'TestEntity']
+            ]
+        );
+
+        $this->expectFormWillReturnData($parentForm, $entity);
+
+        $form->expects($this->once())
+            ->method('getPropertyPath')
+            ->will($this->returnValue('value')); // name of property TestEntity::$value
+
+        $event = $this->getFormEventMock2($form);
 
         $this->doctrine->expects($this->never())
             ->method('anything');
@@ -99,32 +147,35 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $enumValueClassName = 'Test\EnumValue';
 
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->expectFormWillReturnFormConfig($form);
 
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-        $formConfig->expects($this->once())
-            ->method('getName')
-            // name of property TestEntity::$value
-            ->will($this->returnValue('value'));
-        $formConfig->expects($this->exactly(2))
-            ->method('getOption')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['class', null, $enumValueClassName],
-                        ['multiple', null, false],
-                    ]
-                )
-            );
-        $form->expects($this->once())
-            ->method('getConfig')
-            ->will($this->returnValue($formConfig));
-
-        $event = $this->getFormEventMock(new TestEntity(), $form);
-
-        $this->setExpectationsForLoadDefaultEnumValues(
-            $enumValueClassName,
-            ['val1']
+        $parentForm = $this->expectFormWillReturnParentForm($form);
+        $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
+        $this->expectFormConfigWillReturnOptions(
+            $parentFormConfig,
+            [
+                ['data_class', null, 'TestEntity'],
+            ]
         );
+
+        $this->expectFormWillReturnData($parentForm, new TestEntity());
+
+        // name of property TestEntity::$value
+        $form->expects($this->once())
+            ->method('getPropertyPath')
+            ->will($this->returnValue('value'));
+
+        $this->expectFormConfigWillReturnOptions(
+            $formConfig,
+            [
+                ['class', null, $enumValueClassName],
+                ['multiple', null, false],
+            ]
+        );
+
+        $this->setExpectationsForLoadDefaultEnumValues($enumValueClassName, ['val1']);
+
+        $event = $this->getFormEventMock2($form);
 
         $event->expects($this->once())
             ->method('setData')
@@ -138,27 +189,35 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $enumValueClassName = 'Test\EnumValue';
 
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->expectFormWillReturnFormConfig($form);
 
-        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
-        $formConfig->expects($this->once())
-            ->method('getName')
-            // name of property TestEntity::$value
-            ->will($this->returnValue('value'));
-        $formConfig->expects($this->exactly(2))
-            ->method('getOption')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['class', null, $enumValueClassName],
-                        ['multiple', null, true],
-                    ]
-                )
-            );
+        $parentForm = $this->expectFormWillReturnParentForm($form);
+        $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
+
+        $this->expectFormConfigWillReturnOptions(
+            $parentFormConfig,
+            [
+                ['data_class', null, 'TestEntity'],
+            ]
+        );
+
+        $this->expectFormWillReturnData($parentForm, new TestEntity());
+
+        // name of property TestEntity::$value
         $form->expects($this->once())
-            ->method('getConfig')
-            ->will($this->returnValue($formConfig));
+            ->method('getPropertyPath')
+            ->will($this->returnValue('value'));
 
-        $event = $this->getFormEventMock(new TestEntity(), $form);
+        $this->expectFormConfigWillReturnOptions(
+            $formConfig,
+            [
+                ['class', null, $enumValueClassName],
+                ['multiple', null, true],
+            ]
+        );
+
+
+        $event = $this->getFormEventMock2($form);
 
         $this->setExpectationsForLoadDefaultEnumValues(
             $enumValueClassName,
@@ -249,6 +308,23 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     /**
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $form
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getFormEventMock2($form)
+    {
+        $event = $this->getMockBuilder('Symfony\Component\Form\FormEvent')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event->expects($this->once())
+            ->method('getForm')
+            ->will($this->returnValue($form));
+
+        return $event;
+    }
+
+    /**
      * @param mixed                                         $entity
      * @param \PHPUnit_Framework_MockObject_MockObject|null $form
      *
@@ -276,6 +352,72 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->will($this->returnValue($form));
 
         return $event;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $form
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $parentForm
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function expectFormWillReturnParentForm(
+        \PHPUnit_Framework_MockObject_MockObject $form,
+        \PHPUnit_Framework_MockObject_MockObject $parentForm = null
+    ) {
+        if (!$parentForm) {
+            $parentForm = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        }
+
+        $form->expects($this->once())
+            ->method('getParent')
+            ->will($this->returnValue($parentForm));
+
+        return $parentForm;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $form
+     * @param mixed $data
+     */
+    protected function expectFormWillReturnData(\PHPUnit_Framework_MockObject_MockObject $form, $data)
+    {
+        $form->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $form
+     * @param \PHPUnit_Framework_MockObject_MockObject|null $formConfig
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function expectFormWillReturnFormConfig(
+        \PHPUnit_Framework_MockObject_MockObject $form,
+        \PHPUnit_Framework_MockObject_MockObject $formConfig = null
+    ) {
+        if (!$formConfig) {
+            $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        }
+
+        $form->expects($this->atLeastOnce())
+            ->method('getConfig')
+            ->will($this->returnValue($formConfig));
+
+        return $formConfig;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $formConfig
+     * @param array $optionsValueMap
+     */
+    protected function expectFormConfigWillReturnOptions(
+        \PHPUnit_Framework_MockObject_MockObject $formConfig,
+        array $optionsValueMap
+    ) {
+        $formConfig->expects($this->atLeastOnce())
+            ->method('getOption')
+            ->will(
+                $this->returnValueMap($optionsValueMap)
+            );
     }
 
     /**
