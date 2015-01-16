@@ -95,6 +95,10 @@ oro:
         statuses.label:              Statuses
         username.label:              Username
         organization.label:          Organization
+
+        # extended field added in migrations
+        title.label:                 Title
+
         #
         # Oro/Bundle/UserBundle/Entity/Group
         #
@@ -130,4 +134,4 @@ oro:
             reset.label: Reset
             change.label: Change
         action:
-            password_management: Manage users' passwords
+            password_management: Manage users' passwords            

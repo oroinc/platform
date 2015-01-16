@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
 abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
@@ -40,6 +43,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     protected function getJoinType($joinId)
     {
         $joinType = parent::getJoinType($joinId);
+
         if ($joinType === null) {
             $entityClassName = $this->getEntityClassName($joinId);
             if (!empty($entityClassName)) {
@@ -53,7 +57,7 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
                         $nullable = ($nullable || (isset($joinColumn['nullable']) ? $joinColumn['nullable'] : false));
                     }
                 }
-                $joinType = $nullable ? 'left' : 'inner';
+                $joinType = $nullable ? Join::LEFT_JOIN : Join::INNER_JOIN;
             }
         }
 

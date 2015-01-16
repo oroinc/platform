@@ -17,7 +17,6 @@ require([
             userMenu: '#top-page .user-menu',
             breadcrumb: '#breadcrumb',
             beforeContentAddition: '#before-content-addition',
-            loadingMask: '#main .hash-loading-mask',
             messages: '#flash-messages .flash-messages-holder'
         }
     });
@@ -81,8 +80,7 @@ require([
             compose: function () {
                 var view;
                 view = new PageLoadingMaskView({
-                    autoRender: true,
-                    region: 'loadingMask'
+                    container: '#page'
                 });
                 mediator.setHandler('showLoading', view.show, view);
                 mediator.setHandler('hideLoading', view.hide, view);

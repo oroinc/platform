@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -109,7 +110,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
                     $fieldOptions['enum']['enum_code'] = $enumCode;
                 }
-                $isMultiple         = $this->fieldTypeHelper->getUnderlyingType($fieldType) === 'manyToMany';
+                $isMultiple = $this->fieldTypeHelper->getUnderlyingType($fieldType) === RelationType::MANY_TO_MANY;
                 $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
 
                 // create an entity is used to store enum values

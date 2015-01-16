@@ -17,30 +17,56 @@ define(['jquery'], function ($) {
         return $.active || this.active;
     }, {active: false});
 
-    // http://stackoverflow.com/questions/4609405/set-focus-after-last-character-in-text-box
-    $.fn.focusAndSetCaretAtEnd = function () {
-        if (!this.length)
-            return;
-        var elem = this[0], elemLen = elem.value.length;
-        // For IE Only
-        if (document.selection) {
-            // Set focus
-            $(elem).focus();
-            // Use IE Ranges
-            var oSel = document.selection.createRange();
-            // Reset position to 0 & then set at end
-            oSel.moveStart('character', -elemLen);
-            oSel.moveStart('character', elemLen);
-            oSel.moveEnd('character', 0);
-            oSel.select();
-        }
-        else if (elem.selectionStart || elem.selectionStart == '0') {
-            // Firefox/Chrome
-            elem.selectionStart = elemLen;
-            elem.selectionEnd = elemLen;
-            $(elem).focus();
-        } // if
-    }
+    $.fn.extend({
+        // http://stackoverflow.com/questions/4609405/set-focus-after-last-character-in-text-box
+        focusAndSetCaretAtEnd: function () {
+            if (!this.length)
+                return;
+            var elem = this[0], elemLen = elem.value.length;
+            // For IE Only
+            if (document.selection) {
+                // Set focus
+                $(elem).focus();
+                // Use IE Ranges
+                var oSel = document.selection.createRange();
+                // Reset position to 0 & then set at end
+                oSel.moveStart('character', -elemLen);
+                oSel.moveStart('character', elemLen);
+                oSel.moveEnd('character', 0);
+                oSel.select();
+            }
+            else if (elem.selectionStart || elem.selectionStart == '0') {
+                // Firefox/Chrome
+                elem.selectionStart = elemLen;
+                elem.selectionEnd = elemLen;
+                $(elem).focus();
+            } // if
+        },
+
+        /**
+         * Sets focus on first form field
+         */
+        focusFirstInput: function () {
+            var $autoFocus,
+                $input = this.find(':input:visible, [data-focusable]')
+                    .not(':checkbox, :radio, :button, :submit, :disabled, :file');
+            $autoFocus = $input.filter('[autofocus]');
+            ($autoFocus.length ? $autoFocus : $input).first().focus();
+        },
+
+        focus: (function(orig) {
+            return function() {
+                var $elem = $(this);
+                if (!arguments.length && $elem.attr('data-focusable')) {
+                    // the element has own implementation to set focus
+                    $elem.triggerHandler('set-focus');
+                    return $elem;
+                } else {
+                    return orig.apply(this, arguments);
+                }
+            };
+        })($.fn.focus)
+    });
 
     return $;
 });

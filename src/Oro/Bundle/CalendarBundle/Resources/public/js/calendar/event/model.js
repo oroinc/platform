@@ -1,7 +1,7 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'routing'
-    ], function (_, Backbone, routing) {
+define(['underscore', 'backbone', 'routing', 'moment'
+    ], function (_, Backbone, routing, moment) {
     'use strict';
 
     /**
@@ -70,7 +70,7 @@ define(['underscore', 'backbone', 'routing'
                 ),
                 attrs || {}
             );
-            modelData.invitedUsers = modelData.invitedUsers.join(',');
+            modelData.invitedUsers = modelData.invitedUsers ? modelData.invitedUsers.join(',') : undefined;
 
             options.contentType = 'application/json';
             options.data = JSON.stringify(modelData);
@@ -94,7 +94,7 @@ define(['underscore', 'backbone', 'routing'
         validate: function (attrs) {
             var errors = [];
 
-            if (attrs.start > attrs.end) {
+            if (moment(attrs.end).diff(attrs.start) < 0) {
                 errors.push('oro.calendar.error_message.event_model.end_date_earlier_than_start');
             }
 
