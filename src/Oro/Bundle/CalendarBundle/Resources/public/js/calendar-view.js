@@ -737,7 +737,7 @@ define(function (require) {
             };
             options.windowResize = function () {
                 self.setTimeline();
-                _.delay(_.bind(self.chooseLayout, self));
+                _.delay(_.bind(self.updateLayout, self));
             };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
@@ -749,7 +749,7 @@ define(function (require) {
             options.timezone = "UTC";
 
             this.getCalendarElement().fullCalendar(options);
-            this.chooseLayout();
+            this.updateLayout();
             this.enableEventLoading = true;
         },
 
@@ -901,7 +901,7 @@ define(function (require) {
         /**
          * Chooses layout on resize or during creation
          */
-        chooseLayout: function () {
+        updateLayout: function () {
             if (this.options.eventsOptions.aspectRatio) {
                 this.setLayout('default');
                 // do nothing
