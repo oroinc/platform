@@ -35,7 +35,7 @@ define(function (require) {
         /**
          * Minimal height for fullscreen layout
          */
-        minimalHeightForFullScreenLayout: 450,
+        minimalHeightForFullScreenLayout: 300,
 
         /**
          * Keeps calculated devToolbarHeight. Please use getDevToolbarHeight() to retrieve it
