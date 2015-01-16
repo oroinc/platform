@@ -218,4 +218,15 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
     {
         $this->datasource->bindParameters(['foo']);
     }
+
+    public function testClone()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->datasource->setQueryBuilder($qb);
+        $this->datasource = clone $this->datasource;
+        $this->assertNotEquals($qb, $this->datasource->getQueryBuilder());
+    }
 }
