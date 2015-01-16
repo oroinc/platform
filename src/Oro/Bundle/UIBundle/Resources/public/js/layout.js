@@ -317,7 +317,7 @@ define(function (require) {
         getAvailableHeight: function ($mainEl) {
             var $parents = $mainEl.parents(),
                 screenHeight = $(document).height(),
-                heightDiff = screenHeight - $mainEl[0].getBoundingClientRect().top;
+                heightDiff = screenHeight - $mainEl[0].getBoundingClientRect().top + window.scrollY;
             $parents.each(function () {
                 heightDiff += this.scrollTop;
             });
@@ -331,7 +331,8 @@ define(function (require) {
          * @returns {string}
          */
         getPreferredLayout: function ($mainEl) {
-            if (!this.hasHorizontalScroll() && this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
+            if (!this.hasHorizontalScroll() && !tools.isMobile()
+                && this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
                 return 'fullscreen';
             } else {
                 return 'scroll';
