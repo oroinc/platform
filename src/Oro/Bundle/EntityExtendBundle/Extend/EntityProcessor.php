@@ -38,7 +38,6 @@ class EntityProcessor
     protected $commands = [
         'oro:entity-extend:update-config' => [],
         'oro:entity-extend:update-schema' => [],
-        'doctrine:schema:update'          => ['--force' => true],
     ];
 
     /**

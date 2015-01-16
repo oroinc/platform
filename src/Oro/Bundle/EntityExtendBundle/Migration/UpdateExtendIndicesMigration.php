@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Psr\Log\LoggerInterface;
+
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Type;
@@ -10,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 
 use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
@@ -41,16 +44,28 @@ class UpdateExtendIndicesMigration implements
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
+    /** @var CommandExecutor */
+    protected $commandExecutor;
+
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
      * @param FieldTypeHelper      $fieldTypeHelper
+     * @param CommandExecutor      $commandExecutor
+     * @param LoggerInterface      $logger
      */
     public function __construct(
         EntityMetadataHelper $entityMetadataHelper,
-        FieldTypeHelper $fieldTypeHelper
+        FieldTypeHelper $fieldTypeHelper,
+        CommandExecutor $commandExecutor,
+        LoggerInterface $logger
     ) {
         $this->entityMetadataHelper = $entityMetadataHelper;
         $this->fieldTypeHelper      = $fieldTypeHelper;
+        $this->commandExecutor      = $commandExecutor;
+        $this->logger               = $logger;
     }
 
     /**
@@ -82,7 +97,9 @@ class UpdateExtendIndicesMigration implements
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        xdebug_break();
         if ($schema instanceof ExtendSchema) {
+//            $this->clearCache();
             $extendOptions = $schema->getExtendOptions();
             $toSchema      = clone $schema;
 
@@ -127,15 +144,20 @@ class UpdateExtendIndicesMigration implements
             if (isset($options[ExtendOptionsManager::TYPE_OPTION])) {
                 $columnType = $this->fieldTypeHelper->getUnderlyingType($options[ExtendOptionsManager::TYPE_OPTION]);
                 if ($this->fieldTypeHelper->isRelation($columnType)
-                    || in_array($columnType, [Type::TEXT])
                 ) {
                     return;
                 }
-
                 $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
                     $className,
                     $columnName
                 );
+                if (in_array($columnType, [Type::TEXT])) {
+                    if ($table->hasIndex($indexName)) {
+                        $table->dropIndex($indexName);
+                    }
+                    return;
+                }
+
                 $enabled   = !isset($options['datagrid']['is_visible']) || $options['datagrid']['is_visible'];
                 if ($enabled && !$table->hasIndex($indexName)) {
                     $table->addIndex([$columnName], $indexName);
@@ -163,7 +185,34 @@ class UpdateExtendIndicesMigration implements
                     [$newColumnName],
                     $newIndexName
                 );
+                $this->logger->notice(
+                    'else - s:' . $schema . ' in:' . $newIndexName
+                );
             }
         }
+    }
+
+    protected function clearCache()
+    {
+        set_time_limit(0);
+
+        $exitCode = 0;
+        $code = $this->commandExecutor->runCommand(
+            'cache:clear',
+            [''],
+            $this->logger
+        );
+
+        if ($code !== 0) {
+            $exitCode = $code;
+        }
+
+        $isSuccess = $exitCode === 0;
+
+//        if ($isSuccess && $generateProxies) {
+//            $this->generateProxies();
+//        }
+
+        return $isSuccess;
     }
 }
