@@ -47,6 +47,11 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $this->doTestPreSetDataForNullEntity($this->type);
     }
 
+    public function testPreSetDataForFormWithoutDataClass()
+    {
+        $this->doTestPreSetDataForFormWithoutDataClass($this->type);
+    }
+
     public function testPreSetDataForNewEntityKeepExistingValue()
     {
         $this->doTestPreSetDataForNewEntityKeepExistingValue($this->type);
