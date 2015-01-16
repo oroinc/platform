@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
@@ -102,14 +103,8 @@ abstract class AbstractEnumType extends AbstractType
             return null;
         }
 
-        // Check to see if there's a value provided by the form.
-        $accessor = PropertyAccess::createPropertyAccessor();
-        try {
-            if (null !== $accessor->getValue($targetEntity, $form->getPropertyPath())) {
-                return;
-            }
-        } catch (NoSuchPropertyException $exception) {
-            // If value cannot be get then treat it as value is empty and we need to suppress this exception.
+        if (!$this->isDataEmptyValue($targetEntity, $form)) {
+            return;
         }
 
         // Set initial options for new entity
@@ -124,6 +119,32 @@ abstract class AbstractEnumType extends AbstractType
         } else {
             $event->setData($data ? array_shift($data) : '');
         }
+    }
+
+    /**
+     * @param mixed $targetEntity
+     * @param FormInterface $form
+     * @return bool
+     */
+    protected function isDataEmptyValue($targetEntity, FormInterface $form)
+    {
+        $formConfig = $form->getConfig();
+
+        // Check to see if there's a value provided by the form.
+        $accessor = PropertyAccess::createPropertyAccessor();
+        try {
+            $value = $accessor->getValue($targetEntity, $form->getPropertyPath());
+            if ($formConfig->getOption('multiple')) {
+                $result = ($value instanceof Collection && $value->isEmpty());
+            } else {
+                $result = (null == $value);
+            }
+        } catch (NoSuchPropertyException $exception) {
+            // If value cannot be get then treat it as value as empty and we need to suppress this exception.
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**

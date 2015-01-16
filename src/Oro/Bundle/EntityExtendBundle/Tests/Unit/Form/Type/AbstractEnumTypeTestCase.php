@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Fixtures\TestEntity;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Fixtures\TestEntity;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class AbstractEnumTypeTestCase extends TypeTestCase
 {
@@ -115,6 +118,14 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         $entity->setValue($this->getMock($enumValueClassName));
 
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $formConfig = $this->expectFormWillReturnFormConfig($form);
+        $this->expectFormConfigWillReturnOptions(
+            $formConfig,
+            [
+                ['multiple', null, false],
+            ]
+        );
+
         $parentForm = $this->expectFormWillReturnParentForm($form);
         $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
 
@@ -190,6 +201,13 @@ class AbstractEnumTypeTestCase extends TypeTestCase
 
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $formConfig = $this->expectFormWillReturnFormConfig($form);
+        $this->expectFormConfigWillReturnOptions(
+            $formConfig,
+            [
+                ['class', null, $enumValueClassName],
+                ['multiple', null, true],
+            ]
+        );
 
         $parentForm = $this->expectFormWillReturnParentForm($form);
         $parentFormConfig = $this->expectFormWillReturnFormConfig($parentForm);
@@ -201,21 +219,15 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ]
         );
 
-        $this->expectFormWillReturnData($parentForm, new TestEntity());
+        $data = new TestEntity();
+        $data->setValue(new ArrayCollection());
+
+        $this->expectFormWillReturnData($parentForm, $data);
 
         // name of property TestEntity::$value
         $form->expects($this->once())
             ->method('getPropertyPath')
             ->will($this->returnValue('value'));
-
-        $this->expectFormConfigWillReturnOptions(
-            $formConfig,
-            [
-                ['class', null, $enumValueClassName],
-                ['multiple', null, true],
-            ]
-        );
-
 
         $event = $this->getFormEventMock2($form);
 
