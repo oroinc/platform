@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 
 class RelationType extends AbstractType
 {
@@ -76,7 +77,7 @@ class RelationType extends AbstractType
             $targetEntity = $this->getArrayValue($data, 'target_entity');
             $relationType = $this->config->getId()->getFieldType();
 
-            if ($relationType == 'manyToOne') {
+            if ($relationType == RelationTypeBase::MANY_TO_ONE) {
                 $this->addTargetField(
                     $form,
                     'target_field',

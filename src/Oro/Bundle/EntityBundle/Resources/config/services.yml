@@ -8,6 +8,8 @@ parameters:
     oro_entity.exclusion_provider.config.class:                    Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
     oro_entity.exclusion_provider.chain.class:                     Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
     oro_entity.exclusion_provider.dictionary.class:                Oro\Bundle\EntityBundle\Provider\DictionaryExclusionProvider
+    oro_entity.virtual_relation_provider.config.class:             Oro\Bundle\EntityBundle\Provider\ConfigVirtualRelationProvider
+    oro_entity.virtual_relation_provider.chain.class:              Oro\Bundle\EntityBundle\Provider\ChainVirtualRelationProvider
     oro_entity.virtual_field_provider.class:                       Oro\Bundle\EntityBundle\Provider\ConfigVirtualFieldProvider
     oro_entity.virtual_field_provider.chain.class:                 Oro\Bundle\EntityBundle\Provider\ChainVirtualFieldProvider
     oro_entity.virtual_field_provider.dictionary.class:            Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
@@ -98,6 +100,7 @@ services:
         calls:
             - [setEntityProvider, [@oro_entity.entity_provider]]
             - [setVirtualFieldProvider, [@oro_entity.virtual_field_provider]]
+            - [setVirtualRelationProvider, [@oro_entity.virtual_relation_provider.chain]]
             - [setExclusionProvider, [@oro_entity.exclusion_provider]]
 
     oro_entity.exclusion_provider:
@@ -116,11 +119,16 @@ services:
         arguments:
             - @oro_entity_config.provider.grouping
 
+    oro_entity.virtual_field_provider.chain:
+        class: %oro_entity.virtual_field_provider.chain.class%
+
     oro_entity.virtual_field_provider:
         class: %oro_entity.virtual_field_provider.class%
         arguments:
             - @oro_entity.entity_hierarchy_provider
             - %oro_entity.virtual_fields%
+        tags:
+            - { name: oro_entity.virtual_field_provider, priority: 0 }
 
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%
@@ -128,12 +136,27 @@ services:
             - @oro_entity_config.provider.grouping
             - @oro_entity_config.provider.dictionary
             - @doctrine
+        tags:
+            - { name: oro_entity.virtual_field_provider, priority: 100 }
 
     oro_entity.virtual_field_provider.enum:
         class: %oro_entity.virtual_field_provider.enum.class%
         arguments:
             - @oro_entity_config.provider.extend
             - @doctrine
+        tags:
+            - { name: oro_entity.virtual_field_provider, priority: 100 }
+
+    oro_entity.virtual_relation_provider.chain:
+        class: %oro_entity.virtual_relation_provider.chain.class%
+
+    oro_entity.virtual_relation_provider.config:
+        class: %oro_entity.virtual_relation_provider.config.class%
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - %oro_entity.virtual_relations%
+        tags:
+            - { name: oro_entity.virtual_relation_provider, priority: 0 }
 
     oro_entity.entity_hierarchy_provider:
         class: %oro_entity.entity_hierarchy_provider.class%

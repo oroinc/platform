@@ -21,6 +21,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class ExtendFieldValueRenderListener
 {
@@ -102,7 +103,7 @@ class ExtendFieldValueRenderListener
         }
 
         $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($type);
-        if ($value && $underlyingFieldType == 'manyToOne') {
+        if ($value && $underlyingFieldType === RelationType::MANY_TO_ONE) {
             $viewData = $this->getValueForManyToOne(
                 $value,
                 $this->extendProvider->getConfigById($event->getFieldConfigId())

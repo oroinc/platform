@@ -63,8 +63,13 @@ class SearchController extends Controller
      */
     public function searchSuggestionAction(Request $request)
     {
+        $searchString = trim($request->get('search'));
+        if (!$searchString) {
+            return [];
+        }
+
         $searchResults = $this->get('oro_search.index')->simpleSearch(
-            $request->get('search'),
+            $searchString,
             (int) $request->get('offset'),
             (int) $request->get('max_results'),
             $request->get('from')
@@ -92,7 +97,14 @@ class SearchController extends Controller
     public function searchResultsAction(Request $request)
     {
         $from   = $request->get('from');
-        $string = $request->get('search');
+        $string = trim($request->get('search'));
+
+        if (!$string) {
+            return [
+                'searchString' => $string,
+                'groupedResults' => []
+            ];
+        }
 
         /** @var $resultProvider ResultStatisticsProvider */
         $resultProvider = $this->get('oro_search.provider.result_statistics_provider');

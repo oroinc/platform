@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
@@ -70,7 +71,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
 
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
-                if (in_array($fieldConfigId->getFieldType(), ['oneToMany', 'manyToOne', 'manyToMany'])) {
+                if (in_array($fieldConfigId->getFieldType(), RelationType::$anyToAnyRelations)) {
                     $this->createRelation($fieldConfig);
                 }
             }
@@ -138,11 +139,11 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $owner         = true;
         $targetOwner   = false;
 
-        if (in_array($selfFieldId->getFieldType(), ['oneToMany', 'manyToMany'])) {
+        if (in_array($selfFieldId->getFieldType(), RelationType::$toManyRelations)) {
             $classNameArray    = explode('\\', $selfFieldId->getClassName());
             $relationFieldName = strtolower(array_pop($classNameArray)) . '_' . $selfFieldId->getFieldName();
 
-            if ($selfFieldId->getFieldType() === 'oneToMany') {
+            if ($selfFieldId->getFieldType() === RelationType::ONE_TO_MANY) {
                 $owner       = false;
                 $targetOwner = true;
             }
