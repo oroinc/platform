@@ -28,6 +28,12 @@ define(function (require) {
             'reset': 'onReset'
         },
 
+        listen: {
+            'request model': 'onRequest',
+            'sync model': 'onSuccess',
+            'error model': 'onError'
+        },
+
         defaultData: {
             attachmentURL: null,
             attachmentFileName: null,
@@ -36,6 +42,11 @@ define(function (require) {
 
         initialize: function (options) {
             this.template = _.template($(options.template ).html());
+            this.isAddForm = this.model.isNew();
+            if (this.isAddForm) {
+                // save instance of empty model
+                this.original = this.model.clone();
+            }
             CommentFormView.__super__.initialize.apply(this, arguments);
         },
 
@@ -43,7 +54,7 @@ define(function (require) {
             var data = CommentFormView.__super__.getTemplateData.call(this);
             _.defaults(data, this.defaultData);
             // id is required for template
-            data.id = this.model ? this.model.get('id') : null;
+            data.id = this.model.id || null;
             return data;
         },
 
@@ -53,12 +64,12 @@ define(function (require) {
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
-                .addClass(this.model ? 'edit-form' : 'add-form')
+                .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate({invalidHandler: function(event, validator) {
                     _.delay(_.bind(validator.resetForm, validator), 3000);
                 }});
             mediator.execute('layout:init', this.$('form'));
-            if (this.model) {
+            if (!this.isAddForm) {
                 this.bindData();
             }
 
@@ -90,7 +101,7 @@ define(function (require) {
         onReset: function (e) {
             e.stopPropagation();
             e.preventDefault();
-            if (this.model) {
+            if (!this.isAddForm) {
                 this.trigger('reset', this.model);
             } else {
                 this._clearFrom();
@@ -102,6 +113,9 @@ define(function (require) {
         },
 
         _clearFrom: function () {
+            this.stopListening();
+            this.model = this.original.clone();
+            this.delegateListeners();
             this._elements().each(function () {
                 setValue($(this), '');
             });
@@ -122,7 +136,7 @@ define(function (require) {
          *
          *  - shows loading mask
          */
-        requestStarted: function () {
+        onRequest: function () {
             this.subview('loading').show();
         },
 
@@ -132,9 +146,9 @@ define(function (require) {
          *  - hides loading mask
          *  - clears form if necessary
          */
-        requestSucceeded: function () {
+        onSuccess: function () {
             this.subview('loading').hide();
-            if (!this.model) {
+            if (this.isAddForm) {
                 this._clearFrom();
             }
         },
@@ -145,12 +159,13 @@ define(function (require) {
          *  - hides loading mask
          *  - shows error massages if they exist
          *
-         * @param {Object} errors
+         * @param {Model} model
+         * @param {Object} jqxhr
          */
-        requestFailed: function (errors) {
+        onError: function (model, jqxhr) {
             this.subview('loading').hide();
-            if (errors) {
-                this.$('form').data('validator').showBackendErrors(errors);
+            if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
+                this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
             }
         }
     });

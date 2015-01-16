@@ -52,6 +52,8 @@ define(function (require) {
             parentView = this.listView;
             if (model) {
                 parentView = this.listView.getItemView(model);
+            } else {
+                model = new this.collection.model();
             }
 
             formView = new CommentFromView({
@@ -68,25 +70,13 @@ define(function (require) {
             var model, options;
 
             model = formView.model;
-            if (!model) {
-                model = this.collection.add({}, {at: 0});
+
+            if (model.isNew()) {
+                this.collection.add(model, {at: 0});
             }
 
             options = formView.fetchAjaxOptions({
-                url: model.url(),
-                beforeSend: function () {
-                    formView.requestStarted();
-                },
-                success: function () {
-                    formView.requestSucceeded();
-                },
-                error: function (model, jqxhr) {
-                    var errors;
-                    if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
-                        errors = jqxhr.responseJSON.errors;
-                    }
-                    formView.requestFailed(errors);
-                }
+                url: model.url()
             });
 
             model.save(null, options);
