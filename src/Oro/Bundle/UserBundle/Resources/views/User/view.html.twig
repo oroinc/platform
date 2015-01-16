@@ -32,12 +32,29 @@
     {% if entity.enabled and resource_granted('password_management') %}
         {% set html %}
         {# @todo change routes #}
-        {{ UI.dropdownItem({
-            'path': path('oro_user_reset_request'),
-            'title': 'oro.user.password.reset.label'|trans,
-            'label': 'oro.user.password.reset.label'|trans,
-            'iCss': 'icon-repeat'
+
+
+        {{ UI.dropdownClientItem({
+            'dataUrl': path('oro_user_reset_send_email_as_admin', {id: entity.id}),
+            'iCss': 'icon-repeat',
+            'label' : 'oro.user.password.reset.label'|trans,
+            'widget' : {
+                'type' : 'dialog',
+                'multiple' : false,
+                'options' : {
+                    'alias': 'reset-password-dialog',
+                    'dialogOptions' : {
+                        'title' : 'oro.user.password.reset.label'|trans,
+                        'allowMaximize': false,
+                        'allowMinimize': false,
+                        'autoResize': true,
+                        'width': 600
+                    }
+                }
+            }
         }) }}
+
+
         {{ UI.dropdownItem({
             'path': path('oro_user_reset_request'),
             'title': 'oro.user.password.change.label'|trans,

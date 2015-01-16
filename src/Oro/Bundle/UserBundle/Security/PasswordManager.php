@@ -85,18 +85,20 @@ class PasswordManager
      *
      * @return bool
      */
-    public function setResetPasswordEmail(User $user)
+    public function setResetPasswordEmail(User $user, $check = true)
     {
         $this->reset();
 
-        if ($user->isPasswordRequestNonExpired($this->ttl)) {
-            $this->addError(
-                $this->translator->trans(
-                    'oro.user.password.reset.ttl_already_requested.message'
-                )
-            );
+        if ($check) {
+            if ($user->isPasswordRequestNonExpired($this->ttl)) {
+                $this->addError(
+                    $this->translator->trans(
+                        'oro.user.password.reset.ttl_already_requested.message'
+                    )
+                );
 
-            return false;
+                return false;
+            }
         }
 
         if (null === $user->getConfirmationToken()) {

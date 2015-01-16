@@ -63,23 +63,30 @@ class ResetController extends Controller
      * @return array
      *
      * @Route("/send-email-as-admin/{id}", name="oro_user_reset_send_email_as_admin", requirements={"id"="\d+"})
-     * @AclAncestor("oro_user_user_update")
-     * @Template("")
+     * @AclAncestor("password_management")
+     * @Template("OroUserBundle:Reset/widget:sendEmailConfirmation.html.twig")
      */
     public function sendEmailAsAdminAction(User $user)
     {
         $params = [
-            'processed' => false,
+            'entity' => $user,
         ];
 
-        $passwordManager = $this->get('oro_user.security.password_manager');
-        $isMessageSent = $passwordManager->setResetPasswordEmail($user);
+        if ($this->getRequest()->isMethod('POST')) {
+            $passwordManager = $this->get('oro_user.security.password_manager');
+            $isMessageSent = $passwordManager->setResetPasswordEmail($user, false);
 
-        if ($isMessageSent) {
-            $params['processed'] = true;
+            if ($isMessageSent) {
+                $params['processed'] = true;
+            } else {
+                $params['processed'] = false;
+                $params['error'] = $passwordManager->getError();
+            }
         } else {
-            $params['processed'] = false;
-            $params['error'] = $passwordManager->getError();
+            $params['formAction'] = $this->get('router')->generate(
+                'oro_user_reset_send_email_as_admin',
+                ['id' => $user->getId()]
+            );
         }
 
         return $params;
