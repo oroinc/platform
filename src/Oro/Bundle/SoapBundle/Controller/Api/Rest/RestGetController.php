@@ -168,11 +168,15 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      * @param array $filterParameters   assoc array with filter params, like closure
      *                                  [filterName => [closure => \Closure(...), ...]]
      *                                  or [filterName => ParameterFilterInterface]
+     * @param array $filterMap          assoc array with map of filter query params to path that for doctrine criteria
+     *                                  For example: 2 filters by relation field - user_id and username.
+     *                                  Both should be applied to criteria as 'user' relation.
+     *                                  ['user_id' => 'user', 'user_name' => 'user']
      *
      * @return array
      * @throws \Exception
      */
-    protected function getFilterCriteria($supportedApiParams, $filterParameters = [])
+    protected function getFilterCriteria($supportedApiParams, $filterParameters = [], $filterMap = [])
     {
         $allowedFilters = $this->filterQueryParameters($supportedApiParams);
         $criteria       = Criteria::create();
@@ -192,6 +196,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 }
             }
 
+            $filterName = isset($filterMap[$filterName]) ? $filterMap[$filterName] : $filterName;
             $this->addCriteria($criteria, $filterName, $operator, $value);
         }
 
