@@ -101,10 +101,11 @@ define(function (require) {
         onReset: function (e) {
             e.stopPropagation();
             e.preventDefault();
-            if (!this.isAddForm) {
-                this.trigger('reset', this.model);
-            } else {
+            if (this.isAddForm) {
                 this._clearFrom();
+            } else {
+                this.bindData();
+                this.trigger('reset', this);
             }
         },
 
@@ -164,7 +165,8 @@ define(function (require) {
          */
         onError: function (model, jqxhr) {
             this.subview('loading').hide();
-            if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
+            if (jqxhr.status === 400 &&
+                jqxhr.responseJSON && jqxhr.responseJSON.errors) {
                 this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
             }
         }

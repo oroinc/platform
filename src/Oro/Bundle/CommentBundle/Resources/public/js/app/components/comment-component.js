@@ -64,22 +64,35 @@ define(function (require) {
             parentView.subview('form', formView);
 
             this.listenTo(formView, 'submit', this.onFormSubmit, this);
+            this.listenTo(formView, 'reset', this.onFormReset, this);
         },
 
         onFormSubmit: function (formView) {
-            var model, options;
+            var model, itemView, options;
 
             model = formView.model;
+            options = formView.fetchAjaxOptions();
 
             if (model.isNew()) {
                 this.collection.add(model, {at: 0});
+            } else {
+                itemView = this.listView.getItemView(model);
+                options.success = function () {
+                    itemView.render();
+                }
             }
 
-            options = formView.fetchAjaxOptions({
-                url: model.url()
-            });
-
+            options.url = model.url();
             model.save(null, options);
+        },
+
+        onFormReset: function (formView) {
+            var model, itemView;
+            model = formView.model;
+            if (!model.isNew()) {
+                itemView = this.listView.getItemView(model);
+                itemView.render();
+            }
         }
     });
 
