@@ -30,7 +30,7 @@ define(function (require) {
         /**
          * Minimal height for fullscreen layout
          */
-        minimalHeightForFullScreenLayout: 500, // chrome 768px height and a lot
+        minimalHeightForFullScreenLayout: 500,
 
         /**
          * Keeps calculated devToolbarHeight. Please use getDevToolbarHeight() to retrieve it

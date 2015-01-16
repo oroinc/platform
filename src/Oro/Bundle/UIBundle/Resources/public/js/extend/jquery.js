@@ -89,7 +89,7 @@ define(['jquery'], function ($) {
         },
 
         cloneWithStyles: function () {
-            // strange but only that works
+            // @TODO: optimize
             var result = $('<div>');
             this.each(function () {
                 var el = $(this),
