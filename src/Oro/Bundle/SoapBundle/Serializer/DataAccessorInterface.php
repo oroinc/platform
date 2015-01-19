@@ -19,8 +19,8 @@ interface DataAccessorInterface
      *
      * @param mixed  $object
      * @param string $property
-     * @param mixed  $value     When this method returns, contains a value of the specified property;
-     *                          if the operation failed a value of this variable is unpredictable
+     * @param mixed  $value    Contains a value of the specified property;
+     *                         if the operation failed a value of this variable is unpredictable
      *
      * @return boolean true if a value is got; otherwise, false
      */
