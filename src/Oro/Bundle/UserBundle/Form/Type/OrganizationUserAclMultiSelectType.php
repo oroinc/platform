@@ -6,6 +6,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class OrganizationUserAclMultiSelectType extends UserMultiSelectType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(

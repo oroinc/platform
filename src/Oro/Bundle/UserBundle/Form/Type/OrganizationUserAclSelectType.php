@@ -7,6 +7,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class OrganizationUserAclSelectType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
