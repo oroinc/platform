@@ -775,16 +775,7 @@ abstract class AbstractQueryConverter
         );
         $mainEntityJoinAlias = $this->tableAliases[$mainEntityJoinId];
         $query = $this->virtualFieldProvider->getVirtualFieldQuery($className, $fieldName);
-        /** @var array $aliasMap
-         *      key   = local alias (defined in virtual column query definition)
-         *      value = alias
-         */
-        if (isset($query['root_alias'])) {
-            $aliasKey = $query['root_alias'];
-        } else {
-            $aliasKey = 'entity';
-        }
-        $this->aliases[$aliasKey] = $mainEntityJoinAlias;
+        $this->prepareAliases($query, $mainEntityJoinAlias);
 
         if (isset($query['join'])) {
             $joins = $this->buildVirtualJoins($query, $mainEntityJoinId);
@@ -873,6 +864,14 @@ abstract class AbstractQueryConverter
             $className = $this->getEntityClassName($columnJoinId);
             $fieldName = $this->getFieldName($columnJoinId);
 
+            /**
+             * Was joined previously in virtual relation
+             */
+            if (!empty($this->aliases[$fieldName])) {
+                $columnJoinId = null;
+                continue;
+            }
+
             if (!$this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
                 /**
                  * For non virtual join we register aliases with replaced virtual relations joins in path
@@ -886,12 +885,7 @@ abstract class AbstractQueryConverter
             $query = $this->virtualRelationProvider->getVirtualRelationQuery($className, $fieldName);
             $mainEntityJoinAlias = $this->tableAliases[$mainEntityJoinId];
 
-            if (isset($query['root_alias'])) {
-                $aliasKey = $query['root_alias'];
-            } else {
-                $aliasKey = 'entity';
-            }
-            $this->aliases[$aliasKey] = $mainEntityJoinAlias;
+            $this->prepareAliases($query, $mainEntityJoinAlias);
 
             /**
              * Get virtual joins definitions according to aliased dependencies
@@ -951,7 +945,24 @@ abstract class AbstractQueryConverter
          * Join columnJoinIds back into path. All virtual relation joins replaced with joins according to query
          * definition
          */
-        return implode('+', $columnJoinIds);
+        return implode('+', array_filter($columnJoinIds));
+    }
+
+    /** @var array $aliasMap
+     *      key   = local alias (defined in virtual column query definition)
+     *      value = alias
+     *
+     * @param array  $query
+     * @param string $mainEntityJoinAlias
+     */
+    protected function prepareAliases(array $query, $mainEntityJoinAlias)
+    {
+        if (isset($query['root_alias'])) {
+            $aliasKey = $query['root_alias'];
+        } else {
+            $aliasKey = 'entity';
+        }
+        $this->aliases[$aliasKey] = $mainEntityJoinAlias;
     }
 
     /**
