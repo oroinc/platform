@@ -16,11 +16,25 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
     /** @var CoreAssetsHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $assetHelper;
 
+    /** @var  string */
+    protected $testDir;
+
     protected function setUp()
     {
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
             ->disableOriginalConstructor()->getMock();
         $this->type        = new DownloadLinksType($this->assetHelper);
+
+        $this->removeTestDir($this->getTestDir());
+        if (!is_dir($this->testDir)) {
+            mkdir($this->testDir);
+        }
+    }
+
+    protected function tearDown()
+    {
+        $this->removeTestDir();
+        unset($this->testDir, $this->type, $this->assetHelper);
     }
 
     public function testGetName()
@@ -70,7 +84,7 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
 
         $valueMap = [];
         foreach ($files as $fileName) {
-            file_put_contents(sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName, '');
+            file_put_contents($this->testDir . DIRECTORY_SEPARATOR . $fileName, '');
             if (isset($expected['files'][$fileName])) {
                 array_push(
                     $valueMap,
@@ -88,10 +102,6 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->type->finishView($view, $form, $options);
         $this->assertEquals($expected, $view->vars);
-
-        foreach ($files as $fileName) {
-            unlink(sys_get_temp_dir() . DIRECTORY_SEPARATOR . $fileName);
-        }
     }
 
     /**
@@ -104,7 +114,7 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
                 'files'    => [],
                 'options'  => [
                     'source' => [
-                        'path' => sys_get_temp_dir() . '/*.download_file',
+                        'path' =>  $this->getTestDir() . '/*.download_file',
                         'url'  => 'download/files'
                     ],
                     'class'  => ''
@@ -123,7 +133,7 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
                 ],
                 'options'  => [
                     'source' => [
-                        'path' => sys_get_temp_dir() . '/*.download_file',
+                        'path' => $this->getTestDir() . '/*.download_file',
                         'url'  => 'download/files'
                     ],
                     'class'  => 'red'
@@ -139,5 +149,38 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get test dir path
+     *
+     * @return string
+     */
+    protected function getTestDir()
+    {
+        if (!isset($this->testDir)) {
+            $tmpDir = ini_get('upload_tmp_dir');
+            if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
+                $tmpDir = sys_get_temp_dir();
+            }
+            $this->testDir     = $tmpDir . DIRECTORY_SEPARATOR . 'oro_download_dir';
+        }
+
+        return $this->testDir;
+    }
+
+    /**
+     * Remove test dir
+     */
+    protected function removeTestDir()
+    {
+        if (is_dir($this->testDir)) {
+            $files = new \RecursiveDirectoryIterator($this->testDir, \RecursiveDirectoryIterator::SKIP_DOTS);
+            foreach ($files as $fileInfo) {
+                unlink($fileInfo->getRealPath());
+            }
+
+            rmdir($this->testDir);
+        }
     }
 }

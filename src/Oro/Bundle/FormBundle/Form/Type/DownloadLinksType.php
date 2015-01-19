@@ -59,13 +59,12 @@ class DownloadLinksType extends AbstractType
      */
     public function getFiles($source)
     {
-        $resources       = [];
+        $resources = [];
         if (isset($source['path'], $source['url'])) {
             $finder          = new Finder();
             $pathParts       = explode('/', $source['path']);
             $fileNamePattern = array_pop($pathParts);
-            $files = $finder->name($fileNamePattern)->in(implode('/', $pathParts));
-            /** @var \SplFileInfo[] $files */
+            $files = $finder->name($fileNamePattern)->in(implode(DIRECTORY_SEPARATOR, $pathParts));
             foreach ($files as $file) {
                 $resources[$file->getFilename()] = $this->assetHelper->getUrl(
                     rtrim($source['url'], '/') . '/' . $file->getFilename()
