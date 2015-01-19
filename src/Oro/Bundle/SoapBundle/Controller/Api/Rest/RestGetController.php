@@ -52,15 +52,23 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     public function handleGetRequest($id)
     {
-        $result = $this->getManager()->find($id);
+        $manager = $this->getManager();
 
-        $code = Codes::HTTP_NOT_FOUND;
-        if ($result) {
-            $result = $this->getPreparedItem($result);
-            $code   = Codes::HTTP_OK;
+        if ($manager instanceof EntitySerializerManagerInterface) {
+            $result = $manager->serializeOne($id);
+        } else {
+            $result = $manager->find($id);
+            if ($result) {
+                $result = $this->getPreparedItem($result);
+            }
         }
 
-        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+        return $this->buildResponse(
+            $result ?: '',
+            self::ACTION_READ,
+            ['result' => $result],
+            $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
+        );
     }
 
     /**

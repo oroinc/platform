@@ -12,4 +12,11 @@ interface EntitySerializerManagerInterface
      * @return array
      */
     public function serialize(QueryBuilder $qb);
+
+    /**
+     * @param mixed $id Entity id
+     *
+     * @return array|null
+     */
+    public function serializeOne($id);
 }
