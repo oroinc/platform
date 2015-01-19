@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
 
 class FileCacheTest extends \PHPUnit_Framework_TestCase
@@ -16,8 +18,11 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetFilename($cacheClass, $id, $namespace, $expectedFileName)
     {
+        $fs = new Filesystem();
+        $directory = 'dir' . uniqid();
+
         $cache = $this->getMockBuilder($cacheClass)
-            ->setConstructorArgs(['dir', '.ext'])
+            ->setConstructorArgs([$directory, '.ext'])
             ->setMethods(['fetch', 'getNamespace'])
             ->getMock();
 
@@ -27,9 +32,12 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
 
         $result = self::callProtectedMethod($cache, 'getFilename', [$id]);
         $this->assertEquals(
-            $expectedFileName,
-            str_replace(realpath('dir'), 'dir', $result)
+            $directory . DIRECTORY_SEPARATOR . $expectedFileName,
+            str_replace(realpath($directory), $directory, $result)
         );
+
+        $this->assertTrue($fs->exists($directory));
+        $fs->remove($directory);
     }
 
     /**
@@ -67,37 +75,37 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test',
                 null,
-                'dir' . DIRECTORY_SEPARATOR . 'test.ext',
+                'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test',
                 'namespace',
-                'dir' . DIRECTORY_SEPARATOR . 'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
+                'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test\\\\//::""**??<<>>||file',
                 'namespace\\\\//::""**??<<>>||',
-                'dir' . DIRECTORY_SEPARATOR . 'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
+                'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test',
                 null,
-                'dir' . DIRECTORY_SEPARATOR . 'test.ext',
+                'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test',
                 'namespace',
-                'dir' . DIRECTORY_SEPARATOR . 'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
+                'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test\\\\//::""**??<<>>||file',
                 'namespace\\\\//::""**??<<>>||',
-                'dir' . DIRECTORY_SEPARATOR . 'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
+                'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
             ],
         ];
     }
