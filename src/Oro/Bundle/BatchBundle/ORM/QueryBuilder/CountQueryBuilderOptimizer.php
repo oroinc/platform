@@ -91,12 +91,10 @@ class CountQueryBuilderOptimizer
             );
         }
 
-        $hasJoins = false;
         if ($parts['join']) {
-            $hasJoins = $this->addJoins($qb, $parts);
+            $this->addJoins($qb, $parts);
         }
         if (!$parts['groupBy']) {
-            $qb->distinct($hasJoins);
             $fieldsToSelect[] = $this->getFieldFQN($this->idFieldName);
         }
 
@@ -130,12 +128,10 @@ class CountQueryBuilderOptimizer
         $requiredToJoin = array_diff(array_unique($requiredToJoin), array($this->rootAlias));
 
         /** @var Expr\Join $join */
-        $hasJoins = false;
         foreach ($parts['join'][$this->rootAlias] as $join) {
             $alias     = $join->getAlias();
             // To count results number join all tables with inner join and required to tables
             if ($join->getJoinType() == Expr\Join::INNER_JOIN || in_array($alias, $requiredToJoin)) {
-                $hasJoins = true;
                 $condition = $this->qbTools->replaceAliasesWithFields($join->getCondition());
                 $condition = $this->qbTools->replaceAliasesWithJoinPaths($condition);
 
@@ -158,8 +154,6 @@ class CountQueryBuilderOptimizer
                 }
             }
         }
-
-        return $hasJoins;
     }
 
     /**
