@@ -15,7 +15,6 @@ class UpdateExtendIndicesPostUpMigrationListener
     /** @var FieldTypeHelper */
     protected $fieldTypeHelper;
 
-
     /**
      * @param EntityMetadataHelper $entityMetadataHelper
      * @param FieldTypeHelper      $fieldTypeHelper
