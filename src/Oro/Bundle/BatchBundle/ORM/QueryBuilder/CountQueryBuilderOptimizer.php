@@ -113,7 +113,6 @@ class CountQueryBuilderOptimizer
      *
      * @param QueryBuilder $qb
      * @param array $parts
-     * @return bool
      */
     protected function addJoins(QueryBuilder $qb, array $parts)
     {
