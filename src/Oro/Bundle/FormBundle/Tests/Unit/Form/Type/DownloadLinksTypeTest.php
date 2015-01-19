@@ -24,11 +24,9 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
         $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
             ->disableOriginalConstructor()->getMock();
         $this->type        = new DownloadLinksType($this->assetHelper);
-
-        $this->removeTestDir($this->getTestDir());
-        if (!is_dir($this->testDir)) {
-            mkdir($this->testDir);
-        }
+        $this->testDir     = $this->getTestDir();
+        $this->removeTestDir();
+        mkdir($this->testDir);
     }
 
     protected function tearDown()
@@ -89,7 +87,7 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
                 array_push(
                     $valueMap,
                     [
-                        $options['source']['url'] . DIRECTORY_SEPARATOR . $fileName,
+                        $options['source']['url'] . '/' . $fileName,
                         null,
                         $expected['files'][$fileName]
                     ]
@@ -158,15 +156,12 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected function getTestDir()
     {
-        if (!isset($this->testDir)) {
-            $tmpDir = ini_get('upload_tmp_dir');
-            if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
-                $tmpDir = sys_get_temp_dir();
-            }
-            $this->testDir     = $tmpDir . DIRECTORY_SEPARATOR . 'oro_download_dir';
+        $tmpDir = ini_get('upload_tmp_dir');
+        if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
+            $tmpDir = sys_get_temp_dir();
         }
 
-        return $this->testDir;
+        return $tmpDir . DIRECTORY_SEPARATOR . 'oro_download_dir';
     }
 
     /**
