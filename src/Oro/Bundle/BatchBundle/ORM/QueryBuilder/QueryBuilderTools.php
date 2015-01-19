@@ -97,17 +97,13 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
         foreach ($joins[$rootAlias] as $join) {
             $joinTable = $join->getJoin();
             $joinCondition = $join->getCondition();
-            $joinType = $join->getJoinType();
-            $alias = $join->getAlias();
-            if (strtoupper($joinType) == Expr\Join::INNER_JOIN || in_array($alias, $aliases)) {
-                if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
-                    $data = explode('.', $joinTable);
-                    if (!in_array($data[0], $aliases)) {
-                        $aliases[] = $data[0];
-                    }
+            if (!empty($joinTable) && strpos($joinTable, '.') !== false) {
+                $data = explode('.', $joinTable);
+                if (!in_array($data[0], $aliases)) {
+                    $aliases[] = $data[0];
                 }
-                $aliases = array_merge($aliases, $this->getUsedTableAliases($joinCondition));
             }
+            $aliases = array_merge($aliases, $this->getUsedTableAliases($joinCondition));
         }
 
         $aliases = array_unique($aliases);
