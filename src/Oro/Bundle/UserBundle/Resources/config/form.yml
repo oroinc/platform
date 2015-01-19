@@ -18,6 +18,8 @@ parameters:
     oro_user.form.handler.status.class:         Oro\Bundle\UserBundle\Form\Handler\StatusHandler
     oro_user.form.handler.acl_role.class:       Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler
     oro_user.form.type.user_acl_select.class:   Oro\Bundle\UserBundle\Form\Type\UserAclSelectType
+    oro_user.form.type.organization_user_acl_select.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType
+    oro_user.form.type.organization_user_multiselect.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType
 
 services:
     oro_user.form.user:
@@ -129,12 +131,24 @@ services:
         tags:
             - { name: form.type, alias: oro_user_acl_select }
 
+    oro_user.form.type.organization_user_acl_select:
+        class: %oro_user.form.type.organization_user_acl_select.class%
+        tags:
+            - { name: form.type, alias: oro_user_organization_acl_select }
+
     oro_user.form.type.user_multiselect:
         class: %oro_user.form.type.user_multiselect.class%
         arguments:
             - @doctrine.orm.entity_manager
         tags:
             - { name: form.type, alias: oro_user_multiselect }
+
+    oro_user.form.type.organization_user_multiselect:
+        class: %oro_user.form.type.organization_user_multiselect.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: oro_user_organization_acl_multiselect }
 
     oro_user.form.type.gender:
         class: %oro_user.form.type.gender.class%

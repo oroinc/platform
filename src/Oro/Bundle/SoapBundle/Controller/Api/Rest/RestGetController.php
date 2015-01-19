@@ -20,6 +20,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
+use Oro\Bundle\SoapBundle\Entity\Manager\EntitySerializerManagerInterface;
 
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
 {
@@ -32,13 +33,12 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     {
         $manager = $this->getManager();
         $qb      = $manager->getListQueryBuilder($limit, $page, $filters);
-        $items   = $qb->getQuery()->getResult();
 
-        $result = [];
-        foreach ($items as $item) {
-            $result[] = $this->getPreparedItem($item);
+        if ($manager instanceof EntitySerializerManagerInterface) {
+            $result = $manager->serialize($qb);
+        } else {
+            $result = $this->getPreparedItems($qb->getQuery()->getResult());
         }
-        unset($items);
 
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
     }
@@ -52,15 +52,23 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     public function handleGetRequest($id)
     {
-        $result = $this->getManager()->find($id);
+        $manager = $this->getManager();
 
-        $code = Codes::HTTP_NOT_FOUND;
-        if ($result) {
-            $result = $this->getPreparedItem($result);
-            $code   = Codes::HTTP_OK;
+        if ($manager instanceof EntitySerializerManagerInterface) {
+            $result = $manager->serializeOne($id);
+        } else {
+            $result = $manager->find($id);
+            if ($result) {
+                $result = $this->getPreparedItem($result);
+            }
         }
 
-        return $this->buildResponse($result ?: '', self::ACTION_READ, ['result' => $result], $code);
+        return $this->buildResponse(
+            $result ?: '',
+            self::ACTION_READ,
+            ['result' => $result],
+            $result ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
+        );
     }
 
     /**
@@ -160,11 +168,15 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      * @param array $filterParameters   assoc array with filter params, like closure
      *                                  [filterName => [closure => \Closure(...), ...]]
      *                                  or [filterName => ParameterFilterInterface]
+     * @param array $filterMap          assoc array with map of filter query params to path that for doctrine criteria
+     *                                  For example: 2 filters by relation field - user_id and username.
+     *                                  Both should be applied to criteria as 'user' relation.
+     *                                  ['user_id' => 'user', 'user_name' => 'user']
      *
      * @return array
      * @throws \Exception
      */
-    protected function getFilterCriteria($supportedApiParams, $filterParameters = [])
+    protected function getFilterCriteria($supportedApiParams, $filterParameters = [], $filterMap = [])
     {
         $allowedFilters = $this->filterQueryParameters($supportedApiParams);
         $criteria       = Criteria::create();
@@ -184,6 +196,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
                 }
             }
 
+            $filterName = isset($filterMap[$filterName]) ? $filterMap[$filterName] : $filterName;
             $this->addCriteria($criteria, $filterName, $operator, $value);
         }
 

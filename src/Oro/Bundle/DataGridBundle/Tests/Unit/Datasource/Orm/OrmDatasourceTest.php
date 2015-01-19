@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datasource\Orm;
 
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
 class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
@@ -217,5 +218,15 @@ class OrmDatasourceTest extends \PHPUnit_Framework_TestCase
     public function testBindParametersFailsWhenDatagridIsEmpty()
     {
         $this->datasource->bindParameters(['foo']);
+    }
+
+    public function testClone()
+    {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()->getMock();
+
+        $this->datasource->setQueryBuilder($qb);
+        $this->datasource = clone $this->datasource;
+        $this->assertNotSame($qb, $this->datasource->getQueryBuilder());
     }
 }
