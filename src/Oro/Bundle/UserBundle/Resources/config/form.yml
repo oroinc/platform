@@ -88,12 +88,12 @@ services:
         class: %oro_user.form.type.change_password.class%
         arguments:                    ["@oro_user.change_password.subscriber"]
         tags:
-             - { name: form.type, alias: oro_change_password }
+            - { name: form.type, alias: oro_change_password }
 
     oro_user.form.type.set_password.form.type:
         class: %oro_user.form.type.set_password.class%
         tags:
-             - { name: form.type, alias: oro_set_password }
+            - { name: form.type, alias: oro_set_password }
 
     oro_user.form.type.set_password.form:
         class:           Symfony\Component\Form\Form
@@ -106,7 +106,7 @@ services:
     oro_user.form.type.email:
         class: %oro_user.form.type.email.class%
         tags:
-             - { name: form.type, alias: oro_user_email }
+            - { name: form.type, alias: oro_user_email }
 
     oro_user.form.type.role.api:
         class:                        %oro_user.form.type.role.api.class%

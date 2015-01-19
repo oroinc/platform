@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-
 class SetPasswordHandler
 {
     /** @var Request */
