@@ -200,7 +200,7 @@ class UpdateExtendIndicesMigration implements
     }
 
     /**
-     * @param $options
+     * @param array $options
      * @return bool
      */
     protected function isExtended($options)
@@ -209,7 +209,7 @@ class UpdateExtendIndicesMigration implements
     }
 
     /**
-     * @param $options
+     * @param array $options
      * @return bool
      */
     protected function isEnabled($options)
