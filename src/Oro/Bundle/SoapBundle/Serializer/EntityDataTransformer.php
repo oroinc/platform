@@ -9,10 +9,12 @@ class EntityDataTransformer implements DataTransformerInterface
      */
     public function transformValue($value)
     {
-        if ($value instanceof \DateTime) {
-            return $value->format('c');
-        } elseif (is_object($value) && method_exists($value, '__toString')) {
-            return (string)$value;
+        if (is_object($value)) {
+            if (method_exists($value, '__toString')) {
+                return (string)$value;
+            } elseif ($value instanceof \DateTime) {
+                return $value->format('c');
+            }
         }
 
         return $value;
