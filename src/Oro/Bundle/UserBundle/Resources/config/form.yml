@@ -239,6 +239,11 @@ services:
         class: %oro_user.form.handler.set_password.class%
         scope: request
         arguments:
+            - @doctrine.orm.entity_manager
+            - @logger
             - @request
+            - @oro_config.global
+            - @oro_email.direct_mailer
+            - @oro_email.email_renderer
             - @oro_user.manager
             - @oro_user.form.type.set_password.form
