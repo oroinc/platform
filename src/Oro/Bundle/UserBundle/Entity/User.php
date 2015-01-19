@@ -3,11 +3,11 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
@@ -1344,10 +1344,16 @@ class User extends ExtendUser implements
      * Invoked before the entity is updated.
      *
      * @ORM\PreUpdate
+     *
+     * @param PreUpdateEventArgs $event
      */
-    public function preUpdate()
+    public function preUpdate(PreUpdateEventArgs $event)
     {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $excludedFields = ['lastLogin', 'loginCount'];
+
+        if (array_diff_key($event->getEntityChangeSet(), array_flip($excludedFields))) {
+            $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        }
     }
 
     /**

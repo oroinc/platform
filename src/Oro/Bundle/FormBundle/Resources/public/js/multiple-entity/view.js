@@ -11,7 +11,7 @@ define(['underscore', 'backbone', 'oro/dialog-widget'
      */
     return Backbone.View.extend({
         attributes: {
-            'class': 'entity-item clearfix span3 box-type1'
+            'class': 'list-group-item clearfix span3 box-type1'
         },
 
         events: {

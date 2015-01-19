@@ -195,21 +195,6 @@
 {% block oro_multiple_entity_widget %}
     {{ form_widget(form) }}
 
-    <style type="text/css">
-        #{{ id }}-container .entity-item {
-            padding: 5px 7px;
-            margin-left: 0;
-            margin-right: 1.5%;
-            margin-top: 15px;
-            height: 80px;
-            min-width: 290px;
-        }
-
-        #{{ id }}-container .entity-item h4 {
-            margin: 3px 0;
-        }
-    </style>
-
     <div id="{{ id }}-container"></div>
 
     <script type="text/javascript">
@@ -679,19 +664,20 @@
 
 {% block oro_link_type_widget %}
     {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
-        {# @todo after BAP-4696 implementation remove link class #}
-        {% if value is defined and value is iterable%}
-            {% for fileName, route in value %}
-                <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
-                    {{ fileName }}
-                </a>
-            {% endfor %}
-        {% else %}
-            <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
-                {{ title|trans }}
-            </a>
-        {% endif %}
+        <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+            {{ title|trans }}
+        </a>
     {% endif %}
+{% endblock %}
+
+{% block oro_download_links_type_widget %}
+    {% spaceless %}
+        {% for fileName, route in files %}
+            <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                {{ fileName }}
+            </a>
+        {% endfor %}
+    {% endspaceless %}
 {% endblock %}
 
 {% block oro_simple_color_picker_row %}

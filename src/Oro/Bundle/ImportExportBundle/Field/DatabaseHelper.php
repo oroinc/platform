@@ -34,18 +34,34 @@ class DatabaseHelper
     protected $entities = [];
 
     /**
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     * @param ServiceLink $fieldHelperLink
+     * @var ServiceLink
+     */
+    protected $securityFacadeLink;
+
+    /**
+     * @var ServiceLink
+     */
+    protected $ownershipMetadataProviderLink;
+
+    /**
+     * @param ManagerRegistry           $registry
+     * @param DoctrineHelper            $doctrineHelper
+     * @param ServiceLink               $fieldHelperLink
+     * @param ServiceLink            $securityFacadeLink
+     * @param ServiceLink $ownershipMetadataProviderLink
      */
     public function __construct(
         ManagerRegistry $registry,
         DoctrineHelper $doctrineHelper,
-        ServiceLink $fieldHelperLink
+        ServiceLink $fieldHelperLink,
+        ServiceLink $securityFacadeLink,
+        ServiceLink $ownershipMetadataProviderLink
     ) {
         $this->registry = $registry;
         $this->doctrineHelper = $doctrineHelper;
         $this->fieldHelperLink = $fieldHelperLink;
+        $this->securityFacadeLink = $securityFacadeLink;
+        $this->ownershipMetadataProviderLink = $ownershipMetadataProviderLink;
     }
 
     /**
@@ -76,6 +92,13 @@ class DatabaseHelper
                 ->andWhere(implode(' AND ', $where))
                 ->setParameters($criteria)
                 ->setMaxResults(1);
+
+            if ($this->shouldBeAddedOrganizationLimits($entityName)) {
+                $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
+                $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
+                $queryBuilder->andWhere('e.' . $organizationField . ' = :organization')
+                    ->setParameter('organization', $this->securityFacadeLink->getService()->getOrganization());
+            }
 
             $this->entities[$entityName][$storageKey] = $queryBuilder->getQuery()->getOneOrNullResult();
         }
@@ -135,7 +158,22 @@ class DatabaseHelper
      */
     public function find($entityName, $identifier)
     {
-        return $this->doctrineHelper->getEntity($entityName, $identifier);
+        $entity = $this->doctrineHelper->getEntity($entityName, $identifier);
+
+        if ($entity && $this->shouldBeAddedOrganizationLimits($entityName)) {
+            $ownershipMetadataProvider = $this->ownershipMetadataProviderLink->getService();
+            $organizationField = $ownershipMetadataProvider->getMetadata($entityName)->getOrganizationFieldName();
+            /** @var FieldHelper $fieldHelper */
+            $fieldHelper = $this->fieldHelperLink->getService();
+            $entityOrganization = $fieldHelper->getObjectValue($entity, $organizationField);
+            if (!$entityOrganization
+                || $entityOrganization->getId() !== $this->securityFacadeLink->getService()->getOrganizationId()
+            ) {
+                return null;
+            }
+        }
+
+        return $entity;
     }
 
     /**
@@ -223,5 +261,17 @@ class DatabaseHelper
     public function onClear()
     {
         $this->entities = [];
+    }
+
+    /**
+     * We should limit data with current organization
+     *
+     * @param $entityName
+     * @return bool
+     */
+    protected function shouldBeAddedOrganizationLimits($entityName)
+    {
+        return $this->securityFacadeLink->getService()->getOrganization()
+            && $this->ownershipMetadataProviderLink->getService()->getMetadata($entityName)->getOrganizationFieldName();
     }
 }
