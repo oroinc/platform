@@ -202,4 +202,9 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
 
         return $this->parameterBinder->bindParameters($this->datagrid, $datasourceToDatagridParameters, $append);
     }
+
+    public function __clone()
+    {
+        $this->qb = clone $this->qb;
+    }
 }
