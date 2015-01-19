@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Migration;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
@@ -135,7 +136,7 @@ class UpdateExtendIndicesMigration implements
      * @param string $columnName
      * @param array $options
      * @param string $className
-     * @param $table
+     * @param Table $table
      */
     protected function buildIndex($columnName, $options, $className, $table)
     {
@@ -167,7 +168,7 @@ class UpdateExtendIndicesMigration implements
      * @param string $columnName
      * @param array $options
      * @param string $className
-     * @param $table
+     * @param Table $table
      */
     protected function renameIndex(
         Schema $schema,
