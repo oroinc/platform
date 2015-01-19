@@ -20,6 +20,7 @@ use FOS\RestBundle\Request\ParamFetcherInterface;
 use Oro\Bundle\SoapBundle\Handler\Context;
 use Oro\Bundle\SoapBundle\Controller\Api\EntityManagerAwareInterface;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ParameterFilterInterface;
+use Oro\Bundle\SoapBundle\Entity\Manager\EntitySerializerManagerInterface;
 
 abstract class RestGetController extends FOSRestController implements EntityManagerAwareInterface, RestApiReadInterface
 {
@@ -32,13 +33,12 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     {
         $manager = $this->getManager();
         $qb      = $manager->getListQueryBuilder($limit, $page, $filters);
-        $items   = $qb->getQuery()->getResult();
 
-        $result = [];
-        foreach ($items as $item) {
-            $result[] = $this->getPreparedItem($item);
+        if ($manager instanceof EntitySerializerManagerInterface) {
+            $result = $manager->serialize($qb);
+        } else {
+            $result = $this->getPreparedItems($qb->getQuery()->getResult());
         }
-        unset($items);
 
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
     }
