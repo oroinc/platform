@@ -120,7 +120,7 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * @param array $types
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createFetchStatementMock(array $records, array $params, array $types = [])
+    protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
         $statement = $this->getMock('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
         $statement->expects($this->exactly(count($records) + 1))
