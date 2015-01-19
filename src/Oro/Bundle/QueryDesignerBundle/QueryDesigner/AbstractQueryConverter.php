@@ -948,7 +948,8 @@ abstract class AbstractQueryConverter
         return implode('+', array_filter($columnJoinIds));
     }
 
-    /** @var array $aliasMap
+    /**
+     * @var array $aliasMap
      *      key   = local alias (defined in virtual column query definition)
      *      value = alias
      *
