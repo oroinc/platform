@@ -864,15 +864,15 @@ abstract class AbstractQueryConverter
             $className = $this->getEntityClassName($columnJoinId);
             $fieldName = $this->getFieldName($columnJoinId);
 
-            /**
-             * Was joined previously in virtual relation
-             */
-            if (!empty($this->aliases[$fieldName])) {
-                $columnJoinId = null;
-                continue;
-            }
-
             if (!$this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
+                /**
+                 * Was joined previously in virtual relation
+                 */
+                if (!empty($this->aliases[$fieldName])) {
+                    $columnJoinId = null;
+                    continue;
+                }
+
                 /**
                  * For non virtual join we register aliases with replaced virtual relations joins in path
                  */
