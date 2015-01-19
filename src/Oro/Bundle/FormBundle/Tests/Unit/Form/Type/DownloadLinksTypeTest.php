@@ -16,23 +16,15 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
     /** @var CoreAssetsHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $assetHelper;
 
-    /** @var  string */
-    protected $testDir;
-
     protected function setUp()
     {
-        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Templating\Helper\CoreAssetsHelper')
-            ->disableOriginalConstructor()->getMock();
+        $this->assetHelper = $this->getMock('Symfony\Component\Templating\Helper\CoreAssetsHelper', [], [], '', false);
         $this->type        = new DownloadLinksType($this->assetHelper);
-        $this->testDir     = $this->getTestDir();
-        $this->removeTestDir();
-        mkdir($this->testDir);
     }
 
     protected function tearDown()
     {
-        $this->removeTestDir();
-        unset($this->testDir, $this->type, $this->assetHelper);
+        unset($this->type, $this->assetHelper);
     }
 
     public function testGetName()
@@ -77,12 +69,16 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
      */
     public function testFinishView(array $files, array $options, array $expected)
     {
+        $testDir = $this->getTestDir();
+        $this->removeTestDir($testDir);
+        mkdir($testDir);
+
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
         $view = new FormView();
 
         $valueMap = [];
         foreach ($files as $fileName) {
-            file_put_contents($this->testDir . DIRECTORY_SEPARATOR . $fileName, '');
+            file_put_contents($testDir . DIRECTORY_SEPARATOR . $fileName, '');
             if (isset($expected['files'][$fileName])) {
                 array_push(
                     $valueMap,
@@ -100,6 +96,8 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->type->finishView($view, $form, $options);
         $this->assertEquals($expected, $view->vars);
+
+        $this->removeTestDir($testDir);
     }
 
     /**
@@ -112,7 +110,7 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
                 'files'    => [],
                 'options'  => [
                     'source' => [
-                        'path' =>  $this->getTestDir() . '/*.download_file',
+                        'path' => $this->getTestDir() . '/*.download_file',
                         'url'  => 'download/files'
                     ],
                     'class'  => ''
@@ -156,9 +154,9 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
      */
     protected function getTestDir()
     {
-        $tmpDir = ini_get('upload_tmp_dir');
-        if (!$tmpDir || !is_dir($tmpDir) || !is_writable($tmpDir)) {
-            $tmpDir = sys_get_temp_dir();
+        $tmpDir = sys_get_temp_dir();
+        if (!($tmpDir && is_dir($tmpDir) && is_writable($tmpDir))) {
+            $this->markTestSkipped(sprintf('This test requires access on create dir in temp folder "%s"', $tmpDir));
         }
 
         return $tmpDir . DIRECTORY_SEPARATOR . 'oro_download_dir';
@@ -166,16 +164,18 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Remove test dir
+     *
+     * @param string $dir
      */
-    protected function removeTestDir()
+    protected function removeTestDir($dir)
     {
-        if (is_dir($this->testDir)) {
-            $files = new \RecursiveDirectoryIterator($this->testDir, \RecursiveDirectoryIterator::SKIP_DOTS);
+        if (is_dir($dir)) {
+            $files = new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS);
             foreach ($files as $fileInfo) {
                 unlink($fileInfo->getRealPath());
             }
 
-            rmdir($this->testDir);
+            rmdir($dir);
         }
     }
 }
