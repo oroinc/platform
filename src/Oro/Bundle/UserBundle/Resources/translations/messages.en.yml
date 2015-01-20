@@ -134,9 +134,9 @@ oro:
             dropdown.label: Password
             reset.label: Reset
             change.label: Change
-
             reset:
                 email_sent.message:             Reset password email has been sent to user
                 ttl_already_requested.message:  The password for this user has already been requested within the last 24 hours
         action:
             password_management: Manage users' passwords
+            change_dialog.title: Change password

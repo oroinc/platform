@@ -11,13 +11,17 @@ parameters:
     oro_user.form.type.gender.class:            Oro\Bundle\UserBundle\Form\Type\GenderType
     oro_user.form.type.email.class:             Oro\Bundle\UserBundle\Form\Type\EmailType
     oro_user.form.type.change_password.class:   Oro\Bundle\UserBundle\Form\Type\ChangePasswordType
+    oro_user.form.type.set_password.class:      Oro\Bundle\UserBundle\Form\Type\SetPasswordType
     oro_user.form.handler.user.class:           Oro\Bundle\UserBundle\Form\Handler\UserHandler
     oro_user.form.handler.reset.class:          Oro\Bundle\UserBundle\Form\Handler\ResetHandler
     oro_user.form.handler.role.class:           Oro\Bundle\UserBundle\Form\Handler\RoleHandler
     oro_user.form.handler.group.class:          Oro\Bundle\UserBundle\Form\Handler\GroupHandler
     oro_user.form.handler.status.class:         Oro\Bundle\UserBundle\Form\Handler\StatusHandler
     oro_user.form.handler.acl_role.class:       Oro\Bundle\UserBundle\Form\Handler\AclRoleHandler
+    oro_user.form.handler.set_password.class:   Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler
     oro_user.form.type.user_acl_select.class:   Oro\Bundle\UserBundle\Form\Type\UserAclSelectType
+    oro_user.form.type.organization_user_acl_select.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclSelectType
+    oro_user.form.type.organization_user_multiselect.class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType
 
 services:
     oro_user.form.user:
@@ -86,12 +90,25 @@ services:
         class: %oro_user.form.type.change_password.class%
         arguments:                    ["@oro_user.change_password.subscriber"]
         tags:
-             - { name: form.type, alias: oro_change_password }
+            - { name: form.type, alias: oro_change_password }
+
+    oro_user.form.type.set_password.form.type:
+        class: %oro_user.form.type.set_password.class%
+        tags:
+            - { name: form.type, alias: oro_set_password }
+
+    oro_user.form.type.set_password.form:
+        class:           Symfony\Component\Form\Form
+        factory_method:  createNamed
+        factory_service: form.factory
+        arguments:
+            - "oro_set_password_form"
+            - "oro_set_password"
 
     oro_user.form.type.email:
         class: %oro_user.form.type.email.class%
         tags:
-             - { name: form.type, alias: oro_user_email }
+            - { name: form.type, alias: oro_user_email }
 
     oro_user.form.type.role.api:
         class:                        %oro_user.form.type.role.api.class%
@@ -129,12 +146,24 @@ services:
         tags:
             - { name: form.type, alias: oro_user_acl_select }
 
+    oro_user.form.type.organization_user_acl_select:
+        class: %oro_user.form.type.organization_user_acl_select.class%
+        tags:
+            - { name: form.type, alias: oro_user_organization_acl_select }
+
     oro_user.form.type.user_multiselect:
         class: %oro_user.form.type.user_multiselect.class%
         arguments:
             - @doctrine.orm.entity_manager
         tags:
             - { name: form.type, alias: oro_user_multiselect }
+
+    oro_user.form.type.organization_user_multiselect:
+        class: %oro_user.form.type.organization_user_multiselect.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: oro_user_organization_acl_multiselect }
 
     oro_user.form.type.gender:
         class: %oro_user.form.type.gender.class%
@@ -206,4 +235,10 @@ services:
             - [setEntityManager, ["@doctrine.orm.entity_manager"]]
             - [setRequest, ["@request"]]
 
-
+    oro_user.form.handler.set_password:
+        class: %oro_user.form.handler.set_password.class%
+        scope: request
+        arguments:
+            - @request
+            - @oro_user.manager
+            - @oro_user.form.type.set_password.form

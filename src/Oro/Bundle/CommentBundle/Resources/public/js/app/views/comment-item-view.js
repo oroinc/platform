@@ -4,10 +4,12 @@ define(function (require) {
 
     var CommentItemView,
         dateTimeFormatter = require('orolocale/js/formatter/datetime'),
+        _ = require('underscore'),
         moment = require('moment'),
         routing = require('routing'),
         mediator = require('oroui/js/mediator'),
         __ = require('orotranslation/js/translator'),
+        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         BaseView = require('oroui/js/app/views/base/view'),
         template = require('text!../../../templates/comment/comment-item-view.html'),
         DeleteConfirmation = require('oroui/js/delete-confirmation');
@@ -26,7 +28,9 @@ define(function (require) {
         },
 
         listen: {
-            'change:updatedAt model': 'render'
+            'request model': 'showLoading',
+            'sync model': 'hideLoading',
+            'error model': 'hideLoading'
         },
 
         accordionId: null,
@@ -63,6 +67,7 @@ define(function (require) {
         },
 
         render: function () {
+            var loading;
             CommentItemView.__super__.render.apply(this, arguments);
             this.$('.dropdown-toggle').on('mouseover', function () {
                 $(this).trigger('click');
@@ -70,7 +75,21 @@ define(function (require) {
             this.$('.dropdown-menu').on('mouseleave', function () {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
+
+            loading = new LoadingMaskView({
+                container: this.$el
+            });
+            this.subview('loading', loading);
+
             return this;
+        },
+
+        showLoading: function () {
+            this.subview('loading').show();
+        },
+
+        hideLoading: function () {
+            this.subview('loading').hide();
         },
 
         removeModel: function (e) {

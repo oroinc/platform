@@ -27,7 +27,7 @@ class RecipientListType extends AbstractType
     {
         $builder->add(
             'users',
-            'oro_user_multiselect',
+            'oro_user_organization_acl_multiselect',
             [
                 'required' => false,
                 'label'    => 'oro.user.entity_plural_label'

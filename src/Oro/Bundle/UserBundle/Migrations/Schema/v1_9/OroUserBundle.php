@@ -3,9 +3,10 @@
 namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_9;
 
 use Doctrine\DBAL\Schema\Schema;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\MigrationBundle\Migration\Migration;
+
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class OroUserBundle implements Migration
 {
@@ -27,11 +28,10 @@ class OroUserBundle implements Migration
             'title',
             'string',
             [
-                'length' => 255,
+                'length'      => 255,
                 'oro_options' => [
                     'extend'   => ['owner' => ExtendScope::OWNER_CUSTOM],
-                    'datagrid' => ['is_visible' => true],
-                    'merge'    => ['display' => true],
+                    'datagrid' => ['is_visible' => false],
                 ],
             ]
         );

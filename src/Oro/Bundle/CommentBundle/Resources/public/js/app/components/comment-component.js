@@ -52,6 +52,8 @@ define(function (require) {
             parentView = this.listView;
             if (model) {
                 parentView = this.listView.getItemView(model);
+            } else {
+                model = new this.collection.model();
             }
 
             formView = new CommentFromView({
@@ -61,24 +63,40 @@ define(function (require) {
             });
             parentView.subview('form', formView);
 
-            this.listenTo(formView, 'submit', this.onCommentSave, this)
-            this.listenTo(formView, 'reset', this.onCommentReset, this)
+            this.listenTo(formView, 'submit', this.onFormSubmit, this);
+            this.listenTo(formView, 'reset', this.onFormReset, this);
         },
 
-        onCommentSave: function (attrs, options) {
-            var model, itemView;
-            if (attrs.id) {
-                model = this.collection.get(attrs.id);
-            } else {
-                model = this.collection.add({}, {at: 0});
+        onFormSubmit: function (formView) {
+            var model, listView, options;
+
+            listView = this.listView;
+            model = formView.model;
+
+            if (model.isNew()) {
+                this.collection.add(model, {at: 0});
             }
-            options.url = model.url();
+
+            model.once('sync', function () {
+                var itemView = listView.getItemView(model);
+                if (itemView) {
+                    itemView.render();
+                }
+            });
+
+            options = formView.fetchAjaxOptions({
+                url: model.url()
+            });
             model.save(null, options);
         },
 
-        onCommentReset: function (model) {
-            var itemView = this.listView.getItemView(model);
-            itemView.render();
+        onFormReset: function (formView) {
+            var model, itemView;
+            model = formView.model;
+            if (!model.isNew()) {
+                itemView = this.listView.getItemView(model);
+                itemView.render();
+            }
         }
     });
 

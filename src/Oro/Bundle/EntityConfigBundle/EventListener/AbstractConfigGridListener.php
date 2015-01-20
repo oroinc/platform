@@ -14,7 +14,6 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 
@@ -33,28 +32,25 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     const TYPE_TWIG     = 'twig';
     const TYPE_NAVIGATE = 'navigate';
     const TYPE_DELETE   = 'delete';
+
     const PATH_COLUMNS  = '[columns]';
     const PATH_SORTERS  = '[sorters]';
     const PATH_FILTERS  = '[filters]';
     const PATH_ACTIONS  = '[actions]';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var SystemAwareResolver
-     */
+    /** @var SystemAwareResolver */
     protected $datagridResolver;
 
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager       $configManager
      * @param SystemAwareResolver $datagridResolver
      */
     public function __construct(ConfigManager $configManager, SystemAwareResolver $datagridResolver)
     {
-        $this->configManager = $configManager;
+        $this->configManager    = $configManager;
         $this->datagridResolver = $datagridResolver;
     }
 
@@ -63,10 +59,10 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'oro_datagrid.datagrid.build.after.' . static::GRID_NAME  => 'onBuildAfter',
             'oro_datagrid.datagrid.build.before.' . static::GRID_NAME => 'onBuildBefore',
-        );
+        ];
     }
 
     /**
@@ -220,7 +216,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         foreach ($orderedFields as $fieldName => $field) {
             if (isset($field['sortable']) && $field['sortable']) {
                 $sorters['columns'][$fieldName] = [
-                    'data_name' =>  isset($field['expression']) ? $field['expression'] : $alias . $fieldName
+                    'data_name' => isset($field['expression']) ? $field['expression'] : $alias . $fieldName
                 ];
             }
 
@@ -259,13 +255,13 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             $gridActions = $provider->getPropertyConfig()->getGridActions($type);
 
             foreach ($gridActions as $config) {
-                $configItem = array(
-                    'label'        => $config['name'],
-                    'icon'         => isset($config['icon']) ? $config['icon'] : 'question-sign',
-                    'link'         => strtolower($config['name']) . '_link',
-                    'type'         => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,
+                $configItem = [
+                    'label' => $config['name'],
+                    'icon'  => isset($config['icon']) ? $config['icon'] : 'question-sign',
+                    'link'  => strtolower($config['name']) . '_link',
+                    'type'  => isset($config['type']) ? $config['type'] : self::TYPE_NAVIGATE,
                     //'confirmation' => isset($config['confirmation']) ? $config['confirmation'] : false
-                );
+                ];
 
                 $actions = array_merge($actions, [strtolower($config['name']) => $configItem]);
             }
@@ -280,14 +276,14 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     {
         // configure properties from config providers
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
-        $filters    = array();
-        $actions    = array();
+        $filters    = [];
+        $actions    = [];
 
         $providers = $this->configManager->getProviders();
         foreach ($providers as $provider) {
             $gridActions = $provider->getPropertyConfig()->getGridActions($itemType);
 
-            $this->prepareProperties($gridActions, $properties, $actions, $filters, $provider->getScope());
+            $this->prepareProperties($gridActions, $properties, $actions, $filters);
 
             // TODO: check if this neccessary for field config grid
             if (static::GRID_NAME == 'entityconfig-grid' && $provider->getPropertyConfig()->getUpdateActionFilter()) {
@@ -309,9 +305,8 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
      * @param $properties
      * @param $actions
      * @param $filters
-     * @param $scope
      */
-    protected function prepareProperties($gridActions, &$properties, &$actions, &$filters, $scope)
+    protected function prepareProperties($gridActions, &$properties, &$actions, &$filters)
     {
         foreach ($gridActions as $config) {
             $properties[strtolower($config['name']) . '_link'] = [
@@ -321,14 +316,6 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             ];
 
             if (isset($config['filter'])) {
-                $keys = array_map(
-                    function ($item) use ($scope) {
-                        return $scope . '_' . $item;
-                    },
-                    array_keys($config['filter'])
-                );
-
-                $config['filter']                     = array_combine($keys, $config['filter']);
                 $filters[strtolower($config['name'])] = $config['filter'];
             }
 
@@ -375,9 +362,9 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
 
     /**
      * @param QueryBuilder $query
-     * @param string $rootAlias
-     * @param string $joinAlias
-     * @param string $itemsType
+     * @param string       $rootAlias
+     * @param string       $joinAlias
+     * @param string       $itemsType
      *
      * @return $this
      */

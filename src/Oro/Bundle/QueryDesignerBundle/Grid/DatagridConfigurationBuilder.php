@@ -61,8 +61,6 @@ class DatagridConfigurationBuilder
     }
 
     /**
-     * @todo: bc break, move to constructor
-     *
      * @param VirtualRelationProviderInterface $virtualRelationProvider
      */
     public function setVirtualRelationProvider($virtualRelationProvider)

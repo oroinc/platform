@@ -6,6 +6,10 @@ namespace Oro\Bundle\CacheBundle\Provider;
  * Provides an algorithm to generate short name of cache file.
  *
  * This trait can be used in a cache implementation bases on \Doctrine\Common\Cache\FileCache
+ *
+ * @method string getDirectory
+ * @method string getExtension
+ * @method string getNamespace
  */
 trait ShortFileNameGeneratorTrait
 {
@@ -23,9 +27,9 @@ trait ShortFileNameGeneratorTrait
         }
         $id = $this->removeSpecialChars($id);
 
-        return $this->directory . DIRECTORY_SEPARATOR
+        return $this->getDirectory() . DIRECTORY_SEPARATOR
         . ($namespace ? $this->removeSpecialChars($namespace) . DIRECTORY_SEPARATOR : '')
-        . $id . $this->extension;
+        . $id . $this->getExtension();
     }
 
     /**
