@@ -15,10 +15,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
  *     $this->loadExtension(new MyBundleExtension());
  *
  *     $expectedDefinitions = array();
- *     $this->assertDefinitionsMatch($expectedDefinitions);
+ *     $this->assertDefinitionsLoaded($expectedDefinitions);
  *
  *     $expectedParameters = array();
- *     $this->assertParametersMatch($expectedParameters);
+ *     $this->assertParametersLoaded($expectedParameters);
  * }
  * </code>
  */
@@ -44,7 +44,7 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
      * {
      *     $this->loadExtension(new MyBundleExtension());
      *     $expectedDefinitions = array();
-     *     $this->assertDefinitionsMatch($expectedDefinitions);
+     *     $this->assertDefinitionsLoaded($expectedDefinitions);
      * }
      * </code>
      *
@@ -74,7 +74,7 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
      * {
      *     $this->loadExtension(new MyBundleExtension());
      *     $expectedParameters = array();
-     *     $this->assertParametersMatch($expectedParameters);
+     *     $this->assertParametersLoaded($expectedParameters);
      * }
      * </code>
      *
