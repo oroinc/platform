@@ -9,7 +9,7 @@
         ],
         function(__, widgetManager, messenger, mediator) {
             widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
-                messenger.notificationFlashMessage('success', __('change_password.flash.success'));
+                messenger.notificationFlashMessage('success', __('oro.user.change_password.flash.success'));
                 mediator.trigger('widget_success:' + widget.getAlias());
                 mediator.trigger('widget_success:' + widget.getWid());
                 widget.remove();
@@ -23,10 +23,14 @@
             'orotranslation/js/translator'
         ],
         function($, __) {
-            $('#oro_set_password_form_password').after(
-                '<span class="icon-eye-close" id="show-hide-pass" title="' + __("Show/hide password") + '"/>' +
-                '<span class="icon-cog" id="generate-pass" title="' + __("Generate password") + '">' +
-                __("Generate password") + '</span>'
+            $('#oro_set_password_form_password').parent().after(
+                '<div class="controls" style="margin-top: 10px;">' +
+                '<span class="icon-eye-close" id="show-hide-pass" style="cursor: pointer;" ' +
+                ' title="' + __("oro.user.show_hide_password.label") + '"/>' +
+                '<span class="icon-cog" id="generate-pass" style="cursor: pointer;"' +
+                ' title="' + __("oro.user.generate_password.label") + '">' +
+                __("oro.user.generate_password.label") + '</span>' +
+                '</div>'
             );
 
             $('#generate-pass').on('click', function(e){
