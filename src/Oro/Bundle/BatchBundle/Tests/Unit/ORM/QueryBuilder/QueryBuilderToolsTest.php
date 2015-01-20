@@ -223,7 +223,10 @@ class QueryBuilderToolsTest extends \PHPUnit_Framework_TestCase
         );
 
         $tools = new QueryBuilderTools($selects);
-        $this->assertEquals($expected, array_values($tools->getUsedJoinAliases($joins, $aliases, 'root')));
+        $expected = sort($expected);
+        $actual = array_values($tools->getUsedJoinAliases($joins, $aliases, 'root'));
+        $actual = sort($actual);
+        $this->assertEquals($expected, $actual);
     }
 
     public function joinAliasesDataProvider()
