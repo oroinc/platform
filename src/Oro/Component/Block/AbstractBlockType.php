@@ -4,7 +4,7 @@ namespace Oro\Component\Block;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class AbstractBlockType
+abstract class AbstractBlockType implements BlockTypeInterface
 {
     /**
      * {@inheritdoc}
