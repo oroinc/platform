@@ -23,6 +23,10 @@ Login page: Login page
 "User": "User"
 "None": "None"
 
+User account is locked.: User account is locked
+User account is disabled.: User account is disabled
+User account has expired.: User account has expired
+
 change_password:
     flash:
         success: The password has been changed
@@ -138,7 +142,4 @@ oro:
             password_management: Manage users' passwords
 
         security:
-            account_locked.message: User account is locked
-            account_disabled.message: User account is disabled
-            account_expired.message: User account has expired
             password_changed.message: Your password has been updated by administrator. New password was sent to you by email
