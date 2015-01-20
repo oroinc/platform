@@ -19,7 +19,7 @@ class SetPasswordHandler
     /**
      * @var ObjectManager
      */
-    protected $om;
+    protected $objectManager;
 
     /** @var  LoggerInterface */
     protected $logger;
@@ -30,9 +30,6 @@ class SetPasswordHandler
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var \Swift_Mailer */
-    protected $mailer;
-
     /** @var EmailRenderer */
     protected $renderer;
 
@@ -42,34 +39,37 @@ class SetPasswordHandler
     /** @var FormInterface */
     protected $form;
 
+    /** @var \Swift_Mailer */
+    protected $mailer;
+
     /**
-     * @param ObjectManager       $om
+     * @param ObjectManager       $objectManager
      * @param LoggerInterface     $logger
      * @param Request             $request
      * @param EmailRenderer       $renderer
      * @param ConfigManager       $configManager
-     * @param \Swift_Mailer       $mailer
      * @param UserManager         $userManager
      * @param FormInterface       $form
+     * @param \Swift_Mailer       $mailer
      */
     public function __construct(
-        ObjectManager    $om,
+        ObjectManager    $objectManager,
         LoggerInterface  $logger,
         Request          $request,
         ConfigManager    $configManager,
-        \Swift_Mailer    $mailer = null,
         EmailRenderer    $renderer,
         UserManager      $userManager,
-        FormInterface    $form
+        FormInterface    $form,
+        \Swift_Mailer    $mailer = null
     ) {
-        $this->om            = $om;
+        $this->objectManager = $objectManager;
         $this->logger        = $logger;
         $this->request       = $request;
         $this->configManager = $configManager;
-        $this->mailer        = $mailer;
         $this->renderer      = $renderer;
         $this->userManager   = $userManager;
         $this->form          = $form;
+        $this->mailer        = $mailer;
     }
 
     /**
@@ -91,7 +91,8 @@ class SetPasswordHandler
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $this->userManager->updateUser($entity);
 
-                $emailTemplate = $this->om->getRepository('OroEmailBundle:EmailTemplate')->findByName('user_change_password');
+                $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
+                    ->findByName('user_change_password');
 
                 try {
                     list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
