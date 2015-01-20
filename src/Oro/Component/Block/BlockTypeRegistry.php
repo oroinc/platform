@@ -2,10 +2,12 @@
 
 namespace Oro\Component\Block;
 
-class BlockRegistry implements BlockRegistryInterface
+use Oro\Component\Block\Exception;
+
+class BlockTypeRegistry implements BlockTypeRegistryInterface
 {
     /** @var BlockTypeInterface[] */
-    private $types = array();
+    private $types = [];
 
     /** @var BlockTypeFactoryInterface */
     private $blockTypeFactory;
@@ -21,10 +23,10 @@ class BlockRegistry implements BlockRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getType($name)
+    public function getBlockType($name)
     {
         if (!is_string($name)) {
-            throw new \InvalidArgumentException('Expected argument of type string.');
+            throw new Exception\UnexpectedTypeException($name, 'string');
         }
 
         if (!isset($this->types[$name])) {
@@ -38,14 +40,14 @@ class BlockRegistry implements BlockRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function hasType($name)
+    public function hasBlockType($name)
     {
         if (isset($this->types[$name])) {
             return true;
         }
 
         try {
-            $this->getType($name);
+            $this->getBlockType($name);
         } catch (\InvalidArgumentException $e) {
             return false;
         }

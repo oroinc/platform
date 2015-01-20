@@ -2,12 +2,12 @@
 
 namespace Oro\Component\Block\Tests\Unit;
 
-use Oro\Component\Block\BlockRegistry;
+use Oro\Component\Block\BlockTypeRegistry;
 
-class BlockRegistryTest extends \PHPUnit_Framework_TestCase
+class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var BlockRegistry */
-    protected $blockRegistry;
+    /** @var BlockTypeRegistry */
+    protected $registry;
 
     /** @var  \PHPUnit_Framework_MockObject_MockObject */
     protected $blockTypeFactory;
@@ -15,10 +15,10 @@ class BlockRegistryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->blockTypeFactory = $this->getMock('Oro\Component\Block\BlockTypeFactoryInterface');
-        $this->blockRegistry    = new BlockRegistry($this->blockTypeFactory);
+        $this->registry    = new BlockTypeRegistry($this->blockTypeFactory);
     }
 
-    public function testGetType()
+    public function testGetBlockType()
     {
         $widgetBlockType = $this->getMock('Oro\Component\Block\BlockTypeInterface');
 
@@ -27,12 +27,12 @@ class BlockRegistryTest extends \PHPUnit_Framework_TestCase
             ->with('widget')
             ->will($this->returnValue($widgetBlockType));
 
-        $this->assertSame($widgetBlockType, $this->blockRegistry->getType('widget'));
+        $this->assertSame($widgetBlockType, $this->registry->getBlockType('widget'));
         // check that the created block type is cached
-        $this->assertSame($widgetBlockType, $this->blockRegistry->getType('widget'));
+        $this->assertSame($widgetBlockType, $this->registry->getBlockType('widget'));
     }
 
-    public function testHasType()
+    public function testHasBlockType()
     {
         $widgetBlockType = $this->getMock('Oro\Component\Block\BlockTypeInterface');
         $buttonBlockType = $this->getMock('Oro\Component\Block\BlockTypeInterface');
@@ -48,10 +48,10 @@ class BlockRegistryTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->assertTrue($this->blockRegistry->hasType('widget'));
-        $this->assertTrue($this->blockRegistry->hasType('button'));
+        $this->assertTrue($this->registry->hasBlockType('widget'));
+        $this->assertTrue($this->registry->hasBlockType('button'));
         // check that the created block type is cached
-        $this->assertTrue($this->blockRegistry->hasType('button'));
+        $this->assertTrue($this->registry->hasBlockType('button'));
     }
 
     /**
@@ -59,11 +59,11 @@ class BlockRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTypeWithWrongArgument()
     {
-        $this->blockRegistry->getType(1);
+        $this->registry->getBlockType(1);
     }
 
     public function testHasTypeWithWrongArgument()
     {
-        $this->assertFalse($this->blockRegistry->hasType(1));
+        $this->assertFalse($this->registry->hasBlockType(1));
     }
 }

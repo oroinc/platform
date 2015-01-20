@@ -2,7 +2,9 @@
 
 namespace Oro\Component\Block;
 
-interface BlockRegistryInterface
+use Oro\Component\Block\Exception;
+
+interface BlockTypeRegistryInterface
 {
     /**
      * Returns a block type by name.
@@ -11,9 +13,9 @@ interface BlockRegistryInterface
      *
      * @return BlockTypeInterface
      *
-     * @throws \InvalidArgumentException
+     * @throws Exception\ExceptionInterface
      */
-    public function getType($name);
+    public function getBlockType($name);
 
     /**
      * Returns whether the given block type is supported.
@@ -22,7 +24,7 @@ interface BlockRegistryInterface
      *
      * @return bool Whether the block type is supported
      *
-     * @throws \InvalidArgumentException
+     * @throws Exception\ExceptionInterface
      */
-    public function hasType($name);
+    public function hasBlockType($name);
 }
