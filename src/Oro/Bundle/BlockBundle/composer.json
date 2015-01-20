@@ -1,8 +1,8 @@
 {
     "name": "oro/block-bundle",
     "type": "symfony-bundle",
-    "description": "Oro Block Bundle",
-    "keywords": ["Oro", "Block", "Layout", "BAP"],
+    "description": "BAP Block Bundle",
+    "keywords": ["BAP", "Block", "Layout"],
     "license": "MIT",
     "require": {
         "php": ">=5.4.9",

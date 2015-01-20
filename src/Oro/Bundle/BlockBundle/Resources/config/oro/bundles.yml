@@ -1,2 +1,2 @@
 bundles:
-    - { name: Oro\Bundle\BlockBundle\OroBlockBundle, priority: 0 }
+    - { name: Oro\Bundle\BlockBundle\OroBlockBundle }

@@ -2,10 +2,11 @@
     "name": "oro/block",
     "type": "library",
     "description": "Oro Block Component",
-    "keywords": ["Oro", "BAP", "Block"],
+    "keywords": ["ORO", "BAP", "Block"],
     "license": "MIT",
     "require": {
-        "php": ">=5.4.9"
+        "php": ">=5.4.9",
+        "symfony/form": "~2.3"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\Block": "" }
