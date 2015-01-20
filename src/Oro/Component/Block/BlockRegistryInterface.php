@@ -9,11 +9,10 @@ interface BlockRegistryInterface
 {
     /**
      * Returns a block type by name.
-     * This methods registers the block type.
      *
-     * @param string $name The name of the type
+     * @param string $name The name of the block type
      *
-     * @return BlockTypeInterface The type
+     * @return BlockTypeInterface
      *
      * @throws UnexpectedTypeException
      */
@@ -22,9 +21,9 @@ interface BlockRegistryInterface
     /**
      * Returns whether the given block type is supported.
      *
-     * @param string $name The name of the type
+     * @param string $name The name of the block type
      *
-     * @return bool Whether the type is supported
+     * @return bool Whether the block type is supported
      *
      * @throws ExceptionInterface
      */

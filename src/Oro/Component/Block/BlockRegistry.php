@@ -7,19 +7,13 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class BlockRegistry implements BlockRegistryInterface
 {
-    /**
-     * @var BlockTypeInterface[]
-     */
+    /** @var BlockTypeInterface[] */
     private $types = array();
 
-    /**
-     * @var BlockTypeFactoryInterface
-     */
+    /** @var BlockTypeFactoryInterface */
     private $blockTypeFactory;
 
     /**
-     * Constructor.
-     *
      * @param BlockTypeFactoryInterface $blockTypeFactory The factory for created block.
      */
     public function __construct(BlockTypeFactoryInterface $blockTypeFactory)
@@ -37,6 +31,7 @@ class BlockRegistry implements BlockRegistryInterface
         }
 
         if (!isset($this->types[$name])) {
+            // This method registers the block type.
             $this->types[$name] = $this->blockTypeFactory->createBlockType($name);
         }
 
