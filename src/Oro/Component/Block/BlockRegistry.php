@@ -2,9 +2,6 @@
 
 namespace Oro\Component\Block;
 
-use Symfony\Component\Form\Exception\ExceptionInterface;
-use Symfony\Component\Form\Exception\UnexpectedTypeException;
-
 class BlockRegistry implements BlockRegistryInterface
 {
     /** @var BlockTypeInterface[] */
@@ -27,7 +24,7 @@ class BlockRegistry implements BlockRegistryInterface
     public function getType($name)
     {
         if (!is_string($name)) {
-            throw new UnexpectedTypeException($name, 'string');
+            throw new \InvalidArgumentException('Expected argument of type string.');
         }
 
         if (!isset($this->types[$name])) {
@@ -49,7 +46,7 @@ class BlockRegistry implements BlockRegistryInterface
 
         try {
             $this->getType($name);
-        } catch (ExceptionInterface $e) {
+        } catch (\InvalidArgumentException $e) {
             return false;
         }
 
