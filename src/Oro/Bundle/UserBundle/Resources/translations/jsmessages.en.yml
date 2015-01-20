@@ -1,6 +1,8 @@
-"Update status": "Update status"
-"Generate password": "Generate password"
-"Show/hide password": "Show/hide password"
-change_password:
-    flash:
-        success: The password has been changed
+oro:
+    user:
+        update_status.label: Update status
+        generate_password.label: Generate password
+        show_hide_password.label: Show/hide password
+        change_password:
+            flash:
+                success: The password has been changed
