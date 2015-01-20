@@ -48,6 +48,7 @@ class UserManager implements UserProviderInterface, OAuthAwareUserProviderInterf
      * @param string                  $class          Entity name
      * @param ObjectManager           $om             Object manager
      * @param EncoderFactoryInterface $encoderFactory
+     * @param ConfigManager           $cm             Config manager
      */
     public function __construct($class, ObjectManager $om, EncoderFactoryInterface $encoderFactory, ConfigManager $cm)
     {
@@ -341,7 +342,7 @@ class UserManager implements UserProviderInterface, OAuthAwareUserProviderInterf
             throw new AccountNotLinkedException(sprintf("User '%s' not found.", $username));
         }
 
-        $user = $this->findUserBy(array($this->getOAuthProperty($response) => $username));
+        $user = $this->findUserBy([$this->getOAuthProperty($response) => $username]);
         if (!$user && !$this->isEmailEnabledForOauth($response->getEmail())) {
             throw new EmailDomainNotAllowedException();
         }

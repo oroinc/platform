@@ -1732,6 +1732,8 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Get google id
+     * 
      * @return string|null
      */
     public function getGoogleId()
@@ -1740,10 +1742,14 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Set google id
+     * 
      * @param string|null $googleId
      */
     public function setGoogleId($googleId = null)
     {
         $this->googleId = $googleId;
+
+        return $this;
     }
 }

@@ -10,7 +10,9 @@ trait OrganizationContextTokenTrait
     protected $organization;
 
     /**
-     * {@inheritdoc}
+     * Returns organization
+     * 
+     * @return Organization
      */
     public function getOrganizationContext()
     {
@@ -18,7 +20,9 @@ trait OrganizationContextTokenTrait
     }
 
     /**
-     * {@inheritdoc}
+     * Set an organization
+     * 
+     * @param Organization $organization
      */
     public function setOrganizationContext(Organization $organization)
     {

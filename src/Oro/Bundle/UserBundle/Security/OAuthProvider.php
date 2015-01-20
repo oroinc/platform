@@ -10,9 +10,6 @@ use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
-/**
- * @author Miloslav Nenadal <miloslav.nenadal@imatic.cz>
- */
 class OAuthProvider extends HWIOAuthProvider
 {
     /**
@@ -42,14 +39,21 @@ class OAuthProvider extends HWIOAuthProvider
         $this->userChecker = $userChecker;
     }
 
+    /**
+     * Attempts to authenticate a TokenInterface object.
+     *
+     * @param OAuthToken $token The TokenInterface instance to authenticate
+     *
+     * @return TokenInterface An authenticated TokenInterface instance, never null
+     *
+     * @throws AuthenticationException if the authentication fails
+     */
     public function authenticate(TokenInterface $token)
     {
-        /* @var OAuthToken $token */
         $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName($token->getResourceOwnerName());
 
-        $userResponse = $resourceOwner->getUserInformation($token->getRawToken());
-
         try {
+            $userResponse = $resourceOwner->getUserInformation($token->getRawToken());
             $user = $this->userProvider->loadUserByOAuthUserResponse($userResponse);
         } catch (OAuthAwareExceptionInterface $e) {
             $e->setToken($token);
