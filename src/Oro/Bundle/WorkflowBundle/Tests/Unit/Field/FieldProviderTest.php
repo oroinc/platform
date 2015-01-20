@@ -199,4 +199,90 @@ class FieldProviderTest extends EntityFieldProviderTest
             ]
         ];
     }
+
+    /**
+     * @return array
+     */
+    public function getFieldsWithRelationsAndDeepLevelAndWithUnidirectional()
+    {
+        return [
+            [
+                [
+                    [
+                        'name' => 'Test1field2',
+                        'type' => 'string',
+                        'label' => 'A'
+                    ],
+                    [
+                        'name' => 'id',
+                        'type' => 'integer',
+                        'label' => 'B',
+                        'identifier' => true
+                    ],
+                    [
+                        'name' => 'rel1',
+                        'type' => 'ref-one',
+                        'label' => 'Rel11',
+                    ],
+                    [
+                        'name' => 'rel1',
+                        'type' => 'ref-one',
+                        'label' => 'Rel11',
+                        'relation_type' => 'ref-one',
+                        'related_entity_name' => 'Acme\Entity\Test11',
+                    ],
+                    [
+                        'name' => 'Acme\Entity\Test22::uni_rel1',
+                        'type' => 'ref-one',
+                        'label' => 'UniRel1 (Test22 Plural Label)',
+                        'relation_type' => 'ref-one',
+                        'related_entity_name' => 'Acme\Entity\Test22',
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldsWithVirtualRelationsAndEnumsDataProvider()
+    {
+        return [
+            [
+                [
+                    [
+                        'name' => 'rel1',
+                        'type' => 'ref-one',
+                        'label' => 'Enum Field',
+                    ],
+                    [
+                        'name' => 'rel1',
+                        'type' => 'enum',
+                        'label' => 'Enum Field',
+                        'related_entity_name' => 'Acme\EnumValue1'
+                    ],
+                    [
+                        'name' => 'field1',
+                        'type' => 'integer',
+                        'label' => 'Field 1',
+                        'identifier' => true
+                    ],
+                    [
+                        'name' => 'rel2',
+                        'type' => 'multiEnum',
+                        'label' => 'Multi Enum Field',
+                        'related_entity_name' => 'Acme\EnumValue2'
+                    ],
+                    [
+                        'name' => 'virtual_relation',
+                        'type' => 'oneToMany',
+                        'label' => 'acme.entity.test.virtual_relation.label',
+                        'relation_type' => 'oneToMany',
+                        'related_entity_name' => 'OtherEntity'
+                    ]
+                ]
+            ]
+        ];
+    }
 }

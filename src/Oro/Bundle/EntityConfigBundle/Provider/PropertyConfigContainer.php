@@ -18,14 +18,10 @@ class PropertyConfigContainer
     const TYPE_ENTITY = 'entity';
     const TYPE_FIELD  = 'field';
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $config;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     /**

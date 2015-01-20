@@ -1,3 +1,14 @@
+CHANGELOG for 1.6.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.6.0 versions.
+* 1.6.0 (2015-01-19)
+ * Comments to activities.
+With this feature, the users will be able to add comments to various record activities, such as calls, notes, calendar events, tasks, and so on, making it possible to leave permanent remarks to particular activities they find important, and even engage in conversations that might come in handy later.
+Comments are added to every activity record separately, in a linear thread. In addition to text they might contain a file attachment (1 file/image per comment). Comments may be enabled or disabled for any activity in Entity Management. The ability to add, edit, delete, and view others’ comments is subject to user’s ACL configuration.
+ * WYSIWYG rich text editor for emails and notes.
+This feature allows users to create rich text emails and notes with the built-in WYSIWYG text editor. It allows to mark text as bold, italic, and underlined; change text color and background; create bullet and numbered lists; insert hyperlinks and chunks of source code.
+Rich text editor may be turned off in System configuration—in this case, editor will no longer be available and all previously created rich text pieces will be stripped of any formatting to plain text.
+
 CHANGELOG for 1.5.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.5.0 versions.
