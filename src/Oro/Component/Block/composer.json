@@ -1,0 +1,21 @@
+{
+    "name": "oro/block",
+    "type": "library",
+    "description": "Oro Block Component",
+    "keywords": ["ORO", "BAP", "Block"],
+    "license": "MIT",
+    "require": {
+        "php": ">=5.4.9",
+        "symfony/form": "~2.3"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Component\\Block": "" }
+    },
+    "target-dir": "Oro/Component/Block",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}
