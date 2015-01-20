@@ -15,7 +15,10 @@ class UserChecker extends BaseUserChecker
         parent::checkPreAuth($user);
 
         if ($user instanceof User) {
-            if ($user->getPasswordChangedAt() != null && $user->getPasswordChangedAt() > $user->getLastLogin()) {
+            if ($user->getPasswordChangedAt() != null
+                && $user->getLastLogin() != null
+                && $user->getPasswordChangedAt() > $user->getLastLogin()
+            ) {
                 $ex = new PasswordChangedException(
                     'Your password has been updated by administrator. New password was sent to you by email.'
                 );
