@@ -38,8 +38,7 @@
             'label': 'oro.user.password.reset.label'|trans,
             'iCss': 'icon-repeat'
         }) }}
-        <li>
-        {{ UI.clientLink({
+        {{ UI.dropdownClientItem({
             'dataUrl': path('oro_user_reset_set_password', {'id': entity.id}),
             'aCss': 'no-hash',
             'iCss': 'icon-pencil',
@@ -62,7 +61,6 @@
                 }
             }
         }) }}
-        </li>
         {% endset %}
         {{ UI.dropdownButton({
             'label': 'oro.user.password.dropdown.label'|trans,
