@@ -50,9 +50,13 @@ class ChainVirtualRelationProvider extends AbstractChainProvider implements Virt
     /**
      * {@inheritdoc}
      */
-    public function getTargetJoinAlias($className, $fieldName)
+    public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
-        return $this->findProvider($className, $fieldName)->getTargetJoinAlias($className, $fieldName);
+        return $this->findProvider($className, $fieldName)->getTargetJoinAlias(
+            $className,
+            $fieldName,
+            $selectFieldName
+        );
     }
 
     /**

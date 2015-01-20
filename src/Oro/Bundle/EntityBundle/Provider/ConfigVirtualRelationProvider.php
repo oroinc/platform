@@ -50,7 +50,7 @@ class ConfigVirtualRelationProvider extends AbstractConfigVirtualProvider implem
      *
      * {@inheritdoc}
      */
-    public function getTargetJoinAlias($className, $fieldName)
+    public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
         if (!$this->isVirtualRelation($className, $fieldName)) {
             throw new \InvalidArgumentException(
