@@ -31,7 +31,7 @@ class BlockRegistry implements BlockRegistryInterface
         }
 
         if (!isset($this->types[$name])) {
-            // This method registers the block type.
+            // Registers the block type.
             $this->types[$name] = $this->blockTypeFactory->createBlockType($name);
         }
 
