@@ -73,7 +73,7 @@ function($, _, __, mediator, messenger, DialogWidget) {
         $(".update-status a").click(function () {
             $.get($(this).attr('href'), function(data) {
                 dialogBlock = $(data).dialog({
-                    title: __('Update status'),
+                    title: __('oro.user.update_status.label'),
                     width: 300,
                     height: 180,
                     modal: false,

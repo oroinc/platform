@@ -133,5 +133,6 @@ oro:
             dropdown.label: Password
             reset.label: Reset
             change.label: Change
+            change_dialog.title: Change password
         action:
             password_management: Manage users' passwords            

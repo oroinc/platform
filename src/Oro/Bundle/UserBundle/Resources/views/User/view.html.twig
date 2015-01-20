@@ -31,18 +31,35 @@
     {% endif %}
     {% if entity.enabled and resource_granted('password_management') %}
         {% set html %}
-        {# @todo change routes #}
+        {# @todo change route #}
         {{ UI.dropdownItem({
             'path': path('oro_user_reset_request'),
             'title': 'oro.user.password.reset.label'|trans,
             'label': 'oro.user.password.reset.label'|trans,
             'iCss': 'icon-repeat'
         }) }}
-        {{ UI.dropdownItem({
-            'path': path('oro_user_reset_request'),
-            'title': 'oro.user.password.change.label'|trans,
+        {{ UI.dropdownClientItem({
+            'dataUrl': path('oro_user_reset_set_password', {'id': entity.id}),
+            'aCss': 'no-hash',
+            'iCss': 'icon-pencil',
+            'dataId': entity.id,
             'label': 'oro.user.password.change.label'|trans,
-            'iCss': 'icon-pencil'
+            'widget': {
+                'type': 'dialog',
+                'multiple': false,
+                'refresh-widget-alias': 'activity-list-widget',
+                'options': {
+                    'alias': 'set-password-dialog',
+                    'dialogOptions': {
+                        'title': 'oro.user.password.change_dialog.title'|trans,
+                        'allowMaximize': true,
+                        'allowMinimize': true,
+                        'dblclick': 'maximize',
+                        'maximizedHeightDecreaseBy': 'minimize-bar',
+                        'width': 550
+                    }
+                }
+            }
         }) }}
         {% endset %}
         {{ UI.dropdownButton({

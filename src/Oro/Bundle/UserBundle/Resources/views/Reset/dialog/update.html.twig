@@ -1,0 +1,78 @@
+<div class="widget-content">
+    {% if saved %}
+        <script type="text/javascript">
+        require([
+            'orotranslation/js/translator',
+            'oroui/js/widget-manager',
+            'oroui/js/messenger',
+            'oroui/js/mediator'
+        ],
+        function(__, widgetManager, messenger, mediator) {
+            widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                messenger.notificationFlashMessage('success', __('oro.user.change_password.flash.success'));
+                mediator.trigger('widget_success:' + widget.getAlias());
+                mediator.trigger('widget_success:' + widget.getWid());
+                widget.remove();
+            });
+        });
+        </script>
+    {% else %}
+        <script type="text/javascript">
+        require([
+            'jquery',
+            'orotranslation/js/translator'
+        ],
+        function($, __) {
+            $('#oro_set_password_form_password').parent().after(
+                '<div class="controls" style="margin-top: 10px;">' +
+                '<span class="icon-eye-close" id="show-hide-pass" style="cursor: pointer;" ' +
+                ' title="' + __("oro.user.show_hide_password.label") + '"/>' +
+                '<span class="icon-cog" id="generate-pass" style="cursor: pointer;"' +
+                ' title="' + __("oro.user.generate_password.label") + '">' +
+                __("oro.user.generate_password.label") + '</span>' +
+                '</div>'
+            );
+
+            $('#generate-pass').on('click', function(e){
+                var length = 8,
+                    charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+                    pass = "";
+                for (var i = 0, n = charset.length; i < length; ++i) {
+                    pass += charset.charAt(Math.floor(Math.random() * n));
+                }
+
+                $('#oro_set_password_form_password').val(pass);
+            });
+
+            $('#show-hide-pass').on('click', function(e){
+                var target = e.target || window.event.target;
+                if($(target).hasClass('icon-eye-open')) {
+                    $('#oro_set_password_form_password').attr('type', 'password');
+                    $(target).removeClass('icon-eye-open');
+                    $(target).addClass('icon-eye-close');
+                } else {
+                    $('#oro_set_password_form_password').attr('type', 'text');
+                    $(target).removeClass('icon-eye-close');
+                    $(target).addClass('icon-eye-open');
+                }
+            });
+        });
+        </script>
+        <div class="form-container">
+            <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="change-password-form">
+                <fieldset class="form form-horizontal">
+                    {{ form_row(form.password) }}
+                    {{ form_errors(form.password) }}
+                </fieldset>
+                <fieldset class="form-horizontal">
+                    {{ form_rest(form) }}
+                    <div class="widget-actions form-actions" style="display: none;">
+                        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                        <button class="btn btn-primary" type="submit">{{ 'Save'|trans }}</button>
+                    </div>
+                </fieldset>
+            </form>
+            {{ oro_form_js_validation(form) }}
+        </div>
+    {% endif %}
+</div>
