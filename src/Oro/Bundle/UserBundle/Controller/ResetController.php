@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -7,6 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ResetController extends Controller
@@ -145,6 +148,39 @@ class ResetController extends Controller
     }
 
     /**
+     * Sets user password
+     *
+     * @AclAncestor("password_management")
+     * @Method({"GET", "POST"})
+     * @Route("/set-password/{id}", name="oro_user_reset_set_password", requirements={"id"="\d+"})
+     * @Template("OroUserBundle:Reset:update.html.twig")
+     */
+    public function setPasswordAction(User $entity)
+    {
+        $entityRoutingHelper = $this->getEntityRoutingHelper();
+
+        $formAction = $entityRoutingHelper->generateUrlByRequest(
+            'oro_user_reset_set_password',
+            $this->getRequest(),
+            ['id' => $entity->getId()]
+        );
+
+        $responseData = [
+            'entity' => $entity,
+            'saved'  => false
+        ];
+
+        if ($this->get('oro_user.form.handler.set_password')->process($entity)) {
+            $responseData['entity'] = $entity;
+            $responseData['saved']  = true;
+        }
+        $responseData['form']       = $this->get('oro_user.form.type.set_password.form')->createView();
+        $responseData['formAction'] = $formAction;
+
+        return $responseData;
+    }
+
+    /**
      * Get the truncated email displayed when requesting the resetting.
      * The default implementation only keeps the part following @ in the address.
      *
@@ -161,5 +197,13 @@ class ResetController extends Controller
         }
 
         return $email;
+    }
+
+    /**
+     * @return EntityRoutingHelper
+     */
+    protected function getEntityRoutingHelper()
+    {
+        return $this->get('oro_entity.routing_helper');
     }
 }
