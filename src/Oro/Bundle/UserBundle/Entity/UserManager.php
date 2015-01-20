@@ -371,12 +371,18 @@ class UserManager implements UserProviderInterface, OAuthAwareUserProviderInterf
      */
     protected function isEmailEnabledForOauth($email)
     {
-        $enabledDomain = $this->cm->get('oro_user.google_sso_domain');
-        if (!$enabledDomain) {
+        $enabledDomains = $this->cm->get('oro_user.google_sso_domains');
+        if (!$enabledDomains) {
             return true;
         }
 
-        return (bool) preg_match(sprintf('/@%s$/', $enabledDomain), $email);
+        foreach ($enabledDomains as $enabledDomain) {
+            if (preg_match(sprintf('/@%s$/', $enabledDomain), $email)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

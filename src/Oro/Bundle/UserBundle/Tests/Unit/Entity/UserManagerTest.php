@@ -275,8 +275,8 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_user.google_sso_domain'))
-            ->will($this->returnValue(''));
+            ->with($this->equalTo('oro_user.google_sso_domains'))
+            ->will($this->returnValue([]));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse
@@ -325,8 +325,8 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_user.google_sso_domain'))
-            ->will($this->returnValue('example.com'));
+            ->with($this->equalTo('oro_user.google_sso_domains'))
+            ->will($this->returnValue(['example.com']));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse
@@ -378,8 +378,8 @@ class UserManagerTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_user.google_sso_domain'))
-            ->will($this->returnValue('google.com'));
+            ->with($this->equalTo('oro_user.google_sso_domains'))
+            ->will($this->returnValue(['google.com']));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         $userResponse

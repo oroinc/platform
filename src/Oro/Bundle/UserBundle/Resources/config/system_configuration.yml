@@ -11,11 +11,13 @@ oro_system_configuration:
             type: oro_config_checkbox
             options:
                 label: oro.user.system_configuration.fields.enable_google_sso.label
-        oro_user.google_sso_domain:
+        oro_user.google_sso_domains:
             data_type: string
-            type: text
+            type: oro_collection
             options:
-                label: oro.user.system_configuration.fields.google_sso_domain.label
+                label: oro.user.system_configuration.fields.google_sso_domains.label
+                handle_primary: false
+                type: text
 
     tree:
         system_configuration:
@@ -28,4 +30,4 @@ oro_system_configuration:
                                     google_integration_settings:
                                         children:
                                             - oro_user.enable_google_sso
-                                            - oro_user.google_sso_domain
+                                            - oro_user.google_sso_domains

@@ -64,7 +64,7 @@ oro:
                 google_integration_settings.title: Google integration settings
             fields:
                 enable_google_sso.label: Enable SSO
-                google_sso_domain.label: Domain
+                google_sso_domains.label: Domains
         #
         # Oro/Bundle/UserBundle/Entity/User
         #

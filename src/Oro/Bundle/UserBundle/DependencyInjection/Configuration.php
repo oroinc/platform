@@ -72,9 +72,9 @@ class Configuration implements ConfigurationInterface
                 'value' => false,
                 'type' => 'boolean',
             ),
-            'google_sso_domain'=> array(
-                'value' => '',
-                'type' => 'string',
+            'google_sso_domains'=> array(
+                'value' => [],
+                'type' => 'array',
             ),
         ));
 
