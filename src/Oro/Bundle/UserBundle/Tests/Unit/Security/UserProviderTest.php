@@ -31,6 +31,9 @@ class UserProviderTest extends \PHPUnit_Framework_TestCase
         $class      = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
         $om         = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $repository = $this->getMock('Doctrine\Common\Persistence\ObjectRepository');
+        $cm         = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $om->expects($this->any())
             ->method('getRepository')
@@ -45,7 +48,7 @@ class UserProviderTest extends \PHPUnit_Framework_TestCase
         $this->userManager = $this->getMock(
             'Oro\Bundle\UserBundle\Entity\UserManager',
             array('findUserBy', 'findUserByUsernameOrEmail', 'getClass'),
-            array(static::USER_CLASS, $om, $ef)
+            array(static::USER_CLASS, $om, $ef, $cm)
         );
 
         $this->userManager
