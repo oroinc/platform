@@ -35,6 +35,9 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
     {
         $token = new OAuthToken('token');
         $token->setResourceOwnerName('google');
+        $organization = new Organization();
+        $organization->setEnabled(true);
+        $token->setOrganizationContext($organization);
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
         
@@ -55,7 +58,7 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($resourceOwner));
 
         $user = new User();
-        $user->setOrganization(new Organization());
+        $user->addOrganization($organization);
 
         $this->userProvider
             ->expects($this->any())

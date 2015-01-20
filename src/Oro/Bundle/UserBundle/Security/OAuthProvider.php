@@ -67,9 +67,11 @@ class OAuthProvider extends HWIOAuthProvider
             throw $e;
         }
 
+        $organization = $this->guessOrganization($user, $token);
+
         $token = new OAuthToken($token->getRawToken(), $user->getRoles());
         $token->setResourceOwnerName($resourceOwner->getName());
-        $token->setOrganizationContext($this->guessOrganization($user, $token));
+        $token->setOrganizationContext($organization);
         $token->setUser($user);
         $token->setAuthenticated(true);
 
