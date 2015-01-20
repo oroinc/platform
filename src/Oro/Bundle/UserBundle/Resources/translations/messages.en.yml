@@ -135,4 +135,10 @@ oro:
             change.label: Change
             change_dialog.title: Change password
         action:
-            password_management: Manage users' passwords            
+            password_management: Manage users' passwords
+
+        security:
+            account_locked.message: User account is locked
+            account_disabled.message: User account is disabled
+            account_expired.message: User account has expired
+            password_changed.message: Your password has been updated by administrator. New password was sent to you by email
