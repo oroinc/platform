@@ -67,8 +67,10 @@ services:
         arguments:
             - @oro_query_designer.query_designer.restriction_builder
             - @oro_query_designer.query_designer.manager
-            - @oro_query_designer.virtual_field_provider
+            - @oro_entity.virtual_field_provider.chain
             - @doctrine
+        calls:
+            - [setVirtualRelationProvider, [@oro_entity.virtual_relation_provider.chain]]
 
     oro_segment.query.static_segment.query_builder:
         class: %oro_segment.query.static_segment.query_builder.class%

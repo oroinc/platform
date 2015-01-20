@@ -4,6 +4,28 @@
     select2Config.multiple = true;
 {% endblock %}
 
+{% block oro_combobox_dataconfig_acl_users_multiselect %}
+    select2Config.ajax = {
+        url: {{ url|json_encode|raw }},
+        data: function (query, page) {
+            return {
+                page: page,
+                per_page: {{ configs.per_page|default(10)|json_encode|raw }},
+                name: {{ configs.autocomplete_alias|json_encode|raw }},
+                query: query + ';' + {{ configs.entity_name|json_encode|raw }} + ';' + {{ configs.permission|json_encode|raw }} + ';' + {{ configs.entity_id|json_encode|raw }} + ';'
+                    {% if configs.excludeCurrent is defined and configs.excludeCurrent == true %}
+                        + '1'
+                    {% endif %}
+            };
+        },
+        results: function (data, page) {
+            return data;
+        }
+    };
+
+    select2Config.multiple = true;
+{% endblock %}
+
 {% block oro_combobox_dataconfig_acl_user_autocomplete %}
     select2Config.ajax = {
         url: {{ url|json_encode|raw }},

@@ -12,6 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityBundle\Form\Guesser\AbstractFormGuesser;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class ExtendFieldTypeGuesser extends AbstractFormGuesser
 {
@@ -129,7 +130,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                 $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
                     ->get('enum_code');
                 break;
-            case 'manyToOne':
+            case RelationType::MANY_TO_ONE:
                 $options['entity_class'] = $extendConfig->get('target_entity');
                 $options['configs']      = [
                     'placeholder'   => 'oro.form.choose_value',
@@ -139,8 +140,8 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
                     'properties'    => [$extendConfig->get('target_field')],
                 ];
                 break;
-            case 'oneToMany':
-            case 'manyToMany':
+            case RelationType::ONE_TO_MANY:
+            case RelationType::MANY_TO_MANY:
                 $classArray = explode('\\', $extendConfig->get('target_entity'));
                 $blockName  = array_pop($classArray);
 
@@ -171,7 +172,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
             !$extendConfig->is('is_deleted')
             && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
             && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-            && !in_array($extendConfig->getId()->getFieldType(), ['ref-one', 'ref-many'])
+            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations)
             && (
                 !$extendConfig->has('target_entity')
                 || !$this->extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')

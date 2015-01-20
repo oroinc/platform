@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\EventListener;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendIndicesMigration;
-
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class UpdateExtendIndicesPostUpMigrationListener
@@ -36,7 +35,10 @@ class UpdateExtendIndicesPostUpMigrationListener
     public function onPostUp(PostMigrationEvent $event)
     {
         $event->addMigration(
-            new UpdateExtendIndicesMigration($this->entityMetadataHelper, $this->fieldTypeHelper)
+            new UpdateExtendIndicesMigration(
+                $this->entityMetadataHelper,
+                $this->fieldTypeHelper
+            )
         );
     }
 }

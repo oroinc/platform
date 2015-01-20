@@ -8,14 +8,14 @@ oro_entity_config:
                     route:                  'oro_entityextend_entity_remove'
                     type:                   'ajaxdelete'
                     icon:                   'trash'
-                    filter:                 { owner: 'Custom', state: ['New', 'Requires update', 'Active']}
+                    filter:                 { extend_owner: 'Custom', extend_state: ['New', 'Requires update', 'Active']}
                     args:                   ['id']
                 -
                     name:                   oro.entity_extend.entity_config.extend.entity.grid_action.restore
                     route:                  'oro_entityextend_entity_unremove'
                     type:                   'ajax'
                     icon:                   'backward'
-                    filter:                 { owner: 'Custom', state: ['Deleted']}
+                    filter:                 { extend_owner: 'Custom', extend_state: ['Deleted']}
                     args:                   ['id']
             layout_action:
                 -
@@ -125,14 +125,14 @@ oro_entity_config:
                     route:                  'oro_entityextend_field_remove'
                     type:                   'ajaxdeletefield'
                     icon:                   'trash'
-                    filter:                 { owner: 'Custom', mode: 'default', state: ['New', 'Requires update', 'Active'] }
+                    filter:                 { extend_owner: 'Custom', mode: 'default', extend_state: ['New', 'Requires update', 'Active'] }
                     args:                   ['id']
                 -
                     name:                   oro.entity_extend.entity_config.extend.field.grid_action.restore
                     route:                  'oro_entityextend_field_unremove'
                     type:                   'ajax'
                     icon:                   'backward'
-                    filter:                 { owner: 'Custom', state: ['Deleted'] }
+                    filter:                 { extend_owner: 'Custom', extend_state: ['Deleted'] }
                     args:                   ['id']
             layout_action:
                 -
@@ -276,7 +276,7 @@ oro_entity_config:
                 #
                 relation:
                     options:
-                        allowed_type:       [oneToMany, manyToOne, manyToMany]
+                        allowed_type:       [oneToOne, oneToMany, manyToOne, manyToMany]
                         auditable:          false
                         required_property:
                             config_id:

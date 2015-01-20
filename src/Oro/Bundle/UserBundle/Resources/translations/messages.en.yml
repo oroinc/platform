@@ -104,6 +104,10 @@ oro:
         statuses.label:              Statuses
         username.label:              Username
         organization.label:          Organization
+
+        # extended field added in migrations
+        title.label:                 Title
+
         #
         # Oro/Bundle/UserBundle/Entity/Group
         #

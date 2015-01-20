@@ -396,11 +396,45 @@ class UserTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPreUpdate()
+    public function testPreUpdateUnChanged()
     {
+        $changeSet = [
+            'lastLogin' => null,
+            'loginCount' => null
+        ];
+
         $user = new User();
-        $user->preUpdate();
-        $this->assertInstanceOf('\DateTime', $user->getUpdatedAt());
+        $updatedAt = new \DateTime('2015-01-01');
+        $user->setUpdatedAt($updatedAt);
+
+        $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->any())
+            ->method('getEntityChangeSet')
+            ->will($this->returnValue($changeSet));
+
+        $user->preUpdate($event);
+        $this->assertEquals($updatedAt, $user->getUpdatedAt());
+    }
+
+    public function testPreUpdateChanged()
+    {
+        $changeSet = ['lastname' => null];
+
+        $user = new User();
+        $updatedAt = new \DateTime('2015-01-01');
+        $user->setUpdatedAt($updatedAt);
+
+        $event = $this->getMockBuilder('Doctrine\ORM\Event\PreUpdateEventArgs')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $event->expects($this->any())
+            ->method('getEntityChangeSet')
+            ->will($this->returnValue($changeSet));
+
+        $user->preUpdate($event);
+        $this->assertNotEquals($updatedAt, $user->getUpdatedAt());
     }
 
     public function testBusinessUnit()

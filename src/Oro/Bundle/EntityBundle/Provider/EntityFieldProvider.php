@@ -5,9 +5,10 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Translation\Translator;
 
+use Doctrine\Common\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
@@ -32,6 +33,9 @@ class EntityFieldProvider
     /** @var VirtualFieldProviderInterface */
     protected $virtualFieldProvider;
 
+    /** @var VirtualRelationProviderInterface */
+    protected $virtualRelationProvider;
+
     /** @var ExclusionProviderInterface */
     protected $exclusionProvider;
 
@@ -43,6 +47,9 @@ class EntityFieldProvider
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
+
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
 
     /** @var Translator */
     protected $translator;
@@ -103,6 +110,14 @@ class EntityFieldProvider
     }
 
     /**
+     * @param VirtualRelationProviderInterface $virtualRelationProvider
+     */
+    public function setVirtualRelationProvider($virtualRelationProvider)
+    {
+        $this->virtualRelationProvider = $virtualRelationProvider;
+    }
+
+    /**
      * Sets exclusion provider
      *
      * @param ExclusionProviderInterface $exclusionProvider
@@ -157,24 +172,24 @@ class EntityFieldProvider
         }
 
         $result = [];
-        $em     = $this->getManagerForClass($className);
 
-        $this->addFields($result, $className, $em, $withVirtualFields, $applyExclusions, $translate);
+        $this->addFields($result, $className, $applyExclusions, $translate);
+
+        if ($withVirtualFields) {
+            $this->addVirtualFields($result, $className, $applyExclusions, $translate);
+        }
+
         if ($withRelations) {
-            $this->addRelations(
-                $result,
-                $className,
-                $em,
-                $withEntityDetails,
-                $applyExclusions,
-                $translate
-            );
+            $this->addRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
+
+            if ($withVirtualFields) {
+                $this->addVirtualRelations($result, $className, $withEntityDetails, $applyExclusions, $translate);
+            }
 
             if ($withUnidirectional) {
                 $this->addUnidirectionalRelations(
                     $result,
                     $className,
-                    $em,
                     $withEntityDetails,
                     $applyExclusions,
                     $translate
@@ -191,28 +206,17 @@ class EntityFieldProvider
      *
      * @param array         $result
      * @param string        $className
-     * @param EntityManager $em
-     * @param bool          $withVirtualFields
      * @param bool          $applyExclusions
      * @param bool          $translate
      */
-    protected function addFields(
-        array &$result,
-        $className,
-        EntityManager $em,
-        $withVirtualFields,
-        $applyExclusions,
-        $translate
-    ) {
-        $metadata = $em->getClassMetadata($className);
+    protected function addFields(array &$result, $className, $applyExclusions, $translate)
+    {
+        $metadata = $this->getMetadataFor($className);
 
-        // add virtual fields
-        if ($withVirtualFields) {
-            $this->addVirtualFields($result, $metadata, $applyExclusions, $translate);
-        }
         // add regular fields
-        $configs = $this->extendConfigProvider->getConfigs($metadata->getName());
+        $configs = $this->extendConfigProvider->getConfigs($className);
         foreach ($configs as $fieldConfig) {
+            /** @var FieldConfigId $fieldConfigId */
             $fieldConfigId = $fieldConfig->getId();
             $fieldName = $fieldConfigId->getFieldName();
 
@@ -229,7 +233,7 @@ class EntityFieldProvider
                 continue;
             }
 
-            if (!$this->entityConfigProvider->hasConfig($metadata->getName(), $fieldName)) {
+            if (!$this->entityConfigProvider->hasConfig($className, $fieldName)) {
                 // skip non configurable field
                 continue;
             }
@@ -260,18 +264,18 @@ class EntityFieldProvider
     /**
      * Adds entity virtual fields to $result
      *
-     * @param array         $result
-     * @param ClassMetadata $metadata
-     * @param bool          $applyExclusions
-     * @param bool          $translate
+     * @param array  $result
+     * @param string $className
+     * @param bool   $applyExclusions
+     * @param bool   $translate
      */
-    protected function addVirtualFields(
-        array &$result,
-        ClassMetadata $metadata,
-        $applyExclusions,
-        $translate
-    ) {
-        $className     = $metadata->getName();
+    protected function addVirtualFields(array &$result, $className, $applyExclusions, $translate)
+    {
+        if (!$this->virtualFieldProvider) {
+            return;
+        }
+
+        $metadata = $this->getMetadataFor($className);
         $virtualFields = $this->virtualFieldProvider->getVirtualFields($className);
         foreach ($virtualFields as $fieldName) {
             if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)) {
@@ -298,14 +302,58 @@ class EntityFieldProvider
     }
 
     /**
+     * Adds entity virtual fields to $result
+     *
+     * @param array  $result
+     * @param string $className
+     * @param bool $withEntityDetails
+     * @param bool $applyExclusions
+     * @param bool $translate
+     */
+    protected function addVirtualRelations(array &$result, $className, $withEntityDetails, $applyExclusions, $translate)
+    {
+        if (!$this->virtualRelationProvider) {
+            return;
+        }
+
+        $metadata = $this->getMetadataFor($className);
+        $virtualRelations = $this->virtualRelationProvider->getVirtualRelations($className);
+        foreach ($virtualRelations as $associationName => $virtualRelation) {
+            if ($applyExclusions && $this->exclusionProvider->isIgnoredField($metadata, $associationName)) {
+                continue;
+            }
+
+            $fieldType = $virtualRelation['relation_type'];
+            $targetClassName = $this->entityClassResolver->getEntityClass($virtualRelation['related_entity_name']);
+
+            if (empty($virtualRelation['label'])) {
+                $label = $this->getFieldLabel($className, $associationName);
+            } else {
+                $label = $virtualRelation['label'];
+            }
+
+            $this->addRelation(
+                $result,
+                $associationName,
+                $fieldType,
+                $label,
+                $this->getRelationType($fieldType),
+                $targetClassName,
+                $withEntityDetails,
+                $translate
+            );
+        }
+    }
+
+    /**
      * Checks if the given field should be ignored
      *
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
+     * @param ClassMetadataInterface $metadata
+     * @param string                 $fieldName
      *
      * @return bool
      */
-    protected function isIgnoredField(ClassMetadata $metadata, $fieldName)
+    protected function isIgnoredField(ClassMetadataInterface $metadata, $fieldName)
     {
         // @todo: use of $this->hiddenFields is a temporary solution (https://magecore.atlassian.net/browse/BAP-4142)
         if (isset($this->hiddenFields[$metadata->getName()][$fieldName])) {
@@ -327,11 +375,11 @@ class EntityFieldProvider
      */
     protected function addField(array &$result, $name, $type, $label, $isIdentifier, $translate)
     {
-        $field = array(
+        $field = [
             'name'  => $name,
             'type'  => $type,
             'label' => $translate ? $this->translator->trans($label) : $label
-        );
+        ];
         if ($isIdentifier) {
             $field['identifier'] = true;
         }
@@ -343,7 +391,6 @@ class EntityFieldProvider
      *
      * @param array         $result
      * @param string        $className
-     * @param EntityManager $em
      * @param bool          $withEntityDetails
      * @param bool          $applyExclusions
      * @param bool          $translate
@@ -351,19 +398,18 @@ class EntityFieldProvider
     protected function addRelations(
         array &$result,
         $className,
-        EntityManager $em,
         $withEntityDetails,
         $applyExclusions,
         $translate
     ) {
-        $metadata         = $em->getClassMetadata($className);
+        $metadata = $this->getMetadataFor($className);
         $associationNames = $metadata->getAssociationNames();
         foreach ($associationNames as $associationName) {
             if (isset($result[$associationName])) {
                 // skip because a relation with this name is already added, it could be a virtual field
                 continue;
             }
-            if (!$this->entityConfigProvider->hasConfig($metadata->getName(), $associationName)) {
+            if (!$this->entityConfigProvider->hasConfig($className, $associationName)) {
                 // skip non configurable relation
                 continue;
             }
@@ -399,7 +445,6 @@ class EntityFieldProvider
      *
      * @param array         $result
      * @param string        $className
-     * @param EntityManager $em
      * @param bool          $withEntityDetails
      * @param bool          $applyExclusions
      * @param bool          $translate
@@ -407,19 +452,18 @@ class EntityFieldProvider
     protected function addUnidirectionalRelations(
         array &$result,
         $className,
-        EntityManager $em,
         $withEntityDetails,
         $applyExclusions,
         $translate
     ) {
-        $relations = $this->getUnidirectionalRelations($em, $className);
+        $relations = $this->getUnidirectionalRelations($className);
         foreach ($relations as $name => $mapping) {
             $relatedClassName = $mapping['sourceEntity'];
             $fieldName        = $mapping['fieldName'];
-            $metadata         = $em->getClassMetadata($relatedClassName);
+            $metadata         = $this->getMetadataFor($relatedClassName);
             $labelType        = ($mapping['type'] & ClassMetadataInfo::TO_ONE) ? 'label' : 'plural_label';
 
-            if (!$this->entityConfigProvider->hasConfig($metadata->getName(), $fieldName)) {
+            if (!$this->entityConfigProvider->hasConfig($relatedClassName, $fieldName)) {
                 // skip non configurable relation
                 continue;
             }
@@ -430,21 +474,13 @@ class EntityFieldProvider
                 continue;
             }
 
+            $labelKey = $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label');
+            $labelTypeKey = $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType);
             if ($translate) {
-                $label =
-                    $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label')
-                    ) .
-                    ' (' .
-                    $this->translator->trans(
-                        $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType)
-                    ) .
-                    ')';
-            } else {
-                $label =
-                    $this->entityConfigProvider->getConfig($relatedClassName, $fieldName)->get('label') .
-                    ' (' . $this->entityConfigProvider->getConfig($relatedClassName)->get($labelType) . ')';
+                $labelKey = $this->translator->trans($labelKey);
+                $labelTypeKey = $this->translator->trans($labelTypeKey);
             }
+            $label = sprintf('%s (%s)', $labelKey, $labelTypeKey);
 
             $fieldType = $this->getRelationFieldType($relatedClassName, $fieldName);
 
@@ -465,12 +501,11 @@ class EntityFieldProvider
     /**
      * Return mapping data for entities that has one-way link to $className entity
      *
-     * @param EntityManager $em
-     * @param string        $className
+     * @param string $className
      *
      * @return array
      */
-    protected function getUnidirectionalRelations(EntityManager $em, $className)
+    protected function getUnidirectionalRelations($className)
     {
         $relations = [];
 
@@ -481,7 +516,7 @@ class EntityFieldProvider
                 continue;
             }
 
-            $metadata       = $em->getClassMetadata($entityConfigId->getClassName());
+            $metadata = $this->getMetadataFor($entityConfigId->getClassName());
             $targetMappings = $metadata->getAssociationMappings();
             if (empty($targetMappings)) {
                 continue;
@@ -523,12 +558,12 @@ class EntityFieldProvider
     /**
      * Checks if the given relation should be ignored
      *
-     * @param ClassMetadata $metadata
-     * @param string        $associationName
+     * @param ClassMetadataInterface $metadata
+     * @param string                 $associationName
      *
      * @return bool
      */
-    protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
+    protected function isIgnoredRelation(ClassMetadataInterface $metadata, $associationName)
     {
         // skip a relation if it was deleted
         $fieldConfig = $this->extendConfigProvider->getConfig($metadata->getName(), $associationName);
@@ -618,13 +653,20 @@ class EntityFieldProvider
         try {
             $manager = $this->doctrine->getManagerForClass($className);
         } catch (\ReflectionException $ex) {
-            // ignore not found exception
-        }
-        if (!$manager) {
             throw new InvalidEntityException(sprintf('The "%s" entity was not found.', $className));
         }
 
         return $manager;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return ClassMetadataInterface|ClassMetadataInfo|ClassMetadata
+     */
+    protected function getMetadataFor($className)
+    {
+        return $this->getManagerForClass($className)->getMetadataFactory()->getMetadataFor($className);
     }
 
     /**
