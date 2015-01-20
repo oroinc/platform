@@ -60,6 +60,7 @@ oro:
             invite.fail.message: An invitation email sending was failed
         system_configuration:
             groups:
+                integration_setup.title: Integration
                 google_settings.title: Google settings
                 google_integration_settings.title: Google integration settings
             fields:

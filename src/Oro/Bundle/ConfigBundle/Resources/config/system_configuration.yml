@@ -7,9 +7,6 @@ oro_system_configuration:
         general_setup:
             title: oro.config.system_configuration.groups.general_setup.title
 
-        integration_setup:
-            title: oro.config.system_configuration.groups.integration_setup.title
-
     tree:
         system_configuration:
             platform:
