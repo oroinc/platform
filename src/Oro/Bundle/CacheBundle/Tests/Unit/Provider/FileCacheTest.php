@@ -2,34 +2,54 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\Provider;
 
+use Symfony\Component\Filesystem\Filesystem;
+
+use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
+
 class FileCacheTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @param string $cacheClass
+     * @param string $id
+     * @param string $namespace
+     * @param string $expectedFileName
+     *
      * @dataProvider getFilenameProvider
      */
-    public function testGetFilename($cacheClass, $id, $expectedFileName)
+    public function testGetFilename($cacheClass, $id, $namespace, $expectedFileName)
     {
+        $fs = new Filesystem();
+        $directory = 'dir' . uniqid();
+
         $cache = $this->getMockBuilder($cacheClass)
-            ->disableOriginalConstructor()
-            ->setMethods(['fetch'])
+            ->setConstructorArgs([$directory, '.ext'])
+            ->setMethods(['fetch', 'getNamespace'])
             ->getMock();
 
-        self::setProtectedProperty($cache, 'directory', 'dir');
-        self::setProtectedProperty($cache, 'extension', '.ext');
+        $cache->expects($this->any())
+            ->method('getNamespace')
+            ->will($this->returnValue($namespace));
 
+        $result = self::callProtectedMethod($cache, 'getFilename', [$id]);
         $this->assertEquals(
-            $expectedFileName,
-            self::callProtectedMethod($cache, 'getFilename', array($id))
+            $directory . DIRECTORY_SEPARATOR . $expectedFileName,
+            str_replace(realpath($directory), $directory, $result)
         );
+
+        $this->assertTrue($fs->exists($directory));
+        $fs->remove($directory);
     }
 
     /**
+     * @param string $cacheClass
+     *
      * @dataProvider syncProvider
      */
     public function testSync($cacheClass)
     {
         $namespace = '123';
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|SyncCacheInterface $cache */
         $cache = $this->getMockBuilder($cacheClass)
             ->disableOriginalConstructor()
             ->setMethods(['setNamespace', 'getNamespace'])
@@ -45,52 +65,60 @@ class FileCacheTest extends \PHPUnit_Framework_TestCase
         $cache->sync();
     }
 
+    /**
+     * @return array
+     */
     public static function getFilenameProvider()
     {
         return [
             [
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test',
-                'dir' . DIRECTORY_SEPARATOR . 'test.ext',
+                null,
+                'test.ext',
+            ],
+            [
+                'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
+                'test',
+                'namespace',
+                'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\FilesystemCache',
                 'test\\\\//::""**??<<>>||file',
-                'dir' . DIRECTORY_SEPARATOR . 'testfile.ext'
+                'namespace\\\\//::""**??<<>>||',
+                'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test',
-                'dir' . DIRECTORY_SEPARATOR . 'test.ext',
+                null,
+                'test.ext',
+            ],
+            [
+                'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
+                'test',
+                'namespace',
+                'namespace' . DIRECTORY_SEPARATOR . 'test.ext',
             ],
             [
                 'Oro\Bundle\CacheBundle\Provider\PhpFileCache',
                 'test\\\\//::""**??<<>>||file',
-                'dir' . DIRECTORY_SEPARATOR . 'testfile.ext'
+                'namespace\\\\//::""**??<<>>||',
+                'namespace' . DIRECTORY_SEPARATOR . 'testfile.ext',
             ],
         ];
     }
 
+    /**
+     * @return array
+     */
     public static function syncProvider()
     {
         return [
             ['Oro\Bundle\CacheBundle\Provider\FilesystemCache'],
             ['Oro\Bundle\CacheBundle\Provider\PhpFileCache'],
         ];
-    }
-
-    /**
-     * @param mixed  $obj
-     * @param string $propName
-     * @param mixed  $val
-     */
-    public static function setProtectedProperty($obj, $propName, $val)
-    {
-        $class = new \ReflectionClass($obj);
-        $prop = $class->getProperty($propName);
-        $prop->setAccessible(true);
-
-        $prop->setValue($obj, $val);
     }
 
     /**
