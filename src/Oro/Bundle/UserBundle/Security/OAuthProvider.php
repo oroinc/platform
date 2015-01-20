@@ -7,7 +7,12 @@ use HWI\Bundle\OAuthBundle\Security\Core\Exception\OAuthAwareExceptionInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 
+use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
+use Oro\Bundle\UserBundle\Entity\User;
+
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OAuthProvider extends HWIOAuthProvider
@@ -64,12 +69,37 @@ class OAuthProvider extends HWIOAuthProvider
 
         $token = new OAuthToken($token->getRawToken(), $user->getRoles());
         $token->setResourceOwnerName($resourceOwner->getName());
-        $token->setOrganizationContext($user->getOrganization());
+        $token->setOrganizationContext($this->guessOrganization($user, $token));
         $token->setUser($user);
         $token->setAuthenticated(true);
 
         $this->userChecker->checkPostAuth($user);
 
         return $token;
+    }
+
+    /**
+     * Guess organization
+     * 
+     * @param User $user
+     * @param TokenInterface $token
+     *
+     * @return type
+     *
+     * @throws BadCredentialsException
+     */
+    protected function guessOrganization(User $user, TokenInterface $token)
+    {
+        $organizationGuesser = new UserOrganizationGuesser();
+        $organization = $organizationGuesser->guess($user, $token);
+        if (!$organization) {
+            throw new BadCredentialsException("You don't have active organization assigned.");
+        } elseif (!$user->getOrganizations(true)->contains($organization)) {
+            throw new BadCredentialsException(
+                sprintf("You don't have access to organization '%s'", $organization->getName())
+            );
+        }
+
+        return $organization;
     }
 }
