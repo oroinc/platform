@@ -133,11 +133,14 @@ oro:
         privileges:
             entity.label: Entity
             action.label: Capabilities
+
         password:
+            change_dialog.title: Change password
             dropdown.label: Password
             reset.label: Reset
             change.label: Change
-            change_dialog.title: Change password
+            reset:
+                ttl_already_requested.message:  The password for this user has already been requested within the last 24 hours
         action:
             password_management: Manage users' passwords
 

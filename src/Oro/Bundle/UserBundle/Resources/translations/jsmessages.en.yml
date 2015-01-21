@@ -3,6 +3,9 @@ oro:
         update_status.label: Update status
         generate_password.label: Generate password
         show_hide_password.label: Show/hide password
+        reset_password:
+            flash:
+                success: Reset password email has been sent to user
         change_password:
             flash:
                 success: The password has been changed
