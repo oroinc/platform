@@ -53,6 +53,7 @@ class Processor
     public function sendEmail(User $entity)
     {
         $plainPassword = $entity->getPlainPassword();
+        $entity->setPasswordChangedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $this->userManager->updateUser($entity);
 
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
