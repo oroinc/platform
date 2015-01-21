@@ -1,3 +1,20 @@
+CHANGELOG for 1.5.2
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.5.2 versions.
+* 1.5.2 (2015-01-21)
+ * List of improvements and fixed bugs
+ - Provided easy way to use controllers and templates from parent bundle
+ - Fixed notice after doctrine cache bundle upgrade
+ - Fixed invalid escape of enums
+ - Report engine: Fixed double join in Marketing Lists
+ - Fixed localization settings saving
+ - Search is getting out of memory
+ - Disable connection to socket server on login page
+ - Break of differed process potentially affects other processes in batch
+ - Memory leak in data fixture AddTasksActivityLists
+ - 500 error after removing cache
+ - Duplicate Calendars after application version update
+
 CHANGELOG for 1.5.1
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.5.1 versions.
