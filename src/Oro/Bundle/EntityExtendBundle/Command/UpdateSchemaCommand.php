@@ -4,13 +4,13 @@ namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\Tools\SchemaTool;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
@@ -60,8 +60,7 @@ class UpdateSchemaCommand extends ContainerAwareCommand
             }
         );
 
-        $schemaTool = new SchemaTool($em);
-
+        $schemaTool = new SaveSchemaTool($em);
         $sqls       = $schemaTool->getUpdateSchemaSql($metadata, true);
         if (0 === count($sqls)) {
             $output->writeln('Nothing to update - a database is already in sync with the current entity metadata.');

@@ -33,9 +33,10 @@ interface VirtualRelationProviderInterface
     /**
      * Gets a target alias
      *
-     * @param string $className
-     * @param string $fieldName
+     * @param string      $className
+     * @param string      $fieldName
+     * @param string|null $selectFieldName
      * @return string
      */
-    public function getTargetJoinAlias($className, $fieldName);
+    public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null);
 }

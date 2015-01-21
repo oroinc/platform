@@ -539,9 +539,11 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @param array $expected
+     *
+     * @dataProvider getFieldsWithVirtualRelationsAndEnumsDataProvider
      */
-    public function testGetFieldsWithVirtualRelationsAndEnums()
+    public function testGetFieldsWithVirtualRelationsAndEnums(array $expected)
     {
         $className = 'Acme\Entity\Test';
 
@@ -633,35 +635,46 @@ class EntityFieldProviderTest extends \PHPUnit_Framework_TestCase
             );
 
         $result = $this->provider->getFields('Acme:Test', true, true);
-        $expected = [
-            [
-                'name' => 'rel1',
-                'type' => 'enum',
-                'label' => 'Enum Field',
-                'related_entity_name' => 'Acme\EnumValue1'
-            ],
-            [
-                'name' => 'field1',
-                'type' => 'integer',
-                'label' => 'Field 1',
-                'identifier' => true
-            ],
-            [
-                'name' => 'rel2',
-                'type' => 'multiEnum',
-                'label' => 'Multi Enum Field',
-                'related_entity_name' => 'Acme\EnumValue2'
-            ],
-            [
-                'name' => 'virtual_relation',
-                'type' => 'oneToMany',
-                'label' => 'acme.entity.test.virtual_relation.label',
-                'relation_type' => 'oneToMany',
-                'related_entity_name' => 'OtherEntity'
-            ]
-        ];
 
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function getFieldsWithVirtualRelationsAndEnumsDataProvider()
+    {
+        return [
+            [
+                [
+                    [
+                        'name' => 'rel1',
+                        'type' => 'enum',
+                        'label' => 'Enum Field',
+                        'related_entity_name' => 'Acme\EnumValue1'
+                    ],
+                    [
+                        'name' => 'field1',
+                        'type' => 'integer',
+                        'label' => 'Field 1',
+                        'identifier' => true
+                    ],
+                    [
+                        'name' => 'rel2',
+                        'type' => 'multiEnum',
+                        'label' => 'Multi Enum Field',
+                        'related_entity_name' => 'Acme\EnumValue2'
+                    ],
+                    [
+                        'name' => 'virtual_relation',
+                        'type' => 'oneToMany',
+                        'label' => 'acme.entity.test.virtual_relation.label',
+                        'relation_type' => 'oneToMany',
+                        'related_entity_name' => 'OtherEntity'
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**
