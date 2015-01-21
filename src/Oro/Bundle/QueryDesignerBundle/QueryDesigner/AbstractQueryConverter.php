@@ -522,7 +522,8 @@ abstract class AbstractQueryConverter
 
                     $joinTableAlias = $this->aliases[$this->virtualRelationProvider->getTargetJoinAlias(
                         $className,
-                        $fieldName
+                        $fieldName,
+                        $this->getFieldName($joinId)
                     )];
                 }
 
@@ -1041,7 +1042,11 @@ abstract class AbstractQueryConverter
         $className = $this->getEntityClassName($parentJoinId);
 
         if ($this->virtualRelationProvider->isVirtualRelation($className, $fieldName)) {
-            $tableAlias = $this->aliases[$this->virtualRelationProvider->getTargetJoinAlias($className, $fieldName)];
+            $tableAlias = $this->aliases[$this->virtualRelationProvider->getTargetJoinAlias(
+                $className,
+                $fieldName,
+                $this->getFieldName($columnName)
+            )];
         } else {
             $joinId = end($joinIds);
             $tableAlias = $this->tableAliases[$joinId];
@@ -1366,8 +1371,6 @@ abstract class AbstractQueryConverter
      * @param string $condition
      * @param string $alias
      * @param int    $offset
-     *
-     * @todo: use QueryBuilderTools instead
      *
      * @return bool|int The position of $alias in $condition or FALSE if it was not found
      */
