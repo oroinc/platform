@@ -2,17 +2,18 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Psr\Log\LoggerInterface;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
 class SetPasswordHandler
 {
@@ -90,29 +91,13 @@ class SetPasswordHandler
 
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $this->userManager->updateUser($entity);
+                $plainPassword = $this->form->get('password')->getData();
 
                 $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
                     ->findByName('user_change_password');
 
                 try {
-                    list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
-                        $emailTemplate,
-                        [
-                            'entity' => $entity,
-                            'plainPassword' => $this->form->get('password')->getData(),
-                        ]
-                    );
-
-                    $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-                    $senderName  = $this->configManager->get('oro_notification.email_notification_sender_name');
-                    $type        = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
-                    $message     = \Swift_Message::newInstance()
-                        ->setSubject($subjectRendered)
-                        ->setFrom($senderEmail, $senderName)
-                        ->setTo($entity->getEmail())
-                        ->setBody($templateRendered, $type);
-                    $this->mailer->send($message);
-
+                    $this->sendEmail($entity, $plainPassword, $emailTemplate);
                     return true;
                 } catch (\Twig_Error $e) {
                     $identity = method_exists($emailTemplate, '__toString')
@@ -127,5 +112,31 @@ class SetPasswordHandler
         }
 
         return false;
+    }
+
+    /**
+     * @param User $entity
+     * @param string $plainPassword
+     * @param EmailTemplateInterface $emailTemplate
+     */
+    protected function sendEmail(User $entity, $plainPassword, $emailTemplate)
+    {
+        list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
+            $emailTemplate,
+            [
+                'entity' => $entity,
+                'plainPassword' => $plainPassword,
+            ]
+        );
+
+        $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
+        $senderName = $this->configManager->get('oro_notification.email_notification_sender_name');
+        $type = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
+        $message = \Swift_Message::newInstance()
+            ->setSubject($subjectRendered)
+            ->setFrom($senderEmail, $senderName)
+            ->setTo($entity->getEmail())
+            ->setBody($templateRendered, $type);
+        $this->mailer->send($message);
     }
 }
