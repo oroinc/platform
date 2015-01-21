@@ -7,6 +7,7 @@ parameters:
     oro_locale.format_converter.date_time.registry.class: Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterRegistry
     oro_locale.format_converter.date_time.intl.class: Oro\Bundle\LocaleBundle\Converter\IntlDateTimeFormatConverter
     oro_locale.format_converter.date_time.moment.class: Oro\Bundle\LocaleBundle\Converter\MomentDateTimeFormatConverter
+    oro_locale.format_converter.date_time.php.class: Oro\Bundle\LocaleBundle\Converter\PhpDateTimeFormatConverter
 
     oro_locale.formatter.name.class:      Oro\Bundle\LocaleBundle\Formatter\NameFormatter
     oro_locale.formatter.address.class:   Oro\Bundle\LocaleBundle\Formatter\AddressFormatter
@@ -118,6 +119,13 @@ services:
             - @oro_locale.formatter.date_time
         tags:
             - { name: oro_locale.format_converter.date_time, alias: moment }
+
+    oro_locale.format_converter.date_time.php:
+        class: %oro_locale.format_converter.date_time.php.class%
+        arguments:
+            - @oro_locale.formatter.date_time
+        tags:
+            - { name: oro_locale.format_converter.date_time, alias: php }
 
     # event listeners
     oro_locale.locale_listener:
