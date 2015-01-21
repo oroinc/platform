@@ -50,6 +50,7 @@ body {
     .ui-datepicker-buttonpane{
       border: 0;
       margin-top: 0;
+      text-align: center;
     }
     .ui-datepicker-calendar{
       tbody tr:hover{
@@ -126,21 +127,15 @@ body {
         top: 6px;
         right: 4px;
         background-color: #ffffff;
-        background-image: url("../images/ui-icons_222222_256x240.png");
+        background-image: none;
         border-color: #dfdfdf;
-        span{
-          background-color: none;
-        }
       }
       .ui-datepicker-prev-hover{
         top: 6px;
         left: 4px;
         background-color: #ffffff;
-        background-image: url("../images/ui-icons_222222_256x240.png");
+        background-image: none;
         border-color: #dfdfdf;
-        span{
-          background-color: none;
-        }
       }
     }
   }
@@ -264,6 +259,12 @@ body .ui-datepicker{
   }
 }
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-close {
+  // close button is not in use
+  display: none;
+}
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current{
+  float: none;
+  display: inline-block;
   .box-shadow(none);
   #gradient > .vertical(#fdfdfd, #efefef);
   border-color: rgba(0,0,0,0.25);
@@ -284,33 +285,6 @@ body .ui-datepicker{
     &:focus{
       background-color: #f7f7f7;
       color: #666;
-    }
-  }
-}
-.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current{
-  .box-shadow(inset 0 1px 0 0 #9cbcf1);
-  #gradient > .vertical(#80a8e7, #5281cc);
-  border-color: #5e7eb0 #546d92 #485670 #546d92;
-  text-shadow: 0px 1px 0px #386e9f;
-  color: #fff;
-  &:hover {
-    #gradient > .vertical(#739cdc, #5281cc);
-    .box-shadow(inset 0 1px 0 0 #7fa6e5);
-    color: #fff;
-  }
-  &:active,
-  &:focus {
-    #gradient > .vertical(#739cdc, #3061af);
-    .box-shadow(inset 0 1px 4px 0 #3962a3);
-    color: #fff;
-  }
-  &[disabled] {
-    &,
-    &:hover,
-    &:active,
-    &:focus{
-      background-color: #0044cc;
-      color: #fff;
     }
   }
 }
