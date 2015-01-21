@@ -6,22 +6,22 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds all services with the tags "block.type" as arguments of the "block.builder_type" service.
+ * Adds all services with the tags "oro_layout.block_type" as arguments of the "oro_layout.block_type_factory" service.
  */
 class BlockTypePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('block.builder_type')) {
+        if (!$container->hasDefinition('oro_layout.block_type_factory')) {
             return;
         }
 
-        $definition = $container->getDefinition('block.builder_type');
+        $definition = $container->getDefinition('oro_layout.block_type_factory');
 
         // Builds an array with service IDs as keys and tag aliases as values
         $types = array();
 
-        foreach ($container->findTaggedServiceIds('block.type') as $serviceId => $tag) {
+        foreach ($container->findTaggedServiceIds('oro_layout.block_type') as $serviceId => $tag) {
             $alias = isset($tag[0]['alias'])
                 ? $tag[0]['alias']
                 : $serviceId;
