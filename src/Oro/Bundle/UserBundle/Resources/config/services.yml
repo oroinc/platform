@@ -55,11 +55,8 @@ services:
     oro_user.security.password_manager:
         class:                        %oro_user.security.password_manager.class%
         arguments:
-            - @oro_config.global
-            - @translator
-            - @templating
-            - @mailer
             - @oro_user.manager
+            - @oro_user.mailer.processor
             - %oro_user.reset.ttl%
 
     oro_user.cache:

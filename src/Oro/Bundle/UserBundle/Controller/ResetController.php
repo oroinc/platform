@@ -168,6 +168,10 @@ class ResetController extends Controller
     /**
      * Sets user password
      *
+     * @param User $entity
+     *
+     * @return array
+     *
      * @AclAncestor("password_management")
      * @Method({"GET", "POST"})
      * @Route("/set-password/{id}", name="oro_user_reset_set_password", requirements={"id"="\d+"})

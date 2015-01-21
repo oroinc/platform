@@ -11,6 +11,10 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 
 class Processor
 {
+    const TEMPLATE_USER_RESET_PASSWORD          = 'user_reset_password';
+    const TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN = 'user_reset_password_as_admin';
+    const TEMPLATE_USER_CHANGE_PASSWORD         = 'user_change_password';
+
     /** @var ObjectManager */
     protected $objectManager;
 
@@ -48,19 +52,16 @@ class Processor
     }
 
     /**
-     * @param User $entity
+     * @param User $user
      */
-    public function sendEmail(User $entity)
+    public function sendChangePasswordEmail(User $user)
     {
-        $plainPassword = $entity->getPlainPassword();
-        $this->userManager->updateUser($entity);
-
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
             ->findByName('user_change_password');
 
         list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
             $emailTemplate,
-            ['entity' => $entity, 'plainPassword' => $plainPassword]
+            ['entity' => $user, 'plainPassword' => $user->getPlainPassword()]
         );
 
         $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
@@ -69,8 +70,35 @@ class Processor
         $message     = \Swift_Message::newInstance()
             ->setSubject($subjectRendered)
             ->setFrom($senderEmail, $senderName)
-            ->setTo($entity->getEmail())
+            ->setTo($user->getEmail())
             ->setBody($templateRendered, $type);
+
+        $this->mailer->send($message);
+    }
+
+    public function sendResetPasswordEmail(User $user, $asAdmin = false)
+    {
+        $templateName = $asAdmin
+            ? self::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN
+            : self::TEMPLATE_USER_RESET_PASSWORD;
+
+        $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
+            ->findByName($templateName);
+
+        list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
+            $emailTemplate,
+            ['entity' => $user, 'plainPassword' => $user->getPlainPassword()]
+        );
+
+        $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
+        $senderName  = $this->configManager->get('oro_notification.email_notification_sender_name');
+        $type        = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
+        $message = \Swift_Message::newInstance()
+            ->setSubject($subjectRendered)
+            ->setFrom($senderEmail, $senderName)
+            ->setTo($user->getEmail())
+            ->setBody($templateRendered, $type);
+
         $this->mailer->send($message);
     }
 }

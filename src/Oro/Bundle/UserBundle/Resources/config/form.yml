@@ -243,4 +243,4 @@ services:
             - @request
             - @translator
             - @oro_user.form.type.set_password.form
-            - @oro_user.mailer.processor
+            - @oro_user.security.password_manager
