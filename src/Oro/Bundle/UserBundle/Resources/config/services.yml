@@ -25,6 +25,7 @@ parameters:
     oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
     oro_user.activity_widget_provider.class:      %oro_activity.widget_provider.activities.menu.class%
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
+    oro_user.phones_provider.class:               Oro\Bundle\UserBundle\Provider\PhoneProvider
 services:
     oro_user.manager:
         class:                        %oro_user.manager.class%
@@ -161,6 +162,9 @@ services:
         tags:
             - { name: oro_email.owner.provider, order: 1 }
 
+    oro_user.phones.provider:
+        class: %oro_user.phones_provider.class%
+        
     oro_user.change_password.subscriber:
         class: %oro_user.change_password.subscriber.class%
         arguments:
