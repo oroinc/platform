@@ -3,3 +3,14 @@ Remove: Remove
 Add: Add
 "Select {{ entity }}": "Select {{ entity }}"
 "Create {{ entity }}": "Create {{ entity }}"
+
+oro:
+    form:
+        datepicker:
+            am: am
+            pm: pm
+            AM: AM
+            PM: PM
+            mins: mins
+            hr: hr
+            hrs: hrs

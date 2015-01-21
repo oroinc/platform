@@ -8,9 +8,6 @@ define(function (require) {
         DatePickerView = require('./datepicker-view');
     require('oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
-    // @TODO fixed in BAP-7094
-    $.fn.timepicker.defaults.timeFormat = 'g:i A';
-
     DateTimePickerView = DatePickerView.extend({
         defaults: {
             useNativePicker: false,

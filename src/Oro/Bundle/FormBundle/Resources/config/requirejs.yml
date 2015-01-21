@@ -27,8 +27,11 @@ config:
     map:
         '*':
             'jquery.validate': 'oroform/js/extend/validate'
+            'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroform/js/jquery-timepicker-l10n'
         'oroform/js/extend/validate':
             'jquery.validate': 'jquery.validate'
+        'oroform/js/jquery-timepicker-l10n':
+            'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker'
     paths:
         'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
         'jquery.validate': 'bundles/oroform/lib/jquery.validate/jquery.validate.js'
