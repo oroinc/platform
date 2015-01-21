@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Block\Exception;
+namespace Oro\Component\Layout\Exception;
 
 class UnexpectedTypeException extends InvalidArgumentException
 {

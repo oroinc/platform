@@ -1,7 +1,7 @@
-Oro Block Component
+Oro Layout Component
 ====================
 
-`Oro Block Component` provides tools for defining elements of layout, so-called blocks, that can be used for building a different types of layouts, including HTML, XML and so on.
+`Oro Layout Component` provides tools for defining elements of layout, so-called blocks, that can be used for building a different types of layouts, including HTML, XML and so on.
 
 There are two core element types:
 

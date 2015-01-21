@@ -1,8 +1,8 @@
 {
-    "name": "oro/block",
+    "name": "oro/layout",
     "type": "library",
-    "description": "Oro Block Component",
-    "keywords": ["ORO", "BAP", "Block"],
+    "description": "Oro Layout Component",
+    "keywords": ["ORO", "BAP", "Layout", "Block"],
     "license": "MIT",
     "require": {
         "php": ">=5.4.9",
@@ -10,9 +10,9 @@
         "symfony/options-resolver": "~2.3"
     },
     "autoload": {
-        "psr-0": { "Oro\\Component\\Block": "" }
+        "psr-0": { "Oro\\Component\\Layout": "" }
     },
-    "target-dir": "Oro/Component/Block",
+    "target-dir": "Oro/Component/Layout",
     "minimum-stability": "dev",
     "extra": {
         "branch-alias": {

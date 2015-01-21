@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Block;
+namespace Oro\Component\Layout;
 
-use Oro\Component\Block\Exception;
+use Oro\Component\Layout\Exception;
 
 class BlockTypeRegistry implements BlockTypeRegistryInterface
 {

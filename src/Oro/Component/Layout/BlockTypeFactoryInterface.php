@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Block;
+namespace Oro\Component\Layout;
 
 interface BlockTypeFactoryInterface
 {

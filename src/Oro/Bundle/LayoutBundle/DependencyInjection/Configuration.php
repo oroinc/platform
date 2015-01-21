@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\BlockBundle\DependencyInjection;
+namespace Oro\Bundle\LayoutBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -13,7 +13,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('oro_block');
+        $rootNode = $treeBuilder->root('oro_layout');
 
         return $treeBuilder;
     }

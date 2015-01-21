@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\BlockBundle\DependencyInjection;
+namespace Oro\Bundle\LayoutBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class OroBlockExtension extends Extension
+class OroLayoutExtension extends Extension
 {
     /**
      * {@inheritdoc}

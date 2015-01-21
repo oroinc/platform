@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Block\Tests\Unit;
+namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Block\BlockTypeRegistry;
+use Oro\Component\Layout\BlockTypeRegistry;
 
 class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,13 +14,13 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->blockTypeFactory = $this->getMock('Oro\Component\Block\BlockTypeFactoryInterface');
+        $this->blockTypeFactory = $this->getMock('Oro\Component\Layout\BlockTypeFactoryInterface');
         $this->registry    = new BlockTypeRegistry($this->blockTypeFactory);
     }
 
     public function testGetBlockType()
     {
-        $widgetBlockType = $this->getMock('Oro\Component\Block\BlockTypeInterface');
+        $widgetBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
         $this->blockTypeFactory->expects($this->once())
             ->method('createBlockType')
@@ -34,8 +34,8 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testHasBlockType()
     {
-        $widgetBlockType = $this->getMock('Oro\Component\Block\BlockTypeInterface');
-        $buttonBlockType = $this->getMock('Oro\Component\Block\BlockTypeInterface');
+        $widgetBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $buttonBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
         $this->blockTypeFactory->expects($this->exactly(2))
             ->method('createBlockType')
