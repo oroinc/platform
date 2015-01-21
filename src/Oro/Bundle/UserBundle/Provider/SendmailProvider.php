@@ -10,7 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
-class SenmailProvider
+class SendmailProvider
 {
     /** @var ConfigManager */
     protected $configManager;

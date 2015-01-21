@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
-use Oro\Bundle\UserBundle\Provider\SenmailProvider;
+use Oro\Bundle\UserBundle\Provider\SendmailProvider;
 
 class SetPasswordHandler
 {
@@ -27,7 +27,7 @@ class SetPasswordHandler
     /** @var FormInterface */
     protected $form;
 
-    /** @var SenmailProvider */
+    /** @var SendmailProvider */
     protected $sendmailProvider;
 
     /**
@@ -35,14 +35,14 @@ class SetPasswordHandler
      * @param Request             $request
      * @param UserManager         $userManager
      * @param FormInterface       $form
-     * @param SenmailProvider     $sendmailProvider
+     * @param SendmailProvider     $sendmailProvider
      */
     public function __construct(
         ObjectManager    $objectManager,
         Request          $request,
         UserManager      $userManager,
         FormInterface    $form,
-        SenmailProvider  $sendmailProvider
+        SendmailProvider  $sendmailProvider
     ) {
         $this->objectManager = $objectManager;
         $this->request       = $request;
@@ -72,7 +72,7 @@ class SetPasswordHandler
                 $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
                     ->findByName('user_change_password');
 
-                $this->sendmailProvider->sendEmail($entity, $plainPassword, ['emailTemplate' => $emailTemplate]);
+                $this->sendmailProvider->sendEmail($entity, $emailTemplate, ['plainPassword' => $plainPassword]);
                 return true;
             }
         }
