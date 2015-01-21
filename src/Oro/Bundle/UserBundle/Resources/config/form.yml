@@ -240,10 +240,7 @@ services:
         scope: request
         arguments:
             - @doctrine.orm.entity_manager
-            - @logger
             - @request
-            - @oro_config.global
-            - @oro_email.email_renderer
             - @oro_user.manager
             - @oro_user.form.type.set_password.form
-            - @oro_email.direct_mailer
+            - @oro_user.sendemail_provider

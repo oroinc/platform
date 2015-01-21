@@ -25,6 +25,7 @@ parameters:
     oro_user.role.handler.delete.class:           Oro\Bundle\UserBundle\Handler\RoleDeleteHandler
     oro_user.activity_widget_provider.class:      %oro_activity.widget_provider.activities.menu.class%
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
+    oro_user.sendmail_provider.class:             Oro\Bundle\UserBundle\Provider\SenmailProvider
 
     security.user_checker.class:                  Oro\Bundle\UserBundle\Security\UserChecker
 services:
@@ -200,3 +201,11 @@ services:
             - @?security.acl.voter.basic_permissions
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.owner-users-select-grid, method: onBuildBefore }
+
+    oro_user.sendemail_provider:
+        class: %oro_user.sendmail_provider.class%
+        arguments:
+            - @oro_config.global
+            - @oro_email.email_renderer
+            - @logger
+            - @oro_email.direct_mailer
