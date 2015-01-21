@@ -239,7 +239,6 @@ services:
         class: %oro_user.form.handler.set_password.class%
         scope: request
         arguments:
-            - @logger
             - @request
             - @translator
             - @oro_user.form.type.set_password.form

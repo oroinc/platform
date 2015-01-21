@@ -217,4 +217,5 @@ services:
             - @oro_config.global
             - @oro_email.email_renderer
             - @oro_user.manager
+            - @logger
             - @oro_email.direct_mailer

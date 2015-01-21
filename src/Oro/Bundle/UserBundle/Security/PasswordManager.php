@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
+use Psr\Log\LoggerInterface;
+
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
@@ -60,11 +62,11 @@ class PasswordManager
      */
     public function resetPassword(User $user, $asAdmin = false)
     {
-        $this->reset();
+        $this->setError(null);
 
         if (!$asAdmin) {
             if ($user->isPasswordRequestNonExpired($this->ttl)) {
-                $this->addError('oro.user.password.reset.ttl_already_requested.message');
+                $this->setError('oro.user.password.reset.ttl_already_requested.message');
 
                 return false;
             }
@@ -74,31 +76,42 @@ class PasswordManager
             $user->setConfirmationToken($user->generateToken());
         }
 
-        // todo move to processor
-        $message = $this->createMessage($user);
-        $this->mailer->send($message);
+        if ($asAdmin) {
+            $isEmailSent = $this->mailProcessor->sendResetPasswordAsAdminEmail($user);
+        } else {
+            $isEmailSent = $this->mailProcessor->sendResetPasswordEmail($user);
+        }
 
-        $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        $this->userManager->updateUser($user);
+        if ($isEmailSent) {
+            $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+            $this->userManager->updateUser($user);
 
-        return true;
+            return true;
+        } else {
+            if ($this->mailProcessor->hasError()) {
+                $this->setError($this->mailProcessor->getError());
+            }
+
+            return false;
+        }
     }
 
     public function changePassword(User $user, $password)
     {
         $user->setPlainPassword($password);
         $user->setPasswordChangedAt(new \DateTime());
-        $this->userManager->updateUser($user);
 
-        $this->mailProcessor->sendChangePasswordEmail($user);
-    }
+        if ($this->mailProcessor->sendChangePasswordEmail($user)) {
+            $this->userManager->updateUser($user);
 
-    /**
-     * Resets password manager
-     */
-    public function reset()
-    {
-        $this->error = null;
+            return true;
+        } else {
+            if ($this->mailProcessor->hasError()) {
+                $this->setError($this->mailProcessor->getError());
+            }
+
+            return false;
+        }
     }
 
     /**
@@ -120,29 +133,8 @@ class PasswordManager
     /**
      * @param string $error
      */
-    protected function addError($error)
+    protected function setError($error)
     {
         $this->error = $error;
-    }
-
-    // todo move to processor method
-    /**
-     * @param User $user
-     *
-     * @return \Swift_Message
-     */
-    protected function createMessage(User $user)
-    {
-        $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-        $senderName  = $this->configManager->get('oro_notification.email_notification_sender_name');
-
-        return \Swift_Message::newInstance()
-            ->setSubject($this->translator->trans('Reset password'))
-            ->setFrom($senderEmail, $senderName)
-            ->setTo($user->getEmail())
-            ->setBody(
-                $this->templating->render('OroUserBundle:Mail:reset.html.twig', ['user' => $user]),
-                'text/html'
-            );
     }
 }

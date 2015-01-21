@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Psr\Log\LoggerInterface;
-
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,9 +12,6 @@ use Oro\Bundle\UserBundle\Security\PasswordManager;
 
 class SetPasswordHandler
 {
-    /** @var  LoggerInterface */
-    protected $logger;
-
     /** @var Request */
     protected $request;
 
@@ -30,20 +25,17 @@ class SetPasswordHandler
     protected $mailerProcessor;
 
     /**
-     * @param LoggerInterface     $logger
      * @param Request             $request
      * @param Translator          $translator
      * @param FormInterface       $form
      * @param PasswordManager     $passwordManager
      */
     public function __construct(
-        LoggerInterface  $logger,
         Request          $request,
         Translator       $translator,
         FormInterface    $form,
         PasswordManager  $passwordManager
     ) {
-        $this->logger          = $logger;
         $this->request         = $request;
         $this->translator      = $translator;
         $this->form            = $form;
@@ -62,16 +54,16 @@ class SetPasswordHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
             if ($this->form->isValid()) {
-                try {
-                    $newPassword = $this->form->get('password')->getData();
-                    $this->passwordManager->changePassword($entity, $newPassword);
-
+                $newPassword = $this->form->get('password')->getData();
+                if ($this->passwordManager->changePassword($entity, $newPassword)) {
                     return true;
-                } catch (\Exception $ex) {
-                    $this->logger->error('Email sending failed.', ['exception' => $ex]);
-                    $this->form->addError(
-                        new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'))
-                    );
+                } else {
+                    if ($this->passwordManager->hasError()) {
+                        $error = new FormError($this->passwordManager->getError());
+                    } else {
+                        $error = new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'));
+                    }
+                    $this->form->addError($error);
                 }
             }
         }
