@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -29,6 +30,8 @@ class ResetController extends Controller
     /**
      * Request reset user password
      *
+     * @return Response
+     *
      * @Route("/send-email", name="oro_user_reset_send_email")
      * @Method({"POST"})
      */
@@ -41,43 +44,54 @@ class ResetController extends Controller
             return $this->render('OroUserBundle:Reset:request.html.twig', array('invalid_username' => $username));
         }
 
-        if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))) {
+        $passwordManager = $this->get('oro_user.security.password_manager');
+        $isMessageSent = $passwordManager->setResetPasswordEmail($user);
+
+        if (!$isMessageSent) {
             $this->get('session')->getFlashBag()->add(
                 'warn',
-                'The password for this user has already been requested within the last 24 hours.'
+                $passwordManager->getError()
             );
 
             return $this->redirect($this->generateUrl('oro_user_reset_request'));
         }
 
-        if (null === $user->getConfirmationToken()) {
-            $user->setConfirmationToken($user->generateToken());
+        return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return array
+     *
+     * @Route("/send-email-as-admin/{id}", name="oro_user_reset_send_email_as_admin", requirements={"id"="\d+"})
+     * @AclAncestor("password_management")
+     * @Template("OroUserBundle:Reset/widget:sendEmailConfirmation.html.twig")
+     */
+    public function sendEmailAsAdminAction(User $user)
+    {
+        $params = [
+            'entity' => $user,
+        ];
+
+        if ($this->getRequest()->isMethod('POST')) {
+            $passwordManager = $this->get('oro_user.security.password_manager');
+            $isMessageSent = $passwordManager->setResetPasswordEmail($user, false);
+
+            if ($isMessageSent) {
+                $params['processed'] = true;
+            } else {
+                $params['processed'] = false;
+                $params['error'] = $passwordManager->getError();
+            }
+        } else {
+            $params['formAction'] = $this->get('router')->generate(
+                'oro_user_reset_send_email_as_admin',
+                ['id' => $user->getId()]
+            );
         }
 
-        $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
-
-        $cm          = $this->get('oro_config.global');
-        $senderEmail = $cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $cm->get('oro_notification.email_notification_sender_name');
-
-        /**
-         * @todo Move to postUpdate lifecycle event handler as service
-         */
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Reset password')
-            ->setFrom($senderEmail, $senderName)
-            ->setTo($user->getEmail())
-            ->setBody(
-                $this->renderView('OroUserBundle:Mail:reset.html.twig', array('user' => $user)),
-                'text/html'
-            );
-
-        $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-
-        $this->get('mailer')->send($message);
-        $this->get('oro_user.manager')->updateUser($user);
-
-        return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
+        return $params;
     }
 
     /**
@@ -106,6 +120,10 @@ class ResetController extends Controller
 
     /**
      * Reset user password
+     *
+     * @param string $token
+     *
+     * @return array
      *
      * @Route("/reset/{token}", name="oro_user_reset_reset", requirements={"token"="\w+"})
      * @Method({"GET", "POST"})
