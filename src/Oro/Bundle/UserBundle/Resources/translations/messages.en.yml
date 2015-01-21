@@ -23,6 +23,10 @@ Login page: Login page
 "User": "User"
 "None": "None"
 
+User account is locked.: User account is locked
+User account is disabled.: User account is disabled
+User account has expired.: User account has expired
+
 change_password:
     flash:
         success: The password has been changed
@@ -136,7 +140,9 @@ oro:
             reset.label: Reset
             change.label: Change
             reset:
-                email_sent.message:             Reset password email has been sent to user
                 ttl_already_requested.message:  The password for this user has already been requested within the last 24 hours
         action:
             password_management: Manage users' passwords
+
+        security:
+            password_changed.message: Your password has been updated by administrator. New password was sent to you by email

@@ -6,9 +6,9 @@
                     function(_, __, widgetManager, messenger, mediator) {
                         widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
                             {% if processed %}
-                                messenger.notificationFlashMessage('success', __('oro.user.password.reset.email_sent.message'));
+                                messenger.notificationFlashMessage('success', __('oro.user.reset_password.flash.success'));
                             {% else %}
-                                messenger.notificationFlashMessage('error', '{{ error }}');
+                                messenger.notificationFlashMessage('error', '{{ error|trans }}');
                             {% endif %}
                             mediator.trigger('widget_success:' + widget.getAlias());
                             mediator.trigger('widget_success:' + widget.getWid());
