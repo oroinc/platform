@@ -110,6 +110,11 @@ class AliasCollection
             unset($this->aliases[$alias]);
             $aliases = &$this->ids[$id];
             unset($aliases[array_search($alias, $aliases, true)]);
+            if (!empty($aliases)) {
+                $this->removeDependedAliases($alias, $id);
+            } else {
+                unset($this->ids[$id]);
+            }
         }
 
         return $this;
@@ -141,6 +146,30 @@ class AliasCollection
      */
     public function isEmpty()
     {
-        return empty($this->hierarchy);
+        return empty($this->aliases);
+    }
+
+    /**
+     * Removes all depended aliases
+     * For example if "alias3" is removed in alias chain like "alias1 -> alias2 -> alias3 -> id"
+     * than both "alias1" and "alias2" are removed as well
+     *
+     * @param string $alias
+     * @param string $id
+     */
+    protected function removeDependedAliases($alias, $id)
+    {
+        foreach ($this->ids[$id] as $otherAlias) {
+            if ($this->aliases[$otherAlias] === $alias) {
+                unset($this->aliases[$otherAlias]);
+                $aliases = &$this->ids[$id];
+                unset($aliases[array_search($otherAlias, $aliases, true)]);
+                if (!empty($aliases)) {
+                    $this->removeDependedAliases($otherAlias, $id);
+                } else {
+                    unset($this->ids[$id]);
+                }
+            }
+        }
     }
 }

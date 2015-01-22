@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Represents the raw layout configuration and provides methods to modify these data
+ */
 class LayoutData
 {
     /** The name of the block type */
@@ -107,6 +110,19 @@ class LayoutData
         if (empty($id)) {
             throw new Exception\InvalidArgumentException('The item id must not be empty.');
         }
+        if (!is_string($id)) {
+            throw new Exception\UnexpectedTypeException($id, 'string', 'id');
+        }
+        if (!$this->isValidId($id)) {
+            throw new Exception\InvalidArgumentException(
+                sprintf(
+                    'The "%s" string cannot be used as the item id because it contains illegal characters. '
+                    . 'The valid item id should start with a letter, digit or underscore and only contain '
+                    . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                    $id
+                )
+            );
+        }
         if (isset($this->items[$id])) {
             throw new Exception\ItemAlreadyExistsException(
                 sprintf(
@@ -133,14 +149,15 @@ class LayoutData
             );
         }
 
-        $path = [];
-        if (!empty($parentId)) {
+        if (empty($parentId)) {
+            $path = [];
+        } else {
             $parentId = $this->resolveItemId($parentId);
             $path     = $this->getItemProperty($parentId, self::PATH);
         }
-        $path[] = $id;
 
         $this->hierarchy->add($path, $id);
+        $path[]           = $id;
         $this->items[$id] = [
             self::PATH       => $path,
             self::BLOCK_TYPE => $blockType,
@@ -269,15 +286,36 @@ class LayoutData
      *
      * @param string $alias A string that can be used to access to the layout item instead of its id
      * @param string $id    The layout item id
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function addItemAlias($alias, $id)
     {
+        // validate alias
         if (empty($alias)) {
             throw new Exception\InvalidArgumentException('The item alias must not be empty.');
         }
+        if (!is_string($id)) {
+            throw new Exception\UnexpectedTypeException($id, 'string', 'alias');
+        }
+        if (!$this->isValidId($alias)) {
+            throw new Exception\InvalidArgumentException(
+                sprintf(
+                    'The "%s" string cannot be used as the item alias because it contains illegal characters. '
+                    . 'The valid alias should start with a letter, digit or underscore and only contain '
+                    . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                    $alias
+                )
+            );
+        }
+        // validate id
         if (empty($id)) {
             throw new Exception\InvalidArgumentException('The item id must not be empty.');
         }
+        if (!is_string($id)) {
+            throw new Exception\UnexpectedTypeException($id, 'string', 'id');
+        }
+        // perform additional validations
         if ($alias === $id) {
             throw new Exception\LogicException(
                 sprintf(
@@ -352,5 +390,22 @@ class LayoutData
             new KeyAsValueRecursiveArrayIterator($this->getHierarchy($id)),
             \RecursiveIteratorIterator::SELF_FIRST
         );
+    }
+
+    /**
+     * Checks whether the given string is a valid item identifier
+     *
+     * A identifier is accepted if it
+     *   * starts with a letter, digit or underscore
+     *   * contains only letters, digits, numbers, underscores ("_"),
+     *     hyphens ("-") and colons (":")
+     *
+     * @param string $id The layout item id to be tested
+     *
+     * @return bool
+     */
+    public static function isValidId($id)
+    {
+        return preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $id);
     }
 }

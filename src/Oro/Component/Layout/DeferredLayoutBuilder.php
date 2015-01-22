@@ -2,12 +2,30 @@
 
 namespace Oro\Component\Layout;
 
-class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredLayoutModifierInterface
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayoutModifierInterface
 {
     /** @var LayoutBuilder */
     protected $builder;
 
-    /** @var array */
+    /**
+     * The list of all scheduled actions to be executed by applyChanges method
+     *
+     * @var array
+     *
+     * Example:
+     *  [
+     *      'add' => [
+     *          ['root', null, 'root', []],
+     *          ['my_label', 'root', 'label', ['text' => 'test']]
+     *      ],
+     *      'remove' => [
+     *          ['my_label']
+     *      ],
+     *  ]
+     */
     protected $actions = [];
 
     /**
@@ -61,6 +79,26 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredLayoutMod
     /**
      * {@inheritdoc}
      */
+    public function setOption($id, $optionName, $optionValue)
+    {
+        $this->actions['setOption'][] = [$id, $optionName, $optionValue];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeOption($id, $optionName)
+    {
+        $this->actions['removeOption'][] = [$id, $optionName];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLayout($rootId = null)
     {
         $this->applyChanges();
@@ -77,7 +115,10 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredLayoutMod
         while ($total) {
             $this->executeAll();
             $remained = $this->calculateActionCount();
-            $applied  = $total - $remained;
+
+            // validate that all "execute*" methods have correct implementation
+            // if all of them are implemented correctly the following exception will be never raised
+            $applied = $total - $remained;
             if ($applied === 0 && $applied !== $total) {
                 throw new Exception\LogicException(
                     sprintf(
@@ -87,6 +128,8 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredLayoutMod
                     )
                 );
             }
+
+            // prepare for the next loop
             $total = $remained;
         }
     }
@@ -113,6 +156,8 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredLayoutMod
     {
         $this->executeAdd();
         $this->executeAddAlias();
+        $this->executeSetOption();
+        $this->executeRemoveOption();
         $this->executeRemove();
         $this->executeRemoveAlias();
     }
@@ -222,6 +267,56 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredLayoutMod
         // remove remaining 'removeAlias' actions if there are no any 'addAlias' actions
         if (!empty($this->actions[$actionName]) && empty($this->actions['addAlias'])) {
             unset($this->actions[$actionName]);
+        }
+    }
+
+    /**
+     * Executes all actions that change layout item options
+     */
+    protected function executeSetOption()
+    {
+        $actionName = 'setOption';
+        if (!empty($this->actions[$actionName])) {
+            $function       = [$this->builder, $actionName];
+            $skippedActions = [];
+            foreach ($this->actions[$actionName] as $key => $action) {
+                $id = $action[0];
+                if (!empty($id) && !$this->builder->has($id)) {
+                    $skippedActions[] = $action;
+                    continue;
+                }
+                call_user_func_array($function, $action);
+            }
+            if (!empty($skippedActions)) {
+                $this->actions[$actionName] = $skippedActions;
+            } else {
+                unset($this->actions[$actionName]);
+            }
+        }
+    }
+
+    /**
+     * Executes all actions that removes layout item options
+     */
+    protected function executeRemoveOption()
+    {
+        $actionName = 'removeOption';
+        if (!empty($this->actions[$actionName])) {
+            $function       = [$this->builder, $actionName];
+            $skippedActions = [];
+            foreach ($this->actions[$actionName] as $key => $action) {
+                $id = $action[0];
+                if (!empty($id) && !$this->builder->has($id)) {
+                    $skippedActions[] = $action;
+                    continue;
+                }
+                call_user_func_array($function, $action);
+            }
+            if (!empty($skippedActions)) {
+                $this->actions[$actionName] = $skippedActions;
+            } else {
+                unset($this->actions[$actionName]);
+            }
         }
     }
 

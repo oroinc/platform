@@ -12,7 +12,7 @@ namespace Oro\Component\Layout;
  *  - an alias can be added for existing item only
  *  - only existing alias can be removed
  */
-class LayoutBuilder implements LayoutBuilderInterface
+class LayoutBuilder implements RawLayoutModifierInterface
 {
     /** @var LayoutData */
     protected $layoutData;
@@ -22,6 +22,12 @@ class LayoutBuilder implements LayoutBuilderInterface
 
     /** @var BlockOptionsResolverInterface */
     protected $blockOptionsResolver;
+
+    /** @var bool */
+    protected $frozen = false;
+
+    /** @var bool */
+    protected $optionsFrozen = false;
 
     /**
      * @param BlockTypeRegistryInterface    $blockTypeRegistry
@@ -43,6 +49,9 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function add($id, $parentId = null, $blockType = null, array $options = [])
     {
         try {
+            if ($this->frozen) {
+                throw new Exception\LogicException('Cannot modify frozen layout.');
+            }
             $this->layoutData->addItem($id, $parentId, $blockType, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -67,6 +76,9 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function remove($id)
     {
         try {
+            if ($this->frozen) {
+                throw new Exception\LogicException('Cannot modify frozen layout.');
+            }
             $this->layoutData->removeItem($id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -89,6 +101,9 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function addAlias($alias, $id)
     {
         try {
+            if ($this->frozen) {
+                throw new Exception\LogicException('Cannot modify frozen layout.');
+            }
             $this->layoutData->addItemAlias($alias, $id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -112,6 +127,9 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function removeAlias($alias)
     {
         try {
+            if ($this->frozen) {
+                throw new Exception\LogicException('Cannot modify frozen layout.');
+            }
             $this->layoutData->removeItemAlias($alias);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -131,14 +149,80 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setOption($id, $optionName, $optionValue)
+    {
+        try {
+            if ($this->optionsFrozen) {
+                throw new Exception\LogicException('Cannot change frozen options.');
+            }
+            if (empty($optionName)) {
+                throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            $options              = $this->layoutData->getItemProperty($id, LayoutData::OPTIONS);
+            $options[$optionName] = $optionValue;
+            $this->layoutData->setItemProperty($id, LayoutData::OPTIONS, $options);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot set a value for "%s" option for "%s" item. Reason: %s',
+                    $optionName,
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeOption($id, $optionName)
+    {
+        try {
+            if ($this->optionsFrozen) {
+                throw new Exception\LogicException('Cannot change frozen options.');
+            }
+            if (empty($optionName)) {
+                throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            $options = $this->layoutData->getItemProperty($id, LayoutData::OPTIONS);
+            unset($options[$optionName]);
+            $this->layoutData->setItemProperty($id, LayoutData::OPTIONS, $options);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot remove "%s" option for "%s" item. Reason: %s',
+                    $optionName,
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLayout($rootId = null)
     {
         $rootId = $rootId
             ? $this->layoutData->resolveItemId($rootId)
             : $this->layoutData->getRootItemId();
 
+        $this->optionsFrozen = true;
+
         $this->buildBlocks($rootId);
         $view = $this->buildBlockViews($rootId);
+
+        $this->frozen = true;
 
         return new Layout($view);
     }
