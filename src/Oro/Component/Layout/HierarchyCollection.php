@@ -87,7 +87,7 @@ class HierarchyCollection
                 } else {
                     throw new Exception\LogicException(
                         sprintf(
-                            'Cannot add "%s" item to "%s" because "%s" item has no "%s" child.',
+                            'Cannot add "%s" item to "%s" because "%s" item does not have "%s" child.',
                             $id,
                             implode($path),
                             $path[$i - 1],

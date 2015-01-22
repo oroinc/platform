@@ -75,7 +75,7 @@ class AliasCollection
             throw new Exception\AliasAlreadyExistsException(
                 sprintf(
                     'The "%" sting cannot be used as an alias for "%s" item'
-                    . ' because it is already used as an alias for "%s" item.',
+                    . ' because it is already used for "%s" item.',
                     $alias,
                     $id,
                     $this->aliases[$alias]
