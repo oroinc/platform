@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Psr\Log\LoggerInterface;
-
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
@@ -96,6 +94,12 @@ class PasswordManager
         }
     }
 
+    /**
+     * @param User $user
+     * @param      $password
+     *
+     * @return bool
+     */
     public function changePassword(User $user, $password)
     {
         $user->setPlainPassword($password);
@@ -127,7 +131,7 @@ class PasswordManager
      */
     public function hasError()
     {
-        return $this->error != null;
+        return !is_null($this->error);
     }
 
     /**

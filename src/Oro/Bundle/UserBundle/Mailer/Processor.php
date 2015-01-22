@@ -69,6 +69,11 @@ class Processor
         $this->mailer        = $mailer;
     }
 
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
     public function sendChangePasswordEmail(User $user)
     {
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
@@ -84,6 +89,11 @@ class Processor
         return $this->sendEmail($user, $templateData, $type);
     }
 
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
     public function sendResetPasswordEmail(User $user)
     {
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
@@ -99,6 +109,11 @@ class Processor
         return $this->sendEmail($user, $templateData, $type);
     }
 
+    /**
+     * @param User $user
+     *
+     * @return bool
+     */
     public function sendResetPasswordAsAdminEmail(User $user)
     {
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
@@ -132,9 +147,16 @@ class Processor
 
     public function hasError()
     {
-        return $this->error != null;
+        return !is_null($this->error);
     }
 
+    /**
+     * @param User $user
+     * @param      $templateData
+     * @param      $type
+     *
+     * @return bool
+     */
     protected function sendEmail(User $user, $templateData, $type)
     {
         list ($subjectRendered, $templateRendered) = $templateData;
