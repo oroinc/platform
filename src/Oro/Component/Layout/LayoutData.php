@@ -101,28 +101,18 @@ class LayoutData
      * Adds a new item to the layout
      *
      * @param string $id        The layout item id
-     * @param string $parentId  The parent item id or alias
-     * @param string $blockType The block type associated with the layout item
+     * @param string $parentId  The parent item id or alias. Set null to add the root item
+     * @param string $blockType The name of the block type associated with the layout item
      * @param array  $options   The layout item options
+     *
+     * @throws Exception\InvalidArgumentException if the id, parent id or block type are empty or invalid
+     * @throws Exception\ItemAlreadyExistsException if the layout item with the same id already exists
+     * @throws Exception\ItemNotFoundException if the parent layout item does not exist
+     * @throws Exception\LogicException if the layout item cannot be added by other reasons
      */
-    public function addItem($id, $parentId = null, $blockType = null, array $options = [])
+    public function addItem($id, $parentId, $blockType, array $options = [])
     {
-        if (empty($id)) {
-            throw new Exception\InvalidArgumentException('The item id must not be empty.');
-        }
-        if (!is_string($id)) {
-            throw new Exception\UnexpectedTypeException($id, 'string', 'id');
-        }
-        if (!$this->isValidId($id)) {
-            throw new Exception\InvalidArgumentException(
-                sprintf(
-                    'The "%s" string cannot be used as the item id because it contains illegal characters. '
-                    . 'The valid item id should start with a letter, digit or underscore and only contain '
-                    . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
-                    $id
-                )
-            );
-        }
+        $this->validateItemId($id, true);
         if (isset($this->items[$id])) {
             throw new Exception\ItemAlreadyExistsException(
                 sprintf(
@@ -143,10 +133,14 @@ class LayoutData
                     )
                 );
             }
-        } elseif (empty($blockType)) {
-            throw new Exception\LogicException(
+        }
+        if (empty($blockType)) {
+            throw new Exception\InvalidArgumentException(
                 sprintf('The block type for "%s" item must not be empty.', $id)
             );
+        }
+        if (!is_string($blockType)) {
+            throw new Exception\UnexpectedTypeException($blockType, 'string', 'blockType');
         }
 
         if (empty($parentId)) {
@@ -169,17 +163,13 @@ class LayoutData
      * Removes the given item from the layout
      *
      * @param string $id The id of the layout item to be removed
+     *
+     * @throws Exception\InvalidArgumentException if the id is empty
+     * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
     public function removeItem($id)
     {
-        if (empty($id)) {
-            throw new Exception\InvalidArgumentException('The item id must not be empty.');
-        }
-        $id = $this->resolveItemId($id);
-        if (!isset($this->items[$id])) {
-            throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
-        }
-
+        $id   = $this->validateAndResolveItemId($id);
         $path = $this->items[$id][self::PATH];
 
         // remove item from hierarchy
@@ -208,17 +198,12 @@ class LayoutData
      *
      * @return boolean
      *
+     * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
     public function hasItemProperty($id, $name)
     {
-        if (empty($id)) {
-            throw new Exception\InvalidArgumentException('The item id must not be empty.');
-        }
-        $id = $this->resolveItemId($id);
-        if (!isset($this->items[$id])) {
-            throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
-        }
+        $id = $this->validateAndResolveItemId($id);
 
         return isset($this->items[$id][$name]) || array_key_exists($name, $this->items[$id]);
     }
@@ -231,17 +216,17 @@ class LayoutData
      *
      * @return mixed
      *
+     * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      * @throws Exception\LogicException if the layout item does not have the requested property
      */
     public function getItemProperty($id, $name)
     {
-        if (empty($id)) {
-            throw new Exception\InvalidArgumentException('The item id must not be empty.');
-        }
-        $id = $this->resolveItemId($id);
-        if (!isset($this->items[$id])) {
-            throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
+        $id = $this->validateAndResolveItemId($id);
+        if (!isset($this->items[$id][$name]) && !array_key_exists($name, $this->items[$id])) {
+            throw new Exception\LogicException(
+                sprintf('The "%s" item does not have "%s" property.', $id, $name)
+            );
         }
 
         return $this->items[$id][$name];
@@ -254,17 +239,12 @@ class LayoutData
      * @param string $name  The property name
      * @param mixed  $value The property value
      *
+     * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
     public function setItemProperty($id, $name, $value)
     {
-        if (empty($id)) {
-            throw new Exception\InvalidArgumentException('The item id must not be empty.');
-        }
-        $id = $this->resolveItemId($id);
-        if (!isset($this->items[$id])) {
-            throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
-        }
+        $id = $this->validateAndResolveItemId($id);
 
         $this->items[$id][$name] = $value;
     }
@@ -287,34 +267,15 @@ class LayoutData
      * @param string $alias A string that can be used to access to the layout item instead of its id
      * @param string $id    The layout item id
      *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @throws Exception\InvalidArgumentException if the alias or id are empty or invalid
+     * @throws Exception\ItemNotFoundException if the layout item with the given id does not exist
+     * @throws Exception\AliasAlreadyExistsException if the alias is used for another layout item
+     * @throws Exception\LogicException if the alias cannot be added by other reasons
      */
     public function addItemAlias($alias, $id)
     {
-        // validate alias
-        if (empty($alias)) {
-            throw new Exception\InvalidArgumentException('The item alias must not be empty.');
-        }
-        if (!is_string($id)) {
-            throw new Exception\UnexpectedTypeException($id, 'string', 'alias');
-        }
-        if (!$this->isValidId($alias)) {
-            throw new Exception\InvalidArgumentException(
-                sprintf(
-                    'The "%s" string cannot be used as the item alias because it contains illegal characters. '
-                    . 'The valid alias should start with a letter, digit or underscore and only contain '
-                    . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
-                    $alias
-                )
-            );
-        }
-        // validate id
-        if (empty($id)) {
-            throw new Exception\InvalidArgumentException('The item id must not be empty.');
-        }
-        if (!is_string($id)) {
-            throw new Exception\UnexpectedTypeException($id, 'string', 'id');
-        }
+        $this->validateItemAlias($alias, true);
+        $this->validateItemId($id, true);
         // perform additional validations
         if ($alias === $id) {
             throw new Exception\LogicException(
@@ -347,12 +308,13 @@ class LayoutData
      * Removes the layout item alias
      *
      * @param string $alias The layout item alias
+     *
+     * @throws Exception\InvalidArgumentException if the alias is empty
+     * @throws Exception\AliasNotFoundException if the alias does not exist
      */
     public function removeItemAlias($alias)
     {
-        if (empty($alias)) {
-            throw new Exception\InvalidArgumentException('The item alias must not be empty.');
-        }
+        $this->validateItemAlias($alias);
         if (!$this->aliases->has($alias)) {
             throw new Exception\AliasNotFoundException(sprintf('The "%s" item alias does not exist.', $alias));
         }
@@ -367,11 +329,14 @@ class LayoutData
      *
      * @return array
      *
+     * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
     public function getHierarchy($id)
     {
-        return $this->hierarchy->get($this->getItemProperty($id, self::PATH));
+        $path = $this->getItemProperty($id, self::PATH);
+
+        return $this->hierarchy->get($path);
     }
 
     /**
@@ -382,6 +347,7 @@ class LayoutData
      *
      * @return \Iterator
      *
+     * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
     public function getHierarchyIterator($id)
@@ -404,8 +370,92 @@ class LayoutData
      *
      * @return bool
      */
-    public static function isValidId($id)
+    protected function isValidId($id)
     {
         return preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $id);
+    }
+
+    /**
+     * Checks if the given value can be used as the layout item id
+     *
+     * @param string $id        The layout item id
+     * @param bool   $fullCheck Determines whether all validation rules should be applied
+     *                          or it is required to validate for empty value only
+     *
+     * @throws Exception\InvalidArgumentException if the id is not valid
+     */
+    protected function validateItemId($id, $fullCheck = false)
+    {
+        if (empty($id)) {
+            throw new Exception\InvalidArgumentException('The item id must not be empty.');
+        }
+        if ($fullCheck) {
+            if (!is_string($id)) {
+                throw new Exception\UnexpectedTypeException($id, 'string', 'id');
+            }
+            if (!$this->isValidId($id)) {
+                throw new Exception\InvalidArgumentException(
+                    sprintf(
+                        'The "%s" string cannot be used as the item id because it contains illegal characters. '
+                        . 'The valid item id should start with a letter, digit or underscore and only contain '
+                        . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                        $id
+                    )
+                );
+            }
+        }
+    }
+
+    /**
+     * Checks the layout item id for empty and returns real id
+     * Also this method raises an exception if the layout item does not exist
+     *
+     * @param string $id The layout item id
+     *
+     * @return string The resolved item id
+     *
+     * @throws Exception\InvalidArgumentException if the id is empty
+     * @throws Exception\ItemNotFoundException if the layout item does not exist
+     */
+    protected function validateAndResolveItemId($id)
+    {
+        $this->validateItemId($id);
+        $id = $this->resolveItemId($id);
+        if (!isset($this->items[$id])) {
+            throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
+        }
+
+        return $id;
+    }
+
+    /**
+     * Checks if the given value can be used as an alias for the layout item
+     *
+     * @param string $alias     The layout item alias
+     * @param bool   $fullCheck Determines whether all validation rules should be applied
+     *                          or it is required to validate for empty value only
+     *
+     * @throws Exception\InvalidArgumentException if the alias is not valid
+     */
+    protected function validateItemAlias($alias, $fullCheck = false)
+    {
+        if (empty($alias)) {
+            throw new Exception\InvalidArgumentException('The item alias must not be empty.');
+        }
+        if ($fullCheck) {
+            if (!is_string($alias)) {
+                throw new Exception\UnexpectedTypeException($alias, 'string', 'alias');
+            }
+            if (!$this->isValidId($alias)) {
+                throw new Exception\InvalidArgumentException(
+                    sprintf(
+                        'The "%s" string cannot be used as the item alias because it contains illegal characters. '
+                        . 'The valid alias should start with a letter, digit or underscore and only contain '
+                        . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                        $alias
+                    )
+                );
+            }
+        }
     }
 }
