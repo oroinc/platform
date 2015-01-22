@@ -9,7 +9,7 @@ interface BlockTypeFactoryInterface
      *
      * @param $name string Name of block type
      *
-     * @return BlockTypeInterface
+     * @return BlockTypeInterface|null
      */
     public function createBlockType($name);
 }
