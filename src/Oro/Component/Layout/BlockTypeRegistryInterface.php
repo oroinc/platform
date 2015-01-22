@@ -13,7 +13,8 @@ interface BlockTypeRegistryInterface
      *
      * @return BlockTypeInterface
      *
-     * @throws Exception\ExceptionInterface
+     * @throws Exception\UnexpectedTypeException
+     * @throws Exception\InvalidArgumentException
      */
     public function getBlockType($name);
 
@@ -23,8 +24,6 @@ interface BlockTypeRegistryInterface
      * @param string $name The name of the block type
      *
      * @return bool Whether the block type is supported
-     *
-     * @throws Exception\ExceptionInterface
      */
     public function hasBlockType($name);
 }

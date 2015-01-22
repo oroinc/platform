@@ -5,11 +5,13 @@ namespace Oro\Component\Layout;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Component\Layout\BlockTypeFactoryInterface;
-use Oro\Component\Layout\Exception\InvalidArgumentException;
 
 class DependencyInjectionBlockTypeFactory implements BlockTypeFactoryInterface
 {
+    /** @var ContainerInterface */
     protected $container;
+
+    /** @var array */
     protected $typeServiceIds;
 
     public function __construct(ContainerInterface $container, array $typeServiceIds)
@@ -19,13 +21,9 @@ class DependencyInjectionBlockTypeFactory implements BlockTypeFactoryInterface
     }
 
     /**
-     * @param string $name
-     *
-     * @return null|object
-     *
-     * @throws Exception\InvalidArgumentException
+     * {@inheritdoc}
      */
-    protected function getType($name)
+    public function createBlockType($name)
     {
         if (!isset($this->typeServiceIds[$name])) {
             return null;
@@ -33,26 +31,6 @@ class DependencyInjectionBlockTypeFactory implements BlockTypeFactoryInterface
 
         $type = $this->container->get($this->typeServiceIds[$name]);
 
-        if ($type->getName() !== $name) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The type name specified for the service "%s" does not match the actual name. Expected "%s", ' .
-                    'given "%s"',
-                    $this->typeServiceIds[$name],
-                    $name,
-                    $type->getName()
-                )
-            );
-        }
-
         return $type;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createBlockType($name)
-    {
-        return $this->getType($name);
     }
 }

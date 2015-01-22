@@ -10,23 +10,28 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class BlockTypePass implements CompilerPassInterface
 {
+    const SERVICE_BLOCK_TYPE_FACTORY_DI = 'oro_layout.block_type_factory';
+    const SERVICE_BLOCK_TYPE = 'oro_layout.block_type';
+
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('oro_layout.block_type_factory')) {
+        if (!$container->hasDefinition(self::SERVICE_BLOCK_TYPE_FACTORY_DI)) {
             return;
         }
 
-        $definition = $container->getDefinition('oro_layout.block_type_factory');
+        $definition = $container->getDefinition(self::SERVICE_BLOCK_TYPE_FACTORY_DI);
 
-        // Builds an array with service IDs as keys and tag aliases as values
+        // Builds an array with tag aliases as keys and service IDs as values
         $types = array();
 
-        foreach ($container->findTaggedServiceIds('oro_layout.block_type') as $serviceId => $tag) {
+        foreach ($container->findTaggedServiceIds(self::SERVICE_BLOCK_TYPE) as $serviceId => $tag) {
             $alias = isset($tag[0]['alias'])
                 ? $tag[0]['alias']
                 : $serviceId;
 
-            // Flip, because we want tag aliases (= type identifiers) as keys
             $types[$alias] = $serviceId;
         }
 

@@ -1,5 +1,6 @@
 parameters:
     oro_layout.block_type_factory.class: Oro\Component\Layout\DependencyInjectionBlockTypeFactory;
+
 services:
     oro_layout.block_type_factory:
         class: %oro_layout.block_type_factory.class%
