@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-class ScheduledLayoutBuilder implements LayoutBuilderInterface, ScheduledLayoutModifierInterface
+class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredLayoutModifierInterface
 {
     /** @var LayoutBuilder */
     protected $builder;
@@ -92,7 +92,7 @@ class ScheduledLayoutBuilder implements LayoutBuilderInterface, ScheduledLayoutM
     }
 
     /**
-     * Returns the number of scheduled actions
+     * Returns the total number of actions
      *
      * @return int
      */

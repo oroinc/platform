@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-class ScheduledLayoutBuilderAliasesTest extends ScheduledLayoutBuilderTestCase
+class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 {
     public function testSimpleLayoutWithAliases()
     {

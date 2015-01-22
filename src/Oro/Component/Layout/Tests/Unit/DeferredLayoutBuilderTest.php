@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-class ScheduledLayoutBuilderTest extends ScheduledLayoutBuilderTestCase
+class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 {
     public function testSimpleLayout()
     {

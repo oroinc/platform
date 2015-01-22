@@ -5,15 +5,15 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\LayoutBuilder;
-use Oro\Component\Layout\ScheduledLayoutBuilder;
+use Oro\Component\Layout\DeferredLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
 
-class ScheduledLayoutBuilderTestCase extends LayoutBuilderTestCase
+class DeferredLayoutBuilderTestCase extends LayoutBuilderTestCase
 {
     /** @var BlockTypeFactoryStub */
     protected $blockTypeFactory;
 
-    /** @var ScheduledLayoutBuilder */
+    /** @var DeferredLayoutBuilder */
     protected $layoutBuilder;
 
     protected function setUp()
@@ -22,7 +22,7 @@ class ScheduledLayoutBuilderTestCase extends LayoutBuilderTestCase
         $blockTypeRegistry      = new BlockTypeRegistry($this->blockTypeFactory);
         $blockOptionsResolver   = new BlockOptionsResolver($blockTypeRegistry);
 
-        $this->layoutBuilder = new ScheduledLayoutBuilder(
+        $this->layoutBuilder = new DeferredLayoutBuilder(
             new LayoutBuilder(
                 $blockTypeRegistry,
                 $blockOptionsResolver
