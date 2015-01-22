@@ -16,12 +16,12 @@ class UnexpectedTypeException extends InvalidArgumentException implements Except
             : gettype($value);
         $msg        = $argumentName
             ? sprintf(
-                'Invalid "%s" argument type. Expected "%s", "%s" given',
+                'Invalid "%s" argument type. Expected "%s", "%s" given.',
                 $argumentName,
                 $expectedType,
                 $actualType
             )
-            : sprintf('Expected argument of type "%s", "%s" given', $expectedType, $actualType);
+            : sprintf('Expected argument of type "%s", "%s" given.', $expectedType, $actualType);
         parent::__construct($msg);
     }
 }
