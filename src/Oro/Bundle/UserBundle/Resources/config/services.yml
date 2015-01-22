@@ -27,6 +27,7 @@ parameters:
     oro_user.activity_widget_provider.class:      %oro_activity.widget_provider.activities.menu.class%
     oro_user.event_listener.owner_user_grid_listener.class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
     oro_user.mailer.processor.class:              Oro\Bundle\UserBundle\Mailer\Processor
+    oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
 
     security.user_checker.class:                  Oro\Bundle\UserBundle\Security\UserChecker
 services:
@@ -221,3 +222,22 @@ services:
             - @oro_email.email_renderer
             - @oro_user.manager
             - @oro_email.direct_mailer
+
+    oro_user.placeholder.filter:
+        class: %oro_user.placeholder.filter.class%
+
+    oro_user.password_change.widget_provider.actions:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_user_password_change_button
+            - oro_user_password_change_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity, priority: 100 }
+
+    oro_user.password_reset.widget_provider.actions:
+        parent: oro_ui.widget_provider.action_button.abstract
+        arguments:
+            - oro_user_password_reset_button
+            - oro_user_password_reset_link
+        tags:
+            - { name: oro_ui.view_action_provider, group: activity, priority: 110 }

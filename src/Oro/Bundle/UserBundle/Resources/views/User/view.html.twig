@@ -29,58 +29,6 @@
             'disabled': not allow_delete
         }) }}
     {% endif %}
-    {% if entity.enabled and resource_granted('password_management') %}
-        {% set html %}
-        {{ UI.dropdownClientItem({
-            'dataUrl': path('oro_user_reset_send_email_as_admin', {id: entity.id}),
-            'iCss': 'icon-repeat',
-            'label' : 'oro.user.password.reset.label'|trans,
-            'widget' : {
-                'type' : 'dialog',
-                'multiple' : false,
-                'options' : {
-                    'alias': 'reset-password-dialog',
-                    'dialogOptions' : {
-                        'title' : 'oro.user.password.reset.label'|trans,
-                        'allowMaximize': false,
-                        'allowMinimize': false,
-                        'autoResize': true,
-                        'width': 550
-                    }
-                }
-            }
-        }) }}
-        {{ UI.dropdownClientItem({
-            'dataUrl': path('oro_user_reset_set_password', {'id': entity.id}),
-            'aCss': 'no-hash',
-            'iCss': 'icon-pencil',
-            'dataId': entity.id,
-            'label': 'oro.user.password.change.label'|trans,
-            'widget': {
-                'type': 'dialog',
-                'multiple': false,
-                'refresh-widget-alias': 'activity-list-widget',
-                'options': {
-                    'alias': 'set-password-dialog',
-                    'dialogOptions': {
-                        'title': 'oro.user.password.change_dialog.title'|trans,
-                        'allowMaximize': true,
-                        'allowMinimize': true,
-                        'dblclick': 'maximize',
-                        'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 550
-                    }
-                }
-            }
-        }) }}
-        {% endset %}
-        {{ UI.dropdownButton({
-            'label': 'oro.user.password.dropdown.label'|trans,
-            'iCss': 'icon icon-lock',
-            'aCss': 'pull-right',
-            'html': html
-        }) }}
-    {% endif %}
 {% endblock navButtons %}
 
 {% block pageHeader %}
