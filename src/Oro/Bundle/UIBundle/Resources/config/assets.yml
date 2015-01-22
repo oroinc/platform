@@ -1,4 +1,6 @@
 css:
+    'timepicker':
+        - 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.css'
     'oroui':
         # libraries' styles
         - 'bundles/oroui//lib/bootstrap/bootstrap.less'

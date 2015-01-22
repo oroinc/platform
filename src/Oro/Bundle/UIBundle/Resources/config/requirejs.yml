@@ -56,6 +56,7 @@ config:
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
             'jquery-ui-timepicker': 'oroui/js/jquery-ui-timepicker-l10n'
+            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/js/jquery-timepicker-l10n'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
         'oroui/js/extend/select2':
@@ -74,6 +75,8 @@ config:
             'jquery-ui': 'oroui/js/extend/jquery-ui'
         'oroui/js/jquery-ui-timepicker-l10n':
             'jquery-ui-timepicker': 'jquery-ui-timepicker'
+        'oroui/js/jquery-timepicker-l10n':
+            'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker'
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
@@ -97,6 +100,7 @@ config:
         'backbone': 'bundles/oroui/lib/backbone.js'
         'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
+        'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'oroui/js/app/ready-state-tracker': 'bundles/oroui/js/app/ready-state-tracker.js'
@@ -116,6 +120,8 @@ config:
         'oroui/js/app/views/page/loading-mask-view': 'bundles/oroui/js/app/views/page/loading-mask-view.js'
         'oroui/js/app/views/page/messages-view': 'bundles/oroui/js/app/views/page/messages-view.js'
         'oroui/js/app/views/page/debug-toolbar-view': 'bundles/oroui/js/app/views/page/debug-toolbar-view.js'
+        'oroui/js/app/views/datepicker/datetimepicker-view': 'bundles/oroui/js/app/views/datepicker/datetimepicker-view.js'
+        'oroui/js/app/views/datepicker/datepicker-view': 'bundles/oroui/js/app/views/datepicker/datepicker-view.js'
 
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
@@ -160,3 +166,4 @@ build:
 #       files which does not support AMD. backbone-bootstrap-modal use AMD without dependency,
 #       therefore it's excluded
         'backbone-bootstrap-modal': 'empty:'
+        'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'empty:'

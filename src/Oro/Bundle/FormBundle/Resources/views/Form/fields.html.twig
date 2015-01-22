@@ -303,7 +303,7 @@
 
 {% block oro_date_widget %}
     {% set options = {
-        view: 'oroform/js/app/views/datepicker/datepicker-view',
+        view: 'oroui/js/app/views/datepicker/datepicker-view',
         useNativePicker: isMobileVersion(),
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
@@ -329,7 +329,7 @@
 
 {% block oro_datetime_widget %}
     {% set options = {
-        view: 'oroform/js/app/views/datepicker/datetimepicker-view',
+        view: 'oroui/js/app/views/datepicker/datetimepicker-view',
         useNativePicker: isMobileVersion(),
         fieldsWrapper: '<div></div>',
         dateInputAttrs: {

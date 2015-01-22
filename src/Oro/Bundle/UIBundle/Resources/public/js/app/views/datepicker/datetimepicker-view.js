@@ -6,7 +6,7 @@ define(function (require) {
         _ = require('underscore'),
         datetimeFormatter = require('orolocale/js/formatter/datetime'),
         DatePickerView = require('./datepicker-view');
-    require('oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker');
+    require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
     DateTimePickerView = DatePickerView.extend({
         defaults: {

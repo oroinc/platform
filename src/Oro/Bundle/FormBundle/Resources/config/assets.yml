@@ -1,5 +1,3 @@
 css:
     'oroconfig':
       - 'bundles/oroform/css/less/form.less'
-    'timepicker':
-      - 'bundles/oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker.css'

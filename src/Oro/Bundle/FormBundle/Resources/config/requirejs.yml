@@ -27,13 +27,9 @@ config:
     map:
         '*':
             'jquery.validate': 'oroform/js/extend/validate'
-            'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroform/js/jquery-timepicker-l10n'
         'oroform/js/extend/validate':
             'jquery.validate': 'jquery.validate'
-        'oroform/js/jquery-timepicker-l10n':
-            'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker'
     paths:
-        'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'
         'jquery.validate': 'bundles/oroform/lib/jquery.validate/jquery.validate.js'
         'oroform/js/validator/count': 'bundles/oroform/js/validator/count.js'
         'oroform/js/validator/date': 'bundles/oroform/js/validator/date.js'
@@ -62,8 +58,6 @@ config:
 
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
 
-        'oroform/js/app/views/datepicker/datetimepicker-view': 'bundles/oroform/js/app/views/datepicker/datetimepicker-view.js'
-        'oroform/js/app/views/datepicker/datepicker-view': 'bundles/oroform/js/app/views/datepicker/datepicker-view.js'
         'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view.js'
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
@@ -76,4 +70,3 @@ build:
         'tinymce/plugins/code/plugin.min': 'empty:'
         'tinymce/plugins/link/plugin.min': 'empty:'
         'tinymce/themes/modern/theme.min': 'empty:'
-        'oroform/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'empty:'
