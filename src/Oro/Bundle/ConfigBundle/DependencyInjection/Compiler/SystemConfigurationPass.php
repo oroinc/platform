@@ -88,10 +88,9 @@ class SystemConfigurationPass implements CompilerPassInterface
     {
         $config = array();
 
-        $alias        = $scope === 'app' ? 'system' : $scope;
         $configLoader = new CumulativeConfigLoader(
-            sprintf('oro_%s_configuration', $alias),
-            new YamlCumulativeFileLoader(sprintf('Resources/config/%s_configuration.yml', $alias))
+            'oro_system_configuration',
+            new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
