@@ -68,6 +68,8 @@ class AliasCollection
      * @param string $id    The item identifier or already registered item alias
      *
      * @return self
+     *
+     * @throws Exception\AliasAlreadyExistsException if the alias is used for another item
      */
     public function add($alias, $id)
     {

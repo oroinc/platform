@@ -2,11 +2,26 @@
 
 namespace Oro\Component\Layout;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayoutModifierInterface
 {
+    /** The action name for add layout item */
+    const ADD = 'add';
+
+    /** The action name for remove layout item */
+    const REMOVE = 'remove';
+
+    /** The action name for add the alias for the layout item */
+    const ADD_ALIAS = 'addAlias';
+
+    /** The action name for remove the alias for the layout item */
+    const REMOVE_ALIAS = 'removeAlias';
+
+    /** The action name for add/update an option for the layout item */
+    const SET_OPTION = 'setOption';
+
+    /** The action name for remove an option for the layout item */
+    const REMOVE_OPTION = 'removeOption';
+
     /** @var LayoutBuilder */
     protected $builder;
 
@@ -41,7 +56,7 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
      */
     public function add($id, $parentId = null, $blockType = null, array $options = [])
     {
-        $this->actions['add'][] = [$id, $parentId, $blockType, $options];
+        $this->actions[self::ADD][] = [$id, $parentId, $blockType, $options];
 
         return $this;
     }
@@ -51,7 +66,7 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
      */
     public function remove($id)
     {
-        $this->actions['remove'][] = [$id];
+        $this->actions[self::REMOVE][] = [$id];
 
         return $this;
     }
@@ -61,7 +76,7 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
      */
     public function addAlias($alias, $id)
     {
-        $this->actions['addAlias'][] = [$alias, $id];
+        $this->actions[self::ADD_ALIAS][] = [$alias, $id];
 
         return $this;
     }
@@ -71,7 +86,7 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
      */
     public function removeAlias($alias)
     {
-        $this->actions['removeAlias'][] = [$alias];
+        $this->actions[self::REMOVE_ALIAS][] = [$alias];
 
         return $this;
     }
@@ -81,7 +96,7 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
      */
     public function setOption($id, $optionName, $optionValue)
     {
-        $this->actions['setOption'][] = [$id, $optionName, $optionValue];
+        $this->actions[self::SET_OPTION][] = [$id, $optionName, $optionValue];
 
         return $this;
     }
@@ -91,7 +106,7 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
      */
     public function removeOption($id, $optionName)
     {
-        $this->actions['removeOption'][] = [$id, $optionName];
+        $this->actions[self::REMOVE_OPTION][] = [$id, $optionName];
 
         return $this;
     }
@@ -112,8 +127,8 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
     public function applyChanges()
     {
         $total = $this->calculateActionCount();
-        while ($total) {
-            $this->executeAll();
+        while ($total !== 0) {
+            $this->executeAllActions();
             $remained = $this->calculateActionCount();
 
             // validate that all "execute*" methods have correct implementation
@@ -152,171 +167,158 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
     /**
      * Executes all actions
      */
-    protected function executeAll()
+    protected function executeAllActions()
     {
-        $this->executeAdd();
-        $this->executeAddAlias();
-        $this->executeSetOption();
-        $this->executeRemoveOption();
-        $this->executeRemove();
-        $this->executeRemoveAlias();
+        $this->applyAddChanges();
+        $this->executeRemoveActions();
+        $this->executeRemoveAliasActions();
+    }
+
+    /**
+     * Applies the following actions:
+     *  - add new items to the layout
+     *  - add aliases for layout items
+     *  - modify the layout item options
+     */
+    protected function applyAddChanges()
+    {
+        $applied = -1;
+        $total   = $this->calculateActionCount();
+        while ($total !== 0 && $applied !== 0) {
+            $this->executeAddActions();
+            $this->executeAddAliasActions();
+            $this->executeSetOptionActions();
+            $this->executeRemoveOptionActions();
+
+            // prepare for the next loop
+            $remained = $this->calculateActionCount();
+            $applied  = $total - $remained;
+            $total    = $remained;
+        }
     }
 
     /**
      * Executes all actions that add new items to the layout
      */
-    protected function executeAdd()
+    protected function executeAddActions()
     {
-        $actionName = 'add';
-        if (!empty($this->actions[$actionName])) {
-            $function       = [$this->builder, $actionName];
-            $skippedActions = [];
-            foreach ($this->actions[$actionName] as $key => $action) {
+        $this->executeActions(
+            self::ADD,
+            function (array $action) {
                 $parentId = $action[1];
-                if (!empty($parentId) && !$this->builder->has($parentId)) {
-                    $skippedActions[] = $action;
-                    continue;
-                }
-                call_user_func_array($function, $action);
+
+                return empty($parentId) || $this->builder->has($parentId);
             }
-            if (!empty($skippedActions)) {
-                $this->actions[$actionName] = $skippedActions;
-            } else {
-                unset($this->actions[$actionName]);
-            }
-        }
+        );
     }
 
     /**
      * Executes all actions that remove items from the layout
      */
-    protected function executeRemove()
+    protected function executeRemoveActions()
     {
-        $actionName = 'remove';
-        if (!empty($this->actions[$actionName])) {
-            $function       = [$this->builder, $actionName];
-            $skippedActions = [];
-            foreach ($this->actions[$actionName] as $key => $action) {
+        $this->executeActions(
+            self::REMOVE,
+            function (array $action) {
                 $id = $action[0];
-                if (!empty($id) && !$this->builder->has($id)) {
-                    $skippedActions[] = $action;
-                    continue;
-                }
-                call_user_func_array($function, $action);
+
+                return empty($id) || $this->builder->has($id);
             }
-            if (!empty($skippedActions)) {
-                $this->actions[$actionName] = $skippedActions;
-            } else {
-                unset($this->actions[$actionName]);
-            }
-        }
+        );
         // remove remaining 'remove' actions if there are no any 'add' actions
-        if (!empty($this->actions[$actionName]) && empty($this->actions['add'])) {
-            unset($this->actions[$actionName]);
+        if (!empty($this->actions[self::REMOVE]) && empty($this->actions[self::ADD])) {
+            unset($this->actions[self::REMOVE]);
         }
     }
 
     /**
      * Executes all actions that add aliases for layout items
      */
-    protected function executeAddAlias()
+    protected function executeAddAliasActions()
     {
-        $actionName = 'addAlias';
-        if (!empty($this->actions[$actionName])) {
-            $function       = [$this->builder, $actionName];
-            $skippedActions = [];
-            foreach ($this->actions[$actionName] as $key => $action) {
+        $this->executeActions(
+            self::ADD_ALIAS,
+            function (array $action) {
                 $id = $action[1];
-                if (!empty($id) && !$this->builder->has($id)) {
-                    $skippedActions[] = $action;
-                    continue;
-                }
-                call_user_func_array($function, $action);
+
+                return empty($id) || $this->builder->has($id);
             }
-            if (!empty($skippedActions)) {
-                $this->actions[$actionName] = $skippedActions;
-            } else {
-                unset($this->actions[$actionName]);
-            }
-        }
+        );
     }
 
     /**
      * Executes all actions that remove layout item aliases
      */
-    protected function executeRemoveAlias()
+    protected function executeRemoveAliasActions()
     {
-        $actionName = 'removeAlias';
-        if (!empty($this->actions[$actionName])) {
-            $function       = [$this->builder, $actionName];
-            $skippedActions = [];
-            foreach ($this->actions[$actionName] as $key => $action) {
+        $this->executeActions(
+            self::REMOVE_ALIAS,
+            function (array $action) {
                 $alias = $action[0];
-                if (!empty($alias) && !$this->builder->hasAlias($alias)) {
-                    $skippedActions[] = $action;
-                    continue;
-                }
-                call_user_func_array($function, $action);
+
+                return empty($alias) || $this->builder->hasAlias($alias);
             }
-            if (!empty($skippedActions)) {
-                $this->actions[$actionName] = $skippedActions;
-            } else {
-                unset($this->actions[$actionName]);
-            }
-        }
+        );
         // remove remaining 'removeAlias' actions if there are no any 'addAlias' actions
-        if (!empty($this->actions[$actionName]) && empty($this->actions['addAlias'])) {
-            unset($this->actions[$actionName]);
+        if (!empty($this->actions[self::REMOVE_ALIAS]) && empty($this->actions[self::ADD_ALIAS])) {
+            unset($this->actions[self::REMOVE_ALIAS]);
         }
     }
 
     /**
      * Executes all actions that change layout item options
      */
-    protected function executeSetOption()
+    protected function executeSetOptionActions()
     {
-        $actionName = 'setOption';
-        if (!empty($this->actions[$actionName])) {
-            $function       = [$this->builder, $actionName];
-            $skippedActions = [];
-            foreach ($this->actions[$actionName] as $key => $action) {
+        $this->executeActions(
+            self::SET_OPTION,
+            function (array $action) {
                 $id = $action[0];
-                if (!empty($id) && !$this->builder->has($id)) {
-                    $skippedActions[] = $action;
-                    continue;
-                }
-                call_user_func_array($function, $action);
+
+                return empty($id) || $this->builder->has($id);
             }
-            if (!empty($skippedActions)) {
-                $this->actions[$actionName] = $skippedActions;
-            } else {
-                unset($this->actions[$actionName]);
-            }
-        }
+        );
     }
 
     /**
      * Executes all actions that removes layout item options
      */
-    protected function executeRemoveOption()
+    protected function executeRemoveOptionActions()
     {
-        $actionName = 'removeOption';
-        if (!empty($this->actions[$actionName])) {
-            $function       = [$this->builder, $actionName];
-            $skippedActions = [];
-            foreach ($this->actions[$actionName] as $key => $action) {
+        $this->executeActions(
+            self::REMOVE_OPTION,
+            function (array $action) {
                 $id = $action[0];
-                if (!empty($id) && !$this->builder->has($id)) {
-                    $skippedActions[] = $action;
-                    continue;
-                }
-                call_user_func_array($function, $action);
+
+                return empty($id) || $this->builder->has($id);
             }
-            if (!empty($skippedActions)) {
-                $this->actions[$actionName] = $skippedActions;
-            } else {
-                unset($this->actions[$actionName]);
+        );
+    }
+
+    /**
+     * @param string   $actionName       The action name
+     * @param \Closure $isReadyToExecute The callback is used for check if an action is ready to execute
+     *                                   function (array $action) return boolean
+     */
+    protected function executeActions($actionName, \Closure $isReadyToExecute)
+    {
+        if (empty($this->actions[$actionName])) {
+            return;
+        }
+
+        $function       = [$this->builder, $actionName];
+        $skippedActions = [];
+        foreach ($this->actions[$actionName] as $key => $action) {
+            if (!$isReadyToExecute($action)) {
+                $skippedActions[] = $action;
+                continue;
             }
+            call_user_func_array($function, $action);
+        }
+        if (!empty($skippedActions)) {
+            $this->actions[$actionName] = $skippedActions;
+        } else {
+            unset($this->actions[$actionName]);
         }
     }
 

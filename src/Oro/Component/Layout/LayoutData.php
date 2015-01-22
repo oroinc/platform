@@ -142,6 +142,16 @@ class LayoutData
         if (!is_string($blockType)) {
             throw new Exception\UnexpectedTypeException($blockType, 'string', 'blockType');
         }
+        if (!preg_match('/^[a-z0-9_]*$/i', $blockType)) {
+            throw new Exception\InvalidArgumentException(
+                sprintf(
+                    'The "%s" string cannot be used as the name of the block type '
+                    . 'because it contains illegal characters. '
+                    . 'The valid block type name must only contain letters, numbers, and "_".',
+                    $blockType
+                )
+            );
+        }
 
         if (empty($parentId)) {
             $path = [];

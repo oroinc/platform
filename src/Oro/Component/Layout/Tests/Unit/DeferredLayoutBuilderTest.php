@@ -2,14 +2,17 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+/**
+ * This class contains unit tests which are NOT RELATED to ALIASES
+ */
 class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 {
     public function testSimpleLayout()
     {
         $this->layoutBuilder
             ->add('root', null, 'root')
-            ->add('header', 'root', 'header')
-            ->add('logo', 'header', 'logo', ['title' => 'test']);
+            ->add('logo', 'header', 'logo', ['title' => 'test'])
+            ->add('header', 'root', 'header');
 
         $layout = $this->layoutBuilder->getLayout();
 
@@ -37,6 +40,40 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
             ->add('root', null, 'root')
             ->remove('header')
             ->add('header', 'root', 'header');
+
+        $layout = $this->layoutBuilder->getLayout();
+
+        $this->assertBlockView(
+            [ // root
+            ],
+            $layout->getView()
+        );
+    }
+
+    public function testRemoveAfterAdd()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test'])
+            ->remove('header');
+
+        $layout = $this->layoutBuilder->getLayout();
+
+        $this->assertBlockView(
+            [ // root
+            ],
+            $layout->getView()
+        );
+    }
+
+    public function testAddToRemovedItem()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->remove('header')
+            ->add('logo', 'header', 'logo', ['title' => 'test']);
 
         $layout = $this->layoutBuilder->getLayout();
 
@@ -94,5 +131,97 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
             ->add('logo', 'root', 'logo');
 
         $this->layoutBuilder->applyChanges();
+    }
+
+    public function testSetOption()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->setOption('logo', 'title', 'test1')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test']);
+
+        $layout = $this->layoutBuilder->getLayout();
+
+        $this->assertBlockView(
+            [ // root
+                'children' => [
+                    [ // header
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'title' => 'test1'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $layout->getView()
+        );
+    }
+
+    public function testRemoveOption()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->removeOption('logo', 'title')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test']);
+
+        $layout = $this->layoutBuilder->getLayout();
+
+        $this->assertBlockView(
+            [ // root
+                'children' => [
+                    [ // header
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'title' => ''
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $layout->getView()
+        );
+    }
+
+    public function testSetOptionForRemovedItem()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test'])
+            ->remove('header')
+            ->setOption('logo', 'title', 'test1');
+
+        $layout = $this->layoutBuilder->getLayout();
+
+        $this->assertBlockView(
+            [ // root
+            ],
+            $layout->getView()
+        );
+    }
+
+    public function testRemoveOptionForRemovedItem()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test'])
+            ->remove('header')
+            ->removeOption('logo', 'title');
+
+        $layout = $this->layoutBuilder->getLayout();
+
+        $this->assertBlockView(
+            [ // root
+            ],
+            $layout->getView()
+        );
     }
 }

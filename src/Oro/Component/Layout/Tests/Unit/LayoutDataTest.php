@@ -4,6 +4,11 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\LayoutData;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class LayoutDataTest extends \PHPUnit_Framework_TestCase
 {
     /** @var LayoutData */
@@ -135,15 +140,38 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         $this->layoutData->addItem('root', null, 123);
     }
 
+    /**
+     * @dataProvider invalidBlockTypeDataProvider
+     */
+    public function testAddItemWithInvalidBlockType($blockType)
+    {
+        $this->setExpectedException(
+            '\Oro\Component\Layout\Exception\InvalidArgumentException',
+            sprintf(
+                'The "%s" string cannot be used as the name of the block type '
+                . 'because it contains illegal characters. '
+                . 'The valid block type name must only contain letters, numbers, and "_".',
+                $blockType
+            )
+        );
+        $this->layoutData->addItem('root', null, $blockType);
+    }
+
     public function testRemoveItem()
     {
         // prepare test data
         $this->layoutData->addItem('root', null, 'root');
         $this->layoutData->addItem('header', 'root', 'header');
+        $this->layoutData->addItem('item1', 'header', 'label');
+        $this->layoutData->addItem('item2', 'header', 'container');
+        $this->layoutData->addItem('item3', 'item2', 'label');
 
         // do test
         $this->layoutData->removeItem('header');
         $this->assertFalse($this->layoutData->hasItem('header'));
+        $this->assertFalse($this->layoutData->hasItem('item1'));
+        $this->assertFalse($this->layoutData->hasItem('item2'));
+        $this->assertFalse($this->layoutData->hasItem('item3'));
     }
 
     public function testRemoveItemByAlias()
@@ -608,6 +636,14 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['-test'],
+            ['test?']
+        ];
+    }
+
+    public function invalidBlockTypeDataProvider()
+    {
+        return [
+            ['test-block'],
             ['test?']
         ];
     }

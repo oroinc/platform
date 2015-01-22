@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Provides a set of methods to manipulate the layout
+ */
 interface LayoutModifierInterface
 {
     /**

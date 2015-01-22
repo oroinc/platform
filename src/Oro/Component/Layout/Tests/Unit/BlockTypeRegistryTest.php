@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockTypeRegistry;
-use Oro\Component\Layout\Exception\InvalidArgumentException;
 
 class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,7 +15,7 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->blockTypeFactory = $this->getMock('Oro\Component\Layout\BlockTypeFactoryInterface');
-        $this->registry    = new BlockTypeRegistry($this->blockTypeFactory);
+        $this->registry         = new BlockTypeRegistry($this->blockTypeFactory);
     }
 
     public function testGetBlockType()
@@ -65,22 +64,45 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The block type name must not be empty.
      */
-    public function testGetTypeWithWrongArgument()
+    public function testGetTypeWithEmptyName($name)
+    {
+        $this->registry->getBlockType($name);
+    }
+
+    /**
+     * @dataProvider emptyStringDataProvider
+     */
+    public function testHasTypeWithEmptyName($name)
+    {
+        $this->assertFalse($this->registry->hasBlockType($name));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
+     */
+    public function testGetTypeWithNotStringName()
     {
         $this->registry->getBlockType(1);
     }
 
-    public function testHasTypeWithWrongArgument()
+    public function testHasTypeWithNotStringName()
     {
         $this->assertFalse($this->registry->hasBlockType(1));
     }
 
+    // @codingStandardsIgnoreStart
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The block type name does not match the name declared in the class implementing this type. Expected "widget", given "button".
      */
-    public function testGetTypeWithWrongTypeName()
+    // @codingStandardsIgnoreEnd
+    public function testGetTypeWhenGivenNameDoesNotMatchNameDeclaredInClass()
     {
         $widgetBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
@@ -96,7 +118,8 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot find corresponded block type with name "widget".
      */
     public function testGetTypeUndefined()
     {
@@ -106,5 +129,13 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->registry->getBlockType('widget');
+    }
+
+    public function emptyStringDataProvider()
+    {
+        return [
+            [null],
+            ['']
+        ];
     }
 }

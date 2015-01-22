@@ -2,6 +2,10 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * In additional to LayoutModifierInterface provides methods to manage the layout item options
+ * The options related operation are available for the layout built without the block types
+ */
 interface RawLayoutModifierInterface extends LayoutModifierInterface
 {
     /**
