@@ -2,15 +2,9 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use BeSimple\SoapCommon\Type\KeyValue\DateTime;
-use Swift_Mailer;
-
-use Symfony\Component\Templating\DelegatingEngine;
-
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 
 /**
  * Class PasswordManager
@@ -22,29 +16,14 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 class PasswordManager
 {
     /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var DelegatingEngine
-     */
-    protected $templating;
-
-    /**
-     * @var \Swift_Mailer
-     */
-    protected $mailer;
-
-    /**
      * @var UserManager
      */
     protected $userManager;
+
+    /**
+     * @var Processor
+     */
+    protected $mailProcessor;
 
     /**
      * @var int
@@ -57,42 +36,35 @@ class PasswordManager
     protected $error;
 
     /**
-     * @param ConfigManager    $configManager
-     * @param Translator       $translator
-     * @param DelegatingEngine $templating
-     * @param Swift_Mailer     $mailer
-     * @param UserManager      $userManager
-     * @param int              $ttl
+     * @param UserManager $userManager
+     * @param Processor   $processor
+     * @param             $ttl
      */
     public function __construct(
-        ConfigManager $configManager,
-        Translator $translator,
-        DelegatingEngine $templating,
-        \Swift_Mailer $mailer,
         UserManager $userManager,
+        Processor $processor,
         $ttl
     ) {
-        $this->configManager = $configManager;
-        $this->translator    = $translator;
-        $this->templating    = $templating;
-        $this->mailer        = $mailer;
         $this->userManager   = $userManager;
+        $this->mailProcessor = $processor;
         $this->ttl           = $ttl;
     }
 
     /**
+     * Sends reset password email to user
+     *
      * @param User $user
-     * @param boolean $check
+     * @param bool $asAdmin
      *
      * @return bool
      */
-    public function setResetPasswordEmail(User $user, $check = true)
+    public function resetPassword(User $user, $asAdmin = false)
     {
-        $this->reset();
+        $this->setError(null);
 
-        if ($check) {
+        if (!$asAdmin) {
             if ($user->isPasswordRequestNonExpired($this->ttl)) {
-                $this->addError('oro.user.password.reset.ttl_already_requested.message');
+                $this->setError('oro.user.password.reset.ttl_already_requested.message');
 
                 return false;
             }
@@ -102,21 +74,48 @@ class PasswordManager
             $user->setConfirmationToken($user->generateToken());
         }
 
-        $message = $this->createMessage($user);
-        $this->mailer->send($message);
+        if ($asAdmin) {
+            $isEmailSent = $this->mailProcessor->sendResetPasswordAsAdminEmail($user);
+        } else {
+            $isEmailSent = $this->mailProcessor->sendResetPasswordEmail($user);
+        }
 
-        $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        $this->userManager->updateUser($user);
+        if ($isEmailSent) {
+            $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+            $this->userManager->updateUser($user);
 
-        return true;
+            return true;
+        } else {
+            if ($this->mailProcessor->hasError()) {
+                $this->setError($this->mailProcessor->getError());
+            }
+
+            return false;
+        }
     }
 
     /**
-     * Resets password manager
+     * @param User $user
+     * @param      $password
+     *
+     * @return bool
      */
-    public function reset()
+    public function changePassword(User $user, $password)
     {
-        $this->error = null;
+        $user->setPlainPassword($password);
+        $user->setPasswordChangedAt(new \DateTime());
+
+        if ($this->mailProcessor->sendChangePasswordEmail($user)) {
+            $this->userManager->updateUser($user);
+
+            return true;
+        } else {
+            if ($this->mailProcessor->hasError()) {
+                $this->setError($this->mailProcessor->getError());
+            }
+
+            return false;
+        }
     }
 
     /**
@@ -132,34 +131,14 @@ class PasswordManager
      */
     public function hasError()
     {
-        return $this->error != null;
+        return !is_null($this->error);
     }
 
     /**
      * @param string $error
      */
-    protected function addError($error)
+    protected function setError($error)
     {
         $this->error = $error;
-    }
-
-    /**
-     * @param User $user
-     *
-     * @return \Swift_Message
-     */
-    protected function createMessage(User $user)
-    {
-        $senderEmail = $this->configManager->get('oro_notification.email_notification_sender_email');
-        $senderName  = $this->configManager->get('oro_notification.email_notification_sender_name');
-
-        return \Swift_Message::newInstance()
-            ->setSubject($this->translator->trans('Reset password'))
-            ->setFrom($senderEmail, $senderName)
-            ->setTo($user->getEmail())
-            ->setBody(
-                $this->templating->render('OroUserBundle:Mail:reset.html.twig', ['user' => $user]),
-                'text/html'
-            );
     }
 }
