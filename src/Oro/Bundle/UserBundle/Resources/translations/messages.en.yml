@@ -136,6 +136,7 @@ oro:
 
         password:
             change_dialog.title: Change password
+            reset_dialog.title: Reset password
             dropdown.label: Password
             reset.label: Reset
             change.label: Change
