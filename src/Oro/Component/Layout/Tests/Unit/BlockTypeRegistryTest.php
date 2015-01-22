@@ -94,4 +94,17 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->registry->getBlockType('widget');
     }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testGetTypeUndefined()
+    {
+        $this->blockTypeFactory->expects($this->once())
+            ->method('createBlockType')
+            ->with('widget')
+            ->will($this->returnValue(null));
+
+        $this->registry->getBlockType('widget');
+    }
 }
