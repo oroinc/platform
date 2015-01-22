@@ -31,7 +31,26 @@ class BlockTypeRegistry implements BlockTypeRegistryInterface
 
         if (!isset($this->types[$name])) {
             // Registers the block type.
-            $this->types[$name] = $this->blockTypeFactory->createBlockType($name);
+            $type = $this->blockTypeFactory->createBlockType($name);
+
+            if (null === $type) {
+                throw new Exception\InvalidArgumentException(
+                    sprintf('Can not find corresponded block type with name "%s".', $name)
+                );
+            } else {
+                if ($type->getName() !== $name) {
+                    throw new Exception\InvalidArgumentException(
+                        sprintf(
+                            'The block type name specified for the service does not match the actual name. Expected ' .
+                            '"%s", given "%s"',
+                            $name,
+                            $type->getName()
+                        )
+                    );
+                }
+
+                $this->types[$name] = $type;
+            }
         }
 
         return $this->types[$name];
@@ -49,6 +68,8 @@ class BlockTypeRegistry implements BlockTypeRegistryInterface
         try {
             $this->getBlockType($name);
         } catch (\InvalidArgumentException $e) {
+            return false;
+        } catch (\UnexpectedTypeException $e) {
             return false;
         }
 
