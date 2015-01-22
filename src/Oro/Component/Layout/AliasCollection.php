@@ -72,9 +72,14 @@ class AliasCollection
     public function add($alias, $id)
     {
         if (isset($this->aliases[$alias])) {
+            if ($this->aliases[$alias] === $id) {
+                // exactly the same alias for the specified item is already exists
+                return $this;
+            }
+
             throw new Exception\AliasAlreadyExistsException(
                 sprintf(
-                    'The "%" sting cannot be used as an alias for "%s" item'
+                    'The "%s" sting cannot be used as an alias for "%s" item'
                     . ' because it is already used for "%s" item.',
                     $alias,
                     $id,

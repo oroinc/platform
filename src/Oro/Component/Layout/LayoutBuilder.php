@@ -8,7 +8,9 @@ namespace Oro\Component\Layout;
  * It means that:
  *  - several layout items with the same id cannot be added
  *  - only existing layout items can be removed
- *  - an alias for the layout item must be added before you can use it
+ *  - an alias must be added before you can use it
+ *  - an alias can be added for existing item only
+ *  - only existing alias can be removed
  */
 class LayoutBuilder implements LayoutBuilderInterface
 {
@@ -45,7 +47,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
-                    'Cannot add "%s" item to the layout. ParentItemId: %s. BlockType: %s. Error: %s',
+                    'Cannot add "%s" item to the layout. ParentItemId: %s. BlockType: %s. Reason: %s',
                     $id,
                     $parentId,
                     $blockType,
@@ -69,7 +71,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
-                    'Cannot remove "%s" item from the layout. Error: %s',
+                    'Cannot remove "%s" item from the layout. Reason: %s',
                     $id,
                     $e->getMessage()
                 ),
@@ -91,7 +93,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
-                    'Cannot add "%s" alias for "%s" item. Error: %s',
+                    'Cannot add "%s" alias for "%s" item. Reason: %s',
                     $alias,
                     $id,
                     $e->getMessage()
@@ -114,7 +116,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
-                    'Cannot remove "%s" alias. Error: %s',
+                    'Cannot remove "%s" alias. Reason: %s',
                     $alias,
                     $e->getMessage()
                 ),
@@ -151,6 +153,18 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function has($id)
     {
         return $this->layoutData->hasItem($id);
+    }
+
+    /**
+     * Checks whether the given item alias exists
+     *
+     * @param string $alias The item alias
+     *
+     * @return bool
+     */
+    public function hasAlias($alias)
+    {
+        return $this->layoutData->hasItemAlias($alias);
     }
 
     /**

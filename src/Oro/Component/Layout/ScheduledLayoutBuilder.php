@@ -176,7 +176,24 @@ class ScheduledLayoutBuilder implements LayoutBuilderInterface, ScheduledLayoutM
      */
     protected function executeAddAlias()
     {
-        $this->execute('addAlias');
+        $actionName = 'addAlias';
+        if (!empty($this->actions[$actionName])) {
+            $function       = [$this->builder, $actionName];
+            $skippedActions = [];
+            foreach ($this->actions[$actionName] as $key => $action) {
+                $id = $action[1];
+                if (!empty($id) && !$this->builder->has($id)) {
+                    $skippedActions[] = $action;
+                    continue;
+                }
+                call_user_func_array($function, $action);
+            }
+            if (!empty($skippedActions)) {
+                $this->actions[$actionName] = $skippedActions;
+            } else {
+                unset($this->actions[$actionName]);
+            }
+        }
     }
 
     /**
@@ -184,19 +201,26 @@ class ScheduledLayoutBuilder implements LayoutBuilderInterface, ScheduledLayoutM
      */
     protected function executeRemoveAlias()
     {
-        $this->execute('removeAlias');
-    }
-
-    /**
-     * @param string $actionName
-     */
-    protected function execute($actionName)
-    {
+        $actionName = 'removeAlias';
         if (!empty($this->actions[$actionName])) {
-            $function = [$this->builder, $actionName];
-            foreach ($this->actions[$actionName] as $action) {
+            $function       = [$this->builder, $actionName];
+            $skippedActions = [];
+            foreach ($this->actions[$actionName] as $key => $action) {
+                $alias = $action[0];
+                if (!empty($alias) && !$this->builder->hasAlias($alias)) {
+                    $skippedActions[] = $action;
+                    continue;
+                }
                 call_user_func_array($function, $action);
             }
+            if (!empty($skippedActions)) {
+                $this->actions[$actionName] = $skippedActions;
+            } else {
+                unset($this->actions[$actionName]);
+            }
+        }
+        // remove remaining 'removeAlias' actions if there are no any 'addAlias' actions
+        if (!empty($this->actions[$actionName]) && empty($this->actions['addAlias'])) {
             unset($this->actions[$actionName]);
         }
     }

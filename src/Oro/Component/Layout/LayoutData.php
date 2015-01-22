@@ -253,6 +253,18 @@ class LayoutData
     }
 
     /**
+     * Checks if the given layout item alias exists
+     *
+     * @param string $alias The layout item alias
+     *
+     * @return bool
+     */
+    public function hasItemAlias($alias)
+    {
+        return $this->aliases->has($alias);
+    }
+
+    /**
      * Creates an alias for the specified layout item
      *
      * @param string $alias A string that can be used to access to the layout item instead of its id
@@ -267,7 +279,7 @@ class LayoutData
             throw new Exception\InvalidArgumentException('The item id must not be empty.');
         }
         if ($alias === $id) {
-            throw new Exception\ItemAlreadyExistsException(
+            throw new Exception\LogicException(
                 sprintf(
                     'The "%s" sting cannot be used as an alias for "%s" item'
                     . ' because an alias cannot be equal to the item id.',
@@ -277,14 +289,17 @@ class LayoutData
             );
         }
         if (isset($this->items[$alias])) {
-            throw new Exception\ItemAlreadyExistsException(
+            throw new Exception\LogicException(
                 sprintf(
                     'The "%s" sting cannot be used as an alias for "%s" item'
-                    . ' because another item with this id exists.',
+                    . ' because another item with the same id exists.',
                     $alias,
                     $id
                 )
             );
+        }
+        if (!isset($this->items[$this->resolveItemId($id)])) {
+            throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
         }
 
         $this->aliases->add($alias, $id);
@@ -299,6 +314,9 @@ class LayoutData
     {
         if (empty($alias)) {
             throw new Exception\InvalidArgumentException('The item alias must not be empty.');
+        }
+        if (!$this->aliases->has($alias)) {
+            throw new Exception\AliasNotFoundException(sprintf('The "%s" item alias does not exist.', $alias));
         }
 
         $this->aliases->remove($alias);
