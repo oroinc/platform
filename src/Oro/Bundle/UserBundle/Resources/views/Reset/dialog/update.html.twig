@@ -23,13 +23,13 @@
             'orotranslation/js/translator'
         ],
         function($, __) {
+            $('#oro_set_password_form_password').after(
+                    '<span class="icon-eye-close" id="show-hide-pass" style="cursor: pointer; font-size: 16px;" ' +
+                    ' title="' + __("oro.user.show_hide_password.label") + '"/>'
+            );
             $('#oro_set_password_form_password').parent().after(
-                '<div class="controls" style="margin-top: 10px;">' +
-                '<span class="icon-eye-close" id="show-hide-pass" style="cursor: pointer;" ' +
-                ' title="' + __("oro.user.show_hide_password.label") + '"/>' +
-                '<span class="icon-cog" id="generate-pass" style="cursor: pointer;"' +
-                ' title="' + __("oro.user.generate_password.label") + '">' +
-                __("oro.user.generate_password.label") + '</span>' +
+                '<div class="controls" style="margin-top: 5px;">' +
+                    '<a href="#" id="generate-pass">' + __("oro.user.suggest_password.label") + '</a>' +
                 '</div>'
             );
 
@@ -40,8 +40,8 @@
                 for (var i = 0, n = charset.length; i < length; ++i) {
                     pass += charset.charAt(Math.floor(Math.random() * n));
                 }
-
                 $('#oro_set_password_form_password').val(pass);
+                return false;
             });
 
             $('#show-hide-pass').on('click', function(e){

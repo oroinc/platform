@@ -137,9 +137,12 @@ oro:
         password:
             change_dialog.title: Change password
             reset_dialog.title: Reset password
-            dropdown.label: Password
+            reset_password.label: Reset password
+            change_password.label: Change password
+            new_password.label: New password
+            enter_new_password.label: Enter new password
+            enter_new_password_again.label: Enter new password again
             reset.label: Reset
-            change.label: Change
             reset:
                 ttl_already_requested.message:  The password for this user has already been requested within the last 24 hours
         action:
