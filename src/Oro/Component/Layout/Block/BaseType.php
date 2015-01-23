@@ -23,7 +23,6 @@ class BaseType implements BlockTypeInterface
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
         if (isset($options['attr'])) {
             $view->vars['attr'] = $options['attr'];
         }
@@ -33,6 +32,7 @@ class BaseType implements BlockTypeInterface
         if (isset($options['label_attr'])) {
             $view->vars['label_attr'] = $options['label_attr'];
         }
+        $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
     }
 
     /**
@@ -51,7 +51,7 @@ class BaseType implements BlockTypeInterface
         $resolver->setAllowedTypes(
             [
                 'attr'       => 'array',
-                'label_attr' => 'label_attr',
+                'label_attr' => 'array',
             ]
         );
     }
