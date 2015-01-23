@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit\Fixtures;
 
 use Oro\Component\Layout\BlockTypeFactoryInterface;
 use Oro\Component\Layout\BlockTypeInterface;
-use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\BlockType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Block\Type\RootType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
@@ -17,7 +17,7 @@ class BlockTypeFactoryStub implements BlockTypeFactoryInterface
     public function __construct()
     {
         $this
-            ->addBlockType(new BaseType())
+            ->addBlockType(new BlockType())
             ->addBlockType(new ContainerType())
             ->addBlockType(new RootType())
             ->addBlockType(new HeaderType())
