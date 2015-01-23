@@ -127,6 +127,7 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
     public function applyChanges()
     {
         $total = $this->calculateActionCount();
+        // @todo: check if this while is required before close https://magecore.atlassian.net/browse/BAP-7148
         while ($total !== 0) {
             $this->executeAllActions();
             $remained = $this->calculateActionCount();

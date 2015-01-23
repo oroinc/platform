@@ -324,8 +324,17 @@ class LayoutBuilder implements RawLayoutModifierInterface
     {
         $view  = new BlockView($parentView);
         $types = $this->getBlockTypeHierarchy($blockType);
-        $block = new LayoutBlock($this->layoutData, $id);
 
+        // add core variables to the block view, like id and variables required for rendering engine
+        $view->vars['id']                  = $id;
+        $uniqueBlockPrefix                 = $parentView
+            ? sprintf('%s_%s', $parentView->vars['unique_block_prefix'], $id)
+            : '_' . $id;
+        $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
+        $view->vars['block_prefixes']      = $this->getBlockPrefixes($types, $uniqueBlockPrefix);
+        $view->vars['cache_key']           = sprintf('%s_%s', $uniqueBlockPrefix, $blockType);
+
+        $block = new LayoutBlock($this->layoutData, $id);
         foreach ($types as $type) {
             $type->buildView($view, $block, $options);
         }
@@ -363,5 +372,24 @@ class LayoutBuilder implements RawLayoutModifierInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param BlockTypeInterface[] $types
+     * @param string               $uniqueBlockPrefix
+     *
+     * @return string[]
+     */
+    protected function getBlockPrefixes($types, $uniqueBlockPrefix)
+    {
+        $blockPrefixes   = array_map(
+            function (BlockTypeInterface $type) {
+                return $type->getName();
+            },
+            $types
+        );
+        $blockPrefixes[] = $uniqueBlockPrefix;
+
+        return $blockPrefixes;
     }
 }
