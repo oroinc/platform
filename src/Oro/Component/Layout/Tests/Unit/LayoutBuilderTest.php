@@ -30,22 +30,22 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
     public function testCoreVariablesForRootItemOnly()
     {
         $this->layoutBuilder
-            ->add('test_root', null, 'root');
+            ->add('rootId', null, 'root');
 
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
             [ // root
                 'vars'     => [
-                    'id'                  => 'test_root',
+                    'id'                  => 'rootId',
                     'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_root',
+                    'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
                         'block',
                         'root',
-                        '_root',
+                        '_rootId',
                     ],
-                    'cache_key'           => '_root',
+                    'cache_key'           => '_rootId_root',
                 ],
                 'children' => []
             ],
@@ -57,50 +57,50 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
     public function testCoreVariables()
     {
         $this->layoutBuilder
-            ->add('test_root', null, 'root')
-            ->add('test_header', 'test_root', 'header')
-            ->add('test_logo', 'test_header', 'logo', ['title' => 'test']);
+            ->add('rootId', null, 'root')
+            ->add('headerId', 'rootId', 'header')
+            ->add('logoId', 'headerId', 'logo', ['title' => 'test']);
 
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
             [ // root
                 'vars'     => [
-                    'id'                  => 'test_root',
+                    'id'                  => 'rootId',
                     'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_root',
+                    'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
                         'block',
                         'root',
-                        '_root',
+                        '_rootId',
                     ],
-                    'cache_key'           => '_root',
+                    'cache_key'           => '_rootId_root',
                 ],
                 'children' => [
                     [ // header
                         'vars'     => [
-                            'id'                  => 'test_header',
+                            'id'                  => 'headerId',
                             'translation_domain'  => 'messages',
-                            'unique_block_prefix' => '_root_header',
+                            'unique_block_prefix' => '_rootId_headerId',
                             'block_prefixes'      => [
                                 'block',
                                 'header',
-                                '_root_header',
+                                '_rootId_headerId',
                             ],
-                            'cache_key'           => '_root_header',
+                            'cache_key'           => '_rootId_headerId_header',
                         ],
                         'children' => [
                             [ // logo
                                 'vars' => [
-                                    'id'                  => 'test_logo',
+                                    'id'                  => 'logoId',
                                     'translation_domain'  => 'messages',
-                                    'unique_block_prefix' => '_root_header_logo',
+                                    'unique_block_prefix' => '_rootId_headerId_logoId',
                                     'block_prefixes'      => [
                                         'block',
                                         'logo',
-                                        '_root_header_logo',
+                                        '_rootId_headerId_logoId',
                                     ],
-                                    'cache_key'           => '_root_header_logo',
+                                    'cache_key'           => '_rootId_headerId_logoId_logo',
                                     'title'               => 'test'
                                 ],
                             ]
