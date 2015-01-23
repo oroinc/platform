@@ -45,7 +45,7 @@ class ResetController extends Controller
         }
 
         $passwordManager = $this->get('oro_user.security.password_manager');
-        $isMessageSent = $passwordManager->setResetPasswordEmail($user);
+        $isMessageSent = $passwordManager->resetPassword($user);
 
         if (!$isMessageSent) {
             $this->get('session')->getFlashBag()->add(
@@ -76,7 +76,7 @@ class ResetController extends Controller
 
         if ($this->getRequest()->isMethod('POST')) {
             $passwordManager = $this->get('oro_user.security.password_manager');
-            $isMessageSent = $passwordManager->setResetPasswordEmail($user, false);
+            $isMessageSent = $passwordManager->resetPassword($user, true);
 
             if ($isMessageSent) {
                 $params['processed'] = true;
@@ -150,11 +150,14 @@ class ResetController extends Controller
         }
 
         if ($this->get('oro_user.form.handler.reset')->process($user)) {
-            $session->getFlashBag()->add('success', 'Your password has been successfully reset. You may login now.');
-
             // force user logout
             $session->invalidate();
             $this->get('security.context')->setToken(null);
+
+            $session->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.user.security.password_reseted.message')
+            );
 
             return $this->redirect($this->generateUrl('oro_user_security_login'));
         }
@@ -167,6 +170,10 @@ class ResetController extends Controller
 
     /**
      * Sets user password
+     *
+     * @param User $entity
+     *
+     * @return array
      *
      * @AclAncestor("password_management")
      * @Method({"GET", "POST"})
