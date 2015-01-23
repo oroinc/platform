@@ -1,0 +1,7 @@
+{% block root %}
+    {% for child in children -%}
+        {% if not child.rendered -%}
+            {{ block_widget(child) }}
+        {%- endif %}
+    {%- endfor %}
+{% endblock root %}
