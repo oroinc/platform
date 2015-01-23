@@ -13,6 +13,13 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 
+/**
+ * Class SetPasswordHandler
+ *
+ * @package Oro\Bundle\UserBundle\Form\Handler
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class SetPasswordHandler
 {
     /** @var LoggerInterface */

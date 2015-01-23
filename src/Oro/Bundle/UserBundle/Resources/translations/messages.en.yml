@@ -144,7 +144,7 @@ oro:
             enter_new_password_again.label: Enter new password again
             reset.label: Reset
             reset:
-                ttl_already_requested.message:  The password for this user has already been requested within the last 24 hours
+                ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
         action:
             password_management: Manage users' passwords
 

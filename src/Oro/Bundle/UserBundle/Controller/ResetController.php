@@ -44,7 +44,7 @@ class ResetController extends Controller
         if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))) {
             $this->get('session')->getFlashBag()->add(
                 'warn',
-                'The password for this user has already been requested within the last 24 hours.'
+                'oro.user.password.reset.ttl_already_requested.message'
             );
 
             return $this->redirect($this->generateUrl('oro_user_reset_request'));
