@@ -154,7 +154,10 @@ class ResetController extends Controller
             $session->invalidate();
             $this->get('security.context')->setToken(null);
 
-            $session->getFlashBag()->add('success', 'Your password has been successfully reset. You may login now.');
+            $session->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.user.security.password_reseted.message')
+            );
 
             return $this->redirect($this->generateUrl('oro_user_security_login'));
         }

@@ -7,14 +7,14 @@ use Oro\Bundle\UserBundle\Entity\User;
 class PlaceholderFilter
 {
     /**
-     * Checks the object is an instance of a given class.
+     * Checks if the object is an instance of a given class.
      *
      * @param object $entity
      * @return bool
      */
     public function isPasswordManageEnabled($entity)
     {
-        if ($entity instanceof User) {
+        if ($entity instanceof User && $entity->isEnabled()) {
             return true;
         }
         return false;

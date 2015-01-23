@@ -150,3 +150,4 @@ oro:
 
         security:
             password_changed.message: Your password has been updated by administrator. New password was sent to you by email
+            password_reseted.message: Your password has been successfully reset. You may login now.
