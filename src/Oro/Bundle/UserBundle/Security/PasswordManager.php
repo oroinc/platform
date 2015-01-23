@@ -102,6 +102,8 @@ class PasswordManager
      */
     public function changePassword(User $user, $password)
     {
+        $this->setError(null);
+
         $user->setPlainPassword($password);
         $user->setPasswordChangedAt(new \DateTime());
 
