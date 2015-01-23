@@ -1,10 +1,15 @@
 <?php
 
-namespace Oro\Component\Layout;
+namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-abstract class AbstractBlockType implements BlockTypeInterface
+use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\BlockTypeInterface;
+
+abstract class AbstractType implements BlockTypeInterface
 {
     /**
      * {@inheritdoc}

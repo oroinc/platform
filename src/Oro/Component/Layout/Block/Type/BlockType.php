@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Block;
+namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -9,7 +9,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
 
-class BaseType implements BlockTypeInterface
+class BlockType implements BlockTypeInterface
 {
     /**
      * {@inheritdoc}
