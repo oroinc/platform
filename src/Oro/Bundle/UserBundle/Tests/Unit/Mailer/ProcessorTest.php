@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Mailer;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -39,11 +37,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      * @var UserManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $userManager;
-
-    /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $logger;
 
     /**
      * @var \Swift_Mailer|\PHPUnit_Framework_MockObject_MockObject
@@ -87,10 +80,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->logger = $this->getMockBuilder('Psr\Log\LoggerInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->mailer = $this->getMockBuilder('\Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
@@ -102,19 +91,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     $this->configManager,
                     $this->renderer,
                     $this->userManager,
-                    $this->logger,
                     $this->mailer,
                 ]
             )
             ->setMethods(['sendEmail'])
             ->getMock();
-    }
-
-    public function testError()
-    {
-        $this->mailProcessor->setError('error');
-        $this->assertTrue($this->mailProcessor->hasError());
-        $this->assertEquals('error', $this->mailProcessor->getError());
     }
 
     /**
