@@ -2,15 +2,21 @@
 
 namespace Oro\Component\Layout;
 
-class LayoutBlockBuilder extends LayoutBlock implements BlockBuilderInterface
+class LayoutBlockBuilder implements BlockBuilderInterface
 {
+    /** @var string */
+    protected $blockId;
+
+    /** @var LayoutData */
+    protected $layoutData;
+
     /**
-     * Creates the block.
-     *
-     * @return BlockInterface
+     * @param LayoutData $layoutData
+     * @param string     $blockId
      */
-    public function getBlock()
+    public function __construct(LayoutData $layoutData, $blockId)
     {
-        return $this;
+        $this->layoutData = $layoutData;
+        $this->blockId    = $blockId;
     }
 }
