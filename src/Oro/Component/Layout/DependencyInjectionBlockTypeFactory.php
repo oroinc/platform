@@ -4,8 +4,6 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Component\Layout\BlockTypeFactoryInterface;
-
 class DependencyInjectionBlockTypeFactory implements BlockTypeFactoryInterface
 {
     /** @var ContainerInterface */
@@ -14,9 +12,13 @@ class DependencyInjectionBlockTypeFactory implements BlockTypeFactoryInterface
     /** @var array */
     protected $typeServiceIds;
 
+    /**
+     * @param ContainerInterface $container
+     * @param string[]           $typeServiceIds
+     */
     public function __construct(ContainerInterface $container, array $typeServiceIds)
     {
-        $this->container = $container;
+        $this->container      = $container;
         $this->typeServiceIds = $typeServiceIds;
     }
 
@@ -29,8 +31,6 @@ class DependencyInjectionBlockTypeFactory implements BlockTypeFactoryInterface
             return null;
         }
 
-        $type = $this->container->get($this->typeServiceIds[$name]);
-
-        return $type;
+        return $this->container->get($this->typeServiceIds[$name]);
     }
 }

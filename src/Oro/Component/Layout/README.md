@@ -1,7 +1,10 @@
 Oro Layout Component
 ====================
 
-`Oro Layout Component` provides tools for defining elements of layout, so-called blocks, that can be used for building a different types of layouts, including HTML, XML and so on.
+`Oro Layout Component` provides tools for
+
+- defining elements of layout, so-called blocks, that can be used for building a different types of layouts, including HTML, XML and so on.
+- manage a layout structure and themes.
 
 There are two core element types:
 

@@ -13,8 +13,8 @@ interface BlockTypeRegistryInterface
      *
      * @return BlockTypeInterface
      *
-     * @throws Exception\UnexpectedTypeException
-     * @throws Exception\InvalidArgumentException
+     * @throws Exception\InvalidArgumentException if the given name is not valid
+     * @throws Exception\LogicException if the block type cannot be created
      */
     public function getBlockType($name);
 
