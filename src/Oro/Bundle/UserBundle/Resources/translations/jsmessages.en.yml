@@ -1,7 +1,7 @@
 oro:
     user:
         update_status.label: Update status
-        generate_password.label: Generate password
+        suggest_password.label: Suggest password
         show_hide_password.label: Show/hide password
         reset_password:
             flash:

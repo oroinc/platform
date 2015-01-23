@@ -136,9 +136,13 @@ oro:
 
         password:
             change_dialog.title: Change password
-            dropdown.label: Password
+            reset_dialog.title: Reset password
+            reset_password.label: Reset password
+            change_password.label: Change password
+            new_password.label: New password
+            enter_new_password.label: Enter new password
+            enter_new_password_again.label: Enter new password again
             reset.label: Reset
-            change.label: Change
             reset:
                 ttl_already_requested.message:  The password for this user has already been requested within the last 24 hours
         action:
@@ -146,3 +150,4 @@ oro:
 
         security:
             password_changed.message: Your password has been updated by administrator. New password was sent to you by email
+            password_reseted.message: Your password has been successfully reset. You may login now.
