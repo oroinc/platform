@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Block;
+namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 

@@ -2,12 +2,13 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Fixtures;
 
-use Oro\Component\Layout\Block\BaseType;
 use Oro\Component\Layout\BlockTypeFactoryInterface;
 use Oro\Component\Layout\BlockTypeInterface;
-use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\HeaderType;
-use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\LogoType;
-use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\RootType;
+use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Block\Type\RootType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
 
 class BlockTypeFactoryStub implements BlockTypeFactoryInterface
 {
@@ -17,6 +18,7 @@ class BlockTypeFactoryStub implements BlockTypeFactoryInterface
     {
         $this
             ->addBlockType(new BaseType())
+            ->addBlockType(new ContainerType())
             ->addBlockType(new RootType())
             ->addBlockType(new HeaderType())
             ->addBlockType(new LogoType());
@@ -28,7 +30,7 @@ class BlockTypeFactoryStub implements BlockTypeFactoryInterface
     public function createBlockType($name)
     {
         if (!isset($this->types[$name])) {
-            throw new \RuntimeException(sprintf('Unknown block type: %s.', $name));
+            return null;
         }
 
         return $this->types[$name];

@@ -42,6 +42,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
                         'block',
+                        'container',
                         'root',
                         '_rootId',
                     ],
@@ -71,6 +72,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
                         'block',
+                        'container',
                         'root',
                         '_rootId',
                     ],
@@ -84,6 +86,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                             'unique_block_prefix' => '_rootId_headerId',
                             'block_prefixes'      => [
                                 'block',
+                                'container',
                                 'header',
                                 '_rootId_headerId',
                             ],

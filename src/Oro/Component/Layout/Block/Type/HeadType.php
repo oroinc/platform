@@ -4,11 +4,10 @@ namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Component\Layout\AbstractBlockType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
-class HeadBlockType extends AbstractBlockType
+class HeadType extends AbstractContainerType
 {
     /**
     * {@inheritdoc}
@@ -30,14 +29,6 @@ class HeadBlockType extends AbstractBlockType
         $view->vars = array_replace($view->vars, [
             'title' => $options['title']
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'container';
     }
 
     /**

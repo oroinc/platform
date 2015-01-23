@@ -1,14 +1,14 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block;
+namespace Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\AbstractBlockType;
+use Oro\Component\Layout\Block\Type\AbstractType;
 
-class LogoType extends AbstractBlockType
+class LogoType extends AbstractType
 {
     /**
      * {@inheritdoc}
