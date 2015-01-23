@@ -29,7 +29,7 @@ parameters:
     oro_user.mailer.processor.class:              Oro\Bundle\UserBundle\Mailer\Processor
     oro_user.placeholder.filter.class:            Oro\Bundle\UserBundle\Placeholder\PlaceholderFilter
 
-    security.user_checker.class:                  Oro\Bundle\UserBundle\Security\UserChecker
+    oro_user.security.user_checker.class:         Oro\Bundle\UserBundle\Security\UserChecker
 services:
     oro_user.manager:
         class:                        %oro_user.manager.class%
@@ -239,3 +239,9 @@ services:
             - oro_user_password_reset_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: 110 }
+
+    security.user_checker:
+        class: %oro_user.security.user_checker.class%
+        arguments:
+            - @security.context.link
+            - @session.flash_bag
