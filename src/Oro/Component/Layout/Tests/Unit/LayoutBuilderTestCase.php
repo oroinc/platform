@@ -9,11 +9,12 @@ class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @param array     $expected
      * @param BlockView $actual
+     * @param bool      $ignoreAuxiliaryVariables
      */
-    protected function assertBlockView(array $expected, BlockView $actual)
+    protected function assertBlockView(array $expected, BlockView $actual, $ignoreAuxiliaryVariables = true)
     {
         $this->completeView($expected);
-        $actualArray = $this->convertBlockViewToArray($actual);
+        $actualArray = $this->convertBlockViewToArray($actual, $ignoreAuxiliaryVariables);
         $this->assertEquals($expected, $actualArray);
     }
 
@@ -41,14 +42,32 @@ class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param BlockView $view
+     * @param bool      $removeAuxiliaryVariables
      *
      * @return array
      */
-    protected function convertBlockViewToArray(BlockView $view)
+    protected function convertBlockViewToArray(BlockView $view, $removeAuxiliaryVariables = true)
     {
-        return [
+        $children = [];
+        /** @var BlockView $childView */
+        foreach ($view->children as $childView) {
+            $children[] = $this->convertBlockViewToArray($childView, $removeAuxiliaryVariables);
+        }
+
+        $result = [
             'vars'     => $view->vars,
-            'children' => array_map([$this, 'convertBlockViewToArray'], $view->children)
+            'children' => $children
         ];
+
+        if ($removeAuxiliaryVariables) {
+            unset($result['vars']['translation_domain']);
+            unset($result['vars']['label']);
+            unset($result['vars']['unique_block_prefix']);
+            unset($result['vars']['block_prefixes']);
+            unset($result['vars']['cache_key']);
+            unset($result['vars']['id']);
+        }
+
+        return $result;
     }
 }

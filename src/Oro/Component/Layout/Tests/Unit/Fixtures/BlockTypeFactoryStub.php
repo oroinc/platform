@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Fixtures;
 
+use Oro\Component\Layout\Block\BaseType;
 use Oro\Component\Layout\BlockTypeFactoryInterface;
 use Oro\Component\Layout\BlockTypeInterface;
-use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\BlockType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\HeaderType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\LogoType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\RootType;
@@ -16,7 +16,7 @@ class BlockTypeFactoryStub implements BlockTypeFactoryInterface
     public function __construct()
     {
         $this
-            ->addBlockType(new BlockType())
+            ->addBlockType(new BaseType())
             ->addBlockType(new RootType())
             ->addBlockType(new HeaderType())
             ->addBlockType(new LogoType());

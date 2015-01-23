@@ -88,8 +88,8 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
             sprintf(
                 'The "%s" string cannot be used as the item id because it contains illegal characters. '
-                . 'The valid item id should start with a letter, digit or underscore and only contain '
-                . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                . 'The valid item id should start with a letter and only contain '
+                . 'letters, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                 $id
             )
         );
@@ -124,7 +124,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @dataProvider             emptyStringDataProvider
      *
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The block type for "root" item must not be empty.
+     * @expectedExceptionMessage The block type name must not be empty.
      */
     public function testAddItemWithEmptyBlockType($blockType)
     {
@@ -150,7 +150,8 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
             sprintf(
                 'The "%s" string cannot be used as the name of the block type '
                 . 'because it contains illegal characters. '
-                . 'The valid block type name must only contain letters, numbers, and "_".',
+                . 'The valid block type name should start with a letter and only contain '
+                . 'letters, numbers and underscores ("_").',
                 $blockType
             )
         );
@@ -399,8 +400,8 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
             sprintf(
                 'The "%s" string cannot be used as the item alias because it contains illegal characters. '
-                . 'The valid alias should start with a letter, digit or underscore and only contain '
-                . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                . 'The valid alias should start with a letter and only contain '
+                . 'letters, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                 $alias
             )
         );
@@ -416,8 +417,8 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
             sprintf(
                 'The "%s" string cannot be used as the item id because it contains illegal characters. '
-                . 'The valid item id should start with a letter, digit or underscore and only contain '
-                . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                . 'The valid item id should start with a letter and only contain '
+                . 'letters, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                 $id
             )
         );
@@ -636,15 +637,27 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['-test'],
-            ['test?']
+            ['_test'],
+            ['1test'],
+            ['?test'],
+            ['test?'],
+            ['\ntest'],
+            ['test\n'],
         ];
     }
 
     public function invalidBlockTypeDataProvider()
     {
         return [
+            ['-test'],
+            ['_test'],
+            ['1test'],
+            ['?test'],
+            ['test?'],
+            ['\ntest'],
+            ['test\n'],
             ['test-block'],
-            ['test?']
+            ['test:block'],
         ];
     }
 }
