@@ -2,8 +2,18 @@
 
 namespace Oro\Component\Layout\Block\Type;
 
-class StyleBlockType extends ContainerBlockType
+use Oro\Component\Layout\AbstractBlockType;
+
+class StyleBlockType extends AbstractBlockType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'container';
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -2,8 +2,18 @@
 
 namespace Oro\Component\Layout\Block\Type;
 
-class ScriptBlockType extends ContainerBlockType
+use Oro\Component\Layout\AbstractBlockType;
+
+class ScriptBlockType extends AbstractBlockType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'container';
+    }
+
     /**
      * {@inheritdoc}
      */

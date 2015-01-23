@@ -2,8 +2,18 @@
 
 namespace Oro\Component\Layout\Block\Type;
 
-class RootBlockType extends ContainerBlockType
+use Oro\Component\Layout\AbstractBlockType;
+
+class RootBlockType extends AbstractBlockType
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getParent()
+    {
+        return 'container';
+    }
+
     /**
      * {@inheritdoc}
      */
