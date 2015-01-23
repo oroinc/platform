@@ -83,27 +83,27 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                         'vars'     => [
                             'id'                  => 'headerId',
                             'translation_domain'  => 'messages',
-                            'unique_block_prefix' => '_rootId_headerId',
+                            'unique_block_prefix' => '_headerId',
                             'block_prefixes'      => [
                                 'block',
                                 'container',
                                 'header',
-                                '_rootId_headerId',
+                                '_headerId',
                             ],
-                            'cache_key'           => '_rootId_headerId_header',
+                            'cache_key'           => '_headerId_header',
                         ],
                         'children' => [
                             [ // logo
                                 'vars' => [
                                     'id'                  => 'logoId',
                                     'translation_domain'  => 'messages',
-                                    'unique_block_prefix' => '_rootId_headerId_logoId',
+                                    'unique_block_prefix' => '_logoId',
                                     'block_prefixes'      => [
                                         'block',
                                         'logo',
-                                        '_rootId_headerId_logoId',
+                                        '_logoId',
                                     ],
-                                    'cache_key'           => '_rootId_headerId_logoId_logo',
+                                    'cache_key'           => '_logoId_logo',
                                     'title'               => 'test'
                                 ],
                             ]

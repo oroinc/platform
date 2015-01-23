@@ -327,9 +327,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
 
         // add core variables to the block view, like id and variables required for rendering engine
         $view->vars['id']                  = $id;
-        $uniqueBlockPrefix                 = $parentView
-            ? sprintf('%s_%s', $parentView->vars['unique_block_prefix'], $id)
-            : '_' . $id;
+        $uniqueBlockPrefix                 = '_' . $id;
         $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
         $view->vars['block_prefixes']      = $this->getBlockPrefixes($types, $uniqueBlockPrefix);
         $view->vars['cache_key']           = sprintf('%s_%s', $uniqueBlockPrefix, $blockType);
