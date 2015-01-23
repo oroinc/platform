@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Security;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Security\Core\User\UserChecker as BaseUserChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -12,13 +13,19 @@ use Oro\Bundle\UserBundle\Exception\PasswordChangedException;
 class UserChecker extends BaseUserChecker
 {
     /**
-     * @var ContainerInterface
+     * @var ServiceLink
      */
-    protected $container;
+    protected $securityContextLink;
 
-    public function __construct(ContainerInterface $container)
+    /**
+     * @var FlashBagInterface
+     */
+    protected $flashBag;
+
+    public function __construct(ServiceLink $securityContextLink, FlashBagInterface $flashBag)
     {
-        $this->container = $container;
+        $this->flashBag = $flashBag;
+        $this->securityContextLink = $securityContextLink;
     }
 
     /**
@@ -28,12 +35,12 @@ class UserChecker extends BaseUserChecker
     {
         parent::checkPreAuth($user);
 
-        if ($user instanceof User && !is_null($this->container->get('security.context')->getToken())) {
+        if ($user instanceof User && !is_null($this->securityContextLink->getService()->getToken())) {
             if ($user->getPasswordChangedAt() != null
                 && $user->getLastLogin() != null
                 && $user->getPasswordChangedAt() > $user->getLastLogin()
             ) {
-                $this->container->get('session.flash_bag')->add('error', 'oro.user.security.password_changed.message');
+                $this->flashBag->add('error', 'oro.user.security.password_changed.message');
                 $exception = new PasswordChangedException('oro.user.security.password_changed.message');
                 $exception->setUser($user);
                 throw $exception;
