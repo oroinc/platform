@@ -113,6 +113,7 @@ class LayoutData
     public function addItem($id, $parentId, $blockType, array $options = [])
     {
         $this->validateItemId($id, true);
+        $this->validateBlockType($blockType);
         if (isset($this->items[$id])) {
             throw new Exception\ItemAlreadyExistsException(
                 sprintf(
@@ -133,24 +134,6 @@ class LayoutData
                     )
                 );
             }
-        }
-        if (empty($blockType)) {
-            throw new Exception\InvalidArgumentException(
-                sprintf('The block type for "%s" item must not be empty.', $id)
-            );
-        }
-        if (!is_string($blockType)) {
-            throw new Exception\UnexpectedTypeException($blockType, 'string', 'blockType');
-        }
-        if (!preg_match('/^[a-z0-9_]*$/i', $blockType)) {
-            throw new Exception\InvalidArgumentException(
-                sprintf(
-                    'The "%s" string cannot be used as the name of the block type '
-                    . 'because it contains illegal characters. '
-                    . 'The valid block type name must only contain letters, numbers, and "_".',
-                    $blockType
-                )
-            );
         }
 
         if (empty($parentId)) {
@@ -372,7 +355,7 @@ class LayoutData
      * Checks whether the given string is a valid item identifier
      *
      * A identifier is accepted if it
-     *   * starts with a letter, digit or underscore
+     *   * starts with a letter
      *   * contains only letters, digits, numbers, underscores ("_"),
      *     hyphens ("-") and colons (":")
      *
@@ -382,7 +365,7 @@ class LayoutData
      */
     protected function isValidId($id)
     {
-        return preg_match('/^[a-zA-Z0-9_][a-zA-Z0-9_\-:]*$/D', $id);
+        return preg_match('/^[a-z][a-z0-9_\-:]*$/iD', $id);
     }
 
     /**
@@ -407,8 +390,8 @@ class LayoutData
                 throw new Exception\InvalidArgumentException(
                     sprintf(
                         'The "%s" string cannot be used as the item id because it contains illegal characters. '
-                        . 'The valid item id should start with a letter, digit or underscore and only contain '
-                        . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                        . 'The valid item id should start with a letter and only contain '
+                        . 'letters, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                         $id
                     )
                 );
@@ -460,12 +443,40 @@ class LayoutData
                 throw new Exception\InvalidArgumentException(
                     sprintf(
                         'The "%s" string cannot be used as the item alias because it contains illegal characters. '
-                        . 'The valid alias should start with a letter, digit or underscore and only contain '
-                        . 'letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").',
+                        . 'The valid alias should start with a letter and only contain '
+                        . 'letters, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                         $alias
                     )
                 );
             }
+        }
+    }
+
+    /**
+     * Checks if the given value can be used as the block type name
+     *
+     * @param string $blockType The name of the block type
+     *
+     * @throws Exception\InvalidArgumentException if the block type name is not valid
+     */
+    protected function validateBlockType($blockType)
+    {
+        if (empty($blockType)) {
+            throw new Exception\InvalidArgumentException('The block type name must not be empty.');
+        }
+        if (!is_string($blockType)) {
+            throw new Exception\UnexpectedTypeException($blockType, 'string', 'blockType');
+        }
+        if (!preg_match('/^[a-z][a-z0-9_]*$/iD', $blockType)) {
+            throw new Exception\InvalidArgumentException(
+                sprintf(
+                    'The "%s" string cannot be used as the name of the block type '
+                    . 'because it contains illegal characters. '
+                    . 'The valid block type name should start with a letter and only contain '
+                    . 'letters, numbers and underscores ("_").',
+                    $blockType
+                )
+            );
         }
     }
 }
