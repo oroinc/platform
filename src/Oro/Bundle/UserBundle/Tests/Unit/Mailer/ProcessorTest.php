@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Mailer;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -48,8 +49,26 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
      */
     protected $mailProcessor;
 
+    /**
+     * @var EmailTemplateInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $emailTemplate;
+
+    /**
+     * @var User
+     */
+    protected $user;
+
+    /**
+     * @var array
+     */
+    protected $templateData;
+
     protected function setUp()
     {
+        $this->user = new User();
+        $this->templateData = ['templateData'];
+
         $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -74,7 +93,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->renderer->expects($this->any())
             ->method('compileMessage')
-            ->willReturn(null);
+            ->willReturn($this->templateData);
 
         $this->userManager = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\UserManager')
             ->disableOriginalConstructor()
@@ -96,30 +115,36 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             )
             ->setMethods(['sendEmail'])
             ->getMock();
+
+        $this->emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface');
     }
 
     /**
-     * @param $methodName
-     * @param $templateName
-     * @param $sendEmailResult
+     * @param string  $methodName
+     * @param string  $templateName
+     * @param string  $getTypeResult
+     * @param string  $typeValue
+     * @param boolean $sendEmailResult
      *
      * @dataProvider sendEmailResultProvider
      */
-    public function testSendEmail($methodName, $templateName, $sendEmailResult)
+    public function testSendEmail($methodName, $templateName, $getTypeResult, $typeValue, $sendEmailResult)
     {
         $this->objectRepository->expects($this->once())
             ->method('findByName')
             ->with($templateName)
-            ->willReturn($this->getMock('Oro\Bundle\EmailBundle\Model\EmailTemplateInterface'));
+            ->willReturn($this->emailTemplate);
 
-        $this->renderer->expects($this->once())
-            ->method('compileMessage');
+        $this->emailTemplate->expects($this->once())
+            ->method('getType')
+            ->willReturn($getTypeResult);
 
         $this->mailProcessor->expects($this->once())
             ->method('sendEmail')
+            ->with($this->user, $this->templateData, $typeValue)
             ->willReturn($sendEmailResult);
 
-        $this->assertEquals($sendEmailResult, $this->mailProcessor->{$methodName}(new User()));
+        $this->assertEquals($sendEmailResult, $this->mailProcessor->{$methodName}($this->user));
     }
 
     public function sendEmailResultProvider()
@@ -128,31 +153,43 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             [
                 'sendChangePasswordEmail',
                 Processor::TEMPLATE_USER_CHANGE_PASSWORD,
+                'txt',
+                'text/plain',
                 true,
             ],
             [
                 'sendChangePasswordEmail',
                 Processor::TEMPLATE_USER_CHANGE_PASSWORD,
+                'html',
+                'text/html',
                 false,
             ],
             [
                 'sendResetPasswordEmail',
                 Processor::TEMPLATE_USER_RESET_PASSWORD,
+                null,
+                'text/html',
                 true,
             ],
             [
                 'sendResetPasswordEmail',
                 Processor::TEMPLATE_USER_RESET_PASSWORD,
+                'txt',
+                'text/plain',
                 false,
             ],
             [
                 'sendResetPasswordAsAdminEmail',
                 Processor::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN,
+                'txt',
+                'text/plain',
                 true,
             ],
             [
                 'sendResetPasswordAsAdminEmail',
                 Processor::TEMPLATE_USER_RESET_PASSWORD_AS_ADMIN,
+                1,
+                'text/html',
                 false,
             ],
         ];
