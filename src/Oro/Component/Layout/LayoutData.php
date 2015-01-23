@@ -64,7 +64,7 @@ class LayoutData
      *
      * @return string
      */
-    public function getRootItemId()
+    public function getRootId()
     {
         return $this->hierarchy->getRootId();
     }
@@ -76,7 +76,7 @@ class LayoutData
      *
      * @return string The layout item id
      */
-    public function resolveItemId($id)
+    public function resolveId($id)
     {
         return $this->aliases->has($id)
             ? $this->aliases->getId($id)
@@ -90,9 +90,9 @@ class LayoutData
      *
      * @return bool
      */
-    public function hasItem($id)
+    public function has($id)
     {
-        $id = $this->resolveItemId($id);
+        $id = $this->resolveId($id);
 
         return isset($this->items[$id]);
     }
@@ -110,9 +110,9 @@ class LayoutData
      * @throws Exception\ItemNotFoundException if the parent layout item does not exist
      * @throws Exception\LogicException if the layout item cannot be added by other reasons
      */
-    public function addItem($id, $parentId, $blockType, array $options = [])
+    public function add($id, $parentId, $blockType, array $options = [])
     {
-        $this->validateItemId($id, true);
+        $this->validateId($id, true);
         $this->validateBlockType($blockType);
         if (isset($this->items[$id])) {
             throw new Exception\ItemAlreadyExistsException(
@@ -139,8 +139,8 @@ class LayoutData
         if (empty($parentId)) {
             $path = [];
         } else {
-            $parentId = $this->resolveItemId($parentId);
-            $path     = $this->getItemProperty($parentId, self::PATH);
+            $parentId = $this->resolveId($parentId);
+            $path     = $this->getProperty($parentId, self::PATH);
         }
 
         $this->hierarchy->add($path, $id);
@@ -160,9 +160,9 @@ class LayoutData
      * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
-    public function removeItem($id)
+    public function remove($id)
     {
-        $id   = $this->validateAndResolveItemId($id);
+        $id   = $this->validateAndResolveId($id);
         $path = $this->items[$id][self::PATH];
 
         // remove item from hierarchy
@@ -175,7 +175,7 @@ class LayoutData
         $pathLastIndex = $pathLength - 1;
         $ids           = array_keys($this->items);
         foreach ($ids as $itemId) {
-            $currentPath = $this->getItemProperty($itemId, self::PATH);
+            $currentPath = $this->getProperty($itemId, self::PATH);
             if (count($currentPath) > $pathLength && $currentPath[$pathLastIndex] === $id) {
                 unset($this->items[$itemId]);
                 $this->aliases->removeById($itemId);
@@ -194,9 +194,9 @@ class LayoutData
      * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
-    public function hasItemProperty($id, $name)
+    public function hasProperty($id, $name)
     {
-        $id = $this->validateAndResolveItemId($id);
+        $id = $this->validateAndResolveId($id);
 
         return isset($this->items[$id][$name]) || array_key_exists($name, $this->items[$id]);
     }
@@ -213,9 +213,9 @@ class LayoutData
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      * @throws Exception\LogicException if the layout item does not have the requested property
      */
-    public function getItemProperty($id, $name)
+    public function getProperty($id, $name)
     {
-        $id = $this->validateAndResolveItemId($id);
+        $id = $this->validateAndResolveId($id);
         if (!isset($this->items[$id][$name]) && !array_key_exists($name, $this->items[$id])) {
             throw new Exception\LogicException(
                 sprintf('The "%s" item does not have "%s" property.', $id, $name)
@@ -235,9 +235,9 @@ class LayoutData
      * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
-    public function setItemProperty($id, $name, $value)
+    public function setProperty($id, $name, $value)
     {
-        $id = $this->validateAndResolveItemId($id);
+        $id = $this->validateAndResolveId($id);
 
         $this->items[$id][$name] = $value;
     }
@@ -249,7 +249,7 @@ class LayoutData
      *
      * @return bool
      */
-    public function hasItemAlias($alias)
+    public function hasAlias($alias)
     {
         return $this->aliases->has($alias);
     }
@@ -265,10 +265,10 @@ class LayoutData
      * @throws Exception\AliasAlreadyExistsException if the alias is used for another layout item
      * @throws Exception\LogicException if the alias cannot be added by other reasons
      */
-    public function addItemAlias($alias, $id)
+    public function addAlias($alias, $id)
     {
-        $this->validateItemAlias($alias, true);
-        $this->validateItemId($id, true);
+        $this->validateAlias($alias, true);
+        $this->validateId($id, true);
         // perform additional validations
         if ($alias === $id) {
             throw new Exception\LogicException(
@@ -290,7 +290,7 @@ class LayoutData
                 )
             );
         }
-        if (!isset($this->items[$this->resolveItemId($id)])) {
+        if (!isset($this->items[$this->resolveId($id)])) {
             throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
         }
 
@@ -305,9 +305,9 @@ class LayoutData
      * @throws Exception\InvalidArgumentException if the alias is empty
      * @throws Exception\AliasNotFoundException if the alias does not exist
      */
-    public function removeItemAlias($alias)
+    public function removeAlias($alias)
     {
-        $this->validateItemAlias($alias);
+        $this->validateAlias($alias);
         if (!$this->aliases->has($alias)) {
             throw new Exception\AliasNotFoundException(sprintf('The "%s" item alias does not exist.', $alias));
         }
@@ -327,7 +327,7 @@ class LayoutData
      */
     public function getHierarchy($id)
     {
-        $path = $this->getItemProperty($id, self::PATH);
+        $path = $this->getProperty($id, self::PATH);
 
         return $this->hierarchy->get($path);
     }
@@ -377,7 +377,7 @@ class LayoutData
      *
      * @throws Exception\InvalidArgumentException if the id is not valid
      */
-    protected function validateItemId($id, $fullCheck = false)
+    protected function validateId($id, $fullCheck = false)
     {
         if (empty($id)) {
             throw new Exception\InvalidArgumentException('The item id must not be empty.');
@@ -410,10 +410,10 @@ class LayoutData
      * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
-    protected function validateAndResolveItemId($id)
+    protected function validateAndResolveId($id)
     {
-        $this->validateItemId($id);
-        $id = $this->resolveItemId($id);
+        $this->validateId($id);
+        $id = $this->resolveId($id);
         if (!isset($this->items[$id])) {
             throw new Exception\ItemNotFoundException(sprintf('The "%s" item does not exist.', $id));
         }
@@ -430,7 +430,7 @@ class LayoutData
      *
      * @throws Exception\InvalidArgumentException if the alias is not valid
      */
-    protected function validateItemAlias($alias, $fullCheck = false)
+    protected function validateAlias($alias, $fullCheck = false)
     {
         if (empty($alias)) {
             throw new Exception\InvalidArgumentException('The item alias must not be empty.');

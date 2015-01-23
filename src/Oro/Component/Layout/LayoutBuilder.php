@@ -52,11 +52,11 @@ class LayoutBuilder implements RawLayoutModifierInterface
             if ($this->frozen) {
                 throw new Exception\LogicException('Cannot modify frozen layout.');
             }
-            $this->layoutData->addItem($id, $parentId, $blockType, $options);
+            $this->layoutData->add($id, $parentId, $blockType, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
-                    'Cannot add "%s" item to the layout. ParentItemId: %s. BlockType: %s. Reason: %s',
+                    'Cannot add "%s" item to the layout. ParentId: %s. BlockType: %s. Reason: %s',
                     $id,
                     $parentId,
                     $blockType,
@@ -79,7 +79,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
             if ($this->frozen) {
                 throw new Exception\LogicException('Cannot modify frozen layout.');
             }
-            $this->layoutData->removeItem($id);
+            $this->layoutData->remove($id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -104,7 +104,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
             if ($this->frozen) {
                 throw new Exception\LogicException('Cannot modify frozen layout.');
             }
-            $this->layoutData->addItemAlias($alias, $id);
+            $this->layoutData->addAlias($alias, $id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -130,7 +130,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
             if ($this->frozen) {
                 throw new Exception\LogicException('Cannot modify frozen layout.');
             }
-            $this->layoutData->removeItemAlias($alias);
+            $this->layoutData->removeAlias($alias);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -158,9 +158,9 @@ class LayoutBuilder implements RawLayoutModifierInterface
             if (empty($optionName)) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
             }
-            $options              = $this->layoutData->getItemProperty($id, LayoutData::OPTIONS);
+            $options              = $this->layoutData->getProperty($id, LayoutData::OPTIONS);
             $options[$optionName] = $optionValue;
-            $this->layoutData->setItemProperty($id, LayoutData::OPTIONS, $options);
+            $this->layoutData->setProperty($id, LayoutData::OPTIONS, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -189,9 +189,9 @@ class LayoutBuilder implements RawLayoutModifierInterface
             if (empty($optionName)) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
             }
-            $options = $this->layoutData->getItemProperty($id, LayoutData::OPTIONS);
+            $options = $this->layoutData->getProperty($id, LayoutData::OPTIONS);
             unset($options[$optionName]);
-            $this->layoutData->setItemProperty($id, LayoutData::OPTIONS, $options);
+            $this->layoutData->setProperty($id, LayoutData::OPTIONS, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -214,8 +214,8 @@ class LayoutBuilder implements RawLayoutModifierInterface
     public function getLayout($rootId = null)
     {
         $rootId = $rootId
-            ? $this->layoutData->resolveItemId($rootId)
-            : $this->layoutData->getRootItemId();
+            ? $this->layoutData->resolveId($rootId)
+            : $this->layoutData->getRootId();
 
         $this->optionsFrozen = true;
 
@@ -236,7 +236,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
      */
     public function has($id)
     {
-        return $this->layoutData->hasItem($id);
+        return $this->layoutData->has($id);
     }
 
     /**
@@ -248,7 +248,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
      */
     public function hasAlias($alias)
     {
-        return $this->layoutData->hasItemAlias($alias);
+        return $this->layoutData->hasAlias($alias);
     }
 
     /**
@@ -257,19 +257,19 @@ class LayoutBuilder implements RawLayoutModifierInterface
     protected function buildBlocks($rootId)
     {
         // build blocks if they are not built yet
-        if (!$this->layoutData->hasItemProperty($rootId, LayoutData::RESOLVED_OPTIONS)) {
+        if (!$this->layoutData->hasProperty($rootId, LayoutData::RESOLVED_OPTIONS)) {
             $this->buildBlock(
                 $rootId,
-                $this->layoutData->getItemProperty($rootId, LayoutData::BLOCK_TYPE),
-                $this->layoutData->getItemProperty($rootId, LayoutData::OPTIONS)
+                $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE),
+                $this->layoutData->getProperty($rootId, LayoutData::OPTIONS)
             );
             $iterator = $this->layoutData->getHierarchyIterator($rootId);
             foreach ($iterator as $id) {
-                if (!$this->layoutData->hasItemProperty($id, LayoutData::RESOLVED_OPTIONS)) {
+                if (!$this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS)) {
                     $this->buildBlock(
                         $id,
-                        $this->layoutData->getItemProperty($id, LayoutData::BLOCK_TYPE),
-                        $this->layoutData->getItemProperty($id, LayoutData::OPTIONS)
+                        $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE),
+                        $this->layoutData->getProperty($id, LayoutData::OPTIONS)
                     );
                 }
             }
@@ -285,8 +285,8 @@ class LayoutBuilder implements RawLayoutModifierInterface
     {
         return $this->createBlockView(
             $rootId,
-            $this->layoutData->getItemProperty($rootId, LayoutData::BLOCK_TYPE),
-            $this->layoutData->getItemProperty($rootId, LayoutData::RESOLVED_OPTIONS),
+            $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE),
+            $this->layoutData->getProperty($rootId, LayoutData::RESOLVED_OPTIONS),
             $this->layoutData->getHierarchy($rootId)
         );
     }
@@ -302,7 +302,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
 
         // resolve options
         $resolvedOptions = $this->blockOptionsResolver->resolve($blockType, $options);
-        $this->layoutData->setItemProperty($id, LayoutData::RESOLVED_OPTIONS, $resolvedOptions);
+        $this->layoutData->setProperty($id, LayoutData::RESOLVED_OPTIONS, $resolvedOptions);
 
         // build block
         $blockBuilder = new LayoutBlockBuilder($this->layoutData, $id);
@@ -340,8 +340,8 @@ class LayoutBuilder implements RawLayoutModifierInterface
         foreach ($hierarchy as $childId => $children) {
             $view->children[] = $this->createBlockView(
                 $childId,
-                $this->layoutData->getItemProperty($childId, LayoutData::BLOCK_TYPE),
-                $this->layoutData->getItemProperty($childId, LayoutData::RESOLVED_OPTIONS),
+                $this->layoutData->getProperty($childId, LayoutData::BLOCK_TYPE),
+                $this->layoutData->getProperty($childId, LayoutData::RESOLVED_OPTIONS),
                 $children,
                 $view
             );

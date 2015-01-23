@@ -19,44 +19,44 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         $this->layoutData = new LayoutData();
     }
 
-    public function testGetRootItemId()
+    public function testGetRootId()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
 
         // do test
-        $this->assertEquals('root', $this->layoutData->getRootItemId());
+        $this->assertEquals('root', $this->layoutData->getRootId());
     }
 
-    public function testResolveItemId()
+    public function testResolveId()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test_header', 'header');
-        $this->layoutData->addItemAlias('another_header', 'test_header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test_header', 'header');
+        $this->layoutData->addAlias('another_header', 'test_header');
 
         // do test
-        $this->assertEquals('header', $this->layoutData->resolveItemId('header'));
-        $this->assertEquals('header', $this->layoutData->resolveItemId('test_header'));
-        $this->assertEquals('header', $this->layoutData->resolveItemId('another_header'));
-        $this->assertEquals('unknown', $this->layoutData->resolveItemId('unknown'));
+        $this->assertEquals('header', $this->layoutData->resolveId('header'));
+        $this->assertEquals('header', $this->layoutData->resolveId('test_header'));
+        $this->assertEquals('header', $this->layoutData->resolveId('another_header'));
+        $this->assertEquals('unknown', $this->layoutData->resolveId('unknown'));
     }
 
-    public function testHasItem()
+    public function testHas()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test_header', 'header');
-        $this->layoutData->addItemAlias('another_header', 'test_header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test_header', 'header');
+        $this->layoutData->addAlias('another_header', 'test_header');
 
         // do test
-        $this->assertTrue($this->layoutData->hasItem('header'));
-        $this->assertTrue($this->layoutData->hasItem('test_header'));
-        $this->assertTrue($this->layoutData->hasItem('another_header'));
-        $this->assertFalse($this->layoutData->hasItem('unknown'));
+        $this->assertTrue($this->layoutData->has('header'));
+        $this->assertTrue($this->layoutData->has('test_header'));
+        $this->assertTrue($this->layoutData->has('another_header'));
+        $this->assertFalse($this->layoutData->has('unknown'));
     }
 
     /**
@@ -65,24 +65,24 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item id must not be empty.
      */
-    public function testAddItemWithEmptyId($id)
+    public function testAddWithEmptyId($id)
     {
-        $this->layoutData->addItem($id, null, 'root');
+        $this->layoutData->add($id, null, 'root');
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Invalid "id" argument type. Expected "string", "integer" given.
      */
-    public function testAddItemWithNotStringId()
+    public function testAddWithNotStringId()
     {
-        $this->layoutData->addItem(123, null, 'root');
+        $this->layoutData->add(123, null, 'root');
     }
 
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddItemWithInvalidId($id)
+    public function testAddWithInvalidId($id)
     {
         $this->setExpectedException(
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
@@ -93,7 +93,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $id
             )
         );
-        $this->layoutData->addItem($id, null, 'root');
+        $this->layoutData->add($id, null, 'root');
     }
 
     // @codingStandardsIgnoreStart
@@ -102,10 +102,10 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage The "root" item already exists. Remove existing item before add the new item with the same id.
      */
     // @codingStandardsIgnoreEnd
-    public function testAddItemDuplicate()
+    public function testAddDuplicate()
     {
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('root', null, 'root');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('root', null, 'root');
     }
 
     // @codingStandardsIgnoreStart
@@ -114,10 +114,10 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage The "another_root" item cannot be the root item because another root item ("root") already exists.
      */
     // @codingStandardsIgnoreEnd
-    public function testAddItemRedefineRootItem()
+    public function testRedefineRoot()
     {
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('another_root', null, 'root');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('another_root', null, 'root');
     }
 
     /**
@@ -126,24 +126,24 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The block type name must not be empty.
      */
-    public function testAddItemWithEmptyBlockType($blockType)
+    public function testAddWithEmptyBlockType($blockType)
     {
-        $this->layoutData->addItem('root', null, $blockType);
+        $this->layoutData->add('root', null, $blockType);
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Invalid "blockType" argument type. Expected "string", "integer" given.
      */
-    public function testAddItemWithNotStringBlockType()
+    public function testAddWithNotStringBlockType()
     {
-        $this->layoutData->addItem('root', null, 123);
+        $this->layoutData->add('root', null, 123);
     }
 
     /**
      * @dataProvider invalidBlockTypeDataProvider
      */
-    public function testAddItemWithInvalidBlockType($blockType)
+    public function testAddWithInvalidBlockType($blockType)
     {
         $this->setExpectedException(
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
@@ -155,45 +155,45 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $blockType
             )
         );
-        $this->layoutData->addItem('root', null, $blockType);
+        $this->layoutData->add('root', null, $blockType);
     }
 
-    public function testRemoveItem()
+    public function testRemove()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItem('item1', 'header', 'label');
-        $this->layoutData->addItem('item2', 'header', 'container');
-        $this->layoutData->addItem('item3', 'item2', 'label');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->add('item1', 'header', 'label');
+        $this->layoutData->add('item2', 'header', 'container');
+        $this->layoutData->add('item3', 'item2', 'label');
 
         // do test
-        $this->layoutData->removeItem('header');
-        $this->assertFalse($this->layoutData->hasItem('header'));
-        $this->assertFalse($this->layoutData->hasItem('item1'));
-        $this->assertFalse($this->layoutData->hasItem('item2'));
-        $this->assertFalse($this->layoutData->hasItem('item3'));
+        $this->layoutData->remove('header');
+        $this->assertFalse($this->layoutData->has('header'));
+        $this->assertFalse($this->layoutData->has('item1'));
+        $this->assertFalse($this->layoutData->has('item2'));
+        $this->assertFalse($this->layoutData->has('item3'));
     }
 
-    public function testRemoveItemByAlias()
+    public function testRemoveByAlias()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test_header', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test_header', 'header');
 
         // do test
-        $this->layoutData->removeItem('test_header');
-        $this->assertFalse($this->layoutData->hasItem('header'));
+        $this->layoutData->remove('test_header');
+        $this->assertFalse($this->layoutData->has('header'));
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
      * @expectedExceptionMessage The "unknown" item does not exist.
      */
-    public function testRemoveUnknownItem()
+    public function testRemoveUnknown()
     {
-        $this->layoutData->removeItem('unknown');
+        $this->layoutData->remove('unknown');
     }
 
     /**
@@ -202,29 +202,29 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item id must not be empty.
      */
-    public function testRemoveItemWithEmptyId($id)
+    public function testRemoveWithEmptyId($id)
     {
-        $this->layoutData->removeItem($id);
+        $this->layoutData->remove($id);
     }
 
-    public function testHasItemProperty()
+    public function testHasProperty()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
 
         // do test
-        $this->assertTrue($this->layoutData->hasItemProperty('header', LayoutData::PATH));
-        $this->assertFalse($this->layoutData->hasItemProperty('header', 'unknown'));
+        $this->assertTrue($this->layoutData->hasProperty('header', LayoutData::PATH));
+        $this->assertFalse($this->layoutData->hasProperty('header', 'unknown'));
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
      * @expectedExceptionMessage The "unknown" item does not exist.
      */
-    public function testHasItemPropertyForUnknownItem()
+    public function testHasPropertyForUnknownItem()
     {
-        $this->layoutData->hasItemProperty('unknown', LayoutData::PATH);
+        $this->layoutData->hasProperty('unknown', LayoutData::PATH);
     }
 
     /**
@@ -233,42 +233,42 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item id must not be empty.
      */
-    public function testHasItemPropertyWithEmptyId($id)
+    public function testHasPropertyWithEmptyId($id)
     {
-        $this->layoutData->hasItemProperty($id, LayoutData::PATH);
+        $this->layoutData->hasProperty($id, LayoutData::PATH);
     }
 
-    public function testGetItemProperty()
+    public function testGetProperty()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
 
         // do test
-        $this->assertEquals(['root', 'header'], $this->layoutData->getItemProperty('header', LayoutData::PATH));
+        $this->assertEquals(['root', 'header'], $this->layoutData->getProperty('header', LayoutData::PATH));
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage The "header" item does not have "unknown" property.
      */
-    public function testGetItemPropertyForUnknownProperty()
+    public function testGetPropertyForUnknownProperty()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
 
         // do test
-        $this->layoutData->getItemProperty('header', 'unknown');
+        $this->layoutData->getProperty('header', 'unknown');
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
      * @expectedExceptionMessage The "unknown" item does not exist.
      */
-    public function testGetItemPropertyForUnknownItem()
+    public function testGetPropertyForUnknownItem()
     {
-        $this->layoutData->getItemProperty('unknown', LayoutData::PATH);
+        $this->layoutData->getProperty('unknown', LayoutData::PATH);
     }
 
     /**
@@ -277,29 +277,29 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item id must not be empty.
      */
-    public function testGetItemPropertyWithEmptyId($id)
+    public function testGetPropertyWithEmptyId($id)
     {
-        $this->layoutData->getItemProperty($id, LayoutData::PATH);
+        $this->layoutData->getProperty($id, LayoutData::PATH);
     }
 
-    public function testSetItemProperty()
+    public function testSetProperty()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
 
         // do test
-        $this->layoutData->setItemProperty('header', 'some_property', 123);
-        $this->assertEquals(123, $this->layoutData->getItemProperty('header', 'some_property'));
+        $this->layoutData->setProperty('header', 'some_property', 123);
+        $this->assertEquals(123, $this->layoutData->getProperty('header', 'some_property'));
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
      * @expectedExceptionMessage The "unknown" item does not exist.
      */
-    public function testSetItemPropertyForUnknownItem()
+    public function testSetPropertyForUnknownItem()
     {
-        $this->layoutData->setItemProperty('unknown', 'some_property', 123);
+        $this->layoutData->setProperty('unknown', 'some_property', 123);
     }
 
     /**
@@ -308,47 +308,47 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item id must not be empty.
      */
-    public function testSetItemPropertyWithEmptyId($id)
+    public function testSetPropertyWithEmptyId($id)
     {
-        $this->layoutData->setItemProperty($id, 'some_property', 123);
+        $this->layoutData->setProperty($id, 'some_property', 123);
     }
 
-    public function testHasItemAlias()
+    public function testHasAlias()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test_header', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test_header', 'header');
 
         // do test
-        $this->assertTrue($this->layoutData->hasItemAlias('test_header'));
-        $this->assertFalse($this->layoutData->hasItemAlias('header'));
-        $this->assertFalse($this->layoutData->hasItemAlias('unknown'));
+        $this->assertTrue($this->layoutData->hasAlias('test_header'));
+        $this->assertFalse($this->layoutData->hasAlias('header'));
+        $this->assertFalse($this->layoutData->hasAlias('unknown'));
     }
 
-    public function testAddItemAlias()
+    public function testAddAlias()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test_header', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test_header', 'header');
 
         // do test
-        $this->assertTrue($this->layoutData->hasItemAlias('test_header'));
-        $this->assertEquals('header', $this->layoutData->resolveItemId('test_header'));
+        $this->assertTrue($this->layoutData->hasAlias('test_header'));
+        $this->assertEquals('header', $this->layoutData->resolveId('test_header'));
     }
 
-    public function testAddItemAliasWhenAliasIsAddedForAnotherAlias()
+    public function testAddAliasWhenAliasIsAddedForAnotherAlias()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test_header', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test_header', 'header');
 
         // do test
-        $this->layoutData->addItemAlias('another_header', 'test_header');
-        $this->assertTrue($this->layoutData->hasItemAlias('another_header'));
-        $this->assertEquals('header', $this->layoutData->resolveItemId('another_header'));
+        $this->layoutData->addAlias('another_header', 'test_header');
+        $this->assertTrue($this->layoutData->hasAlias('another_header'));
+        $this->assertEquals('header', $this->layoutData->resolveId('another_header'));
     }
 
     /**
@@ -357,9 +357,9 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item alias must not be empty.
      */
-    public function testAddItemAliasWithEmptyAlias($alias)
+    public function testAddAliasWithEmptyAlias($alias)
     {
-        $this->layoutData->addItemAlias($alias, 'root');
+        $this->layoutData->addAlias($alias, 'root');
     }
 
     /**
@@ -368,33 +368,33 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item id must not be empty.
      */
-    public function testAddItemAliasWithEmptyId($id)
+    public function testAddAliasWithEmptyId($id)
     {
-        $this->layoutData->addItemAlias('test', $id);
+        $this->layoutData->addAlias('test', $id);
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Invalid "alias" argument type. Expected "string", "integer" given.
      */
-    public function testAddItemAliasWithNotStringAlias()
+    public function testAddAliasWithNotStringAlias()
     {
-        $this->layoutData->addItemAlias(123, 'root');
+        $this->layoutData->addAlias(123, 'root');
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Invalid "id" argument type. Expected "string", "integer" given.
      */
-    public function testAddItemAliasWithNotStringId()
+    public function testAddAliasWithNotStringId()
     {
-        $this->layoutData->addItemAlias('test', 123);
+        $this->layoutData->addAlias('test', 123);
     }
 
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddItemAliasWithInvalidAlias($alias)
+    public function testAddAliasWithInvalidAlias($alias)
     {
         $this->setExpectedException(
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
@@ -405,13 +405,13 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $alias
             )
         );
-        $this->layoutData->addItemAlias($alias, 'root');
+        $this->layoutData->addAlias($alias, 'root');
     }
 
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddItemAliasWithInvalidId($id)
+    public function testAddAliasWithInvalidId($id)
     {
         $this->setExpectedException(
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
@@ -422,19 +422,19 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $id
             )
         );
-        $this->layoutData->addItemAlias('test', $id);
+        $this->layoutData->addAlias('test', $id);
     }
 
-    public function testAddItemAliasDuplicate()
+    public function testAddAliasDuplicate()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItemAlias('test', 'root');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->addAlias('test', 'root');
 
         // do test
-        $this->layoutData->addItemAlias('test', 'root');
-        $this->assertTrue($this->layoutData->hasItemAlias('test'));
-        $this->assertEquals('root', $this->layoutData->resolveItemId('test'));
+        $this->layoutData->addAlias('test', 'root');
+        $this->assertTrue($this->layoutData->hasAlias('test'));
+        $this->assertEquals('root', $this->layoutData->resolveId('test'));
     }
 
     // @codingStandardsIgnoreStart
@@ -443,15 +443,15 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage The "test" sting cannot be used as an alias for "header" item because it is already used for "root" item.
      */
     // @codingStandardsIgnoreEnd
-    public function testAddItemAliasRedefine()
+    public function testAddAliasRedefine()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test', 'root');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test', 'root');
 
         // do test
-        $this->layoutData->addItemAlias('test', 'header');
+        $this->layoutData->addAlias('test', 'header');
     }
 
     // @codingStandardsIgnoreStart
@@ -460,13 +460,13 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage The "root" sting cannot be used as an alias for "root" item because an alias cannot be equal to the item id.
      */
     // @codingStandardsIgnoreEnd
-    public function testAddItemAliasWhenAliasEqualsId()
+    public function testAddAliasWhenAliasEqualsId()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
+        $this->layoutData->add('root', null, 'root');
 
         // do test
-        $this->layoutData->addItemAlias('root', 'root');
+        $this->layoutData->addAlias('root', 'root');
     }
 
     // @codingStandardsIgnoreStart
@@ -475,35 +475,35 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage The "header" sting cannot be used as an alias for "root" item because another item with the same id exists.
      */
     // @codingStandardsIgnoreEnd
-    public function testAddItemAliasWhenAliasEqualsIdOfAnotherItem()
+    public function testAddAliasWhenAliasEqualsIdOfAnotherItem()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
 
         // do test
-        $this->layoutData->addItemAlias('header', 'root');
+        $this->layoutData->addAlias('header', 'root');
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
      * @expectedExceptionMessage The "root" item does not exist.
      */
-    public function testAddItemAliasForUnknownItem()
+    public function testAddAliasForUnknownItem()
     {
-        $this->layoutData->addItemAlias('header', 'root');
+        $this->layoutData->addAlias('header', 'root');
     }
 
-    public function testRemoveItemAlias()
+    public function testRemoveAlias()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItemAlias('test_header', 'header');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->addAlias('test_header', 'header');
 
         // do test
-        $this->layoutData->removeItemAlias('test_header');
-        $this->assertFalse($this->layoutData->hasItemAlias('test_header'));
+        $this->layoutData->removeAlias('test_header');
+        $this->assertFalse($this->layoutData->hasAlias('test_header'));
     }
 
     /**
@@ -512,7 +512,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveUnknownAlias()
     {
-        $this->layoutData->removeItemAlias('unknown');
+        $this->layoutData->removeAlias('unknown');
     }
 
     /**
@@ -521,18 +521,18 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The item alias must not be empty.
      */
-    public function testRemoveItemAliasWithEmptyAlias($alias)
+    public function testRemoveAliasWithEmptyAlias($alias)
     {
-        $this->layoutData->removeItemAlias($alias);
+        $this->layoutData->removeAlias($alias);
     }
 
     public function testGetHierarchy()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItem('item1', 'root', 'label');
-        $this->layoutData->addItem('item2', 'header', 'label');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->add('item1', 'root', 'label');
+        $this->layoutData->add('item2', 'header', 'label');
 
         // do test
         $this->assertEquals(
@@ -579,10 +579,10 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testGetHierarchyIterator()
     {
         // prepare test data
-        $this->layoutData->addItem('root', null, 'root');
-        $this->layoutData->addItem('header', 'root', 'header');
-        $this->layoutData->addItem('item1', 'root', 'label');
-        $this->layoutData->addItem('item2', 'header', 'label');
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header', 'root', 'header');
+        $this->layoutData->add('item1', 'root', 'label');
+        $this->layoutData->add('item2', 'header', 'label');
 
         // do test
         $this->assertSame(

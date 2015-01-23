@@ -37,7 +37,7 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
         );
     }
 
-    public function testAddItemByAliasAndThenRemoveAlias()
+    public function testAddByAliasAndThenRemoveAlias()
     {
         $this->layoutBuilder
             ->add('root', null, 'root')
@@ -66,7 +66,7 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
         );
     }
 
-    public function testAddItemToRemovedAlias()
+    public function testAddToRemovedAlias()
     {
         $this->layoutBuilder
             ->add('root', null, 'root')
