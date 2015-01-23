@@ -11,3 +11,15 @@ services:
 
     oro_layout.block_type.root:
         class: %oro_layout.block_type.root.class%
+
+    oro_layout.block_type.head:
+        class: %oro_layout.block_type.head.class%
+
+    oro_layout.block_type.script:
+        class: %oro_layout.block_type.script.class%
+
+    oro_layout.block_type.style:
+        class: %oro_layout.block_type.style.class%
+
+    oro_layout.block_type.body:
+        class: %oro_layout.block_type.body.class%
