@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Mailer;
 
-use Psr\Log\LoggerInterface;
-
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -36,36 +34,27 @@ class Processor
     /** @var  UserManager */
     protected $userManager;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
     /** @var \Swift_Mailer */
     protected $mailer;
 
-    /** @var string */
-    protected $error;
-
     /**
-     * @param ObjectManager       $objectManager
-     * @param EmailRenderer       $renderer
-     * @param ConfigManager       $configManager
-     * @param UserManager         $userManager
-     * @param LoggerInterface     $logger
-     * @param \Swift_Mailer       $mailer
+     * @param ObjectManager $objectManager
+     * @param EmailRenderer $renderer
+     * @param ConfigManager $configManager
+     * @param UserManager   $userManager
+     * @param \Swift_Mailer $mailer
      */
     public function __construct(
-        ObjectManager    $objectManager,
-        ConfigManager    $configManager,
-        EmailRenderer    $renderer,
-        UserManager      $userManager,
-        LoggerInterface  $logger,
-        \Swift_Mailer    $mailer = null
+        ObjectManager $objectManager,
+        ConfigManager $configManager,
+        EmailRenderer $renderer,
+        UserManager   $userManager,
+        \Swift_Mailer $mailer = null
     ) {
         $this->objectManager = $objectManager;
         $this->configManager = $configManager;
         $this->renderer      = $renderer;
         $this->userManager   = $userManager;
-        $this->logger        = $logger;
         $this->mailer        = $mailer;
     }
 
@@ -130,27 +119,6 @@ class Processor
     }
 
     /**
-     * @return string
-     */
-    public function getError()
-    {
-        return $this->error;
-    }
-
-    /**
-     * @param string $error
-     */
-    public function setError($error)
-    {
-        $this->error = $error;
-    }
-
-    public function hasError()
-    {
-        return !is_null($this->error);
-    }
-
-    /**
      * @param User $user
      * @param      $templateData
      * @param      $type
@@ -169,16 +137,6 @@ class Processor
             ->setFrom($senderEmail, $senderName)
             ->setTo($user->getEmail())
             ->setBody($templateRendered, $type);
-
-        try {
-            $this->mailer->send($message);
-        } catch (\Exception $e) {
-            $this->logger->error('Email sending failed.', ['exception' => $e]);
-            $this->setError($e->getMessage());
-
-            return false;
-        }
-
-        return true;
+        $this->mailer->send($message);
     }
 }
