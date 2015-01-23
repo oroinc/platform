@@ -2,16 +2,29 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Security\PasswordManager;
+use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Mailer\Processor;
 
+/**
+ * Class SetPasswordHandler
+ *
+ * @package Oro\Bundle\UserBundle\Form\Handler
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class SetPasswordHandler
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var Request */
     protected $request;
 
@@ -21,25 +34,34 @@ class SetPasswordHandler
     /** @var FormInterface */
     protected $form;
 
-    /** @var PasswordManager */
+    /** @var Processor */
     protected $mailerProcessor;
 
+    /** @var UserManager */
+    protected $userManager;
+
     /**
-     * @param Request             $request
-     * @param Translator          $translator
-     * @param FormInterface       $form
-     * @param PasswordManager     $passwordManager
+     * @param LoggerInterface $logger
+     * @param Request         $request
+     * @param Translator      $translator
+     * @param FormInterface   $form
+     * @param Processor       $mailerProcessor
+     * @param UserManager     $userManager
      */
     public function __construct(
-        Request          $request,
-        Translator       $translator,
-        FormInterface    $form,
-        PasswordManager  $passwordManager
+        LoggerInterface $logger,
+        Request         $request,
+        Translator      $translator,
+        FormInterface   $form,
+        Processor       $mailerProcessor,
+        UserManager     $userManager
     ) {
+        $this->logger          = $logger;
         $this->request         = $request;
         $this->translator      = $translator;
         $this->form            = $form;
-        $this->passwordManager = $passwordManager;
+        $this->mailerProcessor = $mailerProcessor;
+        $this->userManager     = $userManager;
     }
 
     /**
@@ -54,17 +76,20 @@ class SetPasswordHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
             if ($this->form->isValid()) {
-                $newPassword = $this->form->get('password')->getData();
-                if ($this->passwordManager->changePassword($entity, $newPassword)) {
-                    return true;
-                } else {
-                    if ($this->passwordManager->hasError()) {
-                        $error = new FormError($this->passwordManager->getError());
-                    } else {
-                        $error = new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'));
-                    }
-                    $this->form->addError($error);
+                $entity->setPlainPassword($this->form->get('password')->getData());
+                $entity->setPasswordChangedAt(new \DateTime());
+                try {
+                    $this->mailerProcessor->sendChangePasswordEmail($entity);
+                } catch (\Exception $e) {
+                    $this->form->addError(
+                        new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'))
+                    );
+                    $this->logger->error('Email sending failed.', ['exception' => $e]);
+                    return false;
                 }
+
+                $this->userManager->updateUser($entity);
+                return true;
             }
         }
 
