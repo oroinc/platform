@@ -20,13 +20,13 @@
         <div class="form-container">
             <form action="{{ formAction }}" method="post">
                 <div class="text-center">
-                    <p>User {{ entity.username }} will receive reset password email.</p>
+                    <p>User <strong>{{ entity.username }}</strong> will receive reset password email.</p>
                     <b>Are you sure?</b>
                 </div>
 
                 <div class="widget-actions form-actions">
                     <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                    <button class="btn btn-primary" type="submit">{{ 'oro.email.send_email'|trans }}</button>
+                    <button class="btn btn-primary" type="submit">{{ 'oro.user.password.reset.label'|trans }}</button>
                 </div>
             </form>
         </div>
