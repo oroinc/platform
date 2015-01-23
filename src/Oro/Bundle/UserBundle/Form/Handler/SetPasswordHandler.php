@@ -71,16 +71,18 @@ class SetPasswordHandler
             if ($this->form->isValid()) {
                 $entity->setPlainPassword($this->form->get('password')->getData());
                 $entity->setPasswordChangedAt(new \DateTime());
-                $this->userManager->updateUser($entity);
                 try {
                     $this->mailerProcessor->sendChangePasswordEmail($entity);
-                    return true;
                 } catch (\Exception $e) {
                     $this->form->addError(
                         new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'))
                     );
                     $this->logger->error('Email sending failed.', ['exception' => $e]);
+                    return false;
                 }
+
+                $this->userManager->updateUser($entity);
+                return true;
             }
         }
 
