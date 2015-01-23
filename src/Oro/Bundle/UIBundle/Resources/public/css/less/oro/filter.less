@@ -1,0 +1,152 @@
+.open-filter {
+  .filter-criteria-selector {
+    #gradient > .vertical(#e6e6e6, #ffffff);
+  }
+  &.oro-drop {
+    .filter-criteria.dropdown-menu {
+      min-width: 120px;
+    }
+  }
+}
+.filter-criteria {
+  .oro-action {
+    width: 100%;
+    margin: 0;
+    .btn-group {
+      float: right;
+    }
+    .btn {
+      outline: none;
+      position: static;
+    }
+  }
+  .input-prepend {
+    > .btn-group {
+      > .dropdown-menu {
+        min-width:125px;
+        a {
+          padding:1px 13px;
+        }
+      }
+    }
+  }
+}
+.filter-box {
+  .box-shadow(inset 0 2px 1px rgba(0, 0, 0, 0.02));
+  background: #efefef;
+  border: 1px solid #e2e2e2;
+  border-width: 1px 0;
+  padding: 15px 20px 8px 150px;
+  .icon-remove:before {
+    color: #aaa;
+    font-size: 14px;
+  }
+  .filter-list {
+    float: left;
+    margin: 0 0 0 -120px;
+    position: relative;
+  }
+  .filter-list, .filter-criteria-selector {
+    .caret {
+      margin-top: 11px;
+    }
+  }
+  .filter-item {
+    .filter-criteria-selector,
+    .dropdown-toggle.btn {
+      height: 29px;
+      font-weight: normal;
+      padding-top: 1px;
+      button {
+        color: #666;
+        font-size: 14px;
+        vertical-align: baseline;
+      }
+    }
+    .select-filter-widget .caret {
+      margin-top: 8px;
+    }
+    .choice-filter {
+      input[type='text'] {
+        margin-right: -3px;
+        .border-radius(0);
+      }
+      .filter-update {
+        .border-radius(0 3px 3px 0);
+        position: relative;
+        font-size: 14px;
+        height: 29px;
+        line-height: 28px;
+      }
+    }
+    .disable-filter {
+      line-height: 18px !important;
+    }
+    &.open-filter {
+      top: 125%;
+      &:before {
+        border-bottom: 11px solid rgba(0, 0, 0, 0.2);
+        border-left: 11px solid transparent;
+        border-right: 11px solid transparent;
+        content: "";
+        display: inline-block;
+        left: 9px;
+        position: absolute;
+        bottom: -10px;
+      }
+      &:after {
+        border-bottom: 10px solid #FFFFFF;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        content: "";
+        display: inline-block;
+        left: 10px;
+        position: absolute;
+        bottom: -10px;
+        z-index: 10001;
+      }
+    }
+    .divider {
+      background: none;
+      line-height: 40px;
+      font-size: 16px;
+      padding: 0;
+      margin: 0;
+      position: relative;
+      top: -3px;
+    }
+    .btn {
+      vertical-align: top;
+    }
+  }
+  .btn-group {
+    margin-bottom: 7px;
+    & + .btn-group {
+      margin-left: 0;
+    }
+  }
+  .filter-select-oro {
+    height: 20px;
+    line-height: 20px;
+    width: 85px; /* need for flexible width at filter grid */
+  }
+  .filter-criteria .selector {
+    width: auto;
+  }
+}
+.filter-item div.selector {
+  height: 20px;
+  line-height: 20px;
+  margin: 0 0 7px;
+  float: right;
+  span {
+    line-height: 20px;
+    height: 20px;
+  }
+}
+.filter-separator {
+  font-size: 16px;
+  padding: 0 3px;
+  position: relative;
+  top: -3px;
+}
