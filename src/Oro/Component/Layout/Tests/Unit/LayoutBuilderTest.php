@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\LayoutBuilder;
+use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
 
 class LayoutBuilderTest extends LayoutBuilderTestCase
@@ -20,11 +21,8 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
         $this->blockTypeFactory = new BlockTypeFactoryStub();
         $blockTypeRegistry      = new BlockTypeRegistry($this->blockTypeFactory);
         $blockOptionsResolver   = new BlockOptionsResolver($blockTypeRegistry);
-
-        $this->layoutBuilder = new LayoutBuilder(
-            $blockTypeRegistry,
-            $blockOptionsResolver
-        );
+        $layoutViewFactory      = new LayoutViewFactory($blockTypeRegistry, $blockOptionsResolver);
+        $this->layoutBuilder    = new LayoutBuilder($layoutViewFactory);
     }
 
     public function testSimpleLayout()

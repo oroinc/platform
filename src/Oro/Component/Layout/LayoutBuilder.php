@@ -17,14 +17,8 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     /** @var LayoutData */
     protected $layoutData;
 
-    /** @var BlockTypeRegistryInterface */
-    protected $blockTypeRegistry;
-
-    /** @var BlockOptionsResolverInterface */
-    protected $blockOptionsResolver;
-
-    /** @var  array */
-    protected $blockTypeHierarchy = [];
+    /** @var LayoutViewFactoryInterface */
+    protected $layoutViewFactory;
 
     /** @var bool */
     protected $frozen = false;
@@ -33,17 +27,12 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     protected $optionsFrozen = false;
 
     /**
-     * @param BlockTypeRegistryInterface    $blockTypeRegistry
-     * @param BlockOptionsResolverInterface $blockOptionsResolver
+     * @param LayoutViewFactoryInterface $layoutViewFactory
      */
-    public function __construct(
-        BlockTypeRegistryInterface $blockTypeRegistry,
-        BlockOptionsResolverInterface $blockOptionsResolver
-    ) {
-        $this->blockTypeRegistry    = $blockTypeRegistry;
-        $this->blockOptionsResolver = $blockOptionsResolver;
-
-        $this->layoutData = new LayoutData();
+    public function __construct(LayoutViewFactoryInterface $layoutViewFactory)
+    {
+        $this->layoutData        = new LayoutData();
+        $this->layoutViewFactory = $layoutViewFactory;
     }
 
     /**
@@ -216,14 +205,9 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
      */
     public function getLayout($rootId = null)
     {
-        $rootId = $rootId
-            ? $this->layoutData->resolveId($rootId)
-            : $this->layoutData->getRootId();
-
         $this->optionsFrozen = true;
 
-        $this->buildBlocks($rootId);
-        $view = $this->buildBlockViews($rootId);
+        $view = $this->layoutViewFactory->createView($this->layoutData, $rootId);
 
         $this->frozen = true;
 
@@ -252,189 +236,5 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function hasAlias($alias)
     {
         return $this->layoutData->hasAlias($alias);
-    }
-
-    /**
-     * @param string $rootId
-     */
-    protected function buildBlocks($rootId)
-    {
-        // build blocks if they are not built yet
-        if (!$this->layoutData->hasProperty($rootId, LayoutData::RESOLVED_OPTIONS, true)) {
-            $this->buildBlock(
-                $rootId,
-                $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE, true),
-                $this->layoutData->getProperty($rootId, LayoutData::OPTIONS, true)
-            );
-            $iterator = $this->layoutData->getHierarchyIterator($rootId);
-            foreach ($iterator as $id) {
-                if (!$this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS, true)) {
-                    $depth    = $iterator->getDepth();
-                    $parentId = $depth === 0
-                        ? $rootId
-                        : $iterator->getSubIterator($depth - 1)->current();
-                    if (!$this->isContainerBlock($parentId)) {
-                        throw new Exception\LogicException(
-                            sprintf(
-                                'The "%s" item cannot be added as a child to "%s" item (block type: %s) '
-                                . 'because only container blocks can have children.',
-                                $id,
-                                $parentId,
-                                $this->layoutData->getProperty($parentId, LayoutData::BLOCK_TYPE, true)
-                            )
-                        );
-                    }
-                    $this->buildBlock(
-                        $id,
-                        $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true),
-                        $this->layoutData->getProperty($id, LayoutData::OPTIONS, true)
-                    );
-                }
-            }
-        }
-    }
-
-    /**
-     * @param string $rootId
-     *
-     * @return BlockView
-     */
-    protected function buildBlockViews($rootId)
-    {
-        return $this->createBlockView(
-            $rootId,
-            $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE, true),
-            $this->layoutData->getProperty($rootId, LayoutData::RESOLVED_OPTIONS, true),
-            $this->layoutData->getHierarchy($rootId)
-        );
-    }
-
-    /**
-     * @param string $id
-     * @param string $blockType
-     * @param array  $options
-     */
-    protected function buildBlock($id, $blockType, array $options)
-    {
-        $types = $this->getBlockTypeHierarchy($blockType);
-
-        // resolve options
-        $resolvedOptions = $this->blockOptionsResolver->resolve($blockType, $options);
-        $this->layoutData->setProperty($id, LayoutData::RESOLVED_OPTIONS, $resolvedOptions);
-
-        // build block
-        $blockBuilder = new LayoutBlockBuilder($this->layoutData, $id);
-        // iterate from parent to current
-        foreach ($types as $type) {
-            $type->buildBlock($blockBuilder, $resolvedOptions);
-        }
-    }
-
-    /**
-     * @param string    $id
-     * @param array     $blockType
-     * @param array     $options
-     * @param array     $hierarchy
-     * @param BlockView $parentView
-     *
-     * @return BlockView
-     */
-    protected function createBlockView($id, $blockType, array $options, array $hierarchy, BlockView $parentView = null)
-    {
-        $view  = new BlockView($parentView);
-        $types = $this->getBlockTypeHierarchy($blockType);
-
-        // add core variables to the block view, like id and variables required for rendering engine
-        $view->vars['id']                  = $id;
-        $uniqueBlockPrefix                 = '_' . $id;
-        $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
-        $view->vars['block_prefixes']      = $this->getBlockPrefixes($types, $uniqueBlockPrefix);
-        $view->vars['cache_key']           = sprintf('%s_%s', $uniqueBlockPrefix, $blockType);
-
-        $block = new LayoutBlock($this->layoutData, $id);
-        foreach ($types as $type) {
-            $type->buildView($view, $block, $options);
-        }
-
-        foreach ($hierarchy as $childId => $children) {
-            $view->children[] = $this->createBlockView(
-                $childId,
-                $this->layoutData->getProperty($childId, LayoutData::BLOCK_TYPE, true),
-                $this->layoutData->getProperty($childId, LayoutData::RESOLVED_OPTIONS, true),
-                $children,
-                $view
-            );
-        }
-
-        foreach ($types as $type) {
-            $type->finishView($view, $block, $options);
-        }
-
-        return $view;
-    }
-
-    /**
-     * Checks whether the given block is a container for other blocks
-     *
-     * @param string $id
-     *
-     * @return bool
-     */
-    protected function isContainerBlock($id)
-    {
-        $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
-        $types     = $this->getBlockTypeHierarchy($blockType);
-        // iterate from current to parent
-        /** @var BlockTypeInterface $type */
-        $type = end($types);
-        while ($type) {
-            if ($type->getName() === 'container') {
-                return true;
-            }
-            $type = prev($types);
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string $blockType
-     *
-     * @return BlockTypeInterface[]
-     */
-    protected function getBlockTypeHierarchy($blockType)
-    {
-        if (isset($this->blockTypeHierarchy[$blockType])) {
-            return $this->blockTypeHierarchy[$blockType];
-        }
-
-        $result = [];
-        while ($blockType) {
-            $type = $this->blockTypeRegistry->getBlockType($blockType);
-            array_unshift($result, $type);
-            $blockType = $type->getParent();
-        }
-        $this->blockTypeHierarchy[$blockType] = $result;
-
-        return $result;
-    }
-
-    /**
-     * @param BlockTypeInterface[] $types
-     * @param string               $uniqueBlockPrefix
-     *
-     * @return string[]
-     */
-    protected function getBlockPrefixes($types, $uniqueBlockPrefix)
-    {
-        $blockPrefixes   = array_map(
-            function (BlockTypeInterface $type) {
-                return $type->getName();
-            },
-            $types
-        );
-        $blockPrefixes[] = $uniqueBlockPrefix;
-
-        return $blockPrefixes;
     }
 }
