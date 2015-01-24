@@ -3,7 +3,7 @@
 namespace Oro\Component\Layout;
 
 /**
- * Base implementation of LayoutBuilderInterface
+ * Base implementation of RawLayoutManipulatorInterface
  * This is straightforward implementation with strict checking of all operations' arguments.
  * It means that:
  *  - several layout items with the same id cannot be added
@@ -17,22 +17,9 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     /** @var LayoutData */
     protected $layoutData;
 
-    /** @var LayoutViewFactoryInterface */
-    protected $layoutViewFactory;
-
-    /** @var bool */
-    protected $frozen = false;
-
-    /** @var bool */
-    protected $optionsFrozen = false;
-
-    /**
-     * @param LayoutViewFactoryInterface $layoutViewFactory
-     */
-    public function __construct(LayoutViewFactoryInterface $layoutViewFactory)
+    public function __construct()
     {
-        $this->layoutData        = new LayoutData();
-        $this->layoutViewFactory = $layoutViewFactory;
+        $this->layoutData = new LayoutData();
     }
 
     /**
@@ -41,9 +28,6 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function add($id, $parentId = null, $blockType = null, array $options = [])
     {
         try {
-            if ($this->frozen) {
-                throw new Exception\LogicException('Cannot modify frozen layout.');
-            }
             $this->layoutData->add($id, $parentId, $blockType, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -68,9 +52,6 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function remove($id)
     {
         try {
-            if ($this->frozen) {
-                throw new Exception\LogicException('Cannot modify frozen layout.');
-            }
             $this->layoutData->remove($id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -93,9 +74,6 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function addAlias($alias, $id)
     {
         try {
-            if ($this->frozen) {
-                throw new Exception\LogicException('Cannot modify frozen layout.');
-            }
             $this->layoutData->addAlias($alias, $id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -119,9 +97,6 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function removeAlias($alias)
     {
         try {
-            if ($this->frozen) {
-                throw new Exception\LogicException('Cannot modify frozen layout.');
-            }
             $this->layoutData->removeAlias($alias);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -144,11 +119,11 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function setOption($id, $optionName, $optionValue)
     {
         try {
-            if ($this->optionsFrozen) {
-                throw new Exception\LogicException('Cannot change frozen options.');
-            }
             if (empty($optionName)) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            if ($this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS)) {
+                throw new Exception\LogicException('Cannot change already resolved options.');
             }
             $options              = $this->layoutData->getProperty($id, LayoutData::OPTIONS);
             $options[$optionName] = $optionValue;
@@ -175,11 +150,11 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function removeOption($id, $optionName)
     {
         try {
-            if ($this->optionsFrozen) {
-                throw new Exception\LogicException('Cannot change frozen options.');
-            }
             if (empty($optionName)) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
+            }
+            if ($this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS)) {
+                throw new Exception\LogicException('Cannot change already resolved options.');
             }
             $options = $this->layoutData->getProperty($id, LayoutData::OPTIONS);
             unset($options[$optionName]);
@@ -198,20 +173,6 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
         }
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLayout($rootId = null)
-    {
-        $this->optionsFrozen = true;
-
-        $view = $this->layoutViewFactory->createView($this->layoutData, $rootId);
-
-        $this->frozen = true;
-
-        return new Layout($view);
     }
 
     /**
@@ -236,5 +197,13 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     public function hasAlias($alias)
     {
         return $this->layoutData->hasAlias($alias);
+    }
+
+    /**
+     * @return LayoutData
+     */
+    public function getLayout()
+    {
+        return $this->layoutData;
     }
 }

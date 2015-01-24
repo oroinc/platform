@@ -13,19 +13,25 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /** @var BlockOptionsResolverInterface */
     protected $blockOptionsResolver;
 
+    /** @var DeferredLayoutManipulatorInterface */
+    protected $layoutManipulator;
+
     /** @var  array */
     protected $blockTypeHierarchy = [];
 
     /**
-     * @param BlockTypeRegistryInterface    $blockTypeRegistry
-     * @param BlockOptionsResolverInterface $blockOptionsResolver
+     * @param BlockTypeRegistryInterface         $blockTypeRegistry
+     * @param BlockOptionsResolverInterface      $blockOptionsResolver
+     * @param DeferredLayoutManipulatorInterface $layoutManipulator
      */
     public function __construct(
         BlockTypeRegistryInterface $blockTypeRegistry,
-        BlockOptionsResolverInterface $blockOptionsResolver
+        BlockOptionsResolverInterface $blockOptionsResolver,
+        DeferredLayoutManipulatorInterface $layoutManipulator
     ) {
         $this->blockTypeRegistry    = $blockTypeRegistry;
         $this->blockOptionsResolver = $blockOptionsResolver;
+        $this->layoutManipulator    = $layoutManipulator;
     }
 
     /**
@@ -101,6 +107,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
                     );
                 }
             }
+            $this->layoutManipulator->applyChanges();
         }
     }
 
@@ -118,7 +125,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         $this->layoutData->setProperty($id, LayoutData::RESOLVED_OPTIONS, $resolvedOptions);
 
         // build block
-        $blockBuilder = new LayoutBlockBuilder($this->layoutData, $id);
+        $blockBuilder = new LayoutBlockBuilder($id, $this->layoutManipulator);
         // iterate from parent to current
         foreach ($types as $type) {
             $type->buildBlock($blockBuilder, $resolvedOptions);

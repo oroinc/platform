@@ -4,19 +4,19 @@ namespace Oro\Component\Layout;
 
 class LayoutManager
 {
-    /** @var LayoutBuilderInterface */
+    /** @var LayoutBuilder */
     protected $layoutBuilder;
 
     /**
-     * @param LayoutBuilderInterface $layoutBuilder
+     * @param LayoutBuilder $layoutBuilder
      */
-    public function __construct(LayoutBuilderInterface $layoutBuilder)
+    public function __construct(LayoutBuilder $layoutBuilder)
     {
         $this->layoutBuilder = $layoutBuilder;
     }
 
     /**
-     * @return LayoutBuilderInterface
+     * @return RawLayoutManipulatorInterface
      */
     public function getLayoutBuilder()
     {

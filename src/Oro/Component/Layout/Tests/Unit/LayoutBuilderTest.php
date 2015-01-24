@@ -4,6 +4,8 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeRegistry;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
@@ -16,13 +18,32 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
     /** @var LayoutBuilder */
     protected $layoutBuilder;
 
+    /** @var LayoutViewFactory */
+    protected $layoutViewFactory;
+
     protected function setUp()
     {
-        $this->blockTypeFactory = new BlockTypeFactoryStub();
-        $blockTypeRegistry      = new BlockTypeRegistry($this->blockTypeFactory);
-        $blockOptionsResolver   = new BlockOptionsResolver($blockTypeRegistry);
-        $layoutViewFactory      = new LayoutViewFactory($blockTypeRegistry, $blockOptionsResolver);
-        $this->layoutBuilder    = new LayoutBuilder($layoutViewFactory);
+        $this->layoutBuilder     = new LayoutBuilder();
+        $this->blockTypeFactory  = new BlockTypeFactoryStub();
+        $blockTypeRegistry       = new BlockTypeRegistry($this->blockTypeFactory);
+        $blockOptionsResolver    = new BlockOptionsResolver($blockTypeRegistry);
+        $this->layoutViewFactory = new LayoutViewFactory(
+            $blockTypeRegistry,
+            $blockOptionsResolver,
+            new DeferredLayoutManipulator($this->layoutBuilder)
+        );
+    }
+
+    /**
+     * @param string|null $rootId
+     *
+     * @return BlockView
+     */
+    protected function getLayoutView($rootId = null)
+    {
+        $layoutData = $this->layoutBuilder->getLayout();
+
+        return $this->layoutViewFactory->createView($layoutData, $rootId);
     }
 
     public function testSimpleLayout()
@@ -32,7 +53,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -48,7 +69,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -65,7 +86,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
             ->add('logo', 'root', 'logo')
             ->add('header', 'logo', 'header');
 
-        $this->layoutBuilder->getLayout();
+        $this->getLayoutView();
     }
 
     public function testCoreVariablesForRootItemOnly()
@@ -73,7 +94,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
         $this->layoutBuilder
             ->add('rootId', null, 'root');
 
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -91,7 +112,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                 ],
                 'children' => []
             ],
-            $layout->getView(),
+            $view,
             false
         );
     }
@@ -103,7 +124,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
             ->add('headerId', 'rootId', 'header')
             ->add('logoId', 'headerId', 'logo', ['title' => 'test']);
 
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -152,7 +173,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     ]
                 ]
             ],
-            $layout->getView(),
+            $view,
             false
         );
     }

@@ -4,4 +4,17 @@ namespace Oro\Component\Layout;
 
 interface BlockBuilderInterface
 {
+    /**
+     * Returns the id of the block
+     *
+     * @return string
+     */
+    public function getId();
+
+    /**
+     * Returns the layout builder
+     *
+     * @return LayoutManipulatorInterface
+     */
+    public function getLayoutBuilder();
 }

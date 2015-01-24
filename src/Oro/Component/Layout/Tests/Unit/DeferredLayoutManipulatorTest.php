@@ -14,8 +14,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->add('header', 'root', 'header');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -31,7 +30,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -42,13 +41,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->remove('header')
             ->add('header', 'root', 'header');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -60,13 +58,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->remove('header');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -78,13 +75,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->remove('header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -94,13 +90,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('root', null, 'root')
             ->remove('header');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -112,13 +107,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->remove('header')
             ->remove('header');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -136,7 +130,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('logo', 'header', 'logo')
             ->add('logo', 'root', 'logo');
 
-        $this->layoutManipulator->applyChanges();
+        $this->getLayoutView();
     }
 
     public function testSetOption()
@@ -147,8 +141,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -164,7 +157,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -176,8 +169,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -193,7 +185,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -206,13 +198,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->remove('header')
             ->setOption('logo', 'title', 'test1');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -225,13 +216,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->remove('header')
             ->removeOption('logo', 'title');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 }

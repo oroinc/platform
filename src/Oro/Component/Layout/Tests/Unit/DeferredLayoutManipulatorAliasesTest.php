@@ -17,8 +17,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->addAlias('header_alias1', 'header')
             ->addAlias('header_alias2', 'header_alias1');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -34,7 +33,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -47,8 +46,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->add('logo', 'header_alias1', 'logo', ['title' => 'test'])
             ->removeAlias('header_alias1');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -64,7 +62,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -77,8 +75,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->removeAlias('header_alias1')
             ->add('logo', 'header_alias1', 'logo', ['title' => 'test']);
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -94,7 +91,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -104,13 +101,12 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->add('root', null, 'root')
             ->removeAlias('test_alias');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -128,7 +124,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->addAlias('test_alias', 'header')
             ->addAlias('test_alias', 'root');
 
-        $this->layoutManipulator->applyChanges();
+        $this->getLayoutView();
     }
 
     public function testDuplicateAddAlias()
@@ -139,8 +135,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->addAlias('test_alias', 'header')
             ->addAlias('test_alias', 'header');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -149,7 +144,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -162,8 +157,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->addAlias('test_logo', 'logo');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -179,7 +173,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -192,8 +186,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->addAlias('test_logo', 'logo');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -209,7 +202,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -223,8 +216,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->removeAlias('test_logo')
             ->setOption('test_logo', 'title', 'test1');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -240,7 +232,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 
@@ -254,8 +246,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             ->removeAlias('test_logo')
             ->removeOption('test_logo', 'title');
 
-        $this->layoutManipulator->applyChanges();
-        $layout = $this->layoutBuilder->getLayout();
+        $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
@@ -271,7 +262,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ]
                 ]
             ],
-            $layout->getView()
+            $view
         );
     }
 }

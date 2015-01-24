@@ -7,16 +7,32 @@ class LayoutBlockBuilder implements BlockBuilderInterface
     /** @var string */
     protected $blockId;
 
-    /** @var LayoutData */
-    protected $layoutData;
+    /** @var LayoutManipulatorInterface */
+    protected $layoutManipulator;
 
     /**
-     * @param LayoutData $layoutData
-     * @param string     $blockId
+     * @param string                     $blockId
+     * @param LayoutManipulatorInterface $layoutManipulator
      */
-    public function __construct(LayoutData $layoutData, $blockId)
+    public function __construct($blockId, LayoutManipulatorInterface $layoutManipulator)
     {
-        $this->layoutData = $layoutData;
-        $this->blockId    = $blockId;
+        $this->blockId           = $blockId;
+        $this->layoutManipulator = $layoutManipulator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->blockId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLayoutBuilder()
+    {
+        return $this->layoutManipulator;
     }
 }
