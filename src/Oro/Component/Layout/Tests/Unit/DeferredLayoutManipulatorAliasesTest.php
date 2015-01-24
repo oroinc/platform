@@ -5,11 +5,11 @@ namespace Oro\Component\Layout\Tests\Unit;
 /**
  * This class contains unit tests related to ALIASES
  */
-class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
+class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTestCase
 {
     public function testSimpleLayoutWithAliases()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root_alias', 'header')
             ->add('logo', 'header_alias2', 'logo', ['title' => 'test'])
@@ -17,6 +17,7 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
             ->addAlias('header_alias1', 'header')
             ->addAlias('header_alias2', 'header_alias1');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -39,13 +40,14 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 
     public function testAddByAliasAndThenRemoveAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->addAlias('header_alias1', 'header')
             ->add('logo', 'header_alias1', 'logo', ['title' => 'test'])
             ->removeAlias('header_alias1');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -68,13 +70,14 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 
     public function testAddToRemovedAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->addAlias('header_alias1', 'header')
             ->removeAlias('header_alias1')
             ->add('logo', 'header_alias1', 'logo', ['title' => 'test']);
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -97,10 +100,11 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveNotExistAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->removeAlias('test_alias');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -118,23 +122,24 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
     // @codingStandardsIgnoreEnd
     public function testRedefineAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->addAlias('test_alias', 'header')
             ->addAlias('test_alias', 'root');
 
-        $this->layoutBuilder->applyChanges();
+        $this->layoutManipulator->applyChanges();
     }
 
     public function testDuplicateAddAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->addAlias('test_alias', 'header')
             ->addAlias('test_alias', 'header');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -150,13 +155,14 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 
     public function testSetOptionByAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->setOption('test_logo', 'title', 'test1')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->addAlias('test_logo', 'logo');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -179,13 +185,14 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveOptionByAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->removeOption('test_logo', 'title')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->addAlias('test_logo', 'logo');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -208,7 +215,7 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 
     public function testSetOptionByRemovedAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
@@ -216,6 +223,7 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
             ->removeAlias('test_logo')
             ->setOption('test_logo', 'title', 'test1');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -238,7 +246,7 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveOptionByRemovedAlias()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
@@ -246,6 +254,7 @@ class DeferredLayoutBuilderAliasesTest extends DeferredLayoutBuilderTestCase
             ->removeAlias('test_logo')
             ->removeOption('test_logo', 'title');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(

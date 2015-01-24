@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayoutManipulatorInterface
+class DeferredLayoutManipulator implements LayoutManipulatorInterface, DeferredRawLayoutManipulatorInterface
 {
     /** The action name for add layout item */
     const ADD = 'add';
@@ -109,16 +109,6 @@ class DeferredLayoutBuilder implements LayoutBuilderInterface, DeferredRawLayout
         $this->actions[self::REMOVE_OPTION][] = [$id, $optionName];
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLayout($rootId = null)
-    {
-        $this->applyChanges();
-
-        return $this->builder->getLayout($rootId);
     }
 
     /**

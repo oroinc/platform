@@ -5,15 +5,16 @@ namespace Oro\Component\Layout\Tests\Unit;
 /**
  * This class contains unit tests which are NOT RELATED to ALIASES
  */
-class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
+class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {
     public function testSimpleLayout()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->add('header', 'root', 'header');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -36,11 +37,12 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveBeforeAdd()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->remove('header')
             ->add('header', 'root', 'header');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -52,12 +54,13 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveAfterAdd()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->remove('header');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -69,12 +72,13 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testAddToRemovedItem()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->remove('header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -86,10 +90,11 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveNotExistItem()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->remove('header');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -101,12 +106,13 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveAlreadyRemovedItem()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->remove('header')
             ->remove('header');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -124,23 +130,24 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
     // @codingStandardsIgnoreEnd
     public function testDuplicateAdd()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo')
             ->add('logo', 'root', 'logo');
 
-        $this->layoutBuilder->applyChanges();
+        $this->layoutManipulator->applyChanges();
     }
 
     public function testSetOption()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->setOption('logo', 'title', 'test1')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -163,12 +170,13 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveOption()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->removeOption('logo', 'title')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -191,13 +199,14 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testSetOptionForRemovedItem()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->remove('header')
             ->setOption('logo', 'title', 'test1');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
@@ -209,13 +218,14 @@ class DeferredLayoutBuilderTest extends DeferredLayoutBuilderTestCase
 
     public function testRemoveOptionForRemovedItem()
     {
-        $this->layoutBuilder
+        $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test'])
             ->remove('header')
             ->removeOption('logo', 'title');
 
+        $this->layoutManipulator->applyChanges();
         $layout = $this->layoutBuilder->getLayout();
 
         $this->assertBlockView(
