@@ -145,9 +145,11 @@ oro:
             reset.label: Reset
             reset:
                 ttl_already_requested.message: The password for this user has already been requested within the last 24 hours
+                popup.message: User {{ user }} will receive reset password by email.
+                popup.question: Are you sure you want to proceed?
         action:
             password_management: Manage users' passwords
 
         security:
-            password_changed.message: Your password has been updated by administrator. New password was sent to you by email
-            password_reseted.message: Your password has been successfully reset. You may login now.
+            password_changed.message: Your password was updated by administrator. New password was sent to you by email
+            password_reseted.message: Your password was successfully reset. You may login now.
