@@ -22,8 +22,8 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     /** The action name for remove an option for the layout item */
     const REMOVE_OPTION = 'removeOption';
 
-    /** @var LayoutBuilder */
-    protected $builder;
+    /** @var RawLayoutAccessorInterface */
+    protected $layout;
 
     /**
      * The list of all scheduled actions to be executed by applyChanges method
@@ -44,11 +44,11 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     protected $actions = [];
 
     /**
-     * @param LayoutBuilder $layoutBuilder
+     * @param RawLayoutAccessorInterface $layout
      */
-    public function __construct(LayoutBuilder $layoutBuilder)
+    public function __construct(RawLayoutAccessorInterface $layout)
     {
-        $this->builder = $layoutBuilder;
+        $this->layout = $layout;
     }
 
     /**
@@ -198,7 +198,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             function (array $action) {
                 $parentId = $action[1];
 
-                return empty($parentId) || $this->builder->has($parentId);
+                return empty($parentId) || $this->layout->has($parentId);
             }
         );
     }
@@ -213,7 +213,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             function (array $action) {
                 $id = $action[0];
 
-                return empty($id) || $this->builder->has($id);
+                return empty($id) || $this->layout->has($id);
             }
         );
         // remove remaining 'remove' actions if there are no any 'add' actions
@@ -232,7 +232,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             function (array $action) {
                 $id = $action[1];
 
-                return empty($id) || $this->builder->has($id);
+                return empty($id) || $this->layout->has($id);
             }
         );
     }
@@ -247,7 +247,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             function (array $action) {
                 $alias = $action[0];
 
-                return empty($alias) || $this->builder->hasAlias($alias);
+                return empty($alias) || $this->layout->hasAlias($alias);
             }
         );
         // remove remaining 'removeAlias' actions if there are no any 'addAlias' actions
@@ -266,7 +266,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             function (array $action) {
                 $id = $action[0];
 
-                return empty($id) || $this->builder->has($id);
+                return empty($id) || $this->layout->has($id);
             }
         );
     }
@@ -281,7 +281,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             function (array $action) {
                 $id = $action[0];
 
-                return empty($id) || $this->builder->has($id);
+                return empty($id) || $this->layout->has($id);
             }
         );
     }
@@ -297,7 +297,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             return;
         }
 
-        $function       = [$this->builder, $actionName];
+        $function       = [$this->layout, $actionName];
         $skippedActions = [];
         foreach ($this->actions[$actionName] as $key => $action) {
             if (!$isReadyToExecute($action)) {

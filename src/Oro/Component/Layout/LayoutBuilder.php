@@ -12,7 +12,7 @@ namespace Oro\Component\Layout;
  *  - an alias can be added for existing item only
  *  - only existing alias can be removed
  */
-class LayoutBuilder implements RawLayoutManipulatorInterface
+class LayoutBuilder implements RawLayoutAccessorInterface
 {
     /** @var LayoutData */
     protected $layoutData;
@@ -176,11 +176,7 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     }
 
     /**
-     * Checks whether the item with the given id exists in the layout
-     *
-     * @param string $id The item id
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function has($id)
     {
@@ -188,15 +184,31 @@ class LayoutBuilder implements RawLayoutManipulatorInterface
     }
 
     /**
-     * Checks whether the given item alias exists
-     *
-     * @param string $alias The item alias
-     *
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasAlias($alias)
     {
         return $this->layoutData->hasAlias($alias);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOptions($id)
+    {
+        try {
+            return $this->layoutData->getProperty($id, LayoutData::OPTIONS);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot get options for "%s" item. Reason: %s',
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
     }
 
     /**
