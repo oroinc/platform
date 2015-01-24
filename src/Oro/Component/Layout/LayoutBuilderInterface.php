@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-interface LayoutBuilderInterface extends LayoutModifierInterface
+interface LayoutBuilderInterface extends LayoutManipulatorInterface
 {
     /**
      * Creates the layout
