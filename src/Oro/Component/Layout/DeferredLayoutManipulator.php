@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-class DeferredLayoutManipulator implements LayoutManipulatorInterface, DeferredRawLayoutManipulatorInterface
+class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
 {
     /** The action name for add layout item */
     const ADD = 'add';
