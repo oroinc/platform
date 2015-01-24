@@ -186,17 +186,23 @@ class LayoutData
     /**
      * Checks if the layout item has the given additional property
      *
-     * @param string $id   The layout item id
-     * @param string $name The property name
+     * @param string $id           The layout item id
+     * @param string $name         The property name
+     * @param bool   $directAccess Indicated whether the item id validation should be skipped.
+     *                             This flag can be used to increase performance of get operation,
+     *                             but use it carefully and only when you absolutely sure that
+     *                             the value passed as the item id is not an alias
      *
-     * @return boolean
+     * @return bool
      *
      * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
-    public function hasProperty($id, $name)
+    public function hasProperty($id, $name, $directAccess = false)
     {
-        $id = $this->validateAndResolveId($id);
+        if (!$directAccess) {
+            $id = $this->validateAndResolveId($id);
+        }
 
         return isset($this->items[$id][$name]) || array_key_exists($name, $this->items[$id]);
     }
@@ -204,8 +210,14 @@ class LayoutData
     /**
      * Gets a value of an additional property for the layout item
      *
-     * @param string $id   The layout item id
-     * @param string $name The property name
+     * @param string $id           The layout item id
+     * @param string $name         The property name
+     * @param bool   $directAccess Indicated whether the item id and property name validation should be skipped.
+     *                             This flag can be used to increase performance of get operation,
+     *                             but use it carefully and only when you absolutely sure that:
+     *                             * the item with the specified id exists
+     *                             * the value passed as the item id is not an alias
+     *                             * the property with the specified name exists
      *
      * @return mixed
      *
@@ -213,8 +225,12 @@ class LayoutData
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      * @throws Exception\LogicException if the layout item does not have the requested property
      */
-    public function getProperty($id, $name)
+    public function getProperty($id, $name, $directAccess = false)
     {
+        if ($directAccess) {
+            return $this->items[$id][$name];
+        }
+
         $id = $this->validateAndResolveId($id);
         if (!isset($this->items[$id][$name]) && !array_key_exists($name, $this->items[$id])) {
             throw new Exception\LogicException(
@@ -338,7 +354,7 @@ class LayoutData
      *
      * @param string $id The layout item id
      *
-     * @return \Iterator
+     * @return \RecursiveIteratorIterator
      *
      * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist

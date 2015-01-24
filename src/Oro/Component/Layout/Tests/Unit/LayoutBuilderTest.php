@@ -27,6 +27,49 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
         );
     }
 
+    public function testSimpleLayout()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test']);
+
+        $layout = $this->layoutBuilder->getLayout();
+
+        $this->assertBlockView(
+            [ // root
+                'children' => [
+                    [ // header
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'title' => 'test'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $layout->getView()
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The "header" item cannot be added as a child to "logo" item (block type: logo) because only container blocks can have children.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddChildToNotContainer()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root')
+            ->add('logo', 'root', 'logo')
+            ->add('header', 'logo', 'header');
+
+        $this->layoutBuilder->getLayout();
+    }
+
     public function testCoreVariablesForRootItemOnly()
     {
         $this->layoutBuilder

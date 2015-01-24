@@ -4,20 +4,11 @@ namespace Oro\Component\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockInterface;
-use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
 
-class BlockType implements BlockTypeInterface
+class BlockType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function buildBlock(BlockBuilderInterface $builder, array $options)
-    {
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -33,13 +24,6 @@ class BlockType implements BlockTypeInterface
             $view->vars['label_attr'] = $options['label_attr'];
         }
         $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function finishView(BlockView $view, BlockInterface $block, array $options)
-    {
     }
 
     /**

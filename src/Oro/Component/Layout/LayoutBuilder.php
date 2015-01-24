@@ -23,6 +23,9 @@ class LayoutBuilder implements RawLayoutModifierInterface
     /** @var BlockOptionsResolverInterface */
     protected $blockOptionsResolver;
 
+    /** @var  array */
+    protected $blockTypeHierarchy = [];
+
     /** @var bool */
     protected $frozen = false;
 
@@ -257,19 +260,34 @@ class LayoutBuilder implements RawLayoutModifierInterface
     protected function buildBlocks($rootId)
     {
         // build blocks if they are not built yet
-        if (!$this->layoutData->hasProperty($rootId, LayoutData::RESOLVED_OPTIONS)) {
+        if (!$this->layoutData->hasProperty($rootId, LayoutData::RESOLVED_OPTIONS, true)) {
             $this->buildBlock(
                 $rootId,
-                $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE),
-                $this->layoutData->getProperty($rootId, LayoutData::OPTIONS)
+                $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE, true),
+                $this->layoutData->getProperty($rootId, LayoutData::OPTIONS, true)
             );
             $iterator = $this->layoutData->getHierarchyIterator($rootId);
             foreach ($iterator as $id) {
-                if (!$this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS)) {
+                if (!$this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS, true)) {
+                    $depth    = $iterator->getDepth();
+                    $parentId = $depth === 0
+                        ? $rootId
+                        : $iterator->getSubIterator($depth - 1)->current();
+                    if (!$this->isContainerBlock($parentId)) {
+                        throw new Exception\LogicException(
+                            sprintf(
+                                'The "%s" item cannot be added as a child to "%s" item (block type: %s) '
+                                . 'because only container blocks can have children.',
+                                $id,
+                                $parentId,
+                                $this->layoutData->getProperty($parentId, LayoutData::BLOCK_TYPE, true)
+                            )
+                        );
+                    }
                     $this->buildBlock(
                         $id,
-                        $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE),
-                        $this->layoutData->getProperty($id, LayoutData::OPTIONS)
+                        $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true),
+                        $this->layoutData->getProperty($id, LayoutData::OPTIONS, true)
                     );
                 }
             }
@@ -285,15 +303,15 @@ class LayoutBuilder implements RawLayoutModifierInterface
     {
         return $this->createBlockView(
             $rootId,
-            $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE),
-            $this->layoutData->getProperty($rootId, LayoutData::RESOLVED_OPTIONS),
+            $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE, true),
+            $this->layoutData->getProperty($rootId, LayoutData::RESOLVED_OPTIONS, true),
             $this->layoutData->getHierarchy($rootId)
         );
     }
 
     /**
      * @param string $id
-     * @param array  $blockType
+     * @param string $blockType
      * @param array  $options
      */
     protected function buildBlock($id, $blockType, array $options)
@@ -306,6 +324,7 @@ class LayoutBuilder implements RawLayoutModifierInterface
 
         // build block
         $blockBuilder = new LayoutBlockBuilder($this->layoutData, $id);
+        // iterate from parent to current
         foreach ($types as $type) {
             $type->buildBlock($blockBuilder, $resolvedOptions);
         }
@@ -340,8 +359,8 @@ class LayoutBuilder implements RawLayoutModifierInterface
         foreach ($hierarchy as $childId => $children) {
             $view->children[] = $this->createBlockView(
                 $childId,
-                $this->layoutData->getProperty($childId, LayoutData::BLOCK_TYPE),
-                $this->layoutData->getProperty($childId, LayoutData::RESOLVED_OPTIONS),
+                $this->layoutData->getProperty($childId, LayoutData::BLOCK_TYPE, true),
+                $this->layoutData->getProperty($childId, LayoutData::RESOLVED_OPTIONS, true),
                 $children,
                 $view
             );
@@ -355,19 +374,47 @@ class LayoutBuilder implements RawLayoutModifierInterface
     }
 
     /**
+     * Checks whether the given block is a container for other blocks
+     *
+     * @param string $id
+     *
+     * @return bool
+     */
+    protected function isContainerBlock($id)
+    {
+        $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
+        $types     = $this->getBlockTypeHierarchy($blockType);
+        // iterate from current to parent
+        /** @var BlockTypeInterface $type */
+        $type = end($types);
+        while ($type) {
+            if ($type->getName() === 'container') {
+                return true;
+            }
+            $type = prev($types);
+        }
+
+        return false;
+    }
+
+    /**
      * @param string $blockType
      *
      * @return BlockTypeInterface[]
      */
     protected function getBlockTypeHierarchy($blockType)
     {
-        $result = [];
+        if (isset($this->blockTypeHierarchy[$blockType])) {
+            return $this->blockTypeHierarchy[$blockType];
+        }
 
+        $result = [];
         while ($blockType) {
             $type = $this->blockTypeRegistry->getBlockType($blockType);
             array_unshift($result, $type);
             $blockType = $type->getParent();
         }
+        $this->blockTypeHierarchy[$blockType] = $result;
 
         return $result;
     }
