@@ -147,6 +147,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
         $total = $this->calculateActionCount();
         if ($total !== 0) {
             $this->executeAllActions();
+            $this->checkRemainingActions();
             // check that all scheduled actions have been performed
             $applied = $total - $this->calculateActionCount();
             if ($applied === 0 && $applied !== $total) {
@@ -183,6 +184,27 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     {
         $this->executeAddActions();
         $this->executeRemoveActions();
+    }
+
+    /**
+     * Checks if there are any not executed actions and remove actions which are not important
+     */
+    protected function checkRemainingActions()
+    {
+        // remove remaining 'move' actions
+        if (!empty($this->actions[self::GROUP_ADD])) {
+            foreach ($this->actions[self::GROUP_ADD] as $key => $action) {
+                if ($action[0] === self::MOVE) {
+                    unset($this->actions[self::GROUP_ADD][$key]);
+                }
+            }
+        }
+        // remove remaining 'remove' actions if there are no any 'add' actions
+        if (!empty($this->actions[self::GROUP_REMOVE])) {
+            if (!empty($this->actions[self::GROUP_REMOVE]) && empty($this->actions[self::GROUP_ADD])) {
+                unset($this->actions[self::GROUP_REMOVE]);
+            }
+        }
     }
 
     /**
@@ -226,10 +248,6 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     {
         if (!empty($this->actions[self::GROUP_REMOVE])) {
             $this->executeActions(self::GROUP_REMOVE);
-            // remove remaining 'remove' actions if there are no any 'add' actions
-            if (!empty($this->actions[self::GROUP_REMOVE]) && empty($this->actions[self::GROUP_ADD])) {
-                unset($this->actions[self::GROUP_REMOVE]);
-            }
         }
     }
 
