@@ -2,7 +2,10 @@
 
 namespace Oro\Component\Layout\Exception;
 
-class UnexpectedTypeException extends InvalidArgumentException implements ExceptionInterface
+/**
+ * Exception thrown if an argument type does not match with the expected value.
+ */
+class UnexpectedTypeException extends InvalidArgumentException
 {
     /**
      * @param mixed  $value

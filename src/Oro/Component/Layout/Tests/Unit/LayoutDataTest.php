@@ -207,6 +207,240 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         $this->layoutData->remove($id);
     }
 
+    public function testMoveToParent()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('container1', 'header1', 'container');
+        $this->layoutData->add('item1', 'container1', 'label');
+        $this->layoutData->add('header2', 'root', 'header');
+        $this->layoutData->add('container2', 'header2', 'container');
+        $this->layoutData->add('item2', 'container2', 'label');
+
+        // do test
+        $this->layoutData->move('container1', 'root');
+        $this->assertSame(
+            ['root', 'container1'],
+            $this->layoutData->getProperty('container1', LayoutData::PATH)
+        );
+        $this->assertSame(
+            ['root', 'container1', 'item1'],
+            $this->layoutData->getProperty('item1', LayoutData::PATH)
+        );
+    }
+
+    public function testMoveToParentByAlias()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('container1', 'header1', 'container');
+        $this->layoutData->add('item1', 'container1', 'label');
+        $this->layoutData->add('header2', 'root', 'header');
+        $this->layoutData->add('container2', 'header2', 'container');
+        $this->layoutData->add('item2', 'container2', 'label');
+        $this->layoutData->addAlias('test_root', 'root');
+        $this->layoutData->addAlias('test_container1', 'container1');
+
+        // do test
+        $this->layoutData->move('test_container1', 'test_root');
+        $this->assertSame(
+            ['root', 'container1'],
+            $this->layoutData->getProperty('container1', LayoutData::PATH)
+        );
+        $this->assertSame(
+            ['root', 'container1', 'item1'],
+            $this->layoutData->getProperty('item1', LayoutData::PATH)
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
+     * @expectedExceptionMessage The "unknown" item does not exist.
+     */
+    public function testMoveUnknown()
+    {
+        $this->layoutData->move('unknown');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
+     * @expectedExceptionMessage The "unknown" parent item does not exist.
+     */
+    public function testMoveToUnknownParent()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->add('header2', 'root', 'header');
+        $this->layoutData->add('item2', 'header2', 'label');
+
+        // do test
+        $this->layoutData->move('item1', 'unknown', 'item2');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
+     * @expectedExceptionMessage The "unknown" sibling item does not exist.
+     */
+    public function testMoveToUnknownSibling()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->add('header2', 'root', 'header');
+        $this->layoutData->add('item2', 'header2', 'label');
+
+        // do test
+        $this->layoutData->move('item1', 'header2', 'unknown');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The parent item cannot be the same as the moving item.
+     */
+    public function testMoveWhenParentEqualsToMovingItem()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->add('header2', 'root', 'header');
+        $this->layoutData->add('item2', 'header2', 'label');
+        $this->layoutData->addAlias('test_item', 'item1');
+
+        // do test
+        $this->layoutData->move('item1', 'test_item', 'item2');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The sibling item cannot be the same as the moving item.
+     */
+    public function testMoveWhenSiblingEqualsToMovingItem()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->add('header2', 'root', 'header');
+        $this->layoutData->add('item2', 'header2', 'label');
+        $this->layoutData->addAlias('test_item', 'item1');
+
+        // do test
+        $this->layoutData->move('item1', 'header2', 'test_item');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The sibling item cannot be the same as the parent item.
+     */
+    public function testMoveWhenParentEqualsToSibling()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->add('header2', 'root', 'header');
+        $this->layoutData->add('item2', 'header2', 'label');
+        $this->layoutData->addAlias('test_header', 'header2');
+        $this->layoutData->addAlias('test_item', 'test_header');
+
+        // do test
+        $this->layoutData->move('item1', 'test_header', 'test_item');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage At least one parent or sibling item must be specified.
+     */
+    public function testMoveWithoutParentAndSibling()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+
+        // do test
+        $this->layoutData->move('item1');
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The parent item (path: root/header1/item1) cannot be a child of the moving item (path: root/header1).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testMoveParentToChild()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->addAlias('test_header', 'header1');
+        $this->layoutData->addAlias('test_item', 'item1');
+
+        // do test
+        $this->layoutData->move('test_header', 'test_item');
+    }
+
+    public function testMoveInsideTheSameParent()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->add('item2', 'header1', 'label');
+        $this->layoutData->addAlias('test_item', 'item1');
+
+        // do test
+        $this->layoutData->move('test_item', null, 'item2');
+        $this->assertSame(
+            ['root', 'header1', 'item1'],
+            $this->layoutData->getProperty('item1', LayoutData::PATH)
+        );
+        $this->assertSame(
+            ['item2' => [], 'item1' => []],
+            $this->layoutData->getHierarchy('header1')
+        );
+    }
+
+    public function testMoveInsideTheSameParentAndWithParentIdSpecified()
+    {
+        // prepare test data
+        $this->layoutData->add('root', null, 'root');
+        $this->layoutData->add('header1', 'root', 'header');
+        $this->layoutData->add('item1', 'header1', 'label');
+        $this->layoutData->add('item2', 'header1', 'label');
+        $this->layoutData->addAlias('test_header', 'header1');
+        $this->layoutData->addAlias('test_item', 'item1');
+
+        // do test
+        $this->layoutData->move('test_item', 'test_header', 'item2');
+        $this->assertSame(
+            ['root', 'header1', 'item1'],
+            $this->layoutData->getProperty('item1', LayoutData::PATH)
+        );
+        $this->assertSame(
+            ['item2' => [], 'item1' => []],
+            $this->layoutData->getHierarchy('header1')
+        );
+    }
+
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The item id must not be empty.
+     */
+    public function testMoveWithEmptyId($id)
+    {
+        $this->layoutData->move($id);
+    }
+
     public function testHasProperty()
     {
         // prepare test data

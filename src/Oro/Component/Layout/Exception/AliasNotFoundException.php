@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout\Exception;
 
-class AliasNotFoundException extends \InvalidArgumentException implements ExceptionInterface
+/**
+ * Exception thrown if an alias does not exist.
+ */
+class AliasNotFoundException extends InvalidArgumentException
 {
 }

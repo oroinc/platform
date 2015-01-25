@@ -96,6 +96,18 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
             ->remove('root');
     }
 
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot move "root" item. ParentId: destination. SiblingId: . Reason: The "root" item does not exist.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testMoveUnknownItem()
+    {
+        $this->layoutBuilder
+            ->move('root', 'destination');
+    }
+
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage Cannot add "test" alias for "root" item. Reason: The "root" item does not exist.

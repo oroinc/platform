@@ -71,6 +71,30 @@ class LayoutBuilder implements RawLayoutAccessorInterface
     /**
      * {@inheritdoc}
      */
+    public function move($id, $parentId = null, $siblingId = null, $prepend = false)
+    {
+        try {
+            $this->layoutData->move($id, $parentId, $siblingId, $prepend);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot move "%s" item. ParentId: %s. SiblingId: %s. Reason: %s',
+                    $id,
+                    $parentId,
+                    $siblingId,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addAlias($alias, $id)
     {
         try {

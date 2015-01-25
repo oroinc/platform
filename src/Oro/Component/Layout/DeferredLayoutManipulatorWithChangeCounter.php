@@ -79,6 +79,18 @@ class DeferredLayoutManipulatorWithChangeCounter implements DeferredLayoutManipu
     /**
      * {@inheritdoc}
      */
+    public function move($id, $parentId = null, $siblingId = null, $prepend = false)
+    {
+        $this->layoutManipulator->move($id, $parentId, $siblingId, $prepend);
+        $this->addCounter++;
+        $this->removeCounter++;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addAlias($alias, $id)
     {
         $this->layoutManipulator->addAlias($alias, $id);

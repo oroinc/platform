@@ -322,6 +322,351 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\OddActionsException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 1 action(s) cannot be applied. Actions: move(unknown).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testMoveUnknownItem()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo')
+            ->move('unknown', 'root');
+
+        $this->getLayoutView();
+    }
+
+    public function testMoveToParent()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('container1', 'header1', 'container')
+            ->add('logo1', 'container1', 'logo')
+            ->add('header2', 'root', 'header')
+            ->add('container2', 'header2', 'container')
+            ->add('logo2', 'container2', 'logo')
+            ->move('container1', 'root');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars' => ['id' => 'header1']
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // container2
+                                'vars'     => ['id' => 'container2'],
+                                'children' => [
+                                    [ // logo2
+                                        'vars' => ['id' => 'logo2', 'title' => '']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                    [ // container1
+                        'vars'     => ['id' => 'container1'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testMoveToAnotherContainer()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('container1', 'header1', 'container')
+            ->add('logo1', 'container1', 'logo')
+            ->add('header2', 'root', 'header')
+            ->add('container2', 'header2', 'container')
+            ->add('logo2', 'container2', 'logo')
+            ->move('container1', 'header2');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars' => ['id' => 'header1']
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // container2
+                                'vars'     => ['id' => 'container2'],
+                                'children' => [
+                                    [ // logo2
+                                        'vars' => ['id' => 'logo2', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container1
+                                'vars'     => ['id' => 'container1'],
+                                'children' => [
+                                    [ // logo1
+                                        'vars' => ['id' => 'logo1', 'title' => '']
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ],
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testMoveToAnotherContainerBeforeSibling()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('container1', 'header1', 'container')
+            ->add('logo1', 'container1', 'logo')
+            ->add('header2', 'root', 'header')
+            ->add('container2', 'header2', 'container')
+            ->add('logo2', 'container2', 'logo')
+            ->add('container3', 'header2', 'container')
+            ->add('logo3', 'container3', 'logo')
+            ->move('container1', 'header2', 'container3', true);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars' => ['id' => 'header1']
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // container2
+                                'vars'     => ['id' => 'container2'],
+                                'children' => [
+                                    [ // logo2
+                                        'vars' => ['id' => 'logo2', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container1
+                                'vars'     => ['id' => 'container1'],
+                                'children' => [
+                                    [ // logo1
+                                        'vars' => ['id' => 'logo1', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container3
+                                'vars'     => ['id' => 'container3'],
+                                'children' => [
+                                    [ // logo3
+                                        'vars' => ['id' => 'logo3', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testMoveToAnotherContainerAfterSibling()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('container1', 'header1', 'container')
+            ->add('logo1', 'container1', 'logo')
+            ->move('container1', 'header2', 'container2')
+            ->add('header2', 'root', 'header')
+            ->add('container2', 'header2', 'container')
+            ->add('logo2', 'container2', 'logo')
+            ->add('container3', 'header2', 'container')
+            ->add('logo3', 'container3', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars' => ['id' => 'header1']
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // container2
+                                'vars'     => ['id' => 'container2'],
+                                'children' => [
+                                    [ // logo2
+                                        'vars' => ['id' => 'logo2', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container1
+                                'vars'     => ['id' => 'container1'],
+                                'children' => [
+                                    [ // logo1
+                                        'vars' => ['id' => 'logo1', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container3
+                                'vars'     => ['id' => 'container3'],
+                                'children' => [
+                                    [ // logo3
+                                        'vars' => ['id' => 'logo3', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testMoveToAnotherContainerBeforeUnknownSibling()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('container1', 'header1', 'container')
+            ->add('logo1', 'container1', 'logo')
+            ->move('container1', 'header2', 'unknown', true)
+            ->add('header2', 'root', 'header')
+            ->add('container2', 'header2', 'container')
+            ->add('logo2', 'container2', 'logo')
+            ->add('container3', 'header2', 'container')
+            ->add('logo3', 'container3', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars' => ['id' => 'header1']
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // container1
+                                'vars'     => ['id' => 'container1'],
+                                'children' => [
+                                    [ // logo1
+                                        'vars' => ['id' => 'logo1', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container2
+                                'vars'     => ['id' => 'container2'],
+                                'children' => [
+                                    [ // logo2
+                                        'vars' => ['id' => 'logo2', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container3
+                                'vars'     => ['id' => 'container3'],
+                                'children' => [
+                                    [ // logo3
+                                        'vars' => ['id' => 'logo3', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testMoveToAnotherContainerAfterUnknownSibling()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('container1', 'header1', 'container')
+            ->add('logo1', 'container1', 'logo')
+            ->add('header2', 'root', 'header')
+            ->add('container2', 'header2', 'container')
+            ->add('logo2', 'container2', 'logo')
+            ->add('container3', 'header2', 'container')
+            ->add('logo3', 'container3', 'logo')
+            ->move('container1', 'header2', 'unknown');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars' => ['id' => 'header1']
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => [
+                            [ // container2
+                                'vars'     => ['id' => 'container2'],
+                                'children' => [
+                                    [ // logo2
+                                        'vars' => ['id' => 'logo2', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container3
+                                'vars'     => ['id' => 'container3'],
+                                'children' => [
+                                    [ // logo3
+                                        'vars' => ['id' => 'logo3', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                            [ // container1
+                                'vars'     => ['id' => 'container1'],
+                                'children' => [
+                                    [ // logo1
+                                        'vars' => ['id' => 'logo1', 'title' => '']
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
+                ]
+            ],
+            $view
+        );
+    }
+
     public function testLayoutChangedByBlockType()
     {
         $this->layoutManipulator

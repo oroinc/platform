@@ -15,6 +15,14 @@ class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
     {
         $this->completeView($expected);
         $actualArray = $this->convertBlockViewToArray($actual, $ignoreAuxiliaryVariables);
+
+        // compare hierarchy
+        $this->assertSame(
+            $this->getViewHierarchy($expected),
+            $this->getViewHierarchy($actualArray),
+            'Failed asserting that two hierarchies are equal.'
+        );
+        // full compare
         $this->assertEquals($expected, $actualArray);
     }
 
@@ -27,6 +35,9 @@ class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
     {
         if (!isset($view['vars'])) {
             $view['vars'] = [];
+        }
+        if (!isset($view['vars']['id'])) {
+            $view['vars']['id'] = '';
         }
         if (!isset($view['vars']['attr'])) {
             $view['vars']['attr'] = [];
@@ -68,5 +79,38 @@ class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $view
+     *
+     * @return array
+     */
+    protected function getViewHierarchy(array $view)
+    {
+        $id     = $view['vars']['id'];
+        $result = [$id => null];
+        if (!empty($view['children'])) {
+            $result[$id] = [];
+            $this->buildViewHierarchy($result[$id], $view);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $result
+     * @param array $view
+     */
+    protected function buildViewHierarchy(array &$result, array $view)
+    {
+        foreach ($view['children'] as $childView) {
+            $childId          = $childView['vars']['id'];
+            $result[$childId] = null;
+            if (!empty($childView['children'])) {
+                $result[$childId] = [];
+                $this->buildViewHierarchy($result[$childId], $childView);
+            }
+        }
     }
 }

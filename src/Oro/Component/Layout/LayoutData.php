@@ -4,6 +4,8 @@ namespace Oro\Component\Layout;
 
 /**
  * Represents the raw layout configuration and provides methods to modify these data
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class LayoutData
 {
@@ -72,7 +74,7 @@ class LayoutData
     /**
      * Returns real id of the layout item
      *
-     * @param string $id The layout item id or alias
+     * @param string $id The id or alias of the layout item
      *
      * @return string The layout item id
      */
@@ -86,7 +88,7 @@ class LayoutData
     /**
      * Checks if the layout item with the given id exists
      *
-     * @param string $id The layout item id
+     * @param string $id The id or alias of the layout item
      *
      * @return bool
      */
@@ -101,7 +103,7 @@ class LayoutData
      * Adds a new item to the layout
      *
      * @param string $id        The layout item id
-     * @param string $parentId  The parent item id or alias. Set null to add the root item
+     * @param string $parentId  The id or alias of parent item. Set null to add the root item
      * @param string $blockType The name of the block type associated with the layout item
      * @param array  $options   The layout item options
      *
@@ -136,13 +138,9 @@ class LayoutData
             }
         }
 
-        if (empty($parentId)) {
-            $path = [];
-        } else {
-            $parentId = $this->resolveId($parentId);
-            $path     = $this->getProperty($parentId, self::PATH);
-        }
-
+        $path = !empty($parentId)
+            ? $this->getProperty($parentId, self::PATH)
+            : [];
         $this->hierarchy->add($path, $id);
         $path[]           = $id;
         $this->items[$id] = [
@@ -175,7 +173,7 @@ class LayoutData
         $pathLastIndex = $pathLength - 1;
         $ids           = array_keys($this->items);
         foreach ($ids as $itemId) {
-            $currentPath = $this->getProperty($itemId, self::PATH);
+            $currentPath = $this->items[$itemId][self::PATH];
             if (count($currentPath) > $pathLength && $currentPath[$pathLastIndex] === $id) {
                 unset($this->items[$itemId]);
                 $this->aliases->removeById($itemId);
@@ -184,9 +182,90 @@ class LayoutData
     }
 
     /**
+     * Moves the given item to another location
+     *
+     * @param string      $id        The id or alias of the layout item to be moved
+     * @param string|null $parentId  The id or alias of a parent item the specified item is moved to
+     *                               If this parameter is null only the order of the item is changed
+     * @param string|null $siblingId The id or alias of an item which should be nearest neighbor
+     * @param bool        $prepend   Determines whether the moving item should be located before or after
+     *                               the specified sibling item
+     *
+     * @throws Exception\InvalidArgumentException if the id is empty
+     * @throws Exception\ItemNotFoundException if the layout item, parent item or sibling item does not exist
+     * @throws Exception\LogicException if the layout item cannot be moved by other reasons
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function move($id, $parentId = null, $siblingId = null, $prepend = false)
+    {
+        $id = $this->validateAndResolveId($id);
+        if (!empty($parentId)) {
+            $parentId = $this->resolveId($parentId);
+            if (!isset($this->items[$parentId])) {
+                throw new Exception\ItemNotFoundException(sprintf('The "%s" parent item does not exist.', $parentId));
+            }
+            if ($parentId === $id) {
+                throw new Exception\LogicException('The parent item cannot be the same as the moving item.');
+            }
+        }
+        if (!empty($siblingId)) {
+            $siblingId = $this->resolveId($siblingId);
+            if (!isset($this->items[$siblingId])) {
+                throw new Exception\ItemNotFoundException(sprintf('The "%s" sibling item does not exist.', $siblingId));
+            }
+            if ($siblingId === $id) {
+                throw new Exception\LogicException('The sibling item cannot be the same as the moving item.');
+            }
+        }
+        if (empty($parentId) && empty($siblingId)) {
+            throw new Exception\LogicException('At least one parent or sibling item must be specified.');
+        }
+        $path = $this->items[$id][self::PATH];
+        if (empty($parentId)) {
+            $parentPath = array_slice($path, 0, -1);
+        } else {
+            if (!empty($siblingId) && $siblingId === $parentId) {
+                throw new Exception\LogicException('The sibling item cannot be the same as the parent item.');
+            }
+            $parentPath = $this->items[$parentId][self::PATH];
+            if (strpos(implode('/', $parentPath) . '/', implode('/', $path)) === 0) {
+                throw new Exception\LogicException(
+                    sprintf(
+                        'The parent item (path: %s) cannot be a child of the moving item (path: %s).',
+                        implode('/', $parentPath),
+                        implode('/', $path)
+                    )
+                );
+            }
+        }
+        // update hierarchy
+        $hierarchy = $this->hierarchy->get($path);
+        $this->hierarchy->remove($path);
+        $this->hierarchy->add($parentPath, $id, $siblingId, $prepend, $hierarchy);
+        if (!empty($parentId)) {
+            // build the new path
+            $newPath   = $parentPath;
+            $newPath[] = $id;
+            // update the path of the moving item
+            $this->items[$id][self::PATH] = $newPath;
+            // update the path for all children
+            $prevPathLength = count($path);
+            $iterator       = $this->getHierarchyIterator($id);
+            foreach ($iterator as $childId) {
+                $this->items[$childId][self::PATH] = array_merge(
+                    $newPath,
+                    array_slice($this->items[$childId][self::PATH], $prevPathLength)
+                );
+            }
+        }
+    }
+
+    /**
      * Checks if the layout item has the given additional property
      *
-     * @param string $id           The layout item id
+     * @param string $id           The id or alias of the layout item
      * @param string $name         The property name
      * @param bool   $directAccess Indicated whether the item id validation should be skipped.
      *                             This flag can be used to increase performance of get operation,
@@ -210,7 +289,7 @@ class LayoutData
     /**
      * Gets a value of an additional property for the layout item
      *
-     * @param string $id           The layout item id
+     * @param string $id           The id or alias of the layout item
      * @param string $name         The property name
      * @param bool   $directAccess Indicated whether the item id and property name validation should be skipped.
      *                             This flag can be used to increase performance of get operation,
@@ -244,7 +323,7 @@ class LayoutData
     /**
      * Sets a value of an additional property for the layout item
      *
-     * @param string $id    The layout item id
+     * @param string $id    The id or alias of the layout item
      * @param string $name  The property name
      * @param mixed  $value The property value
      *
@@ -334,7 +413,7 @@ class LayoutData
     /**
      * Returns the layout items hierarchy from the given path
      *
-     * @param string $id The layout item id
+     * @param string $id The id or alias of the layout item
      *
      * @return array
      *
@@ -352,7 +431,7 @@ class LayoutData
      * Returns an iterator which can be used to get ids of all children of the given item
      * The iteration is performed from parent to child
      *
-     * @param string $id The layout item id
+     * @param string $id The id or alias of the layout item
      *
      * @return \RecursiveIteratorIterator
      *

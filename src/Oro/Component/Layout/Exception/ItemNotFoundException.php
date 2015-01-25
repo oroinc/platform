@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout\Exception;
 
-class ItemNotFoundException extends \InvalidArgumentException implements ExceptionInterface
+/**
+ * Exception thrown if an item does not exist.
+ */
+class ItemNotFoundException extends InvalidArgumentException
 {
 }

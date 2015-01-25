@@ -29,6 +29,20 @@ interface LayoutManipulatorInterface
     public function remove($id);
 
     /**
+     * Moves the item to another location
+     *
+     * @param string      $id        The id or alias of item to be moved
+     * @param string|null $parentId  The id or alias of a parent item the specified item is moved to
+     *                               If this parameter is null only the order of the item is changed
+     * @param string|null $siblingId The id or alias of an item which should be nearest neighbor
+     * @param bool        $prepend   Determines whether the moving item should be located before or after
+     *                               the specified sibling item
+     *
+     * @return self
+     */
+    public function move($id, $parentId = null, $siblingId = null, $prepend = false);
+
+    /**
      * Creates an alias for the specified item
      *
      * @param string $alias A string that can be used instead of the item id

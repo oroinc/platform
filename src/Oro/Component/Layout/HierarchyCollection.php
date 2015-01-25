@@ -46,6 +46,8 @@ class HierarchyCollection
     }
 
     /**
+     * Gets hierarchy by the path
+     *
      * @param string[] $path
      *
      * @return array
@@ -64,12 +66,20 @@ class HierarchyCollection
     }
 
     /**
-     * @param string[] $parentPath
-     * @param string   $id
+     * Adds a new item to the hierarchy
+     *
+     * @param string[]    $parentPath
+     * @param string      $id
+     * @param string|null $siblingId The id of nearest neighbor item
+     * @param bool        $prepend   Determines whether the item should be added before or after
+     *                               the specified sibling item
+     *                               If the sibling item is not specified and $prepend is true than
+     *                               the item is added to the begin of the parent hierarchy
+     * @param array       $children  The child hierarchy
      *
      * @throws Exception\LogicException if the operation failed
      */
-    public function add(array $parentPath, $id)
+    public function add(array $parentPath, $id, $siblingId = null, $prepend = false, array $children = [])
     {
         $current          = &$this->hierarchy;
         $parentPathLength = count($parentPath);
@@ -107,10 +117,43 @@ class HierarchyCollection
                 )
             );
         }
-        $current[$id] = [];
+        if (empty($siblingId)) {
+            if ($prepend && !empty($current)) {
+                $current = array_merge([$id => $children], $current);
+            } else {
+                $current[$id] = $children;
+            }
+        } elseif (!isset($current[$siblingId])) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot add "%s" item to "%s" because "%s" sibling item does not exist.',
+                    $id,
+                    implode('/', $parentPath),
+                    $siblingId
+                )
+            );
+        } else {
+            $new = [];
+            foreach ($current as $key => $value) {
+                if ($key === $siblingId) {
+                    if ($prepend) {
+                        $new[$id]  = $children;
+                        $new[$key] = $value;
+                    } else {
+                        $new[$key] = $value;
+                        $new[$id]  = $children;
+                    }
+                } else {
+                    $new[$key] = $value;
+                }
+            }
+            $current = $new;
+        }
     }
 
     /**
+     * Removes the item from the hierarchy
+     *
      * @param string[] $path
      */
     public function remove(array $path)

@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout\Exception;
 
-class AliasAlreadyExistsException extends \InvalidArgumentException implements ExceptionInterface
+/**
+ * Exception thrown if an alias is already exist.
+ */
+class AliasAlreadyExistsException extends InvalidArgumentException
 {
 }

@@ -57,6 +57,30 @@ class DeferredLayoutManipulatorWithChangeCounterTest extends \PHPUnit_Framework_
         $this->assertEquals(0, $this->layoutManipulator->getNumberOfRemovedItems());
     }
 
+    public function testMove()
+    {
+        $id        = 'test_id';
+        $parentId  = 'test_parent_id';
+        $siblingId = 'test_sibling_id';
+        $prepend   = true;
+
+        $this->baseLayoutManipulator->expects($this->once())
+            ->method('move')
+            ->with($id, $parentId, $siblingId, $prepend);
+
+        $this->assertEquals(0, $this->layoutManipulator->getNumberOfAddedItems());
+        $this->assertEquals(0, $this->layoutManipulator->getNumberOfRemovedItems());
+        $this->assertSame(
+            $this->layoutManipulator,
+            $this->layoutManipulator->move($id, $parentId, $siblingId, $prepend)
+        );
+        $this->assertEquals(1, $this->layoutManipulator->getNumberOfAddedItems());
+        $this->assertEquals(1, $this->layoutManipulator->getNumberOfRemovedItems());
+        $this->layoutManipulator->resetCounters();
+        $this->assertEquals(0, $this->layoutManipulator->getNumberOfAddedItems());
+        $this->assertEquals(0, $this->layoutManipulator->getNumberOfRemovedItems());
+    }
+
     public function testAddAlias()
     {
         $alias = 'test_alias';

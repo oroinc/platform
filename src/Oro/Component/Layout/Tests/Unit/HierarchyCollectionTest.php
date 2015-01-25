@@ -142,6 +142,154 @@ class HierarchyCollectionTest extends \PHPUnit_Framework_TestCase
         $this->hierarchyCollection->add(['root'], 'item1');
     }
 
+    public function testAdd()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'item1');
+        $this->hierarchyCollection->add(['root'], 'item2');
+
+        // do test
+        $this->hierarchyCollection->add(['root'], 'item3');
+        $this->assertSame(
+            [
+                'root' => [
+                    'item1' => [],
+                    'item2' => [],
+                    'item3' => []
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
+    public function testAddToTheBeginning()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'item1');
+        $this->hierarchyCollection->add(['root'], 'item2');
+
+        // do test
+        $this->hierarchyCollection->add(['root'], 'item3', null, true);
+        $this->assertSame(
+            [
+                'root' => [
+                    'item3' => [],
+                    'item1' => [],
+                    'item2' => []
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
+    public function testAddToTheBeginningOfEmpty()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+
+        // do test
+        $this->hierarchyCollection->add(['root'], 'item1', null, true);
+        $this->assertSame(
+            [
+                'root' => [
+                    'item1' => []
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot add "item3" item to "root/header" because "unknown" sibling item does not exist.
+     */
+    public function testAddWithUnknownSibling()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'header');
+        $this->hierarchyCollection->add(['root', 'header'], 'item1');
+        $this->hierarchyCollection->add(['root', 'header'], 'item2');
+
+        // do test
+        $this->hierarchyCollection->add(['root', 'header'], 'item3', 'unknown');
+    }
+
+    public function testAddAfterSibling()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'item1');
+        $this->hierarchyCollection->add(['root'], 'item2');
+
+        // do test
+        $this->hierarchyCollection->add(['root'], 'item3', 'item1');
+        $this->hierarchyCollection->add(['root'], 'item4', 'item2');
+        $this->assertSame(
+            [
+                'root' => [
+                    'item1' => [],
+                    'item3' => [],
+                    'item2' => [],
+                    'item4' => []
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
+    public function testAddBeforeSibling()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'item1');
+        $this->hierarchyCollection->add(['root'], 'item2');
+
+        // do test
+        $this->hierarchyCollection->add(['root'], 'item3', 'item2', true);
+        $this->hierarchyCollection->add(['root'], 'item4', 'item1', true);
+        $this->assertSame(
+            [
+                'root' => [
+                    'item4' => [],
+                    'item1' => [],
+                    'item3' => [],
+                    'item2' => []
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
+    public function testMove()
+    {
+        // prepare hierarchy
+        $this->hierarchyCollection->add([], 'root');
+        $this->hierarchyCollection->add(['root'], 'item1');
+        $this->hierarchyCollection->add(['root', 'item1'], 'item11');
+        $this->hierarchyCollection->add(['root'], 'item2');
+        $this->hierarchyCollection->add(['root', 'item2'], 'item21');
+        $this->hierarchyCollection->add(['root'], 'item3');
+        $this->hierarchyCollection->add(['root', 'item3'], 'item31');
+
+        // do test
+        $movingItem = $this->hierarchyCollection->get(['root', 'item2']);
+        $this->hierarchyCollection->remove(['root', 'item2']);
+        $this->hierarchyCollection->add(['root'], 'item2', 'item1', true, $movingItem);
+        $this->assertSame(
+            [
+                'root' => [
+                    'item2' => ['item21' => []],
+                    'item1' => ['item11' => []],
+                    'item3' => ['item31' => []]
+                ]
+            ],
+            $this->hierarchyCollection->get([])
+        );
+    }
+
     public function testRemove()
     {
         // prepare hierarchy
