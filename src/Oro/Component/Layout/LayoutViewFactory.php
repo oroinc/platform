@@ -13,7 +13,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /** @var BlockOptionsResolverInterface */
     protected $blockOptionsResolver;
 
-    /** @var DeferredLayoutManipulatorInterface */
+    /** @var DeferredLayoutManipulatorWithChangeCounter */
     protected $layoutManipulator;
 
     /** @var  array */
@@ -31,7 +31,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     ) {
         $this->blockTypeRegistry    = $blockTypeRegistry;
         $this->blockOptionsResolver = $blockOptionsResolver;
-        $this->layoutManipulator    = $layoutManipulator;
+        $this->layoutManipulator    = new DeferredLayoutManipulatorWithChangeCounter($layoutManipulator);
     }
 
     /**
@@ -82,32 +82,36 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
                 $this->layoutData->getProperty($rootId, LayoutData::BLOCK_TYPE, true),
                 $this->layoutData->getProperty($rootId, LayoutData::OPTIONS, true)
             );
-            $iterator = $this->layoutData->getHierarchyIterator($rootId);
-            foreach ($iterator as $id) {
-                if (!$this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS, true)) {
-                    $depth    = $iterator->getDepth();
-                    $parentId = $depth === 0
-                        ? $rootId
-                        : $iterator->getSubIterator($depth - 1)->current();
-                    if (!$this->isContainerBlock($parentId)) {
-                        throw new Exception\LogicException(
-                            sprintf(
-                                'The "%s" item cannot be added as a child to "%s" item (block type: %s) '
-                                . 'because only container blocks can have children.',
-                                $id,
-                                $parentId,
-                                $this->layoutData->getProperty($parentId, LayoutData::BLOCK_TYPE, true)
-                            )
-                        );
-                    }
-                    $this->buildBlock(
-                        $id,
-                        $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true),
-                        $this->layoutData->getProperty($id, LayoutData::OPTIONS, true)
+        }
+        $iterator = $this->layoutData->getHierarchyIterator($rootId);
+        foreach ($iterator as $id) {
+            if (!$this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS, true)) {
+                $depth    = $iterator->getDepth();
+                $parentId = $depth === 0
+                    ? $rootId
+                    : $iterator->getSubIterator($depth - 1)->current();
+                if (!$this->isContainerBlock($parentId)) {
+                    throw new Exception\LogicException(
+                        sprintf(
+                            'The "%s" item cannot be added as a child to "%s" item (block type: %s) '
+                            . 'because only container blocks can have children.',
+                            $id,
+                            $parentId,
+                            $this->layoutData->getProperty($parentId, LayoutData::BLOCK_TYPE, true)
+                        )
                     );
                 }
+                $this->buildBlock(
+                    $id,
+                    $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true),
+                    $this->layoutData->getProperty($id, LayoutData::OPTIONS, true)
+                );
             }
-            $this->layoutManipulator->applyChanges();
+        }
+        $this->layoutManipulator->applyChanges();
+        if ($this->layoutManipulator->getNumberOfAddedItems() !== 0) {
+            $this->layoutManipulator->resetCounters();
+            $this->buildBlocks($rootId);
         }
     }
 
@@ -178,7 +182,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
             $view->children[] = $this->buildBlockView(
                 $childId,
                 $childBlockType,
-                $this->layoutData->getProperty($childId, LayoutData::RESOLVED_OPTIONS, true),
+                $this->layoutData->getProperty($childId, LayoutData::RESOLVED_OPTIONS), // !!!! , true
                 $children,
                 $childView
             );

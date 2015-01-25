@@ -2,8 +2,17 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Implements the layout manipulator which allows to perform manipulations in random order
+ */
 class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
 {
+    /** The group name for add new items related actions */
+    const GROUP_ADD = 'add';
+
+    /** The group name for remove items related actions */
+    const GROUP_REMOVE = 'remove';
+
     /** The action name for add layout item */
     const ADD = 'add';
 
@@ -32,12 +41,14 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      *
      * Example:
      *  [
-     *      'add' => [
-     *          ['root', null, 'root', []],
-     *          ['my_label', 'root', 'label', ['text' => 'test']]
+     *      'add' => [ // add new items related actions: add, addAlias, setOption, removeOption
+     *          ['add', ['root', null, 'root', []]],
+     *          ['add', ['my_label', 'my_root', 'label', ['text' => 'test']]],
+     *          ['addAlias', ['my_root', 'root']],
      *      ],
-     *      'remove' => [
-     *          ['my_label']
+     *      'remove' => [ // remove items related actions: remove, removeAlias
+     *          ['remove', ['my_label']],
+     *          ['removeAlias', ['my_root']],
      *      ],
      *  ]
      */
@@ -56,7 +67,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      */
     public function add($id, $parentId = null, $blockType = null, array $options = [])
     {
-        $this->actions[self::ADD][] = [$id, $parentId, $blockType, $options];
+        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, func_get_args()];
 
         return $this;
     }
@@ -66,7 +77,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      */
     public function remove($id)
     {
-        $this->actions[self::REMOVE][] = [$id];
+        $this->actions[self::GROUP_REMOVE][] = [__FUNCTION__, func_get_args()];
 
         return $this;
     }
@@ -76,7 +87,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      */
     public function addAlias($alias, $id)
     {
-        $this->actions[self::ADD_ALIAS][] = [$alias, $id];
+        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, func_get_args()];
 
         return $this;
     }
@@ -86,7 +97,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      */
     public function removeAlias($alias)
     {
-        $this->actions[self::REMOVE_ALIAS][] = [$alias];
+        $this->actions[self::GROUP_REMOVE][] = [__FUNCTION__, func_get_args()];
 
         return $this;
     }
@@ -96,7 +107,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      */
     public function setOption($id, $optionName, $optionValue)
     {
-        $this->actions[self::SET_OPTION][] = [$id, $optionName, $optionValue];
+        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, func_get_args()];
 
         return $this;
     }
@@ -106,7 +117,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      */
     public function removeOption($id, $optionName)
     {
-        $this->actions[self::REMOVE_OPTION][] = [$id, $optionName];
+        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, func_get_args()];
 
         return $this;
     }
@@ -117,14 +128,11 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     public function applyChanges()
     {
         $total = $this->calculateActionCount();
-        // @todo: check if this while is required before close https://magecore.atlassian.net/browse/BAP-7148
-        while ($total !== 0) {
+        if ($total !== 0) {
             $this->executeAllActions();
-            $remained = $this->calculateActionCount();
-
             // validate that all "execute*" methods have correct implementation
             // if all of them are implemented correctly the following exception will be never raised
-            $applied = $total - $remained;
+            $applied = $total - $this->calculateActionCount();
             if ($applied === 0 && $applied !== $total) {
                 throw new Exception\LogicException(
                     sprintf(
@@ -134,14 +142,11 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
                     )
                 );
             }
-
-            // prepare for the next loop
-            $total = $remained;
         }
     }
 
     /**
-     * Returns the total number of actions
+     * Returns the total number of actions in all groups
      *
      * @return int
      */
@@ -156,160 +161,127 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     }
 
     /**
-     * Executes all actions
+     * Executes actions from all groups
      */
     protected function executeAllActions()
     {
-        $this->applyAddChanges();
+        $this->executeAddActions();
         $this->executeRemoveActions();
-        $this->executeRemoveAliasActions();
     }
 
     /**
-     * Applies the following actions:
-     *  - add new items to the layout
-     *  - add aliases for layout items
-     *  - modify the layout item options
-     */
-    protected function applyAddChanges()
-    {
-        $applied = -1;
-        $total   = $this->calculateActionCount();
-        while ($total !== 0 && $applied !== 0) {
-            $this->executeAddActions();
-            $this->executeAddAliasActions();
-            $this->executeSetOptionActions();
-            $this->executeRemoveOptionActions();
-
-            // prepare for the next loop
-            $remained = $this->calculateActionCount();
-            $applied  = $total - $remained;
-            $total    = $remained;
-        }
-    }
-
-    /**
-     * Executes all actions that add new items to the layout
+     * Executes all add new items related actions like
+     *  * add
+     *  * addAlias
+     *  * setOption
+     *  * removeOption
      */
     protected function executeAddActions()
     {
-        $this->executeActions(
-            self::ADD,
-            function (array $action) {
-                $parentId = $action[1];
-
-                return empty($parentId) || $this->layout->has($parentId);
-            }
-        );
+        if (!empty($this->actions[self::GROUP_ADD])) {
+            $this->executeDependedActions(self::GROUP_ADD);
+        }
     }
 
     /**
-     * Executes all actions that remove items from the layout
+     * Executes all remove items related actions like
+     *  * remove
+     *  * removeAlias
      */
     protected function executeRemoveActions()
     {
-        $this->executeActions(
-            self::REMOVE,
-            function (array $action) {
-                $id = $action[0];
-
-                return empty($id) || $this->layout->has($id);
+        if (!empty($this->actions[self::GROUP_REMOVE])) {
+            $this->executeActions(self::GROUP_REMOVE);
+            // remove remaining 'remove' actions if there are no any 'add' actions
+            if (!empty($this->actions[self::GROUP_REMOVE]) && empty($this->actions[self::GROUP_ADD])) {
+                unset($this->actions[self::GROUP_REMOVE]);
             }
-        );
-        // remove remaining 'remove' actions if there are no any 'add' actions
-        if (!empty($this->actions[self::REMOVE]) && empty($this->actions[self::ADD])) {
-            unset($this->actions[self::REMOVE]);
         }
     }
 
     /**
-     * Executes all actions that add aliases for layout items
+     * Checks whether an action is ready to execute
+     *
+     * @param string $name The action name
+     * @param array  $args The action arguments
+     *
+     * @return bool
      */
-    protected function executeAddAliasActions()
+    protected function isActionReadyToExecute($name, $args)
     {
-        $this->executeActions(
-            self::ADD_ALIAS,
-            function (array $action) {
-                $id = $action[1];
+        switch ($name) {
+            case self::ADD:
+                $parentId = $args[1];
+
+                return empty($parentId) || $this->layout->has($parentId);
+            case self::REMOVE:
+            case self::SET_OPTION:
+            case self::REMOVE_OPTION:
+                $id = $args[0];
 
                 return empty($id) || $this->layout->has($id);
-            }
-        );
-    }
+            case self::ADD_ALIAS:
+                $id = $args[1];
 
-    /**
-     * Executes all actions that remove layout item aliases
-     */
-    protected function executeRemoveAliasActions()
-    {
-        $this->executeActions(
-            self::REMOVE_ALIAS,
-            function (array $action) {
-                $alias = $action[0];
+                return empty($id) || $this->layout->has($id);
+            case self::REMOVE_ALIAS:
+                $alias = $args[0];
 
                 return empty($alias) || $this->layout->hasAlias($alias);
+        }
+
+        return true;
+    }
+
+    /**
+     * Executes actions from the given group
+     * Use this method if the group does not contain depended each other actions
+     *
+     * @param string $group
+     */
+    protected function executeActions($group)
+    {
+        foreach ($this->actions[$group] as $key => $action) {
+            if ($this->isActionReadyToExecute($action[0], $action[1])) {
+                call_user_func_array([$this->layout, $action[0]], $action[1]);
+                unset($this->actions[$group][$key]);
             }
-        );
-        // remove remaining 'removeAlias' actions if there are no any 'addAlias' actions
-        if (!empty($this->actions[self::REMOVE_ALIAS]) && empty($this->actions[self::ADD_ALIAS])) {
-            unset($this->actions[self::REMOVE_ALIAS]);
         }
     }
 
     /**
-     * Executes all actions that change layout item options
+     * Executes depended actions from the given group
+     * Use this method if the group can contain depended each other actions
+     * This method guarantee that all actions are executed in the order they are registered
+     *
+     * @param string $group
      */
-    protected function executeSetOptionActions()
+    protected function executeDependedActions($group)
     {
-        $this->executeActions(
-            self::SET_OPTION,
-            function (array $action) {
-                $id = $action[0];
-
-                return empty($id) || $this->layout->has($id);
+        $continue = true;
+        while ($continue) {
+            $continue    = false;
+            $hasExecuted = false;
+            $hasSkipped  = false;
+            foreach ($this->actions[$group] as $key => $action) {
+                if ($this->isActionReadyToExecute($action[0], $action[1])) {
+                    call_user_func_array([$this->layout, $action[0]], $action[1]);
+                    unset($this->actions[$group][$key]);
+                    $hasExecuted = true;
+                    if ($hasSkipped) {
+                        // start execution from the begin
+                        $continue = true;
+                        break;
+                    }
+                } else {
+                    $hasSkipped = true;
+                    if ($hasExecuted) {
+                        // start execution from the begin
+                        $continue = true;
+                        break;
+                    }
+                }
             }
-        );
-    }
-
-    /**
-     * Executes all actions that removes layout item options
-     */
-    protected function executeRemoveOptionActions()
-    {
-        $this->executeActions(
-            self::REMOVE_OPTION,
-            function (array $action) {
-                $id = $action[0];
-
-                return empty($id) || $this->layout->has($id);
-            }
-        );
-    }
-
-    /**
-     * @param string   $actionName       The action name
-     * @param \Closure $isReadyToExecute The callback is used for check if an action is ready to execute
-     *                                   function (array $action) return boolean
-     */
-    protected function executeActions($actionName, \Closure $isReadyToExecute)
-    {
-        if (empty($this->actions[$actionName])) {
-            return;
-        }
-
-        $function       = [$this->layout, $actionName];
-        $skippedActions = [];
-        foreach ($this->actions[$actionName] as $key => $action) {
-            if (!$isReadyToExecute($action)) {
-                $skippedActions[] = $action;
-                continue;
-            }
-            call_user_func_array($function, $action);
-        }
-        if (!empty($skippedActions)) {
-            $this->actions[$actionName] = $skippedActions;
-        } else {
-            unset($this->actions[$actionName]);
         }
     }
 
@@ -319,12 +291,12 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     protected function getRemainedActionsBriefInfo()
     {
         $result = [];
-        foreach ($this->actions as $actionName => $actions) {
+        foreach ($this->actions as $actions) {
             foreach ($actions as $action) {
-                if (empty($action)) {
-                    $result[] = sprintf('%s()', $actionName);
+                if (empty($action[1])) {
+                    $result[] = sprintf('%s()', $action[0]);
                 } else {
-                    $result[] = sprintf('%s(%s)', $actionName, $action[0]);
+                    $result[] = sprintf('%s(%s)', $action[0], $action[1][0]);
                 }
             }
         }

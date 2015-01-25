@@ -11,20 +11,110 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
-            ->add('logo', 'header', 'logo', ['title' => 'test'])
-            ->add('header', 'root', 'header');
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test']);
 
         $view = $this->getLayoutView();
 
         $this->assertBlockView(
             [ // root
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => [
-                                    'title' => 'test'
-                                ]
+                                'vars' => ['id' => 'logo', 'title' => 'test']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAddWhenRootIsAddedAtTheEnd()
+    {
+        $this->layoutManipulator
+            ->add('logo', 'header', 'logo', ['title' => 'test'])
+            ->add('header', 'root', 'header')
+            ->add('root', null, 'root');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'test']
+                            ],
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAddTwoChildren()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo1', 'header', 'logo', ['title' => 'logo1'])
+            ->add('logo2', 'header', 'logo', ['title' => 'logo2']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => 'logo1']
+                            ],
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => 'logo2']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    /** It is expected that children are added in the same order as they are registered */
+    public function testAddTwoChildrenButTheFirstChildIsAddedBeforeContainer()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo', ['title' => 'logo1'])
+            ->add('header', 'root', 'header')
+            ->add('logo2', 'header', 'logo', ['title' => 'logo2']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => 'logo1']
+                            ],
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => 'logo2']
                             ]
                         ]
                     ]
@@ -45,6 +135,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -62,6 +153,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -79,6 +171,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -94,6 +187,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -111,6 +205,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -145,13 +240,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => [
-                                    'title' => 'test1'
-                                ]
+                                'vars' => ['id' => 'logo', 'title' => 'test1']
                             ]
                         ]
                     ]
@@ -173,13 +268,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => [
-                                    'title' => ''
-                                ]
+                                'vars' => ['id' => 'logo', 'title' => '']
                             ]
                         ]
                     ]
@@ -202,6 +297,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars' => ['id' => 'root'],
             ],
             $view
         );
@@ -220,6 +316,43 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars' => ['id' => 'root'],
+            ],
+            $view
+        );
+    }
+
+    public function testLayoutChangedByBlockType()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test'])
+            ->add('test_container', 'header', 'test_self_building_container');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'test']
+                            ],
+                            [ // test_container
+                                'vars'     => ['id' => 'test_container'],
+                                'children' => [
+                                    [ // logo added by 'test_self_building_container' block type
+                                        'vars' => ['id' => 'test_container_logo', 'title' => '']
+                                    ],
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ],
             $view
         );

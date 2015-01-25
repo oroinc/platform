@@ -57,13 +57,13 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
 
         $this->assertBlockView(
             [ // root
+                'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header
+                        'vars'     => ['id' => 'header'],
                         'children' => [
                             [ // logo
-                                'vars' => [
-                                    'title' => 'test'
-                                ]
+                                'vars' => ['id' => 'logo', 'title' => 'test']
                             ]
                         ]
                     ]

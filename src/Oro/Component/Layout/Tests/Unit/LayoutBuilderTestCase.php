@@ -65,7 +65,6 @@ class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
             unset($result['vars']['unique_block_prefix']);
             unset($result['vars']['block_prefixes']);
             unset($result['vars']['cache_key']);
-            unset($result['vars']['id']);
         }
 
         return $result;

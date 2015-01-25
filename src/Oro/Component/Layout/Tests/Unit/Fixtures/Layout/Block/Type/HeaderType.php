@@ -2,9 +2,9 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 
-use Oro\Component\Layout\Block\Type\AbstractType;
+use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
-class HeaderType extends AbstractType
+class HeaderType extends AbstractContainerType
 {
     /**
      * {@inheritdoc}
@@ -12,13 +12,5 @@ class HeaderType extends AbstractType
     public function getName()
     {
         return 'header';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
-    {
-        return 'container';
     }
 }
