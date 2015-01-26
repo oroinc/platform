@@ -1,16 +1,18 @@
 /*jslint nomen:true*/
 /*global define*/
-define([
-    'jquery',
-    'underscore',
-    'orotranslation/js/translator',
-    './choice-filter',
-    'orolocale/js/locale-settings',
-    'orofilter/js/datevariables-widget'
-], function ($, _, __, ChoiceFilter, localeSettings) {
+define(function (require) {
     'use strict';
 
-    var DateFilter;
+    var DateFilter,
+        $ = require('jquery'),
+        _ = require('underscore'),
+        __ = require('orotranslation/js/translator'),
+        ChoiceFilter = require('./choice-filter'),
+        VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view'),
+        DateVariableHelper = require('orofilter/js/date-variable-helper'),
+        datetimeFormatter = require('orolocale/js/formatter/datetime'),
+        localeSettings = require('orolocale/js/locale-settings');
+    require('orofilter/js/datevariables-widget');
 
     /**
      * Date filter: filter type as option + interval begin and end dates
@@ -47,8 +49,9 @@ define([
          * @property
          */
         criteriaValueSelectors: {
-            type: 'select[name!=date_part]',
-            part: 'select[name=date_part]',
+            type: 'select',// to handle both type and part changes
+            date_type: 'select[name!=date_part]',
+            date_part: 'select[name=date_part]',
             value: {
                 start: 'input[name="start"]',
                 end:   'input[name="end"]'
@@ -73,9 +76,16 @@ define([
             yearRange:  '-80:+1',
             dateFormat: localeSettings.getVendorDateTimeFormat('jquery_ui', 'date', 'mm/dd/yy'),
             altFormat:  'yy-mm-dd',
-            className:      'date-filter-widget',
+            className:  'date-filter-widget',
             showButtonPanel: true
         },
+
+        /**
+         * View constructor for picker element
+         *
+         * @property
+         */
+        picker: VariableDatePickerView,
 
         /**
          * Additional date widget options that might be passed to filter
@@ -97,24 +107,6 @@ define([
             lessThan:   4
         },
 
-        defaultTabs: [
-            {
-                name: 'calendar',
-                label: 'oro.filter.date.tab.calendar'
-            },
-            {
-                name: 'variables',
-                label: 'oro.filter.date.tab.variables'
-            }
-        ],
-
-        /**
-         * Date widget selector
-         *
-         * @property
-         */
-        dateWidgetSelector: 'div#ui-datepicker-div.ui-datepicker',
-
         /**
          * Date parts
          *
@@ -124,11 +116,17 @@ define([
 
         hasPartsElement: false,
 
+        events: {
+            'change select': 'onChangeFilterType'
+        },
+
         /**
          * @inheritDoc
          */
         initialize: function () {
-            _.extend(this.dateWidgetOptions, this.externalWidgetOptions);
+            // make own copy of options
+            this.dateWidgetOptions = $.extend(true, {}, this.dateWidgetOptions, this.externalWidgetOptions);
+            this.dateVariableHelper = new DateVariableHelper(this.dateWidgetOptions.dateVars);
 
             //parts rendered only if theme exist
             this.hasPartsElement = (this.templateTheme != "");
@@ -163,8 +161,6 @@ define([
                 };
             }
 
-            this.dateWidgets = {};
-
             DateFilter.__super__.initialize.apply(this, arguments);
         },
 
@@ -178,49 +174,31 @@ define([
             delete this.dateParts;
             delete this.emptyPart;
             delete this.emptyValue;
-            _.each(this.dateWidgets, function ($elem, name) {
-                if (name.slice(-5) === '_vars') {
-                    this._destroyDateVariablesWidget(name);
-                } else {
-                    this._destroyDateWidget(name);
-                }
-                delete this.dateWidgets[name];
-            }, this);
-            delete this.dateWidgets;
             DateFilter.__super__.dispose.call(this);
         },
 
         onChangeFilterType: function (e) {
-            var select = this.$el.find(e.currentTarget);
-            var selectedValue = select.val() || select.data('value');
-
-            this.changeFilterType(selectedValue);
+            var select = this.$el.find(e.currentTarget),
+                value = select.val();
+            this.changeFilterType(value);
         },
 
-        changeFilterType: function (type) {
-            // filter filter range types
-            if (this.dateWidgets.start_vars && type.length > 1) {
-                this.$el.find(this.criteriaValueSelectors.value.start).val('');
-                this.dateWidgets.start_vars.dateVariables('setPart', type);
-            }
-            if (this.dateWidgets.end_vars && type.length > 1) {
-                this.$el.find(this.criteriaValueSelectors.value.end).val('');
-                this.dateWidgets.end_vars.dateVariables('setPart', type);
-            }
-
-            type = parseInt(type, 10);
-
-            // check it's valid integer
-            if (type === parseInt(type)) {
-                this.$el.find('.filter-separator').show().end().find('input').show();
-            }
-
-            if (this.typeValues.moreThan === type) {
-                this.$el.find('.filter-separator').hide();
-                this.$el.find(this.criteriaValueSelectors.value.end).val('').hide();
-            } else if (this.typeValues.lessThan === type) {
-                this.$el.find('.filter-separator').hide();
-                this.$el.find(this.criteriaValueSelectors.value.start).val('').hide();
+        changeFilterType: function (value) {
+            var type = parseInt(value, 10);
+            if (!isNaN(type)) {
+                // it's type
+                this.$('.filter-separator, .filter-start-date, .filter-end-date').css('display','');
+                if (this.typeValues.moreThan === type) {
+                    this.$('.filter-separator, .filter-end-date').hide();
+                    this.subview('end').setValue('');
+                } else if (this.typeValues.lessThan === type) {
+                    this.$('.filter-separator, .filter-start-date').hide();
+                    this.subview('start').setValue('');
+                }
+            } else {
+                // it's part
+                this.subview('start').setPart(value).setValue('');
+                this.subview('end').setPart(value).setValue('');
             }
         },
 
@@ -236,7 +214,6 @@ define([
             this.dateWidgetOptions.part = part.type;
 
             var datePartTemplate = this._getTemplate(this.fieldTemplateSelector);
-            var dropdownTemplate = this._getTemplate(this.dropdownTemplateSelector);
             var parts = [];
 
             // add date parts only if embed template used
@@ -272,142 +249,37 @@ define([
             this._appendFilter($filter);
             this.$(this.criteriaSelector).attr('tabindex', '0');
 
+            this._renderSubViews();
             this.changeFilterType(value.type);
-
-            $filter.find('select:first').bind('change', _.bind(this.onChangeFilterType, this));
-
-            _.each(this.criteriaValueSelectors.value, _.bind(this._appendDropdown, this, dropdownTemplate));
-
-            if (!this._isDateVariable(displayValue.value.start)) {
-                this.dateWidgets.start.datepicker('setDate', displayValue.value.start);
-            }
-            if (!this._isDateVariable(displayValue.value.end)) {
-                this.dateWidgets.end.datepicker('setDate', displayValue.value.end);
-            }
-
-            this.$('.nav-tabs a').click(function (e) {
-                e.preventDefault();
-                $(this).tab('show');
-            });
 
             this._criteriaRenderd = true;
         },
 
         /**
-         * @param {string} value
-         * @returns {boolean}
-         * @private
+         * Renders picker views for both start and end values
+         *
+         * @protected
          */
-        _isDateVariable: function (value) {
-            var result, dateVars;
-            dateVars = this.dateWidgetOptions.dateVars;
-            result = _.some(dateVars.value, function (displayValue, index) {
-                var rawValue = '{{' + index + '}}';
-                return rawValue === value.substr(0, rawValue.length) ||
-                    displayValue === value.substr(0, displayValue.length);
-            });
-            return result;
-        },
-
-        /**
-         * @param {function} template
-         * @param {string} actualSelector
-         * @param {string} name
-         * @private
-         */
-        _appendDropdown: function (template, actualSelector, name) {
-            var $calendar, $el = this.$el,
-                $input = this.$(actualSelector),
-                $dropdown = $input.wrap('<div class="dropdown datefilter">').parent(),
-                tabSuffix = '-' + this.cid + '-' + name,
-                widgetOptions = _.extend({onSelect: function (date) {
-                    $input.val(date).trigger('change');
-                }}, this.dateWidgetOptions);
-
-            var tabs = [];
-            _.each(widgetOptions.tabs || this.defaultTabs, function(tab) {
-                var currentTab   = _.clone(tab);
-                currentTab.label = __(currentTab.label);
-                tabs.push(currentTab);
-            });
-            $input.after(template({
-                tabs:   tabs,
-                suffix: tabSuffix
-            }));
-
-            $input.on('focus, click', function () {
-                $el.find('.dropdown.open').removeClass('open');
-                $dropdown.addClass('open');
-                $calendar.datepicker('refresh');
-            });
-
-            $calendar = this.dateWidgets[name] = this._initializeDateWidget('#calendar' + tabSuffix, widgetOptions);
-            $calendar.addClass(widgetOptions.className)
-                .click(function (e) {
-                    e.stopImmediatePropagation();
+        _renderSubViews: function () {
+            var name, selector, pickerView,
+                value = this.criteriaValueSelectors.value;
+            for (name in value) {
+                if (!value.hasOwnProperty(name)) {
+                    return;
+                }
+                selector = value[name];
+                pickerView = new this.picker({
+                    el: this.$(selector),
+                    useNativePicker: false,
+                    dateInputAttrs: {
+                        'class': this.inputClass
+                    },
+                    datePickerOptions: this.dateWidgetOptions,
+                    dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector)
                 });
-
-            $calendar.data('datepicker').inline = false;
-            $calendar.datepicker('refresh');
-            $calendar.on('click', '.ui-datepicker-close', function() {
-                $dropdown.removeClass('open');
-            });
-
-            widgetOptions = _.extend({
-                $input: $input
-            }, this.dateWidgetOptions);
-            this.dateWidgets[name + '_vars'] = this._initializeDateVariablesWidget('#variables' + tabSuffix, widgetOptions);
+                this.subview(name, pickerView);
+            }
         },
-
-        /**
-         * Initialize date widget
-         *
-         * @param {String} widgetSelector
-         * @param {Object} options
-         * @return {*}
-         * @protected
-         */
-        _initializeDateWidget: function (widgetSelector, options) {
-            return this.$(widgetSelector).datepicker(options);
-        },
-
-        /**
-         * Removes date widget
-         *
-         * @param {string} name of widget
-         * @protected
-         */
-        _destroyDateWidget: function (name) {
-            this.dateWidgets[name].datepicker('destroy');
-        },
-
-        /**
-         * Initialize date variables widget
-         *
-         * @param {String} widgetSelector
-         * @param {Object} options
-         * @return {*}
-         * @protected
-         */
-        _initializeDateVariablesWidget: function (widgetSelector, options) {
-            this.$(widgetSelector).dateVariables(options);
-
-            var widget = this.$(widgetSelector).dateVariables('widget');
-            widget.addClass(options.className);
-
-            return widget;
-        },
-
-        /**
-         * Removes date variables widget
-         *
-         * @param {string} name of widget
-         * @protected
-         */
-        _destroyDateVariablesWidget: function (name) {
-            this.dateWidgets[name].dateVariables('destroy');
-        },
-
 
         /**
          * @inheritDoc
@@ -462,107 +334,70 @@ define([
          * @inheritDoc
          */
         _formatDisplayValue: function (value) {
-            var fromFormat = this.dateWidgetOptions.altFormat;
-            var toFormat = this.dateWidgetOptions.dateFormat;
-
             if (value.value && value.value.start) {
-                value.value.start = this._replaceDateVars(value.value.start, 'display');
+                value.value.start = this._toDisplayValue(value.value.start);
             }
             if (value.value && value.value.end) {
-                value.value.end = this._replaceDateVars(value.value.end, 'display');
+                value.value.end = this._toDisplayValue(value.value.end);
             }
-
-            return this._formatValueDates(value, fromFormat, toFormat);
+            return value;
         },
 
         /**
          * @inheritDoc
          */
         _formatRawValue: function (value) {
-            var fromFormat = this.dateWidgetOptions.dateFormat;
-            var toFormat = this.dateWidgetOptions.altFormat;
-
             if (value.value && value.value.start) {
-                value.value.start = this._replaceDateVars(value.value.start, 'raw');
+                value.value.start = this._toRawValue(value.value.start);
             }
             if (value.value && value.value.end) {
-                value.value.end = this._replaceDateVars(value.value.end, 'raw');
+                value.value.end = this._toRawValue(value.value.end);
             }
-
-            return this._formatValueDates(value, fromFormat, toFormat);
+            return value;
         },
 
         /**
-         * Format dates in a vault to another format
+         * Converts the date value from Raw to Display
          *
-         * @param {Object} value
-         * @param {String} fromFormat
-         * @param {String} toFormat
-         * @return {Object}
+         * @param {string} value
+         * @returns {string}
          * @protected
          */
-        _formatValueDates: function (value, fromFormat, toFormat) {
-            if (value.value && value.value.start) {
-                value.value.start = this._formatDate(value.value.start, fromFormat, toFormat);
+        _toDisplayValue: function (value) {
+            if (this.dateVariableHelper.isDateVariable(value)) {
+                value = this.dateVariableHelper.formatDisplayValue(value);
+            } else if (datetimeFormatter.isBackendDateValid(value)) {
+                value = datetimeFormatter.formatDate(value);
             }
-            if (value.value && value.value.end) {
-                value.value.end = this._formatDate(value.value.end, fromFormat, toFormat);
+            return value;
+        },
+
+        /**
+         * Converts the date value from Display to Raw         *
+         * @param {string} value
+         * @returns {string}
+         * @protected
+         */
+        _toRawValue: function (value) {
+            if (this.dateVariableHelper.isDateVariable(value)) {
+                value = this.dateVariableHelper.formatRawValue(value);
+            } else if (datetimeFormatter.isDateValid(value)) {
+                value = datetimeFormatter.convertDateToBackendFormat(value);
             }
             return value;
         },
 
         _replaceDateVars: function (value, mode) {
+            // todo remove
             // replace date variables with constant values
-            var dateVars = this.dateWidgetOptions.dateVars;
-
             if (mode == 'raw') {
-                for (var part in dateVars) {
-                    if (dateVars.hasOwnProperty(part)) {
-                        for (var varCode in dateVars[part]) {
-                            if (dateVars[part].hasOwnProperty(varCode)) {
-                                value = value.replace(new RegExp(dateVars[part][varCode], 'g'), '{{' + varCode+'}}');
-                            }
-                        }
-                    }
-                }
+                value = this.dateVariableHelper.formatRawValue(value);
             } else {
-                for (var part in dateVars) {
-                    if (dateVars.hasOwnProperty(part)) {
-                        for (var varCode in dateVars[part]) {
-                            if (dateVars[part].hasOwnProperty(varCode)) {
-                                value = value.replace(new RegExp('\{+' + varCode + '\}+', 'gi'), dateVars[part][varCode]);
-                            }
-                        }
-                    }
-                }
+                value = this.dateVariableHelper.formatDisplayValue(value);
             }
-
             return value;
         },
 
-        /**
-         * Formats date string to another format
-         *
-         * @param {String} value
-         * @param {String} fromFormat
-         * @param {String} toFormat
-         * @return {String}
-         * @protected
-         */
-        _formatDate: function (value, fromFormat, toFormat) {
-            var fromValue;
-            if (this._isDateVariable(value)) {
-                return value;
-            }
-            fromValue = $.datepicker.parseDate(fromFormat, value);
-            if (!fromValue) {
-                fromValue = $.datepicker.parseDate(toFormat, value);
-                if (!fromValue) {
-                    return '';
-                }
-            }
-            return $.datepicker.formatDate(toFormat, fromValue);
-        },
 
         /**
          * @inheritDoc
@@ -570,9 +405,9 @@ define([
         _writeDOMValue: function (value) {
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
             this._setInputValue(this.criteriaValueSelectors.value.end, value.value.end);
-            this._setInputValue(this.criteriaValueSelectors.type, value.type);
+            this._setInputValue(this.criteriaValueSelectors.date_type, value.type);
             if (value.part) {
-                this._setInputValue(this.criteriaValueSelectors.part, value.part);
+                this._setInputValue(this.criteriaValueSelectors.date_part, value.part);
             }
             return this;
         },
@@ -582,9 +417,9 @@ define([
          */
         _readDOMValue: function () {
             return {
-                type: this._getInputValue(this.criteriaValueSelectors.type),
+                type: this._getInputValue(this.criteriaValueSelectors.date_type),
                 //empty default parts value if parts not exist
-                part: this.hasPartsElement ? this._getInputValue(this.criteriaValueSelectors.part) : 'value',
+                part: this.hasPartsElement ? this._getInputValue(this.criteriaValueSelectors.date_part) : 'value',
                 value: {
                     start: this._getInputValue(this.criteriaValueSelectors.value.start),
                     end:   this._getInputValue(this.criteriaValueSelectors.value.end)

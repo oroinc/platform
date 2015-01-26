@@ -27,7 +27,8 @@ define(['../locale-settings', 'moment'
         backendFormats: {
             'date':     'YYYY-MM-DD',
             'time':     'HH:mm:ss',
-            'datetime': 'YYYY-MM-DD[T]HH:mm:ssZZ'
+            'datetime': 'YYYY-MM-DD[T]HH:mm:ssZZ',
+            'datetime_separator': 'T'
         },
 
         /**
@@ -57,27 +58,99 @@ define(['../locale-settings', 'moment'
         },
 
         /**
-         * @param {string} value
-         * @returns {*}
+         * Return separator between date and time for current format
+         *
+         * @returns {string}
          */
-        isDateValid: function (value) {
-            return moment(value, this.getDateFormat(), true).isValid();
+        getDateTimeFormatSeparator: function() {
+            return localeSettings.getDateTimeFormatSeparator();
         },
 
         /**
-         * @param {string} value
-         * @returns {Boolean}
+         * Return separator between date and time for backend format
+         *
+         * @returns {string}
          */
-        isTimeValid: function (value) {
-            return moment(value, this.getTimeFormat()).isValid();
+        getBackendDateTimeFormatSeparator: function() {
+            return this.backendFormats.datetime_separator;
         },
 
         /**
+         * Matches any date value to custom format
+         *
          * @param {string} value
-         * @returns {Boolean}
+         * @param {string|Array.<string>} format
+         * @param {boolean=} strict by default its true
+         * @returns {boolean}
          */
-        isDateTimeValid: function (value) {
-            return moment(value, this.getDateTimeFormat()).isValid();
+        isValueValid: function (value, format, strict) {
+            return moment(value, format, strict !== false).isValid();
+        },
+
+        /**
+         * Checks if passed date value matches frontend format
+         *
+         * @param {string} value
+         * @param {boolean=} strict
+         * @returns {boolean}
+         */
+        isDateValid: function (value, strict) {
+            return this.isValueValid(value, this.getDateFormat(), strict);
+        },
+
+        /**
+         * Checks if passed time value matches frontend format
+         *
+         * @param {string} value
+         * @param {boolean=} strict
+         * @returns {boolean}
+         */
+        isTimeValid: function (value, strict) {
+            this.isValueValid(value, this.getTimeFormat(), strict);
+        },
+
+        /**
+         * Checks if passed date time value matches frontend format
+         *
+         * @param {string} value
+         * @param {boolean=} strict
+         * @returns {boolean}
+         */
+        isDateTimeValid: function (value, strict) {
+            return this.isValueValid(value, this.getDateTimeFormat(), strict);
+        },
+
+        /**
+         * Checks if passed date value matches backend format
+         *
+         * @param {string} value
+         * @param {boolean=} strict
+         * @returns {boolean}
+         */
+        isBackendDateValid: function (value, strict) {
+            return this.isValueValid(value, this.backendFormats.date, strict);
+        },
+
+        /**
+         * Checks if passed time value matches backend format
+         *
+         * @param {string} value
+         * @param {boolean=} strict
+         * @returns {boolean}
+         */
+        isBackendTimeValid: function (value, strict) {
+            return this.isValueValid(value, this.backendFormats.time, strict);
+        },
+
+        /**
+         * Checks if passed date time value matches backend format
+         *
+         * @param {string} value
+         * @param {boolean=} strict
+         * @returns {boolean}
+         */
+        isBackendDateTimeValid: function (value, strict) {
+            return this.isValueValid(value, this.backendFormats.datetime, strict);
         },
 
         /**

@@ -67,6 +67,15 @@ define(function (require) {
         },
 
         /**
+         * Sets value directly to backend field
+         *
+         * @param {string} value
+         */
+        setValue: function (value) {
+            this.$el.val(value).trigger('change');
+        },
+
+        /**
          * Creates frontend field
          *
          * @param {Object} options
@@ -149,7 +158,10 @@ define(function (require) {
          * @returns {string}
          */
         getFrontendFormattedDate: function () {
-            var value = datetimeFormatter.formatDate(this.$el.val());
+            var value = this.$el.val();
+            if (datetimeFormatter.isBackendDateValid(value)) {
+                value = datetimeFormatter.formatDate(value);
+            }
             return value;
         }
     });
