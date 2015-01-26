@@ -447,6 +447,26 @@ class LayoutData
     }
 
     /**
+     * Checks whether this storage has data
+     *
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return empty($this->items);
+    }
+
+    /**
+     * Removes all data from this storage
+     */
+    public function clear()
+    {
+        $this->items = [];
+        $this->aliases->clear();
+        $this->hierarchy->clear();
+    }
+
+    /**
      * Checks whether the given string is a valid item identifier
      *
      * A identifier is accepted if it

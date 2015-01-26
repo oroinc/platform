@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-class LayoutBlockBuilder implements BlockBuilderInterface
+class BlockBuilder implements BlockBuilderInterface
 {
     /** @var LayoutManipulatorInterface */
     protected $layoutManipulator;

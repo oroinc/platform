@@ -152,6 +152,15 @@ class AliasCollection
     }
 
     /**
+     * Removes all data from this collection
+     */
+    public function clear()
+    {
+        $this->aliases = [];
+        $this->ids     = [];
+    }
+
+    /**
      * Removes all depended aliases
      * For example if "alias3" is removed in alias chain like "alias1 -> alias2 -> alias3 -> id"
      * than both "alias1" and "alias2" are removed as well

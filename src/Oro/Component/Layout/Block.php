@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-class LayoutBlock implements BlockInterface
+class Block implements BlockInterface
 {
     /** @var ContextInterface */
     protected $context;

@@ -6,11 +6,13 @@ use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
 class ScriptType extends AbstractContainerType
 {
+    const NAME = 'script';
+
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'script';
+        return self::NAME;
     }
 }

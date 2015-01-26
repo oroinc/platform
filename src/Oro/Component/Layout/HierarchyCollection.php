@@ -181,4 +181,12 @@ class HierarchyCollection
     {
         return empty($this->hierarchy);
     }
+
+    /**
+     * Removes all data from this collection
+     */
+    public function clear()
+    {
+        $this->hierarchy = [];
+    }
 }

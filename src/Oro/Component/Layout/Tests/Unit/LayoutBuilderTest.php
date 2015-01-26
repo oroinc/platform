@@ -54,6 +54,19 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
         return $this->layoutViewFactory->createView($layoutData, $this->context, $rootId);
     }
 
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The root item does not exist.
+     */
+    public function testClear()
+    {
+        $this->layoutBuilder
+            ->add('root', null, 'root');
+
+        $this->layoutBuilder->clear();
+        $this->getLayoutView();
+    }
+
     public function testSimpleLayout()
     {
         $this->layoutBuilder

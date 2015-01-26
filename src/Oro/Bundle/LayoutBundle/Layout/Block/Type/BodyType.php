@@ -6,11 +6,13 @@ use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
 class BodyType extends AbstractContainerType
 {
+    const NAME = 'body';
+
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'body';
+        return self::NAME;
     }
 }

@@ -236,6 +236,14 @@ class LayoutBuilder implements RawLayoutAccessorInterface
     }
 
     /**
+     * Declines all built operations
+     */
+    public function clear()
+    {
+        $this->layoutData->clear();
+    }
+
+    /**
      * @return LayoutData
      */
     public function getLayout()
