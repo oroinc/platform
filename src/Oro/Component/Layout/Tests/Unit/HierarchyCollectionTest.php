@@ -25,6 +25,14 @@ class HierarchyCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->hierarchyCollection->isEmpty());
     }
 
+    public function testClear()
+    {
+        $this->hierarchyCollection->add([], 'root');
+
+        $this->hierarchyCollection->clear();
+        $this->assertTrue($this->hierarchyCollection->isEmpty());
+    }
+
     public function testGetRootId()
     {
         $this->hierarchyCollection->add([], 'root');

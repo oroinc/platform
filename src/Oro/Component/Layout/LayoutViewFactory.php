@@ -18,10 +18,10 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /** @var LayoutData */
     protected $layoutData;
 
-    /** @var LayoutBlockBuilder */
+    /** @var BlockBuilder */
     protected $currentBlockBuilder;
 
-    /** @var LayoutBlock */
+    /** @var Block */
     protected $currentBlock;
 
     /** @var  array */
@@ -250,11 +250,11 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      *
      * @param ContextInterface $context
      *
-     * @return LayoutBlockBuilder
+     * @return BlockBuilder
      */
     protected function createBlockBuilder(ContextInterface $context)
     {
-        return new LayoutBlockBuilder($this->layoutManipulator, $context);
+        return new BlockBuilder($this->layoutManipulator, $context);
     }
 
     /**
@@ -262,11 +262,11 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      *
      * @param ContextInterface $context
      *
-     * @return LayoutBlock
+     * @return Block
      */
     protected function createBlock(ContextInterface $context)
     {
-        return new LayoutBlock($context);
+        return new Block($context);
     }
 
     /**

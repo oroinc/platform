@@ -6,11 +6,13 @@ use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
 class RootType extends AbstractContainerType
 {
+    const NAME = 'root';
+
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'root';
+        return self::NAME;
     }
 }

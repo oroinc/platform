@@ -24,3 +24,14 @@
         {{ layout_widget(child) }}
     {%- endfor %}
 {%- endblock %}
+
+{% block head_widget %}
+    <head{{ block('layout_attributes') }}>
+        <title>{{ title|trans({}, translation_domain) }}</title>
+        {{ parent() }}
+    </head>
+{% endblock %}
+
+{% block meta_widget %}
+    <meta{{ block('layout_attributes') }} />
+{% endblock %}

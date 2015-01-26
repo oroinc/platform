@@ -28,6 +28,11 @@ services:
         tags:
              - { name: layout.type, alias: head }
 
+    oro_layout.type.meta:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\MetaType
+        tags:
+             - { name: layout.type, alias: meta }
+
     oro_layout.type.script:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ScriptType
         tags:

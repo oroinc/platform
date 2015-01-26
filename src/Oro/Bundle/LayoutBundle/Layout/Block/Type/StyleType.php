@@ -6,11 +6,13 @@ use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
 class StyleType extends AbstractContainerType
 {
+    const NAME = 'style';
+
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'style';
+        return self::NAME;
     }
 }

@@ -25,6 +25,14 @@ class AliasCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->aliasCollection->isEmpty());
     }
 
+    public function testClear()
+    {
+        $this->aliasCollection->add('test_alias', 'test_id');
+
+        $this->aliasCollection->clear();
+        $this->assertTrue($this->aliasCollection->isEmpty());
+    }
+
     public function testAdd()
     {
         $this->aliasCollection->add('test_alias', 'test_id');

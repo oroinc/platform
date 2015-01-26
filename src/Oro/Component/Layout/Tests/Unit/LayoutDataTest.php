@@ -20,6 +20,22 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         $this->layoutData = new LayoutData();
     }
 
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->layoutData->isEmpty());
+
+        $this->layoutData->add('root', null, 'root');
+        $this->assertFalse($this->layoutData->isEmpty());
+    }
+
+    public function testClear()
+    {
+        $this->layoutData->add('root', null, 'root');
+
+        $this->layoutData->clear();
+        $this->assertTrue($this->layoutData->isEmpty());
+    }
+
     public function testGetRootId()
     {
         // prepare test data
