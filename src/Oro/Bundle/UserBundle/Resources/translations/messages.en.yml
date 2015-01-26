@@ -92,6 +92,7 @@ oro:
         password.label:              Password
         password_re.label:           Re-enter password
         password_requested_at.label: Password requested at
+        password_changed_at.label:   Password changed at
         new_password.label:          New password
         new_password_re.label:       Repeat new password
         roles.label:                 Roles
