@@ -7,10 +7,11 @@ interface LayoutViewFactoryInterface
     /**
      * Creates the object represents the hierarchy of block view objects starting with the given root
      *
-     * @param LayoutData  $layoutData
-     * @param string|null $rootId
+     * @param LayoutData       $layoutData
+     * @param ContextInterface $context
+     * @param string|null      $rootId
      *
      * @return BlockView
      */
-    public function createView(LayoutData $layoutData, $rootId = null);
+    public function createView(LayoutData $layoutData, ContextInterface $context, $rootId = null);
 }

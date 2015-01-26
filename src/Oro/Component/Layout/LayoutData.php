@@ -433,17 +433,17 @@ class LayoutData
      *
      * @param string $id The id or alias of the layout item
      *
-     * @return \RecursiveIteratorIterator
+     * @return HierarchyIterator
      *
      * @throws Exception\InvalidArgumentException if the id is empty
      * @throws Exception\ItemNotFoundException if the layout item does not exist
      */
     public function getHierarchyIterator($id)
     {
-        return new \RecursiveIteratorIterator(
-            new KeyAsValueRecursiveArrayIterator($this->getHierarchy($id)),
-            \RecursiveIteratorIterator::SELF_FIRST
-        );
+        $id       = $this->validateAndResolveId($id);
+        $children = $this->hierarchy->get($this->getProperty($id, self::PATH, true));
+
+        return new HierarchyIterator($id, $children);
     }
 
     /**

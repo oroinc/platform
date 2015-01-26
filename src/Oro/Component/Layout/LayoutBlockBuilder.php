@@ -4,20 +4,33 @@ namespace Oro\Component\Layout;
 
 class LayoutBlockBuilder implements BlockBuilderInterface
 {
-    /** @var string */
-    protected $blockId;
-
     /** @var LayoutManipulatorInterface */
     protected $layoutManipulator;
 
+    /** @var ContextInterface */
+    protected $context;
+
+    /** @var string */
+    protected $blockId;
+
     /**
-     * @param string                     $blockId
      * @param LayoutManipulatorInterface $layoutManipulator
+     * @param ContextInterface           $context
      */
-    public function __construct($blockId, LayoutManipulatorInterface $layoutManipulator)
+    public function __construct(LayoutManipulatorInterface $layoutManipulator, ContextInterface $context)
     {
-        $this->blockId           = $blockId;
         $this->layoutManipulator = $layoutManipulator;
+        $this->context           = $context;
+    }
+
+    /**
+     * Initializes the state of this object
+     *
+     * @param string $blockId
+     */
+    public function initialize($blockId)
+    {
+        $this->blockId = $blockId;
     }
 
     /**
@@ -34,5 +47,13 @@ class LayoutBlockBuilder implements BlockBuilderInterface
     public function getLayoutBuilder()
     {
         return $this->layoutManipulator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 }

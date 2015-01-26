@@ -4,19 +4,43 @@ namespace Oro\Component\Layout;
 
 class LayoutBlock implements BlockInterface
 {
+    /** @var ContextInterface */
+    protected $context;
+
     /** @var string */
     protected $blockId;
 
-    /** @var LayoutData */
-    protected $layoutData;
+    /**
+     * @param ContextInterface $context
+     */
+    public function __construct(ContextInterface $context)
+    {
+        $this->context = $context;
+    }
 
     /**
-     * @param LayoutData $layoutData
-     * @param string     $blockId
+     * Initializes the state of this object
+     *
+     * @param string $blockId
      */
-    public function __construct(LayoutData $layoutData, $blockId)
+    public function initialize($blockId)
     {
-        $this->layoutData = $layoutData;
-        $this->blockId    = $blockId;
+        $this->blockId = $blockId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId()
+    {
+        return $this->blockId;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContext()
+    {
+        return $this->context;
     }
 }

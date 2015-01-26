@@ -17,4 +17,11 @@ interface BlockBuilderInterface
      * @return LayoutManipulatorInterface
      */
     public function getLayoutBuilder();
+
+    /**
+     * Returns the execution context
+     *
+     * @return ContextInterface
+     */
+    public function getContext();
 }

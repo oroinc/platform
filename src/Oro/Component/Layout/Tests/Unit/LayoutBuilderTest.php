@@ -7,6 +7,7 @@ use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\LayoutBuilder;
+use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutData;
 use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
@@ -16,6 +17,9 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
     /** @var BlockTypeFactoryStub */
     protected $blockTypeFactory;
 
+    /** @var LayoutContext */
+    protected $context;
+
     /** @var LayoutBuilder */
     protected $layoutBuilder;
 
@@ -24,6 +28,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
 
     protected function setUp()
     {
+        $this->context           = new LayoutContext();
         $this->layoutBuilder     = new LayoutBuilder();
         $this->blockTypeFactory  = new BlockTypeFactoryStub();
         $blockTypeRegistry       = new BlockTypeRegistry($this->blockTypeFactory);
@@ -44,7 +49,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
     {
         $layoutData = $this->layoutBuilder->getLayout();
 
-        return $this->layoutViewFactory->createView($layoutData, $rootId);
+        return $this->layoutViewFactory->createView($layoutData, $this->context, $rootId);
     }
 
     public function testSimpleLayout()
