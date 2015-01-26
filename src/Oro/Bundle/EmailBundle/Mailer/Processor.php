@@ -84,6 +84,8 @@ class Processor
         $message->setDate($messageDate->getTimestamp());
         $message->setFrom($this->getAddresses($model->getFrom()));
         $message->setTo($this->getAddresses($model->getTo()));
+        $message->setCc($this->getAddresses($model->getCc()));
+        $message->setBcc($this->getAddresses($model->getBcc()));
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
@@ -102,7 +104,10 @@ class Processor
             $model->getTo(),
             $messageDate,
             $messageDate,
-            $messageDate
+            $messageDate,
+            Email::NORMAL_IMPORTANCE,
+            $model->getCc(),
+            $model->getBcc()
         );
 
         $email->addFolder($origin->getFolder(FolderType::SENT));

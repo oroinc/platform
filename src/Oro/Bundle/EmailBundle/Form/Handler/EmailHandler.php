@@ -171,6 +171,56 @@ class EmailHandler
         if ($this->request->query->has('entityId')) {
             $model->setEntityId($this->request->query->get('entityId'));
         }
+        $this->initFrom($model);
+        $this->initRecipients($model);
+        $this->initSubject($model);
+    }
+
+    /**
+     * @param Email $model
+     */
+    protected function initRecipients(Email $model)
+    {
+        $model->setTo($this->getRecipients($model, 'to'));
+        $model->setCc($this->getRecipients($model, 'cc'));
+        $model->setBcc($this->getRecipients($model, 'bcc'));
+    }
+
+    /**
+     * @param Email $model
+     * @param string $type
+     *
+     * @return array
+     */
+    protected function getRecipients(Email $model, $type)
+    {
+        $addresses = [];
+        if ($this->request->query->has($type)) {
+            $address = trim($this->request->query->get($type));
+            if (!empty($address)) {
+                $this->preciseFullEmailAddress($address, $model->getEntityClass(), $model->getEntityId());
+            }
+            $addresses = [$address];
+        }
+        return $addresses;
+    }
+
+    /**
+     * @param Email $model
+     */
+    protected function initSubject(Email $model)
+    {
+        if ($this->request->query->has('subject')) {
+            $subject = trim($this->request->query->get('subject'));
+            $model->setSubject($subject);
+        }
+    }
+
+    /**
+     * @param Email $model
+     */
+    protected function initFrom(Email $model)
+    {
         if ($this->request->query->has('from')) {
             $from = $this->request->query->get('from');
             if (!empty($from)) {
@@ -187,17 +237,6 @@ class EmailHandler
                     )
                 );
             }
-        }
-        if ($this->request->query->has('to')) {
-            $to = trim($this->request->query->get('to'));
-            if (!empty($to)) {
-                $this->preciseFullEmailAddress($to, $model->getEntityClass(), $model->getEntityId());
-            }
-            $model->setTo(array($to));
-        }
-        if ($this->request->query->has('subject')) {
-            $subject = trim($this->request->query->get('subject'));
-            $model->setSubject($subject);
         }
     }
 
