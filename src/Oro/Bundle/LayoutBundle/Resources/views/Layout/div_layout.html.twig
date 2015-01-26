@@ -40,3 +40,14 @@
     {% set attr = {'type': 'text/javascript'}|merge(attr) %}
     <script{{ block('layout_attributes') }}>{{ content|raw }}</script>
 {% endblock %}
+
+{% block style_widget %}
+    {% set attr = {'type': 'text/css'}|merge(attr) %}
+    {% if attr.src is not empty %}
+        {% set href = attr.src %}
+        {% set attr = attr|omit(['src'])|merge({'href' : href}) %}
+        <link rel="stylesheet"{{ block('layout_attributes') }}/>
+    {% else %}
+        <style{{ block('layout_attributes') }}>{{ content|raw }}</style>
+    {% endif %}
+{% endblock %}
