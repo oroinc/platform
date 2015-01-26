@@ -43,10 +43,10 @@ oro:
 
                 ref-one:            System relation
                 ref-many:           System relation
-                array:              Binary
-                json_array:         Binary
-                simple_array:       Binary
-                object:             Binary
+                array:              Binary (Array)
+                json_array:         Binary (JSON array)
+                simple_array:       Binary (Simple array)
+                object:             Binary (Object)
 
                 inverse_relation:   Reuse "%field_name%" of %entity_name%
             field_name.label:       Field name
