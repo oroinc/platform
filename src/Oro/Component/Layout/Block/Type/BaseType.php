@@ -7,7 +7,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
-class BlockType extends AbstractType
+class BaseType extends AbstractType
 {
     const NAME = 'layout';
 

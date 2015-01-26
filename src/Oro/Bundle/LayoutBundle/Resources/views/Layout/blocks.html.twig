@@ -25,10 +25,10 @@
     {%- endfor %}
 {%- endblock layout_rest %}
 
-{% block layout_container_widget -%}
+{% block container_widget -%}
     {% for child in children -%}
         {% if not child.rendered -%}
             {{ layout_widget(child) }}
         {%- endif %}
     {%- endfor %}
-{%- endblock layout_container_widget %}
+{%- endblock container_widget %}

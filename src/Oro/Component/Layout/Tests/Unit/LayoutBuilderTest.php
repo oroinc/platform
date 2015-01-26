@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\BlockView;
@@ -269,8 +271,8 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     'translation_domain'  => 'messages',
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
-                        'layout',
-                        'layout_container',
+                        BaseType::NAME,
+                        ContainerType::NAME,
                         'root',
                         '_rootId',
                     ],
@@ -299,8 +301,8 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     'translation_domain'  => 'messages',
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
-                        'layout',
-                        'layout_container',
+                        BaseType::NAME,
+                        ContainerType::NAME,
                         'root',
                         '_rootId',
                     ],
@@ -313,8 +315,8 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                             'translation_domain'  => 'messages',
                             'unique_block_prefix' => '_headerId',
                             'block_prefixes'      => [
-                                'layout',
-                                'layout_container',
+                                BaseType::NAME,
+                                ContainerType::NAME,
                                 'header',
                                 '_headerId',
                             ],
@@ -327,7 +329,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                                     'translation_domain'  => 'messages',
                                     'unique_block_prefix' => '_logoId',
                                     'block_prefixes'      => [
-                                        'layout',
+                                        BaseType::NAME,
                                         'logo',
                                         '_logoId',
                                     ],

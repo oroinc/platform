@@ -44,6 +44,6 @@ abstract class AbstractType implements BlockTypeInterface
      */
     public function getParent()
     {
-        return BlockType::NAME;
+        return BaseType::NAME;
     }
 }
