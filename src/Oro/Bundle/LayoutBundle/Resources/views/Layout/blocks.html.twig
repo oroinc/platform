@@ -1,7 +1,34 @@
-{% block container_widget -%}
-    {% for child in children -%}
+{% block layout_widget -%}
+{%- endblock layout_widget %}
+
+{% block layout_label -%}
+    {% if label is not sameas(false) %}
+        {%- if label is empty -%}
+            {% set label = name|humanize %}
+        {%- endif -%}
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label|trans({}, translation_domain) }}</label>
+    {%- endif %}
+{%- endblock layout_label %}
+
+{% block layout_row -%}
+    <div>
+        {{- layout_label(form) -}}
+        {{- layout_widget(form) -}}
+    </div>
+{%- endblock layout_row %}
+
+{% block layout_rest -%}
+    {% for child in form -%}
         {% if not child.rendered -%}
-            {{ block_widget(child) }}
+            {{ layout_row(child) }}
         {%- endif %}
     {%- endfor %}
-{%- endblock container_widget %}
+{%- endblock layout_rest %}
+
+{% block layout_container_widget -%}
+    {% for child in children -%}
+        {% if not child.rendered -%}
+            {{ layout_widget(child) }}
+        {%- endif %}
+    {%- endfor %}
+{%- endblock layout_container_widget %}

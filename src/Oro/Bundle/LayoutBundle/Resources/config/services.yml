@@ -1,10 +1,5 @@
 parameters:
-    oro_layout.block_type_factory.class:  Oro\Component\Layout\DependencyInjectionBlockTypeFactory;
-    oro_layout.block_type.root.class:     Oro\Component\Layout\Block\Type\RootBlockType;
-    oro_layout.block_type.head.class:     Oro\Component\Layout\Block\Type\HeadBlockType;
-    oro_layout.block_type.script.class:   Oro\Component\Layout\Block\Type\ScriptBlockType;
-    oro_layout.block_type.style.class:    Oro\Component\Layout\Block\Type\StyleBlockType;
-    oro_layout.block_type.body.class:     Oro\Component\Layout\Block\Type\BodyBlockType;
+    oro_layout.block_type_factory.class:  Oro\Component\Layout\DependencyInjectionBlockTypeFactory
 
 services:
     oro_layout.block_type_factory:
@@ -13,17 +8,37 @@ services:
             - @service_container
             - {}
 
+    oro_layout.block_type.base:
+        class: Oro\Component\Layout\Block\Type\BlockType
+        tags:
+             - { name: layout.block_type, alias: layout }
+
+    oro_layout.block_type.container:
+        class: Oro\Component\Layout\Block\Type\ContainerType
+        tags:
+             - { name: layout.block_type, alias: layout_container }
+
     oro_layout.block_type.root:
-        class: %oro_layout.block_type.root.class%
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RootType
+        tags:
+             - { name: layout.block_type, alias: root }
 
     oro_layout.block_type.head:
-        class: %oro_layout.block_type.head.class%
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType
+        tags:
+             - { name: layout.block_type, alias: head }
 
     oro_layout.block_type.script:
-        class: %oro_layout.block_type.script.class%
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ScriptType
+        tags:
+             - { name: layout.block_type, alias: script }
 
     oro_layout.block_type.style:
-        class: %oro_layout.block_type.style.class%
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
+        tags:
+             - { name: layout.block_type, alias: style }
 
     oro_layout.block_type.body:
-        class: %oro_layout.block_type.body.class%
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\BodyType
+        tags:
+             - { name: layout.block_type, alias: body }

@@ -9,6 +9,6 @@ abstract class AbstractContainerType extends AbstractType
      */
     public function getParent()
     {
-        return 'container';
+        return ContainerType::NAME;
     }
 }

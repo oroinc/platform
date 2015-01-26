@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\LayoutData;
 
 /**
@@ -164,7 +165,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         $this->layoutData->add('root', null, 'root');
         $this->layoutData->add('header', 'root', 'header');
         $this->layoutData->add('item1', 'header', 'label');
-        $this->layoutData->add('item2', 'header', 'container');
+        $this->layoutData->add('item2', 'header', ContainerType::NAME);
         $this->layoutData->add('item3', 'item2', 'label');
 
         // do test
@@ -212,10 +213,10 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         // prepare test data
         $this->layoutData->add('root', null, 'root');
         $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('container1', 'header1', 'container');
+        $this->layoutData->add('container1', 'header1', ContainerType::NAME);
         $this->layoutData->add('item1', 'container1', 'label');
         $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('container2', 'header2', 'container');
+        $this->layoutData->add('container2', 'header2', ContainerType::NAME);
         $this->layoutData->add('item2', 'container2', 'label');
 
         // do test
@@ -235,10 +236,10 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         // prepare test data
         $this->layoutData->add('root', null, 'root');
         $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('container1', 'header1', 'container');
+        $this->layoutData->add('container1', 'header1', ContainerType::NAME);
         $this->layoutData->add('item1', 'container1', 'label');
         $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('container2', 'header2', 'container');
+        $this->layoutData->add('container2', 'header2', ContainerType::NAME);
         $this->layoutData->add('item2', 'container2', 'label');
         $this->layoutData->addAlias('test_root', 'root');
         $this->layoutData->addAlias('test_container1', 'container1');

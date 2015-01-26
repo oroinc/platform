@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\Type\ContainerType;
+
 /**
  * This class contains unit tests which are NOT RELATED to ALIASES
  */
@@ -383,10 +385,10 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header1', 'root', 'header')
-            ->add('container1', 'header1', 'container')
+            ->add('container1', 'header1', ContainerType::NAME)
             ->add('logo1', 'container1', 'logo')
             ->add('header2', 'root', 'header')
-            ->add('container2', 'header2', 'container')
+            ->add('container2', 'header2', ContainerType::NAME)
             ->add('logo2', 'container2', 'logo')
             ->move('container1', 'root');
 
@@ -431,10 +433,10 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header1', 'root', 'header')
-            ->add('container1', 'header1', 'container')
+            ->add('container1', 'header1', ContainerType::NAME)
             ->add('logo1', 'container1', 'logo')
             ->add('header2', 'root', 'header')
-            ->add('container2', 'header2', 'container')
+            ->add('container2', 'header2', ContainerType::NAME)
             ->add('logo2', 'container2', 'logo')
             ->move('container1', 'header2');
 
@@ -479,12 +481,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header1', 'root', 'header')
-            ->add('container1', 'header1', 'container')
+            ->add('container1', 'header1', ContainerType::NAME)
             ->add('logo1', 'container1', 'logo')
             ->add('header2', 'root', 'header')
-            ->add('container2', 'header2', 'container')
+            ->add('container2', 'header2', ContainerType::NAME)
             ->add('logo2', 'container2', 'logo')
-            ->add('container3', 'header2', 'container')
+            ->add('container3', 'header2', ContainerType::NAME)
             ->add('logo3', 'container3', 'logo')
             ->move('container1', 'header2', 'container3', true);
 
@@ -537,13 +539,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header1', 'root', 'header')
-            ->add('container1', 'header1', 'container')
+            ->add('container1', 'header1', ContainerType::NAME)
             ->add('logo1', 'container1', 'logo')
             ->move('container1', 'header2', 'container2')
             ->add('header2', 'root', 'header')
-            ->add('container2', 'header2', 'container')
+            ->add('container2', 'header2', ContainerType::NAME)
             ->add('logo2', 'container2', 'logo')
-            ->add('container3', 'header2', 'container')
+            ->add('container3', 'header2', ContainerType::NAME)
             ->add('logo3', 'container3', 'logo');
 
         $view = $this->getLayoutView();
@@ -595,13 +597,13 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header1', 'root', 'header')
-            ->add('container1', 'header1', 'container')
+            ->add('container1', 'header1', ContainerType::NAME)
             ->add('logo1', 'container1', 'logo')
             ->move('container1', 'header2', 'unknown', true)
             ->add('header2', 'root', 'header')
-            ->add('container2', 'header2', 'container')
+            ->add('container2', 'header2', ContainerType::NAME)
             ->add('logo2', 'container2', 'logo')
-            ->add('container3', 'header2', 'container')
+            ->add('container3', 'header2', ContainerType::NAME)
             ->add('logo3', 'container3', 'logo');
 
         $view = $this->getLayoutView();
@@ -653,12 +655,12 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header1', 'root', 'header')
-            ->add('container1', 'header1', 'container')
+            ->add('container1', 'header1', ContainerType::NAME)
             ->add('logo1', 'container1', 'logo')
             ->add('header2', 'root', 'header')
-            ->add('container2', 'header2', 'container')
+            ->add('container2', 'header2', ContainerType::NAME)
             ->add('logo2', 'container2', 'logo')
-            ->add('container3', 'header2', 'container')
+            ->add('container3', 'header2', ContainerType::NAME)
             ->add('logo3', 'container3', 'logo')
             ->move('container1', 'header2', 'unknown');
 

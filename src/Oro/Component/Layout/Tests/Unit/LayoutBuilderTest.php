@@ -269,8 +269,8 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     'translation_domain'  => 'messages',
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
-                        'block',
-                        'container',
+                        'layout',
+                        'layout_container',
                         'root',
                         '_rootId',
                     ],
@@ -299,8 +299,8 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                     'translation_domain'  => 'messages',
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
-                        'block',
-                        'container',
+                        'layout',
+                        'layout_container',
                         'root',
                         '_rootId',
                     ],
@@ -313,8 +313,8 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                             'translation_domain'  => 'messages',
                             'unique_block_prefix' => '_headerId',
                             'block_prefixes'      => [
-                                'block',
-                                'container',
+                                'layout',
+                                'layout_container',
                                 'header',
                                 '_headerId',
                             ],
@@ -327,7 +327,7 @@ class LayoutBuilderTest extends LayoutBuilderTestCase
                                     'translation_domain'  => 'messages',
                                     'unique_block_prefix' => '_logoId',
                                     'block_prefixes'      => [
-                                        'block',
+                                        'layout',
                                         'logo',
                                         '_logoId',
                                     ],

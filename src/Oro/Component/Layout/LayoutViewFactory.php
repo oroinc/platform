@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\Block\Type\ContainerType;
+
 class LayoutViewFactory implements LayoutViewFactoryInterface
 {
     /** @var BlockTypeRegistryInterface */
@@ -284,7 +286,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
         $types     = $this->getBlockTypeChain($blockType);
 
-        return count($types) > 1 && $types[1]->getName() === 'container';
+        return count($types) > 1 && $types[1]->getName() === ContainerType::NAME;
     }
 
     /**

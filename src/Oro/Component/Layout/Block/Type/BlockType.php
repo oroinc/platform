@@ -9,6 +9,8 @@ use Oro\Component\Layout\BlockView;
 
 class BlockType extends AbstractType
 {
+    const NAME = 'layout';
+
     /**
      * {@inheritdoc}
      */
@@ -53,7 +55,7 @@ class BlockType extends AbstractType
      */
     public function getName()
     {
-        return 'block';
+        return self::NAME;
     }
 
     /**
