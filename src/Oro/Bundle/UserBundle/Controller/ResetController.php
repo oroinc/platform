@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\UserBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -7,6 +8,8 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ResetController extends Controller
@@ -41,7 +44,7 @@ class ResetController extends Controller
         if ($user->isPasswordRequestNonExpired($this->container->getParameter('oro_user.reset.ttl'))) {
             $this->get('session')->getFlashBag()->add(
                 'warn',
-                'The password for this user has already been requested within the last 24 hours.'
+                'oro.user.password.reset.ttl_already_requested.message'
             );
 
             return $this->redirect($this->generateUrl('oro_user_reset_request'));
@@ -52,29 +55,57 @@ class ResetController extends Controller
         }
 
         $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
-
-        $cm          = $this->get('oro_config.global');
-        $senderEmail = $cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $cm->get('oro_notification.email_notification_sender_name');
-
-        /**
-         * @todo Move to postUpdate lifecycle event handler as service
-         */
-        $message = \Swift_Message::newInstance()
-            ->setSubject('Reset password')
-            ->setFrom($senderEmail, $senderName)
-            ->setTo($user->getEmail())
-            ->setBody(
-                $this->renderView('OroUserBundle:Mail:reset.html.twig', array('user' => $user)),
-                'text/html'
+        try {
+            $this->get('oro_user.mailer.processor')->sendResetPasswordEmail($user);
+        } catch (\Exception $e) {
+            $this->get('session')->getFlashBag()->add(
+                'warn',
+                $this->get('translator')->trans('oro.email.handler.unable_to_send_email')
             );
 
+            return $this->redirect($this->generateUrl('oro_user_reset_request'));
+        }
         $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-
-        $this->get('mailer')->send($message);
         $this->get('oro_user.manager')->updateUser($user);
 
         return $this->redirect($this->generateUrl('oro_user_reset_check_email'));
+    }
+
+    /**
+     * @Route("/send-email-as-admin/{id}", name="oro_user_reset_send_email_as_admin", requirements={"id"="\d+"})
+     * @AclAncestor("password_management")
+     * @Template("OroUserBundle:Reset/widget:sendEmailConfirmation.html.twig")
+     */
+    public function sendEmailAsAdminAction(User $user)
+    {
+        $params = [
+            'entity' => $user,
+        ];
+
+        if ($this->getRequest()->isMethod('POST')) {
+            if (null === $user->getConfirmationToken()) {
+                $user->setConfirmationToken($user->generateToken());
+            }
+
+            $this->get('session')->set(static::SESSION_EMAIL, $this->getObfuscatedEmail($user));
+            try {
+                $this->get('oro_user.mailer.processor')->sendResetPasswordAsAdminEmail($user);
+            } catch (\Exception $e) {
+                $params['processed'] = false;
+                $params['error'] = $this->get('translator')->trans('oro.email.handler.unable_to_send_email');
+                return $params;
+            }
+            $user->setPasswordRequestedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+            $this->get('oro_user.manager')->updateUser($user);
+            $params['processed'] = true;
+        } else {
+            $params['formAction'] = $this->get('router')->generate(
+                'oro_user_reset_send_email_as_admin',
+                ['id' => $user->getId()]
+            );
+        }
+
+        return $params;
     }
 
     /**
@@ -129,11 +160,14 @@ class ResetController extends Controller
         }
 
         if ($this->get('oro_user.form.handler.reset')->process($user)) {
-            $session->getFlashBag()->add('success', 'Your password has been successfully reset. You may login now.');
-
             // force user logout
             $session->invalidate();
             $this->get('security.context')->setToken(null);
+
+            $session->getFlashBag()->add(
+                'success',
+                $this->get('translator')->trans('oro.user.security.password_reseted.message')
+            );
 
             return $this->redirect($this->generateUrl('oro_user_security_login'));
         }
@@ -142,6 +176,39 @@ class ResetController extends Controller
             'token' => $token,
             'form'  => $this->get('oro_user.form.reset')->createView(),
         );
+    }
+
+    /**
+     * Sets user password
+     *
+     * @AclAncestor("password_management")
+     * @Method({"GET", "POST"})
+     * @Route("/set-password/{id}", name="oro_user_reset_set_password", requirements={"id"="\d+"})
+     * @Template("OroUserBundle:Reset:update.html.twig")
+     */
+    public function setPasswordAction(User $entity)
+    {
+        $entityRoutingHelper = $this->getEntityRoutingHelper();
+
+        $formAction = $entityRoutingHelper->generateUrlByRequest(
+            'oro_user_reset_set_password',
+            $this->getRequest(),
+            ['id' => $entity->getId()]
+        );
+
+        $responseData = [
+            'entity' => $entity,
+            'saved'  => false
+        ];
+
+        if ($this->get('oro_user.form.handler.set_password')->process($entity)) {
+            $responseData['entity'] = $entity;
+            $responseData['saved']  = true;
+        }
+        $responseData['form']       = $this->get('oro_user.form.type.set_password.form')->createView();
+        $responseData['formAction'] = $formAction;
+
+        return $responseData;
     }
 
     /**
@@ -161,5 +228,13 @@ class ResetController extends Controller
         }
 
         return $email;
+    }
+
+    /**
+     * @return EntityRoutingHelper
+     */
+    protected function getEntityRoutingHelper()
+    {
+        return $this->get('oro_entity.routing_helper');
     }
 }
