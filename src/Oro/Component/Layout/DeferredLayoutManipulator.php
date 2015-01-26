@@ -140,7 +140,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     /**
      * {@inheritdoc}
      *
-     * @throws Exception\OddActionsException if not all scheduled action have been performed
+     * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
      */
     public function applyChanges()
     {
@@ -151,13 +151,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             // check that all scheduled actions have been performed
             $applied = $total - $this->calculateActionCount();
             if ($applied === 0 && $applied !== $total) {
-                throw new Exception\OddActionsException(
-                    sprintf(
-                        'Failed to apply scheduled changes. %d action(s) cannot be applied.',
-                        $total - $applied
-                    ),
-                    $this->getRemainedActionsForOddActionsException()
-                );
+                throw $this->createFailureException();
             }
         }
     }
@@ -349,17 +343,23 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     }
 
     /**
-     * @return string
+     * @return Exception\DeferredUpdateFailureException
      */
-    protected function getRemainedActionsForOddActionsException()
+    protected function createFailureException()
     {
-        $result = [];
+        $exActions = [];
         foreach ($this->actions as $actions) {
             foreach ($actions as $action) {
-                $result[] = ['name' => $action[0], 'args' => isset($action[1]) ? $action[1] : []];
+                $exActions[] = ['name' => $action[0], 'args' => isset($action[1]) ? $action[1] : []];
             }
         }
 
-        return $result;
+        return new Exception\DeferredUpdateFailureException(
+            sprintf(
+                'Failed to apply scheduled changes. %d action(s) cannot be applied.',
+                count($exActions)
+            ),
+            $exActions
+        );
     }
 }

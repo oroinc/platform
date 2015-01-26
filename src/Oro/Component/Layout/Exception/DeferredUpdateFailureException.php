@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Exception;
 /**
  * Exception thrown if not all scheduled actions can be performed.
  */
-class OddActionsException extends LogicException
+class DeferredUpdateFailureException extends LogicException
 {
     /**
      * @var array
