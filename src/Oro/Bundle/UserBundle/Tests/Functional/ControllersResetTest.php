@@ -54,26 +54,6 @@ class ControllersResetTest extends WebTestCase
         $this->assertNotEquals($oldPassword, $newPassword);
     }
 
-//    public function testSetPasswordActionCorrectPost()
-//    {
-//        $this->client->request(
-//            'POST',
-//            $this->getUrl('oro_user_reset_set_password', ['id' => 1, '_widgetContainer' => 'dialog'])
-//        );
-//        $result = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-//    }
-//
-//    public function testSetPasswordActionIncorrectPost()
-//    {
-//        $this->client->request(
-//            'POST',
-//            $this->getUrl('oro_user_reset_set_password', ['id' => 1, '_widgetContainer' => 'dialog'])
-//        );
-//        $result = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-//    }
-
     public function testSendEmailAction()
     {
         /** @var User $user */
@@ -117,30 +97,4 @@ class ControllersResetTest extends WebTestCase
         $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')->find($user->getId());
         $this->assertNotNull($user->getPasswordRequestedAt());
     }
-
-//    public function testSendEmailAsAdminActionPostCorrectForm()
-//    {
-//        $this->client->request(
-//            'POST',
-//            $this->getUrl(
-//                'oro_user_reset_send_email_as_admin',
-//                ['id' => 1, '_widgetContainer' => 'dialog']
-//            )
-//        );
-//        $result = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-//    }
-//
-//    public function testSendEmailAsAdminActionPostIncorrectForm()
-//    {
-//        $this->client->request(
-//            'POST',
-//            $this->getUrl(
-//                'oro_user_reset_send_email_as_admin',
-//                ['id' => 1, '_widgetContainer' => 'dialog']
-//            )
-//        );
-//        $result = $this->client->getResponse();
-//        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-//    }
 }
