@@ -16,15 +16,20 @@ class BaseType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
+        // add the view to itself vars to allow get it using 'item' context variable in a rendered, for example TWIG
+        $view->vars['item'] = $view;
+        // replace attributes if specified ('attr' variable always exists in a view because it is added by FormView)
         if (isset($options['attr'])) {
             $view->vars['attr'] = $options['attr'];
         }
+        // add label text and attributes if specified
         if (isset($options['label'])) {
             $view->vars['label'] = $options['label'];
+            if (isset($options['label_attr'])) {
+                $view->vars['label_attr'] = $options['label_attr'];
+            }
         }
-        if (isset($options['label_attr'])) {
-            $view->vars['label_attr'] = $options['label_attr'];
-        }
+        // add the translation domain
         $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
     }
 

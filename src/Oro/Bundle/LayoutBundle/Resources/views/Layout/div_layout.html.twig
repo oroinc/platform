@@ -1,0 +1,26 @@
+{% block layout_widget -%}
+{%- endblock %}
+
+{% block layout_label -%}
+    {% if label is defined and label is not same as(false) %}
+        {%- if label is empty -%}
+            {% set label = id|humanize %}
+        {%- endif -%}
+        <label{% if label_attr is defined %}{% for attrname, attrvalue in label_attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}{% endif %}>{{ label|trans({}, translation_domain) }}</label>
+    {%- endif %}
+{%- endblock %}
+
+{% block layout_row -%}
+    {{ layout_label(item) -}}
+    {{ layout_widget(item) -}}
+{%- endblock %}
+
+{% block layout_attributes -%}
+    {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
+{%- endblock %}
+
+{% block container_widget -%}
+    {% for child in children -%}
+        {{ layout_widget(child) }}
+    {%- endfor %}
+{%- endblock %}

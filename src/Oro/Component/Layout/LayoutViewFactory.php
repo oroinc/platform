@@ -143,8 +143,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         $views = [];
 
         // build the root view
-        $rootView = $this->createBlockView();
-        $this->buildBlockView($rootView, $rootId);
+        $rootView       = $this->buildBlockView($rootId);
         $views[$rootId] = $rootView;
         // build child views
         $iterator = $this->layoutData->getHierarchyIterator($rootId);
@@ -152,8 +151,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
             $parentView = $views[$iterator->getParent()];
 
             // build child view
-            $view = $this->createBlockView($parentView);
-            $this->buildBlockView($view, $id);
+            $view                   = $this->buildBlockView($id, $parentView);
             $parentView->children[] = $view;
             $views[$id]             = $view;
         }
@@ -192,22 +190,29 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     }
 
     /**
-     * Builds the block view
+     * Created and builds the block view
      *
-     * @param BlockView $view
-     * @param string    $id
+     * @param string         $id
+     * @param BlockView|null $parentView
+     *
+     * @return BlockView
      */
-    protected function buildBlockView(BlockView $view, $id)
+    protected function buildBlockView($id, BlockView $parentView = null)
     {
         $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
         $options   = $this->layoutData->getProperty($id, LayoutData::RESOLVED_OPTIONS, true);
         $types     = $this->getBlockTypeChain($blockType);
+        $typeNames = $this->getBlockTypeNames($types);
+
+        $view = new BlockView($typeNames, $parentView);
 
         // add core variables to the block view, like id and variables required for rendering engine
         $uniqueBlockPrefix                 = '_' . $id;
+        $blockPrefixes                     = $typeNames;
+        $blockPrefixes[]                   = $uniqueBlockPrefix;
         $view->vars['id']                  = $id;
         $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
-        $view->vars['block_prefixes']      = $this->getBlockPrefixes($types, $uniqueBlockPrefix);
+        $view->vars['block_prefixes']      = $blockPrefixes;
         $view->vars['cache_key']           = sprintf('%s_%s', $uniqueBlockPrefix, $blockType);
 
         // point the block view state to the current block
@@ -216,6 +221,8 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         foreach ($types as $type) {
             $type->buildView($view, $this->currentBlock, $options);
         }
+
+        return $view;
     }
 
     /**
@@ -263,18 +270,6 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     }
 
     /**
-     * Creates new instance of the block view
-     *
-     * @param BlockView|null $parentView
-     *
-     * @return BlockView
-     */
-    protected function createBlockView(BlockView $parentView = null)
-    {
-        return new BlockView($parentView);
-    }
-
-    /**
      * Checks whether the given block is a container for other blocks
      *
      * @param string $id
@@ -315,23 +310,19 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     }
 
     /**
-     * Returns block prefixes are used to find an element (for example TWIG block) responsible for rendering the block
+     * Returns names of the given block types
      *
      * @param BlockTypeInterface[] $types
-     * @param string               $uniqueBlockPrefix
      *
      * @return string[]
      */
-    protected function getBlockPrefixes($types, $uniqueBlockPrefix)
+    protected function getBlockTypeNames($types)
     {
-        $blockPrefixes   = array_map(
+        return array_map(
             function (BlockTypeInterface $type) {
                 return $type->getName();
             },
             $types
         );
-        $blockPrefixes[] = $uniqueBlockPrefix;
-
-        return $blockPrefixes;
     }
 }
