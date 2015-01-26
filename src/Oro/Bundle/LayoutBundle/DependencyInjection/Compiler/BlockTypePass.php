@@ -6,12 +6,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds all services with the tags "layout.type" as arguments of the "oro_layout.block_type_factory" service.
+ * Adds all services with the tags "layout.block_type" as arguments of the "oro_layout.block_type_factory" service.
  */
 class BlockTypePass implements CompilerPassInterface
 {
     const FACTORY_SERVICE_ID = 'oro_layout.block_type_factory';
-    const TAG_NAME = 'layout.type';
+    const TAG_NAME = 'layout.block_type';
 
     /**
      * {@inheritdoc}
