@@ -23,7 +23,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     protected $currentBlock;
 
     /** @var  array */
-    protected $blockTypeHierarchy = [];
+    protected $blockTypeChain = [];
 
     /**
      * @param BlockTypeRegistryInterface         $blockTypeRegistry
@@ -297,8 +297,8 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      */
     protected function getBlockTypeChain($blockType)
     {
-        if (isset($this->blockTypeHierarchy[$blockType])) {
-            return $this->blockTypeHierarchy[$blockType];
+        if (isset($this->blockTypeChain[$blockType])) {
+            return $this->blockTypeChain[$blockType];
         }
 
         $result = [];
@@ -307,7 +307,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
             array_unshift($result, $type);
             $blockType = $type->getParent();
         }
-        $this->blockTypeHierarchy[$blockType] = $result;
+        $this->blockTypeChain[$blockType] = $result;
 
         return $result;
     }
