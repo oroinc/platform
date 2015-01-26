@@ -84,7 +84,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->mailer->expects($this->never())
             ->method('send');
 
-        $this->emailProcessor->process($this->createEmailModel(array()));
+        $this->emailProcessor->process($this->createEmailModel([]));
     }
 
     /**
@@ -103,10 +103,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function invalidModelDataProvider()
     {
-        return array(
-            array(array(), '\InvalidArgumentException', 'Sender can not be empty'),
-            array(array('from' => 'test@test.com'), '\InvalidArgumentException', 'Recipient can not be empty'),
-        );
+        return [
+            [[], '\InvalidArgumentException', 'Sender can not be empty'],
+            [['from' => 'test@test.com'], '\InvalidArgumentException', 'Recipient can not be empty'],
+        ];
     }
 
     /**
@@ -125,12 +125,12 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(false));
 
         $model = $this->createEmailModel(
-            array(
+            [
                 'from'    => 'test@test.com',
-                'to'      => array('test2@test.com'),
+                'to'      => ['test2@test.com'],
                 'subject' => 'test',
                 'body'    => 'test body'
-            )
+            ]
         );
         $this->emailProcessor->process($model);
     }
@@ -151,7 +151,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $model = $this->createEmailModel(
             array(
                 'from' => new \stdClass(),
-                'to' => array(new \stdClass()),
+                'to' => [new \stdClass()],
             )
         );
         $this->emailProcessor->process($model);
@@ -167,7 +167,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcess($data, $expectedMessageData)
     {
         $message = $this->getMockBuilder('\Swift_Mime_Message')
-            ->setMethods(array('setDate', 'setFrom', 'setTo', 'setSubject', 'setBody'))
+            ->setMethods(['setDate', 'setFrom', 'setTo', 'setSubject', 'setBody'])
             ->getMockForAbstractClass();
         $message->expects($this->once())
             ->method('setDate');
@@ -211,7 +211,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $emailOriginRepo->expects($this->once())
             ->method('findOneBy')
-            ->with(array('internalName' => InternalEmailOrigin::BAP))
+            ->with(['internalName' => InternalEmailOrigin::BAP])
             ->will($this->returnValue($origin));
         $this->em->expects($this->once())
             ->method('getRepository')
@@ -269,8 +269,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function messageDataProvider()
     {
-        return array(
-            array(
+        return [
+            [
                 array(
                     'from' => 'from@test.com',
                     'to' => array('to@test.com'),
@@ -283,8 +283,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'subject' => 'subject',
                     'body' => 'body'
                 )
-            ),
-            array(
+            ],
+            [
                 array(
                     'from' => 'from@test.com',
                     'to' => array('to@test.com'),
@@ -299,8 +299,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'body' => 'body',
                     'type' => 'text/html'
                 )
-            ),
-            array(
+            ],
+            [
                 array(
                     'from' => 'Test <from@test.com>',
                     'to' => array('To <to@test.com>', 'to2@test.com'),
@@ -313,8 +313,8 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'subject' => 'subject',
                     'body' => 'body'
                 )
-            ),
-            array(
+            ],
+            [
                 array(
                     'from' => 'from@test.com',
                     'to' => array('to1@test.com', 'to1@test.com', 'to2@test.com'),
@@ -323,14 +323,14 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'entityClass' => 'Entity\Target',
                     'entityId' => 123
                 ),
-                array(
-                    'from' => array('from@test.com'),
-                    'to' => array('to1@test.com', 'to1@test.com', 'to2@test.com'),
+                [
+                    'from' => ['from@test.com'],
+                    'to' => ['to1@test.com', 'to1@test.com', 'to2@test.com'],
                     'subject' => 'subject',
                     'body' => 'body'
-                )
-            ),
-        );
+                ]
+            ],
+        ];
     }
 
     public function testCreateUserInternalOrigin()
@@ -427,12 +427,12 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         }
 
         $model = $this->createEmailModel(
-            array(
+            [
                 'from' => 'Test User <test_user@test.com>',
-                'to' => array('test2@test.com'),
+                'to' => ['test2@test.com'],
                 'subject' => 'test',
                 'body' => 'test body'
-            )
+            ]
         );
 
         $this->emailProcessor->process($model);

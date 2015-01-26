@@ -44,7 +44,9 @@ class Email
      */
     public function __construct()
     {
-        $this->to = array();
+        $this->to = [];
+        $this->cc = [];
+        $this->bcc = [];
     }
 
     /**
