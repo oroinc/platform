@@ -8,20 +8,22 @@ class DependencyInjectionBlockTypeFactoryTest extends \PHPUnit_Framework_TestCas
 {
     public function testCreateBlockType()
     {
-        $widgetBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $testName      = 'test';
+        $testServiceId = 'test_service';
+        $testBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->once())
             ->method('get')
-            ->with('oro_layout.block_type_widget')
-            ->will($this->returnValue($widgetBlockType));
+            ->with($testServiceId)
+            ->will($this->returnValue($testBlockType));
 
         $blockTypeFactory = new DependencyInjectionBlockTypeFactory(
             $container,
-            ['widget' => 'oro_layout.block_type_widget']
+            [$testName => $testServiceId]
         );
 
-        $this->assertSame($widgetBlockType, $blockTypeFactory->createBlockType('widget'));
+        $this->assertSame($testBlockType, $blockTypeFactory->createBlockType($testName));
         $this->assertNull($blockTypeFactory->createBlockType('unknown'));
     }
 }

@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\BlockBundle\DependencyInjection\Compiler;
+namespace Oro\Bundle\LayoutBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds all services with the tags "layout.block_type" as arguments of the "oro_layout.block_type_factory" service.
+ * Adds all services with the tags "layout.type" as arguments of the "oro_layout.block_type_factory" service.
  */
 class BlockTypePass implements CompilerPassInterface
 {
     const FACTORY_SERVICE_ID = 'oro_layout.block_type_factory';
-    const TAG_NAME = 'layout.block_type';
+    const TAG_NAME = 'layout.type';
 
     /**
      * {@inheritdoc}
@@ -22,11 +22,7 @@ class BlockTypePass implements CompilerPassInterface
             return;
         }
 
-        $definition = $container->getDefinition(self::FACTORY_SERVICE_ID);
-
-        // Builds an array with tag aliases as keys and service IDs as values
         $types = array();
-
         foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $serviceId => $tag) {
             $alias = isset($tag[0]['alias'])
                 ? $tag[0]['alias']
@@ -35,6 +31,7 @@ class BlockTypePass implements CompilerPassInterface
             $types[$alias] = $serviceId;
         }
 
-        $definition->replaceArgument(1, $types);
+        $factoryDef = $container->getDefinition(self::FACTORY_SERVICE_ID);
+        $factoryDef->replaceArgument(1, $types);
     }
 }

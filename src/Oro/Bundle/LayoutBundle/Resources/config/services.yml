@@ -8,37 +8,37 @@ services:
             - @service_container
             - {}
 
-    oro_layout.block_type.base:
+    oro_layout.type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
         tags:
-             - { name: layout.block_type, alias: layout }
+             - { name: layout.type, alias: layout }
 
-    oro_layout.block_type.container:
+    oro_layout.type.container:
         class: Oro\Component\Layout\Block\Type\ContainerType
         tags:
-             - { name: layout.block_type, alias: container }
+             - { name: layout.type, alias: container }
 
-    oro_layout.block_type.root:
+    oro_layout.type.root:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RootType
         tags:
-             - { name: layout.block_type, alias: root }
+             - { name: layout.type, alias: root }
 
-    oro_layout.block_type.head:
+    oro_layout.type.head:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType
         tags:
-             - { name: layout.block_type, alias: head }
+             - { name: layout.type, alias: head }
 
-    oro_layout.block_type.script:
+    oro_layout.type.script:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ScriptType
         tags:
-             - { name: layout.block_type, alias: script }
+             - { name: layout.type, alias: script }
 
-    oro_layout.block_type.style:
+    oro_layout.type.style:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
         tags:
-             - { name: layout.block_type, alias: style }
+             - { name: layout.type, alias: style }
 
-    oro_layout.block_type.body:
+    oro_layout.type.body:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\BodyType
         tags:
-             - { name: layout.block_type, alias: body }
+             - { name: layout.type, alias: body }
