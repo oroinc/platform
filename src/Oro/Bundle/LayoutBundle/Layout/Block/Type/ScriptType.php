@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Block\Type;
+namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
+
+use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
 class ScriptType extends AbstractContainerType
 {

@@ -6,9 +6,9 @@ use Oro\Component\Layout\BlockTypeFactoryInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\Block\Type\BlockType;
 use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\Block\Type\RootType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\TestSelfBuildingContainerType;
 
 class BlockTypeFactoryStub implements BlockTypeFactoryInterface
