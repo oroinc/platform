@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 use Doctrine\Common\Inflector\Inflector;
 
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+
 class ExtendHelper
 {
     const ENTITY_NAMESPACE = 'Extend\\Entity\\';
@@ -20,12 +22,12 @@ class ExtendHelper
     public static function getReverseRelationType($type)
     {
         switch ($type) {
-            case 'oneToMany':
-                return 'manyToOne';
-            case 'manyToOne':
-                return 'oneToMany';
-            case 'manyToMany':
-                return 'manyToMany';
+            case RelationType::ONE_TO_MANY:
+                return RelationType::MANY_TO_ONE;
+            case RelationType::MANY_TO_ONE:
+                return RelationType::ONE_TO_MANY;
+            case RelationType::MANY_TO_MANY:
+                return RelationType::MANY_TO_MANY;
             default:
                 return $type;
         }

@@ -134,8 +134,15 @@ define(function (require) {
             }
         },
 
-        _addItem: function () {
-            this._openItemEditForm(this._getMessage('addDialogTitle'), this._getUrl('createItem'));
+        _addItem: function (e) {
+            var url = this._getUrl('createItem'),
+                routeAdditionalParams = $(e).data('route_additional_params') || {};
+
+            if (!_.isEmpty(routeAdditionalParams)) {
+                url += (url.indexOf('?') == -1 ? '?' : '&') + $.param(routeAdditionalParams);
+            }
+
+            this._openItemEditForm(this._getMessage('addDialogTitle'), url);
         },
 
         _editItem: function (model) {

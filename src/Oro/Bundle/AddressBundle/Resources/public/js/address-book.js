@@ -64,11 +64,11 @@ define([
 
         _initMainContainers: function() {
             this.$noDataContainer   = $('<div class="no-data"><span>' + this.noDataMessage + '</span></div>');
-            this.$adressesContainer = $('<div class="map-address-list"/>');
+            this.$addressesContainer = $('<div class="map-address-list"/>');
             this.$mapContainerFrame = $('<div class="map-visual-frame"/>');
 
             if (!this.$el.find('.map-address-list').length) {
-                this.$el.append(this.$adressesContainer);
+                this.$el.append(this.$addressesContainer);
             }
 
             if (!this.$el.find('.map-visual-frame').length) {
@@ -107,7 +107,7 @@ define([
         },
 
         addAll: function (items) {
-            this.$adressesContainer.empty();
+            this.$addressesContainer.empty();
             if(items.length > 0){
                 this._hideEmptyMessage();
                 items.each(function (item) {
@@ -126,13 +126,13 @@ define([
         _hideEmptyMessage: function(){
             this.$noDataContainer.hide();
             this.$mapContainerFrame.show();
-            this.$adressesContainer.show();
+            this.$addressesContainer.show();
         },
 
         _showEmptyMessage: function () {
             this.$noDataContainer.show();
             this.$mapContainerFrame.hide();
-            this.$adressesContainer.hide();
+            this.$addressesContainer.hide();
         },
 
         _activatePreviousAddress: function () {
@@ -150,7 +150,7 @@ define([
                     model: address
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
-                this.$adressesContainer.append(addressView.render().$el);
+                this.$addressesContainer.append(addressView.render().$el);
             }
         },
 

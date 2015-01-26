@@ -73,7 +73,7 @@ class QueryConfiguration implements ConfigurationInterface
      */
     protected function addJoinNode($name)
     {
-        if (!in_array($name, ['left', 'inner'])) {
+        if (!in_array(strtolower($name), ['left', 'inner'])) {
             throw new InvalidConfigurationException(sprintf('Invalid join type "%s"', $name));
         }
 

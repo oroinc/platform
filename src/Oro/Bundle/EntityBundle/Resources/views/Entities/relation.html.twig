@@ -29,14 +29,6 @@
         function($, routing, CallbackListener, WidgetManager, MultipleEntityModel) {
             var addedModels = {};
             WidgetManager.getWidgetInstance({{ wid|json_encode|raw }}, function(widget) {
-                if (widget.options.type == 'dialog') {
-                    widget.getWidget().css({
-                        'padding': 0,
-                        'max-height': 500,
-                        'overflow': 'auto'
-                    });
-                }
-
                 widget.getAction('select', 'adopted', function(selectBtn) {
                     selectBtn.click(function() {
                         var addedVal = $('#appendRelation').val();
@@ -77,8 +69,8 @@
                                         'oro_entity_detailed',
                                         {
                                             id: model.get('id'),
-                                            entityName: '{{ relation.get('target_entity')|replace('\\', '_') }}',
-                                            fieldName: '{{ relation.getId().getFieldName() }}'
+                                            entityName: '{{ entity_class|replace('\\', '_') }}',
+                                            fieldName: '{{ field_name }}'
                                         }
                                 ),
                                 'label': label,

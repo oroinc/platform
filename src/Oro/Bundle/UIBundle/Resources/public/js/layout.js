@@ -131,7 +131,10 @@ define(function (require) {
         },
 
         initPopover: function (container) {
-            var $items = container.find('[data-toggle="popover"]');
+            var $items = container.find('[data-toggle="popover"]').filter(function () {
+                // skip already initialized popovers
+                return !$(this).data('popover');
+            });
             $items.not('[data-close="false"]').each(function (i, el) {
                 //append close link
                 var content = $(el).data('content');

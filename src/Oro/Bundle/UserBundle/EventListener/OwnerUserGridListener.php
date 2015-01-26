@@ -65,7 +65,12 @@ class OwnerUserGridListener
     {
         $parameters  = $event->getDatagrid()->getParameters();
         $permission  = $parameters->get('permission');
-        $entityClass = str_replace('_', '\\', $parameters->get('entity'));
+        if ($parameters->get('entity')) {
+            $entityClass = str_replace('_', '\\', $parameters->get('entity'));
+        } else {
+            $entityClass = 'Oro\Bundle\UserBundle\Entity\User';
+        }
+
         $entityId    = $parameters->get('entity_id');
 
         if ($entityId) {

@@ -1,7 +1,7 @@
 {% extends bap.layout %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
-{% oro_title_set({ params: { '%keyword%': searchString } }) %}
+{% oro_title_set({ params: { '%keyword%': searchString|default('oro.search.result.empty'|trans) } }) %}
 {% set gridName = 'search-grid' %}
 
 {% block content %}
@@ -18,7 +18,7 @@
         </form>
     </div>
 
-    {% if '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
+    {% if groupedResults is defined and '' in groupedResults|keys and groupedResults[''].count > 0 or groupedResults|length > 1 %}
         <div class="oro-page collapsible-sidebar clearfix">
             <div class="oro-page-sidebar search-entity-types-column dropdown">
                 <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">

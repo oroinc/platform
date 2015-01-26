@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 class DynamicFieldsExtension extends \Twig_Extension
 {
@@ -137,7 +138,7 @@ class DynamicFieldsExtension extends \Twig_Extension
 
         // skip relations if they are referenced to deleted entity
         $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType());
-        if (in_array($underlyingFieldType, ['oneToMany', 'manyToOne', 'manyToMany'])
+        if (in_array($underlyingFieldType, RelationType::$anyToAnyRelations)
             && $this->extendProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted', true)
         ) {
             return false;

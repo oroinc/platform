@@ -8,10 +8,8 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Psr\Log\LoggerInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
-use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
-
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
 class EmailNotificationProcessor extends AbstractNotificationProcessor
@@ -93,23 +91,20 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         }
 
         foreach ($notifications as $notification) {
-            /** @var EmailTemplate $emailTemplate */
             $emailTemplate = $notification->getTemplate();
 
             try {
                 list ($subjectRendered, $templateRendered) = $this->renderer->compileMessage(
                     $emailTemplate,
-                    array('entity' => $object)
+                    ['entity' => $object]
                 );
             } catch (\Twig_Error $e) {
+                $identity = method_exists($emailTemplate, '__toString')
+                    ? (string)$emailTemplate : $emailTemplate->getSubject();
+
                 $logger->error(
-                    sprintf(
-                        'Rendering of email template "%s"%s failed. %s',
-                        $emailTemplate->getSubject(),
-                        method_exists($emailTemplate, 'getId') ? sprintf(' (id: %d)', $emailTemplate->getId()) : '',
-                        $e->getMessage()
-                    ),
-                    array('exception' => $e)
+                    sprintf('Rendering of email template "%s" failed. %s', $identity, $e->getMessage()),
+                    ['exception' => $e]
                 );
 
                 continue;

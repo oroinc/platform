@@ -69,12 +69,14 @@
                             entityId: entity.id
                         }
                     },
+                    loadingContainerSelector: '.activity-list',
                     pager: pager,
                     dateRangeFilterMetadata: dateRangeFilterMetadata,
                     routes: {}
                 },
                 commentOptions: {
                     listTemplate: '#template-activity-item-comment',
+                    canCreate:    resource_granted('oro_comment_create')
                 }
             } %}
 
