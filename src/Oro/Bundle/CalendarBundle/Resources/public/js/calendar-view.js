@@ -10,7 +10,7 @@ define(function (require) {
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
-        LoadingMask     = require('oroui/js/loading-mask-view'),
+        LoadingMask     = require('oroui/js/app/views/loading-mask-view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
         EventView       = require('orocalendar/js/calendar/event/view'),
@@ -38,7 +38,6 @@ define(function (require) {
             '<div>' +
                 '<div class="calendar-container">' +
                     '<div class="calendar"></div>' +
-                    '<div class="loading-mask"></div>' +
                 '</div>' +
             '</div>'
         ),
