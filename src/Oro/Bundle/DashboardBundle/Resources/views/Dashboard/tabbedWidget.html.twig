@@ -45,9 +45,9 @@
                     },
                     success: function(data) {
                         var content = $tabContent.find('.content');
-                        loadingMask.hide();
                         content.html(data);
                         mediator.execute('layout:init', content);
+                        loadingMask.hide();
                     }
                 });
             });
