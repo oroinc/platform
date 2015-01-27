@@ -6,6 +6,10 @@ define(['jquery', 'jquery-ui'], function ($) {
     /* datepicker extend:start */
     (function () {
 
+        var original = {
+            _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
+        };
+
         /**
          * Combines space-separated line of events with widget's namespace
          *  for handling datepicker's position change
@@ -103,6 +107,13 @@ define(['jquery', 'jquery-ui'], function ($) {
 
             _hideDatepicker.apply(this, arguments);
         };
+
+        $.datepicker.constructor.prototype._destroyDatepicker = function () {
+            if (this._curInst.dpDiv) {
+                this._curInst.dpDiv.remove();
+            }
+            original._destroyDatepicker.apply(this, arguments);
+        }
     }());
     /* datepicker extend:end */
 });
