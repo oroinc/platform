@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Security\Core\Exception;
+namespace Oro\Bundle\SSOBundle\Security\Core\Exception;
 
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 

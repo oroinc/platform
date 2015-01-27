@@ -1,3 +1,2 @@
 bundles:
     - { name: Oro\Bundle\UserBundle\OroUserBundle, priority: -80 }
-    - { name: HWI\Bundle\OAuthBundle\HWIOAuthBundle, priority: -90 }

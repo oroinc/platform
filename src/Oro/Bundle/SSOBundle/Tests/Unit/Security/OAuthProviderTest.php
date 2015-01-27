@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Security;
+namespace Oro\Bundle\SSOBundle\Tests\Security;
 
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SSOBundle\Security\OAuthProvider;
+use Oro\Bundle\SSOBundle\Security\OAuthToken;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Security\OAuthProvider;
-use Oro\Bundle\UserBundle\Security\OAuthToken;
 
 class OAuthProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +67,7 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($user));
 
         $resultToken = $this->oauthProvider->authenticate($token);
-        $this->assertInstanceOf('Oro\Bundle\UserBundle\Security\OAuthToken', $resultToken);
+        $this->assertInstanceOf('Oro\Bundle\SSOBundle\Security\OAuthToken', $resultToken);
         $this->assertSame($user, $resultToken->getUser());
         $this->assertEquals('google', $resultToken->getResourceOwnerName());
         $this->assertTrue($resultToken->isAuthenticated());

@@ -392,7 +392,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
             array('loginCount', 11),
             array('createdAt', new \DateTime()),
             array('updatedAt', new \DateTime()),
-            array('googleId', '3435345'),
         );
     }
 

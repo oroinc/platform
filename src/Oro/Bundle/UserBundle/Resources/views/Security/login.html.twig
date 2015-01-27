@@ -52,12 +52,7 @@
                 <a href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>
                 <button type="submit" class="btn btn-large  btn-primary pull-right" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
             </div>
-            {% if oro_config_value('oro_user.enable_google_sso') %}
-                {{ 'oro.user.login.alternative.label'|trans }}
-                {% for owner in hwi_oauth_resource_owners() %}
-                    <a href="{{ hwi_oauth_authorization_url(owner) }}">{{ owner|trans({}, 'HWIOAuthBundle') }}</a>
-                {% endfor %}
-            {% endif %}
+            {% placeholder oro_user_login_form %}
         </fieldset>
         <input type="hidden" name="_target_path" value="" />
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />

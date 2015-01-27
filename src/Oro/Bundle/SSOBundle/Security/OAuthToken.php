@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Security;
+namespace Oro\Bundle\SSOBundle\Security;
 
 use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken as HWIOAuthToken;
 
