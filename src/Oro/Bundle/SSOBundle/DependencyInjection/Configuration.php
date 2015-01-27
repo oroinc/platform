@@ -19,16 +19,16 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
         $rootNode    = $treeBuilder->root('oro_sso');
 
-        SettingsBuilder::append($rootNode, array(
-            'enable_google_sso' => array(
+        SettingsBuilder::append($rootNode, [
+            'enable_google_sso' => [
                 'value' => false,
                 'type' => 'boolean',
-            ),
-            'google_sso_domains'=> array(
+            ],
+            'google_sso_domains'=> [
                 'value' => [],
                 'type' => 'array',
-            ),
-        ));
+            ],
+        ]);
 
         return $treeBuilder;
     }
