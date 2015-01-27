@@ -12,7 +12,7 @@ namespace Oro\Component\Layout;
  *  - an alias can be added for existing item only
  *  - only existing alias can be removed
  */
-class LayoutBuilder implements RawLayoutAccessorInterface
+class LayoutDataBuilder implements RawLayoutAccessorInterface
 {
     /** @var LayoutData */
     protected $layoutData;
@@ -246,7 +246,7 @@ class LayoutBuilder implements RawLayoutAccessorInterface
     /**
      * @return LayoutData
      */
-    public function getLayout()
+    public function getLayoutData()
     {
         return $this->layoutData;
     }
