@@ -1,7 +1,7 @@
-{% block layout_widget -%}
+{% block block_widget -%}
 {%- endblock %}
 
-{% block layout_label -%}
+{% block block_label -%}
     {% if label is defined and label is not same as(false) %}
         {%- if label is empty -%}
             {% set label = id|humanize %}
@@ -10,18 +10,18 @@
     {%- endif %}
 {%- endblock %}
 
-{% block layout_row -%}
-    {{ layout_label(item) -}}
-    {{ layout_widget(item) -}}
+{% block block_row -%}
+    {{ block_label(block) -}}
+    {{ block_widget(block) -}}
 {%- endblock %}
 
-{% block layout_attributes -%}
+{% block block_attributes -%}
     {% for attrname, attrvalue in attr %} {% if attrname is same as('title') %}{{ attrname }}="{{ attrvalue|trans({}, translation_domain) }}"{% else %}{{ attrname }}="{{ attrvalue }}"{% endif %}{% endfor %}
 {%- endblock %}
 
 {% block container_widget -%}
-    {% for child in children -%}
-        {{ layout_widget(child) }}
+    {% for child in block -%}
+        {{ block_widget(child) }}
     {%- endfor %}
 {%- endblock %}
 
@@ -33,19 +33,19 @@
 {% endblock %}
 
 {% block head_widget %}
-    <head{{ block('layout_attributes') }}>
+    <head{{ block('block_attributes') }}>
         <title>{{ title|trans({}, translation_domain) }}</title>
-        {{ parent() }}
+        {{ block_widget(block) }}
     </head>
 {% endblock %}
 
 {% block meta_widget %}
-    <meta{{ block('layout_attributes') }} />
+    <meta{{ block('block_attributes') }} />
 {% endblock %}
 
 {% block script_widget %}
     {% set attr = {'type': 'text/javascript'}|merge(attr) %}
-    <script{{ block('layout_attributes') }}>{{ content|raw }}</script>
+    <script{{ block('block_attributes') }}>{{ content|raw }}</script>
 {% endblock %}
 
 {% block style_widget %}
@@ -53,8 +53,8 @@
     {% if attr.src is not empty %}
         {% set href = attr.src %}
         {% set attr = attr|omit(['src'])|merge({'href' : href}) %}
-        <link rel="stylesheet"{{ block('layout_attributes') }}/>
+        <link rel="stylesheet"{{ block('block_attributes') }}/>
     {% else %}
-        <style{{ block('layout_attributes') }}>{{ content|raw }}</style>
+        <style{{ block('block_attributes') }}>{{ content|raw }}</style>
     {% endif %}
 {% endblock %}

@@ -6,12 +6,12 @@ use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
-use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\LayoutDataBuilder;
 use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
 
-class DeferredLayoutManipulatorTestCase extends LayoutBuilderTestCase
+class DeferredLayoutManipulatorTestCase extends LayoutTestCase
 {
     /** @var BlockTypeFactoryStub */
     protected $blockTypeFactory;
@@ -19,8 +19,8 @@ class DeferredLayoutManipulatorTestCase extends LayoutBuilderTestCase
     /** @var LayoutContext */
     protected $context;
 
-    /** @var LayoutBuilder */
-    protected $layoutBuilder;
+    /** @var LayoutDataBuilder */
+    protected $layoutDataBuilder;
 
     /** @var DeferredLayoutManipulator */
     protected $layoutManipulator;
@@ -31,11 +31,11 @@ class DeferredLayoutManipulatorTestCase extends LayoutBuilderTestCase
     protected function setUp()
     {
         $this->context           = new LayoutContext();
-        $this->layoutBuilder     = new LayoutBuilder();
+        $this->layoutDataBuilder = new LayoutDataBuilder();
         $this->blockTypeFactory  = new BlockTypeFactoryStub();
         $blockTypeRegistry       = new BlockTypeRegistry($this->blockTypeFactory);
         $blockOptionsResolver    = new BlockOptionsResolver($blockTypeRegistry);
-        $this->layoutManipulator = new DeferredLayoutManipulator($this->layoutBuilder);
+        $this->layoutManipulator = new DeferredLayoutManipulator($this->layoutDataBuilder);
         $this->layoutViewFactory = new LayoutViewFactory(
             $blockTypeRegistry,
             $blockOptionsResolver,
@@ -51,7 +51,7 @@ class DeferredLayoutManipulatorTestCase extends LayoutBuilderTestCase
     protected function getLayoutView($rootId = null)
     {
         $this->layoutManipulator->applyChanges();
-        $layoutData = $this->layoutBuilder->getLayout();
+        $layoutData = $this->layoutDataBuilder->getLayoutData();
 
         return $this->layoutViewFactory->createView($layoutData, $this->context, $rootId);
     }

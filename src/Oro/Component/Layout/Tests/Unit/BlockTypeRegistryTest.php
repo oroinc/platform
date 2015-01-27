@@ -119,7 +119,7 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot find corresponded block type with name "widget".
+     * @expectedExceptionMessage The block type named "widget" was not found.
      */
     public function testGetTypeUndefined()
     {

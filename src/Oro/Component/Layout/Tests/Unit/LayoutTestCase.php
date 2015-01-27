@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
 
-class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
+class LayoutTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array     $expected
@@ -70,7 +70,7 @@ class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
             'children' => $children
         ];
 
-        unset($result['vars']['item']);
+        unset($result['vars']['block']);
 
         if ($removeAuxiliaryVariables) {
             unset($result['vars']['translation_domain']);

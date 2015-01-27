@@ -9,37 +9,37 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
     const RENDER_CALL = '$this->env->getExtension(\'layout\')->renderer->searchAndRenderBlock';
 
     /**
-     * layout_widget(item)
+     * block_widget(block)
      */
     public function testCompileWidget()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_widget', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_widget', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'widget\')',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_widget(item, {'foo' => 'bar'})
+     * block_widget(block, {'foo' => 'bar'})
      */
     public function testCompileWidgetWithVariables()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Array(
                     [
                         new \Twig_Node_Expression_Constant('foo', 0),
@@ -50,57 +50,57 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_widget', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_widget', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'widget\', array("foo" => "bar"))',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item, 'my label')
+     * block_label(block, 'my label')
      */
     public function testCompileLabelWithLabel()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Constant('my label', 0),
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\', array("label" => "my label"))',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item, null)
+     * block_label(block, null)
      */
     public function testCompileLabelWithNullLabel()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Constant(null, 0),
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
@@ -109,25 +109,25 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\')',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item, '')
+     * block_label(block, '')
      */
     public function testCompileLabelWithEmptyStringLabel()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Constant('', 0),
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
@@ -136,44 +136,44 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\')',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item)
+     * block_label(block)
      */
     public function testCompileLabelWithDefaultLabel()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\')',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item, null, {'foo' => 'bar'})
+     * block_label(block, null, {'foo' => 'bar'})
      */
     public function testCompileLabelWithAttributes()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Constant(null, 0),
                 new \Twig_Node_Expression_Array(
                     [
@@ -185,7 +185,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
@@ -195,20 +195,20 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\', array("foo" => "bar"))',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item, 'value in argument', {'foo' => 'bar', 'label' => value in attributes})
+     * block_label(block, 'value in argument', {'foo' => 'bar', 'label' => value in attributes})
      */
     public function testCompileLabelWithLabelAndAttributes()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Constant('value in argument', 0),
                 new \Twig_Node_Expression_Array(
                     [
@@ -222,27 +222,27 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
         $this->assertEquals(
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\', array("foo" => "bar", "label" => "value in argument"))',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item, true ? null : null)
+     * block_label(block, true ? null : null)
      */
     public function testCompileLabelWithLabelThatEvaluatesToNull()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Conditional(
                     new \Twig_Node_Expression_Constant(true, 0), // if
                     new \Twig_Node_Expression_Constant(null, 0), // then
@@ -252,7 +252,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
@@ -263,20 +263,20 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
             sprintf(
                 self::RENDER_CALL . '(%s, \'label\', '
                 . '(twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );
     }
 
     /**
-     * layout_label(item, true ? null : null, {'foo' => 'bar', 'label' => value in attributes})
+     * block_label(block, true ? null : null, {'foo' => 'bar', 'label' => value in attributes})
      */
     public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
     {
         $arguments = new \Twig_Node(
             [
-                new \Twig_Node_Expression_Name('item', 0),
+                new \Twig_Node_Expression_Name('block', 0),
                 new \Twig_Node_Expression_Conditional(
                     new \Twig_Node_Expression_Constant(true, 0), // if
                     new \Twig_Node_Expression_Constant(null, 0), // then
@@ -295,7 +295,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $node = new SearchAndRenderBlockNode('layout_label', $arguments, 0);
+        $node = new SearchAndRenderBlockNode('block_label', $arguments, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 
@@ -307,7 +307,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit_Framework_TestCase
                 self::RENDER_CALL . '(%s, \'label\', '
                 . 'array("foo" => "bar", "label" => "value in attributes") '
                 . '+ (twig_test_empty($_label_ = ((true) ? (null) : (null))) ? array() : array("label" => $_label_)))',
-                $this->getVariableGetter('item')
+                $this->getVariableGetter('block')
             ),
             trim($compiler->compile($node)->getSource())
         );

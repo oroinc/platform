@@ -8,6 +8,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\LayoutDataBuilder;
 use Oro\Component\Layout\LayoutViewFactory;
 
 class BaseBlockTypeTestCase extends \PHPUnit_Framework_TestCase
@@ -18,30 +19,32 @@ class BaseBlockTypeTestCase extends \PHPUnit_Framework_TestCase
     /** @var LayoutContext */
     protected $context;
 
-    /** @var LayoutBuilder */
-    protected $layoutBuilder;
-
     /** @var BlockOptionsResolver */
     protected $blockOptionsResolver;
 
-    /** @var DeferredLayoutManipulator */
-    protected $layoutManipulator;
+    /** @var LayoutDataBuilder */
+    protected $layoutDataBuilder;
 
-    /** @var LayoutViewFactory */
-    protected $layoutViewFactory;
+    /** @var LayoutBuilder */
+    protected $layoutBuilder;
 
     protected function setUp()
     {
         $this->context              = new LayoutContext();
-        $this->layoutBuilder        = new LayoutBuilder();
         $this->factory              = new BlockTypeFactoryStub();
         $blockTypeRegistry          = new BlockTypeRegistry($this->factory);
         $this->blockOptionsResolver = new BlockOptionsResolver($blockTypeRegistry);
-        $this->layoutManipulator    = new DeferredLayoutManipulator($this->layoutBuilder);
-        $this->layoutViewFactory    = new LayoutViewFactory(
+        $this->layoutDataBuilder    = new LayoutDataBuilder();
+        $layoutManipulator          = new DeferredLayoutManipulator($this->layoutDataBuilder);
+        $layoutViewFactory          = new LayoutViewFactory(
             $blockTypeRegistry,
             $this->blockOptionsResolver,
-            $this->layoutManipulator
+            $layoutManipulator
+        );
+        $this->layoutBuilder        = new LayoutBuilder(
+            $this->layoutDataBuilder,
+            $layoutManipulator,
+            $layoutViewFactory
         );
     }
 
@@ -68,13 +71,12 @@ class BaseBlockTypeTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getBlockView($blockType, array $options = [])
     {
-        $this->layoutBuilder->clear();
-        $this->layoutManipulator->add($blockType . '_id', null, $blockType, $options);
+        $this->layoutDataBuilder->clear();
 
-        $this->layoutManipulator->applyChanges();
-        $layoutData = $this->layoutBuilder->getLayout();
+        $this->layoutBuilder->add($blockType . '_id', null, $blockType, $options);
+        $layout = $this->layoutBuilder->getLayout($this->context);
 
-        return $this->layoutViewFactory->createView($layoutData, $this->context);
+        return $layout->getView();
     }
 
     /**
@@ -87,12 +89,10 @@ class BaseBlockTypeTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function getBlockBuilder($blockType, array $options = [])
     {
-        $this->layoutBuilder->clear();
+        $this->layoutDataBuilder->clear();
 
         return new TestBlockBuilder(
             $this->layoutBuilder,
-            $this->layoutManipulator,
-            $this->layoutViewFactory,
             $this->context,
             $blockType . '_id',
             $blockType,
