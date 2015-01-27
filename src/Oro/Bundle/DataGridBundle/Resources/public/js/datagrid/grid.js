@@ -557,12 +557,18 @@ define(function (require) {
         reflow: function () {
             var $grid;
             if (this.floatThead) {
-                this.$(this.selectors.grid).floatThead('reflow');
+                this.removeFloatTheadDropdowns();
                 $grid = this.$(this.selectors.grid);
+                /**
+                 * Additional styles should not affect floatThead plugin calculations
+                 * Remove that styles temporarily
+                 */
+                this.$el.removeClass('floatThead-move-header');
+                $grid.floatThead('reflow');
+                this.$el.addClass('floatThead-move-header');
                 $grid.parent().css({
                     maxHeight: this.getCssHeightCalcExpression()
                 });
-                this.removeFloatTheadDropdowns();
             }
         },
 
@@ -590,6 +596,7 @@ define(function (require) {
                     this.addFloatTheadDropdownsSupport();
                 } else {
                     this.$el.removeClass('floatThead-connected');
+                    this.$el.removeClass('floatThead-move-header');
                     $grid.floatThead('destroy');
                     $grid.parent().css({
                         maxHeight: ''

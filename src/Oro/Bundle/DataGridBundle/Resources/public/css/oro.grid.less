@@ -1,0 +1,200 @@
+.table th, .table td {
+    /* should center content in cell right */
+    line-height: 19px; //@baseFontSize + 2 * floor((@baseLineHeight - @baseFontSize)/2);
+}
+
+.grid-toolbar .pagination ul li input {
+  display: inline;
+  float: left;
+  width: 40px;
+  text-align: center;
+  margin: 0;
+  border-left: none;
+  border-color: #dddddd;
+  border-radius: 0;
+
+}
+
+.no-data {
+  text-align: center;
+  font-size: 14px;
+  padding: 20px;
+  border-radius:4px;
+  -moz-border-radius:4px;
+  -webkit-border-radius:4px;
+  border: 1px solid #ddd;
+  background:#f9f9f9;
+  margin:10px 0;
+}
+
+.grid-views {
+  margin-left: 15px;
+}
+
+table.grid {
+  thead {
+    th {
+      vertical-align: top;
+      > a {
+        display: block;
+        line-height: 12px;
+        padding: 7px 0 5px;
+        &a:focus {
+          outline: none;
+        }
+      }
+      > a,
+      > span {
+        text-transform: uppercase;
+      }
+      span.caret {
+        display: none;
+        border: none;
+        border-right: 4px solid transparent;
+        border-left: 4px solid transparent;
+      }
+      &.ascending span.caret {
+        margin-top: 0;
+        display: inline-block;
+        border-top: 4px solid transparent;
+        border-bottom: 4px solid #000000;
+      }
+      &.descending span.caret {
+        margin-top: 4px;
+        display: inline-block;
+        border-bottom:4px solid transparent;
+        border-top: 4px solid #000000;
+      }
+    }
+  }
+
+  tfoot th {
+      background-color: #f5f5f5;
+      background: -webkit-linear-gradient(top, #ffffff, #f5f5f5);
+      background: -o-linear-gradient(top, #ffffff,#f5f5f5);
+      background: -ms-linear-gradient(top, #ffffff,#f5f5f5);
+      background: linear-gradient(to bottom, #ffffff,#f5f5f5 );
+      padding: 4px 10px;
+    th > a,
+    th > span {
+      text-transform: uppercase;
+      color: #5e5e5e;
+      font-size: 13px;
+    }
+  }
+
+  tbody tr.row-click-action {
+      cursor: pointer;
+  }
+
+  .string-cell,
+  .uri-cell,
+  .email-cell,
+  .select-cell,
+  .date-cell,
+  .time-cell,
+  .datetime-cell,
+  .boolean-cell {
+      text-align: left;
+  }
+  .number-cell,
+  .integer-cell {
+      text-align: right;
+  }
+  .datetime-cell,
+  .date-cell {
+      white-space: nowrap;
+  }
+  .string-cell ul.unstyled {
+      margin-bottom: 0;
+  }
+  td:first-child,
+  th:first-child {
+      text-align: left !important;
+  }
+  td:first-child:before {
+      content: '';
+      min-height: 14px;
+      display: inline-block;
+  }
+  .select-row-cell input[type=checkbox] {
+      margin-top: -3px;
+  }
+}
+
+.floatThead-connected {
+  table th{
+    border-bottom-left-radius: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+  }
+
+  .grid-container-parent {
+    margin-top: 33px;
+  }
+
+  .grid-container {
+    border: 1px solid rgb(221, 221, 221);
+    border-bottom-left-radius: 2px;
+    border-bottom-right-radius: 2px;
+  }
+
+  &.no-data-visible .grid-container {
+    border: none;
+  }
+
+  .grid {
+    border: none !important;
+    border-radius: 0 !important;
+    margin-bottom: 0;
+    margin-left: -1px; /* IE fix */
+    &.table-bordered tr > th:first-child {
+      border-left: none !important;
+    }
+  }
+
+  .floatThead-container {
+    /* float thead should be under loading mask and submenus */
+    z-index: 899 !important;
+    .grid{
+      border-bottom: 1px solid rgb(221, 221, 221) !important;
+      margin: 0 0 0 1px !important;
+    }
+  }
+}
+
+/**
+ * Additional styles should not affect floatThead plugin calculations
+ * These styles removed before floatThead reflow method call
+ */
+.floatThead-move-header {
+  .grid {
+    margin-top: -33px;
+  }
+  .floatThead-container {
+    margin-top: -33px !important;
+    box-sizing: content-box;
+    padding-right: 17px;
+    border: solid #dddddd;
+    border-width: 1px 1px 0px 1px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+
+    .grid {
+      margin-top: 0;
+      /* compensate floatThead-container padding */
+      padding-right: 18px;
+
+      /* copy thead background style*/
+      background-color: #f2f2f2;
+      background-image: -moz-linear-gradient(top,#f5f5f5,#eeeeee);
+      background-image: -webkit-gradient(linear,0 0,0 100%,from(#f5f5f5),to(#eeeeee));
+      background-image: -webkit-linear-gradient(top,#f5f5f5,#eeeeee);
+      background-image: -o-linear-gradient(top,#f5f5f5,#eeeeee);
+      background-image: linear-gradient(to bottom,#f5f5f5,#eeeeee);
+      background-repeat: repeat-x;
+      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#ffeeeeee', GradientType=0);
+    }
+  }
+}
