@@ -19,6 +19,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_4\AttachmentOwner;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as EmailTemplateOwner;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -40,7 +41,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v1_10';
     }
 
     /**
@@ -104,6 +105,7 @@ class OroUserBundleInstaller implements
         UserOrganization::oroUserOrganizationForeignKeys($schema);
 
         ExtendTitle::addTitleColumn($schema);
+        PasswordChanged::addPasswordChangedColumn($schema);
     }
 
     /**
