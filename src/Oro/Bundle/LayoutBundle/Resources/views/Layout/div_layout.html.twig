@@ -25,6 +25,13 @@
     {%- endfor %}
 {%- endblock %}
 
+{% block root_widget %}
+    <!DOCTYPE {{ doctype }}>
+    <html>
+        {{ parent() }}
+    </html>
+{% endblock %}
+
 {% block head_widget %}
     <head{{ block('layout_attributes') }}>
         <title>{{ title|trans({}, translation_domain) }}</title>
