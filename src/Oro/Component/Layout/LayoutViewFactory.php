@@ -151,9 +151,9 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
             $parentView = $views[$iterator->getParent()];
 
             // build child view
-            $view                   = $this->buildBlockView($id, $parentView);
-            $parentView->children[] = $view;
-            $views[$id]             = $view;
+            $view                      = $this->buildBlockView($id, $parentView);
+            $parentView->children[$id] = $view;
+            $views[$id]                = $view;
         }
 
         // finish the root view
