@@ -51,3 +51,9 @@
         <style{{ block('layout_attributes') }}>{{ content|raw }}</style>
     {% endif %}
 {% endblock %}
+
+{% block body_widget %}
+    <body{{ block('layout_attributes') }}>
+        {{ parent() }}
+    </body>
+{% endblock %}
