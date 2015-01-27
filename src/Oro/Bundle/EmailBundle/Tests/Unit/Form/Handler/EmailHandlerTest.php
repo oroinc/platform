@@ -321,13 +321,13 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             ['POST', true, true],
-            ['PUT', true, true],
             ['POST', false, false],
+            ['PUT', true, true],
             ['PUT', false, false],
-            ['GET', false, false],
+            ['GET', true, false],
             ['GET', false, false],
             ['DELETE', true, false],
-            ['DELETE', true, false]
+            ['DELETE', false, false]
         ];
     }
 
