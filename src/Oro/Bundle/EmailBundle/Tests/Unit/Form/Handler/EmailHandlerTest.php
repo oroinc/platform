@@ -153,6 +153,8 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->request->query->set('gridName', 'testGrid');
         $this->request->query->set('from', 'from@example.com');
         $this->request->query->set('to', 'to@example.com');
+        $this->request->query->set('cc', 'cc@example.com');
+        $this->request->query->set('bcc', 'bcc@example.com');
         $this->request->query->set('subject', 'testSubject');
 
         $this->nameFormatter->expects($this->any())
@@ -172,11 +174,15 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testGrid', $this->model->getGridName());
         $this->assertEquals('FirstName LastName <from@example.com>', $this->model->getFrom());
         $this->assertEquals(['FirstName LastName <to@example.com>'], $this->model->getTo());
+        $this->assertEquals(['FirstName LastName <cc@example.com>'], $this->model->getCc());
+        $this->assertEquals(['FirstName LastName <bcc@example.com>'], $this->model->getBcc());
         $this->assertEquals('testSubject', $this->model->getSubject());
     }
 
     /**
-     * @dataProvider supportedMethods
+     * @param string $method
+     *
+     * @dataProvider validData
      */
     public function testProcessValidData($method)
     {
@@ -184,6 +190,8 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->model
             ->setFrom('from@example.com')
             ->setTo(['to@example.com'])
+            ->setCc(['cc@example.com'])
+            ->setBcc(['bcc@example.com', 'bcc2@example.com'])
             ->setSubject('testSubject')
             ->setBody('testBody');
 
@@ -207,7 +215,9 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider supportedMethods
+     * @param string $method
+     *
+     * @dataProvider invalidData
      */
     public function testProcessException($method)
     {
@@ -273,7 +283,6 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(new TestUser($emailAddress, 'OwnerFirstName', 'OwnerLastName')));
         }
 
-        $srcEmailAddress = $emailAddress;
         $param = [&$emailAddress, $ownerClass, $ownerId];
         ReflectionUtil::callProtectedMethod($this->handler, 'preciseFullEmailAddress', $param);
 
@@ -304,7 +313,15 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function supportedMethods()
+    public function validData()
+    {
+        return [
+            ['POST'],
+            ['PUT']
+        ];
+    }
+
+    public function invalidData()
     {
         return [
             ['POST'],
