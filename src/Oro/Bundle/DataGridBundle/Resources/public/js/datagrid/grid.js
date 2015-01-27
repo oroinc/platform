@@ -136,7 +136,6 @@ define(function (require) {
         initialize: function (options) {
             var opts = options || {};
             this.subviews = [];
-            this.cid = _.uniqueId('grid-');
 
             // Check required options
             if (!opts.collection) {
