@@ -182,10 +182,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         _showMask: function (message) {
             if (this.loadingMask) {
-                this.loadingMask.$el
-                    .find(this.selectors.loadingMaskContent)
-                    .text(message);
-                this.loadingMask.show();
+                this.loadingMask.show(message);
             }
         },
 

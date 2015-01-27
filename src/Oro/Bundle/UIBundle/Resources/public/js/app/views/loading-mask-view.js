@@ -42,7 +42,10 @@ define(function (require) {
         /**
          * Shows loading mask
          */
-        show: function () {
+        show: function (hint) {
+            if (hint) {
+                this.setLoadingHint(hint);
+            }
             this.$el.parent().addClass('loading');
             this.$el.addClass('shown');
         },
@@ -68,6 +71,13 @@ define(function (require) {
                 visible = !this.hasClass('shown');
             }
             this[visible ? 'show' : 'hide']();
+        },
+
+        setLoadingHint: function (newHint) {
+            var oldHint = this.loadingHint;
+            this.loadingHint = newHint;
+            this.render();
+            return oldHint;
         }
     });
 
