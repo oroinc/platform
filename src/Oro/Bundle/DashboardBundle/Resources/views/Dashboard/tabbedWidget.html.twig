@@ -15,11 +15,10 @@
                     {{ activeTabContent|raw }}
                 {% endblock %}
             </div>
-            <div class="loading-mask"></div>
         </div>
     </div>
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'oroui/js/mediator', 'oroui/js/error', 'oroui/js/loading-mask'],
+        require(['jquery', 'underscore', 'oroui/js/mediator', 'oroui/js/error', 'oroui/js/app/views/loading-mask-view'],
         function($, _, mediator, error, LoadingMask){
             var loadingMask = null;
             $(document).on('click', '#{{ widgetContentId }} .tab-button', function (e) {
@@ -30,9 +29,8 @@
                 $currentTab.addClass('active');
 
                 var $tabContent = $el.closest('.widget-content').find('.tab-content');
-                if (_.isNull(loadingMask)) {
-                    loadingMask = new LoadingMask();
-                    $tabContent.find('.loading-mask').append(loadingMask.render().$el);
+                if (!loadingMask) {
+                    loadingMask = new LoadingMask({container: $tabContent});
                 }
 
                 loadingMask.show();
