@@ -5,6 +5,7 @@ define(function (require) {
     var EmailEditorComponent,
         BaseComponent = require('oroui/js/app/components/base/component'),
         $ = require('jquery'),
+        select2 = require('jquery.select2'),
         routing = require('routing'),
         __ = require('orotranslation/js/translator'),
         messenger = require('oroui/js/messenger'),
@@ -18,6 +19,49 @@ define(function (require) {
         initialize: function (options) {
             this.options = options;
             this.bindEvents();
+            $('input.taggable-field').each(function(key, elem){
+                $(elem).select2({
+                    containerCssClass: 'taggable-email',
+                    separator: ";",
+                    tags: [],
+                    tokenSeparators: [";", ",", " "]
+                });
+            });
+            if (!this.options.bcc.length) {
+                $('#oro_email_email_bcc').parents('.control-group.taggable-field').css('display', 'none');
+            }
+            if (!this.options.cc.length) {
+                $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'none');
+            }
+            if (!this.options.to.length || !this.options.to[0]) {
+                $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
+                    __("Recipients") + '<em>*</em>'
+                );
+                $('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
+                    '<div id="cc-bcc-holder">' +
+                    '<span id="showCc">Cc</span>' +
+                    '<span id="showBcc">Bcc</span>' +
+                    '</div>'
+                );
+                $('#showCc').on('click', function(e){
+                    e.stopPropagation();
+                    var target = e.target || window.event.target;
+                    $(target).remove();
+                    $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'block');
+                    $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
+                        __("To") + '<em>*</em>'
+                    );
+                });
+                $('#showBcc').on('click', function(e){
+                    e.stopPropagation();
+                    var target = e.target || window.event.target;
+                    $(target).remove();
+                    $('#oro_email_email_bcc').parents('.control-group.taggable-field').css('display', 'block');
+                    $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
+                        __("To") + '<em>*</em>'
+                    );
+                });
+            }
         },
 
         bindEvents: function () {

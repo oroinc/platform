@@ -13,6 +13,7 @@ use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
+use Oro\Bundle\EmailBundle\Form\Type\EmailRecipientsType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
 
 class EmailTypeTest extends TypeTestCase
@@ -45,15 +46,17 @@ class EmailTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $richTextType = new OroRichTextType($configManager);
+        $emailRecipientsType = new EmailRecipientsType($this->securityContext);
 
         return [
             new PreloadedExtension(
                 [
-                    TranslatableEntityType::NAME  => $translatableType,
-                    $select2ChoiceType->getName() => $select2ChoiceType,
-                    $emailTemplateList->getName() => $emailTemplateList,
-                    $emailAddressType->getName()  => $emailAddressType,
-                    $richTextType->getName()      => $richTextType
+                    TranslatableEntityType::NAME    => $translatableType,
+                    $select2ChoiceType->getName()   => $select2ChoiceType,
+                    $emailTemplateList->getName()   => $emailTemplateList,
+                    $emailAddressType->getName()    => $emailAddressType,
+                    $richTextType->getName()        => $richTextType,
+                    $emailRecipientsType->getName() => $emailRecipientsType,
                 ],
                 []
             )
