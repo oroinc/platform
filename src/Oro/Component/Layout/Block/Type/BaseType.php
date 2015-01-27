@@ -9,15 +9,15 @@ use Oro\Component\Layout\BlockView;
 
 class BaseType extends AbstractType
 {
-    const NAME = 'layout';
+    const NAME = 'block';
 
     /**
      * {@inheritdoc}
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        // add the view to itself vars to allow get it using 'item' context variable in a rendered, for example TWIG
-        $view->vars['item'] = $view;
+        // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
+        $view->vars['block'] = $view;
         // replace attributes if specified ('attr' variable always exists in a view because it is added by FormView)
         if (isset($options['attr'])) {
             $view->vars['attr'] = $options['attr'];

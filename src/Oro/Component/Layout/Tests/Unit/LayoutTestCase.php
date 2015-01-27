@@ -70,7 +70,7 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
             'children' => $children
         ];
 
-        unset($result['vars']['item']);
+        unset($result['vars']['block']);
 
         if ($removeAuxiliaryVariables) {
             unset($result['vars']['translation_domain']);

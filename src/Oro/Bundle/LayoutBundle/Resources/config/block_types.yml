@@ -2,7 +2,7 @@ services:
     oro_layout.block_type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
         tags:
-             - { name: layout.block_type, alias: layout }
+             - { name: layout.block_type, alias: block }
 
     oro_layout.block_type.container:
         class: Oro\Component\Layout\Block\Type\ContainerType
