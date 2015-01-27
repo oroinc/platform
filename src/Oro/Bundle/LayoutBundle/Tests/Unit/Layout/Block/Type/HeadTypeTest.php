@@ -34,9 +34,10 @@ class HeadTypeTest extends BlockTypeTestCase
         $this->assertEquals('test', $view->vars['title']);
 
         // check that children are in the right order
-        $this->assertEquals('head_id_meta_id1', $view->children[0]->vars['id']);
-        $this->assertEquals('head_id_meta_id3', $view->children[1]->vars['id']);
-        $this->assertEquals('head_id_script_id2', $view->children[2]->vars['id']);
+        $this->assertEquals(
+            ['head_id_meta_id1', 'head_id_meta_id3', 'head_id_script_id2'],
+            array_keys($view->children)
+        );
     }
 
     public function testGetName()
