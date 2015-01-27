@@ -4,10 +4,6 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
-use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Psr\Log\LoggerInterface;
 
 use Symfony\Component\Form\FormError;
@@ -21,6 +17,9 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
