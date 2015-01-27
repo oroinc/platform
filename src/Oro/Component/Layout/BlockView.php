@@ -41,6 +41,8 @@ class BlockView extends FormView
      * @param string $id The child id
      *
      * @return BlockView The child view
+     *
+     * @throws \OutOfBoundsException if a child does not exist
      */
     public function offsetGet($id)
     {

@@ -92,6 +92,8 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      * Builds all blocks starting with and including the given root block
      *
      * @param string $rootId
+     *
+     * @throws Exception\LogicException if a child block is added to not container
      */
     protected function buildBlocks($rootId)
     {
