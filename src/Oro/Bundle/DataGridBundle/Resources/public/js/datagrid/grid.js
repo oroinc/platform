@@ -645,53 +645,71 @@ define(function (require) {
                 self.dropdownOpened = true;
 
                 var $dropdown = $(e.target).closest('.dropdown'),
-                    $dropdownMenu = $dropdown.find('.dropdown-menu');
+                    $dropdownMenu = $dropdown.find('.dropdown-menu'),
+                    dropdownRect = $dropdown[0].getBoundingClientRect(),
+                    scrollableRect = $grid.parent()[0].getBoundingClientRect(),
+                    moveLeft;
 
-                // let bootstrap show menu
-                _.defer(function () {
-                    if (!$dropdown.hasClass('open')) {
-                        return;
-                    }
-                    var position = $dropdownMenu.offset(),
-                        $dropdownMenuCopy = $dropdownMenu.cloneWithStyles(),
-                    // required in IE, it counts width and height incorrectly
-                        clientRect = $dropdownMenu[0].getBoundingClientRect();
+                if (dropdownRect.left < scrollableRect.left || dropdownRect.right > scrollableRect.right) {
+                    e.stopPropagation();
+                    e.preventDefault();
 
-                    $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
-                    $('body').append($dropdownMenuCopy);
+                    moveLeft = dropdownRect.left < scrollableRect.left
+                        ? dropdownRect.left - scrollableRect.left
+                        : dropdownRect.right - scrollableRect.right;
+                    moveLeft += moveLeft > 0 ? 5 : -5;
+                    $grid.parent().scrollLeft($grid.parent().scrollLeft() + moveLeft);
+                    setTimeout(function(){
+                        $dropdown.find('>*:first').trigger('click');
+                    }, 0);
+                } else {
+                    // let bootstrap show menu
+                    _.defer(function () {
+                        if (!$dropdown.hasClass('open')) {
+                            return;
+                        }
 
-                    $dropdownMenuCopy.css({
-                        position: 'absolute',
-                        top: position.top + 1, // required to add 1px to exactly match position
-                        left: position.left,
-                        width: clientRect.width,
-                        height: clientRect.height
-                    });
+                        var position = $dropdownMenu.offset(),
+                            $dropdownMenuCopy = $dropdownMenu.cloneWithStyles(),
+                        // required in IE, it counts width and height incorrectly
+                            clientRect = $dropdownMenu[0].getBoundingClientRect();
 
-                    $dropdownMenu.hide();
-                    // need to reset after dropdown remove
-                    self.dropdownsToReset.push($dropdownMenu);
+                        $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
+                        $('body').append($dropdownMenuCopy);
 
-                    $dropdownMenuCopy.show();
-
-                    /**
-                     * NOTE: This code switches menus between copy and real dropdown on mouseEnter and mouseLeave
-                     */
-                    $dropdownMenuCopy.on('mouseenter.floatThead-' + self.cid, function expandContainer() {
-                        $container.css({
-                            height: self.getCssHeightCalcExpression()
+                        $dropdownMenuCopy.css({
+                            position: 'absolute',
+                            top: position.top + 1, // required to add 1px to exactly match position
+                            left: position.left,
+                            width: clientRect.width,
+                            height: clientRect.height
                         });
-                        $dropdownMenuCopy.hide();
-                        $dropdownMenu.show();
-                    });
-                    $dropdownMenu.on('mouseleave.floatThead-' + self.cid, function collapseContainer() {
+
                         $dropdownMenu.hide();
+                        // need to reset after dropdown remove
+                        self.dropdownsToReset.push($dropdownMenu);
+
                         $dropdownMenuCopy.show();
-                        $container.css({
-                            height: ''
+
+                        /**
+                         * NOTE: This code switches menus between copy and real dropdown on mouseEnter and mouseLeave
+                         */
+                        $dropdownMenuCopy.on('mouseenter.floatThead-' + self.cid, function expandContainer() {
+                            $container.css({
+                                height: self.getCssHeightCalcExpression()
+                            });
+                            $dropdownMenuCopy.hide();
+                            $dropdownMenu.show();
+                        });
+                        $dropdownMenu.on('mouseleave.floatThead-' + self.cid, function collapseContainer() {
+                            $dropdownMenu.hide();
+                            $dropdownMenuCopy.show();
+                            $container.css({
+                                height: ''
+                            });
                         });
                     });
-                });
+                }
             });
         },
 
