@@ -6,9 +6,9 @@ define(function (require) {
     var CommentFormView,
         $ = require('jquery'),
         _ = require('underscore'),
-        tools = require('oroui/js/tools'),
         mediator = require('oroui/js/mediator'),
         formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options'),
+        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         BaseView = require('oroui/js/app/views/base/view');
     require('jquery.validate');
 
@@ -28,6 +28,12 @@ define(function (require) {
             'reset': 'onReset'
         },
 
+        listen: {
+            'request model': 'onRequest',
+            'sync model': 'onSuccess',
+            'error model': 'onError'
+        },
+
         defaultData: {
             attachmentURL: null,
             attachmentFileName: null,
@@ -36,6 +42,11 @@ define(function (require) {
 
         initialize: function (options) {
             this.template = _.template($(options.template ).html());
+            this.isAddForm = this.model.isNew();
+            if (this.isAddForm) {
+                // save instance of empty model
+                this.original = this.model.clone();
+            }
             CommentFormView.__super__.initialize.apply(this, arguments);
         },
 
@@ -43,21 +54,30 @@ define(function (require) {
             var data = CommentFormView.__super__.getTemplateData.call(this);
             _.defaults(data, this.defaultData);
             // id is required for template
-            data.id = this.model ? this.model.get('id') : null;
+            data.id = this.model.id || null;
             return data;
         },
 
         render: function () {
+            var loading;
+
             CommentFormView.__super__.render.call(this);
+
             this.$('form')
-                .addClass(this.model ? 'edit-form' : 'add-form')
+                .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate({invalidHandler: function(event, validator) {
                     _.delay(_.bind(validator.resetForm, validator), 3000);
                 }});
             mediator.execute('layout:init', this.$('form'));
-            if (this.model) {
+            if (!this.isAddForm) {
                 this.bindData();
             }
+
+            loading = new LoadingMaskView({
+                container: this.$el
+            });
+            this.subview('loading', loading);
+
             return this;
         },
 
@@ -73,26 +93,19 @@ define(function (require) {
         },
 
         onSubmit: function (e) {
-            var attrs, options;
             e.stopPropagation();
             e.preventDefault();
-            attrs = tools.unpackFromQueryString(this.$('form').serialize());
-            options = formToAjaxOptions(this.$('form'));
-            if (this.model) {
-                attrs.id = this.model.id;
-            }
-            options.success = _.bind(this.onSuccessResponse, this);
-            options.error = _.bind(this.onErrorResponse, this);
-            this.trigger('submit', attrs, options);
+            this.trigger('submit', this);
         },
 
         onReset: function (e) {
             e.stopPropagation();
             e.preventDefault();
-            if (this.model) {
-                this.trigger('reset', this.model);
-            } else {
+            if (this.isAddForm) {
                 this._clearFrom();
+            } else {
+                this.bindData();
+                this.trigger('reset', this);
             }
         },
 
@@ -101,18 +114,57 @@ define(function (require) {
         },
 
         _clearFrom: function () {
+            this.stopListening();
+            this.model = this.original.clone();
+            this.delegateListeners();
             this._elements().each(function () {
                 setValue($(this), '');
             });
         },
 
-        onSuccessResponse: function () {
-            if (!this.model) {
+        /**
+         * Fetches options with form-data to send it over ajax
+         *
+         * @param {Object=} options initial options
+         * @returns {Object}
+         */
+        fetchAjaxOptions: function (options) {
+            return formToAjaxOptions(this.$('form'), options);
+        },
+
+        /**
+         * Update view after request start
+         *
+         *  - shows loading mask
+         */
+        onRequest: function () {
+            this.subview('loading').show();
+        },
+
+        /**
+         * Update view after successful request
+         *
+         *  - hides loading mask
+         *  - clears form if necessary
+         */
+        onSuccess: function () {
+            this.subview('loading').hide();
+            if (this.isAddForm) {
                 this._clearFrom();
             }
         },
 
-        onErrorResponse: function (model, jqxhr, options) {
+        /**
+         * Update view after failed request
+         *
+         *  - hides loading mask
+         *  - shows error massages if they exist
+         *
+         * @param {Model} model
+         * @param {Object} jqxhr
+         */
+        onError: function (model, jqxhr) {
+            this.subview('loading').hide();
             if (jqxhr.status === 400 &&
                 jqxhr.responseJSON && jqxhr.responseJSON.errors) {
                 this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
