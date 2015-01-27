@@ -42,7 +42,7 @@
     {% set value = item.value %}
     {% set type  = item.type %}
 
-    {% if type == 'text' %}
+    {% if type == 'text' and value %}
         {% set value %}
             {{ value|raw|nl2br }}
         {% endset %}
