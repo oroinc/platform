@@ -566,6 +566,12 @@ define(function (require) {
                 this.$el.removeClass('floatThead-move-header');
                 $grid.floatThead('reflow');
                 this.$el.addClass('floatThead-move-header');
+
+                // this code fixes horizontal scroll
+                this.$('.floatThead-container, .floatThead-container .grid').css({
+                    paddingRight: mediator.execute('layout:scrollbarWidth')
+                });
+
                 $grid.parent().css({
                     maxHeight: this.getCssHeightCalcExpression()
                 });

@@ -18,6 +18,7 @@ require([
         mediator.setHandler('layout:enablePageScroll', layout.enablePageScroll, layout);
         mediator.setHandler('layout:disablePageScroll', layout.disablePageScroll, layout);
         mediator.setHandler('layout:hasHorizontalScroll', layout.disablePageScroll, layout);
+        mediator.setHandler('layout:scrollbarWidth', layout.scrollbarWidth, layout);
         mediator.on('page:beforeChange', layout.pageRendering, layout);
         mediator.on('page:afterChange', layout.pageRendered, layout);
     });
