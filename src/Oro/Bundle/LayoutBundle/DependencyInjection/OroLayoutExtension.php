@@ -19,5 +19,10 @@ class OroLayoutExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        if ($config['twig']['enabled']) {
+            $loader->load('twig_renderer.yml');
+            $container->setParameter('oro_layout.twig.resources', $config['twig']['resources']);
+        }
     }
 }
