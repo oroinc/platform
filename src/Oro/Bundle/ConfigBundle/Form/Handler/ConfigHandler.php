@@ -22,6 +22,13 @@ class ConfigHandler
         $this->manager = $manager;
     }
 
+    public function setConfigManager(ConfigManager $manager)
+    {
+        $this->manager = $manager;
+
+        return $this;
+    }
+
     /**
      * Process form
      *
