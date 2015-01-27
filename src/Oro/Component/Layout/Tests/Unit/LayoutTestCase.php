@@ -4,7 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
 
-class LayoutBuilderTestCase extends \PHPUnit_Framework_TestCase
+class LayoutTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array     $expected
