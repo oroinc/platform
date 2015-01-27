@@ -10,7 +10,7 @@ define(function (require) {
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
-        LoadingMask     = require('oroui/js/loading-mask'),
+        LoadingMask     = require('oroui/js/loading-mask-view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
         EventView       = require('orocalendar/js/calendar/event/view'),
@@ -197,8 +197,9 @@ define(function (require) {
          */
         getLoadingMask: function () {
             if (!this.loadingMask) {
-                this.loadingMask = new LoadingMask();
-                this.$el.find(this.selectors.loadingMask).append(this.loadingMask.render().$el);
+                this.loadingMask = new LoadingMask({
+                    container: this.getCalendarElement()
+                });
             }
             return this.loadingMask;
         },
