@@ -181,17 +181,17 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $method
+     * @param bool $valid
+     * @param bool $assert
      *
-     * @dataProvider validData
+     * @dataProvider processData
      */
-    public function testProcessValidData($method)
+    public function testProcessData($method, $valid, $assert)
     {
         $this->request->setMethod($method);
         $this->model
             ->setFrom('from@example.com')
             ->setTo(['to@example.com'])
-            ->setCc(['cc@example.com'])
-            ->setBcc(['bcc@example.com', 'bcc2@example.com'])
             ->setSubject('testSubject')
             ->setBody('testBody');
 
@@ -199,25 +199,29 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($this->model);
 
-        $this->form->expects($this->once())
-            ->method('submit')
-            ->with($this->request);
+        if (in_array($method, ['POST', 'PUT'])) {
+            $this->form->expects($this->once())
+                ->method('submit')
+                ->with($this->request);
 
-        $this->form->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(true));
+            $this->form->expects($this->once())
+                ->method('isValid')
+                ->will($this->returnValue($valid));
 
-        $this->emailProcessor->expects($this->once())
-            ->method('process')
-            ->with($this->model);
+            if ($valid) {
+                $this->emailProcessor->expects($this->once())
+                    ->method('process')
+                    ->with($this->model);
+            }
+        }
 
-        $this->assertTrue($this->handler->process($this->model));
+        $this->assertEquals($assert, $this->handler->process($this->model));
     }
 
     /**
      * @param string $method
      *
-     * @dataProvider invalidData
+     * @dataProvider methodsData
      */
     public function testProcessException($method)
     {
@@ -313,15 +317,21 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function validData()
+    public function processData()
     {
         return [
-            ['POST'],
-            ['PUT']
+            ['POST', true, true],
+            ['PUT', true, true],
+            ['POST', false, false],
+            ['PUT', false, false],
+            ['GET', false, false],
+            ['GET', false, false],
+            ['DELETE', true, false],
+            ['DELETE', true, false]
         ];
     }
 
-    public function invalidData()
+    public function methodsData()
     {
         return [
             ['POST'],
