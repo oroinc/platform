@@ -19,7 +19,7 @@ class RootType extends AbstractContainerType
     {
         $resolver->setDefaults(
             [
-                'doctype' => 'html'
+                'doctype' => ''
             ]
         );
     }

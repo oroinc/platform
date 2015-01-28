@@ -26,10 +26,10 @@
 {%- endblock %}
 
 {% block root_widget %}
-    <!DOCTYPE {{ doctype }}>
-    <html>
-        {{ parent() }}
-    </html>
+<!DOCTYPE {{ doctype|default('html') }}>
+<html>
+    {{ block_widget(block) }}
+</html>
 {% endblock %}
 
 {% block head_widget %}
