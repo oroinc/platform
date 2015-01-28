@@ -17,11 +17,21 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
+/**
+ * Class EmailHandler
+ *
+ * @package Oro\Bundle\EmailBundle\Form\Handler
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class EmailHandler
 {
     /**
@@ -133,7 +143,7 @@ class EmailHandler
         }
         $this->form->setData($model);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
@@ -141,7 +151,7 @@ class EmailHandler
                     $this->emailProcessor->process($model);
                     return true;
                 } catch (\Exception $ex) {
-                    $this->logger->error('Email sending failed.', array('exception' => $ex));
+                    $this->logger->error('Email sending failed.', ['exception' => $ex]);
                     $this->form->addError(
                         new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'))
                     );
@@ -181,9 +191,9 @@ class EmailHandler
      */
     protected function initRecipients(Email $model)
     {
-        $model->setTo($this->getRecipients($model, 'to'));
-        $model->setCc($this->getRecipients($model, 'cc'));
-        $model->setBcc($this->getRecipients($model, 'bcc'));
+        $model->setTo($this->getRecipients($model, EmailRecipient::TO));
+        $model->setCc($this->getRecipients($model, EmailRecipient::CC));
+        $model->setBcc($this->getRecipients($model, EmailRecipient::BCC));
     }
 
     /**
@@ -250,7 +260,7 @@ class EmailHandler
         if (!$this->emailAddressHelper->isFullEmailAddress($emailAddress)) {
             if (!empty($ownerClass) && !empty($ownerId)) {
                 $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
-                if ($owner) {
+                if ($owner && $this->isFullQualifiedUser($owner)) {
                     $ownerName = $this->nameFormatter->format($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
@@ -276,18 +286,31 @@ class EmailHandler
     /**
      * Get the current authenticated user
      *
-     * @return UserInterface|null
+     * @return UserInterface|EmailHolderInterface|EmailOwnerInterface|null
      */
     protected function getUser()
     {
         $token = $this->securityContext->getToken();
         if ($token) {
             $user = $token->getUser();
-            if ($user instanceof UserInterface) {
+            if (
+                $this->isFullQualifiedUser($user)
+            ) {
                 return $user;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param $entity
+     * @return bool
+     */
+    protected function isFullQualifiedUser($entity)
+    {
+        return $entity instanceof UserInterface
+        && $entity instanceof EmailHolderInterface
+        && $entity instanceof EmailOwnerInterface;
     }
 }

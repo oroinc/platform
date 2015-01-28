@@ -19,13 +19,13 @@ class Email
     protected $from;
 
     /** @var string[] */
-    protected $to;
+    protected $to = [];
 
     /** @var string[] */
-    protected $cc;
+    protected $cc = [];
 
     /** @var string[] */
-    protected $bcc;
+    protected $bcc = [];
 
     /** @var string */
     protected $subject;
@@ -38,16 +38,6 @@ class Email
 
     /** @var string */
     protected $body;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->to = [];
-        $this->cc = [];
-        $this->bcc = [];
-    }
 
     /**
      * Get id of emails datagrid
