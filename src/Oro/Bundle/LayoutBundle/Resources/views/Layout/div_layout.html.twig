@@ -58,3 +58,9 @@
         <style{{ block('block_attributes') }}>{{ content|raw }}</style>
     {% endif %}
 {% endblock %}
+
+{% block body_widget %}
+    <body{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </body>
+{% endblock %}
