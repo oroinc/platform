@@ -19,7 +19,7 @@ use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
-     * @var string
+     * @var array
      */
     protected $templates;
 
@@ -127,6 +127,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $email->setEmailBody($emailBody);
             $email->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
             $this->setReference('email_' . ($index + 1), $email);
+            $this->setReference('emailBody_' . ($index + 1), $emailBody);
 
             $this->emailEntityBuilder->getBatch()->persist($om);
         }
