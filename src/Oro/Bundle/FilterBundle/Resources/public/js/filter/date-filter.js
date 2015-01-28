@@ -6,6 +6,7 @@ define(function (require) {
     var DateFilter,
         $ = require('jquery'),
         _ = require('underscore'),
+        tools = require('oroui/js/tools'),
         __ = require('orotranslation/js/translator'),
         ChoiceFilter = require('./choice-filter'),
         VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view'),
@@ -261,24 +262,38 @@ define(function (require) {
          * @protected
          */
         _renderSubViews: function () {
-            var name, selector, pickerView,
+            var name, selector, pickerView, options,
                 value = this.criteriaValueSelectors.value;
             for (name in value) {
                 if (!value.hasOwnProperty(name)) {
                     return;
                 }
                 selector = value[name];
-                pickerView = new this.picker({
-                    el: this.$(selector),
-                    useNativePicker: false,
-                    dateInputAttrs: {
-                        'class': this.inputClass
-                    },
-                    datePickerOptions: this.dateWidgetOptions,
-                    dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector)
+                options = this._getPickerConfigurationOptions({
+                    el: this.$(selector)
                 });
+                pickerView = new this.picker(options);
                 this.subview(name, pickerView);
             }
+        },
+
+        /**
+         * Prepares configuration options for picker view
+         *
+         * @param {Object} options
+         * @returns {Object}
+         * @protected
+         */
+        _getPickerConfigurationOptions: function (options) {
+            _.extend(options, {
+                useNativePicker: tools.isMobile(),
+                dateInputAttrs: {
+                    'class': this.inputClass
+                },
+                datePickerOptions: this.dateWidgetOptions,
+                dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector)
+            });
+            return options;
         },
 
         /**
@@ -386,18 +401,6 @@ define(function (require) {
             }
             return value;
         },
-
-        _replaceDateVars: function (value, mode) {
-            // todo remove
-            // replace date variables with constant values
-            if (mode == 'raw') {
-                value = this.dateVariableHelper.formatRawValue(value);
-            } else {
-                value = this.dateVariableHelper.formatDisplayValue(value);
-            }
-            return value;
-        },
-
 
         /**
          * @inheritDoc
