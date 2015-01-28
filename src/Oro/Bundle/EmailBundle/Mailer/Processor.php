@@ -17,6 +17,13 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Class Processor
+ *
+ * @package Oro\Bundle\EmailBundle\Mailer
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Processor
 {
     /** @var EntityManager */

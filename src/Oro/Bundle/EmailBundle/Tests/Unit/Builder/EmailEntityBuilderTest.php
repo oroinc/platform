@@ -67,7 +67,8 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
             $date,
             $date,
             Email::NORMAL_IMPORTANCE,
-            array('"Test2" <test2@example.com>', 'test1@example.com')
+            ['"Test2" <test2@example.com>', 'test1@example.com'],
+            ['"Test3" <test3@example.com>', 'test4@example.com']
         );
 
         $this->assertEquals('testSubject', $email->getSubject());
@@ -86,7 +87,11 @@ class EmailEntityBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test1@example.com', $cc[2]->getName());
         $this->assertEquals('test1@example.com', $cc[2]->getEmailAddress()->getEmail());
         $bcc = $email->getRecipients(EmailRecipient::BCC);
-        $this->assertCount(0, $bcc);
+        $this->assertEquals('"Test3" <test3@example.com>', $bcc[3]->getName());
+        $this->assertEquals('test3@example.com', $bcc[3]->getEmailAddress()->getEmail());
+        $this->assertEquals('test4@example.com', $bcc[4]->getName());
+        $this->assertEquals('test4@example.com', $bcc[4]->getEmailAddress()->getEmail());
+        $this->assertCount(2, $bcc);
     }
 
     public function testToRecipient()

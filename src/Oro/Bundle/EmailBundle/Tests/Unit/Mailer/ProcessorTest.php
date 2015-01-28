@@ -13,6 +13,14 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 
+/**
+ * Class ProcessorTest
+ *
+ * @package Oro\Bundle\EmailBundle\Tests\Unit\Mailer
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ProcessorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -149,10 +157,10 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->method('send');
 
         $model = $this->createEmailModel(
-            array(
+            [
                 'from' => new \stdClass(),
                 'to' => [new \stdClass()],
-            )
+            ]
         );
         $this->emailProcessor->process($model);
     }
@@ -167,7 +175,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     public function testProcess($data, $expectedMessageData)
     {
         $message = $this->getMockBuilder('\Swift_Mime_Message')
-            ->setMethods(['setDate', 'setFrom', 'setTo', 'setSubject', 'setBody'])
+            ->setMethods(['setDate', 'setFrom', 'setTo',  'setCc',  'setBcc', 'setSubject', 'setBody'])
             ->getMockForAbstractClass();
         $message->expects($this->once())
             ->method('setDate');
@@ -177,6 +185,12 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $message->expects($this->once())
             ->method('setTo')
             ->with($expectedMessageData['to']);
+        $message->expects($this->once())
+            ->method('setCc')
+            ->with($expectedMessageData['cc']);
+        $message->expects($this->once())
+            ->method('setBcc')
+            ->with($expectedMessageData['bcc']);
         $message->expects($this->once())
             ->method('setSubject')
             ->with($expectedMessageData['subject']);
@@ -227,7 +241,17 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->emailEntityBuilder->expects($this->once())
             ->method('email')
-            ->with($data['subject'], $data['from'], $data['to'])
+            ->with(
+                $data['subject'],
+                $data['from'],
+                $data['to'],
+                $this->isInstanceOf('DateTime'),
+                $this->isInstanceOf('DateTime'),
+                $this->isInstanceOf('DateTime'),
+                \Oro\Bundle\EmailBundle\Entity\Email::NORMAL_IMPORTANCE,
+                $data['cc'],
+                $data['bcc']
+            )
             ->will($this->returnValue($email));
 
         $body = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
@@ -271,61 +295,77 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                array(
+                [
                     'from' => 'from@test.com',
-                    'to' => array('to@test.com'),
+                    'to' => ['to@test.com'],
+                    'cc' => ['Cc <cc@test.com>'],
+                    'bcc' => ['Bcc <bcc@test.com>'],
                     'subject' => 'subject',
                     'body' => 'body'
-                ),
-                array(
-                    'from' => array('from@test.com'),
-                    'to' => array('to@test.com'),
+                ],
+                [
+                    'from' => ['from@test.com'],
+                    'to' => ['to@test.com'],
+                    'cc' => ['cc@test.com' => 'Cc'],
+                    'bcc' => ['bcc@test.com' => 'Bcc'],
                     'subject' => 'subject',
                     'body' => 'body'
-                )
+                ]
             ],
             [
-                array(
+                [
                     'from' => 'from@test.com',
-                    'to' => array('to@test.com'),
+                    'to' => ['to@test.com'],
+                    'cc' => [],
+                    'bcc' => [],
                     'subject' => 'subject',
                     'body' => 'body',
                     'type' => 'html'
-                ),
-                array(
-                    'from' => array('from@test.com'),
-                    'to' => array('to@test.com'),
+                ],
+                [
+                    'from' => ['from@test.com'],
+                    'to' => ['to@test.com'],
+                    'cc' => [],
+                    'bcc' => [],
                     'subject' => 'subject',
                     'body' => 'body',
                     'type' => 'text/html'
-                )
+                ]
             ],
             [
-                array(
+                [
                     'from' => 'Test <from@test.com>',
-                    'to' => array('To <to@test.com>', 'to2@test.com'),
+                    'to' => ['To <to@test.com>', 'to2@test.com'],
+                    'cc' => ['Cc3 <cc3@test.com>', 'cc4@test.com'],
+                    'bcc' => [],
                     'subject' => 'subject',
                     'body' => 'body'
-                ),
-                array(
-                    'from' => array('from@test.com' => 'Test'),
-                    'to' => array('to@test.com' => 'To', 'to2@test.com'),
+                ],
+                [
+                    'from' => ['from@test.com' => 'Test'],
+                    'to' => ['to@test.com' => 'To', 'to2@test.com'],
+                    'cc' => ['cc3@test.com' => 'Cc3', 'cc4@test.com'],
+                    'bcc' => [],
                     'subject' => 'subject',
                     'body' => 'body'
-                )
+                ]
             ],
             [
-                array(
+                [
                     'from' => 'from@test.com',
-                    'to' => array('to1@test.com', 'to1@test.com', 'to2@test.com'),
+                    'to' => ['to1@test.com', 'to1@test.com', 'to2@test.com'],
+                    'cc' => [],
+                    'bcc' => ['bcc3@test.com', 'bcc4@test.com'],
                     'subject' => 'subject',
                     'body' => 'body',
                     'entityClass' => 'Entity\Target',
                     'entityId' => 123
-                ),
+                ],
                 [
                     'from' => ['from@test.com'],
                     'to' => ['to1@test.com', 'to1@test.com', 'to2@test.com'],
+                    'cc' => [],
+                    'bcc' => ['bcc3@test.com', 'bcc4@test.com'],
                     'subject' => 'subject',
                     'body' => 'body'
                 ]
