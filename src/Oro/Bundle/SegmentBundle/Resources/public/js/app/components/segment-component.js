@@ -8,7 +8,7 @@ define(function (require) {
         BaseComponent = require('oroui/js/app/components/base/component'),
         BaseCollection = require('oroui/js/app/models/base/collection'),
         __ = require('orotranslation/js/translator'),
-        LoadingMask = require('oroui/js/loading-mask'),
+        LoadingMask = require('oroui/js/app/views/loading-mask-view'),
         GroupingModel = require('oroquerydesigner/js/items-manager/grouping-model'),
         ColumnModel = require('oroquerydesigner/js/items-manager/column-model'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
@@ -25,7 +25,6 @@ define(function (require) {
             entityChoice: '',
             valueSource: '',
             fieldsLoader: {
-                loadingMaskParent: '',
                 router: null,
                 routingParams: {},
                 fieldsData: [],
@@ -178,6 +177,8 @@ define(function (require) {
             this.options = {};
             $.extend(true, this.options, this.defaults, options);
 
+            this.loadingMaskContainer = options._sourceElement.closest('form');
+
             // common extra options for all choice inputs
             this.options.fieldChoiceOptions = {
                 select2: {
@@ -220,8 +221,9 @@ define(function (require) {
             self = this;
             options = this.options.fieldsLoader;
 
-            loadingMask = new LoadingMask();
-            $(options.loadingMaskParent).append(loadingMask.render().$el);
+            loadingMask = new LoadingMask({
+                container: this.loadingMaskContainer
+            });
 
             confirm = new DeleteConfirmation({
                 title: __('Change Entity Confirmation'),
