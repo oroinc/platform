@@ -19,7 +19,5 @@ Oro\Bundle\EmailBundle\Form\Model\Email:
     properties:
         from:
             - NotBlank:     ~
-        to:
-            - NotBlank:     ~
         subject:
             - NotBlank:     ~
