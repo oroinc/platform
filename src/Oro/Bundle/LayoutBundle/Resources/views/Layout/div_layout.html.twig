@@ -60,7 +60,7 @@
 {% endblock %}
 
 {% block body_widget %}
-    <body{{ block('layout_attributes') }}>
-        {{ parent() }}
+    <body{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
     </body>
 {% endblock %}

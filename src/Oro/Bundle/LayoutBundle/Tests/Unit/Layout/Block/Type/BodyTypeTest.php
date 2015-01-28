@@ -9,30 +9,14 @@ use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class BodyTypeTest extends BlockTypeTestCase
 {
-    public function testSetDefaultOptions()
-    {
-        $this->assertEquals(
-            [BodyType::OPTIONS_TAG_ATTRIBUTES => []],
-            $this->resolveOptions(BodyType::NAME, [BodyType::OPTIONS_TAG_ATTRIBUTES => []])
-        );
-        $this->assertEquals(
-            [BodyType::OPTIONS_TAG_ATTRIBUTES => ['class' => 'desktop', 'id' => 'root_body']],
-            $this->resolveOptions(
-                BodyType::NAME,
-                [BodyType::OPTIONS_TAG_ATTRIBUTES => ['class' => 'desktop', 'id' => 'root_body']]
-            )
-        );
-    }
-
     public function testBuildView()
     {
         $view = $this->getBlockView(
             BodyType::NAME,
-            [BodyType::OPTIONS_TAG_ATTRIBUTES => ['class' => 'desktop', 'id' => 'root_body']]
+            ['attr' => ['id' => 'test_id_attr']]
         );
 
-        $this->assertEquals('desktop', $view->vars['attr']['class']);
-        $this->assertEquals('root_body', $view->vars['attr']['id']);
+        $this->assertEquals('test_id_attr', $view->vars['attr']['id']);
     }
 
     public function testGetName()
