@@ -27,31 +27,14 @@ define(function (require) {
                     tokenSeparators: [";", ",", " "]
                 });
             });
+            if (!this.options.bcc.length || !this.options.cc.length) {
+                $('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
+                    '<div id="cc-bcc-holder"/>'
+                );
+            }
             if (!this.options.bcc.length) {
                 $('#oro_email_email_bcc').parents('.control-group.taggable-field').css('display', 'none');
-            }
-            if (!this.options.cc.length) {
-                $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'none');
-            }
-            if (!this.options.to.length || !this.options.to[0]) {
-                $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
-                    __("Recipients") + '<em>*</em>'
-                );
-                $('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
-                    '<div id="cc-bcc-holder">' +
-                    '<span id="showCc">Cc</span>' +
-                    '<span id="showBcc">Bcc</span>' +
-                    '</div>'
-                );
-                $('#showCc').on('click', function(e){
-                    e.stopPropagation();
-                    var target = e.target || window.event.target;
-                    $(target).remove();
-                    $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'block');
-                    $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
-                        __("To") + '<em>*</em>'
-                    );
-                });
+                $('#cc-bcc-holder').append('<span id="showBcc">Bcc</span>');
                 $('#showBcc').on('click', function(e){
                     e.stopPropagation();
                     var target = e.target || window.event.target;
@@ -61,6 +44,24 @@ define(function (require) {
                         __("To") + '<em>*</em>'
                     );
                 });
+            }
+            if (!this.options.cc.length) {
+                $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'none');
+                $('#cc-bcc-holder').append('<span id="showCc">Cc</span>');
+                $('#showCc').on('click', function(e){
+                    e.stopPropagation();
+                    var target = e.target || window.event.target;
+                    $(target).remove();
+                    $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'block');
+                    $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
+                        __("To") + '<em>*</em>'
+                    );
+                });
+            }
+            if (!this.options.to.length || !this.options.to[0]) {
+                $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
+                    __("Recipients") + '<em>*</em>'
+                );
             }
         },
 
