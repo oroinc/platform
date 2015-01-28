@@ -40,7 +40,7 @@ class ImapEmailIterator implements \Iterator, \Countable
         $this->onBatchLoaded = function ($batch) {
             $this->handleBatchLoaded($batch);
         };
-        $this->iterator->setBatchCallback();
+        $this->setBatchCallback();
     }
 
     /**
@@ -98,9 +98,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     }
 
     /**
-     * The number of emails in this iterator
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function count()
     {
@@ -108,32 +106,27 @@ class ImapEmailIterator implements \Iterator, \Countable
     }
 
     /**
-     * Return the current element
-     *
-     * @return Email
+     * {@inheritdoc}
      */
     public function current()
     {
-        // call the underlying iterator to make sure a batch is loaded
-        // actually $this->batch is initialized at this moment
-        $this->iterator->current();
-
         return $this->batch[$this->iterationPos];
     }
 
     /**
-     * Move forward to next element
+     * {@inheritdoc}
      */
     public function next()
     {
         $this->iterationPos++;
+
+        // call the underlying iterator to make sure a batch is loaded
+        // actually $this->batch is initialized at this moment
         $this->iterator->next();
     }
 
     /**
-     * Return the key of the current element
-     *
-     * @return int on success, or null on failure.
+     * {@inheritdoc}
      */
     public function key()
     {
@@ -141,21 +134,25 @@ class ImapEmailIterator implements \Iterator, \Countable
     }
 
     /**
-     * Checks if current position is valid
-     *
-     * @return boolean Returns true on success or false on failure.
+     * {@inheritdoc}
      */
     public function valid()
     {
-        return $this->iterator->valid() && (null === $this->batch || isset($this->batch[$this->iterationPos]));
+        // enforce next batch loading if all entries in batch were invalid
+        while (empty($this->batch) && $this->iterator->valid()) {
+            $this->iterator->next();
+        }
+
+        return isset($this->batch[$this->iterationPos]);
     }
 
     /**
-     * Rewind the Iterator to the first element
+     * {@inheritdoc}
      */
     public function rewind()
     {
         $this->iterationPos = 0;
+        $this->batch        = [];
 
         $this->iterator->rewind();
     }
