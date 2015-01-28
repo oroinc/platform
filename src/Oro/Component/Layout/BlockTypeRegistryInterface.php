@@ -26,4 +26,14 @@ interface BlockTypeRegistryInterface
      * @return bool Whether the block type is supported
      */
     public function hasBlockType($name);
+
+    /**
+     * Returns the chain of all block types starting with the given block type
+     * The first element in the chain is the top type in the hierarchy, the last element is the given type
+     *
+     * @param string|BlockTypeInterface $blockType
+     *
+     * @return BlockTypeInterface[]
+     */
+    public function getBlockTypeChain($blockType);
 }

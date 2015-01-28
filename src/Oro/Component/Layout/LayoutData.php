@@ -9,7 +9,7 @@ namespace Oro\Component\Layout;
  */
 class LayoutData
 {
-    /** The name of the block type */
+    /** The block type; can be a string or BlockTypeInterface */
     const BLOCK_TYPE = 'block_type';
 
     /** Additional options which are used for building the layout block */
@@ -102,10 +102,10 @@ class LayoutData
     /**
      * Adds a new item to the layout
      *
-     * @param string $id        The layout item id
-     * @param string $parentId  The id or alias of parent item. Set null to add the root item
-     * @param string $blockType The name of the block type associated with the layout item
-     * @param array  $options   The layout item options
+     * @param string                    $id        The layout item id
+     * @param string                    $parentId  The id or alias of parent item. Set null to add the root item
+     * @param string|BlockTypeInterface $blockType The block type associated with the layout item
+     * @param array                     $options   The layout item options
      *
      * @throws Exception\InvalidArgumentException if the id, parent id or block type are empty or invalid
      * @throws Exception\ItemAlreadyExistsException if the layout item with the same id already exists
@@ -579,19 +579,21 @@ class LayoutData
         if (empty($blockType)) {
             throw new Exception\InvalidArgumentException('The block type name must not be empty.');
         }
-        if (!is_string($blockType)) {
-            throw new Exception\UnexpectedTypeException($blockType, 'string', 'blockType');
-        }
-        if (!preg_match('/^[a-z][a-z0-9_]*$/iD', $blockType)) {
-            throw new Exception\InvalidArgumentException(
-                sprintf(
-                    'The "%s" string cannot be used as the name of the block type '
-                    . 'because it contains illegal characters. '
-                    . 'The valid block type name should start with a letter and only contain '
-                    . 'letters, numbers and underscores ("_").',
-                    $blockType
-                )
-            );
+        if (!$blockType instanceof BlockTypeInterface) {
+            if (!is_string($blockType)) {
+                throw new Exception\UnexpectedTypeException($blockType, 'string or BlockTypeInterface', 'blockType');
+            }
+            if (!preg_match('/^[a-z][a-z0-9_]*$/iD', $blockType)) {
+                throw new Exception\InvalidArgumentException(
+                    sprintf(
+                        'The "%s" string cannot be used as the name of the block type '
+                        . 'because it contains illegal characters. '
+                        . 'The valid block type name should start with a letter and only contain '
+                        . 'letters, numbers and underscores ("_").',
+                        $blockType
+                    )
+                );
+            }
         }
     }
 }

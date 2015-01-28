@@ -50,7 +50,7 @@
 
 {% block style_widget %}
     {% set attr = {'type': 'text/css'}|merge(attr) %}
-    {% if attr.src is not empty %}
+    {% if attr.src is defined and attr.src is not empty %}
         {% set href = attr.src %}
         {% set attr = attr|omit(['src'])|merge({'href' : href}) %}
         <link rel="stylesheet"{{ block('block_attributes') }}/>

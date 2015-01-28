@@ -31,14 +31,24 @@ class BlockOptionsResolver implements BlockOptionsResolverInterface
 
 
     /**
-     * @param string $blockType
+     * @param string|BlockTypeInterface $blockType
      *
      * @return OptionsResolverInterface
      */
     protected function getOptionResolver($blockType)
     {
-        if (!isset($this->resolvers[$blockType])) {
-            $type       = $this->blockTypeRegistry->getBlockType($blockType);
+        if ($blockType instanceof BlockTypeInterface) {
+            $name = $blockType->getName();
+            $type = $blockType;
+        } else {
+            $name = $blockType;
+            $type = null;
+        }
+
+        if (!isset($this->resolvers[$name])) {
+            if (!$type) {
+                $type = $this->blockTypeRegistry->getBlockType($name);
+            }
             $parentName = $type->getParent();
 
             $optionsResolver = $parentName
@@ -47,9 +57,9 @@ class BlockOptionsResolver implements BlockOptionsResolverInterface
 
             $type->setDefaultOptions($optionsResolver);
 
-            $this->resolvers[$blockType] = $optionsResolver;
+            $this->resolvers[$name] = $optionsResolver;
         }
 
-        return $this->resolvers[$blockType];
+        return $this->resolvers[$name];
     }
 }

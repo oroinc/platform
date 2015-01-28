@@ -35,6 +35,20 @@ class LayoutContextTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testHasForUnknownItem()
+    {
+        $this->assertFalse($this->context->has('test'));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     * @expectedExceptionMessage Undefined index: test.
+     */
+    public function testGetUnknownItem()
+    {
+        $this->context->get('test');
+    }
+
     public function valueDataProvider()
     {
         return [

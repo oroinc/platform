@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit;
+namespace Oro\Component\Layout\Tests\Unit\Util;
 
 use Oro\Component\Layout\Util\ArrayUtils;
 

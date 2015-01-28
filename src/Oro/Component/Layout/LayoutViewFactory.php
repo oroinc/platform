@@ -24,9 +24,6 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /** @var Block */
     protected $currentBlock;
 
-    /** @var  array */
-    protected $blockTypeChain = [];
-
     /**
      * @param BlockTypeRegistryInterface         $blockTypeRegistry
      * @param BlockOptionsResolverInterface      $blockOptionsResolver
@@ -112,13 +109,15 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
                 continue;
             }
             if (!$this->isContainerBlock($iterator->getParent())) {
+                $blockType = $this->layoutData->getProperty($iterator->getParent(), LayoutData::BLOCK_TYPE, true);
+
                 throw new Exception\LogicException(
                     sprintf(
                         'The "%s" item cannot be added as a child to "%s" item (block type: %s) '
                         . 'because only container blocks can have children.',
                         $id,
                         $iterator->getParent(),
-                        $this->layoutData->getProperty($iterator->getParent(), LayoutData::BLOCK_TYPE, true)
+                        $blockType instanceof BlockTypeInterface ? $blockType->getName() : $blockType
                     )
                 );
             }
@@ -177,7 +176,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     {
         $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
         $options   = $this->layoutData->getProperty($id, LayoutData::OPTIONS, true);
-        $types     = $this->getBlockTypeChain($blockType);
+        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
 
         // resolve options
         $resolvedOptions = $this->blockOptionsResolver->resolve($blockType, $options);
@@ -203,7 +202,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     {
         $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
         $options   = $this->layoutData->getProperty($id, LayoutData::RESOLVED_OPTIONS, true);
-        $types     = $this->getBlockTypeChain($blockType);
+        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
         $typeNames = $this->getBlockTypeNames($types);
 
         $view = new BlockView($typeNames, $parentView);
@@ -215,7 +214,11 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         $view->vars['id']                  = $id;
         $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
         $view->vars['block_prefixes']      = $blockPrefixes;
-        $view->vars['cache_key']           = sprintf('%s_%s', $uniqueBlockPrefix, $blockType);
+        $view->vars['cache_key']           = sprintf(
+            '%s_%s',
+            $uniqueBlockPrefix,
+            $blockType instanceof BlockTypeInterface ? $blockType->getName() : $blockType
+        );
 
         // point the block view state to the current block
         $this->currentBlock->initialize($id);
@@ -237,7 +240,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     {
         $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
         $options   = $this->layoutData->getProperty($id, LayoutData::RESOLVED_OPTIONS, true);
-        $types     = $this->getBlockTypeChain($blockType);
+        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
 
         // point the block view state to the current block
         $this->currentBlock->initialize($id);
@@ -281,34 +284,9 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     protected function isContainerBlock($id)
     {
         $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
-        $types     = $this->getBlockTypeChain($blockType);
+        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
 
         return count($types) > 1 && $types[1]->getName() === ContainerType::NAME;
-    }
-
-    /**
-     * Returns the chain of all parent block types by the name of block type
-     * The first element in the chain is top type of hierarchy, the last element is the current type
-     *
-     * @param string $blockType
-     *
-     * @return BlockTypeInterface[]
-     */
-    protected function getBlockTypeChain($blockType)
-    {
-        if (isset($this->blockTypeChain[$blockType])) {
-            return $this->blockTypeChain[$blockType];
-        }
-
-        $result = [];
-        while ($blockType) {
-            $type = $this->blockTypeRegistry->getBlockType($blockType);
-            array_unshift($result, $type);
-            $blockType = $type->getParent();
-        }
-        $this->blockTypeChain[$blockType] = $result;
-
-        return $result;
     }
 
     /**

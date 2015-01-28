@@ -63,6 +63,36 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testExistsForUnknownChild()
+    {
+        // root
+        //   header
+        //     title
+        $headerView                         = new BlockView(['base', 'header'], $this->rootView);
+        $this->rootView->children['header'] = $headerView;
+        $titleView                          = new BlockView(['base', 'container'], $headerView);
+        $headerView->children['title']      = $titleView;
+
+        $this->assertFalse(isset($this->rootView['unknown']));
+    }
+
+    /**
+     * @expectedException \OutOfBoundsException
+     * @expectedExceptionMessage Undefined index: unknown.
+     */
+    public function testGetForUnknownChild()
+    {
+        // root
+        //   header
+        //     title
+        $headerView                         = new BlockView(['base', 'header'], $this->rootView);
+        $this->rootView->children['header'] = $headerView;
+        $titleView                          = new BlockView(['base', 'container'], $headerView);
+        $headerView->children['title']      = $titleView;
+
+        $this->rootView['unknown'];
+    }
+
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Not supported

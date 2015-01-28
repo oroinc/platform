@@ -9,8 +9,8 @@ interface BlockOptionsResolverInterface
     /**
      * Returns the combination of the default options for the given block type and the passed options
      *
-     * @param string $blockType The name of block type
-     * @param array  $options   The custom option values.
+     * @param string|BlockTypeInterface $blockType The block type
+     * @param array                     $options   The custom option values.
      *
      * @return array A list of options and their values
      *

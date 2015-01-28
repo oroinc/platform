@@ -24,6 +24,10 @@ class OroLayoutExtension extends Extension
         if ($config['twig']['enabled']) {
             $loader->load('twig_renderer.yml');
             $container->setParameter('oro_layout.twig.resources', $config['twig']['resources']);
+        } else {
+            // @todo: PHP rendering is not implemented yet
+            $loader->load('php_renderer.yml');
+            $container->setParameter('oro_layout.php.resources', []);
         }
     }
 }
