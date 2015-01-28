@@ -4,6 +4,7 @@ define(function (require) {
     var DatePickerView,
         $ = require('jquery'),
         _ = require('underscore'),
+        moment = require('moment'),
         datetimeFormatter = require('orolocale/js/formatter/datetime'),
         BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
@@ -18,6 +19,16 @@ define(function (require) {
         events: {
             change: 'updateFront'
         },
+
+        /**
+         * Format of date that native date input accepts
+         */
+        nativeDateFormat: 'YYYY-MM-DD',
+
+        /**
+         * Format of date/datetime that original input accepts
+         */
+        backendFormat: datetimeFormatter.backendFormats.date,
 
         /**
          * Initializes view
@@ -105,7 +116,6 @@ define(function (require) {
          * Destroys picker widget
          */
         destroyPickerWidget: function () {
-            // @TODO fix the bug BAP-7121
             this.$frontDateField.datepicker('destroy');
         },
 
@@ -141,13 +151,11 @@ define(function (require) {
          * @returns {string}
          */
         getBackendFormattedValue: function () {
-            var value = this.$frontDateField.val();
-            if (this.nativeMode) {
-                // nothing to do, it's already suppose to be in 'yyyy-mm-dd' format
-            } else if (datetimeFormatter.isDateValid(value)) {
-                value = datetimeFormatter.convertDateToBackendFormat(value);
-            } else {
-                value = '';
+            var value = '',
+                momentInstance = this.getFrontendMoment(),
+                format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
+            if (momentInstance) {
+                value = momentInstance.format(format);
             }
             return value;
         },
@@ -158,11 +166,52 @@ define(function (require) {
          * @returns {string}
          */
         getFrontendFormattedDate: function () {
-            var value = this.$el.val();
-            if (datetimeFormatter.isBackendDateValid(value)) {
-                value = datetimeFormatter.formatDate(value);
+            var value = '',
+                momentInstance = this.getOriginalMoment();
+            if (momentInstance) {
+                value = momentInstance.format(this.getDateFormat());
             }
             return value;
+        },
+
+        /**
+         * Creates moment object for original field
+         *
+         * @returns {moment}
+         */
+        getOriginalMoment: function () {
+            var value, format, momentInstance;
+            value = this.$el.val();
+            format = this.backendFormat;
+            momentInstance = moment(value, format, true);
+            if (momentInstance.isValid()) {
+
+                return momentInstance;
+            }
+        },
+
+        /**
+         * Creates moment object for frontend field
+         *
+         * @returns {moment}
+         */
+        getFrontendMoment: function () {
+            var value, format, momentInstance;
+            value = this.$frontDateField.val();
+            format = this.getDateFormat();
+            momentInstance = moment(value, format, true);
+            if (momentInstance.isValid()) {
+                return momentInstance;
+            }
+        },
+
+        /**
+         * Defines frontend format for date field
+         *
+         * @returns {string}
+         */
+        getDateFormat: function () {
+            return this.nativeMode ? this.nativeDateFormat : datetimeFormatter.getDateFormat();
         }
     });
 

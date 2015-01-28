@@ -291,7 +291,8 @@ define(function (require) {
                     'class': this.inputClass
                 },
                 datePickerOptions: this.dateWidgetOptions,
-                dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector)
+                dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector),
+                backendFormat: datetimeFormatter.getDateFormat()
             });
             return options;
         },

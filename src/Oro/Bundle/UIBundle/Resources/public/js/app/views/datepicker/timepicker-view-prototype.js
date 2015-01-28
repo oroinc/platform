@@ -3,7 +3,8 @@ define(function (require) {
 
     var TimePickerViewPrototype,
         $ = require('jquery'),
-        _ = require('underscore');
+        _ = require('underscore'),
+        datetimeFormatter = require('orolocale/js/formatter/datetime');
     require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
     /**
@@ -17,6 +18,16 @@ define(function (require) {
             timeInputAttrs: {},
             timePickerOptions: {}
         },
+
+        /**
+         * Format of time that native date input accepts
+         */
+        nativeTimeFormat: 'HH:mm',
+
+        /**
+         * Format of date/datetime that original input accepts
+         */
+        backendFormat: datetimeFormatter.backendFormats.datetime,
 
         /**
          * Cleans up HTML
@@ -106,8 +117,60 @@ define(function (require) {
          * @returns {string}
          */
         getFrontendFormattedTime: function () {
-            // should be overridden in the extend
-            return this.$el.val();
+            var value = '',
+                momentInstance = this.getOriginalMoment();
+            if (momentInstance) {
+                value = momentInstance.format(this.getTimeFormat());
+            }
+            return value;
+        },
+
+        /**
+         * Creates moment object for frontend field
+         *
+         * @returns {moment}
+         */
+        getFrontendMoment: function () {
+            var value, date, time, format, momentInstance;
+            date = this.$frontDateField.val();
+            time = this.$frontTimeField.val();
+            value = date + this.getSeparatorFormat() + time;
+            format = this.getDateTimeFormat();
+            momentInstance = moment(value, format, true);
+            if (momentInstance.isValid()) {
+                return momentInstance;
+            }
+        },
+
+        /**
+         * Defines frontend format for time field
+         *
+         * @returns {string}
+         */
+        getTimeFormat: function () {
+            return this.nativeMode ? this.nativeTimeFormat : datetimeFormatter.getTimeFormat();
+        },
+
+        /**
+         * Defines frontend format for datetime separator
+         *
+         * @returns {string}
+         */
+        getSeparatorFormat: function () {
+            return this.nativeMode ? ' ' : datetimeFormatter.getDateTimeFormatSeparator();
+        },
+
+        /**
+         * Defines frontend format for datetime field
+         *
+         * @returns {string}
+         */
+        getDateTimeFormat: function () {
+            var dateFormat, timeFormat, separatorFormat;
+            dateFormat = this.getDateFormat();
+            timeFormat = this.getTimeFormat();
+            separatorFormat = this.getSeparatorFormat();
+            return dateFormat + separatorFormat + timeFormat;
         }
     };
 

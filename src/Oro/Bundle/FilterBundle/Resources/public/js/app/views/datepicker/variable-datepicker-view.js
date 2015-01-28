@@ -26,6 +26,7 @@ define(function (require) {
          * @param {Object} options
          */
         initialize: function (options) {
+            _.extend(this, _.pick(options, ['backendFormat']));
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
             VariableDatePickerView.__super__.initialize.apply(this, arguments);
         },

@@ -34,7 +34,7 @@ define(function (require) {
         /**
          * Datetime filter uses custom format to backend datetime
          */
-        backendDatetimeFormat: 'YYYY-MM-DD HH:mm',
+        backendFormat: 'YYYY-MM-DD HH:mm',
 
         events: {
             // timepicker triggers this event on mousedown and hides picker's dropdown
@@ -72,7 +72,7 @@ define(function (require) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
             _.extend(options, {
                 fieldsWrapper: '<div></div>',
-                backendDatetimeFormat: this.backendDatetimeFormat
+                backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat]
             });
             return options;
         },
@@ -88,8 +88,8 @@ define(function (require) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
-            } else if (datetimeFormatter.isValueValid(value, this.backendDatetimeFormat)) {
-                momentInstance = moment(value, this.backendDatetimeFormat, true);
+            } else if (datetimeFormatter.isValueValid(value, this.backendFormat)) {
+                momentInstance = moment(value, this.backendFormat, true);
                 value = momentInstance.format(datetimeFormatter.getDateTimeFormat());
             }
             return value;
@@ -108,7 +108,7 @@ define(function (require) {
                 value = this.dateVariableHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateTimeValid(value)) {
                 momentInstance = moment(value, datetimeFormatter.getDateTimeFormat(), true);
-                value = momentInstance.format(this.backendDatetimeFormat);
+                value = momentInstance.format(this.backendFormat);
             }
             return value;
         }
