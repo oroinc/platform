@@ -315,8 +315,8 @@
     <input type="text" {{ block('widget_attributes') }} />
 
     <script type="text/javascript">
-        require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui'],
-        function($, datetimeFormatter) {
+        require(['jquery', 'orolocale/js/formatter/datetime', 'oroui/js/mediator', 'jquery-ui'],
+        function($, datetimeFormatter, mediator) {
             var selector = $("#{{ selector_id }}");
             var actual = $("#{{ actual_id }}");
             var sync = function() {
@@ -353,6 +353,9 @@
                     }
                 }
             );
+            mediator.once('page:beforeChange', function () {
+                selector.datepicker('destroy');
+            });
         });
     </script>
 {% endblock oro_date_widget %}
