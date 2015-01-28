@@ -43,7 +43,7 @@ class EmailType extends AbstractType
                 'oro_email_email_address',
                 ['required' => true, 'label' => 'oro.email.from_email_address.label']
             )
-            ->add('to', 'oro_email_email_address', ['required' => true, 'multiple' => true])
+            ->add('to', 'oro_email_email_address', ['required' => false, 'multiple' => true])
             ->add('cc', 'oro_email_email_address', ['required' => false, 'multiple' => true])
             ->add('bcc', 'oro_email_email_address', ['required' => false, 'multiple' => true])
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
@@ -78,7 +78,6 @@ class EmailType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
-
     }
 
     /**

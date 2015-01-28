@@ -153,7 +153,7 @@ class EmailHandler
                 } catch (\Exception $ex) {
                     $this->logger->error('Email sending failed.', ['exception' => $ex]);
                     $this->form->addError(
-                        new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'))
+                        new FormError($this->translator->trans($ex->getMessage()))
                     );
                 }
             }
