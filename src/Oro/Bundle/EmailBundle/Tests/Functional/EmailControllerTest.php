@@ -29,9 +29,9 @@ class EmailControllerTest extends WebTestCase
 
     public function testCreate()
     {
-        $this->markTestIncomplete('Skipped. Incomplete');
+        //$this->markTestIncomplete('Skipped. Incomplete');
 
-        $url = $this->getUrl('oro_email_email_create');
+        $url = $this->getUrl('oro_email_email_create', ['_widgetContainer' => 'dialog']);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
