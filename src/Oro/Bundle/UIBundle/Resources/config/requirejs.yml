@@ -3,9 +3,7 @@ config:
         'jquery-ui':
             deps:
                 - 'jquery'
-        'jquery-ui-timepicker':
-            deps:
-                - 'jquery-ui'
+
         'jquery.mousewheel':
             deps:
                 - 'jquery'
@@ -55,7 +53,6 @@ config:
             'backbone': 'oroui/js/extend/backbone'
             'bootstrap': 'oroui/js/extend/bootstrap'
             'jquery-ui': 'oroui/js/jquery-ui-datepicker-l10n'
-            'jquery-ui-timepicker': 'oroui/js/jquery-ui-timepicker-l10n'
             'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/js/jquery-timepicker-l10n'
         'oroui/js/extend/jquery':
             'jquery': 'jquery'
@@ -73,8 +70,6 @@ config:
             'bootstrap': 'bootstrap'
         'oroui/js/jquery-ui-datepicker-l10n':
             'jquery-ui': 'oroui/js/extend/jquery-ui'
-        'oroui/js/jquery-ui-timepicker-l10n':
-            'jquery-ui-timepicker': 'jquery-ui-timepicker'
         'oroui/js/jquery-timepicker-l10n':
             'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker'
     paths:
@@ -83,7 +78,6 @@ config:
         'base64': 'bundles/oroui/lib/base64.js'
         'jquery': 'bundles/oroui/lib/jquery-2.0.2.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.10.4.js'
-        'jquery-ui-timepicker': 'bundles/oroui/lib/jquery-ui-timepicker-addon.js'
         'jquery-outer-html': 'bundles/oroui/lib/outerHTML-2.1.0-min.js'
         'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.min.js'
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
@@ -126,8 +120,6 @@ config:
         'oroui/js/delete-confirmation': 'bundles/oroui/js/delete-confirmation.js'
         'oroui/js/error': 'bundles/oroui/js/error.js'
         'oroui/js/init-layout': 'bundles/oroui/js/init-layout.js'
-        'oroui/js/jquery-ui-datepicker-l10n': 'bundles/oroui/js/jquery-ui-datepicker-l10n.js'
-        'oroui/js/jquery-ui-timepicker-l10n': 'bundles/oroui/js/jquery-ui-timepicker-l10n.js'
         'oroui/js/layout': 'bundles/oroui/js/layout.js'
         'oroui/js/loading-mask': 'bundles/oroui/js/loading-mask.js'
         'oroui/js/mediator': 'bundles/oroui/js/mediator.js'

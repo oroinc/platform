@@ -13,7 +13,6 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
     require('jquery-ui');
-    require('jquery-ui-timepicker');
     require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
 
