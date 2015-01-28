@@ -14,6 +14,20 @@ class BaseType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setOptional(['attr', 'label', 'label_attr', 'translation_domain']);
+        $resolver->setAllowedTypes(
+            [
+                'attr'       => 'array',
+                'label_attr' => 'array'
+            ]
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
@@ -31,20 +45,6 @@ class BaseType extends AbstractType
         }
         // add the translation domain
         $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setOptional(['attr', 'label', 'label_attr', 'translation_domain']);
-        $resolver->setAllowedTypes(
-            [
-                'attr'       => 'array',
-                'label_attr' => 'array',
-            ]
-        );
     }
 
     /**

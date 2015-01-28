@@ -6,11 +6,14 @@ use Oro\Component\Layout\Exception;
 
 class BlockTypeRegistry implements BlockTypeRegistryInterface
 {
-    /** @var BlockTypeInterface[] */
-    private $types = [];
-
     /** @var BlockTypeFactoryInterface */
-    private $blockTypeFactory;
+    protected $blockTypeFactory;
+
+    /** @var BlockTypeInterface[] */
+    protected $types = [];
+
+    /** @var array */
+    protected $chains = [];
 
     /**
      * @param BlockTypeFactoryInterface $blockTypeFactory The factory for created block.
@@ -73,5 +76,38 @@ class BlockTypeRegistry implements BlockTypeRegistryInterface
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockTypeChain($blockType)
+    {
+        if ($blockType instanceof BlockTypeInterface) {
+            $name = $blockType->getName();
+            $type = $blockType;
+        } else {
+            $name = $blockType;
+            $type = null;
+        }
+
+        if (isset($this->chains[$name])) {
+            return $this->chains[$name];
+        }
+
+        if (!$type) {
+            $type = $this->getBlockType($name);
+        }
+
+        $chain      = [$type];
+        $parentName = $type->getParent();
+        while ($parentName) {
+            $type = $this->getBlockType($parentName);
+            array_unshift($chain, $type);
+            $parentName = $type->getParent();
+        }
+        $this->chains[$name] = $chain;
+
+        return $chain;
     }
 }

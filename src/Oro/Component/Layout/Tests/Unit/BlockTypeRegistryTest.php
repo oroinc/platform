@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockTypeRegistry;
 
 class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
@@ -20,47 +22,30 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetBlockType()
     {
-        $widgetBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $blockType = new BaseType();
 
         $this->blockTypeFactory->expects($this->once())
             ->method('createBlockType')
-            ->with('widget')
-            ->will($this->returnValue($widgetBlockType));
-        $widgetBlockType->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('widget'));
+            ->with(BaseType::NAME)
+            ->will($this->returnValue($blockType));
 
-        $this->assertSame($widgetBlockType, $this->registry->getBlockType('widget'));
+        $this->assertSame($blockType, $this->registry->getBlockType(BaseType::NAME));
         // check that the created block type is cached
-        $this->assertSame($widgetBlockType, $this->registry->getBlockType('widget'));
+        $this->assertSame($blockType, $this->registry->getBlockType(BaseType::NAME));
     }
 
     public function testHasBlockType()
     {
-        $widgetBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
-        $widgetBlockType->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('widget'));
-        $buttonBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
-        $buttonBlockType->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue('button'));
+        $blockType = new BaseType();
 
-        $this->blockTypeFactory->expects($this->exactly(2))
+        $this->blockTypeFactory->expects($this->once())
             ->method('createBlockType')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['widget', $widgetBlockType],
-                        ['button', $buttonBlockType]
-                    ]
-                )
-            );
+            ->with(BaseType::NAME)
+            ->will($this->returnValue($blockType));
 
-        $this->assertTrue($this->registry->hasBlockType('widget'));
-        $this->assertTrue($this->registry->hasBlockType('button'));
+        $this->assertTrue($this->registry->hasBlockType(BaseType::NAME));
         // check that the created block type is cached
-        $this->assertTrue($this->registry->hasBlockType('button'));
+        $this->assertTrue($this->registry->hasBlockType(BaseType::NAME));
     }
 
     /**
@@ -104,13 +89,13 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testGetTypeWhenGivenNameDoesNotMatchNameDeclaredInClass()
     {
-        $widgetBlockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $blockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
         $this->blockTypeFactory->expects($this->once())
             ->method('createBlockType')
             ->with('widget')
-            ->will($this->returnValue($widgetBlockType));
-        $widgetBlockType->expects($this->exactly(2))
+            ->will($this->returnValue($blockType));
+        $blockType->expects($this->exactly(2))
             ->method('getName')
             ->will($this->returnValue('button'));
 
@@ -121,7 +106,7 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage The block type named "widget" was not found.
      */
-    public function testGetTypeUndefined()
+    public function testGetUndefinedType()
     {
         $this->blockTypeFactory->expects($this->once())
             ->method('createBlockType')
@@ -129,6 +114,92 @@ class BlockTypeRegistryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(null));
 
         $this->registry->getBlockType('widget');
+    }
+
+    public function testGetBlockTypeChainByBlockName()
+    {
+        $baseBlockType      = new BaseType();
+        $containerBlockType = new ContainerType();
+
+        $this->blockTypeFactory->expects($this->at(0))
+            ->method('createBlockType')
+            ->with(ContainerType::NAME)
+            ->will($this->returnValue($containerBlockType));
+        $this->blockTypeFactory->expects($this->at(1))
+            ->method('createBlockType')
+            ->with(BaseType::NAME)
+            ->will($this->returnValue($baseBlockType));
+        $this->blockTypeFactory->expects($this->exactly(2))
+            ->method('createBlockType');
+
+        $this->assertSame(
+            [$baseBlockType, $containerBlockType],
+            $this->registry->getBlockTypeChain(ContainerType::NAME)
+        );
+        // check that the chain is cached
+        $this->assertSame(
+            [$baseBlockType, $containerBlockType],
+            $this->registry->getBlockTypeChain(ContainerType::NAME)
+        );
+    }
+
+    public function testGetBlockTypeChainByAlreadyCreatedBlockTypeObject()
+    {
+        $baseBlockType      = new BaseType();
+        $containerBlockType = new ContainerType();
+
+        $this->blockTypeFactory->expects($this->once())
+            ->method('createBlockType')
+            ->with(BaseType::NAME)
+            ->will($this->returnValue($baseBlockType));
+
+        $this->assertSame(
+            [$baseBlockType, $containerBlockType],
+            $this->registry->getBlockTypeChain($containerBlockType)
+        );
+        // check that the chain is cached
+        $this->assertSame(
+            [$baseBlockType, $containerBlockType],
+            $this->registry->getBlockTypeChain($containerBlockType)
+        );
+    }
+
+    public function testGetBlockTypeChainForBaseTypeByBlockName()
+    {
+        $blockType = new BaseType();
+
+        $this->blockTypeFactory->expects($this->once())
+            ->method('createBlockType')
+            ->with(BaseType::NAME)
+            ->will($this->returnValue($blockType));
+
+        $this->assertSame(
+            [$blockType],
+            $this->registry->getBlockTypeChain(BaseType::NAME)
+        );
+        // check that the chain is cached
+        $this->assertSame(
+            [$blockType],
+            $this->registry->getBlockTypeChain(BaseType::NAME)
+        );
+    }
+
+    public function testGetBlockTypeChainForBaseTypeByAlreadyCreatedBlockTypeObject()
+    {
+        $blockType = new BaseType();
+
+        $this->blockTypeFactory->expects($this->never())
+            ->method('createBlockType');
+
+        $this->assertSame(
+            [$blockType],
+            $this->registry->getBlockTypeChain($blockType)
+        );
+        // check that the chain is cached
+        $this->assertSame(
+            [$blockType],
+            $this->registry->getBlockTypeChain($blockType)
+        );
     }
 
     public function emptyStringDataProvider()

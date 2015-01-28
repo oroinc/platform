@@ -10,10 +10,10 @@ interface LayoutManipulatorInterface
     /**
      * Adds a new item to the layout
      *
-     * @param string $id        The item id
-     * @param string $parentId  The parent item id or alias
-     * @param string $blockType The block type associated with the item
-     * @param array  $options   The item options
+     * @param string                    $id        The item id
+     * @param string                    $parentId  The parent item id or alias
+     * @param string|BlockTypeInterface $blockType The block type associated with the item
+     * @param array                     $options   The item options
      *
      * @return self
      */

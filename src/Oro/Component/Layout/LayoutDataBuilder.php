@@ -12,7 +12,7 @@ namespace Oro\Component\Layout;
  *  - an alias can be added for existing item only
  *  - only existing alias can be removed
  */
-class LayoutDataBuilder implements RawLayoutAccessorInterface
+class LayoutDataBuilder implements LayoutDataBuilderInterface
 {
     /** @var LayoutData */
     protected $layoutData;
@@ -35,7 +35,7 @@ class LayoutDataBuilder implements RawLayoutAccessorInterface
                     'Cannot add "%s" item to the layout. ParentId: %s. BlockType: %s. Reason: %s',
                     $id,
                     $parentId,
-                    $blockType,
+                    $blockType instanceof BlockTypeInterface ? $blockType->getName() : $blockType,
                     $e->getMessage()
                 ),
                 0,
@@ -236,18 +236,18 @@ class LayoutDataBuilder implements RawLayoutAccessorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getLayoutData()
+    {
+        return $this->layoutData;
+    }
+
+    /**
      * Declines all built operations
      */
     public function clear()
     {
         $this->layoutData->clear();
-    }
-
-    /**
-     * @return LayoutData
-     */
-    public function getLayoutData()
-    {
-        return $this->layoutData;
     }
 }

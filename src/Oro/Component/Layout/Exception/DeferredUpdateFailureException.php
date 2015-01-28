@@ -16,15 +16,15 @@ class DeferredUpdateFailureException extends LogicException
      *      ['name' => 'remove', 'args' => ['test', ...]],
      *  ]
      */
-    protected $actions;
+    protected $failedActions;
 
     /**
      * @param string $message
-     * @param array  $actions
+     * @param array  $failedActions
      */
-    public function __construct($message, array $actions)
+    public function __construct($message, array $failedActions)
     {
-        $this->actions = $actions;
+        $this->failedActions = $failedActions;
         parent::__construct(
             sprintf(
                 '%s Actions: %s.',
@@ -37,7 +37,7 @@ class DeferredUpdateFailureException extends LogicException
                                 ? sprintf('%s()', $action['name'])
                                 : sprintf('%s(%s)', $action['name'], $action['args'][0]);
                         },
-                        $actions
+                        $failedActions
                     )
                 )
             )
@@ -45,12 +45,12 @@ class DeferredUpdateFailureException extends LogicException
     }
 
     /**
-     * Returns the list of odd actions
+     * Returns the list of failed actions
      *
      * @return array
      */
-    public function getActions()
+    public function getFailedActions()
     {
-        return $this->actions;
+        return $this->failedActions;
     }
 }

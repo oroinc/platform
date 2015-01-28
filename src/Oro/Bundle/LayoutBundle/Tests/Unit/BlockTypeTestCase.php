@@ -6,7 +6,10 @@ use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
-class BlockTypeTestCase extends BaseBlockTypeTestCase
+/**
+ * The base test case that helps testing block types
+ */
+abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
 {
     protected function setUp()
     {

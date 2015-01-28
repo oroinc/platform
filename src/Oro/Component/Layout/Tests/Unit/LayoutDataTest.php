@@ -148,19 +148,26 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         $this->layoutData->add('root', null, $blockType);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "blockType" argument type. Expected "string", "integer" given.
+     * @expectedExceptionMessage Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
      */
-    public function testAddWithNotStringBlockType()
+    // @codingStandardsIgnoreEnd
+    public function testAddWithInvalidBlockType()
     {
         $this->layoutData->add('root', null, 123);
     }
 
+    public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
+    {
+        $this->layoutData->add('root', null, new ContainerType());
+    }
+
     /**
-     * @dataProvider invalidBlockTypeDataProvider
+     * @dataProvider invalidBlockTypeNameDataProvider
      */
-    public function testAddWithInvalidBlockType($blockType)
+    public function testAddWithInvalidBlockTypeName($blockTypeName)
     {
         $this->setExpectedException(
             '\Oro\Component\Layout\Exception\InvalidArgumentException',
@@ -169,10 +176,10 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 . 'because it contains illegal characters. '
                 . 'The valid block type name should start with a letter and only contain '
                 . 'letters, numbers and underscores ("_").',
-                $blockType
+                $blockTypeName
             )
         );
-        $this->layoutData->add('root', null, $blockType);
+        $this->layoutData->add('root', null, $blockTypeName);
     }
 
     public function testRemove()
@@ -897,7 +904,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function invalidBlockTypeDataProvider()
+    public function invalidBlockTypeNameDataProvider()
     {
         return [
             ['-test'],

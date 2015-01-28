@@ -3,17 +3,61 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 
 /**
  * This class contains unit tests which are NOT RELATED to ALIASES
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 2 action(s) cannot be applied. Actions: add(header), add(logo).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddItemToUnknownParent()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'unknown_root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test']);
+
+        $this->getLayoutView();
+    }
+
     public function testSimpleLayout()
     {
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo', ['title' => 'test']);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => 'test']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testSimpleLayoutWhenSomeBlocksCreatedDirectly()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', new HeaderType())
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
         $view = $this->getLayoutView();

@@ -1,0 +1,28 @@
+parameters:
+    oro_layout.php.renderer.class:           Symfony\Component\Form\FormRenderer
+    oro_layout.php.renderer.engine.class:    Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine
+    oro_layout.php.block_renderer.class:     Oro\Component\Layout\BlockRenderer
+
+services:
+    oro_layout.block_renderer:
+        public: false
+        alias: oro_layout.php.block_renderer
+
+    oro_layout.php.renderer:
+        public: false
+        class: %oro_layout.php.renderer.class%
+        arguments:
+            - @oro_layout.php.renderer.engine
+
+    oro_layout.php.renderer.engine:
+        public: false
+        class: %oro_layout.php.renderer.engine.class%
+        arguments:
+            - @templating.engine.php
+            - %oro_layout.php.resources%
+
+    oro_layout.php.block_renderer:
+        public: false
+        class: %oro_layout.php.block_renderer.class%
+        arguments:
+            - @oro_layout.php.renderer

@@ -9,9 +9,13 @@ use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutDataBuilder;
+use Oro\Component\Layout\LayoutFactory;
 use Oro\Component\Layout\LayoutViewFactory;
 
-class BaseBlockTypeTestCase extends \PHPUnit_Framework_TestCase
+/**
+ * The base test case that helps testing block types
+ */
+abstract class BaseBlockTypeTestCase extends LayoutTestCase
 {
     /** @var BlockTypeFactoryStub */
     protected $factory;
@@ -41,10 +45,13 @@ class BaseBlockTypeTestCase extends \PHPUnit_Framework_TestCase
             $this->blockOptionsResolver,
             $layoutManipulator
         );
+        $renderer                   = $this->getMock('Oro\Component\Layout\BlockRendererInterface');
+        $layoutFactory              = new LayoutFactory($renderer);
         $this->layoutBuilder        = new LayoutBuilder(
             $this->layoutDataBuilder,
             $layoutManipulator,
-            $layoutViewFactory
+            $layoutViewFactory,
+            $layoutFactory
         );
     }
 

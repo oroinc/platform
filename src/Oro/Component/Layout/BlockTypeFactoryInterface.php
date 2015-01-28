@@ -7,7 +7,7 @@ interface BlockTypeFactoryInterface
     /**
      * Creates a block type
      *
-     * @param $name string The name of the block type
+     * @param string $name The name of the block type
      *
      * @return BlockTypeInterface|null
      */
