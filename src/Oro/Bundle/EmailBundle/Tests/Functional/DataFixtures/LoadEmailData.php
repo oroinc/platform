@@ -97,7 +97,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 //        $contacts = $om->getRepository('OroCRMContactBundle:Contact')->findAll();
 //        $contactCount = count($contacts);
 
-        for ($i = 0; $i < 100; ++$i) {
+        foreach ($this->templates as $index => $template) {
 //            $contactRandom = rand(0, $contactCount - 1);
 
 //            /** @var Contact $contact */
@@ -105,10 +105,10 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $owner = $this->getReference('simple_user');
             $origin = $this->mailerProcessor->getEmailOrigin($owner->getEmail());
 
-            $randomTemplate = array_rand($this->templates);
+//            $randomTemplate = array_rand($this->templates);
 
             $email = $this->emailEntityBuilder->email(
-                $this->templates[$randomTemplate]['Subject'],
+                $template['Subject'],
                 $owner->getEmail(),
                 $owner->getEmail(),
                 new \DateTime('now'),
@@ -120,13 +120,13 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $email->addFolder($origin->getFolder(FolderType::SENT));
 
             $emailBody = $this->emailEntityBuilder->body(
-                "Hi,\n" . $this->templates[$randomTemplate]['Text'],
+                "Hi,\n" . $template['Text'],
                 false,
                 true
             );
             $email->setEmailBody($emailBody);
             $email->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
-            $this->setReference('email_' . $i, $email);
+            $this->setReference('email_' . ($index + 1), $email);
 
             $this->emailEntityBuilder->getBatch()->persist($om);
         }
