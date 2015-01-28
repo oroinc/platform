@@ -57,7 +57,9 @@
     max-width: none;
 }
 .select2-container.select2-container-multi.taggable-email {
-    padding: 4px 6px;
+    padding-left: 6px;
+    padding-top: 1px;
+    padding-right: 6px;
     width: 97%;
     max-width: none;
 }

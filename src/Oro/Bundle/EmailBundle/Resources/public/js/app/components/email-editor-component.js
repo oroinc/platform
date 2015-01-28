@@ -11,6 +11,32 @@ define(function (require) {
         messenger = require('oroui/js/messenger'),
         mediator = require('oroui/js/mediator');
 
+    function showField(fieldName) {
+        var field = fieldName.toLowerCase();
+        $('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'block');
+        $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').unbind('focusout');
+        $('#oro_email_email_' + field).parents('.controls').find('input.select2-input').on('focusout', function(e) {
+            if (!$('#oro_email_email_' + field).val()) {
+                hideField(fieldName);
+            }
+        });
+        $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
+            __("To") + '<em>*</em>'
+        );
+    }
+
+    function hideField(fieldName) {
+        var field = fieldName.toLowerCase();
+        $('#oro_email_email_' + field).parents('.control-group.taggable-field').css('display', 'none');
+        $('#cc-bcc-holder').append('<span id="show' + fieldName + '">' + fieldName +  '</span>');
+        $('#show' + fieldName).on('click', function(e) {
+            e.stopPropagation();
+            var target = e.target || window.event.target;
+            $(target).remove();
+            showField(fieldName);
+        });
+    }
+
     EmailEditorComponent = BaseComponent.extend({
         /**
          * @constructor
@@ -19,50 +45,6 @@ define(function (require) {
         initialize: function (options) {
             this.options = options;
             this.bindEvents();
-            $('input.taggable-field').each(function(key, elem){
-                $(elem).select2({
-                    containerCssClass: 'taggable-email',
-                    separator: ";",
-                    tags: [],
-                    tokenSeparators: [";", ",", " "]
-                });
-            });
-            if (!this.options.bcc.length || !this.options.cc.length) {
-                $('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
-                    '<div id="cc-bcc-holder"/>'
-                );
-            }
-            if (!this.options.bcc.length) {
-                $('#oro_email_email_bcc').parents('.control-group.taggable-field').css('display', 'none');
-                $('#cc-bcc-holder').append('<span id="showBcc">Bcc</span>');
-                $('#showBcc').on('click', function(e){
-                    e.stopPropagation();
-                    var target = e.target || window.event.target;
-                    $(target).remove();
-                    $('#oro_email_email_bcc').parents('.control-group.taggable-field').css('display', 'block');
-                    $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
-                        __("To") + '<em>*</em>'
-                    );
-                });
-            }
-            if (!this.options.cc.length) {
-                $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'none');
-                $('#cc-bcc-holder').append('<span id="showCc">Cc</span>');
-                $('#showCc').on('click', function(e){
-                    e.stopPropagation();
-                    var target = e.target || window.event.target;
-                    $(target).remove();
-                    $('#oro_email_email_cc').parents('.control-group.taggable-field').css('display', 'block');
-                    $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
-                        __("To") + '<em>*</em>'
-                    );
-                });
-            }
-            if (!this.options.to.length || !this.options.to[0]) {
-                $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
-                    __("Recipients") + '<em>*</em>'
-                );
-            }
         },
 
         bindEvents: function () {
@@ -108,6 +90,8 @@ define(function (require) {
                     bodyEditorComponent.view.setEnabled(type === 'html');
                 }
             });
+
+            this.bindFieldEvents();
         },
 
         unbindEvents: function (e) {
@@ -123,6 +107,33 @@ define(function (require) {
             }
             this.unbindEvents();
             EmailEditorComponent.__super__.dispose.call(this);
+        },
+
+        bindFieldEvents: function() {
+            $('input.taggable-field').each(function(key, elem) {
+                $(elem).select2({
+                    containerCssClass: 'taggable-email',
+                    separator: ";",
+                    tags: [],
+                    tokenSeparators: [";", ","]
+                });
+            });
+            if (!this.options.bcc.length || !this.options.cc.length) {
+                $('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
+                    '<div id="cc-bcc-holder"/>'
+                );
+            }
+            if (!this.options.cc.length) {
+                hideField('Cc');
+            }
+            if (!this.options.bcc.length) {
+                hideField('Bcc');
+            }
+            if (!this.options.to.length || !this.options.to[0]) {
+                $('#oro_email_email_to').parents('.control-group.taggable-field').find('label').html(
+                    __("Recipients") + '<em>*</em>'
+                );
+            }
         }
     });
 
