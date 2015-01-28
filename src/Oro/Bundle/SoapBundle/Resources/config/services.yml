@@ -7,6 +7,10 @@ parameters:
     oro_soap.provider.metadata.chain.class:       Oro\Bundle\SoapBundle\Provider\ChainMetadataProvider
     oro_soap.provider.metadata.entity.class:      Oro\Bundle\SoapBundle\Provider\EntityMetadataProvider
 
+    oro_soap.entity_serializer.class:             Oro\Bundle\SoapBundle\Serializer\EntitySerializer
+    oro_soap.entity_accessor.class:               Oro\Bundle\SoapBundle\Serializer\EntityDataAccessor
+    oro_soap.entity_data_transformer.class:       Oro\Bundle\SoapBundle\Serializer\EntityDataTransformer
+
 services:
     oro_soap.loader:
         class: %oro_soap.loader.class%
@@ -59,3 +63,16 @@ services:
 
     oro_soap.provider.metadata:
         alias: oro_soap.provider.metadata.chain
+
+    oro_soap.entity_serializer:
+        class: %oro_soap.entity_serializer.class%
+        arguments:
+            - @doctrine
+            - @oro_soap.entity_accessor
+            - @oro_soap.entity_data_transformer
+
+    oro_soap.entity_accessor:
+        class: %oro_soap.entity_accessor.class%
+
+    oro_soap.entity_data_transformer:
+        class: %oro_soap.entity_data_transformer.class%
