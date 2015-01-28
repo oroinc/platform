@@ -8,7 +8,7 @@ define(function (require) {
         _ = require('underscore'),
         BaseView = require('oroui/js/app/views/base/view'),
         mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
+        LoadingMask = require('oroui/js/app/views/loading-mask-view'),
         __ = require('orotranslation/js/translator');
     require('jquery.form');
 
@@ -148,17 +148,8 @@ define(function (require) {
          */
         _showLoading: function() {
             var loadingElement = this._getLoadingElement();
-            if (this.options.loadingMaskEnabled && !loadingElement.data('loading-mask-visible')) {
-                if (loadingElement && loadingElement.length) {
-                    if (loadingElement[0].tagName.toLowerCase() !== 'body' && loadingElement.css('position') == 'static') {
-                        loadingElement.css('position', 'relative');
-                    }
-                    this.loadingMask = new LoadingMask({loadingElement: loadingElement});
-                    loadingElement.data('loading-mask-visible', true);
-                    loadingElement.append(this.loadingMask.render().$el);
-                    this.loadingMask.show();
-                }
-            }
+            this.loadingMask = new LoadingMask({container: loadingElement});
+            this.loadingMask.show();
         },
 
         /**
@@ -168,7 +159,6 @@ define(function (require) {
          */
         _hideLoading: function() {
             if (this.loadingMask) {
-                this._getLoadingElement().data('loading-mask-visible', false);
                 this.loadingMask.dispose();
                 this.loadingMask = null;
             }
