@@ -12,8 +12,12 @@
         {{ UI.attibuteRow('oro.email.sent_at.label'|trans, entity.sentAt|oro_format_datetime) }}
         {{ UI.attibuteRow('oro.email.from_name.label'|trans, EA.email_address(entity.fromEmailAddress, entity.fromName, true)) }}
         {{ UI.attibuteRow('To'|trans, EA.recipient_email_addresses(entity.recipients('to'), true)) }}
-        {{ UI.attibuteRow('Cc'|trans, EA.recipient_email_addresses(entity.recipients('cc'), true)) }}
-        {{ UI.attibuteRow('Bcc'|trans, EA.recipient_email_addresses(entity.recipients('bcc'), true)) }}
+        {% if entity.recipients('cc')|length > 0 %}
+            {{ UI.attibuteRow('Cc'|trans, EA.recipient_email_addresses(entity.recipients('cc'), true)) }}
+        {% endif %}
+        {% if entity.recipients('bcc')|length > 0 %}
+            {{ UI.attibuteRow('Bcc'|trans, EA.recipient_email_addresses(entity.recipients('bcc'), true)) }}
+        {% endif %}
         {{ UI.attibuteRow('oro.email.subject.label'|trans, entity.subject) }}
         {% if noBodyFound %}
             {% set notFoundMessage %}<strong>{{ 'oro.email.unable_to_load_body'|trans}}</strong>{% endset %}
