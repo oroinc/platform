@@ -21,6 +21,9 @@ define(function (require) {
         /** @property {string} */
         loadingHint: 'Loading...',
 
+        /** @property {jQuery} */
+        $parent: null,
+
         initialize: function (options) {
             _.extend(this, _.pick(options, ['loadingHint']));
             LoadingMaskView.__super__.initialize.apply(this, arguments);
@@ -46,7 +49,8 @@ define(function (require) {
             if (hint) {
                 this.setLoadingHint(hint);
             }
-            this.$el.parent().addClass('loading');
+            this.$parent = this.$el.parent();
+            this.$parent.addClass('loading');
             this.$el.addClass('shown');
         },
 
@@ -55,10 +59,11 @@ define(function (require) {
          */
         hide: function () {
             this.$el.removeClass('shown');
-            if (!this.$el.parent().find('>.loader-mask.shown').length) {
+            if (this.$parent && !this.$parent.find('>.loader-mask.shown').length) {
                 // there are no more loaders for the element
-                this.$el.parent().removeClass('loading');
+                this.$parent.removeClass('loading');
             }
+            this.$parent = null;
         },
 
         /**
@@ -78,6 +83,14 @@ define(function (require) {
             this.loadingHint = newHint;
             this.render();
             return oldHint;
+        },
+
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this.hide();
+            LoadingMaskView.__super__.dispose.apply(this, arguments);
         }
     });
 
