@@ -592,4 +592,28 @@ class Email extends ExtendEmail
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
     }
+
+    /**
+     * @return EmailRecipient[]
+     */
+    public function getTo()
+    {
+        return $this->getRecipients(EmailRecipient::TO);
+    }
+
+    /**
+     * @return EmailRecipient[]
+     */
+    public function getCc()
+    {
+        return $this->getRecipients(EmailRecipient::CC);
+    }
+
+    /**
+     * @return EmailRecipient[]
+     */
+    public function getBcc()
+    {
+        return $this->getRecipients(EmailRecipient::BCC);
+    }
 }
