@@ -8,7 +8,7 @@ define(function (require) {
         _ = require('underscore'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
+        LoadingMask = require('oroui/js/app/views/loading-mask-view'),
         DialogWidget = require('oro/dialog-widget'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
@@ -21,7 +21,6 @@ define(function (require) {
             itemViewIdPrefix: 'note-',
             listSelector: '.items.list-box',
             fallbackSelector: '.no-data',
-            loadingSelector: '.loading-mask',
             collection: null,
             urls: {
                 createItem: null,
@@ -69,14 +68,7 @@ define(function (require) {
                 return;
             }
             delete this.itemEditDialog;
-            delete this.$loadingMaskContainer;
             NotesView.__super__.dispose.call(this);
-        },
-
-        render: function () {
-            NotesView.__super__.render.apply(this, arguments);
-            this.$loadingMaskContainer = this.$('.loading-mask');
-            return this;
         },
 
         expandAll: function () {
@@ -235,17 +227,16 @@ define(function (require) {
         },
 
         _showLoading: function () {
-            if (!this.$loadingMaskContainer.data('loading-mask-visible')) {
-                this.loadingMask = new LoadingMask();
-                this.$loadingMaskContainer.data('loading-mask-visible', true);
-                this.$loadingMaskContainer.append(this.loadingMask.render().$el);
+            if (!this.loadingMask) {
+                this.loadingMask = new LoadingMask({
+                    container: this.$el
+                });
                 this.loadingMask.show();
             }
         },
 
         _hideLoading: function () {
             if (this.loadingMask) {
-                this.$loadingMaskContainer.data('loading-mask-visible', false);
                 this.loadingMask.dispose();
                 this.loadingMask = null;
             }

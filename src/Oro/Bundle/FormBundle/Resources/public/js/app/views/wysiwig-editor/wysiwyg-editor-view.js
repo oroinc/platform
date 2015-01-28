@@ -5,7 +5,7 @@ define(function (require) {
         BaseView = require('oroui/js/app/views/base/view'),
         $ = require('tinymce/jquery.tinymce.min'),
         txtHtmlTransformer = require('./txt-html-transformer'),
-        LoadingMask = require('oroui/js/loading-mask');
+        LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
     WysiwygEditorView = BaseView.extend({
         autoRender: true,
@@ -53,13 +53,13 @@ define(function (require) {
                 this.tinymceConnected = false;
             }
             if (this.enabled) {
-                loadingMask = new LoadingMask();
-                loadingMask.render();
                 loadingMaskContainer = this.$el.parents('.ui-dialog');
                 if (!loadingMaskContainer.length) {
                     loadingMaskContainer = this.$el.parent();
                 }
-                loadingMask.$el.prependTo(loadingMaskContainer);
+                loadingMask = new LoadingMask({
+                    container: loadingMaskContainer
+                });
                 loadingMask.show();
                 if (!this.firstRender) {
                     if (this.htmlValue && this.$el.val() === this.strippedValue) {
