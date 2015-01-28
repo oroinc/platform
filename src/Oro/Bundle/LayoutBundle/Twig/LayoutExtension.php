@@ -51,17 +51,17 @@ class LayoutExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction(
-                'layout_widget',
+                'block_widget',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
             new \Twig_SimpleFunction(
-                'layout_label',
+                'block_label',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),
             new \Twig_SimpleFunction(
-                'layout_row',
+                'block_row',
                 null,
                 ['node_class' => self::RENDER_BLOCK_NODE_CLASS, 'is_safe' => ['html']]
             ),

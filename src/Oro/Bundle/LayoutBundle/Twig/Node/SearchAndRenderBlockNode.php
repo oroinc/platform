@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Twig\Node;
 
 /**
- * Implementation of layout_* TWIG functions
+ * Implementation of block_* TWIG functions
  */
 class SearchAndRenderBlockNode extends \Twig_Node_Expression_Function
 {

@@ -56,15 +56,15 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         /** @var \Twig_SimpleFunction $function */
         $this->assertInstanceOf('Twig_SimpleFunction', $functions[0]);
         $function = $functions[0];
-        $this->assertEquals('layout_widget', $function->getName());
+        $this->assertEquals('block_widget', $function->getName());
         $this->assertNull($function->getCallable());
         $this->assertEquals(LayoutExtension::RENDER_BLOCK_NODE_CLASS, $function->getNodeClass());
         $function = $functions[1];
-        $this->assertEquals('layout_label', $function->getName());
+        $this->assertEquals('block_label', $function->getName());
         $this->assertNull($function->getCallable());
         $this->assertEquals(LayoutExtension::RENDER_BLOCK_NODE_CLASS, $function->getNodeClass());
         $function = $functions[2];
-        $this->assertEquals('layout_row', $function->getName());
+        $this->assertEquals('block_row', $function->getName());
         $this->assertNull($function->getCallable());
         $this->assertEquals(LayoutExtension::RENDER_BLOCK_NODE_CLASS, $function->getNodeClass());
     }

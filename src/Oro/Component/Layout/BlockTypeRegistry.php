@@ -36,7 +36,7 @@ class BlockTypeRegistry implements BlockTypeRegistryInterface
             $type = $this->blockTypeFactory->createBlockType($name);
             if (!$type) {
                 throw new Exception\LogicException(
-                    sprintf('Cannot find corresponded block type with name "%s".', $name)
+                    sprintf('The block type named "%s" was not found.', $name)
                 );
             }
             if ($type->getName() !== $name) {

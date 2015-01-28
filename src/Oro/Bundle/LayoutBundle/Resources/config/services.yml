@@ -1,49 +1,60 @@
 parameters:
-    oro_layout.block_type_factory.class:  Oro\Component\Layout\DependencyInjectionBlockTypeFactory
+    oro_layout.block_type_factory.class:      Oro\Component\Layout\DependencyInjectionBlockTypeFactory
+    oro_layout.block_type_registry.class:     Oro\Component\Layout\BlockTypeRegistry
+    oro_layout.block_options_resolver.class:  Oro\Component\Layout\BlockOptionsResolver
+    oro_layout.layout_data_builder.class:     Oro\Component\Layout\LayoutDataBuilder
+    oro_layout.layout_manipulator.class:      Oro\Component\Layout\DeferredLayoutManipulator
+    oro_layout.layout_view_factory.class:     Oro\Component\Layout\LayoutViewFactory
+    oro_layout.layout_builder.class:          Oro\Component\Layout\LayoutBuilder
+    oro_layout.layout_manager.class:          Oro\Component\Layout\LayoutManager
 
 services:
     oro_layout.block_type_factory:
+        public: false
         class: %oro_layout.block_type_factory.class%
         arguments:
             - @service_container
             - {}
 
-    oro_layout.block_type.base:
-        class: Oro\Component\Layout\Block\Type\BaseType
-        tags:
-             - { name: layout.block_type, alias: layout }
+    oro_layout.block_type_registry:
+        public: false
+        class: %oro_layout.block_type_registry.class%
+        arguments:
+            - @oro_layout.block_type_factory
 
-    oro_layout.block_type.container:
-        class: Oro\Component\Layout\Block\Type\ContainerType
-        tags:
-             - { name: layout.block_type, alias: container }
+    oro_layout.block_options_resolver:
+        public: false
+        class: %oro_layout.block_options_resolver.class%
+        arguments:
+            - @oro_layout.block_type_registry
 
-    oro_layout.block_type.root:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RootType
-        tags:
-             - { name: layout.block_type, alias: root }
+    oro_layout.layout_data_builder:
+        public: false
+        class: %oro_layout.layout_data_builder.class%
 
-    oro_layout.block_type.head:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType
-        tags:
-             - { name: layout.block_type, alias: head }
+    oro_layout.layout_manipulator:
+        public: false
+        class: %oro_layout.layout_manipulator.class%
+        arguments:
+            - @oro_layout.layout_data_builder
 
-    oro_layout.block_type.meta:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\MetaType
-        tags:
-             - { name: layout.block_type, alias: meta }
+    oro_layout.layout_view_factory:
+        public: false
+        class: %oro_layout.layout_view_factory.class%
+        arguments:
+            - @oro_layout.block_type_registry
+            - @oro_layout.block_options_resolver
+            - @oro_layout.layout_manipulator
 
-    oro_layout.block_type.script:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ScriptType
-        tags:
-             - { name: layout.block_type, alias: script }
+    oro_layout.layout_builder:
+        public: false
+        class: %oro_layout.layout_builder.class%
+        arguments:
+            - @oro_layout.layout_data_builder
+            - @oro_layout.layout_manipulator
+            - @oro_layout.layout_view_factory
 
-    oro_layout.block_type.style:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\StyleType
-        tags:
-             - { name: layout.block_type, alias: style }
-
-    oro_layout.block_type.body:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\BodyType
-        tags:
-             - { name: layout.block_type, alias: body }
+    oro_layout.layout_manager:
+        class: %oro_layout.layout_manager.class%
+        arguments:
+            - @oro_layout.layout_builder
