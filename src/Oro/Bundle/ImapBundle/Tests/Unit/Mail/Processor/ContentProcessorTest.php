@@ -92,6 +92,9 @@ class ContentProcessorTest extends \PHPUnit_Framework_TestCase
                 ->method('getParameter')
                 ->with($this->equalTo('charset'))
                 ->will($this->returnValue($contentCharset));
+            $contentTypeHeader->expects($this->any())
+                ->method('getParameters')
+                ->willReturn([]);
         }
 
         // Content-Transfer-Encoding header

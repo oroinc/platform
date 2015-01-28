@@ -1,0 +1,12 @@
+{% block oro_imap_configuration_check_row %}
+    {% set options = {
+        
+    } %}
+
+    {% set attr = attr|merge({
+        'data-page-component-module':  'oroimap/js/app/components/check-connection-btn',
+        'data-page-component-options': options|json_encode|raw
+    }) %}
+
+    {{ form_widget(form, { 'attr': attr }) }}
+{% endblock %}
