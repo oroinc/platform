@@ -601,9 +601,16 @@ define(function (require) {
          * @param {String} content
          */
         setContent: function (content) {
+            var widgetContent = $(content).filter('.widget-content:first');
+
             this.actionsEl = null;
             this.actions = {};
-            this.setElement($(content).filter('.widget-content:first'));
+
+            // creating of jqUI dialog could throw exception
+            if (widgetContent.length === 0) {
+                throw new Error("Invalid server response: " + content);
+            }
+            this.setElement(widgetContent);
             this._show();
         },
 
