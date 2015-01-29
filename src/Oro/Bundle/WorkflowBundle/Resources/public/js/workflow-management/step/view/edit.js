@@ -94,9 +94,6 @@ function(_, __, Backbone, messenger, DialogWidget, Helper, mediator, Transitions
                         'modal': true
                     }
                 });
-                this.listenTo(this.widget, 'renderComplete', function(el) {
-                    mediator.execute('layout:init', el, widget);
-                });
                 this.widget.render();
             } else {
                 this.widget._adoptWidgetActions();

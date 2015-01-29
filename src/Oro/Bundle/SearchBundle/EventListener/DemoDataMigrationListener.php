@@ -47,7 +47,9 @@ class DemoDataMigrationListener
     public function onConsoleTerminate(ConsoleTerminateEvent $event)
     {
         if ($this->isProcessingRequired($event)) {
-            $this->searchEngine->reindex();
+            if ($event->getExitCode() === 0) {
+                $this->searchEngine->reindex();
+            }
             $this->searchListener->setEnabled(true);
         }
     }

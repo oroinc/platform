@@ -2,7 +2,7 @@ oro:
     entity:
         field_choice:
             fields:           Fields
-            relations:        Relatated entities
+            relations:        Related entities
         form:
             choose_entity_field:    Choose a field...
         not_exist: "Utilized entity or its field does not exist"
