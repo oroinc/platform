@@ -20,26 +20,26 @@ datagrid:
                 label: oro.email.from_name.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
-            to:
-                type: twig
-                label: To
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
-            cc:
-                type: twig
-                label: Cc
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
-            bcc:
-                type: twig
-                label: Bcc
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+            to:
+                type: twig
+                label: To
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/to.html.twig
+            cc:
+                type: twig
+                label: Cc
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/cc.html.twig
+            bcc:
+                type: twig
+                label: Bcc
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/bcc.html.twig
             sentAt:
                 label: oro.email.sent_at.label
                 frontend_type: datetime
@@ -150,7 +150,7 @@ datagrid:
                 type: twig
                 label: oro.email.recipients.label
                 frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
+                template: OroEmailBundle:Email:Datagrid/Property/to.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
