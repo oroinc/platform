@@ -83,7 +83,6 @@ class Processor
      */
     public function process(EmailModel $model)
     {
-        $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
 
         /** @var \Swift_Message $message */
@@ -201,20 +200,6 @@ class Processor
         $this->getEntityManager()->persist($emailOwner);
 
         return $origin;
-    }
-
-    /**
-     * @param EmailModel $model
-     * @throws \InvalidArgumentException
-     */
-    protected function assertModel(EmailModel $model)
-    {
-        if (!$model->getFrom()) {
-            throw new \InvalidArgumentException('Sender can not be empty');
-        }
-        if (!$model->getTo() && !$model->getCc() && !$model->getBcc()) {
-            throw new \InvalidArgumentException('Recipient can not be empty');
-        }
     }
 
     /**

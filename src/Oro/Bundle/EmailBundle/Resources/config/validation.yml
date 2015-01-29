@@ -16,6 +16,8 @@ Oro\Bundle\EmailBundle\Entity\EmailTemplate:
             - NotBlank: ~
 
 Oro\Bundle\EmailBundle\Form\Model\Email:
+    constraints:
+        - Oro\Bundle\EmailBundle\Validator\Constraints\EmailRecipients: ~
     properties:
         from:
             - NotBlank:     ~
