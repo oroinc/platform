@@ -4,13 +4,13 @@ define(function (require) {
     var DateTimePickerView,
         _ = require('underscore'),
         DatePickerView = require('./datepicker-view'),
-        DateTimePickerViewPrototype = require('./datetimepicker-view-prototype');
+        dateTimePickerViewMixin = require('./datetimepicker-view-mixin');
 
-    DateTimePickerView = DatePickerView.extend(_.extend({}, DateTimePickerViewPrototype, {
+    DateTimePickerView = DatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
         /**
          * Default options
          */
-        defaults: _.extend({}, DatePickerView.prototype.defaults, DateTimePickerViewPrototype.defaults),
+        defaults: _.extend({}, DatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         /**
          * Returns supper prototype

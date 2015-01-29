@@ -11,7 +11,6 @@ define(function (require) {
 
     DatePickerView = BaseView.extend({
         defaults: {
-            useNativePicker: false,
             dateInputAttrs: {},
             datePickerOptions: {}
         },
@@ -19,6 +18,11 @@ define(function (require) {
         events: {
             change: 'updateFront'
         },
+
+        /**
+         * Use native pickers of proper HTML-inputs
+         */
+        nativeMode: false,
 
         /**
          * Format of date that native date input accepts
@@ -41,7 +45,6 @@ define(function (require) {
         initialize: function (options) {
             var opts = {};
             $.extend(true, opts, this.defaults, options);
-            this.nativeMode = opts.useNativePicker;
 
             this.createFrontField(opts);
 

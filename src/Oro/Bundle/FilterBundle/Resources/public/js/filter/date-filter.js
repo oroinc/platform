@@ -288,7 +288,7 @@ define(function (require) {
          */
         _getPickerConfigurationOptions: function (options) {
             _.extend(options, {
-                useNativePicker: tools.isMobile(),
+                nativeMode: tools.isMobile(),
                 dateInputAttrs: {
                     'class': this.inputClass
                 },

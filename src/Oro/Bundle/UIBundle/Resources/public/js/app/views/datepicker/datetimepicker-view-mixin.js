@@ -1,7 +1,7 @@
 define(function (require) {
     'use strict';
 
-    var TimePickerViewPrototype,
+    var dateTimePickerViewMixin,
         $ = require('jquery'),
         _ = require('underscore'),
         moment = require('moment'),
@@ -13,7 +13,7 @@ define(function (require) {
      * (is used to extend some DatePickerView with timepicker functionality)
      * @interface TimePickerView
      */
-    TimePickerViewPrototype = {
+    dateTimePickerViewMixin = {
         defaults: {
             fieldsWrapper: '',
             timeInputAttrs: {},
@@ -205,5 +205,5 @@ define(function (require) {
         }
     };
 
-    return TimePickerViewPrototype;
+    return dateTimePickerViewMixin;
 });
