@@ -146,15 +146,13 @@ class EmailHandler
         if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
 
-            if ($this->form->isValid()) {
+            if ($this->form->isValid() && $this->isAddressesFilled($model)) {
                 try {
                     $this->emailProcessor->process($model);
                     return true;
                 } catch (\Exception $ex) {
                     $this->logger->error('Email sending failed.', ['exception' => $ex]);
-                    $this->form->addError(
-                        new FormError($this->translator->trans($ex->getMessage()))
-                    );
+                    $this->form->addError(new FormError($ex->getMessage()));
                 }
             }
         }
@@ -312,5 +310,29 @@ class EmailHandler
         return $entity instanceof UserInterface
         && $entity instanceof EmailHolderInterface
         && $entity instanceof EmailOwnerInterface;
+    }
+
+    /**
+     * Check correct filled from and recipients
+     *
+     * @param Email $model
+     * @return bool
+     */
+    protected function isAddressesFilled(Email $model)
+    {
+        $result = true;
+        if (!$model->getFrom()) {
+            $this->form->addError(
+                new FormError($this->translator->trans('oro.email.handler.sender_can_not_be_empty'))
+            );
+            $result = false;
+        }
+        if (!$model->getTo() && !$model->getCc() && !$model->getBcc()) {
+            $this->form->addError(
+                new FormError($this->translator->trans('oro.email.handler.recipient_can_not_be_empty'))
+            );
+            $result = false;
+        }
+        return $result;
     }
 }
