@@ -12,9 +12,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-
-//use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
-//use OroCRM\Bundle\ContactBundle\Entity\Contact;
+use Oro\Bundle\EmailBundle\Entity\Email;
 
 class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
@@ -113,7 +111,10 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 $owner->getEmail(),
                 new \DateTime('now'),
                 new \DateTime('now'),
-                new \DateTime('now')
+                new \DateTime('now'),
+                Email::NORMAL_IMPORTANCE,
+                "cc{$index}@example.com",
+                "bcc{$index}@example.com"
             );
 
 //            $this->setSecurityContext($owner);
