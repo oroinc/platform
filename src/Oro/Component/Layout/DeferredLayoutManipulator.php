@@ -36,7 +36,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     /** The action name for remove an option for the layout item */
     const REMOVE_OPTION = 'removeOption';
 
-    /** @var RawLayoutAccessorInterface */
+    /** @var RawLayoutBuilderInterface */
     protected $layout;
 
     /**
@@ -60,9 +60,9 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     protected $actions = [];
 
     /**
-     * @param RawLayoutAccessorInterface $layout
+     * @param RawLayoutBuilderInterface $layout
      */
-    public function __construct(RawLayoutAccessorInterface $layout)
+    public function __construct(RawLayoutBuilderInterface $layout)
     {
         $this->layout = $layout;
     }

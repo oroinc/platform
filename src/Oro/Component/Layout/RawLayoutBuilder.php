@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout;
 
 /**
- * Base implementation of RawLayoutAccessorInterface
  * This is straightforward implementation with strict checking of all operations' arguments.
  * It means that:
  *  - several layout items with the same id cannot be added
