@@ -27,16 +27,14 @@ class EmailControllerTest extends WebTestCase
         $this->assertContains('Thank you for signing up to My Web Store!', $content);
     }
 
-    public function testCreate()
+    public function testCreateViewForm()
     {
-        //$this->markTestIncomplete('Skipped. Incomplete');
-
         $url = $this->getUrl('oro_email_email_create', ['_widgetContainer' => 'dialog']);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-//        $content = $result->getContent();
-//        $this->assertContains('', $content);
+        $content = $result->getContent();
+        $this->assertContains('From', $content);
     }
 
     public function testBody()
@@ -76,35 +74,28 @@ class EmailControllerTest extends WebTestCase
 
     public function testEmails()
     {
-        $this->markTestIncomplete('Skipped. Incomplete');
-
-        $url = $this->getUrl('oro_email_widget_emails');
+        $url = $this->getUrl('oro_email_widget_emails', ['_widgetContainer' => 'dialog']);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-//        $content = $result->getContent();
-//        $this->assertContains('', $content);
+        $content = $result->getContent();
+        $this->assertContains('BBQ Grill - Order Follow Up', $content);
+        $this->assertContains('Products related to your recent purchase - Zildjian Drumset', $content);
     }
 
     public function testBaseEmails()
     {
-        $this->markTestIncomplete('Skipped. Incomplete');
-
-        $url = $this->getUrl('oro_email_widget_base_emails', [
-            'id' => 1
-        ]);
+        $url = $this->getUrl('oro_email_widget_base_emails', ['_widgetContainer' => 'dialog']);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('BBQ Grill - Order Follow Up', $content);
     }
 
     public function testUserEmails()
     {
-        $this->markTestIncomplete('Skipped. Incomplete');
-
-        $url = $this->getUrl('oro_email_user_emails', [
-            'id' => 1
-        ]);
+        $url = $this->getUrl('oro_email_user_emails', ['_widgetContainer' => 'dialog']);
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
