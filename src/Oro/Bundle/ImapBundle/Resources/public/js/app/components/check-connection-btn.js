@@ -42,7 +42,7 @@ function ($, _, routing, __, mediator, messenger) {
                 url = routing.generate(routeName);
                 if (options.id !== null) {
                     var extraQuery = 'id=' + options.id,
-                        delimiter = url.indexOf('?') ? '?' : '&';
+                        delimiter = url.indexOf('?') === -1 ? '?' : '&';
 
                     url += (delimiter + extraQuery);
                 }
