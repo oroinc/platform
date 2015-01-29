@@ -41,10 +41,10 @@ class Layout
     /**
      * Sets the theme(s) to be used for rendering a block and its children
      *
-     * @param mixed     $themes  The theme(s). The type of these themes is open to the implementation
-     * @param BlockView $blockId The id of a block to assign the theme(s) to
+     * @param string|string[] $themes  The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|null     $blockId The id of a block to assign the theme(s) to
      */
-    public function setTheme($themes, $blockId = null)
+    public function setBlockTheme($themes, $blockId = null)
     {
         $view = $blockId
             ? $this->view[$blockId]

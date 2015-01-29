@@ -40,7 +40,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testSetTheme()
+    public function testSetBlockTheme()
     {
         $theme = 'MyBungle::blocks.html.twig';
 
@@ -51,10 +51,10 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($view), $theme);
 
         $layout = new Layout($view, $this->renderer);
-        $layout->setTheme($theme);
+        $layout->setBlockTheme($theme);
     }
 
-    public function testSetThemeForChild()
+    public function testSetBlockThemeForChild()
     {
         $theme = 'MyBungle::blocks.html.twig';
 
@@ -68,6 +68,6 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($childView), $theme);
 
         $layout = new Layout($view, $this->renderer);
-        $layout->setTheme($theme, 'child_id');
+        $layout->setBlockTheme($theme, 'child_id');
     }
 }

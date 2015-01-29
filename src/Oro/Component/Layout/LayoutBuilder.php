@@ -16,6 +16,9 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var LayoutFactoryInterface */
     protected $layoutFactory;
 
+    /** @var array */
+    protected $themes = [];
+
     /**
      * @param RawLayoutBuilderInterface             $rawLayoutBuilder
      * @param DeferredRawLayoutManipulatorInterface $layoutManipulator
@@ -107,12 +110,33 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function setBlockTheme($themes, $blockId = null)
+    {
+        if ($blockId === null) {
+            $blockId = '';
+        }
+        if (!isset($this->themes[$blockId])) {
+            $this->themes[$blockId] = (array)$themes;
+        } else {
+            $this->themes[$blockId] = array_merge($this->themes[$blockId], (array)$themes);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLayout(ContextInterface $context, $rootId = null)
     {
         $this->layoutManipulator->applyChanges();
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
         $rootView  = $this->layoutViewFactory->createView($rawLayout, $context, $rootId);
         $layout    = $this->layoutFactory->createLayout($rootView);
+        foreach ($this->themes as $blockId => $themes) {
+            // set theme(s) for existing blocks only
+            if (!$blockId || isset($rootView[$blockId])) {
+                $layout->setBlockTheme($themes, $blockId !== '' ? $blockId : null);
+            }
+        }
 
         return $layout;
     }
