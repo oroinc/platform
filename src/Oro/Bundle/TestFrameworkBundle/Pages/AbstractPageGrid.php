@@ -44,17 +44,18 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $pageSize = min($pageSize, $this->getRowsCount());
         $entityId = rand(1, $pageSize);
+        $gridPath = "{$this->gridPath}//table[contains(@class,'grid')]";
         /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $entity */
         $entity = $this->test
             ->elements(
                 $this->test->using('xpath')
-                    ->value("{$this->gridPath}//table[contains(@class,'grid')]/tbody/tr[{$entityId}]/td")
+                    ->value("{$gridPath}/tbody/tr[{$entityId}]/td")
             );
         /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $headers */
         $headers = $this->test
             ->elements(
                 $this->test->using('xpath')
-                    ->value("{$this->gridPath}//table[contains(@class,'grid')]/thead/tr/th")
+                    ->value("{$gridPath}/thead/tr/th[not(contains(@class,'floatThead-col'))]")
             );
 
         $entityData = array();
