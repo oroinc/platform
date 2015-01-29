@@ -663,7 +663,7 @@ define(function (require) {
                 var $dropdown = $(e.target).closest('.dropdown'),
                     $dropdownMenu = $dropdown.find('.dropdown-menu'),
                     dropdownRect = $dropdown[0].getBoundingClientRect(),
-                    scrollableRect = self.$gridParent[0].getBoundingClientRect(),
+                    scrollableRect = self.$grid.parent()[0].getBoundingClientRect(),
                     moveLeft;
 
                 if (dropdownRect.left < scrollableRect.left || dropdownRect.right > scrollableRect.right) {
@@ -674,7 +674,7 @@ define(function (require) {
                         ? dropdownRect.left - scrollableRect.left
                         : dropdownRect.right - scrollableRect.right;
                     moveLeft += moveLeft > 0 ? 5 : -5;
-                    self.$gridParent.scrollLeft(self.$gridParent.scrollLeft() + moveLeft);
+                    self.$grid.parent().scrollLeft(self.$grid.parent().scrollLeft() + moveLeft);
                     setTimeout(function(){
                         $dropdown.find('>*:first').trigger('click');
                     }, 0);
