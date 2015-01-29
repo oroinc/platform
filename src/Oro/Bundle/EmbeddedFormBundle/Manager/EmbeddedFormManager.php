@@ -123,6 +123,8 @@ class EmbeddedFormManager
      * @param string $type
      *
      * @return string
+     *
+     * @deprecated since 1.6. Please implement LayoutUpdateInterface in your form type instead.
      */
     public function getCustomFormLayoutByFormType($type)
     {
@@ -145,7 +147,7 @@ class EmbeddedFormManager
      *
      * @return EmbeddedFormInterface|AbstractType
      */
-    protected function getTypeInstance($type)
+    public function getTypeInstance($type)
     {
         $typeInstance = null;
         if ($this->container->has($type)) {

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
+use Oro\Component\Layout\LayoutUpdateInterface;
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Component\Layout\Layout;
@@ -18,22 +19,26 @@ class EmbedFormLayoutManager
     /** @var LayoutManager */
     protected $layoutManager;
 
+    /** @var EmbeddedFormManager */
+    protected $formManager;
+
     /**
-     * @param LayoutManager $layoutManager
+     * @param LayoutManager       $layoutManager
+     * @param EmbeddedFormManager $formManager
      */
-    public function __construct(LayoutManager $layoutManager)
+    public function __construct(LayoutManager $layoutManager, EmbeddedFormManager $formManager)
     {
         $this->layoutManager = $layoutManager;
+        $this->formManager   = $formManager;
     }
 
     /**
      * @param EmbeddedForm  $formEntity
      * @param FormInterface $form
-     * @param string|null   $formLayout
      *
      * @return Layout
      */
-    public function getFormLayout(EmbeddedForm $formEntity, FormInterface $form, $formLayout = null)
+    public function getFormLayout(EmbeddedForm $formEntity, FormInterface $form)
     {
         $layoutContext = new LayoutContext();
         $layoutBuilder = $this->getLayoutBuilder($formEntity);
@@ -43,9 +48,15 @@ class EmbedFormLayoutManager
             new EmbedFormType(),
             [
                 'form'        => $form->createView(),
-                'form_layout' => $formLayout
+                // @deprecated since 1.6. Kept for backward compatibility
+                'form_layout' => $this->formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
             ]
         );
+
+        $typeInstance = $this->formManager->getTypeInstance($formEntity->getFormType());
+        if ($typeInstance instanceof LayoutUpdateInterface) {
+            $typeInstance->updateLayout($layoutBuilder);
+        }
 
         $layout = $layoutBuilder->getLayout($layoutContext);
 
