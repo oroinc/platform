@@ -338,6 +338,20 @@ class User extends ExtendUser implements
     /**
      * @var \DateTime
      *
+     * @ORM\Column(name="password_changed", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $passwordChangedAt;
+
+    /**
+     * @var \DateTime
+     *
      * @ORM\Column(name="last_login", type="datetime", nullable=true)
      * @JMS\Type("DateTime")
      * @JMS\Expose
@@ -754,6 +768,16 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Gets the timestamp that the administrator has changed user's password
+     *
+     * @return \DateTime
+     */
+    public function getPasswordChangedAt()
+    {
+        return $this->passwordChangedAt;
+    }
+
+    /**
      * Gets the last login time.
      *
      * @return \DateTime
@@ -1040,6 +1064,18 @@ class User extends ExtendUser implements
     public function setPasswordRequestedAt(\DateTime $time = null)
     {
         $this->passwordRequestedAt = $time;
+
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $time [optional] Password changed time. Null by default.
+     *
+     * @return User
+     */
+    public function setPasswordChangedAt(\DateTime $time = null)
+    {
+        $this->passwordChangedAt = $time;
 
         return $this;
     }

@@ -6,6 +6,7 @@ use Composer\Composer;
 use Composer\Installer;
 use Composer\IO\BufferIO;
 use Composer\Package\Link;
+use Composer\Package\Package;
 use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Composer\Package\Version\VersionParser;
@@ -14,6 +15,7 @@ use Composer\Repository\ComposerRepository;
 use Composer\Repository\PlatformRepository;
 use Composer\Repository\RepositoryManager;
 use Composer\Repository\WritableArrayRepository;
+use Composer\Repository\WritableRepositoryInterface;
 use Composer\Installer\InstallationManager;
 use Oro\Bundle\DistributionBundle\Entity\PackageRequirement;
 use Oro\Bundle\DistributionBundle\Entity\PackageUpdate;
@@ -114,7 +116,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         // Fetch available packages configuration
         // from composer repo
         $availablePackage1 = $this->getPackage('name1', 1);
+        $availablePackage1->setRepository($composerRepositoryMock);
         $availablePackage2 = $this->getPackage($duplicatedPackageName, 1);
+        $availablePackage2->setRepository($composerRepositoryMock);
+        $availablePackage3 = $this->getPackage('name2', 1);
+        $availablePackage3->setRepository($composerRepositoryMock);
         $composerRepositoryMock->expects($this->any())
             ->method('hasProviders')
             ->will($this->returnValue(true));
@@ -125,7 +131,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
         $composerRepositoryMock->expects($this->any())
             ->method('whatProvides')
-            ->will($this->returnValue([$availablePackage1, $this->getPackage('name2', 1)]));
+            ->will($this->returnValue([$availablePackage1, $availablePackage3]));
 
         // packagist.org repository
         $packagistRepositoryMock->expects($this->any())
@@ -144,7 +150,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('hasProviders')
             ->will($this->returnValue(false));
 
-        $composerRepositoryWithoutProvidersMock->expects($this->once())
+        $composerRepositoryWithoutProvidersMock->expects($this->atLeastOnce())
             ->method('getPackages')
             ->will($this->returnValue([$availablePackage1, $availablePackage2]));
         $composerRepositoryWithoutProvidersMock->expects($this->any())
@@ -162,10 +168,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             },
             []
         );
-        $this->assertEquals(
-            ['name2', $duplicatedPackageName, 'name4'],
-            $packages
-        );
+        $this->assertEquals(['name2', $duplicatedPackageName, 'name4'], $packages);
     }
 
     /**
@@ -184,7 +187,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $requirementLinkMock2 = $this->createComposerPackageLinkMock();
         $platformRequirementLinkMock = $this->createComposerPackageLinkMock();
 
-
         // non platform requirements
         $requirementLinkMock1->expects($this->exactly(2))
             ->method('getTarget')
@@ -200,13 +202,10 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($platformRequirement));
 
         // package mock configuration
-        $packageMock = $this->createPackageMock();
+        $packageMock = $this->createPackageMock($packageName);
         $packageMock->expects($this->once())
             ->method('getRequires')
             ->will($this->returnValue([$requirementLinkMock1, $requirementLinkMock2, $platformRequirementLinkMock]));
-        $packageMock->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($packageName));
         $packageMock->expects($this->any())
             ->method('getVersion')
             ->will($this->returnValue($packageVersion));
@@ -371,8 +370,10 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     *
+     * @param bool $loadDemoData
      */
-    public function shouldLoadDemoData()
+    public function shouldLoadDemoData($loadDemoData = true)
     {
         $newPackageName = 'new-vendor/new-package';
         $newPackageVersion = 'v3';
@@ -399,13 +400,15 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composerInstaller = $this->prepareInstallerMock($newPackageName, 0);
         $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner);
 
-        $manager->install($newPackageName, $newPackageVersion, $loadDemoData = true);
+        $manager->install($newPackageName, $newPackageVersion, $loadDemoData);
     }
 
     /**
      * @test
+     *
+     * @param bool $loadDemoData
      */
-    public function shouldNotLoadDemoData()
+    public function shouldNotLoadDemoData($loadDemoData = false)
     {
         $newPackageName = 'new-vendor/new-package';
         $newPackageVersion = 'v3';
@@ -432,7 +435,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composerInstaller = $this->prepareInstallerMock($newPackageName, 0);
         $manager = $this->createPackageManager($composer, $composerInstaller, null, $runner);
 
-        $manager->install($newPackageName, $newPackageVersion, $loadDemoData = false);
+        $manager->install($newPackageName, $newPackageVersion, $loadDemoData);
     }
 
     /**
@@ -458,7 +461,8 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         // composer and repository
         $composer = $this->createComposerMock();
         $repositoryManager = $this->createRepositoryManagerMock();
-        $localRepository = new WritableArrayRepository($installedPackages = [$newPackage]);
+        $installedPackages = [$newPackage];
+        $localRepository = new WritableArrayRepository($installedPackages);
 
         $composer->expects($this->any())
             ->method('getRepositoryManager')
@@ -515,7 +519,9 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             unlink($tempComposerJson);
 
             $this->assertEquals("{$newPackageName} can't be installed!", $e->getMessage());
-            return $this->assertEquals($composerJsonData, $composerDataAfterFail);
+            $this->assertEquals($composerJsonData, $composerDataAfterFail);
+
+            return;
         }
 
         unlink($tempComposerJson);
@@ -568,10 +574,12 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('findPackages')
             ->will($this->returnValue([$newPackage]));
 
+        $installedPackages = [$newPackage];
+
         // Package repositories
         $repositoryManager->expects($this->once())
             ->method('getRepositories')
-            ->will($this->returnValue([new WritableArrayRepository($installedPackages = [$newPackage])]));
+            ->will($this->returnValue([new WritableArrayRepository($installedPackages)]));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject $rootPackageMock */
         $rootPackageMock = $composer->getPackage();
@@ -641,7 +649,9 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             unlink($tempComposerJson);
 
             $this->assertSame($thrownException, $e);
-            return $this->assertEquals($composerJsonData, $composerDataAfterFail);
+            $this->assertEquals($composerJsonData, $composerDataAfterFail);
+
+            return;
         }
 
         unlink($tempComposerJson);
@@ -707,10 +717,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getRepositoryManager')
             ->will($this->returnValue($repositoryManager));
 
+        $package1 = $this->getPackage('my/package', '1');
         $repository = new ArrayRepository(
             [
-                $package1 = $this->getPackage('my/package', '1'),
-                $package2 = $this->getPackage('my/package', '2'),
+                $package1,
+                $this->getPackage('my/package', '2'),
             ]
         );
         $repositoryManager->expects($this->once())
@@ -735,10 +746,11 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($repositoryManager));
 
         $packageName = 'my/package';
+        $freshPackage = $this->getPackage($packageName, '2');
         $repository = new ArrayRepository(
             [
-                $outdatedPackage = $this->getPackage($packageName, '1'),
-                $freshPackage = $this->getPackage($packageName, '2'),
+                $this->getPackage($packageName, '1'),
+                $freshPackage,
             ]
         );
         $repositoryManager->expects($this->once())
@@ -924,10 +936,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getTarget')
             ->will($this->returnValue($expectedDependents[0]));
 
-        $package1 = $this->createPackageMock();
-        $package1->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($expectedDependents[0]));
+        $package1 = $this->createPackageMock($expectedDependents[0]);
         $package1->expects($this->any())
             ->method('getRequires')
             ->will($this->returnValue([$packageLink]));
@@ -935,10 +944,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getDevRequires')
             ->will($this->returnValue([]));
 
-        $package2 = $this->createPackageMock();
-        $package2->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($expectedDependents[1]));
+        $package2 = $this->createPackageMock($expectedDependents[1]);
         $package2->expects($this->any())
             ->method('getRequires')
             ->will($this->returnValue([$packageLink]));
@@ -946,10 +952,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getDevRequires')
             ->will($this->returnValue([$packageLink]));
 
-        $package3 = $this->createPackageMock();
-        $package3->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($expectedDependents[2]));
+        $package3 = $this->createPackageMock($expectedDependents[2]);
         $package3->expects($this->any())
             ->method('getRequires')
             ->will($this->returnValue([]));
@@ -985,26 +988,22 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
             new PackageUpdate('vendor1/package1', 'v1 (asdf)', 'v1 (ffff)'),
             new PackageUpdate('vendor2/package2', 'v1 (asss)', 'v1 (dddd)'),
         ];
-        $package1 = $this->createPackageMock();
-        $package1->expects($this->any())->method('getName')->will($this->returnValue('vendor1/package1'));
+        $package1 = $this->createPackageMock('vendor1/package1');
         $package1->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
         $package1->expects($this->any())->method('getSourceReference')->will($this->returnValue('asdf'));
 
-        $updatedPackage1 = $this->createPackageMock();
-        $updatedPackage1->expects($this->any())->method('getName')->will($this->returnValue('vendor1/package1'));
+        $updatedPackage1 = $this->createPackageMock('vendor1/package1');
         $updatedPackage1->expects($this->any())->method('getNames')->will($this->returnValue(['vendor1/package1']));
         $updatedPackage1->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
         $updatedPackage1->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
         $updatedPackage1->expects($this->any())->method('getVersion')->will($this->returnValue('1.0.0.0'));
         $updatedPackage1->expects($this->any())->method('getSourceReference')->will($this->returnValue('ffff'));
 
-        $package2 = $this->createPackageMock();
-        $package2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $package2 = $this->createPackageMock('vendor2/package2');
         $package2->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
         $package2->expects($this->any())->method('getSourceReference')->will($this->returnValue('asss'));
 
-        $updatedPackage2 = $this->createPackageMock();
-        $updatedPackage2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $updatedPackage2 = $this->createPackageMock('vendor2/package2');
         $updatedPackage2->expects($this->any())->method('getNames')->will($this->returnValue(['vendor2/package2']));
         $updatedPackage2->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
         $updatedPackage2->expects($this->any())->method('getPrettyVersion')->will($this->returnValue('v1'));
@@ -1038,20 +1037,16 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     {
         $packageName = 'vendor1/package1';
 
-        $package1 = $this->createPackageMock();
-        $package1->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $package1 = $this->createPackageMock($packageName);
         $package1->expects($this->any())->method('getSourceReference')->will($this->returnValue('asdf'));
 
-        $updatedPackage1 = $this->createPackageMock();
-        $updatedPackage1->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $updatedPackage1 = $this->createPackageMock($packageName);
         $updatedPackage1->expects($this->any())->method('getSourceReference')->will($this->returnValue('ffff'));
 
-        $package2 = $this->createPackageMock();
-        $package2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $package2 = $this->createPackageMock('vendor2/package2');
         $package2->expects($this->any())->method('getSourceReference')->will($this->returnValue('asss'));
 
-        $updatedPackage2 = $this->createPackageMock();
-        $updatedPackage2->expects($this->any())->method('getName')->will($this->returnValue('vendor2/package2'));
+        $updatedPackage2 = $this->createPackageMock('vendor2/package2');
         $updatedPackage2->expects($this->any())->method('getSourceReference')->will($this->returnValue('dddd'));
 
         $package3 = $this->getPackage('vendor3/package3', 'v1');
@@ -1188,12 +1183,10 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     {
         $packageName = 'vendor1/package1';
 
-        $package = $this->createPackageMock();
-        $package->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $package = $this->createPackageMock($packageName);
         $package->expects($this->any())->method('getSourceReference')->will($this->returnValue('asdf'));
 
-        $updatedPackage = $this->createPackageMock();
-        $updatedPackage->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $updatedPackage = $this->createPackageMock($packageName);
         $updatedPackage->expects($this->any())->method('getNames')->will($this->returnValue([$packageName]));
         $updatedPackage->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
         $updatedPackage->expects($this->any())->method('getVersion')->will($this->returnValue('1.0.0.0'));
@@ -1225,8 +1218,7 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     {
         $packageName = 'vendor1/package1';
 
-        $package = $this->createPackageMock();
-        $package->expects($this->any())->method('getName')->will($this->returnValue($packageName));
+        $package = $this->createPackageMock($packageName);
         $package->expects($this->any())->method('getNames')->will($this->returnValue([$packageName]));
         $package->expects($this->any())->method('getStability')->will($this->returnValue('stable'));
         $package->expects($this->any())->method('getVersion')->will($this->returnValue('1.0.0.0'));
@@ -1445,11 +1437,20 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|PackageInterface
+     * @param $name
+     * @return PackageInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createPackageMock()
+    protected function createPackageMock($name)
     {
-        return $this->getMock('Composer\Package\PackageInterface');
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Package $package */
+        $package = $this->getMock('Composer\Package\PackageInterface');
+        $package->id = $name . uniqid();
+
+        $package->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue($name));
+
+        return $package;
     }
 
     /**
