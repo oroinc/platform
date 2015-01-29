@@ -120,6 +120,8 @@ class LayoutBuilder implements LayoutBuilderInterface
         } else {
             $this->themes[$blockId] = array_merge($this->themes[$blockId], (array)$themes);
         }
+
+        return $this;
     }
 
     /**

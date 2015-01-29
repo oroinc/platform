@@ -45,7 +45,13 @@
 
 {% block script_widget %}
     {% set attr = {'type': 'text/javascript'}|merge(attr) %}
-    <script{{ block('block_attributes') }}>{{ content|raw }}</script>
+    {% if attr.src is defined and attr.src is not empty %}
+        <script{{ block('block_attributes') }}></script>
+    {% else %}
+        <script{{ block('block_attributes') }}>
+            {{ content|raw }}
+        </script>
+    {% endif %}
 {% endblock %}
 
 {% block style_widget %}
@@ -55,7 +61,9 @@
         {% set attr = attr|omit(['src'])|merge({'href' : href}) %}
         <link rel="stylesheet"{{ block('block_attributes') }}/>
     {% else %}
-        <style{{ block('block_attributes') }}>{{ content|raw }}</style>
+        <style{{ block('block_attributes') }}>
+            {{ content|raw }}
+        </style>
     {% endif %}
 {% endblock %}
 
