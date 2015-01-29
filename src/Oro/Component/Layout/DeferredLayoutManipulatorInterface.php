@@ -5,14 +5,14 @@ namespace Oro\Component\Layout;
 /**
  * Provides a set of methods to manipulate the layout and apply the changes on demand
  *
- * NOTES: we have to re-declare all methods from {@see LayoutManipulatorInterface} here
- * because in other case "@return self" points to {@see LayoutManipulatorInterface}
+ * NOTES: we have to re-declare all methods from {@see LayoutStructureManipulatorInterface} here
+ * because in other case "@return self" points to {@see LayoutStructureManipulatorInterface}
  * rather than {@see DeferredLayoutManipulatorInterface}.
  * But it is important for a client code because this interface provides "fluent" operations.
  *
  * If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
-interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
+interface DeferredLayoutManipulatorInterface extends LayoutStructureManipulatorInterface
 {
     /**
      * Adds a new item to the layout

@@ -7,7 +7,7 @@ namespace Oro\Component\Layout;
  *
  * NOTES: if a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
-interface LayoutManipulatorInterface
+interface LayoutStructureManipulatorInterface
 {
     /**
      * Adds a new item to the layout
