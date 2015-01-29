@@ -318,8 +318,8 @@ define(function (require) {
          */
         getAvailableHeight: function ($mainEl) {
             var $parents = $mainEl.parents(),
-                screenHeight = $(document).height(),
-                heightDiff = screenHeight - $mainEl[0].getBoundingClientRect().top;
+                documentHeight = $(document).height(),
+                heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
             $parents.each(function () {
                 heightDiff += this.scrollTop;
             });
