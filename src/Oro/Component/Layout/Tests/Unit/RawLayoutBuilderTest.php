@@ -9,12 +9,12 @@ use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutData;
-use Oro\Component\Layout\LayoutDataBuilder;
+use Oro\Component\Layout\RawLayout;
+use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
 
-class LayoutDataBuilderTest extends LayoutTestCase
+class RawLayoutBuilderTest extends LayoutTestCase
 {
     /** @var BlockTypeFactoryStub */
     protected $blockTypeFactory;
@@ -22,8 +22,8 @@ class LayoutDataBuilderTest extends LayoutTestCase
     /** @var LayoutContext */
     protected $context;
 
-    /** @var LayoutDataBuilder */
-    protected $layoutDataBuilder;
+    /** @var RawLayoutBuilder */
+    protected $rawLayoutBuilder;
 
     /** @var LayoutViewFactory */
     protected $layoutViewFactory;
@@ -31,14 +31,14 @@ class LayoutDataBuilderTest extends LayoutTestCase
     protected function setUp()
     {
         $this->context           = new LayoutContext();
-        $this->layoutDataBuilder = new LayoutDataBuilder();
+        $this->rawLayoutBuilder  = new RawLayoutBuilder();
         $this->blockTypeFactory  = new BlockTypeFactoryStub();
         $blockTypeRegistry       = new BlockTypeRegistry($this->blockTypeFactory);
         $blockOptionsResolver    = new BlockOptionsResolver($blockTypeRegistry);
         $this->layoutViewFactory = new LayoutViewFactory(
             $blockTypeRegistry,
             $blockOptionsResolver,
-            new DeferredLayoutManipulator($this->layoutDataBuilder)
+            new DeferredLayoutManipulator($this->rawLayoutBuilder)
         );
     }
 
@@ -49,9 +49,9 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     protected function getLayoutView($rootId = null)
     {
-        $layoutData = $this->layoutDataBuilder->getLayoutData();
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-        return $this->layoutViewFactory->createView($layoutData, $this->context, $rootId);
+        return $this->layoutViewFactory->createView($rawLayout, $this->context, $rootId);
     }
 
     /**
@@ -60,16 +60,16 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     public function testClear()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('root', null, 'root');
 
-        $this->layoutDataBuilder->clear();
+        $this->rawLayoutBuilder->clear();
         $this->getLayoutView();
     }
 
     public function testSimpleLayout()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
@@ -102,7 +102,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreEnd
     public function testAddToUnknownParent()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('test', 'root', 'root');
     }
 
@@ -112,7 +112,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     public function testRemoveUnknownItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->remove('root');
     }
 
@@ -124,7 +124,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreEnd
     public function testMoveUnknownItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->move('root', 'destination');
     }
 
@@ -134,7 +134,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     public function testAddAliasForUnknownItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->addAlias('test', 'root');
     }
 
@@ -144,7 +144,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     public function testRemoveUnknownAlias()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->removeAlias('test');
     }
 
@@ -158,7 +158,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreEnd
     public function testSetOptionWithEmptyName($name)
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->setOption('root', $name, 123);
     }
 
@@ -170,11 +170,11 @@ class LayoutDataBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreEnd
     public function testSetOptionForAlreadyResolvedItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('root', null, 'root');
-        $this->layoutDataBuilder->getLayoutData()->setProperty('root', LayoutData::RESOLVED_OPTIONS, []);
+        $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
 
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->setOption('root', 'test', 123);
     }
 
@@ -186,7 +186,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreEnd
     public function testSetOptionForUnknownItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->setOption('root', 'test', 123);
     }
 
@@ -198,7 +198,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     public function testRemoveOptionWithEmptyName($name)
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->removeOption('root', $name);
     }
 
@@ -210,11 +210,11 @@ class LayoutDataBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreEnd
     public function testRemoveOptionForAlreadyResolvedItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('root', null, 'root');
-        $this->layoutDataBuilder->getLayoutData()->setProperty('root', LayoutData::RESOLVED_OPTIONS, []);
+        $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
 
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->removeOption('root', 'test');
     }
 
@@ -224,23 +224,23 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     public function testRemoveOptionForUnknownItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->removeOption('root', 'test');
     }
 
     public function testGetOptions()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('root', null, 'root')
             ->add('logo', 'root', 'logo', ['title' => 'test']);
 
         $this->assertSame(
             [],
-            $this->layoutDataBuilder->getOptions('root')
+            $this->rawLayoutBuilder->getOptions('root')
         );
         $this->assertSame(
             ['title' => 'test'],
-            $this->layoutDataBuilder->getOptions('logo')
+            $this->rawLayoutBuilder->getOptions('logo')
         );
     }
 
@@ -250,7 +250,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
      */
     public function testGetOptionsForUnknownItem()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->getOptions('root');
     }
 
@@ -262,7 +262,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreEnd
     public function testAddChildToNotContainer()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('root', null, 'root')
             ->add('logo', 'root', 'logo')
             ->add('header', 'logo', 'header');
@@ -272,7 +272,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
 
     public function testCoreVariablesForRootItemOnly()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('rootId', null, 'root');
 
         $view = $this->getLayoutView();
@@ -300,7 +300,7 @@ class LayoutDataBuilderTest extends LayoutTestCase
 
     public function testCoreVariables()
     {
-        $this->layoutDataBuilder
+        $this->rawLayoutBuilder
             ->add('rootId', null, 'root')
             ->add('headerId', 'rootId', 'header')
             ->add('logoId', 'headerId', 'logo', ['title' => 'test']);

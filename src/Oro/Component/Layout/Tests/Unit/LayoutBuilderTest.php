@@ -7,7 +7,7 @@ use Oro\Component\Layout\LayoutBuilder;
 class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutDataBuilder;
+    protected $rawLayoutBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $layoutManipulator;
@@ -23,13 +23,13 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->layoutDataBuilder = $this->getMock('Oro\Component\Layout\LayoutDataBuilderInterface');
+        $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredRawLayoutManipulatorInterface');
         $this->layoutViewFactory = $this->getMock('Oro\Component\Layout\LayoutViewFactoryInterface');
         $this->layoutFactory     = $this->getMock('Oro\Component\Layout\LayoutFactoryInterface');
 
         $this->layoutBuilder = new LayoutBuilder(
-            $this->layoutDataBuilder,
+            $this->rawLayoutBuilder,
             $this->layoutManipulator,
             $this->layoutViewFactory,
             $this->layoutFactory
@@ -135,24 +135,24 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $context = $this->getMock('Oro\Component\Layout\ContextInterface');
         $rootId  = 'test_id';
 
-        $layoutData = $this->getMockBuilder('Oro\Component\Layout\LayoutData')
+        $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')
             ->disableOriginalConstructor()
             ->getMock();
-        $rootView   = $this->getMockBuilder('Oro\Component\Layout\BlockView')
+        $rootView  = $this->getMockBuilder('Oro\Component\Layout\BlockView')
             ->disableOriginalConstructor()
             ->getMock();
-        $layout     = $this->getMockBuilder('Oro\Component\Layout\Layout')
+        $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->layoutManipulator->expects($this->once())
             ->method('applyChanges');
-        $this->layoutDataBuilder->expects($this->once())
-            ->method('getLayoutData')
-            ->will($this->returnValue($layoutData));
+        $this->rawLayoutBuilder->expects($this->once())
+            ->method('getRawLayout')
+            ->will($this->returnValue($rawLayout));
         $this->layoutViewFactory->expects($this->once())
             ->method('createView')
-            ->with($this->identicalTo($layoutData), $this->identicalTo($context), $rootId)
+            ->with($this->identicalTo($rawLayout), $this->identicalTo($context), $rootId)
             ->will($this->returnValue($rootView));
         $this->layoutFactory->expects($this->once())
             ->method('createLayout')

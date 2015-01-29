@@ -15,8 +15,8 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /** @var DeferredLayoutManipulatorWithChangeCounter */
     protected $layoutManipulator;
 
-    /** @var LayoutData */
-    protected $layoutData;
+    /** @var RawLayout */
+    protected $rawLayout;
 
     /** @var BlockBuilder */
     protected $currentBlockBuilder;
@@ -42,13 +42,13 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(LayoutData $layoutData, ContextInterface $context, $rootId = null)
+    public function createView(RawLayout $rawLayout, ContextInterface $context, $rootId = null)
     {
-        $this->initializeState($layoutData, $context);
+        $this->initializeState($rawLayout, $context);
         try {
             $rootId = $rootId
-                ? $this->layoutData->resolveId($rootId)
-                : $this->layoutData->getRootId();
+                ? $this->rawLayout->resolveId($rootId)
+                : $this->rawLayout->getRootId();
 
             $this->buildBlocks($rootId);
             $rootView = $this->buildBlockViews($rootId);
@@ -65,12 +65,12 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /**
      * Initializes the state of this factory
      *
-     * @param LayoutData       $layoutData
+     * @param RawLayout        $rawLayout
      * @param ContextInterface $context
      */
-    protected function initializeState(LayoutData $layoutData, ContextInterface $context)
+    protected function initializeState(RawLayout $rawLayout, ContextInterface $context)
     {
-        $this->layoutData          = $layoutData;
+        $this->rawLayout           = $rawLayout;
         $this->currentBlockBuilder = $this->createBlockBuilder($context);
         $this->currentBlock        = $this->createBlock($context);
     }
@@ -80,7 +80,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      */
     protected function clearState()
     {
-        $this->layoutData          = null;
+        $this->rawLayout           = null;
         $this->currentBlockBuilder = null;
         $this->currentBlock        = null;
     }
@@ -97,19 +97,19 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         $this->layoutManipulator->resetCounters();
 
         // build the root block
-        if (!$this->layoutData->hasProperty($rootId, LayoutData::RESOLVED_OPTIONS, true)) {
+        if (!$this->rawLayout->hasProperty($rootId, RawLayout::RESOLVED_OPTIONS, true)) {
             $this->buildBlock($rootId);
         }
 
         // build child blocks
-        $iterator = $this->layoutData->getHierarchyIterator($rootId);
+        $iterator = $this->rawLayout->getHierarchyIterator($rootId);
         foreach ($iterator as $id) {
-            if ($this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS, true)) {
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS, true)) {
                 // the block is already built
                 continue;
             }
             if (!$this->isContainerBlock($iterator->getParent())) {
-                $blockType = $this->layoutData->getProperty($iterator->getParent(), LayoutData::BLOCK_TYPE, true);
+                $blockType = $this->rawLayout->getProperty($iterator->getParent(), RawLayout::BLOCK_TYPE, true);
 
                 throw new Exception\LogicException(
                     sprintf(
@@ -147,7 +147,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         $rootView       = $this->buildBlockView($rootId);
         $views[$rootId] = $rootView;
         // build child views
-        $iterator = $this->layoutData->getHierarchyIterator($rootId);
+        $iterator = $this->rawLayout->getHierarchyIterator($rootId);
         foreach ($iterator as $id) {
             $parentView = $views[$iterator->getParent()];
 
@@ -174,13 +174,13 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      */
     protected function buildBlock($id)
     {
-        $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
-        $options   = $this->layoutData->getProperty($id, LayoutData::OPTIONS, true);
+        $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
+        $options   = $this->rawLayout->getProperty($id, RawLayout::OPTIONS, true);
         $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
 
         // resolve options
         $resolvedOptions = $this->blockOptionsResolver->resolve($blockType, $options);
-        $this->layoutData->setProperty($id, LayoutData::RESOLVED_OPTIONS, $resolvedOptions);
+        $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
 
         // point the block builder state to the current block
         $this->currentBlockBuilder->initialize($id);
@@ -200,8 +200,8 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      */
     protected function buildBlockView($id, BlockView $parentView = null)
     {
-        $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
-        $options   = $this->layoutData->getProperty($id, LayoutData::RESOLVED_OPTIONS, true);
+        $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
+        $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
         $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
         $typeNames = $this->getBlockTypeNames($types);
 
@@ -238,8 +238,8 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      */
     protected function finishBlockView(BlockView $view, $id)
     {
-        $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
-        $options   = $this->layoutData->getProperty($id, LayoutData::RESOLVED_OPTIONS, true);
+        $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
+        $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
         $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
 
         // point the block view state to the current block
@@ -283,7 +283,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
      */
     protected function isContainerBlock($id)
     {
-        $blockType = $this->layoutData->getProperty($id, LayoutData::BLOCK_TYPE, true);
+        $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
 
         return count($types) > 1 && $types[1]->getName() === ContainerType::NAME;

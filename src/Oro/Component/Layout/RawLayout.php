@@ -7,7 +7,7 @@ namespace Oro\Component\Layout;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class LayoutData
+class RawLayout
 {
     /** The block type; can be a string or BlockTypeInterface */
     const BLOCK_TYPE = 'block_type';

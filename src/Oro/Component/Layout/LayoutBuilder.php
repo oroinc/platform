@@ -4,8 +4,8 @@ namespace Oro\Component\Layout;
 
 class LayoutBuilder implements LayoutBuilderInterface
 {
-    /** @var LayoutDataBuilderInterface */
-    protected $layoutDataBuilder;
+    /** @var RawLayoutBuilderInterface */
+    protected $rawLayoutBuilder;
 
     /** @var DeferredRawLayoutManipulatorInterface */
     protected $layoutManipulator;
@@ -17,18 +17,18 @@ class LayoutBuilder implements LayoutBuilderInterface
     protected $layoutFactory;
 
     /**
-     * @param LayoutDataBuilderInterface            $layoutDataBuilder
+     * @param RawLayoutBuilderInterface             $rawLayoutBuilder
      * @param DeferredRawLayoutManipulatorInterface $layoutManipulator
      * @param LayoutViewFactoryInterface            $layoutViewFactory
      * @param LayoutFactoryInterface                $layoutFactory
      */
     public function __construct(
-        LayoutDataBuilderInterface $layoutDataBuilder,
+        RawLayoutBuilderInterface $rawLayoutBuilder,
         DeferredRawLayoutManipulatorInterface $layoutManipulator,
         LayoutViewFactoryInterface $layoutViewFactory,
         LayoutFactoryInterface $layoutFactory
     ) {
-        $this->layoutDataBuilder = $layoutDataBuilder;
+        $this->rawLayoutBuilder  = $rawLayoutBuilder;
         $this->layoutManipulator = $layoutManipulator;
         $this->layoutViewFactory = $layoutViewFactory;
         $this->layoutFactory     = $layoutFactory;
@@ -110,9 +110,9 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function getLayout(ContextInterface $context, $rootId = null)
     {
         $this->layoutManipulator->applyChanges();
-        $layoutData = $this->layoutDataBuilder->getLayoutData();
-        $rootView   = $this->layoutViewFactory->createView($layoutData, $context, $rootId);
-        $layout     = $this->layoutFactory->createLayout($rootView);
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
+        $rootView  = $this->layoutViewFactory->createView($rawLayout, $context, $rootId);
+        $layout    = $this->layoutFactory->createLayout($rootView);
 
         return $layout;
     }

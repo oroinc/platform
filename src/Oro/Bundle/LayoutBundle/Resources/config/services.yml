@@ -2,7 +2,7 @@ parameters:
     oro_layout.block_type_factory.class:      Oro\Component\Layout\DependencyInjectionBlockTypeFactory
     oro_layout.block_type_registry.class:     Oro\Component\Layout\BlockTypeRegistry
     oro_layout.block_options_resolver.class:  Oro\Component\Layout\BlockOptionsResolver
-    oro_layout.layout_data_builder.class:     Oro\Component\Layout\LayoutDataBuilder
+    oro_layout.raw_layout_builder.class:      Oro\Component\Layout\RawLayoutBuilder
     oro_layout.layout_manipulator.class:      Oro\Component\Layout\DeferredLayoutManipulator
     oro_layout.layout_view_factory.class:     Oro\Component\Layout\LayoutViewFactory
     oro_layout.layout_factory.class:          Oro\Component\Layout\LayoutFactory
@@ -29,15 +29,15 @@ services:
         arguments:
             - @oro_layout.block_type_registry
 
-    oro_layout.layout_data_builder:
+    oro_layout.raw_layout_builder:
         public: false
-        class: %oro_layout.layout_data_builder.class%
+        class: %oro_layout.raw_layout_builder.class%
 
     oro_layout.layout_manipulator:
         public: false
         class: %oro_layout.layout_manipulator.class%
         arguments:
-            - @oro_layout.layout_data_builder
+            - @oro_layout.raw_layout_builder
 
     oro_layout.layout_view_factory:
         public: false
@@ -57,7 +57,7 @@ services:
         public: false
         class: %oro_layout.layout_builder.class%
         arguments:
-            - @oro_layout.layout_data_builder
+            - @oro_layout.raw_layout_builder
             - @oro_layout.layout_manipulator
             - @oro_layout.layout_view_factory
             - @oro_layout.layout_factory

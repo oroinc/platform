@@ -8,7 +8,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutDataBuilder;
+use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\LayoutFactory;
 use Oro\Component\Layout\LayoutViewFactory;
 
@@ -26,8 +26,8 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /** @var BlockOptionsResolver */
     protected $blockOptionsResolver;
 
-    /** @var LayoutDataBuilder */
-    protected $layoutDataBuilder;
+    /** @var RawLayoutBuilder */
+    protected $rawLayoutBuilder;
 
     /** @var LayoutBuilder */
     protected $layoutBuilder;
@@ -38,8 +38,8 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
         $this->factory              = new BlockTypeFactoryStub();
         $blockTypeRegistry          = new BlockTypeRegistry($this->factory);
         $this->blockOptionsResolver = new BlockOptionsResolver($blockTypeRegistry);
-        $this->layoutDataBuilder    = new LayoutDataBuilder();
-        $layoutManipulator          = new DeferredLayoutManipulator($this->layoutDataBuilder);
+        $this->rawLayoutBuilder     = new RawLayoutBuilder();
+        $layoutManipulator          = new DeferredLayoutManipulator($this->rawLayoutBuilder);
         $layoutViewFactory          = new LayoutViewFactory(
             $blockTypeRegistry,
             $this->blockOptionsResolver,
@@ -48,7 +48,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
         $renderer                   = $this->getMock('Oro\Component\Layout\BlockRendererInterface');
         $layoutFactory              = new LayoutFactory($renderer);
         $this->layoutBuilder        = new LayoutBuilder(
-            $this->layoutDataBuilder,
+            $this->rawLayoutBuilder,
             $layoutManipulator,
             $layoutViewFactory,
             $layoutFactory
@@ -78,7 +78,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function getBlockView($blockType, array $options = [])
     {
-        $this->layoutDataBuilder->clear();
+        $this->rawLayoutBuilder->clear();
 
         $this->layoutBuilder->add($blockType . '_id', null, $blockType, $options);
         $layout = $this->layoutBuilder->getLayout($this->context);
@@ -96,7 +96,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function getBlockBuilder($blockType, array $options = [])
     {
-        $this->layoutDataBuilder->clear();
+        $this->rawLayoutBuilder->clear();
 
         return new TestBlockBuilder(
             $this->layoutBuilder,

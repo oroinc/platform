@@ -7,7 +7,7 @@ use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutDataBuilder;
+use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
 
@@ -19,8 +19,8 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
     /** @var LayoutContext */
     protected $context;
 
-    /** @var LayoutDataBuilder */
-    protected $layoutDataBuilder;
+    /** @var RawLayoutBuilder */
+    protected $rawLayoutBuilder;
 
     /** @var DeferredLayoutManipulator */
     protected $layoutManipulator;
@@ -31,11 +31,11 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
     protected function setUp()
     {
         $this->context           = new LayoutContext();
-        $this->layoutDataBuilder = new LayoutDataBuilder();
+        $this->rawLayoutBuilder  = new RawLayoutBuilder();
         $this->blockTypeFactory  = new BlockTypeFactoryStub();
         $blockTypeRegistry       = new BlockTypeRegistry($this->blockTypeFactory);
         $blockOptionsResolver    = new BlockOptionsResolver($blockTypeRegistry);
-        $this->layoutManipulator = new DeferredLayoutManipulator($this->layoutDataBuilder);
+        $this->layoutManipulator = new DeferredLayoutManipulator($this->rawLayoutBuilder);
         $this->layoutViewFactory = new LayoutViewFactory(
             $blockTypeRegistry,
             $blockOptionsResolver,
@@ -51,8 +51,8 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
     protected function getLayoutView($rootId = null)
     {
         $this->layoutManipulator->applyChanges();
-        $layoutData = $this->layoutDataBuilder->getLayoutData();
+        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-        return $this->layoutViewFactory->createView($layoutData, $this->context, $rootId);
+        return $this->layoutViewFactory->createView($rawLayout, $this->context, $rootId);
     }
 }

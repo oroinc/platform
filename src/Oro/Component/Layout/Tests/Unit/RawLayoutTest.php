@@ -3,77 +3,77 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\LayoutData;
+use Oro\Component\Layout\RawLayout;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class LayoutDataTest extends \PHPUnit_Framework_TestCase
+class RawLayoutTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var LayoutData */
-    protected $layoutData;
+    /** @var RawLayout */
+    protected $rawLayout;
 
     protected function setUp()
     {
-        $this->layoutData = new LayoutData();
+        $this->rawLayout = new RawLayout();
     }
 
     public function testIsEmpty()
     {
-        $this->assertTrue($this->layoutData->isEmpty());
+        $this->assertTrue($this->rawLayout->isEmpty());
 
-        $this->layoutData->add('root', null, 'root');
-        $this->assertFalse($this->layoutData->isEmpty());
+        $this->rawLayout->add('root', null, 'root');
+        $this->assertFalse($this->rawLayout->isEmpty());
     }
 
     public function testClear()
     {
-        $this->layoutData->add('root', null, 'root');
+        $this->rawLayout->add('root', null, 'root');
 
-        $this->layoutData->clear();
-        $this->assertTrue($this->layoutData->isEmpty());
+        $this->rawLayout->clear();
+        $this->assertTrue($this->rawLayout->isEmpty());
     }
 
     public function testGetRootId()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
 
         // do test
-        $this->assertEquals('root', $this->layoutData->getRootId());
+        $this->assertEquals('root', $this->rawLayout->getRootId());
     }
 
     public function testResolveId()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test_header', 'header');
-        $this->layoutData->addAlias('another_header', 'test_header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test_header', 'header');
+        $this->rawLayout->addAlias('another_header', 'test_header');
 
         // do test
-        $this->assertEquals('header', $this->layoutData->resolveId('header'));
-        $this->assertEquals('header', $this->layoutData->resolveId('test_header'));
-        $this->assertEquals('header', $this->layoutData->resolveId('another_header'));
-        $this->assertEquals('unknown', $this->layoutData->resolveId('unknown'));
+        $this->assertEquals('header', $this->rawLayout->resolveId('header'));
+        $this->assertEquals('header', $this->rawLayout->resolveId('test_header'));
+        $this->assertEquals('header', $this->rawLayout->resolveId('another_header'));
+        $this->assertEquals('unknown', $this->rawLayout->resolveId('unknown'));
     }
 
     public function testHas()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test_header', 'header');
-        $this->layoutData->addAlias('another_header', 'test_header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test_header', 'header');
+        $this->rawLayout->addAlias('another_header', 'test_header');
 
         // do test
-        $this->assertTrue($this->layoutData->has('header'));
-        $this->assertTrue($this->layoutData->has('test_header'));
-        $this->assertTrue($this->layoutData->has('another_header'));
-        $this->assertFalse($this->layoutData->has('unknown'));
+        $this->assertTrue($this->rawLayout->has('header'));
+        $this->assertTrue($this->rawLayout->has('test_header'));
+        $this->assertTrue($this->rawLayout->has('another_header'));
+        $this->assertFalse($this->rawLayout->has('unknown'));
     }
 
     /**
@@ -84,7 +84,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddWithEmptyId($id)
     {
-        $this->layoutData->add($id, null, 'root');
+        $this->rawLayout->add($id, null, 'root');
     }
 
     /**
@@ -93,7 +93,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddWithNotStringId()
     {
-        $this->layoutData->add(123, null, 'root');
+        $this->rawLayout->add(123, null, 'root');
     }
 
     /**
@@ -110,7 +110,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $id
             )
         );
-        $this->layoutData->add($id, null, 'root');
+        $this->rawLayout->add($id, null, 'root');
     }
 
     // @codingStandardsIgnoreStart
@@ -121,8 +121,8 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testAddDuplicate()
     {
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('root', null, 'root');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('root', null, 'root');
     }
 
     // @codingStandardsIgnoreStart
@@ -133,8 +133,8 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testRedefineRoot()
     {
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('another_root', null, 'root');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('another_root', null, 'root');
     }
 
     /**
@@ -145,7 +145,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddWithEmptyBlockType($blockType)
     {
-        $this->layoutData->add('root', null, $blockType);
+        $this->rawLayout->add('root', null, $blockType);
     }
 
     // @codingStandardsIgnoreStart
@@ -156,12 +156,12 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testAddWithInvalidBlockType()
     {
-        $this->layoutData->add('root', null, 123);
+        $this->rawLayout->add('root', null, 123);
     }
 
     public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
     {
-        $this->layoutData->add('root', null, new ContainerType());
+        $this->rawLayout->add('root', null, new ContainerType());
     }
 
     /**
@@ -179,36 +179,36 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $blockTypeName
             )
         );
-        $this->layoutData->add('root', null, $blockTypeName);
+        $this->rawLayout->add('root', null, $blockTypeName);
     }
 
     public function testRemove()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->add('item1', 'header', 'label');
-        $this->layoutData->add('item2', 'header', ContainerType::NAME);
-        $this->layoutData->add('item3', 'item2', 'label');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->add('item1', 'header', 'label');
+        $this->rawLayout->add('item2', 'header', ContainerType::NAME);
+        $this->rawLayout->add('item3', 'item2', 'label');
 
         // do test
-        $this->layoutData->remove('header');
-        $this->assertFalse($this->layoutData->has('header'));
-        $this->assertFalse($this->layoutData->has('item1'));
-        $this->assertFalse($this->layoutData->has('item2'));
-        $this->assertFalse($this->layoutData->has('item3'));
+        $this->rawLayout->remove('header');
+        $this->assertFalse($this->rawLayout->has('header'));
+        $this->assertFalse($this->rawLayout->has('item1'));
+        $this->assertFalse($this->rawLayout->has('item2'));
+        $this->assertFalse($this->rawLayout->has('item3'));
     }
 
     public function testRemoveByAlias()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test_header', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test_header', 'header');
 
         // do test
-        $this->layoutData->remove('test_header');
-        $this->assertFalse($this->layoutData->has('header'));
+        $this->rawLayout->remove('test_header');
+        $this->assertFalse($this->rawLayout->has('header'));
     }
 
     /**
@@ -217,7 +217,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveUnknown()
     {
-        $this->layoutData->remove('unknown');
+        $this->rawLayout->remove('unknown');
     }
 
     /**
@@ -228,54 +228,54 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveWithEmptyId($id)
     {
-        $this->layoutData->remove($id);
+        $this->rawLayout->remove($id);
     }
 
     public function testMoveToParent()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('container1', 'header1', ContainerType::NAME);
-        $this->layoutData->add('item1', 'container1', 'label');
-        $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('container2', 'header2', ContainerType::NAME);
-        $this->layoutData->add('item2', 'container2', 'label');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('container1', 'header1', ContainerType::NAME);
+        $this->rawLayout->add('item1', 'container1', 'label');
+        $this->rawLayout->add('header2', 'root', 'header');
+        $this->rawLayout->add('container2', 'header2', ContainerType::NAME);
+        $this->rawLayout->add('item2', 'container2', 'label');
 
         // do test
-        $this->layoutData->move('container1', 'root');
+        $this->rawLayout->move('container1', 'root');
         $this->assertSame(
             ['root', 'container1'],
-            $this->layoutData->getProperty('container1', LayoutData::PATH)
+            $this->rawLayout->getProperty('container1', RawLayout::PATH)
         );
         $this->assertSame(
             ['root', 'container1', 'item1'],
-            $this->layoutData->getProperty('item1', LayoutData::PATH)
+            $this->rawLayout->getProperty('item1', RawLayout::PATH)
         );
     }
 
     public function testMoveToParentByAlias()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('container1', 'header1', ContainerType::NAME);
-        $this->layoutData->add('item1', 'container1', 'label');
-        $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('container2', 'header2', ContainerType::NAME);
-        $this->layoutData->add('item2', 'container2', 'label');
-        $this->layoutData->addAlias('test_root', 'root');
-        $this->layoutData->addAlias('test_container1', 'container1');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('container1', 'header1', ContainerType::NAME);
+        $this->rawLayout->add('item1', 'container1', 'label');
+        $this->rawLayout->add('header2', 'root', 'header');
+        $this->rawLayout->add('container2', 'header2', ContainerType::NAME);
+        $this->rawLayout->add('item2', 'container2', 'label');
+        $this->rawLayout->addAlias('test_root', 'root');
+        $this->rawLayout->addAlias('test_container1', 'container1');
 
         // do test
-        $this->layoutData->move('test_container1', 'test_root');
+        $this->rawLayout->move('test_container1', 'test_root');
         $this->assertSame(
             ['root', 'container1'],
-            $this->layoutData->getProperty('container1', LayoutData::PATH)
+            $this->rawLayout->getProperty('container1', RawLayout::PATH)
         );
         $this->assertSame(
             ['root', 'container1', 'item1'],
-            $this->layoutData->getProperty('item1', LayoutData::PATH)
+            $this->rawLayout->getProperty('item1', RawLayout::PATH)
         );
     }
 
@@ -285,7 +285,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testMoveUnknown()
     {
-        $this->layoutData->move('unknown');
+        $this->rawLayout->move('unknown');
     }
 
     /**
@@ -295,14 +295,14 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testMoveToUnknownParent()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('item2', 'header2', 'label');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('header2', 'root', 'header');
+        $this->rawLayout->add('item2', 'header2', 'label');
 
         // do test
-        $this->layoutData->move('item1', 'unknown', 'item2');
+        $this->rawLayout->move('item1', 'unknown', 'item2');
     }
 
     /**
@@ -312,14 +312,14 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testMoveToUnknownSibling()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('item2', 'header2', 'label');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('header2', 'root', 'header');
+        $this->rawLayout->add('item2', 'header2', 'label');
 
         // do test
-        $this->layoutData->move('item1', 'header2', 'unknown');
+        $this->rawLayout->move('item1', 'header2', 'unknown');
     }
 
     /**
@@ -329,15 +329,15 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testMoveWhenParentEqualsToMovingItem()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('item2', 'header2', 'label');
-        $this->layoutData->addAlias('test_item', 'item1');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('header2', 'root', 'header');
+        $this->rawLayout->add('item2', 'header2', 'label');
+        $this->rawLayout->addAlias('test_item', 'item1');
 
         // do test
-        $this->layoutData->move('item1', 'test_item', 'item2');
+        $this->rawLayout->move('item1', 'test_item', 'item2');
     }
 
     /**
@@ -347,15 +347,15 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testMoveWhenSiblingEqualsToMovingItem()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('item2', 'header2', 'label');
-        $this->layoutData->addAlias('test_item', 'item1');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('header2', 'root', 'header');
+        $this->rawLayout->add('item2', 'header2', 'label');
+        $this->rawLayout->addAlias('test_item', 'item1');
 
         // do test
-        $this->layoutData->move('item1', 'header2', 'test_item');
+        $this->rawLayout->move('item1', 'header2', 'test_item');
     }
 
     /**
@@ -365,16 +365,16 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testMoveWhenParentEqualsToSibling()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->add('header2', 'root', 'header');
-        $this->layoutData->add('item2', 'header2', 'label');
-        $this->layoutData->addAlias('test_header', 'header2');
-        $this->layoutData->addAlias('test_item', 'test_header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('header2', 'root', 'header');
+        $this->rawLayout->add('item2', 'header2', 'label');
+        $this->rawLayout->addAlias('test_header', 'header2');
+        $this->rawLayout->addAlias('test_item', 'test_header');
 
         // do test
-        $this->layoutData->move('item1', 'test_header', 'test_item');
+        $this->rawLayout->move('item1', 'test_header', 'test_item');
     }
 
     /**
@@ -384,12 +384,12 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testMoveWithoutParentAndSibling()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
 
         // do test
-        $this->layoutData->move('item1');
+        $this->rawLayout->move('item1');
     }
 
     // @codingStandardsIgnoreStart
@@ -401,56 +401,56 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testMoveParentToChild()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->addAlias('test_header', 'header1');
-        $this->layoutData->addAlias('test_item', 'item1');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->addAlias('test_header', 'header1');
+        $this->rawLayout->addAlias('test_item', 'item1');
 
         // do test
-        $this->layoutData->move('test_header', 'test_item');
+        $this->rawLayout->move('test_header', 'test_item');
     }
 
     public function testMoveInsideTheSameParent()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->add('item2', 'header1', 'label');
-        $this->layoutData->addAlias('test_item', 'item1');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('item2', 'header1', 'label');
+        $this->rawLayout->addAlias('test_item', 'item1');
 
         // do test
-        $this->layoutData->move('test_item', null, 'item2');
+        $this->rawLayout->move('test_item', null, 'item2');
         $this->assertSame(
             ['root', 'header1', 'item1'],
-            $this->layoutData->getProperty('item1', LayoutData::PATH)
+            $this->rawLayout->getProperty('item1', RawLayout::PATH)
         );
         $this->assertSame(
             ['item2' => [], 'item1' => []],
-            $this->layoutData->getHierarchy('header1')
+            $this->rawLayout->getHierarchy('header1')
         );
     }
 
     public function testMoveInsideTheSameParentAndWithParentIdSpecified()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header1', 'root', 'header');
-        $this->layoutData->add('item1', 'header1', 'label');
-        $this->layoutData->add('item2', 'header1', 'label');
-        $this->layoutData->addAlias('test_header', 'header1');
-        $this->layoutData->addAlias('test_item', 'item1');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('item2', 'header1', 'label');
+        $this->rawLayout->addAlias('test_header', 'header1');
+        $this->rawLayout->addAlias('test_item', 'item1');
 
         // do test
-        $this->layoutData->move('test_item', 'test_header', 'item2');
+        $this->rawLayout->move('test_item', 'test_header', 'item2');
         $this->assertSame(
             ['root', 'header1', 'item1'],
-            $this->layoutData->getProperty('item1', LayoutData::PATH)
+            $this->rawLayout->getProperty('item1', RawLayout::PATH)
         );
         $this->assertSame(
             ['item2' => [], 'item1' => []],
-            $this->layoutData->getHierarchy('header1')
+            $this->rawLayout->getHierarchy('header1')
         );
     }
 
@@ -462,18 +462,18 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testMoveWithEmptyId($id)
     {
-        $this->layoutData->move($id);
+        $this->rawLayout->move($id);
     }
 
     public function testHasProperty()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
 
         // do test
-        $this->assertTrue($this->layoutData->hasProperty('header', LayoutData::PATH));
-        $this->assertFalse($this->layoutData->hasProperty('header', 'unknown'));
+        $this->assertTrue($this->rawLayout->hasProperty('header', RawLayout::PATH));
+        $this->assertFalse($this->rawLayout->hasProperty('header', 'unknown'));
     }
 
     /**
@@ -482,7 +482,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasPropertyForUnknownItem()
     {
-        $this->layoutData->hasProperty('unknown', LayoutData::PATH);
+        $this->rawLayout->hasProperty('unknown', RawLayout::PATH);
     }
 
     /**
@@ -493,17 +493,17 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testHasPropertyWithEmptyId($id)
     {
-        $this->layoutData->hasProperty($id, LayoutData::PATH);
+        $this->rawLayout->hasProperty($id, RawLayout::PATH);
     }
 
     public function testGetProperty()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
 
         // do test
-        $this->assertEquals(['root', 'header'], $this->layoutData->getProperty('header', LayoutData::PATH));
+        $this->assertEquals(['root', 'header'], $this->rawLayout->getProperty('header', RawLayout::PATH));
     }
 
     /**
@@ -513,11 +513,11 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testGetPropertyForUnknownProperty()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
 
         // do test
-        $this->layoutData->getProperty('header', 'unknown');
+        $this->rawLayout->getProperty('header', 'unknown');
     }
 
     /**
@@ -526,7 +526,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPropertyForUnknownItem()
     {
-        $this->layoutData->getProperty('unknown', LayoutData::PATH);
+        $this->rawLayout->getProperty('unknown', RawLayout::PATH);
     }
 
     /**
@@ -537,18 +537,18 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetPropertyWithEmptyId($id)
     {
-        $this->layoutData->getProperty($id, LayoutData::PATH);
+        $this->rawLayout->getProperty($id, RawLayout::PATH);
     }
 
     public function testSetProperty()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
 
         // do test
-        $this->layoutData->setProperty('header', 'some_property', 123);
-        $this->assertEquals(123, $this->layoutData->getProperty('header', 'some_property'));
+        $this->rawLayout->setProperty('header', 'some_property', 123);
+        $this->assertEquals(123, $this->rawLayout->getProperty('header', 'some_property'));
     }
 
     /**
@@ -557,7 +557,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetPropertyForUnknownItem()
     {
-        $this->layoutData->setProperty('unknown', 'some_property', 123);
+        $this->rawLayout->setProperty('unknown', 'some_property', 123);
     }
 
     /**
@@ -568,45 +568,45 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetPropertyWithEmptyId($id)
     {
-        $this->layoutData->setProperty($id, 'some_property', 123);
+        $this->rawLayout->setProperty($id, 'some_property', 123);
     }
 
     public function testHasAlias()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test_header', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test_header', 'header');
 
         // do test
-        $this->assertTrue($this->layoutData->hasAlias('test_header'));
-        $this->assertFalse($this->layoutData->hasAlias('header'));
-        $this->assertFalse($this->layoutData->hasAlias('unknown'));
+        $this->assertTrue($this->rawLayout->hasAlias('test_header'));
+        $this->assertFalse($this->rawLayout->hasAlias('header'));
+        $this->assertFalse($this->rawLayout->hasAlias('unknown'));
     }
 
     public function testAddAlias()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test_header', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test_header', 'header');
 
         // do test
-        $this->assertTrue($this->layoutData->hasAlias('test_header'));
-        $this->assertEquals('header', $this->layoutData->resolveId('test_header'));
+        $this->assertTrue($this->rawLayout->hasAlias('test_header'));
+        $this->assertEquals('header', $this->rawLayout->resolveId('test_header'));
     }
 
     public function testAddAliasWhenAliasIsAddedForAnotherAlias()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test_header', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test_header', 'header');
 
         // do test
-        $this->layoutData->addAlias('another_header', 'test_header');
-        $this->assertTrue($this->layoutData->hasAlias('another_header'));
-        $this->assertEquals('header', $this->layoutData->resolveId('another_header'));
+        $this->rawLayout->addAlias('another_header', 'test_header');
+        $this->assertTrue($this->rawLayout->hasAlias('another_header'));
+        $this->assertEquals('header', $this->rawLayout->resolveId('another_header'));
     }
 
     /**
@@ -617,7 +617,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAliasWithEmptyAlias($alias)
     {
-        $this->layoutData->addAlias($alias, 'root');
+        $this->rawLayout->addAlias($alias, 'root');
     }
 
     /**
@@ -628,7 +628,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAliasWithEmptyId($id)
     {
-        $this->layoutData->addAlias('test', $id);
+        $this->rawLayout->addAlias('test', $id);
     }
 
     /**
@@ -637,7 +637,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAliasWithNotStringAlias()
     {
-        $this->layoutData->addAlias(123, 'root');
+        $this->rawLayout->addAlias(123, 'root');
     }
 
     /**
@@ -646,7 +646,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAliasWithNotStringId()
     {
-        $this->layoutData->addAlias('test', 123);
+        $this->rawLayout->addAlias('test', 123);
     }
 
     /**
@@ -663,7 +663,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $alias
             )
         );
-        $this->layoutData->addAlias($alias, 'root');
+        $this->rawLayout->addAlias($alias, 'root');
     }
 
     /**
@@ -680,19 +680,19 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 $id
             )
         );
-        $this->layoutData->addAlias('test', $id);
+        $this->rawLayout->addAlias('test', $id);
     }
 
     public function testAddAliasDuplicate()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->addAlias('test', 'root');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->addAlias('test', 'root');
 
         // do test
-        $this->layoutData->addAlias('test', 'root');
-        $this->assertTrue($this->layoutData->hasAlias('test'));
-        $this->assertEquals('root', $this->layoutData->resolveId('test'));
+        $this->rawLayout->addAlias('test', 'root');
+        $this->assertTrue($this->rawLayout->hasAlias('test'));
+        $this->assertEquals('root', $this->rawLayout->resolveId('test'));
     }
 
     // @codingStandardsIgnoreStart
@@ -704,12 +704,12 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testAddAliasRedefine()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test', 'root');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test', 'root');
 
         // do test
-        $this->layoutData->addAlias('test', 'header');
+        $this->rawLayout->addAlias('test', 'header');
     }
 
     // @codingStandardsIgnoreStart
@@ -721,10 +721,10 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testAddAliasWhenAliasEqualsId()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
+        $this->rawLayout->add('root', null, 'root');
 
         // do test
-        $this->layoutData->addAlias('root', 'root');
+        $this->rawLayout->addAlias('root', 'root');
     }
 
     // @codingStandardsIgnoreStart
@@ -736,11 +736,11 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
     public function testAddAliasWhenAliasEqualsIdOfAnotherItem()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
 
         // do test
-        $this->layoutData->addAlias('header', 'root');
+        $this->rawLayout->addAlias('header', 'root');
     }
 
     /**
@@ -749,19 +749,19 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testAddAliasForUnknownItem()
     {
-        $this->layoutData->addAlias('header', 'root');
+        $this->rawLayout->addAlias('header', 'root');
     }
 
     public function testRemoveAlias()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->addAlias('test_header', 'header');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('test_header', 'header');
 
         // do test
-        $this->layoutData->removeAlias('test_header');
-        $this->assertFalse($this->layoutData->hasAlias('test_header'));
+        $this->rawLayout->removeAlias('test_header');
+        $this->assertFalse($this->rawLayout->hasAlias('test_header'));
     }
 
     /**
@@ -770,7 +770,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveUnknownAlias()
     {
-        $this->layoutData->removeAlias('unknown');
+        $this->rawLayout->removeAlias('unknown');
     }
 
     /**
@@ -781,16 +781,16 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testRemoveAliasWithEmptyAlias($alias)
     {
-        $this->layoutData->removeAlias($alias);
+        $this->rawLayout->removeAlias($alias);
     }
 
     public function testGetHierarchy()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->add('item1', 'root', 'label');
-        $this->layoutData->add('item2', 'header', 'label');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->add('item1', 'root', 'label');
+        $this->rawLayout->add('item2', 'header', 'label');
 
         // do test
         $this->assertEquals(
@@ -800,17 +800,17 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 ],
                 'item1'  => []
             ],
-            $this->layoutData->getHierarchy('root')
+            $this->rawLayout->getHierarchy('root')
         );
         $this->assertEquals(
             [
                 'item2' => []
             ],
-            $this->layoutData->getHierarchy('header')
+            $this->rawLayout->getHierarchy('header')
         );
         $this->assertEquals(
             [],
-            $this->layoutData->getHierarchy('item2')
+            $this->rawLayout->getHierarchy('item2')
         );
     }
 
@@ -820,7 +820,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHierarchyForUnknownItem()
     {
-        $this->layoutData->getHierarchy('unknown');
+        $this->rawLayout->getHierarchy('unknown');
     }
 
     /**
@@ -831,16 +831,16 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHierarchyWithEmptyId($id)
     {
-        $this->layoutData->getHierarchy($id);
+        $this->rawLayout->getHierarchy($id);
     }
 
     public function testGetHierarchyIterator()
     {
         // prepare test data
-        $this->layoutData->add('root', null, 'root');
-        $this->layoutData->add('header', 'root', 'header');
-        $this->layoutData->add('item1', 'root', 'label');
-        $this->layoutData->add('item2', 'header', 'label');
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->add('item1', 'root', 'label');
+        $this->rawLayout->add('item2', 'header', 'label');
 
         // do test
         $this->assertSame(
@@ -849,17 +849,17 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
                 'item2'  => 'item2',
                 'item1'  => 'item1',
             ],
-            iterator_to_array($this->layoutData->getHierarchyIterator('root'))
+            iterator_to_array($this->rawLayout->getHierarchyIterator('root'))
         );
         $this->assertSame(
             [
                 'item2' => 'item2',
             ],
-            iterator_to_array($this->layoutData->getHierarchyIterator('header'))
+            iterator_to_array($this->rawLayout->getHierarchyIterator('header'))
         );
         $this->assertSame(
             [],
-            iterator_to_array($this->layoutData->getHierarchyIterator('item2'))
+            iterator_to_array($this->rawLayout->getHierarchyIterator('item2'))
         );
     }
 
@@ -869,7 +869,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHierarchyIteratorForUnknownItem()
     {
-        $this->layoutData->getHierarchyIterator('unknown');
+        $this->rawLayout->getHierarchyIterator('unknown');
     }
 
     /**
@@ -880,7 +880,7 @@ class LayoutDataTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetHierarchyIteratorWithEmptyId($id)
     {
-        $this->layoutData->getHierarchyIterator($id);
+        $this->rawLayout->getHierarchyIterator($id);
     }
 
     public function emptyStringDataProvider()

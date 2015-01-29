@@ -12,14 +12,14 @@ namespace Oro\Component\Layout;
  *  - an alias can be added for existing item only
  *  - only existing alias can be removed
  */
-class LayoutDataBuilder implements LayoutDataBuilderInterface
+class RawLayoutBuilder implements RawLayoutBuilderInterface
 {
-    /** @var LayoutData */
-    protected $layoutData;
+    /** @var RawLayout */
+    protected $rawLayout;
 
     public function __construct()
     {
-        $this->layoutData = new LayoutData();
+        $this->rawLayout = new RawLayout();
     }
 
     /**
@@ -28,7 +28,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
     public function add($id, $parentId = null, $blockType = null, array $options = [])
     {
         try {
-            $this->layoutData->add($id, $parentId, $blockType, $options);
+            $this->rawLayout->add($id, $parentId, $blockType, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -52,7 +52,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
     public function remove($id)
     {
         try {
-            $this->layoutData->remove($id);
+            $this->rawLayout->remove($id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -74,7 +74,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
     public function move($id, $parentId = null, $siblingId = null, $prepend = false)
     {
         try {
-            $this->layoutData->move($id, $parentId, $siblingId, $prepend);
+            $this->rawLayout->move($id, $parentId, $siblingId, $prepend);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -98,7 +98,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
     public function addAlias($alias, $id)
     {
         try {
-            $this->layoutData->addAlias($alias, $id);
+            $this->rawLayout->addAlias($alias, $id);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -121,7 +121,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
     public function removeAlias($alias)
     {
         try {
-            $this->layoutData->removeAlias($alias);
+            $this->rawLayout->removeAlias($alias);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -146,12 +146,12 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
             if (empty($optionName)) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
             }
-            if ($this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS)) {
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
                 throw new Exception\LogicException('Cannot change already resolved options.');
             }
-            $options              = $this->layoutData->getProperty($id, LayoutData::OPTIONS);
+            $options              = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
             $options[$optionName] = $optionValue;
-            $this->layoutData->setProperty($id, LayoutData::OPTIONS, $options);
+            $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -177,12 +177,12 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
             if (empty($optionName)) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
             }
-            if ($this->layoutData->hasProperty($id, LayoutData::RESOLVED_OPTIONS)) {
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
                 throw new Exception\LogicException('Cannot change already resolved options.');
             }
-            $options = $this->layoutData->getProperty($id, LayoutData::OPTIONS);
+            $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
             unset($options[$optionName]);
-            $this->layoutData->setProperty($id, LayoutData::OPTIONS, $options);
+            $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -204,7 +204,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
      */
     public function has($id)
     {
-        return $this->layoutData->has($id);
+        return $this->rawLayout->has($id);
     }
 
     /**
@@ -212,7 +212,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
      */
     public function hasAlias($alias)
     {
-        return $this->layoutData->hasAlias($alias);
+        return $this->rawLayout->hasAlias($alias);
     }
 
     /**
@@ -221,7 +221,7 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
     public function getOptions($id)
     {
         try {
-            return $this->layoutData->getProperty($id, LayoutData::OPTIONS);
+            return $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
@@ -238,9 +238,9 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getLayoutData()
+    public function getRawLayout()
     {
-        return $this->layoutData;
+        return $this->rawLayout;
     }
 
     /**
@@ -248,6 +248,6 @@ class LayoutDataBuilder implements LayoutDataBuilderInterface
      */
     public function clear()
     {
-        $this->layoutData->clear();
+        $this->rawLayout->clear();
     }
 }
