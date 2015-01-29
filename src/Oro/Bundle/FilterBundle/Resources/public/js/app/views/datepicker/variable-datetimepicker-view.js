@@ -2,16 +2,16 @@
 define(function (require) {
     'use strict';
 
-    var VariableDateTimePickerView, prototype,
+    var VariableDateTimePickerView,
         _ = require('underscore'),
         VariableDatePickerView = require('./variable-datepicker-view'),
-        DateTimePickerViewPrototype = require('oroui/js/app/views/datepicker/datetimepicker-view-prototype');
+        dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
 
-    VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, DateTimePickerViewPrototype, {
+    VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
         /**
          * Default options
          */
-        defaults: _.extend({}, VariableDatePickerView.prototype.defaults, DateTimePickerViewPrototype.defaults),
+        defaults: _.extend({}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         /**
          * Returns supper prototype
@@ -43,7 +43,7 @@ define(function (require) {
          */
         checkConsistency: function (target) {
             var date, time, isVariable, isValidDate, isValidTime;
-            DateTimePickerViewPrototype.checkConsistency.apply(this, arguments);
+            dateTimePickerViewMixin.checkConsistency.apply(this, arguments);
 
             date = this.$frontDateField.val();
             time = this.$frontTimeField.val();
