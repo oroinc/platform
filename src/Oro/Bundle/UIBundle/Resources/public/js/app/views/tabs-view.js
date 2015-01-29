@@ -4,13 +4,10 @@ define(function (require) {
 
     var DatePickerTabsView,
         _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
         BaseView = require('oroui/js/app/views/base/view');
-    require('orofilter/js/datevariables-widget');
 
     DatePickerTabsView = BaseView.extend({
         autoRender: true,
-        keepElement: true,
 
         events: {
             'click .nav-tabs a': 'onTabSwitch'
@@ -27,25 +24,12 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
-            if (!this.disposed && this.$content) {
-                this.$content.remove();
-            }
-            DatePickerTabsView.__super__.dispose.apply(this, arguments);
-        },
-
-        /**
-         * @inheritDoc
-         */
         render: function () {
             var data, template, html;
             data = this.getTemplateData();
             template = this.getTemplateFunction();
             html = template(data);
-            if (this.$content) {
-                this.$content.remove();
-            }
-            this.$content = this.$el.append(html);
+            this.$el.html(html);
         },
 
         /**
@@ -57,7 +41,7 @@ define(function (require) {
         },
 
         /**
-         * Handles tab switch ivent
+         * Handles tab switch event
          *
          * @param {jQuery.Event} e
          */

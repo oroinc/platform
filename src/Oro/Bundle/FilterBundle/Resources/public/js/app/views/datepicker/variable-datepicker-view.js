@@ -4,7 +4,8 @@ define(function (require) {
 
     var VariableDatePickerView,
         _ = require('underscore'),
-        TabsView = require('./tabs-view'),
+        __ = require('orotranslation/js/translator'),
+        TabsView = require('oroui/js/app/views/tabs-view'),
         DateVariableHelper = require('orofilter/js/date-variable-helper'),
         DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     require('orofilter/js/datevariables-widget');
@@ -13,11 +14,11 @@ define(function (require) {
         defaultTabs: [
             {
                 name: 'calendar',
-                label: 'oro.filter.date.tab.calendar'
+                label: __('oro.filter.date.tab.calendar')
             },
             {
                 name: 'variables',
-                label: 'oro.filter.date.tab.variables'
+                label: __('oro.filter.date.tab.variables')
             }
         ],
 
@@ -35,11 +36,9 @@ define(function (require) {
          * Updates part of variable picker
          *
          * @param {string} part
-         * @returns {VariableDatePickerView}
          */
         setPart: function (part) {
             this.$variables.dateVariables('setPart', part);
-            return this;
         },
 
         /**
@@ -65,8 +64,9 @@ define(function (require) {
             var tabs;
             this.$dropdown = this.$frontDateField
                 .wrap('<div class="dropdown datefilter">').parent();
+            this.$dropdown.append('<div class="dropdown-menu dropdown-menu-calendar test"></div>');
             tabs = new TabsView({
-                el: this.$dropdown,
+                el: this.$dropdown.find('.dropdown-menu'),
                 template: options.dropdownTemplate,
                 data: {
                     tabs: options.tabs || this.defaultTabs,

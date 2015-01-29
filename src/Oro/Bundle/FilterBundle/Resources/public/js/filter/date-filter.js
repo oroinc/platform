@@ -198,8 +198,10 @@ define(function (require) {
                 }
             } else {
                 // it's part
-                this.subview('start').setPart(value).setValue('');
-                this.subview('end').setPart(value).setValue('');
+                this.subview('start').setPart(value);
+                this.subview('start').setValue('');
+                this.subview('end').setPart(value);
+                this.subview('end').setValue('');
             }
         },
 
@@ -436,13 +438,6 @@ define(function (require) {
          */
         _focusCriteria: function () {
             this.$(this.criteriaSelector).focus();
-        },
-
-        /**
-         * @inheritDoc
-         */
-        _hideCriteria: function () {
-            DateFilter.__super__._hideCriteria.apply(this, arguments);
         },
 
         _getSelectedChoiceLabel: function (property, value) {
