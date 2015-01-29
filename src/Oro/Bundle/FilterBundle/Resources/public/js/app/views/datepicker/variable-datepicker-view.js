@@ -117,7 +117,7 @@ define(function (require) {
             this.$calendar.datepicker('destroy');
             this.$calendar.off();
             this.$variables.dateVariables('destroy');
-            this.subview('tabs').dispose();
+            this.removeSubview('tabs');
             this.$frontDateField.unwrap();
             delete this.$calendar;
             delete this.$variables;
