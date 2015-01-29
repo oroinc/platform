@@ -9,9 +9,12 @@ use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Bridge\ProxyManager\LazyProxy\PhpDumper\ProxyDumper;
+use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 
@@ -286,5 +289,19 @@ abstract class OroKernel extends Kernel
         }
 
         return parent::getBundle($name, $first);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getContainerBuilder()
+    {
+        $container = new OroContainerBuilder(new ParameterBag($this->getKernelParameters()));
+
+        if (class_exists('ProxyManager\Configuration')) {
+            $container->setProxyInstantiator(new RuntimeInstantiator());
+        }
+
+        return $container;
     }
 }
