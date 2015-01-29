@@ -48,7 +48,6 @@ class EmbedFormLayoutManager
         );
 
         $layout = $layoutBuilder->getLayout($layoutContext);
-        $layout->setTheme('OroEmbeddedFormBundle:Layout:embed_form.html.twig');
 
         return $layout;
     }
@@ -73,7 +72,6 @@ class EmbedFormLayoutManager
         );
 
         $layout = $layoutBuilder->getLayout($layoutContext);
-        $layout->setTheme('OroEmbeddedFormBundle:Layout:embed_form.html.twig');
 
         return $layout;
     }
@@ -105,7 +103,8 @@ class EmbedFormLayoutManager
             )
             ->add('base_css', 'head', 'style')
             ->add('form_css', 'head', 'style', ['content' => $formEntity->getCss()])
-            ->add('content', 'root', 'body');
+            ->add('content', 'root', 'body')
+            ->setBlockTheme('OroEmbeddedFormBundle:Layout:embed_form.html.twig');
 
         return $layoutBuilder;
     }
