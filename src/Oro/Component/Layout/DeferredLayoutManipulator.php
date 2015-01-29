@@ -7,7 +7,7 @@ namespace Oro\Component\Layout;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
+class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 {
     /** The group name for add new items related actions */
     const GROUP_ADD = 'add';

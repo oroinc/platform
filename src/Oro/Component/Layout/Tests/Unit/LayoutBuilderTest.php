@@ -24,7 +24,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
-        $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredRawLayoutManipulatorInterface');
+        $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
         $this->layoutViewFactory = $this->getMock('Oro\Component\Layout\LayoutViewFactoryInterface');
         $this->layoutFactory     = $this->getMock('Oro\Component\Layout\LayoutFactoryInterface');
 

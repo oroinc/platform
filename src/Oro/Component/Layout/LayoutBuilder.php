@@ -7,7 +7,7 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var RawLayoutBuilderInterface */
     protected $rawLayoutBuilder;
 
-    /** @var DeferredRawLayoutManipulatorInterface */
+    /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
 
     /** @var LayoutViewFactoryInterface */
@@ -20,14 +20,14 @@ class LayoutBuilder implements LayoutBuilderInterface
     protected $themes = [];
 
     /**
-     * @param RawLayoutBuilderInterface             $rawLayoutBuilder
-     * @param DeferredRawLayoutManipulatorInterface $layoutManipulator
-     * @param LayoutViewFactoryInterface            $layoutViewFactory
-     * @param LayoutFactoryInterface                $layoutFactory
+     * @param RawLayoutBuilderInterface          $rawLayoutBuilder
+     * @param DeferredLayoutManipulatorInterface $layoutManipulator
+     * @param LayoutViewFactoryInterface         $layoutViewFactory
+     * @param LayoutFactoryInterface             $layoutFactory
      */
     public function __construct(
         RawLayoutBuilderInterface $rawLayoutBuilder,
-        DeferredRawLayoutManipulatorInterface $layoutManipulator,
+        DeferredLayoutManipulatorInterface $layoutManipulator,
         LayoutViewFactoryInterface $layoutViewFactory,
         LayoutFactoryInterface $layoutFactory
     ) {

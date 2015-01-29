@@ -111,6 +111,26 @@ class DeferredLayoutManipulatorWithChangeCounter implements DeferredLayoutManipu
     /**
      * {@inheritdoc}
      */
+    public function setOption($id, $optionName, $optionValue)
+    {
+        $this->layoutManipulator->setOption($id, $optionName, $optionValue);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeOption($id, $optionName)
+    {
+        $this->layoutManipulator->removeOption($id, $optionName);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function applyChanges()
     {
         $this->layoutManipulator->applyChanges();

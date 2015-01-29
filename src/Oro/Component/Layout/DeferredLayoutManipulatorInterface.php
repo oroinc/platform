@@ -5,14 +5,14 @@ namespace Oro\Component\Layout;
 /**
  * Provides a set of methods to manipulate the layout and apply the changes on demand
  *
- * NOTES: we have to re-declare all methods from {@see LayoutStructureManipulatorInterface} here
- * because in other case "@return self" points to {@see LayoutStructureManipulatorInterface}
+ * NOTES: we have to re-declare all methods from {@see LayoutManipulatorInterface} here
+ * because in other case "@return self" points to {@see LayoutManipulatorInterface}
  * rather than {@see DeferredLayoutManipulatorInterface}.
  * But it is important for a client code because this interface provides "fluent" operations.
  *
  * If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
-interface DeferredLayoutManipulatorInterface extends LayoutStructureManipulatorInterface
+interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
 {
     /**
      * Adds a new item to the layout
@@ -67,6 +67,27 @@ interface DeferredLayoutManipulatorInterface extends LayoutStructureManipulatorI
      * @return self
      */
     public function removeAlias($alias);
+
+    /**
+     * Adds a new option or updates a value of existing option for the item
+     *
+     * @param string $id          The item id
+     * @param string $optionName  The option name
+     * @param mixed  $optionValue The option value
+     *
+     * @return self
+     */
+    public function setOption($id, $optionName, $optionValue);
+
+    /**
+     * Removes the option for the item
+     *
+     * @param string $id         The item id
+     * @param string $optionName The option name
+     *
+     * @return self
+     */
+    public function removeOption($id, $optionName);
 
     /**
      * Applies all scheduled changes
