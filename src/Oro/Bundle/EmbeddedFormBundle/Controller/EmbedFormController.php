@@ -11,7 +11,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 
@@ -19,6 +18,7 @@ use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
 use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
+use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
 
 class EmbedFormController extends Controller
 {
@@ -89,27 +89,30 @@ class EmbedFormController extends Controller
             return $this->redirect($this->generateUrl('oro_embedded_form_success', ['id' => $formEntity->getId()]));
         }
 
-        $this->render(
-            'OroEmbeddedFormBundle:EmbedForm:form.html.twig',
-            [
-                'form'             => $form->createView(),
-                'formEntity'       => $formEntity,
-                'customFormLayout' => $formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
-            ],
-            $response
+        /** @var EmbedFormLayoutManager $layoutManager */
+        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+        $layout        = $layoutManager->getFormLayout(
+            $formEntity,
+            $form,
+            $formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
         );
+        $response->setContent($layout->render());
 
         return $response;
     }
 
     /**
      * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
-     * @Template
      */
     public function formSuccessAction(EmbeddedForm $formEntity)
     {
-        return [
-            'formEntity' => $formEntity
-        ];
+        $response = new Response();
+
+        /** @var EmbedFormLayoutManager $layoutManager */
+        $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+        $layout        = $layoutManager->getFormSuccessLayout($formEntity);
+        $response->setContent($layout->render());
+
+        return $response;
     }
 }
