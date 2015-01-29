@@ -3,7 +3,7 @@
 namespace Oro\Component\Layout;
 
 /**
- * Provides a set of methods to manipulate the layout
+ * Provides a set of methods to change the structure of the layout.
  *
  * NOTES: if a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */

@@ -3,8 +3,9 @@
 namespace Oro\Component\Layout;
 
 /**
- * In additional to LayoutStructureManipulatorInterface provides methods to manage the layout item options
- * The options related operation are available for the layout built without the block types
+ * In additional to LayoutStructureManipulatorInterface provides methods to manage the layout item options.
+ * Options can be changed only before block types come in the game, so they cannot be changed
+ * in a block type itself and block type related extensions.
  *
  * NOTES: we have to re-declare all methods from {@see LayoutStructureManipulatorInterface} here
  * because in other case "@return self" points to {@see LayoutStructureManipulatorInterface}
