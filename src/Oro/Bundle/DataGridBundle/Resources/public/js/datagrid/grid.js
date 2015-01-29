@@ -439,7 +439,9 @@ define(function (require) {
                 var always = xhr.always;
                 xhr.always = function () {
                     always.apply(this, arguments);
-                    self._afterRequest();
+                    if (!self.disposed) {
+                        self._afterRequest();
+                    }
                 };
             });
 
