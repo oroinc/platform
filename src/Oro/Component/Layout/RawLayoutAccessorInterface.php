@@ -3,17 +3,17 @@
 namespace Oro\Component\Layout;
 
 /**
- * In additional to the layout manipulation methods provided by RawLayoutManipulatorInterface
+ * In additional to the layout manipulation methods provided by LayoutManipulatorInterface
  * provides methods to check current state of the layout
  *
- * NOTES: we have to re-declare all methods from {@see RawLayoutManipulatorInterface} here
- * because in other case "@return self" points to {@see RawLayoutManipulatorInterface}
+ * NOTES: we have to re-declare all methods from {@see LayoutManipulatorInterface} here
+ * because in other case "@return self" points to {@see LayoutManipulatorInterface}
  * rather than {@see RawLayoutAccessorInterface}.
  * But it is important for a client code because this interface provides "fluent" operations.
  *
  * If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
-interface RawLayoutAccessorInterface extends RawLayoutManipulatorInterface
+interface RawLayoutAccessorInterface extends LayoutManipulatorInterface
 {
     /**
      * Adds a new item to the layout

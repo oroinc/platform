@@ -3,12 +3,12 @@
 namespace Oro\Component\Layout;
 
 /**
- * NOTES: we have to re-declare all methods from {@see RawLayoutManipulatorInterface} here
- * because in other case "@return self" points to {@see RawLayoutManipulatorInterface}
+ * NOTES: we have to re-declare all methods from {@see LayoutManipulatorInterface} here
+ * because in other case "@return self" points to {@see LayoutManipulatorInterface}
  * rather than {@see LayoutBuilderInterface}.
  * But it is important for a client code because this interface provides "fluent" operations.
  */
-interface LayoutBuilderInterface extends RawLayoutManipulatorInterface
+interface LayoutBuilderInterface extends LayoutManipulatorInterface
 {
     /**
      * Adds a new item to the layout
