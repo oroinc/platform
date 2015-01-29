@@ -13,7 +13,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
@@ -39,7 +39,7 @@ class CommentApiManager extends ApiEntityManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var UserConfigManager */
+    /** @var ConfigManager */
     protected $config;
 
     /** @var AttachmentManager */
@@ -53,7 +53,7 @@ class CommentApiManager extends ApiEntityManager
      * @param SecurityFacade    $securityFacade
      * @param NameFormatter     $nameFormatter
      * @param Pager             $pager
-     * @param UserConfigManager $config
+     * @param ConfigManager $config
      * @param EventDispatcher   $eventDispatcher
      * @param AttachmentManager $attachmentManager
      * @param AclHelper         $aclHelper
@@ -63,7 +63,7 @@ class CommentApiManager extends ApiEntityManager
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config,
+        ConfigManager $config,
         EventDispatcher $eventDispatcher,
         AttachmentManager $attachmentManager,
         AclHelper $aclHelper

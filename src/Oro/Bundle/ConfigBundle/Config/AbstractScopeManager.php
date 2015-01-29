@@ -123,8 +123,7 @@ abstract class AbstractScopeManager
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
         unset($this->storedSettings[$entity][$entityId][$section][$key]);
 
-        $changeKey                         = str_replace(ConfigManager::SECTION_MODEL_SEPARATOR,
-            ConfigManager::SECTION_VIEW_SEPARATOR, $name);
+        $changeKey = str_replace(ConfigManager::SECTION_MODEL_SEPARATOR, ConfigManager::SECTION_VIEW_SEPARATOR, $name);
         $this->changedSettings[$changeKey] = ['use_parent_scope_value' => true];
     }
 
