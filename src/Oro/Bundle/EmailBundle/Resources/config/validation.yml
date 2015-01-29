@@ -21,5 +21,12 @@ Oro\Bundle\EmailBundle\Form\Model\Email:
     properties:
         from:
             - NotBlank:     ~
+            - Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress: ~
+        to:
+            - Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress: ~
+        cc:
+            - Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress: ~
+        bcc:
+            - Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress: ~
         subject:
             - NotBlank:     ~

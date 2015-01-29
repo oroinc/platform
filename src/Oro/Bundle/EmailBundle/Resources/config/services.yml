@@ -266,6 +266,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_template_syntax_validator }
 
+    oro_email.validator.email_address_validator:
+        class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
+        arguments:
+            - @oro_email.email.address.helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_email.email_address_validator }
+
     oro_email.validator.email_recipients:
         class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
         tags:
