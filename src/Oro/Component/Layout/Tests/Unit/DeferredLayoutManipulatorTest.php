@@ -6,7 +6,7 @@ use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 
 /**
- * This class contains unit tests which are NOT RELATED to ALIASES
+ * This class contains unit tests which are NOT RELATED to ALIASES and CHANGE COUNTERS
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {

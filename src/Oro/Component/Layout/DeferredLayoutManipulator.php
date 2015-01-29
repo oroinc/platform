@@ -59,6 +59,12 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     protected $actions = [];
 
+    /** @var int */
+    protected $addCounter = 0;
+
+    /** @var int */
+    protected $removeCounter = 0;
+
     /**
      * @param RawLayoutBuilderInterface $layout
      */
@@ -73,6 +79,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function add($id, $parentId = null, $blockType = null, array $options = [])
     {
         $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $parentId, $blockType, $options]];
+        $this->addCounter++;
 
         return $this;
     }
@@ -83,6 +90,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function remove($id)
     {
         $this->actions[self::GROUP_REMOVE][] = [__FUNCTION__, [$id]];
+        $this->removeCounter++;
 
         return $this;
     }
@@ -93,6 +101,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function move($id, $parentId = null, $siblingId = null, $prepend = false)
     {
         $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $parentId, $siblingId, $prepend]];
+        $this->addCounter++;
+        $this->removeCounter++;
 
         return $this;
     }
@@ -138,9 +148,36 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the number of added items
      *
-     * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
+     * @return int
+     */
+    public function getNumberOfAddedItems()
+    {
+        return $this->addCounter;
+    }
+
+    /**
+     * Returns the number of removed items
+     *
+     * @return int
+     */
+    public function getNumberOfRemovedItems()
+    {
+        return $this->removeCounter;
+    }
+
+    /**
+     * Sets all counters to zero
+     */
+    public function resetCounters()
+    {
+        $this->addCounter    = 0;
+        $this->removeCounter = 0;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function applyChanges()
     {
@@ -221,10 +258,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             $hasChanges = false;
             foreach ($this->actions[self::GROUP_ADD] as $key => $action) {
                 if ($action[0] === self::MOVE && !empty($action[1][2])) {
-                    if (!empty($action[1][2])) {
-                        $this->actions[self::GROUP_ADD][$key][1][2] = null;
-                        $hasChanges                                 = true;
-                    }
+                    $this->actions[self::GROUP_ADD][$key][1][2] = null;
+                    $hasChanges                                 = true;
                 }
             }
             if ($hasChanges) {

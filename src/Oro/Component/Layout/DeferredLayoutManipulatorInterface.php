@@ -90,7 +90,28 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     public function removeOption($id, $optionName);
 
     /**
+     * Returns the number of added items
+     *
+     * @return int
+     */
+    public function getNumberOfAddedItems();
+
+    /**
+     * Returns the number of removed items
+     *
+     * @return int
+     */
+    public function getNumberOfRemovedItems();
+
+    /**
+     * Sets all counters to zero
+     */
+    public function resetCounters();
+
+    /**
      * Applies all scheduled changes
+     *
+     * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
      */
     public function applyChanges();
 }
