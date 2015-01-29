@@ -4,6 +4,7 @@ define(function (require) {
     var TimePickerViewPrototype,
         $ = require('jquery'),
         _ = require('underscore'),
+        moment = require('moment'),
         datetimeFormatter = require('orolocale/js/formatter/datetime');
     require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
@@ -90,8 +91,11 @@ define(function (require) {
 
         /**
          * Updates original field on front field change
+         *
+         * @param {jQuery.Event} e
          */
-        updateOrigin: function () {
+        updateOrigin: function (e) {
+            this.checkConsistency(e.target);
             this._super().updateOrigin.apply(this, arguments);
             this.updateTimeFieldState();
         },
@@ -103,6 +107,33 @@ define(function (require) {
             this._super().updateFront.call(this);
             this.$frontTimeField.val(this.getFrontendFormattedTime());
             this.updateTimeFieldState();
+        },
+
+        /**
+         * Check if both frontend fields (date && time) have consistent value
+         *
+         * @param {HTMLElement} target
+         */
+        checkConsistency: function (target) {
+            var date, time, isValidDate, isValidTime;
+
+            date = this.$frontDateField.val();
+            time = this.$frontTimeField.val();
+            isValidDate = moment(date, this.getDateFormat(), true).isValid();
+            isValidTime = moment(time, this.getTimeFormat(), true).isValid();
+
+            // just changed the date
+            if (this.$frontDateField.is(target) && isValidDate && !time) {
+                // default time is beginning of the day
+                time = moment('00:00', 'HH:mm').format(this.getTimeFormat());
+                this.$frontTimeField.val(time);
+
+            // just changed the time
+            } else if (this.$frontTimeField.is(target) && isValidTime && !date) {
+                // default day is today
+                date = moment().format(this.getDateFormat());
+                this.$frontDateField.val(date);
+            }
         },
 
         /**

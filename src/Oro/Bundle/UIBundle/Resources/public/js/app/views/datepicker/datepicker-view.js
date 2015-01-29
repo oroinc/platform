@@ -133,8 +133,10 @@ define(function (require) {
 
         /**
          * Updates original field on front field change
+         *
+         * @param {jQuery.Event} e
          */
-        updateOrigin: function () {
+        updateOrigin: function (e) {
             this.$el.val(this.getBackendFormattedValue());
         },
 

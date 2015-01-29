@@ -4,8 +4,6 @@ define(function (require) {
 
     var VariableDateTimePickerView, prototype,
         _ = require('underscore'),
-        moment = require('moment'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime'),
         VariableDatePickerView = require('./variable-datepicker-view'),
         TimePickerViewPrototype = require('oroui/js/app/views/datepicker/timepicker-view-prototype');
 
@@ -35,6 +33,27 @@ define(function (require) {
                 this.$frontTimeField.val('').attr('disabled','disabled');
             } else {
                 this.$frontTimeField.removeAttr('disabled');
+            }
+        },
+
+        /**
+         * Check if both frontend fields (date && time) have consistent value
+         *
+         * @param target
+         */
+        checkConsistency: function (target) {
+            var date, time, isVariable, isValidDate, isValidTime;
+            TimePickerViewPrototype.checkConsistency.apply(this, arguments);
+
+            date = this.$frontDateField.val();
+            time = this.$frontTimeField.val();
+            isVariable = this.dateVariableHelper.isDateVariable(date);
+            isValidDate = moment(date, this.getDateFormat(), true).isValid();
+            isValidTime = moment(time, this.getTimeFormat(), true).isValid();
+
+            if (!target && !isVariable && (!isValidDate || !isValidTime)) {
+                this.$frontDateField.val('');
+                this.$frontTimeField.val('');
             }
         }
     }));

@@ -111,6 +111,15 @@ define(function (require) {
                 value = momentInstance.format(this.backendFormat);
             }
             return value;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _readDOMValue: function () {
+            this.subview('start').checkConsistency();
+            this.subview('end').checkConsistency();
+            return DatetimeFilter.__super__._readDOMValue.apply(this, arguments);
         }
     });
 
