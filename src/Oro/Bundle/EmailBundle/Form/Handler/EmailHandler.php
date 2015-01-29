@@ -152,9 +152,7 @@ class EmailHandler
                     return true;
                 } catch (\Exception $ex) {
                     $this->logger->error('Email sending failed.', ['exception' => $ex]);
-                    $this->form->addError(
-                        new FormError($this->translator->trans($ex->getMessage()))
-                    );
+                    $this->form->addError(new FormError($ex->getMessage()));
                 }
             }
         }
