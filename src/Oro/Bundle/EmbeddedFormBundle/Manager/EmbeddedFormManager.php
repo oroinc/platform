@@ -124,7 +124,7 @@ class EmbeddedFormManager
      *
      * @return string
      *
-     * @deprecated since 1.6. Please implement LayoutUpdateInterface in your form type instead.
+     * @deprecated since 1.7. Please implement LayoutUpdateInterface in your form type instead.
      */
     public function getCustomFormLayoutByFormType($type)
     {

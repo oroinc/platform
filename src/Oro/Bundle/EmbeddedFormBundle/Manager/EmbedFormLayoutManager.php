@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 
-use Oro\Component\Layout\LayoutUpdateInterface;
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
+use Oro\Component\Layout\LayoutUpdateInterface;
 
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType;
@@ -48,7 +48,7 @@ class EmbedFormLayoutManager
             new EmbedFormType(),
             [
                 'form'        => $form->createView(),
-                // @deprecated since 1.6. Kept for backward compatibility
+                // @deprecated since 1.7. Kept for backward compatibility
                 'form_layout' => $this->formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
             ]
         );
