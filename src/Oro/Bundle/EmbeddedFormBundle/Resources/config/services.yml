@@ -36,3 +36,4 @@ services:
         class: %oro_embedded_form.embed_form_layout_manager.class%
         arguments:
             - @oro_layout.layout_manager
+            - @oro_embedded_form.manager
