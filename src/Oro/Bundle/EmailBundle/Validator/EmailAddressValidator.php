@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Validator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\EmailValidator;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\ConstraintViolation;
 
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
@@ -42,8 +43,13 @@ class EmailAddressValidator extends ConstraintValidator
                 continue;
             }
             $emailValidator->validate($email, $constraint);
-            if ($this->context->getViolations()) {
-                break;
+            if ($this->context->getViolations()->count()) {
+                foreach ($this->context->getViolations() as $violation) {
+                    /** @var ConstraintViolation $violation */
+                    if ($violation->getPropertyPath() == $this->context->getPropertyPath()) {
+                        return;
+                    }
+                }
             }
         }
     }
