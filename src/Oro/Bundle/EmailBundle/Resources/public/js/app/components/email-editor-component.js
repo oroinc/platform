@@ -109,12 +109,16 @@ define(function (require) {
 
         bindFieldEvents: function() {
             $('input.taggable-field').each(function(key, elem) {
-                $(elem).select2({
+                var select2Config = {
                     containerCssClass: 'taggable-email',
                     separator: ";",
                     tags: [],
                     tokenSeparators: [";", ","]
-                });
+                };
+                if ($(elem).hasClass('from')) {
+                    select2Config.maximumSelectionSize = 1;
+                }
+                $(elem).select2(select2Config);
             });
             if (!this.options.bcc.length || !this.options.cc.length) {
                 $('#oro_email_email_to').parents('.controls').find('ul.select2-choices').after(
