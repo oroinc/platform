@@ -33,6 +33,21 @@ define(function (require) {
         picker: VariableDateTimePickerView,
 
         /**
+         * Selectors for filter data
+         *
+         * @property
+         */
+        criteriaValueSelectors: {
+            type: 'select',// to handle both type and part changes
+            date_type: 'select[name!=datetime_part]',
+            date_part: 'select[name=datetime_part]',
+            value: {
+                start: 'input[name="start"]',
+                end:   'input[name="end"]'
+            }
+        },
+
+        /**
          * Datetime filter uses custom format to backend datetime
          */
         backendFormat: 'YYYY-MM-DD HH:mm',
