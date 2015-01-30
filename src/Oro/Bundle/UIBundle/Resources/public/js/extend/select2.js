@@ -196,6 +196,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
     }(window.Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
+    // Fix is valid for version 3.4.1
     (function(prototype) {
         var resizeSearch = prototype.resizeSearch;
 

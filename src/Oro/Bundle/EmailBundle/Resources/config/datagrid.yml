@@ -69,10 +69,10 @@ datagrid:
         filters:
             columns:
                 fromEmailExpression: { type: string,   data_name: fromEmailExpression }
+                subject:             { type: string,   data_name: e.subject }
                 to:                  { type: string,   data_name: r_to.name }
                 cc:                  { type: string,   data_name: r_cc.name }
                 bcc:                 { type: string,   data_name: r_bcc.name }
-                subject:             { type: string,   data_name: e.subject }
                 sentAt:              { type: datetime, data_name: e.sentAt }
 
     activity-email-grid:
