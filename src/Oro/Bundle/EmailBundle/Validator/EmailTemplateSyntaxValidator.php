@@ -8,10 +8,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailTemplateSyntax;
+
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EmailTemplateSyntaxValidator extends ConstraintValidator
@@ -19,43 +20,29 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
     /** @var \Twig_Environment */
     protected $twig;
 
-    /**
-     * @var LocaleSettings
-     */
+    /** @var LocaleSettings */
     protected $localeSettings;
 
-    /**
-     * @var UserConfigManager
-     */
-    protected $userConfig;
-
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /**
      * @param \Twig_Environment   $twig
      * @param LocaleSettings      $localeSettings
-     * @param UserConfigManager   $userConfig
      * @param ConfigProvider      $entityConfigProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
         \Twig_Environment $twig,
         LocaleSettings $localeSettings,
-        UserConfigManager $userConfig,
         ConfigProvider $entityConfigProvider,
         TranslatorInterface $translator
     ) {
         $this->twig                 = $twig;
         $this->localeSettings       = $localeSettings;
-        $this->userConfig           = $userConfig;
         $this->entityConfigProvider = $entityConfigProvider;
         $this->translator           = $translator;
     }

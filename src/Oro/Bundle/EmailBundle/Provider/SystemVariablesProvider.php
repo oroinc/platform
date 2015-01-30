@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;

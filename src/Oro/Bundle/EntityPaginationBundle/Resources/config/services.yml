@@ -35,7 +35,7 @@ services:
     oro_entity_pagination.manager:
         class: %oro_entity_pagination.manager.class%
         arguments:
-            - @oro_config.global
+            - @oro_config.user
 
     oro_entity_pagination.message_manager:
         class: %oro_entity_pagination.message_manager.class%
