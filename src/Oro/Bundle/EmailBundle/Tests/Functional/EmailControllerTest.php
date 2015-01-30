@@ -22,13 +22,82 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('My Web Store Introduction', $content);
+        $this->assertContains('Thank you for signing up to My Web Store!', $content);
     }
 
-// activity
-// create
-// body
-// attachment
-// emails
-// baseEmails
-// userEmails
+    public function testCreateViewForm()
+    {
+        $url = $this->getUrl('oro_email_email_create', ['_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('From', $content);
+    }
+
+    public function testBody()
+    {
+        $url = $this->getUrl('oro_email_body', ['id' => $this->getReference('emailBody_1')->getId()]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('Thank you for signing up to My Web Store!', $content);
+    }
+
+    public function testActivity()
+    {
+        $this->markTestIncomplete('Skipped. Need activity fixture');
+
+        $url = $this->getUrl('oro_email_activity_view', [
+            'entityClass' => 'test',
+            'entityId' => 1
+        ]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+    }
+
+    public function testAttachment()
+    {
+        $this->markTestIncomplete('Skipped. Need attachment fixture');
+
+        $url = $this->getUrl('oro_email_attachment', [
+            'id' => 1
+        ]);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+    }
+
+    public function testEmails()
+    {
+        $url = $this->getUrl('oro_email_widget_emails', ['_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('BBQ Grill - Order Follow Up', $content);
+        $this->assertContains('Products related to your recent purchase - Zildjian Drumset', $content);
+    }
+
+    public function testBaseEmails()
+    {
+        $url = $this->getUrl('oro_email_widget_base_emails', ['_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $content = $result->getContent();
+        $this->assertContains('BBQ Grill - Order Follow Up', $content);
+    }
+
+    public function testUserEmails()
+    {
+        $url = $this->getUrl('oro_email_user_emails', ['_widgetContainer' => 'dialog']);
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+    }
 }
