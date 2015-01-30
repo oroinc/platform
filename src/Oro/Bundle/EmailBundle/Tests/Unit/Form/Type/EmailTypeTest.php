@@ -53,7 +53,7 @@ class EmailTypeTest extends TypeTestCase
                     $select2ChoiceType->getName() => $select2ChoiceType,
                     $emailTemplateList->getName() => $emailTemplateList,
                     $emailAddressType->getName()  => $emailAddressType,
-                    $richTextType->getName()      => $richTextType,
+                    $richTextType->getName()      => $richTextType
                 ],
                 []
             )
