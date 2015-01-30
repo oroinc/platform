@@ -13,6 +13,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
 use Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
@@ -37,6 +38,9 @@ class CommentApiManager extends ApiEntityManager
 
     /** @var NameFormatter */
     protected $nameFormatter;
+
+    /** @var ConfigManager */
+    protected $config;
 
     /** @var AttachmentManager */
     protected $attachmentManager;

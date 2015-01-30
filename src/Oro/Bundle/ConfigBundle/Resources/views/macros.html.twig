@@ -3,9 +3,24 @@
 #}
 {% macro renderTitleAndButtons(pageTitle, buttons) %}
     <div class="container-fluid configuration-header clearfix">
+    {% if pageTitle is iterable %}
+        <div class="customer-info customer-simple pull-left">
+        {% for title in pageTitle%}
+            {% if not loop.last %}
+            <div class="sub-title">
+                {{ title }}
+            </div>
+            <span class="separator">/</span>
+            {% else %}
+            <h1 class="user-name">{{ title }}</h1>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% else %}
         <h1>
             {{ pageTitle }}
         </h1>
+    {% endif %}
         <div class="pull-right">
             {% if buttons is defined %}
                 {% for button in buttons %}
