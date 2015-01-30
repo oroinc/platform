@@ -312,9 +312,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getHeaders()
     {
+        $excludeHeadCell = "contains(@style, 'display: none;') or contains(@class,'floatThead-col')";
         $records = $this->test->elements(
             $this->test->using('xpath')
-                ->value("{$this->gridPath}//table/thead/tr/th[not(contains(@style, 'display: none;'))]")
+                ->value("{$this->gridPath}//table/thead/tr/th[not({$excludeHeadCell})]")
         );
         return $records;
     }
