@@ -309,6 +309,7 @@
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
+            'data-validation': '{"Date":{}}',
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -331,12 +332,12 @@
     {% set options = {
         view: 'oroui/js/app/views/datepicker/datetimepicker-view',
         nativeMode: isMobileVersion(),
-        fieldsWrapper: '<div></div>',
         dateInputAttrs: {
             placeholder: 'oro.form.choose_date'|trans,
             id: 'date_selector_' ~ id,
             name: 'date_selector_' ~ id,
-            class: 'input-small'
+            class: 'input-small',
+            'data-validation': '{"Date":{}}',
         },
         datePickerOptions: {
             altFormat: 'yy-mm-dd',
@@ -349,7 +350,8 @@
             placeholder: 'oro.form.choose_time'|trans,
             id: 'time_selector_' ~ id,
             name: 'time_selector_' ~ id,
-            class: 'input-small'
+            class: 'input-small',
+            'data-validation': '{"Time":{}}',
         },
         timePickerOptions: {
         }

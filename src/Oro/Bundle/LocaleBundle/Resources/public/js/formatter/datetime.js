@@ -106,7 +106,7 @@ define(['../locale-settings', 'moment'
          * @returns {boolean}
          */
         isTimeValid: function (value, strict) {
-            this.isValueValid(value, this.getTimeFormat(), strict);
+            return this.isValueValid(value, this.getTimeFormat(), strict);
         },
 
         /**

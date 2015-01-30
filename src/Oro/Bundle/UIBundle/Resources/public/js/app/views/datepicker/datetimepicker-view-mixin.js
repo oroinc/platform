@@ -15,7 +15,7 @@ define(function (require) {
      */
     dateTimePickerViewMixin = {
         defaults: {
-            fieldsWrapper: '',
+            fieldsWrapper: '<div class="fields-row"></div>',
             timeInputAttrs: {},
             timePickerOptions: {}
         },

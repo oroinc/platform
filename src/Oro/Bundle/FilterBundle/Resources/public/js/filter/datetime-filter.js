@@ -71,7 +71,6 @@ define(function (require) {
         _getPickerConfigurationOptions: function (options) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
             _.extend(options, {
-                fieldsWrapper: '<div></div>',
                 backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat]
             });
             return options;
