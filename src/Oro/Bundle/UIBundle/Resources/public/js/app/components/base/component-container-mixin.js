@@ -12,6 +12,10 @@ define(function (require) {
          * @param {BaseComponent=} component to set
          */
         pageComponent: function (name, component) {
+            if (this.disposed) {
+                component.dispose();
+                return;
+            }
             if (!this.pageComponents) {
                 this.pageComponents = {};
             }
