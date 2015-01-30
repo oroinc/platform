@@ -17,7 +17,6 @@ use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider;
-use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Form\Type\ParentScopeCheckbox;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 
@@ -35,28 +34,6 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
 
     /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
     protected $ed;
-
-    /**
-     * @var array
-     */
-    protected $settings = array(
-        'oro_user' => array(
-            'greeting' => array(
-                'value' => true,
-                'type'  => 'boolean',
-            ),
-            'level'    => array(
-                'value' => 20,
-                'type'  => 'scalar',
-            )
-        ),
-        'oro_test' => array(
-            'anysetting' => array(
-                'value' => 'anyvalue',
-                'type'  => 'scalar',
-            ),
-        ),
-    );
 
     /**
      * @var array
@@ -151,54 +128,6 @@ class GlobalScopeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($loadedSettings['oro_user']['level']['updatedAt'], $updated);
         $this->assertFalse($isNullValue);
     }
-
-    /**
-     * Test default settings condition
-     */
-//    public function testGetDefaultSettings()
-//    {
-//        $object = $this->getMock(
-//            'Oro\Bundle\ConfigBundle\Config\ConfigManager',
-//            array('loadStoredSettings'),
-//            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
-//        );
-//
-//        $this->assertEquals($this->settings['oro_user']['greeting']['value'], $object->get('oro_user.greeting', true));
-//        $this->assertEquals($this->settings['oro_user']['level']['value'], $object->get('oro_user.level', true));
-//        $this->assertEquals(
-//            $this->settings['oro_test']['anysetting']['value'],
-//            $object->get('oro_test.anysetting', true)
-//        );
-//    }
-
-    /**
-     * Test form pre-fill
-     */
-//    public function testGetSettingsByForm()
-//    {
-//        $object = $this->getMock(
-//            'Oro\Bundle\ConfigBundle\Config\ConfigManager',
-//            array('get'),
-//            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
-//        );
-//
-//        $testSetting = array(
-//            'value' => 'test',
-//        );
-//
-//        $object->expects($this->at(0))
-//            ->method('get')
-//            ->with('some_field')
-//            ->will($this->returnValue($testSetting));
-//
-//        $provider = $this->getProviderWithConfigLoaded(__DIR__ . '/../Fixtures/Provider/good_definition.yml');
-//        $form = $provider->getForm('third_group');
-//
-//        $settings = $object->getSettingsByForm($form);
-//        $this->assertArrayHasKey('some_field', $settings);
-//        $this->assertCount(2, $settings);
-//        $this->assertEquals($testSetting['value'], $settings['some_field']['value']);
-//    }
 
     /**
      * Test saving settings
