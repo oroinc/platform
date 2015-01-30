@@ -337,7 +337,7 @@ class Channel
 
     /**
      * @deprecated Deprecated since 1.7.0 in favor of getLastStatusForConnector because of performance impact.
-     * @param string  $connector
+     * @param string $connector
      * @param int|null $codeFilter
      *
      * @return ArrayCollection
@@ -357,7 +357,7 @@ class Channel
     /**
      * Returns latest status for connector and code if it exists.
      *
-     * @param $connector
+     * @param string $connector
      * @param int|null $code
      * @return Status|null
      */
