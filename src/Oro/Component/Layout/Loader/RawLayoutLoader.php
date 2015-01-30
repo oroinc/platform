@@ -49,7 +49,7 @@ class RawLayoutLoader
      */
     public function load(array $config)
     {
-        if (isset($config[self::LAYOUT_CONFIG_KEY])) {
+        if (!isset($config[self::LAYOUT_CONFIG_KEY])) {
             return;
         }
 
