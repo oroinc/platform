@@ -3,9 +3,9 @@
 namespace Oro\Component\Layout;
 
 /**
- * Provides a set of methods to manipulate the layout
+ * Provides methods to manage the layout structure and configuration.
  *
- * NOTES: if a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
+ * NOTES: If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
 interface LayoutManipulatorInterface
 {
@@ -62,4 +62,35 @@ interface LayoutManipulatorInterface
      * @return self
      */
     public function removeAlias($alias);
+
+    /**
+     * Adds a new option or updates a value of existing option for the item
+     *
+     * @param string $id          The item id
+     * @param string $optionName  The option name
+     * @param mixed  $optionValue The option value
+     *
+     * @return self
+     */
+    public function setOption($id, $optionName, $optionValue);
+
+    /**
+     * Removes the option for the item
+     *
+     * @param string $id         The item id
+     * @param string $optionName The option name
+     *
+     * @return self
+     */
+    public function removeOption($id, $optionName);
+
+    /**
+     * Sets the theme(s) to be used for rendering the layout item and its children
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|null     $id     The id of the layout item to assign the theme(s) to
+     *
+     * @return self
+     */
+    public function setBlockTheme($themes, $id = null);
 }

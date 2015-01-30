@@ -3,12 +3,14 @@
 namespace Oro\Component\Layout;
 
 /**
- * NOTES: we have to re-declare all methods from {@see RawLayoutAccessorInterface} here
- * because in other case "@return self" points to {@see RawLayoutAccessorInterface}
+ * Provides an interface for builders which can be used to build {@see RawLayout}.
+ *
+ * NOTES: we have to re-declare all methods from {@see LayoutManipulatorInterface} here
+ * because in other case "@return self" points to {@see LayoutManipulatorInterface}
  * rather than {@see RawLayoutBuilderInterface}.
  * But it is important for a client code because this interface provides "fluent" operations.
  */
-interface RawLayoutBuilderInterface extends RawLayoutAccessorInterface
+interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
 {
     /**
      * Adds a new item to the layout
@@ -84,6 +86,50 @@ interface RawLayoutBuilderInterface extends RawLayoutAccessorInterface
      * @return self
      */
     public function removeOption($id, $optionName);
+
+    /**
+     * Sets the theme(s) to be used for rendering the layout item and its children
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|null     $id     The id of the layout item to assign the theme(s) to
+     *
+     * @return self
+     */
+    public function setBlockTheme($themes, $id = null);
+
+    /**
+     * Checks whether at least one item exists in the layout
+     *
+     * @return bool
+     */
+    public function isEmpty();
+
+    /**
+     * Checks whether the item with the given id exists in the layout
+     *
+     * @param string $id The item id
+     *
+     * @return bool
+     */
+    public function has($id);
+
+    /**
+     * Checks whether the given item alias exists
+     *
+     * @param string $alias The item alias
+     *
+     * @return bool
+     */
+    public function hasAlias($alias);
+
+    /**
+     * Returns all options for the given layout item
+     *
+     * @param string $id The item id
+     *
+     * @return array
+     */
+    public function getOptions($id);
 
     /**
      * Returns the built layout data

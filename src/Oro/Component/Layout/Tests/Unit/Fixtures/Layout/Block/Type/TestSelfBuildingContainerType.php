@@ -13,7 +13,7 @@ class TestSelfBuildingContainerType extends AbstractContainerType
     public function buildBlock(BlockBuilderInterface $builder, array $options)
     {
         $id = $builder->getId();
-        $builder->getLayoutBuilder()
+        $builder->getLayoutManipulator()
             ->add($id . '_logo', $id, 'logo');
     }
 

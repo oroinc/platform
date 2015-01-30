@@ -3,12 +3,15 @@
 namespace Oro\Component\Layout;
 
 /**
- * NOTES: we have to re-declare all methods from {@see RawLayoutManipulatorInterface} here
- * because in other case "@return self" points to {@see RawLayoutManipulatorInterface}
+ * Provides an interface for builders which can be used to build {@see Layout}.
+ * In additional to LayoutManipulatorInterface allows to get built layout.
+ *
+ * NOTES: we have to re-declare all methods from {@see LayoutManipulatorInterface} here
+ * because in other case "@return self" points to {@see LayoutManipulatorInterface}
  * rather than {@see LayoutBuilderInterface}.
  * But it is important for a client code because this interface provides "fluent" operations.
  */
-interface LayoutBuilderInterface extends RawLayoutManipulatorInterface
+interface LayoutBuilderInterface extends LayoutManipulatorInterface
 {
     /**
      * Adds a new item to the layout
@@ -86,14 +89,14 @@ interface LayoutBuilderInterface extends RawLayoutManipulatorInterface
     public function removeOption($id, $optionName);
 
     /**
-     * Sets the theme(s) to be used for rendering a block and its children
+     * Sets the theme(s) to be used for rendering the layout item and its children
      *
-     * @param string|string[] $themes  The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
-     * @param string|null     $blockId The id of a block to assign the theme(s) to
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|null     $id     The id of the layout item to assign the theme(s) to
      *
      * @return self
      */
-    public function setBlockTheme($themes, $blockId = null);
+    public function setBlockTheme($themes, $id = null);
 
     /**
      * Returns the layout object

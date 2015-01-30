@@ -44,7 +44,7 @@ class BlockBuilder implements BlockBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getLayoutBuilder()
+    public function getLayoutManipulator()
     {
         return $this->layoutManipulator;
     }

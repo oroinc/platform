@@ -3,7 +3,6 @@
 namespace Oro\Component\Layout;
 
 /**
- * Base implementation of RawLayoutAccessorInterface
  * This is straightforward implementation with strict checking of all operations' arguments.
  * It means that:
  *  - several layout items with the same id cannot be added
@@ -197,6 +196,39 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setBlockTheme($themes, $id = null)
+    {
+        try {
+            if (empty($id)) {
+                $id = $this->rawLayout->getRootId();
+            }
+            $this->rawLayout->setBlockTheme($id, $themes);
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot set theme(s) for "%s" item. Reason: %s',
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return $this->rawLayout->isEmpty();
     }
 
     /**

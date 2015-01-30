@@ -9,8 +9,6 @@ namespace Oro\Component\Layout;
  * because in other case "@return self" points to {@see LayoutManipulatorInterface}
  * rather than {@see DeferredLayoutManipulatorInterface}.
  * But it is important for a client code because this interface provides "fluent" operations.
- *
- * If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
 interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
 {
@@ -69,7 +67,59 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     public function removeAlias($alias);
 
     /**
+     * Adds a new option or updates a value of existing option for the item
+     *
+     * @param string $id          The item id
+     * @param string $optionName  The option name
+     * @param mixed  $optionValue The option value
+     *
+     * @return self
+     */
+    public function setOption($id, $optionName, $optionValue);
+
+    /**
+     * Removes the option for the item
+     *
+     * @param string $id         The item id
+     * @param string $optionName The option name
+     *
+     * @return self
+     */
+    public function removeOption($id, $optionName);
+
+    /**
+     * Sets the theme(s) to be used for rendering the layout item and its children
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|null     $id     The id of the layout item to assign the theme(s) to
+     *
+     * @return self
+     */
+    public function setBlockTheme($themes, $id = null);
+
+    /**
+     * Returns the number of added items
+     *
+     * @return int
+     */
+    public function getNumberOfAddedItems();
+
+    /**
+     * Returns the number of removed items
+     *
+     * @return int
+     */
+    public function getNumberOfRemovedItems();
+
+    /**
+     * Sets all counters to zero
+     */
+    public function resetCounters();
+
+    /**
      * Applies all scheduled changes
+     *
+     * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
      */
     public function applyChanges();
 }

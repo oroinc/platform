@@ -366,4 +366,41 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
             $view
         );
     }
+
+    public function testSetBlockThemeByAlias()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'test_logo')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo')
+            ->addAlias('test_logo', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => '']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+
+        $blockThemes = $this->rawLayoutBuilder->getRawLayout()->getBlockThemes();
+        $this->assertSame(
+            [
+                'logo' => ['MyBundle:Layout:my_theme.html.twig']
+            ],
+            $blockThemes
+        );
+    }
 }

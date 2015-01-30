@@ -784,6 +784,100 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
         $this->rawLayout->removeAlias($alias);
     }
 
+    public function testSetBlockTheme()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+
+        // do test
+        $this->rawLayout->setBlockTheme(
+            'root',
+            ['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig']
+        );
+        $this->rawLayout->setBlockTheme(
+            'root',
+            'MyBundle:Layout:theme3.html.twig'
+        );
+        $this->rawLayout->setBlockTheme(
+            'header',
+            'MyBundle:Layout:header_theme1.html.twig'
+        );
+        $this->rawLayout->setBlockTheme(
+            'header',
+            ['MyBundle:Layout:header_theme2.html.twig', 'MyBundle:Layout:header_theme3.html.twig']
+        );
+
+        $blockThemes = $this->rawLayout->getBlockThemes();
+        $this->assertSame(
+            [
+                'root'   => [
+                    'MyBundle:Layout:theme1.html.twig',
+                    'MyBundle:Layout:theme2.html.twig',
+                    'MyBundle:Layout:theme3.html.twig'
+                ],
+                'header' => [
+                    'MyBundle:Layout:header_theme1.html.twig',
+                    'MyBundle:Layout:header_theme2.html.twig',
+                    'MyBundle:Layout:header_theme3.html.twig'
+                ]
+            ],
+            $blockThemes
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
+     * @expectedExceptionMessage The "unknown" item does not exist.
+     */
+    public function testSetBlockThemeForUnknownItem()
+    {
+        $this->rawLayout->setBlockTheme('unknown', 'MyBundle:Layout:theme1.html.twig');
+    }
+
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The item id must not be empty.
+     */
+    public function testSetBlockThemeWithEmptyId($id)
+    {
+        $this->rawLayout->setBlockTheme($id, 'MyBundle:Layout:theme1.html.twig');
+    }
+
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The theme must not be empty.
+     */
+    public function testSetBlockThemeWithEmptyTheme($theme)
+    {
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->setBlockTheme('root', $theme);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The theme must not be empty.
+     */
+    public function testSetBlockThemeWithEmptyThemes()
+    {
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->setBlockTheme('root', []);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid "themes" argument type. Expected "string or array of strings", "integer" given.
+     */
+    public function testSetBlockThemeWithInvalidThemeType()
+    {
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->setBlockTheme('root', 123);
+    }
+
     public function testGetHierarchy()
     {
         // prepare test data

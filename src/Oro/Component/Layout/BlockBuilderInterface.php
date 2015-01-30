@@ -12,11 +12,11 @@ interface BlockBuilderInterface
     public function getId();
 
     /**
-     * Returns the layout builder
+     * Returns the layout manipulator
      *
      * @return LayoutManipulatorInterface
      */
-    public function getLayoutBuilder();
+    public function getLayoutManipulator();
 
     /**
      * Returns the execution context

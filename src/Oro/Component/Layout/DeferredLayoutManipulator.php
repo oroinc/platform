@@ -7,7 +7,7 @@ namespace Oro\Component\Layout;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
+class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 {
     /** The group name for add new items related actions */
     const GROUP_ADD = 'add';
@@ -36,8 +36,11 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     /** The action name for remove an option for the layout item */
     const REMOVE_OPTION = 'removeOption';
 
-    /** @var RawLayoutAccessorInterface */
-    protected $layout;
+    /** The action name for add the theme(s) to be used for rendering the layout item and its children */
+    const SET_BLOCK_THEME = 'setBlockTheme';
+
+    /** @var RawLayoutBuilderInterface */
+    protected $rawLayoutBuilder;
 
     /**
      * The list of all scheduled actions to be executed by applyChanges method
@@ -59,12 +62,18 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
      */
     protected $actions = [];
 
+    /** @var int */
+    protected $addCounter = 0;
+
+    /** @var int */
+    protected $removeCounter = 0;
+
     /**
-     * @param RawLayoutAccessorInterface $layout
+     * @param RawLayoutBuilderInterface $rawLayoutBuilder
      */
-    public function __construct(RawLayoutAccessorInterface $layout)
+    public function __construct(RawLayoutBuilderInterface $rawLayoutBuilder)
     {
-        $this->layout = $layout;
+        $this->rawLayoutBuilder = $rawLayoutBuilder;
     }
 
     /**
@@ -73,6 +82,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     public function add($id, $parentId = null, $blockType = null, array $options = [])
     {
         $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $parentId, $blockType, $options]];
+        $this->addCounter++;
 
         return $this;
     }
@@ -83,6 +93,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     public function remove($id)
     {
         $this->actions[self::GROUP_REMOVE][] = [__FUNCTION__, [$id]];
+        $this->removeCounter++;
 
         return $this;
     }
@@ -93,6 +104,8 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     public function move($id, $parentId = null, $siblingId = null, $prepend = false)
     {
         $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $parentId, $siblingId, $prepend]];
+        $this->addCounter++;
+        $this->removeCounter++;
 
         return $this;
     }
@@ -139,8 +152,45 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
 
     /**
      * {@inheritdoc}
+     */
+    public function setBlockTheme($themes, $id = null)
+    {
+        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$themes, $id]];
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of added items
      *
-     * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
+     * @return int
+     */
+    public function getNumberOfAddedItems()
+    {
+        return $this->addCounter;
+    }
+
+    /**
+     * Returns the number of removed items
+     *
+     * @return int
+     */
+    public function getNumberOfRemovedItems()
+    {
+        return $this->removeCounter;
+    }
+
+    /**
+     * Sets all counters to zero
+     */
+    public function resetCounters()
+    {
+        $this->addCounter    = 0;
+        $this->removeCounter = 0;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function applyChanges()
     {
@@ -221,10 +271,8 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             $hasChanges = false;
             foreach ($this->actions[self::GROUP_ADD] as $key => $action) {
                 if ($action[0] === self::MOVE && !empty($action[1][2])) {
-                    if (!empty($action[1][2])) {
-                        $this->actions[self::GROUP_ADD][$key][1][2] = null;
-                        $hasChanges                                 = true;
-                    }
+                    $this->actions[self::GROUP_ADD][$key][1][2] = null;
+                    $hasChanges                                 = true;
                 }
             }
             if ($hasChanges) {
@@ -261,30 +309,34 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             case self::ADD:
                 $parentId = $args[1];
 
-                return empty($parentId) || $this->layout->has($parentId);
+                return empty($parentId) || $this->rawLayoutBuilder->has($parentId);
             case self::REMOVE:
             case self::SET_OPTION:
             case self::REMOVE_OPTION:
                 $id = $args[0];
 
-                return empty($id) || $this->layout->has($id);
+                return empty($id) || $this->rawLayoutBuilder->has($id);
             case self::MOVE:
                 $id        = $args[0];
                 $parentId  = $args[1];
                 $siblingId = $args[2];
 
                 return
-                    (empty($id) || $this->layout->has($id))
-                    && (empty($parentId) || $this->layout->has($parentId))
-                    && (empty($siblingId) || $this->layout->has($siblingId));
+                    (empty($id) || $this->rawLayoutBuilder->has($id))
+                    && (empty($parentId) || $this->rawLayoutBuilder->has($parentId))
+                    && (empty($siblingId) || $this->rawLayoutBuilder->has($siblingId));
+            case self::SET_BLOCK_THEME:
+                $id = $args[1];
+
+                return (empty($id) && !$this->rawLayoutBuilder->isEmpty()) || $this->rawLayoutBuilder->has($id);
             case self::ADD_ALIAS:
                 $id = $args[1];
 
-                return empty($id) || $this->layout->has($id);
+                return empty($id) || $this->rawLayoutBuilder->has($id);
             case self::REMOVE_ALIAS:
                 $alias = $args[0];
 
-                return empty($alias) || $this->layout->hasAlias($alias);
+                return empty($alias) || $this->rawLayoutBuilder->hasAlias($alias);
         }
 
         return true;
@@ -300,7 +352,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
     {
         foreach ($this->actions[$group] as $key => $action) {
             if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                call_user_func_array([$this->layout, $action[0]], $action[1]);
+                call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
                 unset($this->actions[$group][$key]);
             }
         }
@@ -322,7 +374,7 @@ class DeferredLayoutManipulator implements DeferredRawLayoutManipulatorInterface
             $hasSkipped  = false;
             foreach ($this->actions[$group] as $key => $action) {
                 if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                    call_user_func_array([$this->layout, $action[0]], $action[1]);
+                    call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
                     unset($this->actions[$group][$key]);
                     $hasExecuted = true;
                     if ($hasSkipped) {

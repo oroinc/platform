@@ -7,7 +7,7 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var RawLayoutBuilderInterface */
     protected $rawLayoutBuilder;
 
-    /** @var DeferredRawLayoutManipulatorInterface */
+    /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
 
     /** @var LayoutViewFactoryInterface */
@@ -16,18 +16,15 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var LayoutFactoryInterface */
     protected $layoutFactory;
 
-    /** @var array */
-    protected $themes = [];
-
     /**
-     * @param RawLayoutBuilderInterface             $rawLayoutBuilder
-     * @param DeferredRawLayoutManipulatorInterface $layoutManipulator
-     * @param LayoutViewFactoryInterface            $layoutViewFactory
-     * @param LayoutFactoryInterface                $layoutFactory
+     * @param RawLayoutBuilderInterface          $rawLayoutBuilder
+     * @param DeferredLayoutManipulatorInterface $layoutManipulator
+     * @param LayoutViewFactoryInterface         $layoutViewFactory
+     * @param LayoutFactoryInterface             $layoutFactory
      */
     public function __construct(
         RawLayoutBuilderInterface $rawLayoutBuilder,
-        DeferredRawLayoutManipulatorInterface $layoutManipulator,
+        DeferredLayoutManipulatorInterface $layoutManipulator,
         LayoutViewFactoryInterface $layoutViewFactory,
         LayoutFactoryInterface $layoutFactory
     ) {
@@ -110,16 +107,9 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setBlockTheme($themes, $blockId = null)
+    public function setBlockTheme($themes, $id = null)
     {
-        if ($blockId === null) {
-            $blockId = '';
-        }
-        if (!isset($this->themes[$blockId])) {
-            $this->themes[$blockId] = (array)$themes;
-        } else {
-            $this->themes[$blockId] = array_merge($this->themes[$blockId], (array)$themes);
-        }
+        $this->layoutManipulator->setBlockTheme($themes, $id);
 
         return $this;
     }
@@ -130,14 +120,13 @@ class LayoutBuilder implements LayoutBuilderInterface
     public function getLayout(ContextInterface $context, $rootId = null)
     {
         $this->layoutManipulator->applyChanges();
-        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
-        $rootView  = $this->layoutViewFactory->createView($rawLayout, $context, $rootId);
-        $layout    = $this->layoutFactory->createLayout($rootView);
-        foreach ($this->themes as $blockId => $themes) {
-            // set theme(s) for existing blocks only
-            if (!$blockId || isset($rootView[$blockId])) {
-                $layout->setBlockTheme($themes, $blockId !== '' ? $blockId : null);
-            }
+        $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
+        $rootView    = $this->layoutViewFactory->createView($rawLayout, $context, $rootId);
+        $layout      = $this->layoutFactory->createLayout($rootView);
+        $rootBlockId = $rawLayout->getRootId();
+        $blockThemes = $rawLayout->getBlockThemes();
+        foreach ($blockThemes as $blockId => $themes) {
+            $layout->setBlockTheme($themes, $blockId !== $rootBlockId ? $blockId : null);
         }
 
         return $layout;

@@ -12,7 +12,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /** @var BlockOptionsResolverInterface */
     protected $blockOptionsResolver;
 
-    /** @var DeferredLayoutManipulatorWithChangeCounter */
+    /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
 
     /** @var RawLayout */
@@ -36,7 +36,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     ) {
         $this->blockTypeRegistry    = $blockTypeRegistry;
         $this->blockOptionsResolver = $blockOptionsResolver;
-        $this->layoutManipulator    = new DeferredLayoutManipulatorWithChangeCounter($layoutManipulator);
+        $this->layoutManipulator    = $layoutManipulator;
     }
 
     /**
