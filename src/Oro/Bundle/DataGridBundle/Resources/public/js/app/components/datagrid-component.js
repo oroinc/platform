@@ -66,6 +66,7 @@ define(function (require) {
             $.when.apply($, promises).always(function () {
                 $(options.el).html(options.$el.children());
                 self.subComponents = _.compact(arguments);
+                self.grid.reflow();
                 self._resolveDeferredInit();
             });
         },
@@ -227,7 +228,8 @@ define(function (require) {
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
-                metadata: this.metadata
+                metadata: this.metadata,
+                enableFullScreenLayout: this.metadata.enableFullScreenLayout
             };
         },
         dispose: function () {

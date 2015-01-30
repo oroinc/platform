@@ -59,14 +59,20 @@ class DemoDataMigrationListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $commandClass
      * @param string|null $fixturesType
+     * @param int $exitCode
      * @dataProvider consoleDataProvider
      */
-    public function testOnConsoleTerminate($commandClass, $fixturesType = null)
+    public function testOnConsoleTerminate($commandClass, $fixturesType = null, $exitCode = 0)
     {
         if ($fixturesType == LoadDataFixturesCommand::DEMO_FIXTURES_TYPE) {
-            $this->searchEngine->expects($this->once())
-                ->method('reindex')
-                ->with();
+            if ($exitCode === 0) {
+                $this->searchEngine->expects($this->once())
+                    ->method('reindex')
+                    ->with();
+            } else {
+                $this->searchEngine->expects($this->never())
+                    ->method('reindex');
+            }
             $this->searchListener->expects($this->once())
                 ->method('setEnabled')
                 ->with(true);
@@ -78,7 +84,7 @@ class DemoDataMigrationListenerTest extends \PHPUnit_Framework_TestCase
         }
 
         list($command, $input, $output) = $this->prepareEventData($commandClass, $fixturesType);
-        $this->listener->onConsoleTerminate(new ConsoleTerminateEvent($command, $input, $output, 0));
+        $this->listener->onConsoleTerminate(new ConsoleTerminateEvent($command, $input, $output, $exitCode));
     }
 
     /**
@@ -97,6 +103,11 @@ class DemoDataMigrationListenerTest extends \PHPUnit_Framework_TestCase
             'demo migration command' => [
                 'commandClass' => 'Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand',
                 'fixturesType' => LoadDataFixturesCommand::DEMO_FIXTURES_TYPE,
+            ],
+            'invalid demo migration command' => [
+                'commandClass' => 'Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand',
+                'fixturesType' => LoadDataFixturesCommand::DEMO_FIXTURES_TYPE,
+                'exitCode'     => 1
             ],
         ];
     }
