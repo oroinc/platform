@@ -87,4 +87,41 @@ class RawLayoutLoaderTest extends DeferredLayoutManipulatorTestCase
             $view
         );
     }
+
+    public function testLayoutWithChildrenAndAliases()
+    {
+        $config = [
+            'oro_layout' => [
+                'items' => [
+                    'root' => ['type' => 'root'],
+                    'header' => ['type' => 'header']
+                ],
+                'tree' => [
+                    'root' => [
+                        'children' => [
+                            'header' => []
+                        ]
+                    ]
+                ],
+                'aliases' => [
+                    'myroot' => 'root'
+                ]
+            ]
+        ];
+
+        $this->rawLayoutLoader->load($config);
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars' => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars' => ['id' => 'header'],
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
 }

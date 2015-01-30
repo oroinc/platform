@@ -4,6 +4,30 @@ namespace Oro\Component\Layout\Loader;
 
 use Oro\Component\Layout\LayoutManipulatorInterface;
 
+/**
+ * Example of config
+ * $config = [
+ *     'oro_layout' => [
+ *         'items' => [
+ *             'root' => ['type' => 'root'],
+ *             'header' => ['type' => 'header'],
+ *             'logo' => ['type' => 'logo', 'options' => ['title' => 'test']],
+ *         ],
+ *         'tree' => [
+ *             'root' => [
+ *                 'children' => [
+ *                     'header' => [
+ *                         'children' => [
+ *                             'logo' => []
+ *                         ]
+ *                     ],
+ *                 ]
+ *             ]
+ *         ]
+ *     ]
+ * ];
+ *
+ */
 class RawLayoutLoader
 {
     const LAYOUT_CONFIG_KEY = 'oro_layout';
