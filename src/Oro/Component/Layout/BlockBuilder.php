@@ -4,7 +4,7 @@ namespace Oro\Component\Layout;
 
 class BlockBuilder implements BlockBuilderInterface
 {
-    /** @var LayoutStructureManipulatorInterface */
+    /** @var LayoutManipulatorInterface */
     protected $layoutManipulator;
 
     /** @var ContextInterface */
@@ -14,10 +14,10 @@ class BlockBuilder implements BlockBuilderInterface
     protected $blockId;
 
     /**
-     * @param LayoutStructureManipulatorInterface $layoutManipulator
-     * @param ContextInterface                    $context
+     * @param LayoutManipulatorInterface $layoutManipulator
+     * @param ContextInterface           $context
      */
-    public function __construct(LayoutStructureManipulatorInterface $layoutManipulator, ContextInterface $context)
+    public function __construct(LayoutManipulatorInterface $layoutManipulator, ContextInterface $context)
     {
         $this->layoutManipulator = $layoutManipulator;
         $this->context           = $context;

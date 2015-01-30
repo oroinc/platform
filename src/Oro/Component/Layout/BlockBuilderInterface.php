@@ -14,7 +14,7 @@ interface BlockBuilderInterface
     /**
      * Returns the layout manipulator
      *
-     * @return LayoutStructureManipulatorInterface
+     * @return LayoutManipulatorInterface
      */
     public function getLayoutManipulator();
 

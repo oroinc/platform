@@ -3,18 +3,11 @@
 namespace Oro\Component\Layout;
 
 /**
- * In additional to LayoutStructureManipulatorInterface provides methods to manage the layout item options.
- * Options can be changed only before block types come in the game, so they cannot be changed
- * in a block type itself and block type related extensions.
+ * Provides methods to manage the layout structure and configuration.
  *
- * NOTES: we have to re-declare all methods from {@see LayoutStructureManipulatorInterface} here
- * because in other case "@return self" points to {@see LayoutStructureManipulatorInterface}
- * rather than {@see LayoutManipulatorInterface}.
- * But it is important for a client code because this interface provides "fluent" operations.
- *
- * If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
+ * NOTES: If a new "fluent" methods are added to this interface do not forget to re-declare it in inherited interfaces.
  */
-interface LayoutManipulatorInterface extends LayoutStructureManipulatorInterface
+interface LayoutManipulatorInterface
 {
     /**
      * Adds a new item to the layout
