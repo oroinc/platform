@@ -4,19 +4,16 @@ namespace Oro\Bundle\ConfigBundle\Config;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
-use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
+/**
+ * Abstract class for configuration scope
+ */
 abstract class AbstractScopeManager
 {
     /** @var ObjectManager */
     protected $om;
-
-    /** @var EventDispatcher */
-    protected $eventDispatcher;
 
     /** @var array */
     protected $storedSettings = [];
@@ -25,15 +22,12 @@ abstract class AbstractScopeManager
     protected $changedSettings = [];
 
     /**
-     * @param EventDispatcher $eventDispatcher
-     * @param ObjectManager   $om
+     * @param ObjectManager $om
      */
     public function __construct(
-        EventDispatcher $eventDispatcher,
         ObjectManager $om
     ) {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->om              = $om;
+        $this->om = $om;
     }
 
     /**
@@ -53,7 +47,10 @@ abstract class AbstractScopeManager
         if (isset($this->storedSettings[$entity][$entityId][$section][$key])) {
             $setting = $this->storedSettings[$entity][$entityId][$section][$key];
 
-            return is_array($setting) && array_key_exists('value', $setting) && !$full ? $setting['value'] : $setting;
+            if (is_array($setting) && array_key_exists('value', $setting) && !is_null($setting['value'])) {
+
+                return !$full ? $setting['value'] : $setting;
+            }
         }
 
         return null;
@@ -72,11 +69,15 @@ abstract class AbstractScopeManager
         $this->loadStoredSettings($entity, $entityId);
         list($section, $key) = explode(ConfigManager::SECTION_MODEL_SEPARATOR, $name);
 
-        $createdAt = null;
-        $updatedAt = null;
+        $createdAt   = null;
+        $updatedAt   = null;
+        $isNullValue = true;
+
         if (!empty($this->storedSettings[$entity][$entityId][$section][$key])) {
             $setting = $this->storedSettings[$entity][$entityId][$section][$key];
-            if (is_array($setting)) {
+
+            if (is_array($setting) && array_key_exists('value', $setting) && !is_null($setting['value'])) {
+                $isNullValue = false;
                 if (array_key_exists('createdAt', $setting)) {
                     $createdAt = $setting['createdAt'];
                 }
@@ -86,7 +87,7 @@ abstract class AbstractScopeManager
             }
         }
 
-        return ['createdAt' => $createdAt, 'updatedAt' => $updatedAt];
+        return [$createdAt, $updatedAt, $isNullValue];
     }
 
     /**
@@ -144,23 +145,26 @@ abstract class AbstractScopeManager
      */
     public function save($newSettings)
     {
-        $repository = $this->om->getRepository('OroConfigBundle:ConfigValue');
         /** @var Config $config */
         $config = $this->om
             ->getRepository('OroConfigBundle:Config')
             ->getByEntity($this->getScopedEntityName(), $this->getScopeId());
 
         list ($updated, $removed) = $this->calculateChangeSet($newSettings);
-
+        /** @var ConfigValue $value */
         if (!empty($removed)) {
-            $repository->removeValues($config, $removed);
+            foreach ($removed as $removedItemValue) {
+                $value = $config->getValue($removedItemValue[0], $removedItemValue[1]);
+                if ($value) {
+                    $value->clearValue();
+                }
+            }
         }
 
         foreach ($updated as $newItemKey => $newItemValue) {
             $newItemKey   = explode(ConfigManager::SECTION_VIEW_SEPARATOR, $newItemKey);
             $newItemValue = is_array($newItemValue) ? $newItemValue['value'] : $newItemValue;
 
-            /** @var ConfigValue $value */
             $value = $config->getOrCreateValue($newItemKey[0], $newItemKey[1]);
             $value->setValue($newItemValue);
 
@@ -172,10 +176,7 @@ abstract class AbstractScopeManager
         $this->om->persist($config);
         $this->om->flush();
 
-        $event = new ConfigUpdateEvent($this, $updated, $removed);
-        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
-
-        $this->reload();
+        return [$updated, $removed];
     }
 
     /**
@@ -191,18 +192,17 @@ abstract class AbstractScopeManager
         // find new and updated
         $updated = $removed = [];
         foreach ($newSettings as $key => $value) {
-            $currentValue = $this->get(
+            $currentValue = $this->getSettingValue(
                 str_replace(
                     ConfigManager::SECTION_VIEW_SEPARATOR,
                     ConfigManager::SECTION_MODEL_SEPARATOR,
                     $key
                 ),
-                false,
                 true
             );
 
-            // save only if setting exists and there's no default checkbox checked
-            if (!is_null($currentValue) && empty($value['use_parent_scope_value'])) {
+            // save only if there's no default checkbox checked
+            if (empty($value['use_parent_scope_value'])) {
                 $updated[$key] = $value;
             }
 

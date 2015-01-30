@@ -3,6 +3,9 @@
 namespace Oro\Bundle\ConfigBundle\Config;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigManager
 {
@@ -18,13 +21,19 @@ class ConfigManager
     /** @var string */
     protected $scopeName;
 
+    /** @var EventDispatcher */
+    protected $eventDispatcher;
+
     /**
      * @param ConfigDefinitionImmutableBag $configDefinition
+     * @param EventDispatcher              $eventDispatcher
      */
     public function __construct(
-        ConfigDefinitionImmutableBag $configDefinition
+        ConfigDefinitionImmutableBag $configDefinition,
+        EventDispatcher $eventDispatcher
     ) {
         $this->settings = $configDefinition->all();
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -112,7 +121,40 @@ class ConfigManager
      */
     public function getInfo($name)
     {
-        return $this->getScopeManager()->getInfo($name);
+        $managers = array_reverse($this->managers);
+
+        $createdValues = [];
+        $updatedValues = [];
+
+        $createdValue = $updatedValue  = null;
+        $valueWasFind = false;
+
+        foreach ($managers as $manager) {
+            list($created, $updated, $isNullValue) = $manager->getInfo($name);
+            if (!$isNullValue) {
+                $createdValue = $created;
+                $updatedValue = $updated;
+                $valueWasFind = true;
+                break;
+            }
+            if ($created) {
+                $createdValues[] = $created;
+            }
+            if ($updated) {
+                $updatedValues[] = $updated;
+            }
+        }
+
+        if (!$valueWasFind) {
+            if (!empty($createdValues)) {
+                $createdValue =  min($createdValues);
+            }
+            if (!empty($updatedValues)) {
+                $updatedValue =  max($updatedValues);
+            }
+        }
+
+        return ['createdAt' => $createdValue, 'updatedAt' => $updatedValue];
     }
 
     /**
@@ -145,11 +187,16 @@ class ConfigManager
     }
 
     /**
-     * Save settings with fallback to global scope (default)
+     * Save settings
      */
     public function save($newSettings)
     {
-        $this->getScopeManager()->save($newSettings);
+        list($updated, $removed) = $this->getScopeManager()->save($newSettings);
+
+        $event = new ConfigUpdateEvent($this, $updated, $removed);
+        $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
+
+        $this->getScopeManager()->reload();
     }
 
     /**

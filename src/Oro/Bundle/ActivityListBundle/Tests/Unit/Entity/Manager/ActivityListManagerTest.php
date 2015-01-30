@@ -55,7 +55,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $this->pager          = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager')
             ->disableOriginalConstructor()->getMock();
-        $this->config         = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+        $this->config         = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
         $this->provider = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')

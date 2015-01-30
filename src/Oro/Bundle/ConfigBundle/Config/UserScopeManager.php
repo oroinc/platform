@@ -4,6 +4,9 @@ namespace Oro\Bundle\ConfigBundle\Config;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
+/**
+ * User config scope
+ */
 class UserScopeManager extends AbstractScopeManager
 {
     /**

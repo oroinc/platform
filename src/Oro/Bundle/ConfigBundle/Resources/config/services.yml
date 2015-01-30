@@ -26,7 +26,6 @@ services:
     oro_config.scope.user:
         class:                        %oro_config.user.class%
         arguments:
-            - @event_dispatcher
             - @doctrine.orm.entity_manager
         calls:
             - [setSecurity, ["@security.context"]]
@@ -36,7 +35,6 @@ services:
     oro_config.scope.global:
         class:                        %oro_config.global.class%
         arguments:
-            - @event_dispatcher
             - @doctrine.orm.entity_manager
         tags:
             - { name: oro_config.scope, scope: global, priority: -255 }
@@ -45,22 +43,7 @@ services:
         class: %oro_config.manager.class%
         arguments:
             - @oro_config.config_definition_bag
-
-#    oro_config.user:
-#        class:                        %oro_config.user.class%
-#        arguments:
-#           - @event_dispatcher
-#           - @doctrine.orm.entity_manager
-#           - @oro_config.config_definition_bag
-#        calls:
-#             - [setSecurity, ["@security.context"]]
-#
-#    oro_config.global:
-#        class:                        %oro_config.global.class%
-#        arguments:
-#           - @event_dispatcher
-#           - @doctrine.orm.entity_manager
-#           - @oro_config.config_definition_bag
+            - @event_dispatcher
 
     oro_config.twig.config_extension:
         class: %oro_config.twig_extension.class%
@@ -77,7 +60,7 @@ services:
             - @form.factory
             - @oro_security.security_facade
         tags:
-            -  { name: oro_config.configuration_provider, scope: app }
+            -  { name: oro_config.configuration_provider }
         lazy: true
 
     oro_config.form.config_subscriber:
@@ -116,5 +99,4 @@ services:
         class: %oro_config.manager.api.class%
         arguments:
             - @oro_config.provider.system_configuration.form_provider
-            - @oro_config.global
         lazy: true

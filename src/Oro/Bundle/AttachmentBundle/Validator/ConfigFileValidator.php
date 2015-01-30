@@ -20,7 +20,7 @@ class ConfigFileValidator
     /** @var Validator */
     protected $validator;
 
-    /** @var UserConfigManager */
+    /** @var ConfigManager */
     protected $config;
 
     /** @var ConfigProvider */
@@ -29,7 +29,7 @@ class ConfigFileValidator
     /**
      * @param Validator         $validator
      * @param ConfigManager     $configManager
-     * @param UserConfigManager $config
+     * @param ConfigManager $config
      */
     public function __construct(Validator $validator, ConfigManager $configManager, $config)
     {
