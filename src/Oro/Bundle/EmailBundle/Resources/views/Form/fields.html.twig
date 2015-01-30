@@ -24,14 +24,6 @@
     {{ form_row(form) }}
 {% endblock %}
 
-{% block oro_email_email_addresser_row %}
-    {{ form_row(form, {'attr': {'class': 'from taggable-field'}}) }}
-{% endblock %}
-
-{% block oro_email_email_recipients_row %}
-    {{ form_row(form, {'attr': {'class': 'taggable-field'}}) }}
-{% endblock %}
-
 {% block oro_email_emailtemplate_translatation_widget %}
     <div class="emailtemplate-translatation oro-tabs tabbable">
         <ul class="nav nav-tabs">

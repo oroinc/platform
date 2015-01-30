@@ -8,8 +8,6 @@ parameters:
     oro_email.form.handler.email.class:                   Oro\Bundle\EmailBundle\Form\Handler\EmailHandler
     oro_email.form.type.email.class:                      Oro\Bundle\EmailBundle\Form\Type\EmailType
     oro_email.form.type.email_address.class:              Oro\Bundle\EmailBundle\Form\Type\EmailAddressType
-    oro_email.form.type.recipients.class:                 Oro\Bundle\EmailBundle\Form\Type\EmailRecipientsType
-    oro_email.form.type.addresser.class:                  Oro\Bundle\EmailBundle\Form\Type\EmailAddresserType
 
 services:
     oro_email.form.subscriber.emailtemplate:
@@ -85,13 +83,3 @@ services:
         class: %oro_email.form.type.email_address.class%
         tags:
             - { name: form.type, alias: oro_email_email_address }
-
-    oro_email.form.type.recipients:
-        class: %oro_email.form.type.recipients.class%
-        tags:
-            - { name: form.type, alias: oro_email_email_recipients }
-
-    oro_email.form.type.addresser:
-        class: %oro_email.form.type.addresser.class%
-        tags:
-            - { name: form.type, alias: oro_email_email_addresser }
