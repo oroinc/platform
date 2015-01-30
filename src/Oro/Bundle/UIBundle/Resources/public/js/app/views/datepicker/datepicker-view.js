@@ -45,6 +45,7 @@ define(function (require) {
         initialize: function (options) {
             var opts = {};
             $.extend(true, opts, this.defaults, options);
+            $.extend(this, _.pick(opts, ['nativeMode']));
 
             this.createFrontField(opts);
 
