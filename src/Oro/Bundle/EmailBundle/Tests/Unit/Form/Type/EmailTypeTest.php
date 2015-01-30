@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
+use Oro\Bundle\EmailBundle\Form\Type\EmailAddresserType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
@@ -46,6 +47,7 @@ class EmailTypeTest extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $richTextType = new OroRichTextType($configManager);
+        $emailAddresserType  = new EmailAddresserType($this->securityContext);
         $emailRecipientsType = new EmailRecipientsType($this->securityContext);
 
         return [
@@ -56,6 +58,7 @@ class EmailTypeTest extends TypeTestCase
                     $emailTemplateList->getName()   => $emailTemplateList,
                     $emailAddressType->getName()    => $emailAddressType,
                     $richTextType->getName()        => $richTextType,
+                    $emailAddresserType->getName()  => $emailAddresserType,
                     $emailRecipientsType->getName() => $emailRecipientsType,
                 ],
                 []
