@@ -6,7 +6,8 @@ define(function (require) {
         _ = require('underscore'),
         moment = require('moment'),
         datetimeFormatter = require('orolocale/js/formatter/datetime'),
-        BaseView = require('oroui/js/app/views/base/view');
+        BaseView = require('oroui/js/app/views/base/view'),
+        localeSettings  = require('orolocale/js/locale-settings');
     require('jquery-ui');
 
     DatePickerView = BaseView.extend({
@@ -160,7 +161,7 @@ define(function (require) {
                 momentInstance = this.getFrontendMoment(),
                 format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
-                value = momentInstance.format(format);
+                value = momentInstance.subtract(localeSettings.getTimeZoneShift(), 'm').format(format);
             }
             return value;
         },
@@ -174,7 +175,7 @@ define(function (require) {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.format(this.getDateFormat());
+                value = momentInstance.add(localeSettings.getTimeZoneShift(), 'm').format(this.getDateFormat());
             }
             return value;
         },
@@ -188,9 +189,8 @@ define(function (require) {
             var value, format, momentInstance;
             value = this.$el.val();
             format = this.backendFormat;
-            momentInstance = moment(value, format, true);
+            momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
-
                 return momentInstance;
             }
         },
@@ -204,7 +204,7 @@ define(function (require) {
             var value, format, momentInstance;
             value = this.$frontDateField.val();
             format = this.getDateFormat();
-            momentInstance = moment(value, format, true);
+            momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance;
             }

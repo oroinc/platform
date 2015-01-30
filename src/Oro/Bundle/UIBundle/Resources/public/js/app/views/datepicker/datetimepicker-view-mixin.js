@@ -5,7 +5,8 @@ define(function (require) {
         $ = require('jquery'),
         _ = require('underscore'),
         moment = require('moment'),
-        datetimeFormatter = require('orolocale/js/formatter/datetime');
+        datetimeFormatter = require('orolocale/js/formatter/datetime'),
+        localeSettings  = require('orolocale/js/locale-settings');
     require('oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker');
 
     /**
@@ -151,7 +152,7 @@ define(function (require) {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.format(this.getTimeFormat());
+                value = momentInstance.add(localeSettings.getTimeZoneShift(), 'm').format(this.getTimeFormat());
             }
             return value;
         },
@@ -167,7 +168,7 @@ define(function (require) {
             time = this.$frontTimeField.val();
             value = date + this.getSeparatorFormat() + time;
             format = this.getDateTimeFormat();
-            momentInstance = moment(value, format, true);
+            momentInstance = moment.utc(value, format, true);
             if (momentInstance.isValid()) {
                 return momentInstance;
             }
