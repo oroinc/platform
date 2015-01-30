@@ -4,10 +4,10 @@ To add new config scope, developer should do next steps.
 
 ### Add scope manager ###
 
-Scope manager is the main scope class. This class should be extended from the
-`Oro\Bundle\ConfigBundle\Config\AbstractScopeManager` and realize two abstract methods from this abstract class.
+Scope manager is the main scope class. This class should extend `Oro\Bundle\ConfigBundle\Config\AbstractScopeManager`
+and realize two abstract methods.
 
-In the simplest case, scope manager can be made as in example:
+In the simplest case, scope manager will looks like this:
 
 ``` php
 
@@ -33,7 +33,7 @@ In the simplest case, scope manager can be made as in example:
          */
         public function getScopeId()
         {
-            return 0; // scope entity id (can de different for different cases)
+            return 0; // scope entity id (can be different for different cases)
         }
     }
 
@@ -52,12 +52,12 @@ This manager should be registered as the service with tag `oro_config.scope` :
 
 ```
 
-After this, new `test scope` will be used during take some value. This scope will be between `global` and `user` scopes.
+After this, new `test scope` will be used during retrieving some config value. This scope will be between `global` and `user` scopes.
 Developer can use this scope with `oro_config.test` config provider.
 
-### Change scope values from  the UI ###
+### Change scope values via UI ###
 
-To be able to change values for new scope, developer should add new tree structure for this scope in `system_configuration.yml` file:
+To be able to change values for new scope, developer should add new tree structure for this scope in `system_configuration.yml` file, e.g.:
 
 ```yml
 
@@ -93,20 +93,20 @@ After this, developer should add new form provider for test scope:
     
     class TestConfigurationFormProvider extends SystemConfigurationFormProvider
     {
-        const ORGANIZATION_TREE_NAME  = 'test_configuration';
+        const TEST_TREE_NAME  = 'test_configuration';
     
         /**
          * {@inheritdoc}
          */
         public function getTree()
         {
-            return $this->getTreeData(self::ORGANIZATION_TREE_NAME, self::CORRECT_FIELDS_NESTING_LEVEL);
+            return $this->getTreeData(self::TEST_TREE_NAME, self::CORRECT_FIELDS_NESTING_LEVEL);
         }
     }
 
 ```
 
-and register this class as service with `oro_config.configuration_provider` tag:
+register it as a service with `oro_config.configuration_provider` tag:
 
 ```yml
 
@@ -121,7 +121,7 @@ and register this class as service with `oro_config.configuration_provider` tag:
           lazy: true
 ```
 
-And add new action to manipulate data:
+add new action to manipulate data:
 
 ```php
 
@@ -174,7 +174,7 @@ And add new action to manipulate data:
     }
 ```
 
-And the template:
+and the template:
  
 ```
     {% extends 'OroConfigBundle::configPage.html.twig' %}
