@@ -594,7 +594,7 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @return EmailRecipient[]
+     * @return ArrayCollection
      */
     public function getTo()
     {
@@ -602,7 +602,7 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @return EmailRecipient[]
+     * @return ArrayCollection
      */
     public function getCc()
     {
@@ -610,10 +610,20 @@ class Email extends ExtendEmail
     }
 
     /**
-     * @return EmailRecipient[]
+     * @return ArrayCollection
      */
     public function getBcc()
     {
         return $this->getRecipients(EmailRecipient::BCC);
+    }
+
+    /**
+     * @return EmailRecipient[]
+     */
+    public function getCcBcc()
+    {
+        return new ArrayCollection(
+            array_merge($this->getCc()->toArray(), $this->getBcc()->toArray())
+        );
     }
 }
