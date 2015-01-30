@@ -7,7 +7,8 @@ define(function (require) {
         _ = require('underscore'),
         datetimeFormatter = require('orolocale/js/formatter/datetime'),
         VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view'),
-        DateFilter = require('./date-filter');
+        DateFilter = require('./date-filter'),
+        tools = require('oroui/js/tools');
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
@@ -120,6 +121,23 @@ define(function (require) {
             this.subview('start').checkConsistency();
             this.subview('end').checkConsistency();
             return DatetimeFilter.__super__._readDOMValue.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _triggerUpdate: function (newValue, oldValue) {
+            if (!tools.isEqualsLoosely(newValue, oldValue)) {
+                var start = this.subview('start'),
+                    end = this.subview('end');
+                if (start && start.updateFront) {
+                    start.updateFront();
+                }
+                if (end && end.updateFront) {
+                    end.updateFront();
+                }
+                this.trigger('update');
+            }
         }
     });
 
