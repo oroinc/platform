@@ -28,7 +28,7 @@ class BlockTypeRegistry implements BlockTypeRegistryInterface
      */
     public function getBlockType($name)
     {
-        if (empty($name)) {
+        if (!$name) {
             throw new Exception\InvalidArgumentException('The block type name must not be empty.');
         }
         if (!is_string($name)) {

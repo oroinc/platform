@@ -117,7 +117,7 @@ class HierarchyCollection
                 )
             );
         }
-        if (empty($siblingId)) {
+        if (!$siblingId) {
             if ($prepend && !empty($current)) {
                 $current = array_merge([$id => $children], $current);
             } else {

@@ -75,6 +75,23 @@ class RawLayout
     }
 
     /**
+     * Returns the id of the parent layout item
+     *
+     * @param string $id The id or alias of the layout item
+     *
+     * @return string|null The id of the parent layout item or null if the given item is the root
+     */
+    public function getParentId($id)
+    {
+        $path = $this->getProperty($id, self::PATH);
+        array_pop($path);
+
+        return empty($path)
+            ? null // the given item is the root
+            : array_pop($path);
+    }
+
+    /**
      * Returns real id of the layout item
      *
      * @param string $id The id or alias of the layout item
@@ -109,14 +126,25 @@ class RawLayout
      * @param string                    $parentId  The id or alias of parent item. Set null to add the root item
      * @param string|BlockTypeInterface $blockType The block type associated with the layout item
      * @param array                     $options   The layout item options
+     * @param string|null               $siblingId The id or alias of an item which should be nearest neighbor
+     * @param bool                      $prepend   Determines whether the moving item should be located before or after
+     *                                             the specified sibling item
      *
      * @throws Exception\InvalidArgumentException if the id, parent id or block type are empty or invalid
      * @throws Exception\ItemAlreadyExistsException if the layout item with the same id already exists
      * @throws Exception\ItemNotFoundException if the parent layout item does not exist
      * @throws Exception\LogicException if the layout item cannot be added by other reasons
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function add($id, $parentId, $blockType, array $options = [])
-    {
+    public function add(
+        $id,
+        $parentId,
+        $blockType,
+        array $options = [],
+        $siblingId = null,
+        $prepend = false
+    ) {
         $this->validateId($id, true);
         $this->validateBlockType($blockType);
         if (isset($this->items[$id])) {
@@ -128,23 +156,33 @@ class RawLayout
                 )
             );
         }
-        if (empty($parentId)) {
-            if (!$this->hierarchy->isEmpty()) {
-                throw new Exception\LogicException(
-                    sprintf(
-                        'The "%s" item cannot be the root item'
-                        . ' because another root item ("%s") already exists.',
-                        $id,
-                        $this->hierarchy->getRootId()
-                    )
-                );
+        if (!$parentId && !$this->hierarchy->isEmpty()) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'The "%s" item cannot be the root item'
+                    . ' because another root item ("%s") already exists.',
+                    $id,
+                    $this->hierarchy->getRootId()
+                )
+            );
+        }
+        if ($parentId) {
+            $parentId = $this->validateAndResolveId($parentId);
+        }
+        if ($siblingId) {
+            $siblingId = $this->resolveId($siblingId);
+            if (!isset($this->items[$siblingId])) {
+                throw new Exception\ItemNotFoundException(sprintf('The "%s" sibling item does not exist.', $siblingId));
+            }
+            if ($parentId && $siblingId === $parentId) {
+                throw new Exception\LogicException('The sibling item cannot be the same as the parent item.');
             }
         }
 
-        $path = !empty($parentId)
-            ? $this->getProperty($parentId, self::PATH)
+        $path = $parentId
+            ? $this->getProperty($parentId, self::PATH, true)
             : [];
-        $this->hierarchy->add($path, $id);
+        $this->hierarchy->add($path, $id, $siblingId, $prepend);
         $path[]           = $id;
         $this->items[$id] = [
             self::PATH       => $path,
@@ -206,7 +244,7 @@ class RawLayout
     public function move($id, $parentId = null, $siblingId = null, $prepend = false)
     {
         $id = $this->validateAndResolveId($id);
-        if (!empty($parentId)) {
+        if ($parentId) {
             $parentId = $this->resolveId($parentId);
             if (!isset($this->items[$parentId])) {
                 throw new Exception\ItemNotFoundException(sprintf('The "%s" parent item does not exist.', $parentId));
@@ -215,7 +253,7 @@ class RawLayout
                 throw new Exception\LogicException('The parent item cannot be the same as the moving item.');
             }
         }
-        if (!empty($siblingId)) {
+        if ($siblingId) {
             $siblingId = $this->resolveId($siblingId);
             if (!isset($this->items[$siblingId])) {
                 throw new Exception\ItemNotFoundException(sprintf('The "%s" sibling item does not exist.', $siblingId));
@@ -224,14 +262,14 @@ class RawLayout
                 throw new Exception\LogicException('The sibling item cannot be the same as the moving item.');
             }
         }
-        if (empty($parentId) && empty($siblingId)) {
+        if (!$parentId && !$siblingId) {
             throw new Exception\LogicException('At least one parent or sibling item must be specified.');
         }
         $path = $this->items[$id][self::PATH];
-        if (empty($parentId)) {
+        if (!$parentId) {
             $parentPath = array_slice($path, 0, -1);
         } else {
-            if (!empty($siblingId) && $siblingId === $parentId) {
+            if ($siblingId && $siblingId === $parentId) {
                 throw new Exception\LogicException('The sibling item cannot be the same as the parent item.');
             }
             $parentPath = $this->items[$parentId][self::PATH];
@@ -249,7 +287,7 @@ class RawLayout
         $hierarchy = $this->hierarchy->get($path);
         $this->hierarchy->remove($path);
         $this->hierarchy->add($parentPath, $id, $siblingId, $prepend, $hierarchy);
-        if (!empty($parentId)) {
+        if ($parentId) {
             // build the new path
             $newPath   = $parentPath;
             $newPath[] = $id;
@@ -544,7 +582,7 @@ class RawLayout
      */
     protected function validateId($id, $fullCheck = false)
     {
-        if (empty($id)) {
+        if (!$id) {
             throw new Exception\InvalidArgumentException('The item id must not be empty.');
         }
         if ($fullCheck) {
@@ -597,7 +635,7 @@ class RawLayout
      */
     protected function validateAlias($alias, $fullCheck = false)
     {
-        if (empty($alias)) {
+        if (!$alias) {
             throw new Exception\InvalidArgumentException('The item alias must not be empty.');
         }
         if ($fullCheck) {
@@ -626,7 +664,7 @@ class RawLayout
      */
     protected function validateBlockType($blockType)
     {
-        if (empty($blockType)) {
+        if (!$blockType) {
             throw new Exception\InvalidArgumentException('The block type name must not be empty.');
         }
         if (!$blockType instanceof BlockTypeInterface) {

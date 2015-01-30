@@ -37,9 +37,15 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function add($id, $parentId = null, $blockType = null, array $options = [])
-    {
-        $this->layoutManipulator->add($id, $parentId, $blockType, $options);
+    public function add(
+        $id,
+        $parentId = null,
+        $blockType = null,
+        array $options = [],
+        $siblingId = null,
+        $prepend = false
+    ) {
+        $this->layoutManipulator->add($id, $parentId, $blockType, $options, $siblingId, $prepend);
 
         return $this;
     }

@@ -16,10 +16,20 @@ interface LayoutManipulatorInterface
      * @param string                    $parentId  The parent item id or alias
      * @param string|BlockTypeInterface $blockType The block type associated with the item
      * @param array                     $options   The item options
+     * @param string|null               $siblingId The id or alias of an item which should be nearest neighbor
+     * @param bool                      $prepend   Determines whether the moving item should be located before or after
+     *                                             the specified sibling item
      *
      * @return self
      */
-    public function add($id, $parentId = null, $blockType = null, array $options = []);
+    public function add(
+        $id,
+        $parentId = null,
+        $blockType = null,
+        array $options = [],
+        $siblingId = null,
+        $prepend = false
+    );
 
     /**
      * Removes the item from the layout

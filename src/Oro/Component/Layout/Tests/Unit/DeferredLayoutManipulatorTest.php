@@ -13,7 +13,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
-     * @expectedExceptionMessage Failed to apply scheduled changes. 2 action(s) cannot be applied. Actions: add(header), add(logo).
+     * @expectedExceptionMessage Failed to apply scheduled changes. 2 action(s) cannot be applied. Actions: add(header, unknown_root), add(logo, header).
      */
     // @codingStandardsIgnoreEnd
     public function testAddItemToUnknownParent()
@@ -260,7 +260,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "logo" item to the layout. ParentId: root. BlockType: logo. Reason: The "logo" item already exists. Remove existing item before add the new item with the same id.
+     * @expectedExceptionMessage Cannot add "logo" item to the layout. ParentId: root. BlockType: logo. SiblingId: . Reason: The "logo" item already exists. Remove existing item before add the new item with the same id.
      */
     // @codingStandardsIgnoreEnd
     public function testDuplicateAdd()
@@ -272,6 +272,158 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->add('logo', 'root', 'logo');
 
         $this->getLayoutView();
+    }
+
+    public function testAddWithSibling()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo2', 'header', 'logo', [], 'logo3')
+            ->add('logo1', 'header', 'logo', [])
+            ->add('logo3', 'header', 'logo', [], 'logo1', true);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAddWithUnknownSibling()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo2', 'header', 'logo', [], 'unknown1')
+            ->add('logo1', 'header', 'logo', [])
+            ->add('logo3', 'header', 'logo', [], 'unknown2', true);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => '']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAddWithSiblingAndMoveToUnknownSiblingAfterAdd()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('header2', 'root', 'header')
+            ->add('logo1', 'header1', 'logo', [])
+            ->add('logo2', 'header2', 'logo', [])
+            ->add('logo3', 'header1', 'logo', [], 'logo2')
+            ->move('logo2', 'header1', 'unknown', true);
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars'     => ['id' => 'header1'],
+                        'children' => [
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => []
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAddWithSiblingAndMoveToUnknownSiblingBeforeAdd()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header1', 'root', 'header')
+            ->add('header2', 'root', 'header')
+            ->add('logo1', 'header1', 'logo', [])
+            ->add('logo2', 'header2', 'logo', [])
+            ->move('logo2', 'header1', 'unknown', true)
+            ->add('logo3', 'header1', 'logo', [], 'logo2');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header1
+                        'vars'     => ['id' => 'header1'],
+                        'children' => [
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // header2
+                        'vars'     => ['id' => 'header2'],
+                        'children' => []
+                    ]
+                ]
+            ],
+            $view
+        );
     }
 
     public function testSetOption()

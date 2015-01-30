@@ -42,12 +42,14 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $parentId  = 'test_parent_id';
         $blockType = 'test_block_type';
         $options   = ['test' => 'val'];
+        $siblingId = 'test_sibling_id';
+        $prepend   = true;
 
         $this->layoutManipulator->expects($this->once())
             ->method('add')
-            ->with($id, $parentId, $blockType, $options);
+            ->with($id, $parentId, $blockType, $options, $siblingId, $prepend);
 
-        $result = $this->layoutBuilder->add($id, $parentId, $blockType, $options);
+        $result = $this->layoutBuilder->add($id, $parentId, $blockType, $options, $siblingId, $prepend);
         $this->assertSame($this->layoutBuilder, $result);
     }
 
