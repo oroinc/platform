@@ -1,0 +1,2 @@
+bundles:
+    - OroImapBundle:Form:fields.html.twig
