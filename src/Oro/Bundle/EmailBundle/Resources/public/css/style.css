@@ -56,3 +56,23 @@
 .ui-dialog .email-form .form-horizontal .control-group {
     max-width: none;
 }
+.select2-container.select2-container-multi.taggable-email {
+    width: calc(~"97% + 12px");
+    max-width: none;
+    position: relative;
+}
+.select2-container.select2-container-multi.taggable-email ul.select2-choices {
+    padding-right: 60px;
+}
+#cc-bcc-holder {
+    position: absolute;
+    top: 5px;
+    right: 0;
+}
+#showCc, #showBcc {
+    cursor:pointer;
+    padding: 0 5px;
+}
+#showCc:hover, #showBcc:hover {
+    text-decoration: underline;
+}

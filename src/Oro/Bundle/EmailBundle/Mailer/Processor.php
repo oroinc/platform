@@ -17,6 +17,13 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Class Processor
+ *
+ * @package Oro\Bundle\EmailBundle\Mailer
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Processor
 {
     /** @var EntityManager */
@@ -84,6 +91,8 @@ class Processor
         $message->setDate($messageDate->getTimestamp());
         $message->setFrom($this->getAddresses($model->getFrom()));
         $message->setTo($this->getAddresses($model->getTo()));
+        $message->setCc($this->getAddresses($model->getCc()));
+        $message->setBcc($this->getAddresses($model->getBcc()));
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
@@ -102,7 +111,10 @@ class Processor
             $model->getTo(),
             $messageDate,
             $messageDate,
-            $messageDate
+            $messageDate,
+            Email::NORMAL_IMPORTANCE,
+            $model->getCc(),
+            $model->getBcc()
         );
 
         $email->addFolder($origin->getFolder(FolderType::SENT));
@@ -200,8 +212,8 @@ class Processor
         if (!$model->getFrom()) {
             throw new \InvalidArgumentException('Sender can not be empty');
         }
-        if (!$model->getTo()) {
-            throw new \InvalidArgumentException('Recipient can not be empty');
+        if (!$model->getTo() && !$model->getCc() && !$model->getBcc()) {
+                throw new \InvalidArgumentException('Recipient can not be empty');
         }
     }
 

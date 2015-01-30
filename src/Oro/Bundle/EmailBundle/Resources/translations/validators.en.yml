@@ -1,1 +1,3 @@
 "The template for {{ field }} ({{ locale }}) has syntax error: {{ error }}": "The template for {{ field }} ({{ locale }}) has syntax error: {{ error }}"
+"This value contains not valid email address.": "This value contains not valid email address."
+"Recipient can not be empty": "Recipient can not be empty"
