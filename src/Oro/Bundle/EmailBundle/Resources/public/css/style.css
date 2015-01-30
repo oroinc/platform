@@ -57,19 +57,17 @@
     max-width: none;
 }
 .select2-container.select2-container-multi.taggable-email {
-    padding-left: 6px;
-    padding-top: 1px;
-    padding-right: 6px;
-    width: 97%;
+    width: calc(~"97% + 12px");
     max-width: none;
+    position: relative;
 }
 .select2-container.select2-container-multi.taggable-email ul.select2-choices {
-    display: inline-block;
-    width: 90%;
+    padding-right: 60px;
 }
 #cc-bcc-holder {
-    display: inline-block;
-    float: right;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 #showCc, #showBcc {
     cursor:pointer;
