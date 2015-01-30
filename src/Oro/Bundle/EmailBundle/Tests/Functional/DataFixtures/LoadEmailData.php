@@ -17,7 +17,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
 {
     /**
-     * @var string
+     * @var array
      */
     protected $templates;
 
@@ -92,18 +92,9 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
      */
     protected function loadEmailsDemo(ObjectManager $om)
     {
-//        $contacts = $om->getRepository('OroCRMContactBundle:Contact')->findAll();
-//        $contactCount = count($contacts);
-
         foreach ($this->templates as $index => $template) {
-//            $contactRandom = rand(0, $contactCount - 1);
-
-//            /** @var Contact $contact */
-//            $contact = $contacts[$contactRandom];
             $owner = $this->getReference('simple_user');
             $origin = $this->mailerProcessor->getEmailOrigin($owner->getEmail());
-
-//            $randomTemplate = array_rand($this->templates);
 
             $email = $this->emailEntityBuilder->email(
                 $template['Subject'],
@@ -117,7 +108,6 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
                 "bcc{$index}@example.com"
             );
 
-//            $this->setSecurityContext($owner);
             $email->addFolder($origin->getFolder(FolderType::SENT));
 
             $emailBody = $this->emailEntityBuilder->body(
@@ -128,23 +118,9 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $email->setEmailBody($emailBody);
             $email->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
             $this->setReference('email_' . ($index + 1), $email);
+            $this->setReference('emailBody_' . ($index + 1), $emailBody);
 
             $this->emailEntityBuilder->getBatch()->persist($om);
         }
     }
-
-//    /**
-//     * @param User $user
-//     */
-//    protected function setSecurityContext($user)
-//    {
-//        $securityContext = $this->container->get('security.context');
-//        $token = new UsernamePasswordOrganizationToken(
-//            $user,
-//            $user->getUsername(),
-//            'main',
-//            $this->getReference('default_organization')
-//        );
-//        $securityContext->setToken($token);
-//    }
 }

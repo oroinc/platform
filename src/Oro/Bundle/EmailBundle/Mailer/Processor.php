@@ -213,7 +213,7 @@ class Processor
             throw new \InvalidArgumentException('Sender can not be empty');
         }
         if (!$model->getTo() && !$model->getCc() && !$model->getBcc()) {
-            throw new \InvalidArgumentException('Recipient can not be empty');
+                throw new \InvalidArgumentException('Recipient can not be empty');
         }
     }
 

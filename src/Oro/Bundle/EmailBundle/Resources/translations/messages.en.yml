@@ -84,6 +84,8 @@ oro:
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
             unable_to_send_email:         "Unable to send the email."
+            sender_can_not_be_empty:      "Sender can not be empty"
+            recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
         from_email_address.label: From
@@ -104,7 +106,7 @@ oro:
         subject.label:            Subject
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
-        template.label:           Template
+        template.label:           Apply template
         type.label:               Type
 
         empty_body:               Empty body

@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle;
 
 use Psr\Log\LoggerInterface;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -11,7 +12,9 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class SecurityFacade
@@ -52,6 +55,14 @@ class SecurityFacade
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->entityClassResolver   = $classResolver;
         $this->logger                = $logger;
+    }
+
+    /**
+     * @return null|TokenInterface
+     */
+    public function getToken()
+    {
+        return $this->securityContext->getToken();
     }
 
     /**
