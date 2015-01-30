@@ -14,14 +14,14 @@ define(function (require) {
     $.extend($.fn.timepicker.defaults, {
         timeFormat: timeFormat,
         lang: {
-            am: __('oro.form.datepicker.am'),
-            pm: __('oro.form.datepicker.pm'),
-            AM: __('oro.form.datepicker.AM'),
-            PM: __('oro.form.datepicker.PM'),
+            am: __('oro.ui.timepicker.am'),
+            pm: __('oro.ui.timepicker.pm'),
+            AM: __('oro.ui.timepicker.AM'),
+            PM: __('oro.ui.timepicker.PM'),
             decimal: decimal,
-            mins: __('oro.form.datepicker.mins'),
-            hr: __('oro.form.datepicker.hr'),
-            hrs: __('oro.form.datepicker.hrs')
+            mins: __('oro.ui.timepicker.mins'),
+            hr: __('oro.ui.timepicker.hr'),
+            hrs: __('oro.ui.timepicker.hrs')
         }
     });
 });

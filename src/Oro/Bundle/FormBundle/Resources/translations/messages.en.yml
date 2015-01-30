@@ -8,7 +8,7 @@ oro:
     form:
         choose_value: Choose a value...
         choose_date: Choose a date
-        choose_time: and time
+        choose_time: time
         click_here_to_select: Click here to select...
         tooltip.read_more: Read more
         color:
