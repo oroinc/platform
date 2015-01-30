@@ -69,6 +69,84 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
+    public function testAddWithSiblingAsAlias()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root_alias', 'header')
+            ->add('logo2', 'header_alias', 'logo', [], 'logo_alias3')
+            ->add('logo1', 'header_alias', 'logo', [])
+            ->add('logo3', 'header_alias', 'logo', [], 'logo_alias1', true)
+            ->addAlias('root_alias', 'root')
+            ->addAlias('header_alias', 'header')
+            ->addAlias('logo_alias1', 'logo1')
+            ->addAlias('logo_alias3', 'logo3');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testAddWithSiblingAsUnknownAlias()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root_alias', 'header')
+            ->add('logo2', 'header_alias', 'logo', [], 'unknown_alias1')
+            ->add('logo1', 'header_alias', 'logo', [])
+            ->add('logo3', 'header_alias', 'logo', [], 'unknown_alias2', true)
+            ->addAlias('root_alias', 'root')
+            ->addAlias('header_alias', 'header')
+            ->addAlias('logo_alias1', 'logo1')
+            ->addAlias('logo_alias3', 'logo3');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => '']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     /** It is expected that children are added in the same order as they are registered */
     public function testAddByAliasTwoChildrenButTheFirstChildIsAddedBeforeContainer()
     {

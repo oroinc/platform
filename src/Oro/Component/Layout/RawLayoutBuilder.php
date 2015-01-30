@@ -24,17 +24,24 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function add($id, $parentId = null, $blockType = null, array $options = [])
-    {
+    public function add(
+        $id,
+        $parentId = null,
+        $blockType = null,
+        array $options = [],
+        $siblingId = null,
+        $prepend = false
+    ) {
         try {
-            $this->rawLayout->add($id, $parentId, $blockType, $options);
+            $this->rawLayout->add($id, $parentId, $blockType, $options, $siblingId, $prepend);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
                 sprintf(
-                    'Cannot add "%s" item to the layout. ParentId: %s. BlockType: %s. Reason: %s',
+                    'Cannot add "%s" item to the layout. ParentId: %s. BlockType: %s. SiblingId: %s. Reason: %s',
                     $id,
                     $parentId,
                     $blockType instanceof BlockTypeInterface ? $blockType->getName() : $blockType,
+                    $siblingId,
                     $e->getMessage()
                 ),
                 0,
@@ -142,7 +149,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function setOption($id, $optionName, $optionValue)
     {
         try {
-            if (empty($optionName)) {
+            if (!$optionName) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
             }
             if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
@@ -173,7 +180,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function removeOption($id, $optionName)
     {
         try {
-            if (empty($optionName)) {
+            if (!$optionName) {
                 throw new Exception\InvalidArgumentException('The option name must not be empty.');
             }
             if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
@@ -204,7 +211,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function setBlockTheme($themes, $id = null)
     {
         try {
-            if (empty($id)) {
+            if (!$id) {
                 $id = $this->rawLayout->getRootId();
             }
             $this->rawLayout->setBlockTheme($id, $themes);
@@ -237,6 +244,17 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function has($id)
     {
         return $this->rawLayout->has($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isParentFor($parentId, $id)
+    {
+        return
+            $this->rawLayout->has($parentId)
+            && $this->rawLayout->has($id)
+            && $this->rawLayout->getParentId($id) === $this->rawLayout->resolveId($parentId);
     }
 
     /**

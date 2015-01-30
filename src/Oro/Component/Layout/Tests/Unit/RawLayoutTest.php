@@ -9,6 +9,7 @@ use Oro\Component\Layout\RawLayout;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class RawLayoutTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,6 +45,62 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
 
         // do test
         $this->assertEquals('root', $this->rawLayout->getRootId());
+    }
+
+    public function testGetParentId()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+
+        // do test
+        $this->assertEquals('root', $this->rawLayout->getParentId('header'));
+    }
+
+    public function testGetParentIdByAlias()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+        $this->rawLayout->addAlias('header_alias', 'header');
+
+        // do test
+        $this->assertEquals('root', $this->rawLayout->getParentId('header_alias'));
+    }
+
+    public function testGetParentIdForRootItem()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+
+        // do test
+        $this->assertEquals(null, $this->rawLayout->getParentId('root'));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
+     * @expectedExceptionMessage The "unknown" item does not exist.
+     */
+    public function testGetParentIdForUnknownItem()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header', 'root', 'header');
+
+        // do test
+        $this->rawLayout->getParentId('unknown');
+    }
+
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The item id must not be empty.
+     */
+    public function testGetParentIdWithEmptyId($id)
+    {
+        $this->rawLayout->getParentId($id);
     }
 
     public function testResolveId()
@@ -180,6 +237,108 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
             )
         );
         $this->rawLayout->add('root', null, $blockTypeName);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
+     * @expectedExceptionMessage The "unknown" sibling item does not exist.
+     */
+    public function testAddToUnknownSibling()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+
+        // do test
+        $this->rawLayout->add('item2', 'header1', 'label', [], 'unknown');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage The sibling item cannot be the same as the parent item.
+     */
+    public function testAddWhenParentEqualsToSibling()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->addAlias('test_header', 'header1');
+        $this->rawLayout->addAlias('test_item', 'test_header');
+
+        // do test
+        $this->rawLayout->add('item2', 'test_header', 'label', [], 'test_item');
+    }
+
+    public function testAddToEnd()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('item2', 'header1', 'label');
+        $this->rawLayout->addAlias('test_header', 'header1');
+
+        // do test
+        $this->rawLayout->add('item3', 'test_header', 'label', []);
+        $this->assertSame(
+            ['item1', 'item2', 'item3'],
+            array_keys($this->rawLayout->getHierarchy('header1'))
+        );
+    }
+
+    public function testAddToBegin()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('item2', 'header1', 'label');
+        $this->rawLayout->addAlias('test_header', 'header1');
+
+        // do test
+        $this->rawLayout->add('item3', 'test_header', 'label', [], null, true);
+        $this->assertSame(
+            ['item3', 'item1', 'item2'],
+            array_keys($this->rawLayout->getHierarchy('header1'))
+        );
+    }
+
+    public function testAddAfterSibling()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('item2', 'header1', 'label');
+        $this->rawLayout->addAlias('test_header', 'header1');
+        $this->rawLayout->addAlias('test_item', 'item1');
+
+        // do test
+        $this->rawLayout->add('item3', 'test_header', 'label', [], 'test_item');
+        $this->assertSame(
+            ['item1', 'item3', 'item2'],
+            array_keys($this->rawLayout->getHierarchy('header1'))
+        );
+    }
+
+    public function testAddBeforeSibling()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->add('header1', 'root', 'header');
+        $this->rawLayout->add('item1', 'header1', 'label');
+        $this->rawLayout->add('item2', 'header1', 'label');
+        $this->rawLayout->addAlias('test_header', 'header1');
+        $this->rawLayout->addAlias('test_item', 'item2');
+
+        // do test
+        $this->rawLayout->add('item3', 'test_header', 'label', [], 'test_item', true);
+        $this->assertSame(
+            ['item1', 'item3', 'item2'],
+            array_keys($this->rawLayout->getHierarchy('header1'))
+        );
     }
 
     public function testRemove()

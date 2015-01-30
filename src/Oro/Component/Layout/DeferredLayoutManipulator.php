@@ -50,8 +50,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      * Example:
      *  [
      *      'add' => [ // add new items related actions: add, move, addAlias, setOption, removeOption
-     *          ['add', ['root', null, 'root', []]],
-     *          ['add', ['my_label', 'my_root', 'label', ['text' => 'test']]],
+     *          ['add', ['root', null, 'root', [], null, false]],
+     *          ['add', ['my_label', 'my_root', 'label', ['text' => 'test'], null, true]],
      *          ['addAlias', ['my_root', 'root']],
      *      ],
      *      'remove' => [ // remove items related actions: remove, removeAlias
@@ -79,9 +79,18 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * {@inheritdoc}
      */
-    public function add($id, $parentId = null, $blockType = null, array $options = [])
-    {
-        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $parentId, $blockType, $options]];
+    public function add(
+        $id,
+        $parentId = null,
+        $blockType = null,
+        array $options = [],
+        $siblingId = null,
+        $prepend = false
+    ) {
+        $this->actions[self::GROUP_ADD][] = [
+            __FUNCTION__,
+            [$id, $parentId, $blockType, $options, $siblingId, $prepend]
+        ];
         $this->addCounter++;
 
         return $this;
@@ -244,10 +253,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             }
         }
         // remove remaining 'remove' actions if there are no any 'add' actions
-        if (!empty($this->actions[self::GROUP_REMOVE])) {
-            if (!empty($this->actions[self::GROUP_REMOVE]) && empty($this->actions[self::GROUP_ADD])) {
-                unset($this->actions[self::GROUP_REMOVE]);
-            }
+        if (!empty($this->actions[self::GROUP_REMOVE]) && empty($this->actions[self::GROUP_ADD])) {
+            unset($this->actions[self::GROUP_REMOVE]);
         }
     }
 
@@ -264,19 +271,31 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         if (!empty($this->actions[self::GROUP_ADD])) {
             $this->executeDependedActions(self::GROUP_ADD);
         }
-        // the siblingId argument in the 'move' action is "optional", this means that if it is not possible
-        // to locate an item near to sibling due to the sibling item does not exist
-        // we should try to execute such 'move' action without siblingId argument
-        if (!empty($this->actions[self::GROUP_ADD])) {
-            $hasChanges = false;
+
+        // Here are several special rules:
+        // 1) the siblingId argument in the 'add' action is "optional", this means that
+        //    if it is not possible to add an item near to the sibling item due to it does not exist
+        //    we should try to execute such 'add' action without siblingId argument
+        // 2) the siblingId argument in the 'move' action is "optional", this means that
+        //    if it is not possible to locate an item near to the sibling item due to it does not exist
+        //    we should try to execute such 'move' action without siblingId argument
+        $continue = true;
+        while ($continue && !empty($this->actions[self::GROUP_ADD])) {
+            $continue = false;
             foreach ($this->actions[self::GROUP_ADD] as $key => $action) {
-                if ($action[0] === self::MOVE && !empty($action[1][2])) {
+                if (self::ADD === $action[0] && $action[1][4]) {
+                    $this->actions[self::GROUP_ADD][$key][1][4] = null;
+                    if (0 !== $this->executeDependedActions(self::GROUP_ADD)) {
+                        $continue = true;
+                        break;
+                    }
+                } elseif (self::MOVE === $action[0] && $action[1][2]) {
                     $this->actions[self::GROUP_ADD][$key][1][2] = null;
-                    $hasChanges                                 = true;
+                    if (0 !== $this->executeDependedActions(self::GROUP_ADD)) {
+                        $continue = true;
+                        break;
+                    }
                 }
-            }
-            if ($hasChanges) {
-                $this->executeActions(self::GROUP_ADD);
             }
         }
     }
@@ -307,36 +326,45 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     {
         switch ($name) {
             case self::ADD:
-                $parentId = $args[1];
+                $parentId  = $args[1];
+                $siblingId = $args[4];
 
-                return empty($parentId) || $this->rawLayoutBuilder->has($parentId);
+                return
+                    !$parentId
+                    || (
+                        $this->rawLayoutBuilder->has($parentId)
+                        && (!$siblingId || $this->rawLayoutBuilder->isParentFor($parentId, $siblingId))
+                    );
             case self::REMOVE:
             case self::SET_OPTION:
             case self::REMOVE_OPTION:
                 $id = $args[0];
 
-                return empty($id) || $this->rawLayoutBuilder->has($id);
+                return !$id || $this->rawLayoutBuilder->has($id);
             case self::MOVE:
                 $id        = $args[0];
                 $parentId  = $args[1];
                 $siblingId = $args[2];
 
                 return
-                    (empty($id) || $this->rawLayoutBuilder->has($id))
-                    && (empty($parentId) || $this->rawLayoutBuilder->has($parentId))
-                    && (empty($siblingId) || $this->rawLayoutBuilder->has($siblingId));
+                    (!$id || $this->rawLayoutBuilder->has($id))
+                    && (!$parentId || $this->rawLayoutBuilder->has($parentId))
+                    && (
+                        !$siblingId
+                        || (!$parentId || $this->rawLayoutBuilder->isParentFor($parentId, $siblingId))
+                    );
             case self::SET_BLOCK_THEME:
                 $id = $args[1];
 
-                return (empty($id) && !$this->rawLayoutBuilder->isEmpty()) || $this->rawLayoutBuilder->has($id);
+                return (!$id && !$this->rawLayoutBuilder->isEmpty()) || $this->rawLayoutBuilder->has($id);
             case self::ADD_ALIAS:
                 $id = $args[1];
 
-                return empty($id) || $this->rawLayoutBuilder->has($id);
+                return !$id || $this->rawLayoutBuilder->has($id);
             case self::REMOVE_ALIAS:
                 $alias = $args[0];
 
-                return empty($alias) || $this->rawLayoutBuilder->hasAlias($alias);
+                return !$alias || $this->rawLayoutBuilder->hasAlias($alias);
         }
 
         return true;
@@ -347,15 +375,21 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      * Use this method if the group does not contain depended each other actions
      *
      * @param string $group
+     *
+     * @return int The number of executed actions
      */
     protected function executeActions($group)
     {
+        $executeCounter = 0;
         foreach ($this->actions[$group] as $key => $action) {
             if ($this->isActionReadyToExecute($action[0], $action[1])) {
                 call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
                 unset($this->actions[$group][$key]);
+                $executeCounter++;
             }
         }
+
+        return $executeCounter;
     }
 
     /**
@@ -364,10 +398,13 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      * This method guarantee that all actions are executed in the order they are registered
      *
      * @param string $group
+     *
+     * @return int The number of executed actions
      */
     protected function executeDependedActions($group)
     {
-        $continue = true;
+        $executeCounter = 0;
+        $continue       = true;
         while ($continue) {
             $continue    = false;
             $hasExecuted = false;
@@ -376,6 +413,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                 if ($this->isActionReadyToExecute($action[0], $action[1])) {
                     call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
                     unset($this->actions[$group][$key]);
+                    $executeCounter++;
                     $hasExecuted = true;
                     if ($hasSkipped) {
                         // start execution from the begin
@@ -392,6 +430,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                 }
             }
         }
+
+        return $executeCounter;
     }
 
     /**
@@ -411,7 +451,26 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                 'Failed to apply scheduled changes. %d action(s) cannot be applied.',
                 count($exActions)
             ),
-            $exActions
+            $exActions,
+            [$this, 'convertActionArgsToString']
         );
+    }
+
+    /**
+     * @param array $action
+     *
+     * @return string|null
+     */
+    public function convertActionArgsToString(array $action)
+    {
+        switch ($action['name']) {
+            case self::ADD:
+            case self::ADD_ALIAS:
+                return sprintf('%s, %s', $action['args'][0], $action['args'][1]);
+            case self::SET_BLOCK_THEME:
+                return sprintf('%s', $action['args'][1]);
+        }
+
+        return null;
     }
 }

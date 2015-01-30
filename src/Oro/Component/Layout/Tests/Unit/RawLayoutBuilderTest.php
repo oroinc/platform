@@ -77,6 +77,34 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertFalse($this->rawLayoutBuilder->isEmpty());
     }
 
+    /**
+     * @dataProvider isParentForDataProvider
+     */
+    public function testIsParentFor($expected, $parentId, $id)
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo')
+            ->addAlias('root_alias', 'root')
+            ->addAlias('header_alias', 'header')
+            ->addAlias('logo_alias', 'logo');
+
+        $this->assertEquals($expected, $this->rawLayoutBuilder->isParentFor($parentId, $id));
+    }
+
+    public function isParentForDataProvider()
+    {
+        return [
+            [true, 'header', 'logo'],
+            [true, 'header_alias', 'logo_alias'],
+            [false, 'root', 'logo'],
+            [false, 'unknown', 'logo'],
+            [false, 'header', 'unknown'],
+            [false, 'unknown', 'unknown']
+        ];
+    }
+
     public function testSimpleLayout()
     {
         $this->rawLayoutBuilder
@@ -107,7 +135,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage Cannot add "test" item to the layout. ParentId: root. BlockType: root. Reason: The "root" item does not exist.
+     * @expectedExceptionMessage Cannot add "test" item to the layout. ParentId: root. BlockType: root. SiblingId: . Reason: The "root" item does not exist.
      */
     // @codingStandardsIgnoreEnd
     public function testAddToUnknownParent()
