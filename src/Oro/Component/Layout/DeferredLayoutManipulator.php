@@ -36,8 +36,11 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** The action name for remove an option for the layout item */
     const REMOVE_OPTION = 'removeOption';
 
+    /** The action name for add the theme(s) to be used for rendering the layout item and its children */
+    const SET_BLOCK_THEME = 'setBlockTheme';
+
     /** @var RawLayoutBuilderInterface */
-    protected $layout;
+    protected $rawLayoutBuilder;
 
     /**
      * The list of all scheduled actions to be executed by applyChanges method
@@ -66,11 +69,11 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     protected $removeCounter = 0;
 
     /**
-     * @param RawLayoutBuilderInterface $layout
+     * @param RawLayoutBuilderInterface $rawLayoutBuilder
      */
-    public function __construct(RawLayoutBuilderInterface $layout)
+    public function __construct(RawLayoutBuilderInterface $rawLayoutBuilder)
     {
-        $this->layout = $layout;
+        $this->rawLayoutBuilder = $rawLayoutBuilder;
     }
 
     /**
@@ -143,6 +146,16 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function removeOption($id, $optionName)
     {
         $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $optionName]];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setBlockTheme($themes, $id = null)
+    {
+        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$themes, $id]];
 
         return $this;
     }
@@ -296,30 +309,34 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             case self::ADD:
                 $parentId = $args[1];
 
-                return empty($parentId) || $this->layout->has($parentId);
+                return empty($parentId) || $this->rawLayoutBuilder->has($parentId);
             case self::REMOVE:
             case self::SET_OPTION:
             case self::REMOVE_OPTION:
                 $id = $args[0];
 
-                return empty($id) || $this->layout->has($id);
+                return empty($id) || $this->rawLayoutBuilder->has($id);
             case self::MOVE:
                 $id        = $args[0];
                 $parentId  = $args[1];
                 $siblingId = $args[2];
 
                 return
-                    (empty($id) || $this->layout->has($id))
-                    && (empty($parentId) || $this->layout->has($parentId))
-                    && (empty($siblingId) || $this->layout->has($siblingId));
+                    (empty($id) || $this->rawLayoutBuilder->has($id))
+                    && (empty($parentId) || $this->rawLayoutBuilder->has($parentId))
+                    && (empty($siblingId) || $this->rawLayoutBuilder->has($siblingId));
+            case self::SET_BLOCK_THEME:
+                $id = $args[1];
+
+                return (empty($id) && !$this->rawLayoutBuilder->isEmpty()) || $this->rawLayoutBuilder->has($id);
             case self::ADD_ALIAS:
                 $id = $args[1];
 
-                return empty($id) || $this->layout->has($id);
+                return empty($id) || $this->rawLayoutBuilder->has($id);
             case self::REMOVE_ALIAS:
                 $alias = $args[0];
 
-                return empty($alias) || $this->layout->hasAlias($alias);
+                return empty($alias) || $this->rawLayoutBuilder->hasAlias($alias);
         }
 
         return true;
@@ -335,7 +352,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     {
         foreach ($this->actions[$group] as $key => $action) {
             if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                call_user_func_array([$this->layout, $action[0]], $action[1]);
+                call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
                 unset($this->actions[$group][$key]);
             }
         }
@@ -357,7 +374,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             $hasSkipped  = false;
             foreach ($this->actions[$group] as $key => $action) {
                 if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                    call_user_func_array([$this->layout, $action[0]], $action[1]);
+                    call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
                     unset($this->actions[$group][$key]);
                     $hasExecuted = true;
                     if ($hasSkipped) {

@@ -10,9 +10,9 @@ interface LayoutUpdateInterface
     /**
      * Makes changes in the layout
      *
-     * @param LayoutBuilderInterface $layoutBuilder
+     * @param LayoutManipulatorInterface $layoutManipulator
      *
      * @return mixed
      */
-    public function updateLayout(LayoutBuilderInterface $layoutBuilder);
+    public function updateLayout(LayoutManipulatorInterface $layoutManipulator);
 }

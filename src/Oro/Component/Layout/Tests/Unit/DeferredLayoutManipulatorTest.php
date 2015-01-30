@@ -787,4 +787,49 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             $view
         );
     }
+
+    public function testSetBlockTheme()
+    {
+        $this->layoutManipulator
+            ->setBlockTheme(['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig'])
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo', 'header', 'logo')
+            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'logo')
+            ->setBlockTheme('MyBundle:Layout:theme3.html.twig');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => ['id' => 'logo', 'title' => '']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+
+        $blockThemes = $this->rawLayoutBuilder->getRawLayout()->getBlockThemes();
+        $this->assertSame(
+            [
+                'root' => [
+                    'MyBundle:Layout:theme1.html.twig',
+                    'MyBundle:Layout:theme2.html.twig',
+                    'MyBundle:Layout:theme3.html.twig'
+                ],
+                'logo' => [
+                    'MyBundle:Layout:my_theme.html.twig'
+                ]
+            ],
+            $blockThemes
+        );
+    }
 }

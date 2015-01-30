@@ -88,6 +88,23 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
     public function removeOption($id, $optionName);
 
     /**
+     * Sets the theme(s) to be used for rendering the layout item and its children
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|null     $id     The id of the layout item to assign the theme(s) to
+     *
+     * @return self
+     */
+    public function setBlockTheme($themes, $id = null);
+
+    /**
+     * Checks whether at least one item exists in the layout
+     *
+     * @return bool
+     */
+    public function isEmpty();
+
+    /**
      * Checks whether the item with the given id exists in the layout
      *
      * @param string $id The item id

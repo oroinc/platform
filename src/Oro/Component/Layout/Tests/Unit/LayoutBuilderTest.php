@@ -130,16 +130,10 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->layoutBuilder, $result);
     }
 
-    public function testGetLayoutAndSetBlockTheme()
+    public function testGetLayout()
     {
         $context = $this->getMock('Oro\Component\Layout\ContextInterface');
         $rootId  = 'test_id';
-
-        $this->layoutBuilder->setBlockTheme('RootTheme1');
-        $this->layoutBuilder->setBlockTheme(['RootTheme2', 'RootTheme3']);
-        $this->layoutBuilder->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block');
-        $this->layoutBuilder->setBlockTheme('TestTheme3', 'test_block');
-        $this->layoutBuilder->setBlockTheme('TestTheme10', 'unknown_block');
 
         $rawLayout = $this->getMockBuilder('Oro\Component\Layout\RawLayout')
             ->disableOriginalConstructor()
@@ -150,6 +144,19 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->layoutManipulator->expects($this->at(0))
+            ->method('setBlockTheme')
+            ->with('RootTheme1', $this->identicalTo(null));
+        $this->layoutManipulator->expects($this->at(1))
+            ->method('setBlockTheme')
+            ->with(['RootTheme2', 'RootTheme3'], $this->identicalTo(null));
+        $this->layoutManipulator->expects($this->at(2))
+            ->method('setBlockTheme')
+            ->with(['TestTheme1', 'TestTheme2'], 'test_block');
+        $this->layoutManipulator->expects($this->at(3))
+            ->method('setBlockTheme')
+            ->with('TestTheme3', 'test_block');
 
         $this->layoutManipulator->expects($this->once())
             ->method('applyChanges');
@@ -165,16 +172,19 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($rootView))
             ->will($this->returnValue($layout));
 
-        $rootView->expects($this->at(0))
-            ->method('offsetExists')
-            ->with('test_block')
-            ->will($this->returnValue(true));
-        $rootView->expects($this->at(1))
-            ->method('offsetExists')
-            ->with('unknown_block')
-            ->will($this->returnValue(false));
-        $rootView->expects($this->exactly(2))
-            ->method('offsetExists');
+        $rawLayout->expects($this->once())
+            ->method('getRootId')
+            ->will($this->returnValue($rootId));
+        $rawLayout->expects($this->once())
+            ->method('getBlockThemes')
+            ->will(
+                $this->returnValue(
+                    [
+                        $rootId      => ['RootTheme1', 'RootTheme2', 'RootTheme3'],
+                        'test_block' => ['TestTheme1', 'TestTheme2', 'TestTheme3']
+                    ]
+                )
+            );
 
         $layout->expects($this->at(0))
             ->method('setBlockTheme')
@@ -184,6 +194,12 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(['TestTheme1', 'TestTheme2', 'TestTheme3'], 'test_block');
         $layout->expects($this->exactly(2))
             ->method('setBlockTheme');
+
+        $this->layoutBuilder
+            ->setBlockTheme('RootTheme1')
+            ->setBlockTheme(['RootTheme2', 'RootTheme3'])
+            ->setBlockTheme(['TestTheme1', 'TestTheme2'], 'test_block')
+            ->setBlockTheme('TestTheme3', 'test_block');
 
         $result = $this->layoutBuilder->getLayout($context, $rootId);
         $this->assertSame($layout, $result);

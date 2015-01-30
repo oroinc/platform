@@ -67,6 +67,16 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->getLayoutView();
     }
 
+    public function testIsEmpty()
+    {
+        $this->assertTrue($this->rawLayoutBuilder->isEmpty());
+
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root');
+
+        $this->assertFalse($this->rawLayoutBuilder->isEmpty());
+    }
+
     public function testSimpleLayout()
     {
         $this->rawLayoutBuilder
@@ -226,6 +236,26 @@ class RawLayoutBuilderTest extends LayoutTestCase
     {
         $this->rawLayoutBuilder
             ->removeOption('root', 'test');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot set theme(s) for "root" item. Reason: The "root" item does not exist.
+     */
+    public function testSetBlockThemeForUnknownItem()
+    {
+        $this->rawLayoutBuilder
+            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'root');
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot set theme(s) for "" item. Reason: The root item does not exist.
+     */
+    public function testSetRootBlockThemeForUnknownItem()
+    {
+        $this->rawLayoutBuilder
+            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig');
     }
 
     public function testGetOptions()

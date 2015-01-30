@@ -55,6 +55,9 @@ class RawLayout
     /** @var AliasCollection */
     protected $aliases;
 
+    /** @var array */
+    protected $blockThemes = [];
+
     public function __construct()
     {
         $this->hierarchy = new HierarchyCollection();
@@ -168,6 +171,7 @@ class RawLayout
         // remove item
         unset($this->items[$id]);
         $this->aliases->removeById($id);
+        unset($this->blockThemes[$id]);
         // remove all children
         $pathLength    = count($path);
         $pathLastIndex = $pathLength - 1;
@@ -177,6 +181,7 @@ class RawLayout
             if (count($currentPath) > $pathLength && $currentPath[$pathLastIndex] === $id) {
                 unset($this->items[$itemId]);
                 $this->aliases->removeById($itemId);
+                unset($this->blockThemes[$itemId]);
             }
         }
     }
@@ -408,6 +413,51 @@ class RawLayout
         }
 
         $this->aliases->remove($alias);
+    }
+
+    /**
+     * Returns all registered themes to be used for rendering layout items
+     *
+     * Example of returned data:
+     *  [
+     *      'root_item_id' => [
+     *          'MyBundle:Layout:my_theme.html.twig',
+     *          'AcmeBundle:Layout:some_theme.html.twig'
+     *      ],
+     *      'item_id1' => [
+     *          'MyBundle:Layout:custom_item.html.twig'
+     *      ]
+     *  ]
+     *
+     * @return array
+     */
+    public function getBlockThemes()
+    {
+        return $this->blockThemes;
+    }
+
+    /**
+     * Sets the theme(s) to be used for rendering the layout item and its children
+     *
+     * @param string          $id     The id of the layout item to assign the theme(s) to
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     *
+     * @return self
+     */
+    public function setBlockTheme($id, $themes)
+    {
+        $id = $this->validateAndResolveId($id);
+        if (empty($themes)) {
+            throw new Exception\InvalidArgumentException('The theme must not be empty.');
+        }
+        if (!is_string($themes) && !is_array($themes)) {
+            throw new Exception\UnexpectedTypeException($themes, 'string or array of strings', 'themes');
+        }
+        if (!isset($this->blockThemes[$id])) {
+            $this->blockThemes[$id] = (array)$themes;
+        } else {
+            $this->blockThemes[$id] = array_merge($this->blockThemes[$id], (array)$themes);
+        }
     }
 
     /**

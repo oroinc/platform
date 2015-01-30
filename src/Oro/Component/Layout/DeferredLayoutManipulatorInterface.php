@@ -88,6 +88,16 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     public function removeOption($id, $optionName);
 
     /**
+     * Sets the theme(s) to be used for rendering the layout item and its children
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     * @param string|null     $id     The id of the layout item to assign the theme(s) to
+     *
+     * @return self
+     */
+    public function setBlockTheme($themes, $id = null);
+
+    /**
      * Returns the number of added items
      *
      * @return int
