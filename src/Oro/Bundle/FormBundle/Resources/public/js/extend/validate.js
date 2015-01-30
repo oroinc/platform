@@ -221,7 +221,9 @@ define([
         errorElement: 'span',
         errorClass: 'validation-failed',
         errorPlacement: function (label, $el) {
-            label.insertAfter(getErrorTarget($el));
+            var $targetElem = getErrorTarget($el),
+                $errorHolder = $targetElem.parent();
+            label.insertAfter($errorHolder.is('.fields-row') ? $errorHolder : $targetElem);
         },
         highlight: function (element) {
             this.settings.unhighlight.call(this, element);
