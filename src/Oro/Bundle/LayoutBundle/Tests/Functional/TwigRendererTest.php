@@ -8,7 +8,7 @@ use Oro\Component\Layout\LayoutManager;
 /**
  * @outputBuffering enabled
  */
-class TwigRenderingTest extends LayoutTestCase
+class TwigRendererTest extends LayoutTestCase
 {
     protected function setUp()
     {
@@ -17,8 +17,12 @@ class TwigRenderingTest extends LayoutTestCase
 
     public function testHtmlRenderingForCoreBlocks()
     {
+        if (!$this->getContainer()->hasParameter('oro_layout.twig.resources')) {
+            $this->markTestSkipped('TWIG renderer is not enabled.');
+        }
+
         /** @var LayoutManager $layoutManager */
-        $layoutManager = $this->client->getContainer()->get('oro_layout.layout_manager');
+        $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
 
         $layout = $layoutManager->getLayoutBuilder()
             ->add('root', null, 'root')
