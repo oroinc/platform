@@ -32,7 +32,7 @@
         <div class="form-container">
             <form id="{{ form.vars.name }}" action="{{ path('oro_email_email_create') }}" method="post">
                 {%
-                    set emailEditorOptions = {entityId: entity.entityId}
+                    set emailEditorOptions = {entityId: entity.entityId, to: entity.to, cc: entity.cc, bcc: entity.bcc}
                 %}
                 <fieldset class="form-horizontal"
                           data-page-component-module="oroemail/js/app/components/email-editor-component"
