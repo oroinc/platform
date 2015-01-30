@@ -15,12 +15,8 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
  *         ],
  *         'tree' => [
  *             'root' => [
- *                 'children' => [
- *                     'header' => [
- *                         'children' => [
- *                             'logo' => []
- *                         ]
- *                     ],
+ *                 'header' => [
+ *                     'logo' => []
  *                 ]
  *             ]
  *         ]
@@ -45,32 +41,29 @@ class RawLayoutLoader
 
     /**
      * @param array $config Full config from merged configuration files
-     *
-     * @return LayoutManipulatorInterface
      */
     public function load(array $config)
     {
         if (!$config) {
-            return $this->layoutManipulator;
+            return;
         }
 
         if (isset($config[self::LAYOUT_CONFIG_KEY])) {
-            if (array_key_exists('items', $config[self::LAYOUT_CONFIG_KEY])) {
-                $this->items = $config[self::LAYOUT_CONFIG_KEY]['items'];
+            $layoutConfig = $config[self::LAYOUT_CONFIG_KEY];
+            if (isset($layoutConfig['items'])) {
+                $this->items = $layoutConfig['items'];
             }
-            if (array_key_exists('tree', $config[self::LAYOUT_CONFIG_KEY])) {
-                foreach ($config[self::LAYOUT_CONFIG_KEY]['tree'] as $block => $configPart) {
+            if (isset($layoutConfig['tree'])) {
+                foreach ($layoutConfig['tree'] as $block => $configPart) {
                     $this->appendBlock($block, $configPart);
                 }
             }
-            if (array_key_exists('aliases', $config[self::LAYOUT_CONFIG_KEY])) {
-                foreach ($config[self::LAYOUT_CONFIG_KEY]['aliases'] as $alias => $id) {
+            if (isset($layoutConfig['aliases'])) {
+                foreach ($layoutConfig['aliases'] as $alias => $id) {
                     $this->layoutManipulator->addAlias($alias, $id);
                 }
             }
         }
-
-        return $this->layoutManipulator;
     }
 
     /**
@@ -88,8 +81,8 @@ class RawLayoutLoader
                 isset($this->items[$block]['options']) ? $this->items[$block]['options'] : []
             );
 
-            if (isset($configPart['children']) && !empty($configPart['children'])) {
-                foreach ($configPart['children'] as $childName => $childConfig) {
+            if (is_array($configPart)) {
+                foreach ($configPart as $childName => $childConfig) {
                     $this->appendBlock($childName, $childConfig, $block);
                 }
             }

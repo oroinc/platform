@@ -55,12 +55,8 @@ class RawLayoutLoaderTest extends DeferredLayoutManipulatorTestCase
                 ],
                 'tree' => [
                     'root' => [
-                        'children' => [
-                            'header' => [
-                                'children' => [
-                                    'logo' => []
-                                ]
-                            ],
+                        'header' => [
+                            'logo' => []
                         ]
                     ]
                 ]
@@ -98,9 +94,7 @@ class RawLayoutLoaderTest extends DeferredLayoutManipulatorTestCase
                 ],
                 'tree' => [
                     'root' => [
-                        'children' => [
-                            'header' => []
-                        ]
+                        'header' => []
                     ]
                 ],
                 'aliases' => [
@@ -123,5 +117,7 @@ class RawLayoutLoaderTest extends DeferredLayoutManipulatorTestCase
             ],
             $view
         );
+
+        $this->assertTrue($this->rawLayoutBuilder->hasAlias('myroot'));
     }
 }
