@@ -109,11 +109,14 @@ define(['jquery', 'jquery-ui'], function ($) {
         };
 
         $.datepicker.constructor.prototype._destroyDatepicker = function () {
-            if (this._curInst && this._curInst.dpDiv) {
+            if (!this._curInst) {
+                return;
+            }
+            if (this._curInst.dpDiv) {
                 this._curInst.dpDiv.remove();
             }
             original._destroyDatepicker.apply(this, arguments);
-        }
+        };
     }());
     /* datepicker extend:end */
 });
