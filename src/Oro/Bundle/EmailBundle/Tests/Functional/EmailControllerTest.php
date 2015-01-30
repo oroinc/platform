@@ -78,9 +78,6 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $content = $result->getContent();
-        $this->assertContains('BBQ Grill - Order Follow Up', $content);
-        $this->assertContains('Products related to your recent purchase - Zildjian Drumset', $content);
     }
 
     public function testBaseEmails()
@@ -89,8 +86,6 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $content = $result->getContent();
-        $this->assertContains('BBQ Grill - Order Follow Up', $content);
     }
 
     public function testUserEmails()

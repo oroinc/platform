@@ -119,8 +119,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
             $email->setMessageId(sprintf('id.%s@%s', uniqid(), '@bap.migration.generated'));
             $this->setReference('email_' . ($index + 1), $email);
             $this->setReference('emailBody_' . ($index + 1), $emailBody);
-
-            $this->emailEntityBuilder->getBatch()->persist($om);
         }
+        $this->emailEntityBuilder->getBatch()->persist($om);
     }
 }
