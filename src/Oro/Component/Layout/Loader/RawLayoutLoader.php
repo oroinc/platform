@@ -19,6 +19,11 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
  *                     'logo' => []
  *                 ]
  *             ]
+ *         ],
+ *         'aliases' => [
+ *             'root_alias' => 'root',
+ *             'logo_1' => 'logo',
+ *             'logo_2' => 'logo'
  *         ]
  *     ]
  * ];
@@ -44,24 +49,25 @@ class RawLayoutLoader
      */
     public function load(array $config)
     {
-        if (!$config) {
+        if (isset($config[self::LAYOUT_CONFIG_KEY])) {
             return;
         }
 
-        if (isset($config[self::LAYOUT_CONFIG_KEY])) {
-            $layoutConfig = $config[self::LAYOUT_CONFIG_KEY];
-            if (isset($layoutConfig['items'])) {
-                $this->items = $layoutConfig['items'];
+        $layoutConfig = $config[self::LAYOUT_CONFIG_KEY];
+
+        if (isset($layoutConfig['items'])) {
+            $this->items = $layoutConfig['items'];
+        }
+
+        if (isset($layoutConfig['tree'])) {
+            foreach ($layoutConfig['tree'] as $block => $configPart) {
+                $this->appendBlock($block, $configPart);
             }
-            if (isset($layoutConfig['tree'])) {
-                foreach ($layoutConfig['tree'] as $block => $configPart) {
-                    $this->appendBlock($block, $configPart);
-                }
-            }
-            if (isset($layoutConfig['aliases'])) {
-                foreach ($layoutConfig['aliases'] as $alias => $id) {
-                    $this->layoutManipulator->addAlias($alias, $id);
-                }
+        }
+
+        if (isset($layoutConfig['aliases'])) {
+            foreach ($layoutConfig['aliases'] as $alias => $id) {
+                $this->layoutManipulator->addAlias($alias, $id);
             }
         }
     }
