@@ -100,7 +100,8 @@ class ConfigurationType extends AbstractType
                 'password',
                 'password',
                 array('label' => 'oro.imap.configuration.password.label', 'required' => true)
-            );
+            )
+            ->add('check_connection', new CheckButtonType());
     }
 
     /**

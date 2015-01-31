@@ -286,6 +286,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
         $this->logger->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
 
+        $count = $processed = $invalid = 0;
+
         $emails = $this->manager->getEmails($searchQuery);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setBatchCallback(
@@ -293,16 +295,23 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->registerEmailsInKnownEmailAddressChecker($batch, $folderType);
             }
         );
+        $emails->setConvertErrorCallback(
+            function (\Exception $e) use (&$invalid) {
+                $invalid++;
+                $this->logger->error('Error occurred while trying to process email:', ['exception' => $e]);
+            }
+        );
+
         $this->logger->notice(sprintf('Found %d email(s).', $emails->count()));
 
-        $count     = 0;
-        $processed = 0;
-        $batch     = [];
+        $batch = [];
         /** @var Email $email */
         foreach ($emails as $email) {
             $processed++;
             if ($processed % self::READ_HINT_COUNT === 0) {
-                $this->logger->notice(sprintf('Processed %d of %d emails ...', $processed, $emails->count()));
+                $this->logger->notice(
+                    sprintf('Processed %d of %d emails %d were invalid ...', $processed, $emails->count(), $invalid)
+                );
             }
 
             if (!$this->isApplicableEmail($email, $folderType)) {

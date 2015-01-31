@@ -102,7 +102,17 @@ class ImapMessageIterator implements \Iterator, \Countable
      */
     public function current()
     {
-        if (!isset($this->batch[$this->iterationPos]) && !array_key_exists($this->iterationPos, $this->batch)) {
+        return $this->batch[$this->iterationPos];
+    }
+
+    /**
+     * Move forward to next element
+     */
+    public function next()
+    {
+        $this->increasePosition($this->iterationPos);
+
+        if ($this->isValidPosition($this->iterationPos) && !array_key_exists($this->iterationPos, $this->batch)) {
             // initialize the batch
             $this->batch = [];
             if ($this->batchSize > 1) {
@@ -127,16 +137,6 @@ class ImapMessageIterator implements \Iterator, \Countable
                 call_user_func($this->onBatchLoaded, $this->batch);
             }
         }
-
-        return $this->batch[$this->iterationPos];
-    }
-
-    /**
-     * Move forward to next element
-     */
-    public function next()
-    {
-        $this->increasePosition($this->iterationPos);
     }
 
     /**
@@ -158,7 +158,7 @@ class ImapMessageIterator implements \Iterator, \Countable
     {
         $this->ensureInitialized();
 
-        return $this->isValidPosition($this->iterationPos);
+        return isset($this->batch[$this->iterationPos]);
     }
 
     /**
@@ -169,10 +169,12 @@ class ImapMessageIterator implements \Iterator, \Countable
         $this->initialize();
 
         $this->iterationPos = $this->reverse
-            ? $this->iterationMax
-            : $this->iterationMin;
+            ? ($this->iterationMax + 1)
+            : ($this->iterationMin - 1);
 
         $this->batch = [];
+
+        $this->next();
     }
 
     /**
