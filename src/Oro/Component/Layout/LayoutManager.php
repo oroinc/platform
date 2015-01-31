@@ -20,6 +20,8 @@ class LayoutManager
      */
     public function getLayoutBuilder()
     {
+        $this->layoutBuilder->clear();
+
         return $this->layoutBuilder;
     }
 }

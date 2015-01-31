@@ -103,4 +103,11 @@ interface LayoutManipulatorInterface
      * @return self
      */
     public function setBlockTheme($themes, $id = null);
+
+    /**
+     * Reverts the manipulator to the initial state
+     *
+     * @return self
+     */
+    public function clear();
 }

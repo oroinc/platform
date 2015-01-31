@@ -132,6 +132,16 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->layoutBuilder, $result);
     }
 
+    public function testClear()
+    {
+        $this->layoutManipulator->expects($this->once())
+            ->method('clear');
+        $this->rawLayoutBuilder->expects($this->once())
+            ->method('clear');
+
+        $this->layoutBuilder->clear();
+    }
+
     public function testGetLayout()
     {
         $context = $this->getMock('Oro\Component\Layout\ContextInterface');

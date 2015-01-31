@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\BlockRendererRegistry;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutFactory;
 
@@ -15,8 +16,12 @@ class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->renderer = $this->getMock('Oro\Component\Layout\BlockRendererInterface');
-        $this->layoutFactory = new LayoutFactory($this->renderer);
+        $this->renderer   = $this->getMock('Oro\Component\Layout\BlockRendererInterface');
+        $rendererRegistry = new BlockRendererRegistry();
+        $rendererRegistry->addRenderer('test', $this->renderer);
+        $rendererRegistry->setDefaultRenderer('test');
+
+        $this->layoutFactory = new LayoutFactory($rendererRegistry);
     }
 
     public function testCreateLayout()

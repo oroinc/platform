@@ -10,6 +10,22 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {
+    public function testClear()
+    {
+        // prepare data
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->remove('header');
+
+        // do test
+        $this->layoutManipulator->clear();
+        $this->layoutManipulator->applyChanges();
+        $this->assertTrue($this->rawLayoutBuilder->isEmpty());
+        $this->assertSame(0, $this->layoutManipulator->getNumberOfAddedItems());
+        $this->assertSame(0, $this->layoutManipulator->getNumberOfRemovedItems());
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException

@@ -2,25 +2,46 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 
+use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
-/**
- * @outputBuffering enabled
- */
-class TwigRendererTest extends LayoutTestCase
+class RendererTest extends LayoutTestCase
 {
     protected function setUp()
     {
         $this->initClient();
     }
 
-    public function testHtmlRenderingForCoreBlocks()
+    public function testHtmlRenderingForCoreBlocksByTwigRenderer()
     {
         if (!$this->getContainer()->hasParameter('oro_layout.twig.resources')) {
             $this->markTestSkipped('TWIG renderer is not enabled.');
         }
 
+        $result   = $this->getCoreBlocksTestLayout()->setRenderer('twig')->render();
+        $expected = $this->getCoreBlocksTestLayoutResult();
+
+        $this->assertHtmlEquals($expected, $result);
+    }
+
+    public function testHtmlRenderingForCoreBlocksByPhpRenderer()
+    {
+        if (!$this->getContainer()->hasParameter('oro_layout.php.resources')) {
+            $this->markTestSkipped('PHP renderer is not enabled.');
+        }
+
+        $result   = $this->getCoreBlocksTestLayout()->setRenderer('php')->render();
+        $expected = $this->getCoreBlocksTestLayoutResult();
+
+        $this->assertHtmlEquals($expected, $result);
+    }
+
+    /**
+     * @return Layout
+     */
+    protected function getCoreBlocksTestLayout()
+    {
         /** @var LayoutManager $layoutManager */
         $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
 
@@ -33,8 +54,14 @@ class TwigRendererTest extends LayoutTestCase
             ->add('content', 'root', 'body')
             ->getLayout(new LayoutContext());
 
-        $result = $layout->render();
+        return $layout;
+    }
 
+    /**
+     * @return string
+     */
+    protected function getCoreBlocksTestLayoutResult()
+    {
         $expected = <<<HTML
 <!DOCTYPE html>
 <html>
@@ -53,6 +80,7 @@ class TwigRendererTest extends LayoutTestCase
 </html>
 HTML;
 
-        $this->assertHtmlEquals($expected, $result);
+        return $expected;
     }
+
 }

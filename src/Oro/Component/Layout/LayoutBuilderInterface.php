@@ -109,6 +109,13 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
     public function setBlockTheme($themes, $id = null);
 
     /**
+     * Reverts the builder to the initial state
+     *
+     * @return self
+     */
+    public function clear();
+
+    /**
      * Returns the layout object
      *
      * @param ContextInterface $context The context

@@ -5,16 +5,14 @@ parameters:
     oro_layout.twig.block_renderer.class:     Oro\Bundle\LayoutBundle\Layout\TwigBlockRenderer
 
 services:
-    oro_layout.block_renderer:
-        public: false
-        alias: oro_layout.twig.block_renderer
-
     oro_layout.twig.extension.array:
+        public: false
         class: Oro\Bundle\LayoutBundle\Twig\ArrayExtension
         tags:
             - { name: twig.extension }
 
     oro_layout.twig.extension.layout:
+        public: false
         class: %oro_layout.twig.extension.layout.class%
         arguments:
             - @oro_layout.twig.renderer

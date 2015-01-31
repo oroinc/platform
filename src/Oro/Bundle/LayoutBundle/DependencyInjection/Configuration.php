@@ -7,6 +7,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const DEFAULT_LAYOUT_PHP_RESOURCE  = 'OroLayoutBundle:Layout/php';
     const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
 
     /**
@@ -18,23 +19,50 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('oro_layout');
         $rootNode
             ->children()
-                ->arrayNode('twig')
-                    ->canBeDisabled()
-                    ->fixXmlConfig('resource')
+                ->arrayNode('templating')
+                    ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('resources')
-                            ->addDefaultChildrenIfNoneSet()
-                            ->prototype('scalar')->defaultValue(self::DEFAULT_LAYOUT_TWIG_RESOURCE)->end()
-                            ->example(['MyBundle:Layout:blocks.html.twig'])
-                            ->validate()
-                                ->ifTrue(
-                                    function ($v) {
-                                        return !in_array(self::DEFAULT_LAYOUT_TWIG_RESOURCE, $v);
-                                    }
-                                )
-                                ->then(function ($v) {
-                                    return array_merge([self::DEFAULT_LAYOUT_TWIG_RESOURCE], $v);
-                                })
+                        ->scalarNode('default')->defaultValue('twig')->end()
+                        ->arrayNode('php')
+                            ->canBeDisabled()
+                            ->fixXmlConfig('resource')
+                            ->children()
+                                ->arrayNode('resources')
+                                    ->addDefaultChildrenIfNoneSet()
+                                    ->prototype('scalar')->defaultValue(self::DEFAULT_LAYOUT_PHP_RESOURCE)->end()
+                                    ->example(['MyBundle:Layout/php'])
+                                    ->validate()
+                                        ->ifTrue(
+                                            function ($v) {
+                                                return !in_array(self::DEFAULT_LAYOUT_PHP_RESOURCE, $v);
+                                            }
+                                        )
+                                        ->then(function ($v) {
+                                            return array_merge([self::DEFAULT_LAYOUT_PHP_RESOURCE], $v);
+                                        })
+                                    ->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                        ->arrayNode('twig')
+                            ->canBeDisabled()
+                            ->fixXmlConfig('resource')
+                            ->children()
+                                ->arrayNode('resources')
+                                    ->addDefaultChildrenIfNoneSet()
+                                    ->prototype('scalar')->defaultValue(self::DEFAULT_LAYOUT_TWIG_RESOURCE)->end()
+                                    ->example(['MyBundle:Layout:blocks.html.twig'])
+                                    ->validate()
+                                        ->ifTrue(
+                                            function ($v) {
+                                                return !in_array(self::DEFAULT_LAYOUT_TWIG_RESOURCE, $v);
+                                            }
+                                        )
+                                        ->then(function ($v) {
+                                            return array_merge([self::DEFAULT_LAYOUT_TWIG_RESOURCE], $v);
+                                        })
+                                    ->end()
+                                ->end()
                             ->end()
                         ->end()
                     ->end()

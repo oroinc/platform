@@ -108,6 +108,13 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     public function setBlockTheme($themes, $id = null);
 
     /**
+     * Reverts the manipulator to the initial state
+     *
+     * @return self
+     */
+    public function clear();
+
+    /**
      * Returns the number of added items
      *
      * @return int

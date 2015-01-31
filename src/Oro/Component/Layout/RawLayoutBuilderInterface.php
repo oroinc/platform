@@ -98,6 +98,13 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
     public function removeOption($id, $optionName);
 
     /**
+     * Reverts the builder to the initial state
+     *
+     * @return self
+     */
+    public function clear();
+
+    /**
      * Sets the theme(s) to be used for rendering the layout item and its children
      *
      * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'

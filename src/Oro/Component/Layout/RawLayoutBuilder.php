@@ -233,6 +233,14 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function clear()
+    {
+        $this->rawLayout->clear();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isEmpty()
     {
         return $this->rawLayout->isEmpty();
@@ -291,13 +299,5 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function getRawLayout()
     {
         return $this->rawLayout;
-    }
-
-    /**
-     * Declines all built operations
-     */
-    public function clear()
-    {
-        $this->rawLayout->clear();
     }
 }

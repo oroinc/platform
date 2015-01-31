@@ -28,6 +28,11 @@ class LayoutTestCase extends WebTestCase
     {
         $html = preg_replace('/\\n\s*\\n/', "\n", $html);
         $html = preg_replace('/\\n\s+\</', "\n<", $html);
+        $html = preg_replace('/\>\s*\</', ">\n<", $html);
+        $html = preg_replace('/\s+\/\>/', '/>', $html);
+        $html = preg_replace('/\s+\>/', '>', $html);
+        $html = preg_replace('/\s+\<\//', "\n</", $html);
+        $html = preg_replace('/^\s+/m', '', $html);
         $html = rtrim($html);
 
         return $html;

@@ -4,15 +4,15 @@ namespace Oro\Component\Layout;
 
 class LayoutFactory implements LayoutFactoryInterface
 {
-    /** @var BlockRendererInterface */
-    protected $renderer;
+    /** @var BlockRendererRegistryInterface */
+    protected $rendererRegistry;
 
     /**
-     * @param BlockRendererInterface $renderer
+     * @param BlockRendererRegistryInterface $rendererRegistry
      */
-    public function __construct(BlockRendererInterface $renderer)
+    public function __construct(BlockRendererRegistryInterface $rendererRegistry)
     {
-        $this->renderer = $renderer;
+        $this->rendererRegistry = $rendererRegistry;
     }
 
     /**
@@ -20,6 +20,6 @@ class LayoutFactory implements LayoutFactoryInterface
      */
     public function createLayout(BlockView $view)
     {
-        return new Layout($view, $this->renderer);
+        return new Layout($view, $this->rendererRegistry);
     }
 }

@@ -123,6 +123,15 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function clear()
+    {
+        $this->layoutManipulator->clear();
+        $this->rawLayoutBuilder->clear();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLayout(ContextInterface $context, $rootId = null)
     {
         $this->layoutManipulator->applyChanges();

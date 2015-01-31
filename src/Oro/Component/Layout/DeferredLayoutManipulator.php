@@ -170,6 +170,16 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        $this->rawLayoutBuilder->clear();
+        $this->actions = [];
+        $this->resetCounters();
+    }
+
+    /**
      * Returns the number of added items
      *
      * @return int

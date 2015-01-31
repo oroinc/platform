@@ -7,17 +7,23 @@ class Layout
     /** @var BlockView */
     protected $view;
 
-    /** @var BlockRendererInterface */
-    protected $renderer;
+    /** @var BlockRendererRegistryInterface */
+    protected $rendererRegistry;
+
+    /** @var string */
+    protected $rendererName;
+
+    /** @var array */
+    protected $themes = [];
 
     /**
-     * @param BlockView              $view
-     * @param BlockRendererInterface $renderer
+     * @param BlockView                      $view
+     * @param BlockRendererRegistryInterface $rendererRegistry
      */
-    public function __construct(BlockView $view, BlockRendererInterface $renderer)
+    public function __construct(BlockView $view, BlockRendererRegistryInterface $rendererRegistry)
     {
-        $this->view     = $view;
-        $this->renderer = $renderer;
+        $this->view             = $view;
+        $this->rendererRegistry = $rendererRegistry;
     }
 
     /**
@@ -35,7 +41,26 @@ class Layout
      */
     public function render()
     {
-        return $this->renderer->renderBlock($this->view);
+        $renderer = $this->rendererRegistry->getRenderer($this->rendererName);
+        foreach ($this->themes as $theme) {
+            $renderer->setTheme($theme[0], $theme[1]);
+        }
+
+        return $renderer->renderBlock($this->view);
+    }
+
+    /**
+     * Sets a renderer to be used to render this layout
+     *
+     * @param string $name The name of the block renderer
+     *
+     * @return self
+     */
+    public function setRenderer($name)
+    {
+        $this->rendererName = $name;
+
+        return $this;
     }
 
     /**
@@ -43,6 +68,8 @@ class Layout
      *
      * @param string|string[] $themes  The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
      * @param string|null     $blockId The id of a block to assign the theme(s) to
+     *
+     * @return self
      */
     public function setBlockTheme($themes, $blockId = null)
     {
@@ -50,6 +77,8 @@ class Layout
             ? $this->view[$blockId]
             : $this->view;
 
-        $this->renderer->setTheme($view, $themes);
+        $this->themes[] = [$view, $themes];
+
+        return $this;
     }
 }
