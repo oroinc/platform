@@ -28,7 +28,7 @@ class BlockRenderer implements BlockRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function setTheme(BlockView $view, $themes)
+    public function setBlockTheme(BlockView $view, $themes)
     {
         $this->innerRenderer->setTheme($view, $themes);
     }

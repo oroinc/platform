@@ -4,7 +4,8 @@ namespace Oro\Component\Layout\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Component\Form\FormRendererInterface;
-use Symfony\Component\Form\FormView;
+
+use Oro\Component\Layout\BlockView;
 
 /**
  * BlockHelper provides helpers to help display layout blocks
@@ -33,82 +34,77 @@ class BlockHelper extends Helper
     }
 
     /**
-     * Sets a theme for a given view.
+     * Sets the theme(s) to be used for rendering a view and its children
      *
      * The theme format is "<Bundle>:<Controller>".
      *
-     * @param FormView     $view   A FormView instance
-     * @param string|array $themes A theme or an array of theme
+     * @param BlockView       $view   The view to assign the theme(s) to
+     * @param string|string[] $themes The theme(s). For example 'MuBundle:Layout/php'
      */
-    public function setTheme(FormView $view, $themes)
+    public function setBlockTheme(BlockView $view, $themes)
     {
         $this->renderer->setTheme($view, $themes);
     }
 
     /**
-     * Renders the HTML for a given view.
+     * Renders the HTML for a given view
      *
      * Example usage:
+     *     <?php echo $view['block']->widget($block) ?>
+     *     <?php echo $view['block']->widget($block, array('attr' => array('class' => 'foo'))) ?>
      *
-     *     <?php echo $view['form']->widget($form) ?>
+     * @param BlockView $view      The view for which to render the widget
+     * @param array     $variables Additional variables passed to the template
      *
-     * You can pass options during the call:
-     *
-     *     <?php echo $view['form']->widget($form, array('attr' => array('class' => 'foo'))) ?>
-     *
-     *     <?php echo $view['form']->widget($form, array('separator' => '+++++')) ?>
-     *
-     * @param FormView $view      The view for which to render the widget
-     * @param array    $variables Additional variables passed to the template
-     *
-     * @return string The HTML markup
+     * @return string
      */
-    public function widget(FormView $view, array $variables = array())
+    public function widget(BlockView $view, array $variables = [])
     {
         return $this->renderer->searchAndRenderBlock($view, 'widget', $variables);
     }
 
     /**
-     * Renders the entire form field "row".
+     * Renders the entire block "row"
+     * Usually the "row" is a combination of a block label and block widget
      *
-     * @param FormView $view      The view for which to render the row
-     * @param array    $variables Additional variables passed to the template
+     * @param BlockView $view      The view for which to render the row
+     * @param array     $variables Additional variables passed to the template
      *
-     * @return string The HTML markup
+     * @return string
      */
-    public function row(FormView $view, array $variables = array())
+    public function row(BlockView $view, array $variables = [])
     {
         return $this->renderer->searchAndRenderBlock($view, 'row', $variables);
     }
 
     /**
-     * Renders the label of the given view.
+     * Renders the label of the given view
      *
-     * @param FormView $view      The view for which to render the label
-     * @param string   $label     The label
-     * @param array    $variables Additional variables passed to the template
+     * @param BlockView $view      The view for which to render the label
+     * @param string    $label     The label
+     * @param array     $variables Additional variables passed to the template
      *
-     * @return string The HTML markup
+     * @return string
      */
-    public function label(FormView $view, $label = null, array $variables = array())
+    public function label(BlockView $view, $label = null, array $variables = [])
     {
         if (null !== $label) {
-            $variables += array('label' => $label);
+            $variables += ['label' => $label];
         }
 
         return $this->renderer->searchAndRenderBlock($view, 'label', $variables);
     }
 
     /**
-     * Renders a block of the template.
+     * Renders a block of the template
      *
-     * @param FormView $view      The view for determining the used themes.
-     * @param string   $blockName The name of the block to render.
-     * @param array    $variables The variable to pass to the template.
+     * @param BlockView $view      The view for determining the used themes.
+     * @param string    $blockName The name of the block to render.
+     * @param array     $variables The variable to pass to the template.
      *
-     * @return string The HTML markup
+     * @return string
      */
-    public function block(FormView $view, $blockName, array $variables = array())
+    public function block(BlockView $view, $blockName, array $variables = [])
     {
         return $this->renderer->renderBlock($view, $blockName, $variables);
     }

@@ -34,7 +34,7 @@ class BlockRendererTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testSetTheme()
+    public function testSetBlockTheme()
     {
         $theme = 'MyBungle::blocks.html.twig';
 
@@ -44,6 +44,6 @@ class BlockRendererTest extends \PHPUnit_Framework_TestCase
             ->method('setTheme')
             ->with($this->identicalTo($view), $theme);
 
-        $this->renderer->setTheme($view, $theme);
+        $this->renderer->setBlockTheme($view, $theme);
     }
 }

@@ -85,7 +85,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $view = new BlockView(['test']);
 
         $this->renderer->expects($this->once())
-            ->method('setTheme')
+            ->method('setBlockTheme')
             ->with($this->identicalTo($view), $theme);
 
         $this->renderer->expects($this->once())
@@ -110,7 +110,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $view->children['child_id'] = $childView;
 
         $this->renderer->expects($this->once())
-            ->method('setTheme')
+            ->method('setBlockTheme')
             ->with($this->identicalTo($childView), $theme);
 
         $this->renderer->expects($this->once())

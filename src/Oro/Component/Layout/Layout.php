@@ -43,7 +43,7 @@ class Layout
     {
         $renderer = $this->rendererRegistry->getRenderer($this->rendererName);
         foreach ($this->themes as $theme) {
-            $renderer->setTheme($theme[0], $theme[1]);
+            $renderer->setBlockTheme($theme[0], $theme[1]);
         }
 
         return $renderer->renderBlock($this->view);

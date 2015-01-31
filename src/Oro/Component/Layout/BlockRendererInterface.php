@@ -19,5 +19,5 @@ interface BlockRendererInterface
      * @param BlockView       $view   The view to assign the theme(s) to
      * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
      */
-    public function setTheme(BlockView $view, $themes);
+    public function setBlockTheme(BlockView $view, $themes);
 }
