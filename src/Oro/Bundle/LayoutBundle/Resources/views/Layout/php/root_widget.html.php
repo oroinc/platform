@@ -1,4 +1,4 @@
 <!DOCTYPE <?php echo !empty($doctype) ? $view->escape($doctype) : 'html' ?>>
 <html>
-    <?php echo $view['block']->widget($block) ?>
+    <?php echo $view['layout']->widget($block) ?>
 </html>

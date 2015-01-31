@@ -4,9 +4,9 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Exception;
 
-class BlockRendererRegistry implements BlockRendererRegistryInterface
+class LayoutRendererRegistry implements LayoutRendererRegistryInterface
 {
-    /** @var BlockRendererInterface[] */
+    /** @var LayoutRendererInterface[] */
     protected $renderers;
 
     /** @var string */
@@ -22,7 +22,7 @@ class BlockRendererRegistry implements BlockRendererRegistryInterface
         }
         if (!isset($this->renderers[$name])) {
             throw new Exception\LogicException(
-                sprintf('The block renderer named "%s" was not found.', $name)
+                sprintf('The layout renderer named "%s" was not found.', $name)
             );
         }
 
@@ -38,20 +38,20 @@ class BlockRendererRegistry implements BlockRendererRegistryInterface
     }
 
     /**
-     * Registers a block renderer
+     * Registers a layout renderer
      *
-     * @param string                 $name     The name of the block renderer
-     * @param BlockRendererInterface $renderer A block renderer
+     * @param string                  $name     The name of the renderer
+     * @param LayoutRendererInterface $renderer A layout renderer
      */
-    public function addRenderer($name, BlockRendererInterface $renderer)
+    public function addRenderer($name, LayoutRendererInterface $renderer)
     {
         $this->renderers[$name] = $renderer;
     }
 
     /**
-     * Sets the default block renderer
+     * Sets the default renderer
      *
-     * @param string $name The name of the block renderer
+     * @param string $name The name of a renderer
      */
     public function setDefaultRenderer($name)
     {

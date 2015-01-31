@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Twig;
 
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 
-use Oro\Bundle\LayoutBundle\Twig\TokenParser\LayoutThemeTokenParser;
+use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
 class LayoutExtension extends \Twig_Extension
 {
@@ -40,7 +40,7 @@ class LayoutExtension extends \Twig_Extension
     public function getTokenParsers()
     {
         return [
-            new LayoutThemeTokenParser(),
+            new BlockThemeTokenParser()
         ];
     }
 

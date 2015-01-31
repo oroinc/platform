@@ -2,22 +2,22 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\BlockRendererRegistry;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Layout;
+use Oro\Component\Layout\LayoutRendererRegistry;
 
 class LayoutTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
-    /** @var BlockRendererRegistry */
+    /** @var LayoutRendererRegistry */
     protected $rendererRegistry;
 
     protected function setUp()
     {
-        $this->renderer         = $this->getMock('Oro\Component\Layout\BlockRendererInterface');
-        $this->rendererRegistry = new BlockRendererRegistry();
+        $this->renderer         = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
+        $this->rendererRegistry = new LayoutRendererRegistry();
         $this->rendererRegistry->addRenderer('test', $this->renderer);
         $this->rendererRegistry->setDefaultRenderer('test');
     }
@@ -49,7 +49,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The block renderer named "unknown" was not found.
+     * @expectedExceptionMessage The layout renderer named "unknown" was not found.
      */
     public function testRenderByUnknownRenderer()
     {
@@ -64,7 +64,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
 
         $view = new BlockView(['test']);
 
-        $otherRenderer = $this->getMock('Oro\Component\Layout\BlockRendererInterface');
+        $otherRenderer = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
         $this->rendererRegistry->addRenderer('other', $otherRenderer);
 
         $otherRenderer->expects($this->once())

@@ -4,26 +4,26 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Exception;
 
-interface BlockRendererRegistryInterface
+interface LayoutRendererRegistryInterface
 {
     /**
-     * Returns a block renderer by name
+     * Returns a renderer by name
      *
-     * @param string|null $name The name of the block renderer
+     * @param string|null $name The name of a renderer
      *                          If the name is not specified a default renderer is returned
      *
-     * @return BlockRendererInterface
+     * @return LayoutRendererInterface
      *
      * @throws Exception\LogicException if a renderer does not exist
      */
     public function getRenderer($name = null);
 
     /**
-     * Returns whether the given block renderer is supported
+     * Returns whether the given renderer is supported
      *
-     * @param string $name The name of the block renderer
+     * @param string $name The name of a renderer
      *
-     * @return bool Whether the block renderer is supported
+     * @return bool Whether the renderer is supported
      */
     public function hasRenderer($name);
 }

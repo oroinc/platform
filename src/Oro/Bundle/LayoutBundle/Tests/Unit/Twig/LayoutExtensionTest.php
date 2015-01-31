@@ -42,7 +42,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $tokenParsers);
 
         $this->assertInstanceOf(
-            'Oro\Bundle\LayoutBundle\Twig\TokenParser\LayoutThemeTokenParser',
+            'Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser',
             $tokenParsers[0]
         );
     }

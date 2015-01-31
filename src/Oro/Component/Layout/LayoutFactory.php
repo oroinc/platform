@@ -4,13 +4,13 @@ namespace Oro\Component\Layout;
 
 class LayoutFactory implements LayoutFactoryInterface
 {
-    /** @var BlockRendererRegistryInterface */
+    /** @var LayoutRendererRegistryInterface */
     protected $rendererRegistry;
 
     /**
-     * @param BlockRendererRegistryInterface $rendererRegistry
+     * @param LayoutRendererRegistryInterface $rendererRegistry
      */
-    public function __construct(BlockRendererRegistryInterface $rendererRegistry)
+    public function __construct(LayoutRendererRegistryInterface $rendererRegistry)
     {
         $this->rendererRegistry = $rendererRegistry;
     }

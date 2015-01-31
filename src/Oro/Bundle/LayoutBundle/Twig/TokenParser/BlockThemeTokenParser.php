@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\LayoutBundle\Twig\TokenParser;
 
-use Oro\Bundle\LayoutBundle\Twig\Node\LayoutThemeNode;
+use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 
 /**
- * Token Parser for the 'layout_theme' tag
+ * Token Parser for the 'block_theme' tag
  * Examples:
- *  {% layout_theme layout _self %}
- *  {% layout_theme layout 'SomeBundle:Layout:blocks.html.twig' %}
- *  {% layout_theme layout.some_block_id 'SomeBundle:Layout:blocks.html.twig' %}
- *  {% layout_theme layout with ['SomeBundle:Layout:blocks.html.twig', 'AnotherBundle:Layout:blocks.html.twig'] %}
+ *  {% block_theme layout _self %}
+ *  {% block_theme layout 'SomeBundle:Layout:blocks.html.twig' %}
+ *  {% block_theme layout.some_block_id 'SomeBundle:Layout:blocks.html.twig' %}
+ *  {% block_theme layout with ['SomeBundle:Layout:blocks.html.twig', 'AnotherBundle:Layout:blocks.html.twig'] %}
  */
-class LayoutThemeTokenParser extends \Twig_TokenParser
+class BlockThemeTokenParser extends \Twig_TokenParser
 {
     /**
      * {@inheritdoc}
@@ -36,7 +36,7 @@ class LayoutThemeTokenParser extends \Twig_TokenParser
 
         $stream->expect(\Twig_Token::BLOCK_END_TYPE);
 
-        return new LayoutThemeNode($block, $resources, $lineno, $this->getTag());
+        return new BlockThemeNode($block, $resources, $lineno, $this->getTag());
     }
 
     /**
@@ -44,6 +44,6 @@ class LayoutThemeTokenParser extends \Twig_TokenParser
      */
     public function getTag()
     {
-        return 'layout_theme';
+        return 'block_theme';
     }
 }

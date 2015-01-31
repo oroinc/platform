@@ -1,4 +1,4 @@
 OroLayoutBundle
 ===============
 
-Provides integration for Block Renderer with `Oro Layout Component`.
+This bundle integrates `Oro Layout Component` into Oro Platform.

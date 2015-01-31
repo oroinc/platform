@@ -27,9 +27,9 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::BLOCK_RENDERER_REGISTRY_SERVICE, true],
-                        [ConfigurationPass::PHP_BLOCK_RENDERER_SERVICE, true],
-                        [ConfigurationPass::TWIG_BLOCK_RENDERER_SERVICE, true],
+                        [ConfigurationPass::RENDERER_REGISTRY_SERVICE, true],
+                        [ConfigurationPass::PHP_RENDERER_SERVICE, true],
+                        [ConfigurationPass::TWIG_RENDERER_SERVICE, true],
                         [ConfigurationPass::BLOCK_TYPE_FACTORY_SERVICE, true]
                     ]
                 )
@@ -39,7 +39,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::BLOCK_RENDERER_REGISTRY_SERVICE, $registryDef],
+                        [ConfigurationPass::RENDERER_REGISTRY_SERVICE, $registryDef],
                         [ConfigurationPass::BLOCK_TYPE_FACTORY_SERVICE, $factoryDef]
                     ]
                 )
@@ -49,13 +49,13 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->method('addMethodCall')
             ->with(
                 'addRenderer',
-                ['php', new Reference(ConfigurationPass::PHP_BLOCK_RENDERER_SERVICE)]
+                ['php', new Reference(ConfigurationPass::PHP_RENDERER_SERVICE)]
             );
         $registryDef->expects($this->at(1))
             ->method('addMethodCall')
             ->with(
                 'addRenderer',
-                ['twig', new Reference(ConfigurationPass::TWIG_BLOCK_RENDERER_SERVICE)]
+                ['twig', new Reference(ConfigurationPass::TWIG_RENDERER_SERVICE)]
             );
 
         $container->expects($this->once())

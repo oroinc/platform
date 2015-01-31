@@ -2,21 +2,21 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\BlockRenderer;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\LayoutRenderer;
 
-class BlockRendererTest extends \PHPUnit_Framework_TestCase
+class LayoutRendererTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $innerRenderer;
 
-    /** @var BlockRenderer */
+    /** @var LayoutRenderer */
     protected $renderer;
 
     protected function setUp()
     {
         $this->innerRenderer = $this->getMock('Symfony\Component\Form\FormRendererInterface');
-        $this->renderer      = new BlockRenderer($this->innerRenderer);
+        $this->renderer      = new LayoutRenderer($this->innerRenderer);
     }
 
     public function testRenderBlock()

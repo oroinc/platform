@@ -2,7 +2,7 @@ parameters:
     oro_layout.twig.extension.layout.class:   Oro\Bundle\LayoutBundle\Twig\LayoutExtension
     oro_layout.twig.renderer.class:           Symfony\Bridge\Twig\Form\TwigRenderer
     oro_layout.twig.renderer.engine.class:    Symfony\Bridge\Twig\Form\TwigRendererEngine
-    oro_layout.twig.block_renderer.class:     Oro\Bundle\LayoutBundle\Layout\TwigBlockRenderer
+    oro_layout.twig.layout_renderer.class:    Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer
 
 services:
     oro_layout.twig.extension.array:
@@ -31,9 +31,9 @@ services:
         arguments:
             - %oro_layout.twig.resources%
 
-    oro_layout.twig.block_renderer:
+    oro_layout.twig.layout_renderer:
         public: false
-        class: %oro_layout.twig.block_renderer.class%
+        class: %oro_layout.twig.layout_renderer.class%
         arguments:
             - @oro_layout.twig.renderer
             - @twig

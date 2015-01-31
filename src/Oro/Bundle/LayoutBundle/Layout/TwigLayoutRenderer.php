@@ -4,9 +4,9 @@ namespace Oro\Bundle\LayoutBundle\Layout;
 
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 
-use Oro\Component\Layout\BlockRenderer;
+use Oro\Component\Layout\LayoutRenderer;
 
-class TwigBlockRenderer extends BlockRenderer
+class TwigLayoutRenderer extends LayoutRenderer
 {
     /**
      * @param TwigRendererInterface $innerRenderer

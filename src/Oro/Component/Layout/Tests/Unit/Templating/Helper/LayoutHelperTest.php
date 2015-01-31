@@ -3,25 +3,25 @@
 namespace Oro\Component\Layout\Tests\Unit\Templating\Helper;
 
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\Templating\Helper\BlockHelper;
+use Oro\Component\Layout\Templating\Helper\LayoutHelper;
 
-class BlockHelperTest extends \PHPUnit_Framework_TestCase
+class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $renderer;
 
-    /** @var BlockHelper */
+    /** @var LayoutHelper */
     protected $helper;
 
     protected function setUp()
     {
         $this->renderer = $this->getMock('Symfony\Component\Form\FormRendererInterface');
-        $this->helper   = new BlockHelper($this->renderer);
+        $this->helper   = new LayoutHelper($this->renderer);
     }
 
     public function testGetName()
     {
-        $this->assertEquals('block', $this->helper->getName());
+        $this->assertEquals('layout', $this->helper->getName());
     }
 
     public function testSetBlockTheme()

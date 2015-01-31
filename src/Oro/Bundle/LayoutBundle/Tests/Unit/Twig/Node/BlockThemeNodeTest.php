@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\Node;
 
-use Oro\Bundle\LayoutBundle\Twig\Node\LayoutThemeNode;
+use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
 
-class LayoutThemeNodeTest extends \PHPUnit_Framework_TestCase
+class BlockThemeNodeTest extends \PHPUnit_Framework_TestCase
 {
     const SET_THEME_CALL = '$this->env->getExtension(\'layout\')->renderer->setTheme';
 
@@ -21,7 +21,7 @@ class LayoutThemeNodeTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $node = new LayoutThemeNode($block, $resources, 0);
+        $node = new BlockThemeNode($block, $resources, 0);
 
         $compiler = new \Twig_Compiler(new \Twig_Environment());
 

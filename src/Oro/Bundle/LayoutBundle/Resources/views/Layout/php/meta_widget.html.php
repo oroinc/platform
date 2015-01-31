@@ -1,1 +1,1 @@
-<meta <?php echo $view['block']->block($block, 'block_attributes') ?> />
+<meta <?php echo $view['layout']->block($block, 'block_attributes') ?> />

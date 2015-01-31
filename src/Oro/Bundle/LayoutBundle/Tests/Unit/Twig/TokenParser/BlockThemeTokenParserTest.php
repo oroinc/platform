@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig\TokenParser;
 
-use Oro\Bundle\LayoutBundle\Twig\Node\LayoutThemeNode;
-use Oro\Bundle\LayoutBundle\Twig\TokenParser\LayoutThemeTokenParser;
+use Oro\Bundle\LayoutBundle\Twig\Node\BlockThemeNode;
+use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
-class LayoutThemeTokenParserTest extends \PHPUnit_Framework_TestCase
+class BlockThemeTokenParserTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider getTestsForLayoutTheme
@@ -16,7 +16,7 @@ class LayoutThemeTokenParserTest extends \PHPUnit_Framework_TestCase
             new \Twig_Loader_String(),
             ['cache' => false, 'autoescape' => false, 'optimizations' => 0]
         );
-        $env->addTokenParser(new LayoutThemeTokenParser());
+        $env->addTokenParser(new BlockThemeTokenParser());
         $stream = $env->tokenize($source);
         $parser = new \Twig_Parser($env);
 
@@ -27,8 +27,8 @@ class LayoutThemeTokenParserTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                '{% layout_theme layout "tpl1" %}',
-                new LayoutThemeNode(
+                '{% block_theme layout "tpl1" %}',
+                new BlockThemeNode(
                     new \Twig_Node_Expression_Name('layout', 1),
                     new \Twig_Node_Expression_Array(
                         [
@@ -38,12 +38,12 @@ class LayoutThemeTokenParserTest extends \PHPUnit_Framework_TestCase
                         1
                     ),
                     1,
-                    'layout_theme'
+                    'block_theme'
                 ),
             ],
             [
-                '{% layout_theme layout "tpl1" "tpl2" %}',
-                new LayoutThemeNode(
+                '{% block_theme layout "tpl1" "tpl2" %}',
+                new BlockThemeNode(
                     new \Twig_Node_Expression_Name('layout', 1),
                     new \Twig_Node_Expression_Array(
                         [
@@ -55,21 +55,21 @@ class LayoutThemeTokenParserTest extends \PHPUnit_Framework_TestCase
                         1
                     ),
                     1,
-                    'layout_theme'
+                    'block_theme'
                 ),
             ],
             [
-                '{% layout_theme layout with "tpl1" %}',
-                new LayoutThemeNode(
+                '{% block_theme layout with "tpl1" %}',
+                new BlockThemeNode(
                     new \Twig_Node_Expression_Name('layout', 1),
                     new \Twig_Node_Expression_Constant('tpl1', 1),
                     1,
-                    'layout_theme'
+                    'block_theme'
                 ),
             ],
             [
-                '{% layout_theme layout with ["tpl1"] %}',
-                new LayoutThemeNode(
+                '{% block_theme layout with ["tpl1"] %}',
+                new BlockThemeNode(
                     new \Twig_Node_Expression_Name('layout', 1),
                     new \Twig_Node_Expression_Array(
                         [
@@ -79,12 +79,12 @@ class LayoutThemeTokenParserTest extends \PHPUnit_Framework_TestCase
                         1
                     ),
                     1,
-                    'layout_theme'
+                    'block_theme'
                 ),
             ],
             [
-                '{% layout_theme layout with ["tpl1", "tpl2"] %}',
-                new LayoutThemeNode(
+                '{% block_theme layout with ["tpl1", "tpl2"] %}',
+                new BlockThemeNode(
                     new \Twig_Node_Expression_Name('layout', 1),
                     new \Twig_Node_Expression_Array(
                         [
@@ -96,7 +96,7 @@ class LayoutThemeTokenParserTest extends \PHPUnit_Framework_TestCase
                         1
                     ),
                     1,
-                    'layout_theme'
+                    'block_theme'
                 ),
             ],
         ];

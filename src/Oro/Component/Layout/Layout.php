@@ -7,7 +7,7 @@ class Layout
     /** @var BlockView */
     protected $view;
 
-    /** @var BlockRendererRegistryInterface */
+    /** @var LayoutRendererRegistryInterface */
     protected $rendererRegistry;
 
     /** @var string */
@@ -17,10 +17,10 @@ class Layout
     protected $themes = [];
 
     /**
-     * @param BlockView                      $view
-     * @param BlockRendererRegistryInterface $rendererRegistry
+     * @param BlockView                       $view
+     * @param LayoutRendererRegistryInterface $rendererRegistry
      */
-    public function __construct(BlockView $view, BlockRendererRegistryInterface $rendererRegistry)
+    public function __construct(BlockView $view, LayoutRendererRegistryInterface $rendererRegistry)
     {
         $this->view             = $view;
         $this->rendererRegistry = $rendererRegistry;
@@ -52,7 +52,7 @@ class Layout
     /**
      * Sets a renderer to be used to render this layout
      *
-     * @param string $name The name of the block renderer
+     * @param string $name The name of a layout renderer
      *
      * @return self
      */

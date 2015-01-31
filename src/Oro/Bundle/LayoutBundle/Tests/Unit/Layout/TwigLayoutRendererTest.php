@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout;
 
-use Oro\Bundle\LayoutBundle\Layout\TwigBlockRenderer;
+use Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer;
 
-class TwigBlockRendererTest extends \PHPUnit_Framework_TestCase
+class TwigLayoutRendererTest extends \PHPUnit_Framework_TestCase
 {
     public function testEnviromentSet()
     {
@@ -15,6 +15,6 @@ class TwigBlockRendererTest extends \PHPUnit_Framework_TestCase
             ->method('setEnvironment')
             ->with($this->identicalTo($environment));
 
-        new TwigBlockRenderer($innerRenderer, $environment);
+        new TwigLayoutRenderer($innerRenderer, $environment);
     }
 }

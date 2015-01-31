@@ -4,7 +4,7 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\Form\FormRendererInterface;
 
-class BlockRenderer implements BlockRendererInterface
+class LayoutRenderer implements LayoutRendererInterface
 {
     /** @var FormRendererInterface */
     protected $innerRenderer;

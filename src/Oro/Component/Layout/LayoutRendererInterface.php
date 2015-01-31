@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-interface BlockRendererInterface
+interface LayoutRendererInterface
 {
     /**
      * Renders the block

@@ -8,9 +8,9 @@ use Symfony\Component\Form\FormRendererInterface;
 use Oro\Component\Layout\BlockView;
 
 /**
- * BlockHelper provides helpers to help display layout blocks
+ * LayoutHelper provides helpers to help display layout blocks
  */
-class BlockHelper extends Helper
+class LayoutHelper extends Helper
 {
     /**
      * @var FormRendererInterface
@@ -30,7 +30,7 @@ class BlockHelper extends Helper
      */
     public function getName()
     {
-        return 'block';
+        return 'layout';
     }
 
     /**

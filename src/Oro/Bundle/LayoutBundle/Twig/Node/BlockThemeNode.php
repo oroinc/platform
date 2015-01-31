@@ -3,9 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Twig\Node;
 
 /**
- * Node for the 'layout_theme' tag
+ * Node for the 'block_theme' tag
  */
-class LayoutThemeNode extends \Twig_Node
+class BlockThemeNode extends \Twig_Node
 {
     /**
      * @param \Twig_Node $block     A note represents BlockView instance for which additional theme(s) is set
