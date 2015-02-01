@@ -130,6 +130,7 @@ abstract class AbstractScopeManager
         if (!empty($this->changedSettings)) {
             $this->save($this->changedSettings);
             $this->changedSettings = [];
+            $this->reload();
         }
     }
 
