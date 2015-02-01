@@ -77,7 +77,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+        $this->userConfigManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 

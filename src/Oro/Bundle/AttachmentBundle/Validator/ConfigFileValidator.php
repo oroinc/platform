@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints\File as FileConstraint;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager as Configuration;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -20,7 +20,7 @@ class ConfigFileValidator
     /** @var Validator */
     protected $validator;
 
-    /** @var UserConfigManager */
+    /** @var Configuration */
     protected $config;
 
     /** @var ConfigProvider */
@@ -29,9 +29,9 @@ class ConfigFileValidator
     /**
      * @param Validator         $validator
      * @param ConfigManager     $configManager
-     * @param UserConfigManager $config
+     * @param Configuration     $config
      */
-    public function __construct(Validator $validator, ConfigManager $configManager, UserConfigManager $config)
+    public function __construct(Validator $validator, ConfigManager $configManager, Configuration $config)
     {
         $this->validator                = $validator;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');

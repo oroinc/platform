@@ -4,7 +4,10 @@ namespace Oro\Bundle\ConfigBundle\Config;
 
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
-class UserConfigManager extends ConfigManager
+/**
+ * User config scope
+ */
+class UserScopeManager extends AbstractScopeManager
 {
     /**
      * @var SecurityContextInterface
@@ -33,7 +36,7 @@ class UserConfigManager extends ConfigManager
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getScopedEntityName()
     {
@@ -41,7 +44,7 @@ class UserConfigManager extends ConfigManager
     }
 
     /**
-     * @return int
+     * {@inheritdoc}
      */
     public function getScopeId()
     {

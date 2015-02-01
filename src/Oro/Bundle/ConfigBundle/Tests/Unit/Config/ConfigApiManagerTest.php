@@ -24,7 +24,8 @@ class ConfigApiManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ConfigApiManager($this->configProvider, $this->configManager);
+        $this->manager = new ConfigApiManager($this->configProvider);
+        $this->manager->addConfigManager('user', $this->configManager);
     }
 
     public function testGetSections()

@@ -32,7 +32,7 @@ class ConfigFileValidatorTest extends \PHPUnit_Framework_TestCase
             new ConstraintValidatorFactory(),
             new DefaultTranslator()
         );
-        $this->config = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+        $this->config = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
         $this->attachmentConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
