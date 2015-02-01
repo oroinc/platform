@@ -38,7 +38,13 @@
                                         {% endif %}
                                         {% if breadcrumbs.additional is defined %}
                                             {% for breadcrumb in breadcrumbs.additional %}
-                                                <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumb.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
+                                                <div class="sub-title">
+                                                {%- if breadcrumb.indexPath is defined -%}
+                                                    <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
+                                                {%- else -%}
+                                                    {{ breadcrumb.indexLabel }}
+                                                {%- endif -%}
+                                                </div>
                                                 <span class="separator">/</span>
                                             {% endfor %}
                                         {% endif %}

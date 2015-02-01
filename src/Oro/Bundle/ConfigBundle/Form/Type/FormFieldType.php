@@ -21,6 +21,7 @@ class FormFieldType extends AbstractType
                 'target_field_type'    => 'text',
                 'resettable'           => true,
                 'cascade_validation'   => true,
+                'parent_checkbox_label' => ''
             )
         );
     }
@@ -36,6 +37,7 @@ class FormFieldType extends AbstractType
             $useParentOptions = ['data' => 0];
             $useParentType    = 'hidden';
         }
+        $useParentOptions['label'] = $options['parent_checkbox_label'];
 
         $builder->add('use_parent_scope_value', $useParentType, $useParentOptions);
         $builder->add('value', $options['target_field_type'], $options['target_field_options']);

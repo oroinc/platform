@@ -2,55 +2,61 @@
 
 namespace Oro\Bundle\ConfigBundle\Config;
 
-use Doctrine\Common\Persistence\ObjectManager;
-
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-use Oro\Bundle\ConfigBundle\Entity\Config;
-use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 
 class ConfigManager
 {
     const SECTION_VIEW_SEPARATOR  = '___';
     const SECTION_MODEL_SEPARATOR = '.';
-    const SCOPE_NAME              = 'app';
-
-    /** @var ObjectManager */
-    protected $om;
-
-    /** @var EventDispatcher */
-    protected $eventDispatcher;
 
     /** @var array Settings array, initiated with global application settings */
     protected $settings;
 
     /** @var array */
-    protected $storedSettings = [];
+    protected $managers;
 
-    /** @var array */
-    protected $changedSettings = [];
+    /** @var string */
+    protected $scopeName;
+
+    /** @var EventDispatcher */
+    protected $eventDispatcher;
 
     /**
-     * @param EventDispatcher              $eventDispatcher
-     * @param ObjectManager                $om
      * @param ConfigDefinitionImmutableBag $configDefinition
+     * @param EventDispatcher              $eventDispatcher
      */
     public function __construct(
-        EventDispatcher $eventDispatcher,
-        ObjectManager $om,
-        ConfigDefinitionImmutableBag $configDefinition
+        ConfigDefinitionImmutableBag $configDefinition,
+        EventDispatcher $eventDispatcher
     ) {
+        $this->settings = $configDefinition->all();
         $this->eventDispatcher = $eventDispatcher;
-        $this->om              = $om;
-        $this->settings        = $configDefinition->all();
+    }
+
+    /**
+     * @param string               $scopeName
+     * @param AbstractScopeManager $manager
+     */
+    public function addManager($scopeName, $manager)
+    {
+        $this->managers[$scopeName] = $manager;
+    }
+
+    /**
+     * @param string $scopeName
+     */
+    public function setScopeName($scopeName)
+    {
+        $this->scopeName = $scopeName;
     }
 
     /**
      * Get setting value
      *
-     * @param  string $name Setting name, for example "oro_user.level"
+     * @param string $name Setting name, for example "oro_user.level"
      * @param bool    $default
      * @param bool    $full
      *
@@ -58,26 +64,53 @@ class ConfigManager
      */
     public function get($name, $default = false, $full = false)
     {
-        $entity   = $this->getScopedEntityName();
-        $entityId = $this->getScopeId();
-        $this->loadStoredSettings($entity, $entityId);
-        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $managers = array_reverse($this->managers);
 
+        //in case if we need default value - unset current scope manager
         if ($default) {
-            $settings = $this->settings;
-        } elseif (isset($this->storedSettings[$entity][$entityId][$section][$key])) {
-            $settings = $this->storedSettings[$entity][$entityId];
-        } elseif (isset($this->settings[$section][$key])) {
-            $settings = $this->settings;
+            unset($managers[$this->scopeName]);
+        }
+        $value = null;
+        foreach ($managers as $scopeName => $manager) {
+            /** @var $manager AbstractScopeManager */
+            $value = $manager->getSettingValue($name, $full);
+
+            if (!is_null($value)) {
+                if (is_array($value)
+                    && ($scopeName !== $this->scopeName
+                        || (isset($value['scope']) && $value['scope'] !== $manager->getScopedEntityName())
+                    )
+                ) {
+                    $value['use_parent_scope_value'] = true;
+                }
+                break;
+            }
         }
 
-        if (empty($settings[$section][$key])) {
-            return null;
-        } else {
-            $setting = $settings[$section][$key];
-
+        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        if (is_null($value) && !empty($this->settings[$section][$key])) {
+            $setting = $this->settings[$section][$key];
             return is_array($setting) && array_key_exists('value', $setting) && !$full ? $setting['value'] : $setting;
         }
+
+        return $value;
+    }
+
+    /**
+     * @param int|null    $scopeId
+     * @param string|null $scope
+     *
+     * @return $this
+     */
+    public function setScopeId($scopeId = null, $scope = null)
+    {
+        if (is_null($scope)) {
+            $scope = $this->scopeName;
+        }
+
+        $this->managers[$scope]->setScopeId($scopeId);
+
+        return $this;
     }
 
     /**
@@ -88,26 +121,40 @@ class ConfigManager
      */
     public function getInfo($name)
     {
-        $entity   = $this->getScopedEntityName();
-        $entityId = $this->getScopeId();
-        $this->loadStoredSettings($entity, $entityId);
-        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
+        $managers = array_reverse($this->managers);
 
-        $createdAt = null;
-        $updatedAt = null;
-        if (!empty($this->storedSettings[$entity][$entityId][$section][$key])) {
-            $setting = $this->storedSettings[$entity][$entityId][$section][$key];
-            if (is_array($setting)) {
-                if (array_key_exists('createdAt', $setting)) {
-                    $createdAt = $setting['createdAt'];
-                }
-                if (array_key_exists('updatedAt', $setting)) {
-                    $updatedAt = $setting['updatedAt'];
-                }
+        $createdValues = [];
+        $updatedValues = [];
+
+        $createdValue = $updatedValue  = null;
+        $valueWasFind = false;
+
+        foreach ($managers as $manager) {
+            list($created, $updated, $isNullValue) = $manager->getInfo($name);
+            if (!$isNullValue) {
+                $createdValue = $created;
+                $updatedValue = $updated;
+                $valueWasFind = true;
+                break;
+            }
+            if ($created) {
+                $createdValues[] = $created;
+            }
+            if ($updated) {
+                $updatedValues[] = $updated;
             }
         }
 
-        return ['createdAt' => $createdAt, 'updatedAt' => $updatedAt];
+        if (!$valueWasFind) {
+            if (!empty($createdValues)) {
+                $createdValue =  min($createdValues);
+            }
+            if (!empty($updatedValues)) {
+                $updatedValue =  max($updatedValues);
+            }
+        }
+
+        return ['createdAt' => $createdValue, 'updatedAt' => $updatedValue];
     }
 
     /**
@@ -118,16 +165,7 @@ class ConfigManager
      */
     public function set($name, $value)
     {
-        $entity   = $this->getScopedEntityName();
-        $entityId = $this->getScopeId();
-        $this->loadStoredSettings($entity, $entityId);
-
-        $changeKey                         = str_replace(
-            self::SECTION_MODEL_SEPARATOR,
-            self::SECTION_VIEW_SEPARATOR,
-            $name
-        );
-        $this->changedSettings[$changeKey] = ['value' => $value, 'use_parent_scope_value' => false];
+        $this->getScopeManager()->set($name, $value);
     }
 
     /**
@@ -137,15 +175,7 @@ class ConfigManager
      */
     public function reset($name)
     {
-        $entity   = $this->getScopedEntityName();
-        $entityId = $this->getScopeId();
-        $this->loadStoredSettings($entity, $entityId);
-
-        list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
-        unset($this->storedSettings[$entity][$entityId][$section][$key]);
-
-        $changeKey = str_replace(self::SECTION_MODEL_SEPARATOR, self::SECTION_VIEW_SEPARATOR, $name);
-        $this->changedSettings[$changeKey] = ['use_parent_scope_value' => true];
+        $this->getScopeManager()->reset($name);
     }
 
     /**
@@ -153,90 +183,35 @@ class ConfigManager
      */
     public function flush()
     {
-        if (!empty($this->changedSettings)) {
-            $this->save($this->changedSettings);
-            $this->changedSettings = [];
-        }
+        $this->getScopeManager()->flush();
     }
 
     /**
-     * Save settings with fallback to global scope (default)
+     * Save settings
+     *
+     * @param array $newSettings
      */
     public function save($newSettings)
     {
-        $repository = $this->om->getRepository('OroConfigBundle:ConfigValue');
-        /** @var Config $config */
-        $config = $this->om
-            ->getRepository('OroConfigBundle:Config')
-            ->getByEntity($this->getScopedEntityName(), $this->getScopeId());
-
-        list ($updated, $removed) = $this->calculateChangeSet($newSettings);
-
-        if (!empty($removed)) {
-            $repository->removeValues($config, $removed);
-        }
-
-        foreach ($updated as $newItemKey => $newItemValue) {
-            $newItemKey   = explode(self::SECTION_VIEW_SEPARATOR, $newItemKey);
-            $newItemValue = is_array($newItemValue) ? $newItemValue['value'] : $newItemValue;
-
-            /** @var ConfigValue $value */
-            $value = $config->getOrCreateValue($newItemKey[0], $newItemKey[1]);
-            $value->setValue($newItemValue);
-
-            if (!$value->getId()) {
-                $config->getValues()->add($value);
-            }
-        }
-
-        $this->om->persist($config);
-        $this->om->flush();
+        list($updated, $removed) = $this->getScopeManager()->save($newSettings);
 
         $event = new ConfigUpdateEvent($this, $updated, $removed);
         $this->eventDispatcher->dispatch(ConfigUpdateEvent::EVENT_NAME, $event);
 
-        $this->reload();
+        $this->getScopeManager()->reload();
     }
 
     /**
      * Calculates and returns config change set
      * Does not modify anything, so even if you call flush after calculating you will not persist any changes
      *
-     * @param $newSettings
+     * @param array $newSettings
      *
      * @return array
      */
     public function calculateChangeSet($newSettings)
     {
-        // find new and updated
-        $updated = $removed = [];
-        foreach ($newSettings as $key => $value) {
-            $currentValue = $this->get(
-                str_replace(
-                    self::SECTION_VIEW_SEPARATOR,
-                    self::SECTION_MODEL_SEPARATOR,
-                    $key
-                ),
-                false,
-                true
-            );
-
-            // save only if setting exists and there's no default checkbox checked
-            if (!is_null($currentValue) && empty($value['use_parent_scope_value'])) {
-                $updated[$key] = $value;
-            }
-
-            $valueDefined      = isset($currentValue['use_parent_scope_value'])
-                && $currentValue['use_parent_scope_value'] == false;
-            $valueStillDefined = isset($value['use_parent_scope_value'])
-                && $value['use_parent_scope_value'] == false;
-
-            if ($valueDefined && !$valueStillDefined) {
-                $removed[] = array_slice(explode(self::SECTION_VIEW_SEPARATOR, $key), 0, 2);
-            }
-        }
-
-        return [$updated, $removed];
+        return $this->getScopeManager()->calculateChangeSet($newSettings);
     }
 
     /**
@@ -247,26 +222,7 @@ class ConfigManager
      */
     public function loadStoredSettings($entity, $entityId)
     {
-        if (isset($this->storedSettings[$entity][$entityId])) {
-            return false;
-        }
-
-        $config = $this->om
-            ->getRepository('OroConfigBundle:Config')
-            ->loadSettings($entity, $entityId);
-
-        // TODO: optimize it
-        // merge app settings with scope settings
-        if ($entity != static::SCOPE_NAME) {
-            $appConfig = $this->om
-                ->getRepository('OroConfigBundle:Config')
-                ->loadSettings(static::SCOPE_NAME, 0);
-            $config    = array_merge($appConfig, $config);
-        }
-
-        $this->storedSettings[$entity][$entityId] = $config;
-
-        return true;
+        return $this->getScopeManager()->loadStoredSettings($entity, $entityId);
     }
 
     /**
@@ -274,10 +230,7 @@ class ConfigManager
      */
     public function reload()
     {
-        $entity   = $this->getScopedEntityName();
-        $entityId = $this->getScopeId();
-        unset($this->storedSettings[$entity][$entityId]);
-        $this->loadStoredSettings($entity, $entityId);
+        $this->getScopeManager()->reload();
     }
 
     /**
@@ -308,18 +261,10 @@ class ConfigManager
     }
 
     /**
-     * @return null
+     * @return AbstractScopeManager
      */
-    public function getScopedEntityName()
+    protected function getScopeManager()
     {
-        return static::SCOPE_NAME;
-    }
-
-    /**
-     * @return int
-     */
-    public function getScopeId()
-    {
-        return 0;
+        return $this->managers[$this->scopeName];
     }
 }

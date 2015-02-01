@@ -41,7 +41,7 @@ services:
     oro_locale.settings:
         class: %oro_locale.settings.class%
         arguments:
-            - @oro_config.global
+            - @oro_config.user
             - @oro_locale.calendar_factory
         calls:
             - [addNameFormats, [%oro_locale.format.name%]]
@@ -126,8 +126,6 @@ services:
             - @oro_locale.settings
             - @stof_doctrine_extensions.listener.translatable
             - %installed%
-        calls:
-            - [ setRequest, [@?request=] ]
         tags:
             - { name: kernel.event_subscriber }
 

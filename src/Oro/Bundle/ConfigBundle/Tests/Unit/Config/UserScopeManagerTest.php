@@ -5,17 +5,15 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Persistence\ObjectRepository;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
-use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
+use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
 
-class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
+class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var UserConfigManager
+     * @var UserScopeManager
      */
     protected $object;
 
@@ -34,31 +32,6 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected $om;
 
-    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
-    protected $ed;
-
-    /**
-     * @var array
-     */
-    protected $loadedSettings = array(
-        'oro_user' => array(
-            'greeting' => array(
-                'value' => true,
-                'type'  => 'boolean',
-            ),
-            'level'    => array(
-                'value' => 20,
-                'type'  => 'scalar',
-            )
-        ),
-        'oro_test' => array(
-            'anysetting' => array(
-                'value' => 'anyvalue',
-                'type'  => 'scalar',
-            ),
-        ),
-    );
-
     /**
      * @var array
      */
@@ -74,8 +47,7 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->ed = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcher');
-        $this->object = new UserConfigManager($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings));
+        $this->object = new UserScopeManager($this->om);
 
         $this->security   = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
         $this->group1     = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
@@ -109,15 +81,15 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->addGroup($this->group1)
             ->addGroup($this->group2);
 
-        $this->object = new UserConfigManager($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings));
+        $this->object = new UserScopeManager($this->om);
     }
 
     public function testSecurity()
     {
         $object = $this->getMock(
-            'Oro\Bundle\ConfigBundle\Config\UserConfigManager',
+            'Oro\Bundle\ConfigBundle\Config\UserScopeManager',
             array('loadStoredSettings'),
-            array($this->ed, $this->om, new ConfigDefinitionImmutableBag($this->settings))
+            array($this->om)
         );
 
         $object->expects($this->exactly(3))
@@ -129,30 +101,13 @@ class UserConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0, $object->getScopeId());
     }
 
-    /**
-     * Test get loaded settings
-     */
-    public function testGetLoaded()
+    public function testGetScopedEntityName()
     {
-        $loadedSettings = $this->loadedSettings;
+        $this->assertEquals('user', $this->object->getScopedEntityName());
+    }
 
-        $repository = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repository->expects($this->at(0))
-            ->method('loadSettings')
-            ->with('user', 0)
-            ->will($this->returnValue($loadedSettings));
-        $repository->expects($this->at(1))
-            ->method('loadSettings')
-            ->with('app', 0)
-            ->will($this->returnValue($loadedSettings));
-
-        $this->om
-            ->expects($this->exactly(2))
-            ->method('getRepository')
-            ->will($this->returnValue($repository));
-
-        $this->object->get('oro_user.level');
+    public function testGetScopeId()
+    {
+        $this->assertEquals(0, $this->object->getScopeId());
     }
 }

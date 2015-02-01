@@ -290,7 +290,7 @@ class ConfigValue
      *
      * @return void
      */
-    protected function clearValue()
+    public function clearValue()
     {
         $this->objectValue = $this->arrayValue = $this->textValue = null;
     }

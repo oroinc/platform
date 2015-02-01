@@ -98,7 +98,7 @@ class NavigationMostviewedBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(get_class($item))
             ->will($this->returnValue($repository));
 
-        $configMock = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+        $configMock = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
