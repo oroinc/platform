@@ -56,7 +56,7 @@ class ConfigManager
     /**
      * Get setting value
      *
-     * @param  string $name Setting name, for example "oro_user.level"
+     * @param string $name Setting name, for example "oro_user.level"
      * @param bool    $default
      * @param bool    $full
      *
@@ -97,8 +97,8 @@ class ConfigManager
     }
 
     /**
-     * @param int    $scopeId
-     * @param string $scope
+     * @param int|null    $scopeId
+     * @param string|null $scope
      *
      * @return $this
      */
@@ -188,6 +188,8 @@ class ConfigManager
 
     /**
      * Save settings
+     *
+     * @param array $newSettings
      */
     public function save($newSettings)
     {
@@ -203,7 +205,7 @@ class ConfigManager
      * Calculates and returns config change set
      * Does not modify anything, so even if you call flush after calculating you will not persist any changes
      *
-     * @param $newSettings
+     * @param array $newSettings
      *
      * @return array
      */

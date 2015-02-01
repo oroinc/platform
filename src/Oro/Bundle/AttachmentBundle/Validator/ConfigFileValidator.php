@@ -31,7 +31,7 @@ class ConfigFileValidator
      * @param ConfigManager     $configManager
      * @param Configuration     $config
      */
-    public function __construct(Validator $validator, ConfigManager $configManager, $config)
+    public function __construct(Validator $validator, ConfigManager $configManager, Configuration $config)
     {
         $this->validator                = $validator;
         $this->attachmentConfigProvider = $configManager->getProvider('attachment');

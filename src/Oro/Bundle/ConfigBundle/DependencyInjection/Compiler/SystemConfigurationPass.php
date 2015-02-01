@@ -19,7 +19,7 @@ class SystemConfigurationPass implements CompilerPassInterface
     const CONFIG_DEFINITION_BAG_SERVICE = 'oro_config.config_definition_bag';
     const CONFIG_PROVIDER_TAG_NAME      = 'oro_config.configuration_provider';
 
-    const SCOPE_MANAGER_TAG_NAME = 'oro_config.scope';
+    const SCOPE_MANAGER_TAG_NAME  = 'oro_config.scope';
     const MAIN_MANAGER_SERVICE_ID = 'oro_config.manager';
 
     const API_MANAGER_SERVICE_ID = 'oro_config.manager.api';
@@ -36,7 +36,7 @@ class SystemConfigurationPass implements CompilerPassInterface
             new Processor(),
             $this->getDeclaredVariableNames($settings)
         );
-        $config    = $this->loadConfig($container, $processor);
+        $config         = $this->loadConfig($container, $processor);
         $taggedServices = $container->findTaggedServiceIds(self::CONFIG_PROVIDER_TAG_NAME);
         if ($taggedServices) {
             $config = $processor->process($config);
@@ -49,10 +49,10 @@ class SystemConfigurationPass implements CompilerPassInterface
         }
 
         // find managers
-        $managers      = [];
+        $managers       = [];
         $taggedServices = $container->findTaggedServiceIds(self::SCOPE_MANAGER_TAG_NAME);
         foreach ($taggedServices as $id => $attributes) {
-            $priority  = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
             $managers[$priority][$attributes[0]['scope']] = new Reference($id);
         }
         if (empty($managers)) {
@@ -61,7 +61,7 @@ class SystemConfigurationPass implements CompilerPassInterface
 
         // sort by priority and flatten
         ksort($managers);
-        $managers = call_user_func_array('array_merge', $managers);
+        $managers      = call_user_func_array('array_merge', $managers);
         $apiManagerDef = $container->getDefinition(self::API_MANAGER_SERVICE_ID);
 
         // register

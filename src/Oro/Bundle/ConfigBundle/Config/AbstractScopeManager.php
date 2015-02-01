@@ -46,9 +46,7 @@ abstract class AbstractScopeManager
 
         if (isset($this->storedSettings[$entity][$entityId][$section][$key])) {
             $setting = $this->storedSettings[$entity][$entityId][$section][$key];
-
             if (is_array($setting) && array_key_exists('value', $setting) && !is_null($setting['value'])) {
-
                 return !$full ? $setting['value'] : $setting;
             }
         }
@@ -75,7 +73,6 @@ abstract class AbstractScopeManager
 
         if (!empty($this->storedSettings[$entity][$entityId][$section][$key])) {
             $setting = $this->storedSettings[$entity][$entityId][$section][$key];
-
             if (is_array($setting) && array_key_exists('value', $setting) && !is_null($setting['value'])) {
                 $isNullValue = false;
                 if (array_key_exists('createdAt', $setting)) {
@@ -102,11 +99,8 @@ abstract class AbstractScopeManager
         $entityId = $this->getScopeId();
         $this->loadStoredSettings($entity, $entityId);
 
-        $changeKey                         = str_replace(
-            ConfigManager::SECTION_MODEL_SEPARATOR,
-            ConfigManager::SECTION_VIEW_SEPARATOR,
-            $name
-        );
+        $changeKey = str_replace(ConfigManager::SECTION_MODEL_SEPARATOR, ConfigManager::SECTION_VIEW_SEPARATOR, $name);
+
         $this->changedSettings[$changeKey] = ['value' => $value, 'use_parent_scope_value' => false];
     }
 
@@ -192,11 +186,7 @@ abstract class AbstractScopeManager
         $updated = $removed = [];
         foreach ($newSettings as $key => $value) {
             $currentValue = $this->getSettingValue(
-                str_replace(
-                    ConfigManager::SECTION_VIEW_SEPARATOR,
-                    ConfigManager::SECTION_MODEL_SEPARATOR,
-                    $key
-                ),
+                str_replace(ConfigManager::SECTION_VIEW_SEPARATOR, ConfigManager::SECTION_MODEL_SEPARATOR, $key),
                 true
             );
 
