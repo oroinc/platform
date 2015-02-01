@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity;
 
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
-class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareInterface
+class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareInterface, EmailHolderInterface
 {
     private $email;
 

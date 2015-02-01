@@ -136,6 +136,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $emails);
 
         $emails->rewind();
+        $this->assertTrue($emails->valid());
         $email = $emails->current();
         $this->assertEquals(123, $email->getId()->getUid());
         $this->assertEquals(456, $email->getId()->getUidValidity());

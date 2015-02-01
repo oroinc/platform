@@ -1,0 +1,36 @@
+<div class="widget-content">
+    {% if processed is defined %}
+        <script type="text/javascript">
+            require(['underscore', 'orotranslation/js/translator', 'oroui/js/widget-manager',
+                        'oroui/js/messenger', 'oroui/js/mediator'],
+                    function(_, __, widgetManager, messenger, mediator) {
+                        widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                            {% if processed %}
+                                messenger.notificationFlashMessage('success', __('oro.user.reset_password.flash.success'));
+                            {% else %}
+                                messenger.notificationFlashMessage('error', '{{ error|trans }}');
+                            {% endif %}
+                            mediator.trigger('widget_success:' + widget.getAlias());
+                            mediator.trigger('widget_success:' + widget.getWid());
+                            widget.remove();
+                        });
+                    });
+        </script>
+    {% else %}
+        <div class="form-container">
+            <form action="{{ formAction }}" method="post">
+                <div class="text-center">
+                    <p>{{ 'oro.user.password.reset.popup.message'|trans({
+                            '{{ user }}': '<strong>' ~ entity.username|escape ~ '</strong>'
+                        })|raw }}</p>
+                    <b>{{ 'oro.user.password.reset.popup.question'|trans }}</b>
+                </div>
+
+                <div class="widget-actions form-actions">
+                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                    <button class="btn btn-primary" type="submit">{{ 'oro.user.password.reset.label'|trans }}</button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+</div>

@@ -6,6 +6,13 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
+/**
+ * Class EmailTest
+ *
+ * @package Oro\Bundle\EmailBundle\Tests\Unit\Entity
+ *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class EmailTest extends \PHPUnit_Framework_TestCase
 {
     public function testIdGetter()

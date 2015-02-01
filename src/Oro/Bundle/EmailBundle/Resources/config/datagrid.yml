@@ -8,6 +8,10 @@ datagrid:
                     - partial e.{id, subject, sentAt}
                 from:
                     - { table: OroEmailBundle:Email, alias: e }
+                join:
+                    left:
+                        - { join: e.recipients, alias: r_to, conditionType: WITH, condition: r_to.type = 'to' }
+                        - { join: e.recipients, alias: r_cc_bcc, conditionType: WITH, condition: r_cc_bcc.type = 'cc' OR r_cc_bcc.type = 'bcc' }
 
         columns:
             fromEmailExpression:
@@ -15,16 +19,21 @@ datagrid:
                 label: oro.email.from_name.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/from.html.twig
-            recipients:
-                type: twig
-                label: oro.email.recipients.label
-                frontend_type: html
-                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             subject:
                 type: twig
                 label: oro.email.subject.label
                 frontend_type: html
                 template: OroEmailBundle:Email:Datagrid/Property/subject.html.twig
+            to:
+                type: twig
+                label: To
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
+            ccBcc:
+                type: twig
+                label: Cc/Bcc
+                frontend_type: html
+                template: OroEmailBundle:Email:Datagrid/Property/recipients.html.twig
             sentAt:
                 label: oro.email.sent_at.label
                 frontend_type: datetime
@@ -34,6 +43,8 @@ datagrid:
             columns:
                 subject: { data_name: e.subject }
                 sentAt:  { data_name: e.sentAt }
+                to:      { data_name: r_to.name }
+                ccBcc:   { data_name: r_cc_bcc.name }
                 fromEmailExpression: { data_name: fromEmailExpression }
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
@@ -52,6 +63,8 @@ datagrid:
             columns:
                 fromEmailExpression: { type: string,   data_name: fromEmailExpression }
                 subject:             { type: string,   data_name: e.subject }
+                to:                  { type: string,   data_name: r_to.name }
+                ccBcc:               { type: string,   data_name: r_cc_bcc.name }
                 sentAt:              { type: datetime, data_name: e.sentAt }
 
     activity-email-grid:

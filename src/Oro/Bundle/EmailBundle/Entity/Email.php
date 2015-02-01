@@ -592,4 +592,38 @@ class Email extends ExtendEmail
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
     }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTo()
+    {
+        return $this->getRecipients(EmailRecipient::TO);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getCc()
+    {
+        return $this->getRecipients(EmailRecipient::CC);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getBcc()
+    {
+        return $this->getRecipients(EmailRecipient::BCC);
+    }
+
+    /**
+     * @return EmailRecipient[]
+     */
+    public function getCcBcc()
+    {
+        return new ArrayCollection(
+            array_merge($this->getCc()->toArray(), $this->getBcc()->toArray())
+        );
+    }
 }
