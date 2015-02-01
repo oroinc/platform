@@ -36,7 +36,6 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles);
-
         $this->container->expects($this->once())
             ->method('getExtensions')
             ->will($this->returnValue(['test_bundle' => null]));
@@ -62,14 +61,12 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-
         $bagServiceDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
         $providerServiceDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->container->expects($this->exactly(2))
             ->method('findTaggedServiceIds')
             ->will(
@@ -96,18 +93,14 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 
                         return [];
                     }
-
                 )
             );
-
         $apiManagerServiceDef     = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-
         $configManagerServiceDef     = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-
         $this->container->expects($this->exactly(4))
             ->method('getDefinition')
             ->will(
@@ -120,18 +113,15 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-
         $apiManagerServiceDef->expects($this->exactly(2))
             ->method('addMethodCall');
 
         $bagServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'));
-
         $providerServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'));
-
         $this->compiler->process($this->container);
     }
 }
