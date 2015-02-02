@@ -12,6 +12,9 @@ class DateTimeParser
      * @return \DateTime
      *
      * @throws \Exception
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public static function parse($value)
     {
