@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\IntegrationBundle\Entity;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -337,6 +336,7 @@ class Channel
 
     /**
      * @deprecated Deprecated since 1.7.0 in favor of getLastStatusForConnector because of performance impact.
+     * @see Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector
      * @param string $connector
      * @param int|null $codeFilter
      *
@@ -352,30 +352,6 @@ class Channel
                 return $connectorFilter && $codeFilter;
             }
         );
-    }
-
-    /**
-     * Returns latest status for connector and code if it exists.
-     *
-     * @param string $connector
-     * @param int|null $code
-     * @return Status|null
-     */
-    public function getLastStatusForConnector($connector, $code = null)
-    {
-        $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq('connector', $connector))
-            ->orderBy(['date' => Criteria::DESC])
-            ->setFirstResult(0)
-            ->setMaxResults(1);
-
-        if ($code) {
-            $criteria->andWhere(Criteria::expr()->eq('code', $code));
-        };
-
-        $statuses = $this->statuses->matching($criteria);
-
-        return $statuses->first();
     }
 
     /**
