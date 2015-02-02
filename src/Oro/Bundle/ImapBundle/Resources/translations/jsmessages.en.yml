@@ -1,0 +1,4 @@
+oro.imap:
+    connection:
+        success: Connection established successfully!
+        error:   Parameters are not valid!

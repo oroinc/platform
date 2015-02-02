@@ -45,6 +45,16 @@ class DateTimeParser
         if (!$date) {
             $err  = self::getDateTimeLastError($value);
             $date = self::parseDateTime($value, 'D, d m Y H:i:s O');
+
+            if (!$date && false !== strpos($value, ',')) {
+                // handle case when invalid short day name given
+                $value                 = substr($value, strpos($value, ',') + 1);
+                $alphabeticalCharsLeft = trim(preg_replace('#[\W0-9]+#', '', $value));
+                if (strlen($alphabeticalCharsLeft) > 0) {
+                    $date = self::parseDateTime(ltrim($value), 'd M Y H:i:s O');
+                }
+            }
+
             if (!$date) {
                 if ($originalVal === $value) {
                     throw new \InvalidArgumentException($err);
@@ -86,15 +96,15 @@ class DateTimeParser
     {
         $msg = null;
         $errors = \DateTime::getLastErrors();
-        if (!$msg && !empty($errors['warnings'])) {
-            foreach ($errors['errors'] as $pos => $err) {
-                $msg = sprintf('at position %d: (warning) %s', $pos, $err);
-                break;
-            }
-        }
         if (!empty($errors['errors'])) {
             foreach ($errors['errors'] as $pos => $err) {
                 $msg = sprintf('at position %d: %s', $pos, $err);
+                break;
+            }
+        }
+        if (!$msg && !empty($errors['warnings'])) {
+            foreach ($errors['warnings'] as $pos => $err) {
+                $msg = sprintf('at position %d: (warning) %s', $pos, $err);
                 break;
             }
         }
