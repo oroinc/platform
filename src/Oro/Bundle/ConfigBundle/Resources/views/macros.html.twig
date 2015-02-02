@@ -3,9 +3,24 @@
 #}
 {% macro renderTitleAndButtons(pageTitle, buttons) %}
     <div class="container-fluid configuration-header clearfix">
+    {% if pageTitle is iterable %}
+        <div class="customer-info customer-simple pull-left">
+        {% for title in pageTitle%}
+            {% if not loop.last %}
+            <div class="sub-title">
+                {{ title }}
+            </div>
+            <span class="separator">/</span>
+            {% else %}
+            <h1 class="user-name">{{ title }}</h1>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% else %}
         <h1>
             {{ pageTitle }}
         </h1>
+    {% endif %}
         <div class="pull-right">
             {% if buttons is defined %}
                 {% for button in buttons %}
@@ -23,14 +38,16 @@
         form             - form view of active group
         activeTabName    - active tab name
         activeSubTabName - active subtab name
+        routeName        - route name for tabs switch
+        routeParameters  - additional route parameters
 #}
-{% macro renderScrollData(data, form, activeTabName = false, activeSubTabName = false) %}
+{% macro renderScrollData(data, form, activeTabName = false, activeSubTabName = false, routeName = 'oro_config_configuration_system', routeParameters = {}) %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="system-configuration-container left-panel-container">
         <div class="placeholder">
             <div class="scrollable-container">
                 {% if activeSubTabName and form != false %}
-                    {{ _self.renderTabs(data, activeTabName, activeSubTabName) }}
+                    {{ _self.renderTabs(data, activeTabName, activeSubTabName, routeName, routeParameters) }}
                     {{ _self.renderTabContent(form) }}
                 {% endif %}
             </div>
@@ -62,8 +79,10 @@
         data              - tree of current configuration
         activeTabName     - Active tab name
         activeSubTabName  - Active subtab name
+        routeName        - route name for tabs switch
+        routeParameters  - additional route parameters
 #}
-{% macro renderTabs(data, activeTabName = false, activeSubTabName = false) %}
+{% macro renderTabs(data, activeTabName = false, activeSubTabName = false, routeName = 'oro_config_configuration_system', routeParameters = {}) %}
     <div class="left-panel">
         <div class="system-configuration-search">
             {#div class="clearfix">
@@ -82,7 +101,7 @@
             {% set tabData = {
                 isActive: activeTabName and activeTabName == tab.name,
                 name: tab.name,
-                url: path('oro_config_configuration_system', {activeGroup: tab.name})
+                url: path(routeName, {activeGroup: tab.name}|merge(routeParameters))
                 }|merge(tab.toViewData)
             %}
             <li class="accordion-group">
@@ -121,7 +140,7 @@
                                     {% set subTabData = {
                                         isActive: activeSubTab == subTab,
                                         name: subTab.name,
-                                        url: path('oro_config_configuration_system', {activeGroup: tab.name, activeSubGroup: subTab.name})
+                                        url: path(routeName, {activeGroup: tab.name, activeSubGroup: subTab.name}|merge(routeParameters))
                                         }|merge(subTab.toViewData)
                                     %}
                                     {{ _self.renderTabNavItem(subTabData) }}

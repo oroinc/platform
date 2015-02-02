@@ -7,3 +7,4 @@ configuration trees.
 ## Usage ##
 - [Config management](./Resources/doc/config_management.md)
 - [System configuration UIX](./Resources/doc/system_configuration.md)
+- [Add new configuration scope](./Resources/doc/add_new_config_scope.md)

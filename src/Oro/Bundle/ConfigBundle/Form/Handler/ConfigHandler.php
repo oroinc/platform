@@ -23,6 +23,18 @@ class ConfigHandler
     }
 
     /**
+     * @param ConfigManager $manager
+     *
+     * @return $this
+     */
+    public function setConfigManager(ConfigManager $manager)
+    {
+        $this->manager = $manager;
+
+        return $this;
+    }
+
+    /**
      * Process form
      *
      * @param FormInterface $form
@@ -35,7 +47,7 @@ class ConfigHandler
         $settingsData = $this->manager->getSettingsByForm($form);
         $form->setData($settingsData);
 
-        if (in_array($request->getMethod(), array('POST', 'PUT'))) {
+        if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             $form->submit($request);
             if ($form->isValid()) {
                 $this->manager->save($form->getData());

@@ -238,7 +238,7 @@ services:
         lazy: true
         arguments:
             - @translator
-            - @oro_config.global
+            - @oro_config.user
             - @oro_locale.formatter.date_time
         lazy: true
         tags:
@@ -260,7 +260,6 @@ services:
         arguments:
             - @oro_email.email_renderer
             - @oro_locale.settings
-            - @oro_config.user
             - @oro_entity_config.provider.entity
             - @translator
         tags:
