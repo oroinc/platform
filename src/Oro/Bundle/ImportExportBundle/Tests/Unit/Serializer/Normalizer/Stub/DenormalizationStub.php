@@ -7,6 +7,8 @@ class DenormalizationStub
     public $id;
     public $name;
     public $created;
+    public $birthday;
+    public $time;
     public $obj;
     public $collection;
 }
