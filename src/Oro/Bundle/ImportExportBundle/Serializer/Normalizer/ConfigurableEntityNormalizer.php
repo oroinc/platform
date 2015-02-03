@@ -32,13 +32,13 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     {
         $this->fieldHelper = $fieldHelper;
 
-        parent::__construct(array(self::FULL_MODE, self::SHORT_MODE), self::FULL_MODE);
+        parent::__construct([self::FULL_MODE, self::SHORT_MODE], self::FULL_MODE);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, $class, $format = null, array $context = array())
+    public function denormalize($data, $class, $format = null, array $context = [])
     {
         $result = $this->createObject($class);
         $fields = $this->fieldHelper->getFields($class, true);
@@ -90,7 +90,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * {@inheritdoc}
      */
-    public function supportsDenormalization($data, $type, $format = null, array $context = array())
+    public function supportsDenormalization($data, $type, $format = null, array $context = [])
     {
         return is_array($data) && class_exists($type) && $this->fieldHelper->hasConfig($type);
     }
@@ -98,23 +98,17 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * {@inheritdoc}
      */
-    public function normalize($object, $format = null, array $context = array())
+    public function normalize($object, $format = null, array $context = [])
     {
         $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldHelper->getFields($entityName, true);
 
-        $result = array();
+        $result = [];
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
         foreach ($fields as $field) {
             $fieldName = $field['name'];
 
-            // Do not normalize excluded fields
-            if ($this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded')) {
-                continue;
-            }
-            // Do not normalize non identity fields for short mode
-            if ($this->getMode($context) == self::SHORT_MODE
-                && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
+            if ($this->isFieldSkippedForNormalization($entityName, $fieldName, $context)) {
                 continue;
             }
 
@@ -146,6 +140,10 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                     }
                 }
 
+                if ($this->fieldHelper->isDateTimeField($field)) {
+                    $fieldContext['type'] = $field['type'];
+                }
+
                 $fieldValue = $this->serializer->normalize($fieldValue, $format, $fieldContext);
             }
 
@@ -156,9 +154,27 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @param array $context
+     * @return bool
+     */
+    protected function isFieldSkippedForNormalization($entityName, $fieldName, array $context)
+    {
+        // Do not normalize excluded fields
+        $isExcluded = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'excluded');
+
+        // Do not normalize non identity fields for short mode
+        $isNotIdentity = $this->getMode($context) === self::SHORT_MODE
+            && !$this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity');
+
+        return $isExcluded || $isNotIdentity;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function supportsNormalization($data, $format = null, array $context = array())
+    public function supportsNormalization($data, $format = null, array $context = [])
     {
         if (is_object($data)) {
             $dataClass = ClassUtils::getClass($data);
