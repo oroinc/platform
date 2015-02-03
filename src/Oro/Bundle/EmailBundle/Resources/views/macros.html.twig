@@ -196,7 +196,19 @@
 #}
 {% macro email_address_link(emailAddress, label) -%}
     {% set label = label|default(_self.email_address_text(emailAddress)) %}
-    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">{{ _self.email_address_text(emailAddress) }}</a>
+    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
+        {{ _self.email_address_text(emailAddress) }}</a>
+{%- endmacro -%}
+
+{#
+    Remders email address name as link based on owner type
+    Parameters:
+        emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
+#}
+{% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
+    {% set label = label|default(emailAddressName|default('N/A')) %}
+    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
+        {{ label }}</a>
 {%- endmacro -%}
 
 {#
@@ -217,6 +229,28 @@
             {{ _self.email_address_text(emailAddress) }}
         {%- else -%}
             {{ _self.email_address_link(emailAddress)|raw }}
+        {%- endif %}
+    {%- endif %}
+{%- endmacro %}
+
+{#
+    Render email address name a link to owner view page can be rendered depends on given parameters
+    Parameters:
+        emailAddress - email address entity Oro\Bundle\EmailBundle\Entity\EmailAddress
+        emailAddressName - a string contains an email address. It is used if the email address has no owner
+        noLink - determines whether the rendering of a link to the owner view page is forbidden or not. Default value is false
+        knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
+#}
+{% macro email_address_recipient(emailAddress, emailAddressName, noLink, knownOnly) -%}
+    {% if emailAddress.owner is null -%}
+        {% if not knownOnly|default(false) -%}
+            {{ emailAddressName }}
+        {%- endif %}
+    {%- else -%}
+        {% if noLink|default(false) -%}
+            {{ emailAddressName }}
+        {%- else -%}
+            {{ _self.email_address_recipient_link(emailAddress, emailAddressName)|raw }}
         {%- endif %}
     {%- endif %}
 {%- endmacro %}
@@ -260,7 +294,7 @@
 {% macro recipient_email_addresses(recipients, noLink, knownOnly) -%}
     {% set addresses = {} -%}
     {% for recipient in recipients -%}
-        {% set address = _self.email_address(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
+        {% set address = _self.email_address_recipient(recipient.emailAddress, recipient.name, noLink, knownOnly) %}
         {%- if address|length > 0 -%}
             {% set addresses = addresses|merge([address]) %}
         {% else %}

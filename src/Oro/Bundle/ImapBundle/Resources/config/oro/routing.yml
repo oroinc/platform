@@ -1,0 +1,4 @@
+oro_imap_connection:
+    resource:     "@OroImapBundle/Controller/ConnectionController.php"
+    type:         annotation
+    prefix:       /

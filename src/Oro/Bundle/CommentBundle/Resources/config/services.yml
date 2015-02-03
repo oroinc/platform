@@ -31,7 +31,6 @@ services:
             - @oro_security.security_facade
             - @oro_locale.formatter.name
             - @oro_datagrid.extension.pager.orm.pager
-            - @oro_config.user
             - @event_dispatcher
             - @oro_attachment.manager
             - @oro_security.acl_helper

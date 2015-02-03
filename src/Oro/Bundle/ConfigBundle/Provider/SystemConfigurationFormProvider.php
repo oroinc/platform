@@ -41,11 +41,11 @@ class SystemConfigurationFormProvider extends Provider
     {
         $block = $this->getSubtree($group);
 
-        $toAdd = array();
+        $toAdd = [];
         $bc    = $block->toBlockConfig();
 
         if (!$block->isEmpty()) {
-            $sbc = array();
+            $sbc = [];
 
             /** @var $subblock GroupNodeDefinition */
             foreach ($block as $subblock) {
@@ -64,7 +64,7 @@ class SystemConfigurationFormProvider extends Provider
             $bc[$block->getName()]['subblocks'] = $sbc;
         }
 
-        $fb = $this->factory->createNamedBuilder($group, 'oro_config_form_type', null, array('block_config' => $bc));
+        $fb = $this->factory->createNamedBuilder($group, 'oro_config_form_type', null, ['block_config' => $bc]);
         foreach ($toAdd as $field) {
             $this->addFieldToForm($fb, $field);
         }
@@ -96,7 +96,7 @@ class SystemConfigurationFormProvider extends Provider
             }
         }
 
-        return array($activeGroup, $activeSubGroup);
+        return [$activeGroup, $activeSubGroup];
     }
 
     /**
@@ -127,6 +127,17 @@ class SystemConfigurationFormProvider extends Provider
             $fieldDefinition->getOptions(),
             $configFieldOptions
         );
+        $configFieldOptions['parent_checkbox_label'] = $this->getParentCheckboxLabel();
         $form->add($name, 'oro_config_form_field_type', $configFieldOptions);
+    }
+
+    /**
+     * Use default checkbox label
+     *
+     * @return string
+     */
+    protected function getParentCheckboxLabel()
+    {
+        return 'oro.config.system_configuration.use_default';
     }
 }
