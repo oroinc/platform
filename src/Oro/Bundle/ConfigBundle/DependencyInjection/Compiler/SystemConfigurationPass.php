@@ -24,6 +24,9 @@ class SystemConfigurationPass implements CompilerPassInterface
 
     const API_MANAGER_SERVICE_ID = 'oro_config.manager.api';
 
+    const DEFAULT_SCOPE = 'app';
+    const DEFAULT_PRIORITY = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -52,10 +55,19 @@ class SystemConfigurationPass implements CompilerPassInterface
         $managers       = [];
         $taggedServices = $container->findTaggedServiceIds(self::SCOPE_MANAGER_TAG_NAME);
         foreach ($taggedServices as $id => $attributes) {
-            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $managers[$priority][$attributes[0]['scope']] = new Reference($id);
+            if (array_key_exists('priority', $attributes[0])) {
+                $priority = (int)$attributes[0]['priority'];
+            } else {
+                $priority = self::DEFAULT_PRIORITY;
+            }
+            if (array_key_exists('scope', $attributes[0])) {
+                $scope = $attributes[0]['scope'];
+            } else {
+                $scope = self::DEFAULT_SCOPE;
+            }
+            $managers[$priority][$scope] = new Reference($id);
         }
-        if (empty($managers)) {
+        if (count($managers) === 0) {
             return;
         }
 

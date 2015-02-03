@@ -25,8 +25,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->compiler);
-        unset($this->container);
+        unset($this->compiler, $this->container);
     }
 
     public function testProcess()
@@ -53,9 +52,8 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                                     'scope' => 'app'
                                 ],
                                 'some_another_field'          => [
-                                    'value' => 'some_another_val',
-                                    'scope' => 'app'
-                                ],
+                                    'value' => 'some_another_val'
+                                ]
                             ]
                         ]
                     ]
@@ -87,7 +85,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                                 ],
                                 'second_scope_service' => [
                                     ['scope' => 'user', 'priority' => -100]
-                                ],
+                                ]
                             ];
                         }
 
