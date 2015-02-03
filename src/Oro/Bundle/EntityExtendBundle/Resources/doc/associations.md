@@ -1,0 +1,686 @@
+Associations
+============
+
+The Oro Entity Extend Bundle allows to create a special type of relation between entities named **association**. The association allows you to create a unidirectional relation between some entity and different kind of other entities.
+
+Introduction
+------------
+
+Lets consider an example when you have an email entity which can be owned either by an user or a contact. To implement such case of relation you have two choices:
+
+ - The first approach can be to use two regular Doctrine's many-to-one relations, one for user, another for contact. Also to generalize a work with owner you can create several helper methods in email entity, like `getOwner` and `setOwner`.
+
+``` php
+    public function getOwner()
+    {
+        if (null !== $this->user) {
+	        return $this->user;
+	    }
+        if (null !== $this->contact) {
+	        return $this->contact;
+	    }
+
+        return null;
+    }
+
+    public function setOwner($owner)
+    {
+        if (null === $owner) {
+	        $this->user = null;
+	        $this->contact = null;
+	    } elseif ($owner instanceof Oro\Bundle\UserBundle\Entity\User) {
+	        $this->contact = null;
+	        $this->user = $owner;
+	    } elseif ($owner instanceof OroCRM\Bundle\ContactBundle\Entity\Contact) {
+	        $this->user = null;
+	        $this->contact = $owner;
+	    } else {
+		    throw new \RuntimeException(
+			    sprintf(
+				    'Invalid owner type: %s.',
+				    \Doctrine\Common\Util\ClassUtils::getClass($owner)
+				)
+			);
+	    }
+
+        return $this;
+    }
+```
+
+ - The second approach can be to use associations. In this case you just need to properly configure the association and Oro Entity Extend Bundle will create Doctrine's relations and helper methods automatically for you. The configuration of an association will be described later in this article.
+
+Pros and cons of both approaches:
+
+ - Regular Doctrine's relations
+	Pros:
+
+	 - You have full control over program logic. For example you can implement helper methods as you need, or you can create bidirectional relations if you need.
+
+	Cons:
+
+	 - You need to create a bit more code than for association based approach.
+	 - If you heed to add other types of owners you have to change email entity manually.
+	 - There is only one way to add other types of owners from external bundle - ask you to modify email entity.
+
+ - Associations
+	Pros:
+
+	 - Associations provide a some kind of "standard" approach in Oro Platform to add relations between some entity and other entities.
+	 - It is easy to add other types of owners from any external bundle or even by an administrator using entity management UI.
+
+	Cons:
+
+	 - An entity which is the owning side of an association, in this example email entity, must be extendable.
+	 - An entity(s) which is the target side of an association must be configurable.
+	 - Associations use unidirectional Doctrine's relations only. It is not possible to use bidirectional relations.
+
+
+Configure many-to-one association
+---------------------------------
+
+In this section we will use Oro Note Bundle as an example of configuration of many-to-one association. Also please note that it is possible to [create many-to-many association](#configure_many_to_many_association).
+
+At first you need to make an entity which is the owning side of association extendable. To do this you need to create a class which name starts with `Extend` prefix and put in in Model folder of you bundle. Also you need to declare several empty helper methods in this class like `supportTarget`, `getTarget` and `setTarget`.
+
+``` php
+<?php
+
+namespace Oro\Bundle\NoteBundle\Model;
+
+class ExtendNote
+{
+    /**
+     * Constructor
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * IMPORTANT: If the derived class has own constructor it must call parent constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
+     * Checks if this note can be associated with the given target entity type
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportTarget($targetClass)
+    {
+        return false;
+    }
+
+    /**
+     * Gets the entity this note is associated with
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @return object|null Any configurable entity
+     */
+    public function getTarget()
+    {
+        return null;
+    }
+
+    /**
+     * Sets the entity this note is associated with
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param object $target Any configurable entity that can have notes
+     *
+     * @return object This object
+     */
+    public function setTarget($target)
+    {
+        return $this;
+    }
+}
+```
+
+And your entity must extends created `Extend` class.
+
+``` php
+<?php
+namespace Oro\Bundle\NoteBundle\Entity;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="oro_note")
+ * @Config
+ */
+class Note extends ExtendNote
+{
+}
+```
+
+After that you entity is ready to be the owning side of an association, but you need to do some core configuration of this entity. At first add `Resources/config/entity_config.yml` file in your bundle:
+
+``` yaml
+oro_entity_config:
+    note:
+        entity:
+            items:
+                # indicates whether the entity can have notes or not
+                enabled: # boolean
+                    options:
+                        require_schema_update: true
+                        priority:           250
+                        default_value:      false
+                    form:
+                        type:               oro_entity_extend_association_choice
+                        options:
+                            block:          associations
+                            required:       true
+                            label:          oro.note.enabled
+                            association_class: 'OroNoteBundle:Note'
+
+                # this attribute can be used to prohibit changing the note association state (no matter whether
+                # it is enabled or not) for the entity
+                # if TRUE than the current state cannot be changed
+                immutable: # boolean
+                    options:
+                        auditable:          false
+```
+
+As you can see this configuration file declares new entity config scope named `note` and two attributes on entity level in this scope:
+
+ - **enabled** - this attribute indicates whether an entity is associated with a target entity.
+ - **immutable** - this attribute can be used to prohibit changing the association state. This attribute can be used to prohibit disable already enabled association and vise versa.
+
+Both of these attributes are applicable for target side of association. For example if you want to prohibit to create notes for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
+
+``` php
+<?php
+namespace Acme\Bundle\AcmeBundle\Entity;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="acme_my_entity")
+ * @Config(
+ *      defaultValues={
+ *          "note"={
+ *              "immutable"=true
+ *          }
+ *      }
+ * )
+ */
+class MyEntity
+{
+}
+```
+
+The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following example shows how it can be done:
+
+``` php
+<?php
+
+namespace Oro\Bundle\NoteBundle\Tools;
+
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AssociationEntityConfigDumperExtension;
+use Oro\Bundle\NoteBundle\Entity\Note;
+
+class NoteEntityConfigDumperExtension extends AssociationEntityConfigDumperExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationEntityClass()
+    {
+        return Note::ENTITY_NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationScope()
+    {
+        return 'note';
+    }
+}
+```
+
+``` php
+<?php
+
+namespace Oro\Bundle\NoteBundle\Tools;
+
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
+use Oro\Bundle\NoteBundle\Entity\Note;
+
+class NoteEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(array $schema)
+    {
+        return
+            $schema['class'] === Note::ENTITY_NAME
+            && parent::supports($schema);
+    }
+}
+```
+
+``` php
+class NoteExtension implements ExtendExtensionAwareInterface
+{
+    const NOTE_TABLE_NAME = 'oro_note';
+
+    /** @var ExtendExtension */
+    protected $extendExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
+    }
+
+    /**
+     * Adds the association between the target table and the note table
+     *
+     * @param Schema $schema
+     * @param string $targetTableName  Target entity table name
+     * @param string $targetColumnName A column name is used to show related entity
+     */
+    public function addNoteAssociation(
+        Schema $schema,
+        $targetTableName,
+        $targetColumnName = null
+    ) {
+        $noteTable   = $schema->getTable(self::NOTE_TABLE_NAME);
+        $targetTable = $schema->getTable($targetTableName);
+
+        if (empty($targetColumnName)) {
+            $primaryKeyColumns = $targetTable->getPrimaryKeyColumns();
+            $targetColumnName  = array_shift($primaryKeyColumns);
+        }
+
+        $options = new OroOptions();
+        $options->set('note', 'enabled', true);
+        $targetTable->addOption(OroOptions::KEY, $options);
+
+        $associationName = ExtendHelper::buildAssociationName(
+            $this->extendExtension->getEntityClassByTableName($targetTableName)
+        );
+
+        $this->extendExtension->addManyToOneRelation(
+            $schema,
+            $noteTable,
+            $associationName,
+            $targetTable,
+            $targetColumnName
+        );
+    }
+}
+```
+
+
+Configure many-to-many association
+----------------------------------
+
+In this section we will use Oro Activity Bundle as an example of configuration of many-to-many association. An activity association has two important features:
+
+ - the owning side of this association can be any entity marked as an activity (it means that an entity is included in *activity* group).
+ - it is "named" association. It means that the association name is included in names of Doctrine's relations as well as in names of generated helper methods.
+
+The first thing you need to do is to make sure that your entity is extendable and has empty implementation of helper methods required for the access to associated data. To achieve this you need to create a class which name starts with `Extend` prefix and put in in Model folder of you bundle. Also you need to declare several empty helper methods in this class like `supportActivityTarget`, `getActivityTargets`, `hasActivityTarget`, `addActivityTarget` and `removeActivityTarget`. Here `Activity` is the name of named association.
+
+``` php
+<?php
+namespace Oro\Bundle\EmailBundle\Model;
+
+class ExtendEmail
+{
+    /**
+     * Constructor
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * IMPORTANT: If the derived class has own constructor it must call parent constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
+     * Checks if an entity of the given type can be associated with this activity entity
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportActivityTarget($targetClass)
+    {
+        return false;
+    }
+
+    /**
+     * Gets entities of the given type associated with this activity entity
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return object[]
+     */
+    public function getActivityTargets($targetClass)
+    {
+        return null;
+    }
+
+    /**
+     * Checks is the given entity is associated with this activity entity
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param object $target Any configurable entity that can be associated with this activity
+     *
+     * @return bool
+     */
+    public function hasActivityTarget($target)
+    {
+        return false;
+    }
+
+    /**
+     * Associates the given entity with this activity entity
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param object $target Any configurable entity that can be associated with this activity
+     * @return object This object
+     */
+    public function addActivityTarget($target)
+    {
+        return $this;
+    }
+
+    /**
+     * Removes the association of the given entity with this activity entity
+     *
+     * The real implementation of this method is auto generated.
+     *
+     * @param object $target Any configurable entity that can be associated with this activity
+     * @return object This object
+     */
+    public function removeActivityTarget($target)
+    {
+        return $this;
+    }
+}
+```
+
+Next make sure that your entity extends created `Extend` class.
+
+``` php
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="oro_email")
+ * @Config
+ */
+class Email extends ExtendEmail
+{
+}
+```
+
+The second step you need to do is to declare possible entity configuration attributes. To do this you need to create `Resources/config/entity_config.yml` file in your bundle. Usually you need to declare only several attributes like **enabled** and **immutable**. But it detends of your needs. For example Oro Activity Bundle declares **activities** attribute instead of **enabled** attribute because as it was mentioned above the owning side of activity association can be any entity marked as an activity.
+
+``` yaml
+oro_entity_config:
+    activity:
+        entity:
+            items:
+                # the list of activities that can be assigned to the entity
+                activities: # array of class names
+                    options:
+                        require_schema_update: true
+                        priority:           250
+                    form:
+                        type:               oro_entity_extend_multiple_association_choice
+                        options:
+                            block:          associations
+                            required:       false
+                            label:          oro.activity.activities
+                            association_class: activity
+
+                # this attribute can be used to prohibit changing activity state (no matter whether
+                # it is enabled or not) for the entity
+                # if TRUE than no one activity state can be changed
+                # also it can be an array with the list of class names of activities which state cannot be changed
+                immutable: # boolean or array
+                    options:
+                        auditable:          false
+```
+
+As you can see this configuration file declares new entity config scope named `activity` and two attributes on entity level in this scope:
+
+ - **activities** - this attribute indicates which activity entities are associated with a target entity.
+ - **immutable** - this attribute can be used to prohibit changing the association state. This attribute can be used to prohibit disable already enabled association and vise versa.
+
+Both of these attributes are applicable for target side of association. For example if you want to prohibit to associate any activity for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
+
+``` php
+<?php
+namespace Acme\Bundle\AcmeBundle\Entity;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="acme_my_entity")
+ * @Config(
+ *      defaultValues={
+ *          "activity"={
+ *              "immutable"=true
+ *          }
+ *      }
+ * )
+ */
+class MyEntity
+{
+}
+```
+
+The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following example shows how it can be done:
+
+``` php
+<?php
+
+namespace Oro\Bundle\ActivityBundle\Tools;
+
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEntityConfigDumperExtension;
+
+class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfigDumperExtension
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationScope()
+    {
+        return 'activity';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationAttributeName()
+    {
+        return 'activities';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationKind()
+    {
+        return ActivityScope::ASSOCIATION_KIND;
+    }
+}
+```
+
+``` php
+<?php
+
+namespace Oro\Bundle\ActivityBundle\Tools;
+
+use CG\Generator\PhpClass;
+
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
+
+class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExtension
+{
+    /** @var ConfigProvider */
+    protected $groupingConfigProvider;
+
+    /**
+     * @param ConfigProvider $groupingConfigProvider
+     */
+    public function __construct(ConfigProvider $groupingConfigProvider)
+    {
+        $this->groupingConfigProvider = $groupingConfigProvider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports(array $schema)
+    {
+        if (!$this->groupingConfigProvider->hasConfig($schema['class'])) {
+            return false;
+        }
+
+        $groups = $this->groupingConfigProvider->getConfig($schema['class'])->get('groups');
+
+        return
+            !empty($groups)
+            && in_array(ActivityScope::GROUP_ACTIVITY, $groups);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generate(array $schema, PhpClass $class)
+    {
+        $class->addInterfaceName('Oro\Bundle\ActivityBundle\Model\ActivityInterface');
+
+        parent::generate($schema, $class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationKind()
+    {
+        return ActivityScope::ASSOCIATION_KIND;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getAssociationType()
+    {
+        return RelationType::MANY_TO_MANY;
+    }
+}
+```
+
+``` php
+<?php
+
+namespace Oro\Bundle\ActivityBundle\Migration\Extension;
+
+use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
+class ActivityExtension implements ExtendExtensionAwareInterface
+{
+    /** @var ExtendExtension */
+    protected $extendExtension;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtendExtension(ExtendExtension $extendExtension)
+    {
+        $this->extendExtension = $extendExtension;
+    }
+
+    /**
+     * Adds the association between the given table and the table contains activity records
+     *
+     * The activity entity must be included in 'activity' group ('groups' attribute of 'grouping' scope)
+     *
+     * @param Schema $schema
+     * @param string $activityTableName Activity entity table name. It is owning side of the association
+     * @param string $targetTableName   Target entity table name
+     * @param bool   $immutable         Set TRUE to prohibit disabling the activity association from UI
+     */
+    public function addActivityAssociation(
+        Schema $schema,
+        $activityTableName,
+        $targetTableName,
+        $immutable = false
+    ) {
+        $targetTable = $schema->getTable($targetTableName);
+
+        // Column names are used to show a title of target entity
+        $targetTitleColumnNames = $targetTable->getPrimaryKeyColumns();
+        // Column names are used to show detailed info about target entity
+        $targetDetailedColumnNames = $targetTable->getPrimaryKeyColumns();
+        // Column names are used to show target entity in a grid
+        $targetGridColumnNames = $targetTable->getPrimaryKeyColumns();
+
+        $activityClassName = $this->extendExtension->getEntityClassByTableName($activityTableName);
+
+        $options = new OroOptions();
+        $options->append(
+            'activity',
+            'activities',
+            $activityClassName
+        );
+        if ($immutable) {
+            $options->append(
+                'activity',
+                'immutable',
+                $activityClassName
+            );
+        }
+
+        $targetTable->addOption(OroOptions::KEY, $options);
+
+        $associationName = ExtendHelper::buildAssociationName(
+            $this->extendExtension->getEntityClassByTableName($targetTableName),
+            ActivityScope::ASSOCIATION_KIND
+        );
+
+        $this->extendExtension->addManyToManyRelation(
+            $schema,
+            $activityTableName,
+            $associationName,
+            $targetTable,
+            $targetTitleColumnNames,
+            $targetDetailedColumnNames,
+            $targetGridColumnNames,
+            [
+                'extend' => [
+                    'without_default' => true
+                ]
+            ]
+        );
+    }
+}
+```
