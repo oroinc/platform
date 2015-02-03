@@ -56,6 +56,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
                         $entityClass = $field['related_entity_name'];
                     } else {
                         $entityClass = 'DateTime';
+                        $context = array_merge($context, ['type' => $field['type']]);
                     }
                     $context = array_merge($context, ['fieldName' => $fieldName]);
                     $value = $this->serializer->denormalize($value, $entityClass, $format, $context);
