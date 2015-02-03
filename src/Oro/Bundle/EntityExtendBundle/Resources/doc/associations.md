@@ -1,90 +1,91 @@
 Associations
 ============
 
-The Oro Entity Extend Bundle allows to create a special type of relation between entities named **association**. The association allows you to create a unidirectional relation between some entity and different kind of other entities.
+The Oro Entity Extend Bundle allows to create a special type of relation between entities named **association**. The association allows you to create a unidirectional relation between some entity(s) and different kind of other entities when types of target entities are not known or can be changed.
 
 Introduction
 ------------
 
-Lets consider an example when you have an email entity which can be owned either by an user or a contact. To implement such case of relation you have two choices:
+Lets consider an example when you have an email entity which can be owned either by an user or a contact. To implement such relation you have two choices:
 
- - The first approach can be to use two regular Doctrine's many-to-one relations, one for user, another for contact. Also to generalize a work with owner you can create several helper methods in email entity, like `getOwner` and `setOwner`.
+ - The first approach can be to use two regular Doctrine's many-to-one relations, one for an user, another for a contact. Also to generalize a work with the owner you can create several helper methods in the email entity, like `getOwner` and `setOwner`.
 
 ``` php
-    public function getOwner()
-    {
-        if (null !== $this->user) {
-	        return $this->user;
-	    }
-        if (null !== $this->contact) {
-	        return $this->contact;
-	    }
-
-        return null;
+public function getOwner()
+{
+    if (null !== $this->user) {
+        return $this->user;
+    }
+    if (null !== $this->contact) {
+        return $this->contact;
     }
 
-    public function setOwner($owner)
-    {
-        if (null === $owner) {
-	        $this->user = null;
-	        $this->contact = null;
-	    } elseif ($owner instanceof Oro\Bundle\UserBundle\Entity\User) {
-	        $this->contact = null;
-	        $this->user = $owner;
-	    } elseif ($owner instanceof OroCRM\Bundle\ContactBundle\Entity\Contact) {
-	        $this->user = null;
-	        $this->contact = $owner;
-	    } else {
-		    throw new \RuntimeException(
-			    sprintf(
-				    'Invalid owner type: %s.',
-				    \Doctrine\Common\Util\ClassUtils::getClass($owner)
-				)
-			);
-	    }
+    return null;
+}
 
-        return $this;
+public function setOwner($owner)
+{
+    if (null === $owner) {
+        $this->user = null;
+        $this->contact = null;
+    } elseif ($owner instanceof Oro\Bundle\UserBundle\Entity\User) {
+        $this->contact = null;
+        $this->user = $owner;
+    } elseif ($owner instanceof OroCRM\Bundle\ContactBundle\Entity\Contact) {
+        $this->user = null;
+        $this->contact = $owner;
+    } else {
+        throw new \RuntimeException(
+            sprintf(
+                'Invalid owner type: %s.',
+                \Doctrine\Common\Util\ClassUtils::getClass($owner)
+            )
+        );
     }
+
+    return $this;
+}
 ```
 
- - The second approach can be to use associations. In this case you just need to properly configure the association and Oro Entity Extend Bundle will create Doctrine's relations and helper methods automatically for you. The configuration of an association will be described later in this article.
+ - The second approach can be to use associations. In this case you just need to properly configure the association and Oro Entity Extend Bundle will create Doctrine's relations and helper methods automatically for you. The [configuration of an association](##configure-many-to-one-association) will be described later in this article.
 
 Pros and cons of both approaches:
 
  - Regular Doctrine's relations
-	Pros:
 
-	 - You have full control over program logic. For example you can implement helper methods as you need, or you can create bidirectional relations if you need.
+    Pros:
 
-	Cons:
+     - You have full control over program logic. For example you can implement helper methods as you need, or you can create bidirectional relations.
 
-	 - You need to create a bit more code than for association based approach.
-	 - If you heed to add other types of owners you have to change email entity manually.
-	 - There is only one way to add other types of owners from external bundle - ask you to modify email entity.
+    Cons:
+
+     - You need to create a bit more code than for association based approach.
+     - If you heed to add other types of owners you have to change email entity manually.
+     - There is only one way to add other types of owners from external bundle - ask you to modify email entity.
+     - It is not possible to use custom entities as an owner.
 
  - Associations
-	Pros:
 
-	 - Associations provide a some kind of "standard" approach in Oro Platform to add relations between some entity and other entities.
-	 - It is easy to add other types of owners from any external bundle or even by an administrator using entity management UI.
+    Pros:
 
-	Cons:
+     - Associations provide a some kind of "standard" approach in Oro Platform to add relations between some entity and other entities.
+     - It is easy to add other types of owners from any external bundle or even by an administrator using entity management UI.
 
-	 - An entity which is the owning side of an association, in this example email entity, must be extendable.
-	 - An entity(s) which is the target side of an association must be configurable.
-	 - Associations use unidirectional Doctrine's relations only. It is not possible to use bidirectional relations.
+    Cons:
+
+     - An entity which is the owning side of an association, in this example email entity, must be extendable.
+     - An entity(s) which is the target side of an association must be configurable (or extendable, because extendable entity must be configurable as well).
+     - Associations use unidirectional Doctrine's relations only. It is not possible to use bidirectional relations.
 
 
 Configure many-to-one association
 ---------------------------------
 
-In this section we will use Oro Note Bundle as an example of configuration of many-to-one association. Also please note that it is possible to [create many-to-many association](#configure_many_to_many_association).
+In this section we will use [Oro Note Bundle](../../../NoteBundle/readme.md) as an example of configuration of many-to-one association. Also please note that it is possible to [create many-to-many association](#configure-many-to-many-association).
 
-At first you need to make an entity which is the owning side of association extendable. To do this you need to create a class which name starts with `Extend` prefix and put in in Model folder of you bundle. Also you need to declare several empty helper methods in this class like `supportTarget`, `getTarget` and `setTarget`.
+At first you need to make an entity which is the owning side of association extendable. To do this you need to create a class which name starts with `Extend` prefix and put in in Model folder of you bundle. Also you need to declare several empty helper methods in this class like `supportTarget`, `getTarget` and `setTarget` (the implementation of these methods will be generated by Oro Entity Extend Bundle and you can find it in `app/cache/dev/oro_entities/Extend/Entity` folder).
 
 ``` php
-<?php
-
 namespace Oro\Bundle\NoteBundle\Model;
 
 class ExtendNote
@@ -144,7 +145,6 @@ class ExtendNote
 And your entity must extends created `Extend` class.
 
 ``` php
-<?php
 namespace Oro\Bundle\NoteBundle\Entity;
 
 /**
@@ -157,7 +157,7 @@ class Note extends ExtendNote
 }
 ```
 
-After that you entity is ready to be the owning side of an association, but you need to do some core configuration of this entity. At first add `Resources/config/entity_config.yml` file in your bundle:
+After that you entity is ready to be the owning side of an association, but you need to do some more configuration of your association. Add `Resources/config/entity_config.yml` file in your bundle:
 
 ``` yaml
 oro_entity_config:
@@ -186,15 +186,14 @@ oro_entity_config:
                         auditable:          false
 ```
 
-As you can see this configuration file declares new entity config scope named `note` and two attributes on entity level in this scope:
+As you can see this configuration file declares new entity config scope named `note` and two attributes on entity level in this scope (both of these attributes are applicable for target side of association):
 
- - **enabled** - this attribute indicates whether an entity is associated with a target entity.
+ - **enabled** - this attribute indicates whether the note can be added to a target entity.
  - **immutable** - this attribute can be used to prohibit changing the association state. This attribute can be used to prohibit disable already enabled association and vise versa.
 
-Both of these attributes are applicable for target side of association. For example if you want to prohibit to create notes for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
+For example if you want to prohibit to create notes for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
 
 ``` php
-<?php
 namespace Acme\Bundle\AcmeBundle\Entity;
 
 /**
@@ -216,8 +215,6 @@ class MyEntity
 The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following example shows how it can be done:
 
 ``` php
-<?php
-
 namespace Oro\Bundle\NoteBundle\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\AssociationEntityConfigDumperExtension;
@@ -244,8 +241,6 @@ class NoteEntityConfigDumperExtension extends AssociationEntityConfigDumperExten
 ```
 
 ``` php
-<?php
-
 namespace Oro\Bundle\NoteBundle\Tools;
 
 use Oro\Bundle\EntityExtendBundle\Tools\GeneratorExtensions\AbstractAssociationEntityGeneratorExtension;
@@ -324,15 +319,14 @@ class NoteExtension implements ExtendExtensionAwareInterface
 Configure many-to-many association
 ----------------------------------
 
-In this section we will use Oro Activity Bundle as an example of configuration of many-to-many association. An activity association has two important features:
+In this section we will use [Oro Activity Bundle](../../../ActivityBundle/readme.md) as an example of configuration of many-to-many association. An activity association has two important features:
 
  - the owning side of this association can be any entity marked as an activity (it means that an entity is included in *activity* group).
  - it is "named" association. It means that the association name is included in names of Doctrine's relations as well as in names of generated helper methods.
 
-The first thing you need to do is to make sure that your entity is extendable and has empty implementation of helper methods required for the access to associated data. To achieve this you need to create a class which name starts with `Extend` prefix and put in in Model folder of you bundle. Also you need to declare several empty helper methods in this class like `supportActivityTarget`, `getActivityTargets`, `hasActivityTarget`, `addActivityTarget` and `removeActivityTarget`. Here `Activity` is the name of named association.
+The first thing you need to do is to make sure that your entity is extendable and has empty implementation of helper methods required for the access to associated data. To achieve this you need to create a class which name starts with `Extend` prefix and put in in Model folder of you bundle. Also you need to declare several empty helper methods in this class like `supportActivityTarget`, `getActivityTargets`, `hasActivityTarget`, `addActivityTarget` and `removeActivityTarget` (the implementation of these methods will be generated by Oro Entity Extend Bundle and you can find it in `app/cache/dev/oro_entities/Extend/Entity` folder). Here `Activity` is the name of named association.
 
 ``` php
-<?php
 namespace Oro\Bundle\EmailBundle\Model;
 
 class ExtendEmail
@@ -458,15 +452,14 @@ oro_entity_config:
                         auditable:          false
 ```
 
-As you can see this configuration file declares new entity config scope named `activity` and two attributes on entity level in this scope:
+As you can see this configuration file declares new entity config scope named `activity` and two attributes on entity level in this scope (both of these attributes are applicable for target side of association):
 
- - **activities** - this attribute indicates which activity entities are associated with a target entity.
+ - **activities** - this attribute indicates which activity entities can be associated with a target entity.
  - **immutable** - this attribute can be used to prohibit changing the association state. This attribute can be used to prohibit disable already enabled association and vise versa.
 
-Both of these attributes are applicable for target side of association. For example if you want to prohibit to associate any activity for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
+For example if you want to prohibit to associate any activity for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
 
 ``` php
-<?php
 namespace Acme\Bundle\AcmeBundle\Entity;
 
 /**
@@ -488,8 +481,6 @@ class MyEntity
 The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following example shows how it can be done:
 
 ``` php
-<?php
-
 namespace Oro\Bundle\ActivityBundle\Tools;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
@@ -524,8 +515,6 @@ class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfi
 ```
 
 ``` php
-<?php
-
 namespace Oro\Bundle\ActivityBundle\Tools;
 
 use CG\Generator\PhpClass;
@@ -593,14 +582,11 @@ class ActivityEntityGeneratorExtension extends AbstractAssociationEntityGenerato
 ```
 
 ``` php
-<?php
-
 namespace Oro\Bundle\ActivityBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
