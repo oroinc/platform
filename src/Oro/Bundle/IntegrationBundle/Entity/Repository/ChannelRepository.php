@@ -24,14 +24,14 @@ class ChannelRepository extends EntityRepository
             ->from('OroIntegrationBundle:Status', 'status')
             ->where('status.channel = :integration')
             ->andWhere('status.connector = :connector')
-            ->setParameters(['integration' => $integration, 'connector' => $connector])
+            ->setParameters(['integration' => $integration, 'connector' => (string)$connector])
             ->orderBy('status.date', 'DESC')
             ->setFirstResult(0)
             ->setMaxResults(1);
 
         if ($code) {
             $queryBuilder->andWhere('status.code = :code')
-                ->setParameter('code', $code);
+                ->setParameter('code', (string)$code);
         };
 
         $statuses = $queryBuilder->getQuery()->execute();
