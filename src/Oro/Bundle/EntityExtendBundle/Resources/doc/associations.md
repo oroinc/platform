@@ -212,7 +212,7 @@ class MyEntity
 }
 ```
 
-The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following example shows how it can be done:
+The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following examples show how it can be done:
 
 ``` php
 namespace Oro\Bundle\NoteBundle\Tools;
@@ -478,7 +478,7 @@ class MyEntity
 }
 ```
 
-The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following example shows how it can be done:
+The last thing you need to do to finish configuration of your association is to create extensions for entity config dumper, entity generator and migrations. The following examples show how it can be done:
 
 ``` php
 namespace Oro\Bundle\ActivityBundle\Tools;
