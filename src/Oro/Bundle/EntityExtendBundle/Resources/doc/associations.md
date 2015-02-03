@@ -261,6 +261,15 @@ class NoteEntityGeneratorExtension extends AbstractAssociationEntityGeneratorExt
 ```
 
 ``` php
+namespace Oro\Bundle\NoteBundle\Migration\Extension;
+
+use Doctrine\DBAL\Schema\Schema;
+
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
+use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
+use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+
 class NoteExtension implements ExtendExtensionAwareInterface
 {
     const NOTE_TABLE_NAME = 'oro_note';
