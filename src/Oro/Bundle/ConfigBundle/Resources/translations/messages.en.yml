@@ -6,7 +6,7 @@ oro:
             collapse_all:  "Collapse All"
             expand_all:    "Expand All"
             save_settings: "Save settings"
-            restore_saved_values: "Restore Saved Values"
+            restore_saved_values: "Reset"
 
         menu:
             system_configuration.label:       "Configuration"

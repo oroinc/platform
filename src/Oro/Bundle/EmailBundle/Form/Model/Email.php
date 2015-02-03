@@ -19,7 +19,13 @@ class Email
     protected $from;
 
     /** @var string[] */
-    protected $to;
+    protected $to = [];
+
+    /** @var string[] */
+    protected $cc = [];
+
+    /** @var string[] */
+    protected $bcc = [];
 
     /** @var string */
     protected $subject;
@@ -32,14 +38,6 @@ class Email
 
     /** @var string */
     protected $body;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->to = array();
-    }
 
     /**
      * Get id of emails datagrid
@@ -167,6 +165,54 @@ class Email
     public function setTo(array $to)
     {
         $this->to = $to;
+
+        return $this;
+    }
+
+    /**
+     * Get CC email addresses
+     *
+     * @return string[]
+     */
+    public function getCc()
+    {
+        return $this->cc;
+    }
+
+    /**
+     * Set CC email addresses
+     *
+     * @param string[] $cc
+     *
+     * @return $this
+     */
+    public function setCc(array $cc)
+    {
+        $this->cc = $cc;
+
+        return $this;
+    }
+
+    /**
+     * Get BCC email addresses
+     *
+     * @return string[]
+     */
+    public function getBcc()
+    {
+        return $this->bcc;
+    }
+
+    /**
+     * Set BCC email addresses
+     *
+     * @param string[] $bcc
+     *
+     * @return $this
+     */
+    public function setBcc(array $bcc)
+    {
+        $this->bcc = $bcc;
 
         return $this;
     }

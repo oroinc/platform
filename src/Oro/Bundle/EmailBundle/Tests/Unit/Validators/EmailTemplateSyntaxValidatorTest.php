@@ -34,9 +34,6 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit_Framework_TestCase
     protected $localeSettings;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $userConfig;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
 
     protected function setUp()
@@ -52,10 +49,6 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMock('Symfony\Component\Validator\ExecutionContextInterface');
 
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->userConfig = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -233,7 +226,6 @@ class EmailTemplateSyntaxValidatorTest extends \PHPUnit_Framework_TestCase
         $validator = new EmailTemplateSyntaxValidator(
             $this->twig,
             $this->localeSettings,
-            $this->userConfig,
             $this->entityConfigProvider,
             $translator
         );

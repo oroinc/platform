@@ -11,7 +11,7 @@ use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -30,7 +30,7 @@ class ActivityListManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var UserConfigManager */
+    /** @var ConfigManager */
     protected $config;
 
     /** @var ActivityListChainProvider */
@@ -44,7 +44,7 @@ class ActivityListManager
      * @param SecurityFacade            $securityFacade
      * @param NameFormatter             $nameFormatter
      * @param Pager                     $pager
-     * @param UserConfigManager         $config
+     * @param ConfigManager             $config
      * @param ActivityListChainProvider $provider
      * @param ActivityListFilterHelper  $activityListFilterHelper
      * @param CommentApiManager         $commentManager
@@ -54,7 +54,7 @@ class ActivityListManager
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config,
+        ConfigManager $config,
         ActivityListChainProvider $provider,
         ActivityListFilterHelper $activityListFilterHelper,
         CommentApiManager $commentManager

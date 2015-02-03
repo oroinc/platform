@@ -1,73 +1,10 @@
-{% extends bap.layout %}
-{% if form %}
-    {% form_theme form with ['OroConfigBundle:Form:fields.html.twig', 'OroFormBundle:Form:fields.html.twig', 'OroLocaleBundle:Form:fields.html.twig'] %}
-{% endif %}
-{% import 'OroNavigationBundle:Include:contentTags.html.twig' as navigationMacro %}
-{% import 'OroConfigBundle::macros.html.twig' as configUI %}
-{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% extends 'OroConfigBundle::configPage.html.twig' %}
 
 {% set pageTitle = 'oro.config.menu.system_configuration.label'|trans %}
-
-{% block content %}
-    {% set pageReload    = attribute(form.vars.block_config, activeSubGroup).page_reload %}
-    {% set saveButton    = UI.saveAndCloseButton('oro.config.actions.save_settings'|trans) %}
-    {% set restoreButton = UI.buttonType({type: 'reset', label: 'oro.config.actions.restore_saved_values'|trans }) %}
-    {% set formAction    = path(
+{% set formAction    = path(
         'oro_config_configuration_system',
         {activeGroup: activeGroup, activeSubGroup: activeSubGroup}
-    ) %}
-    <form
-        id="{{ form.vars.name }}"
-        {{ form_enctype(form) }}
-        action="{{ formAction }}"
-        method="post"
-        data-collect="true"
-    >
-        {{ configUI.renderTitleAndButtons(pageTitle, [restoreButton, saveButton]) }}
-        {{ configUI.renderScrollData(data, form, activeGroup, activeSubGroup) }}
-    </form>
-    {{ oro_form_js_validation(form) }}
-
-    <script type="text/javascript">
-        /* jshint browser:true, devel:true */
-        /* global require */
-        require(['jquery', 'orotranslation/js/translator', 'oroui/js/mediator', 'oroui/js/messenger', 'oroconfig/js/form/state', 'oroconfig/js/form/default', 'oroui/js/modal'],
-        function ($, __, Mediator, Messenger, FormState, FormDefault, Modal) {
-            'use strict';
-
-            $('#{{ form.vars.name }} :input[type=reset]').click(function (e) {
-                var $form = $(this).closest('form'),
-                    $checkboxes = $form.find('.parent-scope-checkbox input'),
-                    confirm = new Modal({
-                        title: __('Confirmation'),
-                        okText: __('OK'),
-                        cancelText: __('Cancel'),
-                        content: __('Settings will be restored to saved values. Please confirm you want to continue.'),
-                        className: 'modal modal-primary',
-                        okButtonClass: 'btn-primary btn-large'
-                    });
-
-                confirm.on('ok', function () {
-                    $form.get(0).reset();
-                    $checkboxes.trigger('change');
-                });
-                confirm.open();
-                e.preventDefault();
-            });
-
-            {% if pageReload %}
-                $('#{{ form.vars.name }}').submit(function() {
-                    Mediator.once('page:update', function() {
-                        Messenger.notificationMessage('info', "{{ 'oro.config.controller.page.reload.message'|trans }}");
-                        // force reload without hash navigation
-                        window.location.reload();
-                    });
-                });
-            {% endif %}
-
-            new FormState();
-            new FormDefault();
-        });
-    </script>
-    {{ navigationMacro.navigationContentTags({name: 'system_configuration', params: [activeGroup, activeSubGroup]}) }}
-{% endblock content %}
+    )
+%}
+{% set routeName = 'oro_config_configuration_system' %}
+{% set routeParameters = {} %}
