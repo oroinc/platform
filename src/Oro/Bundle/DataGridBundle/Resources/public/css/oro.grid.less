@@ -122,6 +122,19 @@ table.grid {
   }
 }
 
+.no-data {
+  display: none;
+}
+
+.no-data-visible {
+  > .toolbar, .grid-container > *:not(.no-data), .filter-box {
+    display: none;
+  }
+  .no-data {
+    display: block;
+  }
+}
+
 .floatThead-connected {
   table th{
     border-bottom-left-radius: 0 !important;
@@ -138,10 +151,6 @@ table.grid {
     border: 1px solid rgb(221, 221, 221);
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
-  }
-
-  &.no-data-visible .grid-container {
-    border: none;
   }
 
   .grid {

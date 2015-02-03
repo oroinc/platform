@@ -782,7 +782,7 @@ define(function (require) {
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
                 hint: __(message, placeholders).replace('\n', '<br />')
-            }))).hide();
+            })));
         },
 
         /**
@@ -839,19 +839,7 @@ define(function (require) {
          */
         renderNoDataBlock: function () {
             this._defineNoDataBlock();
-            if (this.collection.models.length > 0 && !this.noColumnsFlag) {
-                this.$(this.selectors.toolbar).show();
-                this.$grid.show();
-                this.$(this.selectors.filterBox).show();
-                this.$(this.selectors.noDataBlock).hide();
-                this.$el.removeClass('no-data-visible');
-            } else {
-                this.$grid.hide();
-                this.$(this.selectors.toolbar).hide();
-                this.$(this.selectors.filterBox).hide();
-                this.$(this.selectors.noDataBlock).show();
-                this.$el.addClass('no-data-visible');
-            }
+            this.$el.toggleClass('no-data-visible', this.collection.models.length <= 0  || this.noColumnsFlag);
         },
 
         /**
