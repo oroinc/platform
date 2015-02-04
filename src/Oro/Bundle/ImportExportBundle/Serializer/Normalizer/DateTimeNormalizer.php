@@ -66,6 +66,15 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
         $timezone = $this->getTimezone($context);
         $format = $this->getFormat($context);
         $datetime = \DateTime::createFromFormat($format . '|', (string) $data, $timezone);
+
+        // If we are denormalizing date or time for backward compatibility try to denormalize as dateTime
+        if (false === $datetime
+            && array_key_exists('type', $context)
+            && in_array($context['type'], ['date', 'time'], true)
+        ) {
+            $datetime = \DateTime::createFromFormat($this->defaultDateTimeFormat . '|', (string) $data, $timezone);
+        }
+
         if (false === $datetime) {
             throw new RuntimeException(sprintf('Invalid datetime "%s", expected format %s.', $data, $format));
         }
@@ -86,7 +95,7 @@ class DateTimeNormalizer implements NormalizerInterface, DenormalizerInterface
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = array())
     {
-        return is_string($data) && $type == 'DateTime';
+        return is_string($data) && $type === 'DateTime';
     }
 
     /**
