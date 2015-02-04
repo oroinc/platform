@@ -54,6 +54,9 @@ class Email extends ExtendEmail
     const NORMAL_IMPORTANCE = 0;
     const HIGH_IMPORTANCE   = 1;
 
+    const DIRECTION_NORMAL     = 0;
+    const DIRECTION_REPLY      = 1;
+
     /**
      * @var integer
      *
@@ -179,6 +182,24 @@ class Email extends ExtendEmail
     protected $xThreadId;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="direction", type="integer")
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     */
+    protected $direction;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="refs", type="text", nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     */
+    protected $refs;
+
+    /**
      * @var ArrayCollection|EmailFolder[] $folders
      *
      * @ORM\ManyToMany(targetEntity="EmailFolder", inversedBy="emails")
@@ -201,6 +222,7 @@ class Email extends ExtendEmail
         parent::__construct();
 
         $this->importance = self::NORMAL_IMPORTANCE;
+        $this->direction  = self::DIRECTION_NORMAL;
         $this->recipients = new ArrayCollection();
         $this->emailBody  = new ArrayCollection();
         $this->folders    = new ArrayCollection();
@@ -499,6 +521,54 @@ class Email extends ExtendEmail
     public function setXThreadId($xThreadId)
     {
         $this->xThreadId = $xThreadId;
+
+        return $this;
+    }
+
+    /**
+     * Get email direction
+     *
+     * @return int
+     */
+    public function getDirection()
+    {
+        return $this->direction;
+    }
+
+    /**
+     * Set email direction
+     *
+     * @param $direction
+     *
+     * @return Email
+     */
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
+
+        return $this;
+    }
+
+    /**
+     * Get email references
+     *
+     * @return string
+     */
+    public function getRefs()
+    {
+        return $this->refs;
+    }
+
+    /**
+     * Set email references
+     *
+     * @param $refs
+     *
+     * @return $this
+     */
+    public function setRefs($refs)
+    {
+        $this->refs = $refs;
 
         return $this;
     }

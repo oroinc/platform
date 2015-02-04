@@ -145,6 +145,26 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $entity->getXThreadId());
     }
 
+    public function testDirectionAfterConstruct()
+    {
+        $entity = new Email();
+        $this->assertEquals(Email::DIRECTION_NORMAL, $entity->getDirection());
+    }
+
+    public function testDirectionGetterAndSetter()
+    {
+        $entity = new Email();
+        $entity->setDirection(Email::DIRECTION_REPLY);
+        $this->assertEquals(Email::DIRECTION_REPLY, $entity->getDirection());
+    }
+
+    public function testReferencesGetterAndSetter()
+    {
+        $entity = new Email();
+        $entity->setRefs('test');
+        $this->assertEquals('test', $entity->getRefs());
+    }
+
     public function testFolderGetterAndSetter()
     {
         $folder = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailFolder');
