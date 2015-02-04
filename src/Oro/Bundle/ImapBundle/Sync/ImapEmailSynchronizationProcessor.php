@@ -298,7 +298,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {
                 $invalid++;
-                $this->logger->error('Error occurred while trying to process email:', ['exception' => $e]);
+                $this->logger->error(
+                    sprintf('Error occurred while trying to process email: %s', $e->getMessage()),
+                    ['exception' => $e]
+                );
             }
         );
 
