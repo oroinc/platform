@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
+use Oro\Bundle\CalendarBundle\Model\ExtendCalendar;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
@@ -43,7 +44,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      }
  * )
  */
-class Calendar
+class Calendar extends ExtendCalendar
 {
     const CALENDAR_ALIAS = 'user';
 
