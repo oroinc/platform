@@ -60,7 +60,12 @@ class ProcessJobRepositoryTest extends WebTestCase
         $batchJobManager->createQuery('DELETE AkeneoBatchBundle:JobInstance')->execute();
         $batchJobManager->createQuery('DELETE AkeneoBatchBundle:JobExecution')->execute();
         $batchJobManager->createQuery('DELETE AkeneoBatchBundle:StepExecution')->execute();
-        $batchJobManager->createQuery('DELETE OroWorkflowBundle:ProcessJob')->execute();
+
+        $this->getContainer()
+            ->get('doctrine')
+            ->getManager()
+            ->createQuery('DELETE OroWorkflowBundle:ProcessJob')
+            ->execute();
     }
 
     public function testDeleteByHashes()
