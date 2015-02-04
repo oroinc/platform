@@ -566,6 +566,16 @@ define(function (require) {
          * Must be called on resize.
          */
         reflow: function () {
+            var self = this;
+            if (this.removeFloatTheadTimeoutId) {
+                // no need to reflow
+                clearTimeout(this.removeFloatTheadTimeoutId);
+                this.removeFloatTheadTimeoutId = setTimeout(function () {
+                    self.removeFloatThead();
+                    delete self.removeFloatTheadTimeoutId;
+                }, 200);
+                return;
+            }
             if (this.floatThead) {
                 this.removeFloatTheadDropdowns();
 
@@ -594,32 +604,52 @@ define(function (require) {
          * @param newValue {boolean}
          */
         setFloatThead: function (newValue) {
-            var containerClass = '.grid-container';
-
+            var self = this;
             if (newValue !== this.floatThead) {
                 this.floatThead = newValue;
                 if (newValue) {
-                    this.$el.addClass('floatThead-connected');
-                    this.$grid.floatThead({
-                        useAbsolutePositioning: false,
-                        scrollContainer: function($table){
-                            return $table.closest(containerClass);
-                        }
-                    });
-                    this.reflow();
-                    this.addFloatTheadDropdownsSupport();
-                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
+                    if (this.removeFloatTheadTimeoutId) {
+                        // cancel remove request
+                        clearTimeout(this.removeFloatTheadTimeoutId);
+                        delete this.removeFloatTheadTimeoutId;
+                        return;
+                    }
+                    this.addFloatThead();
                 } else {
-                    this.$el.removeClass('floatThead-connected');
-                    this.$el.removeClass('floatThead-move-header');
-                    this.$grid.floatThead('destroy');
-                    this.$grid.parent().css({
-                        maxHeight: ''
-                    });
-                    this.removeFloatTheadDropdownsSupport();
-                    clearInterval(this.heightFixIntervalId);
+                    // need stabilize UI before remove
+                    this.removeFloatTheadTimeoutId = setTimeout(function () {
+                        self.removeFloatThead();
+                        delete self.removeFloatTheadTimeoutId;
+                    }, 200);
                 }
             }
+        },
+
+        addFloatThead: function () {
+            var containerClass = '.grid-container';
+            this.$el.addClass('floatThead-connected');
+            this.$grid.floatThead({
+                useAbsolutePositioning: false,
+                // reflow must be called in general resize flow, see this.reflow()
+                debounceResizeMs: 100000000,
+                scrollContainer: function($table){
+                    return $table.closest(containerClass);
+                }
+            });
+            this.reflow();
+            this.addFloatTheadDropdownsSupport();
+            this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
+        },
+
+        removeFloatThead: function () {
+            this.$el.removeClass('floatThead-connected');
+            this.$el.removeClass('floatThead-move-header');
+            this.$grid.floatThead('destroy');
+            this.$grid.parent().css({
+                maxHeight: ''
+            });
+            this.removeFloatTheadDropdownsSupport();
+            clearInterval(this.heightFixIntervalId);
         },
 
         fixHeightInFloatTheadMode: function () {
@@ -784,7 +814,7 @@ define(function (require) {
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
                 hint: __(message, placeholders).replace('\n', '<br />')
-            }))).hide();
+            })));
         },
 
         /**
@@ -841,19 +871,7 @@ define(function (require) {
          */
         renderNoDataBlock: function () {
             this._defineNoDataBlock();
-            if (this.collection.models.length > 0 && !this.noColumnsFlag) {
-                this.$(this.selectors.toolbar).show();
-                this.$grid.show();
-                this.$(this.selectors.filterBox).show();
-                this.$(this.selectors.noDataBlock).hide();
-                this.$el.removeClass('no-data-visible');
-            } else {
-                this.$grid.hide();
-                this.$(this.selectors.toolbar).hide();
-                this.$(this.selectors.filterBox).hide();
-                this.$(this.selectors.noDataBlock).show();
-                this.$el.addClass('no-data-visible');
-            }
+            this.$el.toggleClass('no-data-visible', this.collection.models.length <= 0  || this.noColumnsFlag);
         },
 
         /**
