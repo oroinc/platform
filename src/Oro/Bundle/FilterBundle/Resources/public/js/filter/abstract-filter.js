@@ -4,9 +4,9 @@ define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
-    'backbone',
+    'oroui/js/app/views/base/view',
     'oroui/js/tools'
-], function ($, _, __, Backbone, tools) {
+], function ($, _, __, BaseView, tools) {
     'use strict';
 
     var AbstractFilter;
@@ -18,7 +18,7 @@ define([
      * @class   oro.filter.AbstractFilter
      * @extends Backbone.View
      */
-    AbstractFilter = Backbone.View.extend({
+    AbstractFilter = BaseView.extend({
         /**
          * Template for filter criteria
          *

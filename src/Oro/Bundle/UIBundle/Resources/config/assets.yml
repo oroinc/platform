@@ -1,10 +1,17 @@
 css:
+    'timepicker':
+        - 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.css'
     'oroui':
-        - 'bundles/oroui/css/jquery-ui.grid.css'
-        - 'bundles/oroui/css/less/main.less'
-        - 'bundles/oroui/css/all.css'
+        # libraries' styles
+        - 'bundles/oroui//lib/bootstrap/bootstrap.less'
         - 'bundles/oroui/lib/jstree/themes/default/style.css'
         - 'bundles/oroui/lib/font-awesome/css/font-awesome.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
+        # customized libraries' styles
+        - 'bundles/oroui/css/jquery-ui.grid.css'
+        - 'bundles/oroui/css/jquery-ui-1.10.2.custom.css'
+        # custom styles
+        - 'bundles/oroui/css/less/main.less'
+        - 'bundles/oroui/css/all.css'
