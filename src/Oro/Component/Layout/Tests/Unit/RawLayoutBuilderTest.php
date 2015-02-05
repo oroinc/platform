@@ -2,75 +2,26 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\BlockFactory;
-use Oro\Component\Layout\Block\Type\BaseType;
-use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\DeferredLayoutManipulator;
-use Oro\Component\Layout\Extension\Core\CoreExtension;
-use Oro\Component\Layout\ExtensionManager;
-use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\RawLayout;
 use Oro\Component\Layout\RawLayoutBuilder;
-use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 
 class RawLayoutBuilderTest extends LayoutTestCase
 {
-    /** @var LayoutContext */
-    protected $context;
-
     /** @var RawLayoutBuilder */
     protected $rawLayoutBuilder;
 
-    /** @var BlockFactory */
-    protected $blockFactory;
-
     protected function setUp()
     {
-        $extensionManager = new ExtensionManager();
-        $extensionManager->addExtension(
-            new PreloadedExtension(
-                [
-                    'root'                         => new Type\RootType(),
-                    'header'                       => new Type\HeaderType(),
-                    'logo'                         => new Type\LogoType(),
-                    'test_self_building_container' => new Type\TestSelfBuildingContainerType()
-                ]
-            )
-        );
-
-        $this->context          = new LayoutContext();
         $this->rawLayoutBuilder = new RawLayoutBuilder();
-        $this->blockFactory     = new BlockFactory(
-            $extensionManager,
-            new DeferredLayoutManipulator($this->rawLayoutBuilder, $extensionManager)
-        );
     }
 
-    /**
-     * @param string|null $rootId
-     *
-     * @return BlockView
-     */
-    protected function getLayoutView($rootId = null)
-    {
-        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
-
-        return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);
-    }
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The root item does not exist.
-     */
     public function testClear()
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
 
         $this->rawLayoutBuilder->clear();
-        $this->getLayoutView();
+        $this->assertTrue($this->rawLayoutBuilder->isEmpty());
     }
 
     public function testIsEmpty()
@@ -111,31 +62,16 @@ class RawLayoutBuilderTest extends LayoutTestCase
         ];
     }
 
-    public function testSimpleLayout()
+    public function testAdd()
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
-        $view = $this->getLayoutView();
-
-        $this->assertBlockView(
-            [ // root
-                'vars'     => ['id' => 'root'],
-                'children' => [
-                    [ // header
-                        'vars'     => ['id' => 'header'],
-                        'children' => [
-                            [ // logo
-                                'vars' => ['id' => 'logo', 'title' => 'test']
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            $view
-        );
+        $this->assertTrue($this->rawLayoutBuilder->has('root'));
+        $this->assertTrue($this->rawLayoutBuilder->has('header'));
+        $this->assertTrue($this->rawLayoutBuilder->has('logo'));
     }
 
     // @codingStandardsIgnoreStart
@@ -316,111 +252,6 @@ class RawLayoutBuilderTest extends LayoutTestCase
     {
         $this->rawLayoutBuilder
             ->getOptions('root');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "header" item cannot be added as a child to "logo" item (block type: logo) because only container blocks can have children.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAddChildToNotContainer()
-    {
-        $this->rawLayoutBuilder
-            ->add('root', null, 'root')
-            ->add('logo', 'root', 'logo')
-            ->add('header', 'logo', 'header');
-
-        $this->getLayoutView();
-    }
-
-    public function testCoreVariablesForRootItemOnly()
-    {
-        $this->rawLayoutBuilder
-            ->add('rootId', null, 'root');
-
-        $view = $this->getLayoutView();
-
-        $this->assertBlockView(
-            [ // root
-                'vars'     => [
-                    'id'                  => 'rootId',
-                    'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_rootId',
-                    'block_prefixes'      => [
-                        BaseType::NAME,
-                        ContainerType::NAME,
-                        'root',
-                        '_rootId',
-                    ],
-                    'cache_key'           => '_rootId_root',
-                ],
-                'children' => []
-            ],
-            $view,
-            false
-        );
-    }
-
-    public function testCoreVariables()
-    {
-        $this->rawLayoutBuilder
-            ->add('rootId', null, 'root')
-            ->add('headerId', 'rootId', 'header')
-            ->add('logoId', 'headerId', 'logo', ['title' => 'test']);
-
-        $view = $this->getLayoutView();
-
-        $this->assertBlockView(
-            [ // root
-                'vars'     => [
-                    'id'                  => 'rootId',
-                    'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_rootId',
-                    'block_prefixes'      => [
-                        BaseType::NAME,
-                        ContainerType::NAME,
-                        'root',
-                        '_rootId',
-                    ],
-                    'cache_key'           => '_rootId_root',
-                ],
-                'children' => [
-                    [ // header
-                        'vars'     => [
-                            'id'                  => 'headerId',
-                            'translation_domain'  => 'messages',
-                            'unique_block_prefix' => '_headerId',
-                            'block_prefixes'      => [
-                                BaseType::NAME,
-                                ContainerType::NAME,
-                                'header',
-                                '_headerId',
-                            ],
-                            'cache_key'           => '_headerId_header',
-                        ],
-                        'children' => [
-                            [ // logo
-                                'vars' => [
-                                    'id'                  => 'logoId',
-                                    'translation_domain'  => 'messages',
-                                    'unique_block_prefix' => '_logoId',
-                                    'block_prefixes'      => [
-                                        BaseType::NAME,
-                                        'logo',
-                                        '_logoId',
-                                    ],
-                                    'cache_key'           => '_logoId_logo',
-                                    'title'               => 'test'
-                                ],
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            $view,
-            false
-        );
     }
 
     public function emptyStringDataProvider()

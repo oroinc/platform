@@ -7,7 +7,6 @@ use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
-use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\ExtensionInterface;
 use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutBuilder;

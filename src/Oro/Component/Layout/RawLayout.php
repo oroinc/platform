@@ -454,6 +454,18 @@ class RawLayout
     }
 
     /**
+     * Returns a list of all aliases registered for the given item
+     *
+     * @param string $id The layout item id
+     *
+     * @return string[] The list of all aliases for the layout item with the given id
+     */
+    public function getAliases($id)
+    {
+        return $this->aliases->getAliases($id);
+    }
+
+    /**
      * Returns all registered themes to be used for rendering layout items
      *
      * Example of returned data:

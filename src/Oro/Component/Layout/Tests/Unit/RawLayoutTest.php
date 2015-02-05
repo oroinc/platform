@@ -943,6 +943,21 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
         $this->rawLayout->removeAlias($alias);
     }
 
+    public function testGetAliases()
+    {
+        $this->rawLayout->add('test_id', null, 'root');
+        $this->rawLayout->addAlias('test_alias', 'test_id');
+        $this->rawLayout->addAlias('another_alias', 'test_alias');
+        $this->assertEquals(
+            ['test_alias', 'another_alias'],
+            $this->rawLayout->getAliases('test_id')
+        );
+        $this->assertEquals(
+            [],
+            $this->rawLayout->getAliases('unknown')
+        );
+    }
+
     public function testSetBlockTheme()
     {
         // prepare test data

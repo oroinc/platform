@@ -21,11 +21,14 @@ class BlockFactory implements BlockFactoryInterface
     /** @var RawLayout */
     protected $rawLayout;
 
+    /** @var ContextInterface */
+    protected $context;
+
     /** @var BlockBuilder */
-    protected $currentBlockBuilder;
+    protected $blockBuilder;
 
     /** @var Block */
-    protected $currentBlock;
+    protected $block;
 
     /**
      * @param ExtensionManagerInterface          $extensionManager
@@ -72,9 +75,10 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function initializeState(RawLayout $rawLayout, ContextInterface $context)
     {
-        $this->rawLayout           = $rawLayout;
-        $this->currentBlockBuilder = $this->createBlockBuilder($context);
-        $this->currentBlock        = $this->createBlock($context);
+        $this->rawLayout    = $rawLayout;
+        $this->context      = $context;
+        $this->blockBuilder = $this->createBlockBuilder();
+        $this->block        = $this->createBlock();
     }
 
     /**
@@ -82,9 +86,10 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function clearState()
     {
-        $this->rawLayout           = null;
-        $this->currentBlockBuilder = null;
-        $this->currentBlock        = null;
+        $this->rawLayout    = null;
+        $this->context      = null;
+        $this->blockBuilder = null;
+        $this->block        = null;
     }
 
     /**
@@ -185,11 +190,11 @@ class BlockFactory implements BlockFactoryInterface
         $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
 
         // point the block builder state to the current block
-        $this->currentBlockBuilder->initialize($id);
+        $this->blockBuilder->initialize($id);
         // iterate from parent to current
         foreach ($types as $type) {
-            $type->buildBlock($this->currentBlockBuilder, $resolvedOptions);
-            $this->extensionManager->buildBlock($type->getName(), $this->currentBlockBuilder, $resolvedOptions);
+            $type->buildBlock($this->blockBuilder, $resolvedOptions);
+            $this->extensionManager->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
         }
     }
 
@@ -224,11 +229,11 @@ class BlockFactory implements BlockFactoryInterface
         );
 
         // point the block view state to the current block
-        $this->currentBlock->initialize($id);
+        $this->block->initialize($id);
         // build the view
         foreach ($types as $type) {
-            $type->buildView($view, $this->currentBlock, $options);
-            $this->extensionManager->buildView($type->getName(), $view, $this->currentBlock, $options);
+            $type->buildView($view, $this->block, $options);
+            $this->extensionManager->buildView($type->getName(), $view, $this->block, $options);
         }
 
         return $view;
@@ -247,11 +252,11 @@ class BlockFactory implements BlockFactoryInterface
         $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
 
         // point the block view state to the current block
-        $this->currentBlock->initialize($id);
+        $this->block->initialize($id);
         // finish the view
         foreach ($types as $type) {
-            $type->finishView($view, $this->currentBlock, $options);
-            $this->extensionManager->finishView($type->getName(), $view, $this->currentBlock, $options);
+            $type->finishView($view, $this->block, $options);
+            $this->extensionManager->finishView($type->getName(), $view, $this->block, $options);
         }
     }
 
@@ -278,25 +283,21 @@ class BlockFactory implements BlockFactoryInterface
     /**
      * Creates new instance of the block builder
      *
-     * @param ContextInterface $context
-     *
      * @return BlockBuilder
      */
-    protected function createBlockBuilder(ContextInterface $context)
+    protected function createBlockBuilder()
     {
-        return new BlockBuilder($this->layoutManipulator, $context);
+        return new BlockBuilder($this->layoutManipulator, $this->rawLayout, $this->context);
     }
 
     /**
      * Creates new instance of the block
      *
-     * @param ContextInterface $context
-     *
      * @return Block
      */
-    protected function createBlock(ContextInterface $context)
+    protected function createBlock()
     {
-        return new Block($context);
+        return new Block($this->rawLayout, $this->context);
     }
 
     /**

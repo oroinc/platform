@@ -12,6 +12,13 @@ interface BlockBuilderInterface
     public function getId();
 
     /**
+     * Returns the name of the block type
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
      * Returns the layout manipulator
      *
      * @return LayoutManipulatorInterface

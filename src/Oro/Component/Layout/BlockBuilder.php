@@ -10,27 +10,35 @@ class BlockBuilder implements BlockBuilderInterface
     /** @var ContextInterface */
     protected $context;
 
+    /** @var RawLayout */
+    protected $rawLayout;
+
     /** @var string */
-    protected $blockId;
+    protected $id;
 
     /**
      * @param LayoutManipulatorInterface $layoutManipulator
+     * @param RawLayout                  $rawLayout
      * @param ContextInterface           $context
      */
-    public function __construct(LayoutManipulatorInterface $layoutManipulator, ContextInterface $context)
-    {
+    public function __construct(
+        LayoutManipulatorInterface $layoutManipulator,
+        RawLayout $rawLayout,
+        ContextInterface $context
+    ) {
         $this->layoutManipulator = $layoutManipulator;
+        $this->rawLayout         = $rawLayout;
         $this->context           = $context;
     }
 
     /**
      * Initializes the state of this object
      *
-     * @param string $blockId
+     * @param string $id The the block id
      */
-    public function initialize($blockId)
+    public function initialize($id)
     {
-        $this->blockId = $blockId;
+        $this->id = $id;
     }
 
     /**
@@ -38,7 +46,19 @@ class BlockBuilder implements BlockBuilderInterface
      */
     public function getId()
     {
-        return $this->blockId;
+        return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        $blockType = $this->rawLayout->getProperty($this->id, RawLayout::BLOCK_TYPE, true);
+
+        return $blockType instanceof BlockTypeInterface
+            ? $blockType->getName()
+            : $blockType;
     }
 
     /**
