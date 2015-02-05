@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockView;
@@ -9,7 +10,6 @@ use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\RawLayout;
 use Oro\Component\Layout\RawLayoutBuilder;
@@ -23,8 +23,8 @@ class RawLayoutBuilderTest extends LayoutTestCase
     /** @var RawLayoutBuilder */
     protected $rawLayoutBuilder;
 
-    /** @var LayoutViewFactory */
-    protected $layoutViewFactory;
+    /** @var BlockFactory */
+    protected $blockFactory;
 
     protected function setUp()
     {
@@ -40,9 +40,9 @@ class RawLayoutBuilderTest extends LayoutTestCase
             )
         );
 
-        $this->context           = new LayoutContext();
-        $this->rawLayoutBuilder  = new RawLayoutBuilder();
-        $this->layoutViewFactory = new LayoutViewFactory(
+        $this->context          = new LayoutContext();
+        $this->rawLayoutBuilder = new RawLayoutBuilder();
+        $this->blockFactory     = new BlockFactory(
             $extensionManager,
             new DeferredLayoutManipulator($this->rawLayoutBuilder, $extensionManager)
         );
@@ -57,7 +57,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
     {
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-        return $this->layoutViewFactory->createView($rawLayout, $this->context, $rootId);
+        return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);
     }
 
     /**

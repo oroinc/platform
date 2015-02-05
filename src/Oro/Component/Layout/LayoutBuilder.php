@@ -10,8 +10,8 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
 
-    /** @var LayoutViewFactoryInterface */
-    protected $layoutViewFactory;
+    /** @var BlockFactoryInterface */
+    protected $blockFactory;
 
     /** @var LayoutFactoryInterface */
     protected $layoutFactory;
@@ -19,18 +19,18 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * @param RawLayoutBuilderInterface          $rawLayoutBuilder
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
-     * @param LayoutViewFactoryInterface         $layoutViewFactory
+     * @param BlockFactoryInterface              $blockFactory
      * @param LayoutFactoryInterface             $layoutFactory
      */
     public function __construct(
         RawLayoutBuilderInterface $rawLayoutBuilder,
         DeferredLayoutManipulatorInterface $layoutManipulator,
-        LayoutViewFactoryInterface $layoutViewFactory,
+        BlockFactoryInterface $blockFactory,
         LayoutFactoryInterface $layoutFactory
     ) {
         $this->rawLayoutBuilder  = $rawLayoutBuilder;
         $this->layoutManipulator = $layoutManipulator;
-        $this->layoutViewFactory = $layoutViewFactory;
+        $this->blockFactory      = $blockFactory;
         $this->layoutFactory     = $layoutFactory;
     }
 
@@ -136,7 +136,7 @@ class LayoutBuilder implements LayoutBuilderInterface
     {
         $this->layoutManipulator->applyChanges();
         $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
-        $rootView    = $this->layoutViewFactory->createView($rawLayout, $context, $rootId);
+        $rootView    = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
         $layout      = $this->layoutFactory->createLayout($rootView);
         $rootBlockId = $rawLayout->getRootId();
         $blockThemes = $rawLayout->getBlockThemes();

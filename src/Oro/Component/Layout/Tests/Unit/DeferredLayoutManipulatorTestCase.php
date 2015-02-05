@@ -2,12 +2,12 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutViewFactory;
 use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
@@ -23,8 +23,8 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
     /** @var DeferredLayoutManipulator */
     protected $layoutManipulator;
 
-    /** @var LayoutViewFactory */
-    protected $layoutViewFactory;
+    /** @var BlockFactory */
+    protected $blockFactory;
 
     /** @var ExtensionManager */
     protected $extensionManager;
@@ -49,7 +49,7 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
             $this->rawLayoutBuilder,
             $this->extensionManager
         );
-        $this->layoutViewFactory = new LayoutViewFactory(
+        $this->blockFactory      = new BlockFactory(
             $this->extensionManager,
             $this->layoutManipulator
         );
@@ -65,6 +65,6 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
         $this->layoutManipulator->applyChanges();
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
-        return $this->layoutViewFactory->createView($rawLayout, $this->context, $rootId);
+        return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);
     }
 }

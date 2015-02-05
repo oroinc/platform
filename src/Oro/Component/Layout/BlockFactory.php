@@ -4,7 +4,7 @@ namespace Oro\Component\Layout;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
 
-class LayoutViewFactory implements LayoutViewFactoryInterface
+class BlockFactory implements BlockFactoryInterface
 {
     /** @var ExtensionManagerInterface */
     protected $extensionManager;
@@ -44,7 +44,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createView(RawLayout $rawLayout, ContextInterface $context, $rootId = null)
+    public function createBlockView(RawLayout $rawLayout, ContextInterface $context, $rootId = null)
     {
         $this->initializeState($rawLayout, $context);
         try {

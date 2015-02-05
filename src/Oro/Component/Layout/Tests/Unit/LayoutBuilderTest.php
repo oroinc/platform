@@ -13,7 +13,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     protected $layoutManipulator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutViewFactory;
+    protected $blockFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $layoutFactory;
@@ -25,13 +25,13 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
-        $this->layoutViewFactory = $this->getMock('Oro\Component\Layout\LayoutViewFactoryInterface');
+        $this->blockFactory      = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
         $this->layoutFactory     = $this->getMock('Oro\Component\Layout\LayoutFactoryInterface');
 
         $this->layoutBuilder = new LayoutBuilder(
             $this->rawLayoutBuilder,
             $this->layoutManipulator,
-            $this->layoutViewFactory,
+            $this->blockFactory,
             $this->layoutFactory
         );
     }
@@ -175,8 +175,8 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->rawLayoutBuilder->expects($this->once())
             ->method('getRawLayout')
             ->will($this->returnValue($rawLayout));
-        $this->layoutViewFactory->expects($this->once())
-            ->method('createView')
+        $this->blockFactory->expects($this->once())
+            ->method('createBlockView')
             ->with($this->identicalTo($rawLayout), $this->identicalTo($context), $rootId)
             ->will($this->returnValue($rootView));
         $this->layoutFactory->expects($this->once())
