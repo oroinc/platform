@@ -200,7 +200,7 @@ define(function (require) {
                 return;
             }
 
-            this.setLayout('default');
+            this.setLayout('default', true);
 
             _.each(this.columns.models, function (column) {
                 column.dispose();
@@ -603,7 +603,7 @@ define(function (require) {
          *
          * @param newValue {boolean}
          */
-        setFloatThead: function (newValue) {
+        setFloatThead: function (newValue, instant) {
             var self = this;
             if (newValue !== this.floatThead) {
                 this.floatThead = newValue;
@@ -617,10 +617,14 @@ define(function (require) {
                     this.addFloatThead();
                 } else {
                     // need stabilize UI before remove
-                    this.removeFloatTheadTimeoutId = setTimeout(function () {
+                    if (instant) {
                         self.removeFloatThead();
-                        delete self.removeFloatTheadTimeoutId;
-                    }, 200);
+                    } else {
+                        this.removeFloatTheadTimeoutId = setTimeout(function () {
+                            self.removeFloatThead();
+                            delete self.removeFloatTheadTimeoutId;
+                        }, 200);
+                    }
                 }
             }
         },
@@ -928,7 +932,7 @@ define(function (require) {
         /**
          * Sets layout and perform all required operations
          */
-        setLayout: function (newLayout) {
+        setLayout: function (newLayout, instant) {
             if (newLayout === this.layout) {
                 this.reflow();
                 return;
@@ -937,11 +941,11 @@ define(function (require) {
             switch (newLayout) {
                 case 'fullscreen':
                     mediator.execute('layout:disablePageScroll', this.$grid);
-                    this.setFloatThead(true);
+                    this.setFloatThead(true, instant);
                     break;
                 case 'scroll':
                 case 'default':
-                    this.setFloatThead(false);
+                    this.setFloatThead(false, instant);
                     mediator.execute('layout:enablePageScroll', this.$grid);
                     break;
                 default:
