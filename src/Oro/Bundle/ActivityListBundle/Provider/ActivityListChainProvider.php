@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -230,6 +231,10 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
+            if ($provider instanceof ActivityListDateProviderInterface) {
+                $list->setCreatedAt($provider->getDate($entity));
+                $list->setUpdatedAt($provider->getDate($entity));
+            }
             $list->setVerb($verb);
 
             if ($verb === ActivityList::VERB_UPDATE) {
