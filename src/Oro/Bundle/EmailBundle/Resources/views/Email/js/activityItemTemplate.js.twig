@@ -19,7 +19,7 @@
                         %>
                         <%= _.template(
                             {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
-                            { user: ownerLink, date: '<i class="date">' + updatedAt + '</i>'},
+                            { user: ownerLink, date: '<i class="date">' + createdAt + '</i>'},
                             { interpolate: /\{\{(.+?)\}\}/g }
                         ) %>
                     </span>
