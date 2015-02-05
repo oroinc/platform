@@ -85,7 +85,9 @@ class ActivityListChangesListener
      */
     protected function setCreatedProperties(ActivityList $activityList, EntityManager $entityManager)
     {
-        $activityList->setCreatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        if (!$activityList->getCreatedAt()) {
+            $activityList->setCreatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        }
         $activityList->setOwner($this->getUser($entityManager));
     }
 
