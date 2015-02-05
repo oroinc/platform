@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ExtensionManager;
 
 class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
@@ -165,9 +166,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     public function testBuildView()
     {
         $name    = 'test';
-        $view    = $this->getMockBuilder('Oro\Component\Layout\BlockView')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $view    = new BlockView();
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $options = ['foo' => 'bar'];
 
@@ -191,9 +190,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     public function testFinishView()
     {
         $name    = 'test';
-        $view    = $this->getMockBuilder('Oro\Component\Layout\BlockView')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $view    = new BlockView();
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $options = ['foo' => 'bar'];
 

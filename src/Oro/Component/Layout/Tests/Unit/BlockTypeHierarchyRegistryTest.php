@@ -4,23 +4,23 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\BlockTypeChainRegistry;
+use Oro\Component\Layout\BlockTypeHierarchyRegistry;
 
-class BlockTypeChainRegistryTest extends \PHPUnit_Framework_TestCase
+class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extensionManager;
 
-    /** @var BlockTypeChainRegistry */
-    protected $blockTypeChainRegistry;
+    /** @var BlockTypeHierarchyRegistry */
+    protected $registry;
 
     protected function setUp()
     {
-        $this->extensionManager       = $this->getMock('Oro\Component\Layout\ExtensionManagerInterface');
-        $this->blockTypeChainRegistry = new BlockTypeChainRegistry($this->extensionManager);
+        $this->extensionManager = $this->getMock('Oro\Component\Layout\ExtensionManagerInterface');
+        $this->registry         = new BlockTypeHierarchyRegistry($this->extensionManager);
     }
 
-    public function testGetBlockTypeChainByBlockName()
+    public function testByBlockName()
     {
         $baseBlockType      = new BaseType();
         $containerBlockType = new ContainerType();
@@ -38,16 +38,18 @@ class BlockTypeChainRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain(ContainerType::NAME)
+            $this->registry->getBlockTypes(ContainerType::NAME)
         );
-        // check that the chain is cached
         $this->assertSame(
-            [$baseBlockType, $containerBlockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain(ContainerType::NAME)
+            [$baseBlockType->getName(), $containerBlockType->getName()],
+            $this->registry->getBlockTypeNames(ContainerType::NAME)
         );
+        $this->assertTrue($this->registry->isInstanceOf(ContainerType::NAME, ContainerType::NAME));
+        $this->assertTrue($this->registry->isInstanceOf(ContainerType::NAME, BaseType::NAME));
+        $this->assertFalse($this->registry->isInstanceOf(ContainerType::NAME, 'another'));
     }
 
-    public function testGetBlockTypeChainByAlreadyCreatedBlockTypeObject()
+    public function testByAlreadyCreatedBlockTypeObject()
     {
         $baseBlockType      = new BaseType();
         $containerBlockType = new ContainerType();
@@ -59,16 +61,18 @@ class BlockTypeChainRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain($containerBlockType)
+            $this->registry->getBlockTypes($containerBlockType)
         );
-        // check that the chain is cached
         $this->assertSame(
-            [$baseBlockType, $containerBlockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain($containerBlockType)
+            [$baseBlockType->getName(), $containerBlockType->getName()],
+            $this->registry->getBlockTypeNames($containerBlockType)
         );
+        $this->assertTrue($this->registry->isInstanceOf($containerBlockType, ContainerType::NAME));
+        $this->assertTrue($this->registry->isInstanceOf($containerBlockType, BaseType::NAME));
+        $this->assertFalse($this->registry->isInstanceOf($containerBlockType, 'another'));
     }
 
-    public function testGetBlockTypeChainForBaseTypeByBlockName()
+    public function testForBaseTypeByBlockName()
     {
         $blockType = new BaseType();
 
@@ -79,16 +83,17 @@ class BlockTypeChainRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$blockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain(BaseType::NAME)
+            $this->registry->getBlockTypes(BaseType::NAME)
         );
-        // check that the chain is cached
         $this->assertSame(
-            [$blockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain(BaseType::NAME)
+            [$blockType->getName()],
+            $this->registry->getBlockTypeNames(BaseType::NAME)
         );
+        $this->assertTrue($this->registry->isInstanceOf(BaseType::NAME, BaseType::NAME));
+        $this->assertFalse($this->registry->isInstanceOf(BaseType::NAME, 'another'));
     }
 
-    public function testGetBlockTypeChainForBaseTypeByAlreadyCreatedBlockTypeObject()
+    public function testForBaseTypeByAlreadyCreatedBlockTypeObject()
     {
         $blockType = new BaseType();
 
@@ -97,12 +102,13 @@ class BlockTypeChainRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$blockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain($blockType)
+            $this->registry->getBlockTypes($blockType)
         );
-        // check that the chain is cached
         $this->assertSame(
-            [$blockType],
-            $this->blockTypeChainRegistry->getBlockTypeChain($blockType)
+            [$blockType->getName()],
+            $this->registry->getBlockTypeNames($blockType)
         );
+        $this->assertTrue($this->registry->isInstanceOf($blockType, BaseType::NAME));
+        $this->assertFalse($this->registry->isInstanceOf($blockType, 'another'));
     }
 }

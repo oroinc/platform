@@ -19,6 +19,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
             [
                 'vars' => [
                     'id'                  => 'container_id',
+                    'block_type'          => 'container',
                     'unique_block_prefix' => '_container_id',
                     'block_prefixes'      => [
                         'block',
@@ -53,6 +54,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
             [
                 'vars' => [
                     'id'                  => 'container_id',
+                    'block_type'          => 'container',
                     'unique_block_prefix' => '_container_id',
                     'block_prefixes'      => [
                         'block',

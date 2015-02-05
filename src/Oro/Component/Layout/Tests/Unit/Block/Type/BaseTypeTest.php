@@ -64,6 +64,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
             [
                 'vars' => [
                     'id'                  => 'block_id',
+                    'block_type'          => 'block',
                     'unique_block_prefix' => '_block_id',
                     'block_prefixes'      => [
                         'block',
@@ -97,6 +98,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
             [
                 'vars' => [
                     'id'                  => 'block_id',
+                    'block_type'          => 'block',
                     'unique_block_prefix' => '_block_id',
                     'block_prefixes'      => [
                         'block',

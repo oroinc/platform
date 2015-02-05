@@ -23,7 +23,7 @@ class LayoutRendererTest extends \PHPUnit_Framework_TestCase
     {
         $expected = 'some rendered string';
 
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
         $this->innerRenderer->expects($this->once())
             ->method('searchAndRenderBlock')
@@ -38,7 +38,7 @@ class LayoutRendererTest extends \PHPUnit_Framework_TestCase
     {
         $theme = 'MyBungle::blocks.html.twig';
 
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
         $this->innerRenderer->expects($this->once())
             ->method('setTheme')

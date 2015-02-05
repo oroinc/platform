@@ -10,6 +10,9 @@ final class Block implements BlockInterface
     /** @var RawLayout */
     private $rawLayout;
 
+    /** @var BlockTypeHelperInterface */
+    private $typeHelper;
+
     /** @var string */
     private $id;
 
@@ -17,13 +20,18 @@ final class Block implements BlockInterface
     private $parent = false;
 
     /**
-     * @param ContextInterface $context
-     * @param RawLayout        $rawLayout
+     * @param RawLayout                $rawLayout
+     * @param BlockTypeHelperInterface $typeHelper
+     * @param ContextInterface         $context
      */
-    public function __construct(RawLayout $rawLayout, ContextInterface $context)
-    {
-        $this->rawLayout = $rawLayout;
-        $this->context   = $context;
+    public function __construct(
+        RawLayout $rawLayout,
+        BlockTypeHelperInterface $typeHelper,
+        ContextInterface $context
+    ) {
+        $this->rawLayout  = $rawLayout;
+        $this->typeHelper = $typeHelper;
+        $this->context    = $context;
     }
 
     /**
@@ -73,7 +81,7 @@ final class Block implements BlockInterface
         if ($this->parent === false) {
             $parentId = $this->rawLayout->getParentId($this->id);
             if ($parentId) {
-                $this->parent = new self($this->rawLayout, $this->context);
+                $this->parent = new self($this->rawLayout, $this->typeHelper, $this->context);
                 $this->parent->initialize($parentId);
             } else {
                 $this->parent = null;
@@ -89,6 +97,14 @@ final class Block implements BlockInterface
     public function getOptions()
     {
         return $this->rawLayout->getProperty($this->id, RawLayout::RESOLVED_OPTIONS, true);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypeHelper()
+    {
+        return $this->typeHelper;
     }
 
     /**

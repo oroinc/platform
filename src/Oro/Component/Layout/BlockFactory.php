@@ -15,8 +15,8 @@ class BlockFactory implements BlockFactoryInterface
     /** @var BlockOptionsResolver */
     protected $optionsResolver;
 
-    /** @var BlockTypeChainRegistry */
-    protected $typeChainRegistry;
+    /** @var BlockTypeHelperInterface */
+    protected $typeHelper;
 
     /** @var RawLayout */
     protected $rawLayout;
@@ -41,7 +41,7 @@ class BlockFactory implements BlockFactoryInterface
         $this->extensionManager  = $extensionManager;
         $this->layoutManipulator = $layoutManipulator;
         $this->optionsResolver   = $this->createOptionsResolver();
-        $this->typeChainRegistry = $this->createTypeChainRegistry();
+        $this->typeHelper        = $this->createBlockTypeHelper();
     }
 
     /**
@@ -183,7 +183,7 @@ class BlockFactory implements BlockFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::OPTIONS, true);
-        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
+        $types     = $this->typeHelper->getBlockTypes($blockType);
 
         // resolve options
         $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
@@ -210,23 +210,8 @@ class BlockFactory implements BlockFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
-        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
-        $typeNames = $this->getBlockTypeNames($types);
-
-        $view = new BlockView($typeNames, $parentView);
-
-        // add core variables to the block view, like id and variables required for rendering engine
-        $uniqueBlockPrefix                 = '_' . $id;
-        $blockPrefixes                     = $typeNames;
-        $blockPrefixes[]                   = $uniqueBlockPrefix;
-        $view->vars['id']                  = $id;
-        $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
-        $view->vars['block_prefixes']      = $blockPrefixes;
-        $view->vars['cache_key']           = sprintf(
-            '%s_%s',
-            $uniqueBlockPrefix,
-            $blockType instanceof BlockTypeInterface ? $blockType->getName() : $blockType
-        );
+        $types     = $this->typeHelper->getBlockTypes($blockType);
+        $view      = new BlockView($parentView);
 
         // point the block view state to the current block
         $this->block->initialize($id);
@@ -249,7 +234,7 @@ class BlockFactory implements BlockFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
-        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
+        $types     = $this->typeHelper->getBlockTypes($blockType);
 
         // point the block view state to the current block
         $this->block->initialize($id);
@@ -271,13 +256,13 @@ class BlockFactory implements BlockFactoryInterface
     }
 
     /**
-     * Creates new instance of the block type chain registry
+     * Creates new instance of the block type hierarchy registry
      *
-     * @return BlockTypeChainRegistry
+     * @return BlockTypeHelperInterface
      */
-    protected function createTypeChainRegistry()
+    protected function createBlockTypeHelper()
     {
-        return new BlockTypeChainRegistry($this->extensionManager);
+        return new BlockTypeHierarchyRegistry($this->extensionManager);
     }
 
     /**
@@ -287,7 +272,7 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function createBlockBuilder()
     {
-        return new BlockBuilder($this->layoutManipulator, $this->rawLayout, $this->context);
+        return new BlockBuilder($this->layoutManipulator, $this->rawLayout, $this->typeHelper, $this->context);
     }
 
     /**
@@ -297,7 +282,7 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function createBlock()
     {
-        return new Block($this->rawLayout, $this->context);
+        return new Block($this->rawLayout, $this->typeHelper, $this->context);
     }
 
     /**
@@ -309,26 +294,9 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function isContainerBlock($id)
     {
-        $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
-        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
-
-        return count($types) > 1 && $types[1]->getName() === ContainerType::NAME;
-    }
-
-    /**
-     * Returns names of the given block types
-     *
-     * @param BlockTypeInterface[] $types
-     *
-     * @return string[]
-     */
-    protected function getBlockTypeNames($types)
-    {
-        return array_map(
-            function (BlockTypeInterface $type) {
-                return $type->getName();
-            },
-            $types
+        return $this->typeHelper->isInstanceOf(
+            $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true),
+            ContainerType::NAME
         );
     }
 }

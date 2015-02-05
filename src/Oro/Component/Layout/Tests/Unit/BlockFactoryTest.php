@@ -113,6 +113,7 @@ class BlockFactoryTest extends LayoutTestCase
             [ // root
                 'vars'     => [
                     'id'                  => 'rootId',
+                    'block_type'          => 'root',
                     'translation_domain'  => 'messages',
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
@@ -143,6 +144,7 @@ class BlockFactoryTest extends LayoutTestCase
             [ // root
                 'vars'     => [
                     'id'                  => 'rootId',
+                    'block_type'          => 'root',
                     'translation_domain'  => 'messages',
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
@@ -157,6 +159,7 @@ class BlockFactoryTest extends LayoutTestCase
                     [ // header
                         'vars'     => [
                             'id'                  => 'headerId',
+                            'block_type'          => 'header',
                             'translation_domain'  => 'messages',
                             'unique_block_prefix' => '_headerId',
                             'block_prefixes'      => [
@@ -171,6 +174,7 @@ class BlockFactoryTest extends LayoutTestCase
                             [ // logo
                                 'vars' => [
                                     'id'                  => 'logoId',
+                                    'block_type'          => 'logo',
                                     'translation_domain'  => 'messages',
                                     'unique_block_prefix' => '_logoId',
                                     'block_prefixes'      => [
@@ -216,6 +220,9 @@ class BlockFactoryTest extends LayoutTestCase
         $testBlockType->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('test'));
+        $testBlockType->expects($this->any())
+            ->method('getParent')
+            ->will($this->returnValue(BaseType::NAME));
 
         $headerLayoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $headerLayoutUpdate->expects($this->once())

@@ -6,6 +6,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockTypeHelperInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Util\ArrayUtils;
 
@@ -38,7 +39,14 @@ class HeadType extends AbstractContainerType
      */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
-        ArrayUtils::sortBy($view->children, false, [$this, 'getChildPriority']);
+        $typeHelper = $block->getTypeHelper();
+        ArrayUtils::sortBy(
+            $view->children,
+            false,
+            function (BlockView $childView) use ($typeHelper) {
+                return $this->getChildPriority($childView, $typeHelper);
+            }
+        );
     }
 
     /**
@@ -50,19 +58,21 @@ class HeadType extends AbstractContainerType
     }
 
     /**
-     * @param BlockView $childView
+     * @param BlockView                $childView
+     * @param BlockTypeHelperInterface $typeHelper
      *
      * @return int
      */
-    public function getChildPriority(BlockView $childView)
+    protected function getChildPriority(BlockView $childView, BlockTypeHelperInterface $typeHelper)
     {
-        if ($childView->isInstanceOf(MetaType::NAME)) {
+        $type = $childView->vars['block_type'];
+        if ($typeHelper->isInstanceOf($type, MetaType::NAME)) {
             return 10;
         }
-        if ($childView->isInstanceOf(StyleType::NAME)) {
+        if ($typeHelper->isInstanceOf($type, StyleType::NAME)) {
             return 20;
         }
-        if ($childView->isInstanceOf(ScriptType::NAME)) {
+        if ($typeHelper->isInstanceOf($type, ScriptType::NAME)) {
             return 30;
         }
 

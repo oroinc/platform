@@ -11,14 +11,7 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->rootView = new BlockView(['base', 'root']);
-    }
-
-    public function testIsInstanceOf()
-    {
-        $this->assertTrue($this->rootView->isInstanceOf('root'));
-        $this->assertTrue($this->rootView->isInstanceOf('base'));
-        $this->assertFalse($this->rootView->isInstanceOf('another'));
+        $this->rootView = new BlockView();
     }
 
     public function testChildGetAndExists()
@@ -27,11 +20,11 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
         //   header
         //     title
         //       logo
-        $headerView                         = new BlockView(['base', 'header'], $this->rootView);
+        $headerView                         = new BlockView($this->rootView);
         $this->rootView->children['header'] = $headerView;
-        $titleView                          = new BlockView(['base', 'container'], $headerView);
+        $titleView                          = new BlockView($headerView);
         $headerView->children['title']      = $titleView;
-        $logoView                           = new BlockView(['base', 'logo'], $headerView);
+        $logoView                           = new BlockView($headerView);
         $titleView->children['logo']        = $logoView;
 
         $this->assertTrue(
@@ -68,9 +61,9 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
         // root
         //   header
         //     title
-        $headerView                         = new BlockView(['base', 'header'], $this->rootView);
+        $headerView                         = new BlockView($this->rootView);
         $this->rootView->children['header'] = $headerView;
-        $titleView                          = new BlockView(['base', 'container'], $headerView);
+        $titleView                          = new BlockView($headerView);
         $headerView->children['title']      = $titleView;
 
         $this->assertFalse(isset($this->rootView['unknown']));
@@ -85,9 +78,9 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
         // root
         //   header
         //     title
-        $headerView                         = new BlockView(['base', 'header'], $this->rootView);
+        $headerView                         = new BlockView($this->rootView);
         $this->rootView->children['header'] = $headerView;
-        $titleView                          = new BlockView(['base', 'container'], $headerView);
+        $titleView                          = new BlockView($headerView);
         $headerView->children['title']      = $titleView;
 
         $this->rootView['unknown'];
@@ -99,7 +92,7 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testChildSet()
     {
-        $this->rootView['header'] = new BlockView(['base', 'header'], $this->rootView);
+        $this->rootView['header'] = new BlockView($this->rootView);
     }
 
     /**
@@ -108,7 +101,7 @@ class BlockViewTest extends \PHPUnit_Framework_TestCase
      */
     public function testChildUnset()
     {
-        $headerView                         = new BlockView(['base', 'header'], $this->rootView);
+        $headerView                         = new BlockView($this->rootView);
         $this->rootView->children['header'] = $headerView;
 
         unset($this->rootView['header']);

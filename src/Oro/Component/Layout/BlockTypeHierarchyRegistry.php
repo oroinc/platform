@@ -2,13 +2,19 @@
 
 namespace Oro\Component\Layout;
 
-class BlockTypeChainRegistry
+class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
 {
     /** @var ExtensionManagerInterface */
     protected $extensionManager;
 
     /** @var array */
-    protected $chains = [];
+    protected $types = [];
+
+    /** @var array */
+    protected $names = [];
+
+    /** @var array */
+    protected $nameMap = [];
 
     /**
      * @param ExtensionManagerInterface $extensionManager
@@ -19,14 +25,41 @@ class BlockTypeChainRegistry
     }
 
     /**
-     * Returns the chain of all block types starting with the given block type.
-     * The first element in the chain is the top type in the hierarchy, the last element is the given type.
-     *
+     * {@inheritdoc}
+     */
+    public function isInstanceOf($blockType, $targetName)
+    {
+        $name = $this->ensureInitialized($blockType);
+
+        return isset($this->nameMap[$name][$targetName]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockTypeNames($blockType)
+    {
+        $name = $this->ensureInitialized($blockType);
+
+        return $this->names[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockTypes($blockType)
+    {
+        $name = $this->ensureInitialized($blockType);
+
+        return $this->types[$name];
+    }
+
+    /**
      * @param string|BlockTypeInterface $blockType The block type name or instance of BlockTypeInterface
      *
-     * @return BlockTypeInterface[]
+     * @return string The name of the given block type
      */
-    public function getBlockTypeChain($blockType)
+    protected function ensureInitialized($blockType)
     {
         if ($blockType instanceof BlockTypeInterface) {
             $name = $blockType->getName();
@@ -36,23 +69,29 @@ class BlockTypeChainRegistry
             $type = null;
         }
 
-        if (isset($this->chains[$name])) {
-            return $this->chains[$name];
-        }
+        if (!isset($this->types[$name])) {
+            if (!$type) {
+                $type = $this->extensionManager->getBlockType($name);
+            }
 
-        if (!$type) {
-            $type = $this->extensionManager->getBlockType($name);
-        }
-
-        $chain      = [$type];
-        $parentName = $type->getParent();
-        while ($parentName) {
-            $type = $this->extensionManager->getBlockType($parentName);
-            array_unshift($chain, $type);
+            $types      = [$type];
+            $names      = [$type->getName()];
+            $nameMap    = [$type->getName() => true];
             $parentName = $type->getParent();
-        }
-        $this->chains[$name] = $chain;
+            while ($parentName) {
+                $type = $this->extensionManager->getBlockType($parentName);
 
-        return $chain;
+                array_unshift($types, $type);
+                array_unshift($names, $type->getName());
+                $nameMap[$type->getName()] = true;
+
+                $parentName = $type->getParent();
+            }
+            $this->types[$name]   = $types;
+            $this->names[$name]   = $names;
+            $this->nameMap[$name] = $nameMap;
+        }
+
+        return $name;
     }
 }

@@ -32,10 +32,12 @@ class BaseType extends AbstractType
     {
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
         $view->vars['block'] = $view;
+
         // replace attributes if specified ('attr' variable always exists in a view because it is added by FormView)
         if (isset($options['attr'])) {
             $view->vars['attr'] = $options['attr'];
         }
+
         // add label text and attributes if specified
         if (isset($options['label'])) {
             $view->vars['label'] = $options['label'];
@@ -43,8 +45,21 @@ class BaseType extends AbstractType
                 $view->vars['label_attr'] = $options['label_attr'];
             }
         }
+
         // add the translation domain
         $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
+
+        // add core variables to the block view, like id, block type and variables required for rendering engine
+        $id                                = $block->getId();
+        $name                              = $block->getName();
+        $uniqueBlockPrefix                 = '_' . $id;
+        $blockPrefixes                     = $block->getTypeHelper()->getBlockTypeNames($name);
+        $blockPrefixes[]                   = $uniqueBlockPrefix;
+        $view->vars['id']                  = $id;
+        $view->vars['block_type']          = $name;
+        $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
+        $view->vars['block_prefixes']      = $blockPrefixes;
+        $view->vars['cache_key']           = sprintf('%s_%s', $uniqueBlockPrefix, $name);
     }
 
     /**
@@ -74,10 +89,8 @@ class BaseType extends AbstractType
         $translationDomain = isset($options['translation_domain'])
             ? $options['translation_domain']
             : null;
-        if ($view->parent) {
-            if (!$translationDomain) {
-                $translationDomain = $view->parent->vars['translation_domain'];
-            }
+        if (!$translationDomain && $view->parent) {
+            $translationDomain = $view->parent->vars['translation_domain'];
         }
         if (!$translationDomain) {
             $translationDomain = 'messages';

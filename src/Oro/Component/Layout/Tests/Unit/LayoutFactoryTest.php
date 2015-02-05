@@ -26,7 +26,7 @@ class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateLayout()
     {
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
         $layout = $this->layoutFactory->createLayout($view);
 
@@ -34,7 +34,8 @@ class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
 
         // check that the renderer is passed to the Layout object
         $this->renderer->expects($this->once())
-            ->method('renderBlock');
+            ->method('renderBlock')
+            ->with($this->identicalTo($view));
         $layout->render();
     }
 }

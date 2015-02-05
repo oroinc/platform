@@ -26,6 +26,13 @@ interface BlockBuilderInterface
     public function getLayoutManipulator();
 
     /**
+     * Returns the block type helper
+     *
+     * @return BlockTypeHelperInterface
+     */
+    public function getTypeHelper();
+
+    /**
      * Returns the execution context
      *
      * @return ContextInterface

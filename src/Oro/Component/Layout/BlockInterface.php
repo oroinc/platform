@@ -26,7 +26,7 @@ interface BlockInterface
     public function getAliases();
 
     /**
-     * Returns the parent block
+     * Returns the parent block in the layout hierarchy
      *
      * @return BlockInterface|null The parent block
      */
@@ -38,6 +38,13 @@ interface BlockInterface
      * @return array
      */
     public function getOptions();
+
+    /**
+     * Returns the block type helper
+     *
+     * @return BlockTypeHelperInterface
+     */
+    public function getTypeHelper();
 
     /**
      * Returns the execution context

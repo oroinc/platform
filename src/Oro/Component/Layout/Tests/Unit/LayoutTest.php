@@ -24,7 +24,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
 
     public function testGetView()
     {
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
         $layout = new Layout($view, $this->rendererRegistry);
 
@@ -35,7 +35,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
     {
         $expected = 'some rendered string';
 
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
         $this->renderer->expects($this->once())
             ->method('renderBlock')
@@ -53,7 +53,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenderByUnknownRenderer()
     {
-        $view   = new BlockView(['test']);
+        $view   = new BlockView();
         $layout = new Layout($view, $this->rendererRegistry);
         $layout->setRenderer('unknown')->render();
     }
@@ -62,7 +62,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
     {
         $expected = 'some rendered string';
 
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
         $otherRenderer = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
         $this->rendererRegistry->addRenderer('other', $otherRenderer);
@@ -82,7 +82,7 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $expected = 'some rendered string';
         $theme    = 'MyBungle::blocks.html.twig';
 
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
         $this->renderer->expects($this->once())
             ->method('setBlockTheme')
@@ -104,9 +104,9 @@ class LayoutTest extends \PHPUnit_Framework_TestCase
         $expected = 'some rendered string';
         $theme    = 'MyBungle::blocks.html.twig';
 
-        $view = new BlockView(['test']);
+        $view = new BlockView();
 
-        $childView                  = new BlockView(['test'], $view);
+        $childView                  = new BlockView($view);
         $view->children['child_id'] = $childView;
 
         $this->renderer->expects($this->once())
