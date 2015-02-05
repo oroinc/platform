@@ -2,19 +2,19 @@
 
 namespace Oro\Component\Layout;
 
-class BlockBuilder implements BlockBuilderInterface
+final class BlockBuilder implements BlockBuilderInterface
 {
     /** @var LayoutManipulatorInterface */
-    protected $layoutManipulator;
+    private $layoutManipulator;
 
     /** @var ContextInterface */
-    protected $context;
+    private $context;
 
     /** @var RawLayout */
-    protected $rawLayout;
+    private $rawLayout;
 
     /** @var string */
-    protected $id;
+    private $id;
 
     /**
      * @param LayoutManipulatorInterface $layoutManipulator

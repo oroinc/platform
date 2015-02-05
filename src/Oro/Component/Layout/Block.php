@@ -2,19 +2,19 @@
 
 namespace Oro\Component\Layout;
 
-class Block implements BlockInterface
+final class Block implements BlockInterface
 {
     /** @var ContextInterface */
-    protected $context;
+    private $context;
 
     /** @var RawLayout */
-    protected $rawLayout;
+    private $rawLayout;
 
     /** @var string */
-    protected $id;
+    private $id;
 
     /** @var BlockInterface|null or false if not initialized */
-    protected $parent = false;
+    private $parent = false;
 
     /**
      * @param ContextInterface $context
