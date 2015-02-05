@@ -218,8 +218,7 @@ class AclHelperTest extends OrmTestCase
                 'resultHelper3',
                 'resultWalker3',
                 []
-            ]
-            ,
+            ],
             [
                 $this->getRequest4(),
                 [
@@ -242,6 +241,22 @@ class AclHelperTest extends OrmTestCase
                 ],
                 'resultHelper4',
                 'resultWalker4',
+                []
+            ],
+            [
+                $this->getRequest5(),
+                [
+                    'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser' => [
+                        'id',
+                        [3, 2, 1],
+                        PathExpression::TYPE_STATE_FIELD,
+                        null,
+                        null,
+                        false
+                    ],
+                ],
+                'resultHelper5',
+                'resultWalker5',
                 []
             ]
         ];
@@ -447,12 +462,50 @@ class AclHelperTest extends OrmTestCase
     {
         $subselect  = $resultAst->whereClause
             ->conditionalExpression
+            ->conditionalFactors[0]
+            ->conditionalExpression
             ->conditionalTerms[1]
             ->simpleConditionalExpression
             ->subselect;
         $expression = $subselect->whereClause->conditionalExpression
             ->conditionalFactors[1]->simpleConditionalExpression;
         $this->assertEquals([3, 2, 1], $this->collectLiterals($expression->literals));
+    }
+
+    protected function getRequest5()
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        $queryBuilder->select('u')
+            ->from('Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser', 'u')
+            ->join('u.articles', 'art')
+            ->where('art.id IS NULL OR art.topic IS NULL');
+        return $queryBuilder;
+    }
+
+    protected function resultHelper5($hints)
+    {
+        $whereCondition = $hints[AclWalker::ORO_ACL_CONDITION]->getWhereConditions()[0];
+        $this->assertEquals([3, 2, 1], $whereCondition->getValue());
+    }
+
+    protected function resultWalker5(SelectStatement $resultAst)
+    {
+        $this->assertCount(
+            2,
+            $resultAst->whereClause->conditionalExpression->conditionalFactors
+        );
+
+        $this->assertInstanceOf(
+            'Doctrine\ORM\Query\AST\ConditionalPrimary',
+            $resultAst->whereClause->conditionalExpression->conditionalFactors[0]
+        );
+
+        $this->assertCount(
+            2,
+            $resultAst
+                ->whereClause->conditionalExpression
+                ->conditionalFactors[0]->conditionalExpression->conditionalTerms
+        );
     }
 
     /**
