@@ -6,3 +6,14 @@ hwi_oauth:
             client_id: %google.client_id%
             client_secret: %google.client_secret%
             scope: "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile"
+
+security:
+    firewalls:
+        main:
+            oauth:
+                resource_owners:
+                    google: /login/check-google
+                login_path: /user/login
+                failure_path: /user/login
+                oauth_user_provider:
+                    service: oro_sso.oauth_provider
