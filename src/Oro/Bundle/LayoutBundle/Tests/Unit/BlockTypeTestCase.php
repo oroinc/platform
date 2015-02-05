@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit;
 
+use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type;
@@ -11,16 +12,25 @@ use Oro\Bundle\LayoutBundle\Layout\Block\Type;
  */
 abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
 {
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function createExtensionManager()
     {
-        parent::setUp();
+        $extensionManager = parent::createExtensionManager();
+        $extensionManager->addExtension(
+            new PreloadedExtension(
+                [
+                    Type\RootType::NAME   => new Type\RootType(),
+                    Type\BodyType::NAME   => new Type\BodyType(),
+                    Type\HeadType::NAME   => new Type\HeadType(),
+                    Type\MetaType::NAME   => new Type\MetaType(),
+                    Type\ScriptType::NAME => new Type\ScriptType(),
+                    Type\StyleType::NAME  => new Type\StyleType()
+                ]
+            )
+        );
 
-        $this->factory
-            ->addBlockType(new Type\RootType())
-            ->addBlockType(new Type\BodyType())
-            ->addBlockType(new Type\HeadType())
-            ->addBlockType(new Type\MetaType())
-            ->addBlockType(new Type\ScriptType())
-            ->addBlockType(new Type\StyleType());
+        return $extensionManager;
     }
 }

@@ -4,29 +4,39 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-class BlockOptionsResolver implements BlockOptionsResolverInterface
+class BlockOptionsResolver
 {
-    /** @var BlockTypeRegistryInterface */
-    protected $blockTypeRegistry;
+    /** @var ExtensionManagerInterface */
+    protected $extensionManager;
 
     /** @var OptionsResolverInterface[] */
     protected $resolvers = [];
 
     /**
-     * @param BlockTypeRegistryInterface $blockTypeRegistry
+     * @param ExtensionManagerInterface $extensionManager
      */
-    public function __construct(BlockTypeRegistryInterface $blockTypeRegistry)
+    public function __construct(ExtensionManagerInterface $extensionManager)
     {
-        $this->blockTypeRegistry = $blockTypeRegistry;
+        $this->extensionManager = $extensionManager;
     }
 
     /**
-     * {@inheritdoc}
+     * Returns the combination of the default options for the given block type and the passed options
+     *
+     * @param string|BlockTypeInterface $blockType The block type
+     * @param array                     $options   The custom option values.
+     *
+     * @return array A list of options and their values
+     *
+     * @throws InvalidOptionsException if any given option is not applicable to the given block type
      */
-    public function resolve($blockType, array $options = [])
+    public function resolveOptions($blockType, array $options = [])
     {
-        return $this->getOptionResolver($blockType)->resolve($options);
+        $resolver = $this->getOptionResolver($blockType);
+
+        return $resolver->resolve($options);
     }
 
 
@@ -47,7 +57,7 @@ class BlockOptionsResolver implements BlockOptionsResolverInterface
 
         if (!isset($this->resolvers[$name])) {
             if (!$type) {
-                $type = $this->blockTypeRegistry->getBlockType($name);
+                $type = $this->extensionManager->getBlockType($name);
             }
             $parentName = $type->getParent();
 
@@ -56,6 +66,7 @@ class BlockOptionsResolver implements BlockOptionsResolverInterface
                 : new OptionsResolver();
 
             $type->setDefaultOptions($optionsResolver);
+            $this->extensionManager->setDefaultOptions($name, $optionsResolver);
 
             $this->resolvers[$name] = $optionsResolver;
         }

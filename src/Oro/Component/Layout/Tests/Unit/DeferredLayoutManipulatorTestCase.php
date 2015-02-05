@@ -2,20 +2,18 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\BlockOptionsResolver;
-use Oro\Component\Layout\BlockTypeRegistry;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\Extension\Core\CoreExtension;
+use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\LayoutViewFactory;
-use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
+use Oro\Component\Layout\PreloadedExtension;
+use Oro\Component\Layout\RawLayoutBuilder;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 
 class DeferredLayoutManipulatorTestCase extends LayoutTestCase
 {
-    /** @var BlockTypeFactoryStub */
-    protected $blockTypeFactory;
-
     /** @var LayoutContext */
     protected $context;
 
@@ -28,17 +26,31 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
     /** @var LayoutViewFactory */
     protected $layoutViewFactory;
 
+    /** @var ExtensionManager */
+    protected $extensionManager;
+
     protected function setUp()
     {
+        $this->extensionManager = new ExtensionManager();
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [
+                    'root'                         => new Type\RootType(),
+                    'header'                       => new Type\HeaderType(),
+                    'logo'                         => new Type\LogoType(),
+                    'test_self_building_container' => new Type\TestSelfBuildingContainerType()
+                ]
+            )
+        );
+
         $this->context           = new LayoutContext();
         $this->rawLayoutBuilder  = new RawLayoutBuilder();
-        $this->blockTypeFactory  = new BlockTypeFactoryStub();
-        $blockTypeRegistry       = new BlockTypeRegistry($this->blockTypeFactory);
-        $blockOptionsResolver    = new BlockOptionsResolver($blockTypeRegistry);
-        $this->layoutManipulator = new DeferredLayoutManipulator($this->rawLayoutBuilder);
+        $this->layoutManipulator = new DeferredLayoutManipulator(
+            $this->rawLayoutBuilder,
+            $this->extensionManager
+        );
         $this->layoutViewFactory = new LayoutViewFactory(
-            $blockTypeRegistry,
-            $blockOptionsResolver,
+            $this->extensionManager,
             $this->layoutManipulator
         );
     }

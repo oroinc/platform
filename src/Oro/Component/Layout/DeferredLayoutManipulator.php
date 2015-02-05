@@ -42,6 +42,9 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** @var RawLayoutBuilderInterface */
     protected $rawLayoutBuilder;
 
+    /** @var ExtensionManagerInterface */
+    protected $extensionManager;
+
     /**
      * The list of all scheduled actions to be executed by applyChanges method
      *
@@ -70,10 +73,14 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 
     /**
      * @param RawLayoutBuilderInterface $rawLayoutBuilder
+     * @param ExtensionManagerInterface $extensionManager
      */
-    public function __construct(RawLayoutBuilderInterface $rawLayoutBuilder)
-    {
+    public function __construct(
+        RawLayoutBuilderInterface $rawLayoutBuilder,
+        ExtensionManagerInterface $extensionManager
+    ) {
         $this->rawLayoutBuilder = $rawLayoutBuilder;
+        $this->extensionManager = $extensionManager;
     }
 
     /**
@@ -391,9 +398,10 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     protected function executeActions($group)
     {
         $executeCounter = 0;
-        foreach ($this->actions[$group] as $key => $action) {
+        reset($this->actions[$group]);
+        while (list($key, $action) = each($this->actions[$group])) {
             if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
+                $this->executeAction($action[0], $action[1]);
                 unset($this->actions[$group][$key]);
                 $executeCounter++;
             }
@@ -419,9 +427,10 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             $continue    = false;
             $hasExecuted = false;
             $hasSkipped  = false;
-            foreach ($this->actions[$group] as $key => $action) {
+            reset($this->actions[$group]);
+            while (list($key, $action) = each($this->actions[$group])) {
                 if ($this->isActionReadyToExecute($action[0], $action[1])) {
-                    call_user_func_array([$this->rawLayoutBuilder, $action[0]], $action[1]);
+                    $this->executeAction($action[0], $action[1]);
                     unset($this->actions[$group][$key]);
                     $executeCounter++;
                     $hasExecuted = true;
@@ -442,6 +451,23 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         }
 
         return $executeCounter;
+    }
+
+    /**
+     * @param string $name
+     * @param array  $args
+     */
+    protected function executeAction($name, $args)
+    {
+        call_user_func_array([$this->rawLayoutBuilder, $name], $args);
+
+        switch ($name) {
+            case self::ADD:
+            case self::ADD_ALIAS:
+                // $args[0] contains $id for 'add' and $alias for 'addAlias'
+                $this->extensionManager->updateLayout($args[0], $this);
+                break;
+        }
     }
 
     /**

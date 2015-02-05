@@ -2,6 +2,10 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Component\Layout\PreloadedExtension;
+
 /**
  * This class contains unit tests related to ALIASES
  */
@@ -479,6 +483,116 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                 'logo' => ['MyBundle:Layout:my_theme.html.twig']
             ],
             $blockThemes
+        );
+    }
+
+    public function testLayoutUpdatesWithAliases()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('logo2', 'root_alias', 'logo');
+                                $layoutManipulator->add('logo3', 'header_alias', 'logo');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo1', 'header', 'logo')
+            ->addAlias('root_alias', 'root')
+            ->addAlias('header_alias', 'header');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testLayoutUpdatesWhenParentIsAddedByAliasInUpdate()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header'     => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('logo2', 'root_alias', 'logo');
+                                $layoutManipulator->add('logo3', 'header_alias', 'logo');
+                                $layoutManipulator->addAlias('header_alias', 'header');
+                            }
+                        )
+                    ],
+                    'root_alias' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('header', 'root', 'header');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo')
+            ->addAlias('root_alias', 'root');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
         );
     }
 }

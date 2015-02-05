@@ -1,14 +1,4 @@
 services:
-    oro_layout.block_type.base:
-        class: Oro\Component\Layout\Block\Type\BaseType
-        tags:
-             - { name: layout.block_type, alias: block }
-
-    oro_layout.block_type.container:
-        class: Oro\Component\Layout\Block\Type\ContainerType
-        tags:
-             - { name: layout.block_type, alias: container }
-
     oro_layout.block_type.root:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\RootType
         tags:

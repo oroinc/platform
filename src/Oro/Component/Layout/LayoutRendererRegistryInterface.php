@@ -19,7 +19,7 @@ interface LayoutRendererRegistryInterface
     public function getRenderer($name = null);
 
     /**
-     * Returns whether the given renderer is supported
+     * Checks whether the given renderer is supported
      *
      * @param string $name The name of a renderer
      *

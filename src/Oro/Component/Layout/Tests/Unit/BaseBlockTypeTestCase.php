@@ -3,9 +3,12 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockOptionsResolver;
-use Oro\Component\Layout\BlockTypeRegistry;
+use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\Extension\Core\CoreExtension;
+use Oro\Component\Layout\ExtensionInterface;
+use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutFactory;
@@ -18,9 +21,6 @@ use Oro\Component\Layout\RawLayoutBuilder;
  */
 abstract class BaseBlockTypeTestCase extends LayoutTestCase
 {
-    /** @var BlockTypeFactoryStub */
-    protected $factory;
-
     /** @var LayoutContext */
     protected $context;
 
@@ -30,20 +30,28 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /** @var RawLayoutBuilder */
     protected $rawLayoutBuilder;
 
+    /** @var ExtensionManager */
+    protected $extensionManager;
+
     /** @var LayoutBuilder */
     protected $layoutBuilder;
 
     protected function setUp()
     {
+        $this->extensionManager = $this->createExtensionManager();
+        foreach ($this->getExtensions() as $extension) {
+            $this->extensionManager->addExtension($extension);
+        };
+
         $this->context              = new LayoutContext();
-        $this->factory              = new BlockTypeFactoryStub();
-        $blockTypeRegistry          = new BlockTypeRegistry($this->factory);
-        $this->blockOptionsResolver = new BlockOptionsResolver($blockTypeRegistry);
+        $this->blockOptionsResolver = new BlockOptionsResolver($this->extensionManager);
         $this->rawLayoutBuilder     = new RawLayoutBuilder();
-        $layoutManipulator          = new DeferredLayoutManipulator($this->rawLayoutBuilder);
+        $layoutManipulator          = new DeferredLayoutManipulator(
+            $this->rawLayoutBuilder,
+            $this->extensionManager
+        );
         $layoutViewFactory          = new LayoutViewFactory(
-            $blockTypeRegistry,
-            $this->blockOptionsResolver,
+            $this->extensionManager,
             $layoutManipulator
         );
 
@@ -62,6 +70,34 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     }
 
     /**
+     * @return ExtensionManager
+     */
+    protected function createExtensionManager()
+    {
+        return new ExtensionManager();
+    }
+
+    /**
+     * @return ExtensionInterface[]
+     */
+    protected function getExtensions()
+    {
+        return [];
+    }
+
+    /**
+     * Returns a block type by its name
+     *
+     * @param string $blockType
+     *
+     * @return BlockTypeInterface
+     */
+    protected function getBlockType($blockType)
+    {
+        return $this->extensionManager->getBlockType($blockType);
+    }
+
+    /**
      * Asks the given block type to resolve options
      *
      * @param string $blockType
@@ -71,7 +107,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function resolveOptions($blockType, array $options)
     {
-        return $this->blockOptionsResolver->resolve($blockType, $options);
+        return $this->blockOptionsResolver->resolveOptions($blockType, $options);
     }
 
     /**

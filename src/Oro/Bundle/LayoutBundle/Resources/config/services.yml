@@ -1,7 +1,6 @@
 parameters:
-    oro_layout.block_type_factory.class:        Oro\Component\Layout\DependencyInjectionBlockTypeFactory
-    oro_layout.block_type_registry.class:       Oro\Component\Layout\BlockTypeRegistry
-    oro_layout.block_options_resolver.class:    Oro\Component\Layout\BlockOptionsResolver
+    oro_layout.extension.class:                 Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension
+    oro_layout.extension_manager.class:         Oro\Component\Layout\ExtensionManager
     oro_layout.raw_layout_builder.class:        Oro\Component\Layout\RawLayoutBuilder
     oro_layout.layout_manipulator.class:        Oro\Component\Layout\DeferredLayoutManipulator
     oro_layout.layout_view_factory.class:       Oro\Component\Layout\LayoutViewFactory
@@ -11,24 +10,20 @@ parameters:
     oro_layout.layout_manager.class:            Oro\Component\Layout\LayoutManager
 
 services:
-    oro_layout.block_type_factory:
+    oro_layout.extension:
         public: false
-        class: %oro_layout.block_type_factory.class%
+        class: %oro_layout.extension.class%
         arguments:
             - @service_container
             - {}
+            - {}
+            - {}
 
-    oro_layout.block_type_registry:
+    oro_layout.extension_manager:
         public: false
-        class: %oro_layout.block_type_registry.class%
-        arguments:
-            - @oro_layout.block_type_factory
-
-    oro_layout.block_options_resolver:
-        public: false
-        class: %oro_layout.block_options_resolver.class%
-        arguments:
-            - @oro_layout.block_type_registry
+        class: %oro_layout.extension_manager.class%
+        calls:
+            - [addExtension, [@oro_layout.extension]]
 
     oro_layout.raw_layout_builder:
         public: false
@@ -39,13 +34,13 @@ services:
         class: %oro_layout.layout_manipulator.class%
         arguments:
             - @oro_layout.raw_layout_builder
+            - @oro_layout.extension_manager
 
     oro_layout.layout_view_factory:
         public: false
         class: %oro_layout.layout_view_factory.class%
         arguments:
-            - @oro_layout.block_type_registry
-            - @oro_layout.block_options_resolver
+            - @oro_layout.extension_manager
             - @oro_layout.layout_manipulator
 
     oro_layout.layout_factory:

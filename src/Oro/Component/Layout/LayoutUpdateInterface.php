@@ -11,8 +11,6 @@ interface LayoutUpdateInterface
      * Makes changes in the layout
      *
      * @param LayoutManipulatorInterface $layoutManipulator
-     *
-     * @return mixed
      */
     public function updateLayout(LayoutManipulatorInterface $layoutManipulator);
 }

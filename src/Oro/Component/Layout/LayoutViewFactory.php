@@ -6,14 +6,17 @@ use Oro\Component\Layout\Block\Type\ContainerType;
 
 class LayoutViewFactory implements LayoutViewFactoryInterface
 {
-    /** @var BlockTypeRegistryInterface */
-    protected $blockTypeRegistry;
-
-    /** @var BlockOptionsResolverInterface */
-    protected $blockOptionsResolver;
+    /** @var ExtensionManagerInterface */
+    protected $extensionManager;
 
     /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
+
+    /** @var BlockOptionsResolver */
+    protected $optionsResolver;
+
+    /** @var BlockTypeChainRegistry */
+    protected $typeChainRegistry;
 
     /** @var RawLayout */
     protected $rawLayout;
@@ -25,18 +28,17 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     protected $currentBlock;
 
     /**
-     * @param BlockTypeRegistryInterface         $blockTypeRegistry
-     * @param BlockOptionsResolverInterface      $blockOptionsResolver
+     * @param ExtensionManagerInterface          $extensionManager
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
      */
     public function __construct(
-        BlockTypeRegistryInterface $blockTypeRegistry,
-        BlockOptionsResolverInterface $blockOptionsResolver,
+        ExtensionManagerInterface $extensionManager,
         DeferredLayoutManipulatorInterface $layoutManipulator
     ) {
-        $this->blockTypeRegistry    = $blockTypeRegistry;
-        $this->blockOptionsResolver = $blockOptionsResolver;
-        $this->layoutManipulator    = $layoutManipulator;
+        $this->extensionManager  = $extensionManager;
+        $this->layoutManipulator = $layoutManipulator;
+        $this->optionsResolver   = $this->createOptionsResolver();
+        $this->typeChainRegistry = $this->createTypeChainRegistry();
     }
 
     /**
@@ -176,10 +178,10 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::OPTIONS, true);
-        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
+        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
 
         // resolve options
-        $resolvedOptions = $this->blockOptionsResolver->resolve($blockType, $options);
+        $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
         $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
 
         // point the block builder state to the current block
@@ -187,6 +189,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         // iterate from parent to current
         foreach ($types as $type) {
             $type->buildBlock($this->currentBlockBuilder, $resolvedOptions);
+            $this->extensionManager->buildBlock($type->getName(), $this->currentBlockBuilder, $resolvedOptions);
         }
     }
 
@@ -202,7 +205,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
-        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
+        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
         $typeNames = $this->getBlockTypeNames($types);
 
         $view = new BlockView($typeNames, $parentView);
@@ -225,6 +228,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
         // build the view
         foreach ($types as $type) {
             $type->buildView($view, $this->currentBlock, $options);
+            $this->extensionManager->buildView($type->getName(), $view, $this->currentBlock, $options);
         }
 
         return $view;
@@ -240,14 +244,35 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
-        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
+        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
 
         // point the block view state to the current block
         $this->currentBlock->initialize($id);
         // finish the view
         foreach ($types as $type) {
             $type->finishView($view, $this->currentBlock, $options);
+            $this->extensionManager->finishView($type->getName(), $view, $this->currentBlock, $options);
         }
+    }
+
+    /**
+     * Creates new instance of the option resolver
+     *
+     * @return BlockOptionsResolver
+     */
+    protected function createOptionsResolver()
+    {
+        return new BlockOptionsResolver($this->extensionManager);
+    }
+
+    /**
+     * Creates new instance of the block type chain registry
+     *
+     * @return BlockTypeChainRegistry
+     */
+    protected function createTypeChainRegistry()
+    {
+        return new BlockTypeChainRegistry($this->extensionManager);
     }
 
     /**
@@ -284,7 +309,7 @@ class LayoutViewFactory implements LayoutViewFactoryInterface
     protected function isContainerBlock($id)
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
-        $types     = $this->blockTypeRegistry->getBlockTypeChain($blockType);
+        $types     = $this->typeChainRegistry->getBlockTypeChain($blockType);
 
         return count($types) > 1 && $types[1]->getName() === ContainerType::NAME;
     }

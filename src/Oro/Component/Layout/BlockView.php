@@ -59,7 +59,7 @@ class BlockView extends FormView
     }
 
     /**
-     * Returns whether the given child exists on any level of a hierarchy (implements \ArrayAccess)
+     * Checks whether the given child exists on any level of a hierarchy (implements \ArrayAccess)
      *
      * @param string $id The child id
      *

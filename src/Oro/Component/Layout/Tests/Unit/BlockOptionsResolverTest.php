@@ -9,31 +9,31 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\LogoType;
 class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $blockTypeRegistry;
+    protected $extensionManager;
 
     /** @var BlockOptionsResolver */
     protected $blockOptionsResolver;
 
     protected function setUp()
     {
-        $this->blockTypeRegistry    = $this->getMock('Oro\Component\Layout\BlockTypeRegistryInterface');
-        $this->blockOptionsResolver = new BlockOptionsResolver($this->blockTypeRegistry);
+        $this->extensionManager     = $this->getMock('Oro\Component\Layout\ExtensionManagerInterface');
+        $this->blockOptionsResolver = new BlockOptionsResolver($this->extensionManager);
     }
 
     public function testResolveOptionsByBlockName()
     {
-        $this->blockTypeRegistry->expects($this->at(0))
+        $this->extensionManager->expects($this->at(0))
             ->method('getBlockType')
             ->with('logo')
             ->will($this->returnValue(new LogoType()));
-        $this->blockTypeRegistry->expects($this->at(1))
+        $this->extensionManager->expects($this->at(1))
             ->method('getBlockType')
             ->with(BaseType::NAME)
             ->will($this->returnValue(new BaseType()));
-        $this->blockTypeRegistry->expects($this->exactly(2))
+        $this->extensionManager->expects($this->exactly(2))
             ->method('getBlockType');
 
-        $result = $this->blockOptionsResolver->resolve(
+        $result = $this->blockOptionsResolver->resolveOptions(
             'logo',
             ['translation_domain' => 'test', 'title' => 'test_title']
         );
@@ -43,12 +43,12 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveOptionsByAlreadyCreatedBlockTypeObject()
     {
-        $this->blockTypeRegistry->expects($this->once())
+        $this->extensionManager->expects($this->once())
             ->method('getBlockType')
             ->with(BaseType::NAME)
             ->will($this->returnValue(new BaseType()));
 
-        $result = $this->blockOptionsResolver->resolve(
+        $result = $this->blockOptionsResolver->resolveOptions(
             new LogoType(),
             ['translation_domain' => 'test', 'title' => 'test_title']
         );
@@ -58,12 +58,12 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveOptionsForBaseTypeByBlockName()
     {
-        $this->blockTypeRegistry->expects($this->once())
+        $this->extensionManager->expects($this->once())
             ->method('getBlockType')
             ->with(BaseType::NAME)
             ->will($this->returnValue(new BaseType()));
 
-        $result = $this->blockOptionsResolver->resolve(
+        $result = $this->blockOptionsResolver->resolveOptions(
             BaseType::NAME,
             ['translation_domain' => 'test']
         );
@@ -72,10 +72,10 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResolveOptionsForBaseTypeByAlreadyCreatedBlockTypeObject()
     {
-        $this->blockTypeRegistry->expects($this->never())
+        $this->extensionManager->expects($this->never())
             ->method('getBlockType');
 
-        $result = $this->blockOptionsResolver->resolve(
+        $result = $this->blockOptionsResolver->resolveOptions(
             new BaseType(),
             ['translation_domain' => 'test']
         );

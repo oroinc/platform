@@ -3,10 +3,15 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 
 /**
  * This class contains unit tests which are NOT RELATED to ALIASES and CHANGE COUNTERS
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {
@@ -999,5 +1004,159 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ],
             $blockThemes
         );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 3 action(s) cannot be applied. Actions: add(header, logo1), add(logo1, logo2), add(logo2, header).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testCyclicDependency()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'logo1', 'header')
+            ->add('logo1', 'logo2', 'logo')
+            ->add('logo2', 'header', 'logo');
+
+        $this->getLayoutView();
+    }
+
+    public function testLayoutUpdates()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('logo2', 'root', 'logo');
+                                $layoutManipulator->add('logo3', 'header', 'logo');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo1', 'header', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testLayoutUpdatesWhenParentIsAddedInUpdate()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('logo2', 'root', 'logo');
+                                $layoutManipulator->add('logo3', 'header', 'logo');
+                            }
+                        )
+                    ],
+                    'root'   => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('header', 'root', 'header');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 1 action(s) cannot be applied. Actions: add(logo1, header).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testLayoutUpdatesWhenParentIsAddedInUpdateLinkedWithChild()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'logo1' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('header', 'root', 'header');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo');
+
+        $this->getLayoutView();
     }
 }
