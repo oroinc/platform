@@ -301,16 +301,30 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             $continue = false;
             foreach ($this->actions[self::GROUP_ADD] as $key => $action) {
                 if (self::ADD === $action[0] && $action[1][4]) {
+                    // remember siblingId for the case if the removing of it does not allow to execute the action
+                    $siblingId = $this->actions[self::GROUP_ADD][$key][1][4];
+                    // remove siblingId
                     $this->actions[self::GROUP_ADD][$key][1][4] = null;
+                    // try to execute the action without siblingId
                     if (0 !== $this->executeDependedActions(self::GROUP_ADD)) {
                         $continue = true;
                         break;
+                    } else {
+                        // restore siblingId if the action was not executed
+                        $this->actions[self::GROUP_ADD][$key][1][4] = $siblingId;
                     }
                 } elseif (self::MOVE === $action[0] && $action[1][2]) {
+                    // remember siblingId for the case if the removing of it does not allow to execute the action
+                    $siblingId = $this->actions[self::GROUP_ADD][$key][1][2];
+                    // remove siblingId
                     $this->actions[self::GROUP_ADD][$key][1][2] = null;
+                    // try to execute the action without siblingId
                     if (0 !== $this->executeDependedActions(self::GROUP_ADD)) {
                         $continue = true;
                         break;
+                    } else {
+                        // restore siblingId if the action was not executed
+                        $this->actions[self::GROUP_ADD][$key][1][2] = $siblingId;
                     }
                 }
             }

@@ -1159,4 +1159,119 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         $this->getLayoutView();
     }
+
+    /**
+     * test the case when removing siblingId for 'add' does not help and siblingId must be restored
+     */
+    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndAddDependsToUpdate()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('logo2', 'root', 'logo');
+                                $layoutManipulator->add('logo3', 'header', 'logo');
+                                $layoutManipulator->add('logo4', 'header', 'logo');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo', [], 'logo4', true)
+            ->add('header', 'root', 'header', [], 'unknown');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo4
+                                'vars' => ['id' => 'logo4', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    /**
+     * test the case when removing siblingId for 'move' does not help and siblingId must be restored
+     */
+    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndMoveDependsToUpdate()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator) {
+                                $layoutManipulator->add('logo2', 'root', 'logo');
+                                $layoutManipulator->add('logo3', 'header', 'logo');
+                                $layoutManipulator->add('logo4', 'header', 'logo');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->move('logo1', 'header', 'logo4', true)
+            ->add('logo1', 'header', 'logo', [])
+            ->add('header', 'root', 'header', [], 'unknown');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo4
+                                'vars' => ['id' => 'logo4', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
 }
