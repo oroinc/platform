@@ -381,8 +381,16 @@ class ProcessCollectorListener implements OptionalListenerInterface
 
         $entityManager->flush();
 
+        $this->confirmJobs($entityManager, $jmsJobList);
+    }
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param Job[] $jmsJobList
+     */
+    protected function confirmJobs($entityManager, $jmsJobList)
+    {
         foreach ($jmsJobList as $jmsJob) {
-            /** @var $jmsJob Job */
             $jmsJob->setState(Job::STATE_PENDING);
             $entityManager->persist($jmsJob);
         }
