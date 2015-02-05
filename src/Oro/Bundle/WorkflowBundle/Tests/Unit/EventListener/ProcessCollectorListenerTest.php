@@ -636,8 +636,8 @@ class ProcessCollectorListenerTest extends \PHPUnit_Framework_TestCase
         $this->callPreFunctionByEventName(ProcessTrigger::EVENT_CREATE, $entity, $entityManager);
 
         // there is no need to check all trace - just ensure that job was queued
-        $entityManager->expects($this->exactly(2))->method('persist');
-        $entityManager->expects($this->exactly(2))->method('flush');
+        $entityManager->expects($this->exactly(3))->method('persist');
+        $entityManager->expects($this->exactly(3))->method('flush');
 
         $this->handler->expects($this->never())->method($this->anything());
 
