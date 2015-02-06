@@ -35,8 +35,12 @@ class ActivityListChangesListener
         }
 
         /** @var ActivityList $entity */
-        $this->setCreatedProperties($entity, $args->getEntityManager());
-        $this->setUpdatedProperties($entity, $args->getEntityManager());
+        if (!$entity->getCreatedAt()) {
+            $this->setCreatedProperties($entity, $args->getEntityManager());
+        }
+        if (!$entity->getUpdatedAt()) {
+            $this->setUpdatedProperties($entity, $args->getEntityManager());
+        }
     }
 
     /**
@@ -85,9 +89,7 @@ class ActivityListChangesListener
      */
     protected function setCreatedProperties(ActivityList $activityList, EntityManager $entityManager)
     {
-        if (!$activityList->getCreatedAt()) {
-            $activityList->setCreatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        }
+        $activityList->setCreatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
         $activityList->setOwner($this->getUser($entityManager));
     }
 
