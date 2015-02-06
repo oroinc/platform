@@ -230,6 +230,7 @@ class ActivityListChainProvider
             $list->setSubject($provider->getSubject($entity));
             if ($provider instanceof ActivityListDateProviderInterface) {
                 $list->setCreatedAt($provider->getDate($entity));
+                $list->setUpdatedAt($provider->getDate($entity));
             }
             $list->setVerb($verb);
 
