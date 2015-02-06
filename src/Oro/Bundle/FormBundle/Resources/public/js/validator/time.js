@@ -4,16 +4,16 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/da
     'use strict';
 
     var defaultParam = {
-        message: 'This value is not a valid datetime.'
+        message: 'This value is not a valid time.'
     };
 
     /**
      * @export oroform/js/validator/datetime
      */
     return [
-        'DateTime',
+        'Time',
         function (value, element) {
-            return this.optional(element) || datetimeFormatter.isDateTimeValid(String(value));
+            return this.optional(element) || element.type === 'time' || datetimeFormatter.isTimeValid(String(value));
         },
         function (param, element) {
             var value = String(this.elementValue(element)),

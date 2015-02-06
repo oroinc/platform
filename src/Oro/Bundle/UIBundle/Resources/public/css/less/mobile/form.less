@@ -8,7 +8,11 @@
     }
   }
 
+  select,
   input[type="text"],
+  input[type="date"],
+  input[type="time"],
+  input[type="number"],
   input[type="search"],
   input[type="email"]{
     width: 100% !important;
@@ -23,7 +27,15 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
   }
-
+  .fields-row {
+    .input-small {
+      width: 140px !important;
+      margin-left: 5px;
+    }
+    .input-small:first-child {
+      margin-left: 0;
+    }
+  }
 }
 .form-horizontal{
   & > .span6 {
