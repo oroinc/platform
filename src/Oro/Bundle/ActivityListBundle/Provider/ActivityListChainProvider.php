@@ -12,7 +12,13 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 
+/**
+ * Class ActivityListChainProvider
+ * @package Oro\Bundle\ActivityListBundle\Provider
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ActivityListChainProvider
 {
     /** @var DoctrineHelper */
@@ -222,6 +228,10 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
+            if ($provider instanceof ActivityListDateProviderInterface) {
+                $list->setCreatedAt($provider->getDate($entity));
+                $list->setUpdatedAt($provider->getDate($entity));
+            }
             $list->setVerb($verb);
 
             if ($verb === ActivityList::VERB_UPDATE) {

@@ -13,8 +13,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 
-class EmailActivityListProvider implements ActivityListProviderInterface
+class EmailActivityListProvider implements
+    ActivityListProviderInterface,
+    ActivityListDateProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
 
@@ -96,6 +99,15 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getDate($entity)
+    {
+        /** @var $entity Email */
+        return $entity->getSentAt();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOrganization($activityEntity)
     {
         /** @var $activityEntity Email */
@@ -163,5 +175,15 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function getTargetEntities($entity)
     {
         return $entity->getActivityTargetEntities();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasComments(ConfigManager $configManager, $entity)
+    {
+        $config = $configManager->getProvider('comment')->getConfig($entity);
+
+        return $config->is('enabled');
     }
 }
