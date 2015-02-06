@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -14,8 +13,13 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 
-class EmailActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
+class EmailActivityListProvider implements
+    ActivityListProviderInterface,
+    ActivityListDateProviderInterface,
+    CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
 
@@ -92,6 +96,15 @@ class EmailActivityListProvider implements ActivityListProviderInterface, Commen
     {
         /** @var $entity Email */
         return $entity->getSubject();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDate($entity)
+    {
+        /** @var $entity Email */
+        return $entity->getSentAt();
     }
 
     /**
