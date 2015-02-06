@@ -1,0 +1,8 @@
+parameters:
+    oro_sso.oauth_provider.class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
+    hwi_oauth.authentication.provider.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthProvider
+
+services:
+    oro_sso.oauth_provider:
+        class:     %oro_sso.oauth_provider.class%
+        arguments: [@oro_user.manager, @oro_config.global]

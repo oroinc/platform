@@ -1,0 +1,35 @@
+oro_system_configuration:
+    groups:
+        google_settings:
+            title: oro.sso.system_configuration.groups.google_settings.title
+        google_integration_settings:
+            title: oro.sso.system_configuration.groups.google_integration_settings.title
+        integration_setup:
+            title: oro.sso.system_configuration.groups.integration_setup.title
+
+    fields:
+        oro_sso.enable_google_sso:
+            data_type: boolean
+            type: oro_config_checkbox
+            options:
+                label: oro.sso.system_configuration.fields.enable_google_sso.label
+        oro_sso.google_sso_domains:
+            data_type: string
+            type: oro_collection
+            options:
+                label: oro.sso.system_configuration.fields.google_sso_domains.label
+                handle_primary: false
+                type: text
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    integration_setup:
+                        children:
+                            google_settings:
+                                children:
+                                    google_integration_settings:
+                                        children:
+                                            - oro_sso.enable_google_sso
+                                            - oro_sso.google_sso_domains

@@ -1,0 +1,6 @@
+{% if oro_config_value('oro_sso.enable_google_sso') %}
+    {{ 'oro.sso.login.alternative.label'|trans }}
+    {% for owner in hwi_oauth_resource_owners() %}
+        <a href="{{ hwi_oauth_authorization_url(owner) }}">{{ owner|trans({}, 'HWIOAuthBundle') }}</a>
+    {% endfor %}
+{% endif %}
