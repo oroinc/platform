@@ -22,7 +22,7 @@ class EmailTemplateApiTestTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()->getMock();
 
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
 
         $this->type = new EmailTemplateApiType(

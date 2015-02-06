@@ -305,7 +305,6 @@ class LoggableManager
 
         if ($action !== self::ACTION_REMOVE && count($meta->propertyMetadata)) {
             foreach ($uow->getEntityChangeSet($entity) as $field => $changes) {
-
                 if (!isset($meta->propertyMetadata[$field])) {
                     continue;
                 }

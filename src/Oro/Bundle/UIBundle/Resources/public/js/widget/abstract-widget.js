@@ -31,11 +31,6 @@ define(function (require) {
             loadingMaskEnabled: true,
             loadingElement: null,
             container: null,
-            // set to true if 'layout:init' should be executed after a widget is shown
-            // e.g. if HTML content passed to a widget is rendered from JS template
-            // this option is ignored when content is retrieved by AJAX, in this case 'layout:init'
-            // is executed anyway
-            initLayout: false,
             submitHandler: function () {
                 this.trigger('adoptedFormSubmit', this.form, this);
             }
@@ -158,7 +153,7 @@ define(function (require) {
                     if (loadingElement[0].tagName.toLowerCase() !== 'body' && loadingElement.css('position') == 'static') {
                         loadingElement.css('position', 'relative');
                     }
-                    this.loadingMask = new LoadingMask();
+                    this.loadingMask = new LoadingMask({loadingElement: loadingElement});
                     loadingElement.data('loading-mask-visible', true);
                     loadingElement.append(this.loadingMask.render().$el);
                     this.loadingMask.show();
@@ -174,7 +169,7 @@ define(function (require) {
         _hideLoading: function() {
             if (this.loadingMask) {
                 this._getLoadingElement().data('loading-mask-visible', false);
-                this.loadingMask.remove();
+                this.loadingMask.dispose();
                 this.loadingMask = null;
             }
         },
@@ -606,9 +601,6 @@ define(function (require) {
                 this.loadContent();
             } else {
                 this._show();
-                if (this.options.initLayout) {
-                    mediator.execute('layout:init', this.widget, this);
-                }
             }
             this.firstRun = false;
         },
@@ -617,16 +609,12 @@ define(function (require) {
          * Updates content of a widget.
          *
          * @param {String} content
-         * @param {bool=}  initLayout
          */
-        setContent: function (content, initLayout) {
+        setContent: function (content) {
             this.actionsEl = null;
             this.actions = {};
             this.setElement($(content).filter('.widget-content:first'));
             this._show();
-            if (initLayout || (initLayout === undefined && this.options.initLayout)) {
-                mediator.execute('layout:init', this.widget, this);
-            }
         },
 
         /**
@@ -688,8 +676,21 @@ define(function (require) {
          */
         _onContentLoad: function(content) {
             this.loading = false;
-            this.trigger('contentLoad', content, this);
+            this.disposePageComponents();
             this.setContent(content, true);
+            if (this.renderDeffered) {
+                this.renderDeffered
+                    .done(_.bind(this._triggerContentLoadEvents, this, content))
+                    .fail(function () {
+                        throw new Error("Widget rendering failed");
+                    });
+            } else {
+                this._triggerContentLoadEvents();
+            }
+        },
+
+        _triggerContentLoadEvents: function (content) {
+            this.trigger('contentLoad', content, this);
             mediator.trigger('widget:contentLoad', this.widget);
             mediator.trigger('layout:adjustHeight');
         },
@@ -705,6 +706,15 @@ define(function (require) {
             this.show();
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
+            this.renderDeffered = $.Deferred();
+            mediator.execute('layout:init', this.widget, this)
+                .done(_.bind(this._afterLayoutInit, this));
+        },
+
+        _afterLayoutInit: function () {
+            this.widget.removeClass('invisible');
+            this.renderDeffered.resolve();
+            delete this.renderDeffered;
         },
 
         /**
@@ -720,6 +730,7 @@ define(function (require) {
 
         _renderInContainer: function() {
             if (!this.containerFilled && this.options.container) {
+                this.widget.addClass('invisible');
                 $(this.options.container).append(this.widget);
                 this.containerFilled = true;
             }

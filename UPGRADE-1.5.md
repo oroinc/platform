@@ -158,3 +158,6 @@ workflows:
   it's possible to run manually using `oro:cron:batch:cleanup` command. By default log records lifetime is `1 month`, but this
   option is configurable on application level under `oro_batch.cleanup_interval` node. For manual run it's possible to pass
   interval directly as command argument `[-i|--interval[="..."]]` 
+
+####OroDistributionBundle:
+ - Added possibility to access precise bundle in case of bundle inheritance by adding "!" sign before bundle name.

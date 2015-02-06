@@ -9,12 +9,12 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EmailTemplateType extends AbstractType
 {
     /**
-     * @var UserConfigManager
+     * @var ConfigManager
      */
     private $userConfig;
 
@@ -24,10 +24,10 @@ class EmailTemplateType extends AbstractType
     private $localeSettings;
 
     /**
-     * @param UserConfigManager $userConfig
+     * @param ConfigManager $userConfig
      * @param LocaleSettings    $localeSettings
      */
-    public function __construct(UserConfigManager $userConfig, LocaleSettings $localeSettings)
+    public function __construct(ConfigManager $userConfig, LocaleSettings $localeSettings)
     {
         $this->userConfig     = $userConfig;
         $this->localeSettings = $localeSettings;
@@ -75,7 +75,7 @@ class EmailTemplateType extends AbstractType
 
         $lang              = $this->localeSettings->getLanguage();
         $notificationLangs = $this->userConfig->get('oro_locale.languages');
-        $notificationLangs = array_merge($notificationLangs, [$lang]);
+        $notificationLangs = array_unique(array_merge($notificationLangs, [$lang]));
         $localeLabels      = $this->localeSettings->getLocalesByCodes($notificationLangs, $lang);
         $builder->add(
             'translations',

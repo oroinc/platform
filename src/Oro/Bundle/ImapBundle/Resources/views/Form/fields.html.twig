@@ -1,0 +1,24 @@
+{% block oro_imap_configuration_check_row %}
+    {% set options = {
+        elementNamePrototype: full_name,
+        id: form.parent.vars.value ? form.parent.vars.value.id : null
+    } %}
+    {% set attr = attr|merge({
+        'data-page-component-module':  'oroimap/js/app/components/check-connection-btn',
+        'data-page-component-options': options|json_encode|raw,
+    }) %}
+    {% set wrapperId = id ~ '_wrapper' %}
+
+    <div class="control-group" id="{{ wrapperId }}">
+        <div class="controls">{{ form_widget(form, {'attr': attr }) }}</div>
+    </div>
+
+    <style type="text/css">
+        {{ '#' ~ wrapperId }} {
+            max-width: 465px;
+        }
+        {{ '#' ~ wrapperId }} .alert {
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}

@@ -67,32 +67,32 @@
 }
 
 #accordion {
-  .toggle {
+  .toggle () {
     font-weight: bold;
     padding-left: 15px;
     background: @accordionHeadingBackgroundColor;
     border-bottom: 1px solid darken(@accordionHeadingBackgroundColor, 5%);
     border-top: 1px solid lighten(@accordionHeadingBackgroundColor, 5%);
   }
-  .toggle-before {
+  .toggle-before () {
     content: "\f0d7";
     font-family: FontAwesome;
     margin: 0 7px 0 -7px;
     width: 10px;
     display: inline-block;
   }
-  .toggle-collapsed-before {
+  .toggle-collapsed-before () {
     content: "\f0da";
     margin: 0 5px 0 -5px;
   }
-  .group {
+  .group () {
     .border-radius(0);
     margin-bottom: 0;
     border: none;
   }
 }
 
-.horizontal-icon-menu {
+.horizontal-icon-menu () {
   .dropdown-menu.pull-right {
     padding: 0;
     right: 33px;
@@ -104,5 +104,15 @@
         margin-left: 2px;
       }
     }
+  }
+}
+
+.open () {
+  // IE7's z-index only goes to the nearest positioned ancestor, which would
+  // make the menu appear below buttons that appeared later on the page
+  *z-index: @zindexDropdown;
+
+  & > .dropdown-menu {
+    display: block;
   }
 }

@@ -47,6 +47,7 @@ class FileExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('file_url', [$this, 'getFIleUrl']),
+            new \Twig_SimpleFunction('file_size', [$this, 'getFIleSize']),
             new \Twig_SimpleFunction('resized_image_url', [$this, 'getResizedImageUrl']),
             new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
@@ -90,6 +91,17 @@ class FileExtension extends \Twig_Extension
         $absolute = false
     ) {
         return $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, $type, $absolute);
+    }
+
+    /**
+     * Get human readable file size
+     *
+     * @param integer $bytes
+     * @return string
+     */
+    public function getFileSize($bytes)
+    {
+        return $this->manager->getFileSize($bytes);
     }
 
     /**

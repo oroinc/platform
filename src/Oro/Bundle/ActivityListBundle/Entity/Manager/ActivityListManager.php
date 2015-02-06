@@ -4,12 +4,14 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
+use Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -28,7 +30,7 @@ class ActivityListManager
     /** @var NameFormatter */
     protected $nameFormatter;
 
-    /** @var UserConfigManager */
+    /** @var ConfigManager */
     protected $config;
 
     /** @var ActivityListChainProvider */
@@ -42,18 +44,20 @@ class ActivityListManager
      * @param SecurityFacade            $securityFacade
      * @param NameFormatter             $nameFormatter
      * @param Pager                     $pager
-     * @param UserConfigManager         $config
+     * @param ConfigManager             $config
      * @param ActivityListChainProvider $provider
      * @param ActivityListFilterHelper  $activityListFilterHelper
+     * @param CommentApiManager         $commentManager
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
         NameFormatter $nameFormatter,
         Pager $pager,
-        UserConfigManager $config,
+        ConfigManager $config,
         ActivityListChainProvider $provider,
-        ActivityListFilterHelper $activityListFilterHelper
+        ActivityListFilterHelper $activityListFilterHelper,
+        CommentApiManager $commentManager
     ) {
         $this->em                       = $doctrine->getManager();
         $this->securityFacade           = $securityFacade;
@@ -62,6 +66,7 @@ class ActivityListManager
         $this->config                   = $config;
         $this->chainProvider            = $provider;
         $this->activityListFilterHelper = $activityListFilterHelper;
+        $this->commentManager           = $commentManager;
     }
 
     /**
@@ -82,12 +87,7 @@ class ActivityListManager
      */
     public function getList($entityClass, $entityId, $filter, $page)
     {
-        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
-            $entityClass,
-            $entityId,
-            $this->config->get('oro_activity_list.sorting_field'),
-            $this->config->get('oro_activity_list.sorting_direction')
-        );
+        $qb = $this->getBaseQB($entityClass, $entityId);
 
         $this->activityListFilterHelper->addFiltersToQuery($qb, $filter);
 
@@ -109,12 +109,7 @@ class ActivityListManager
      */
     public function getListCount($entityClass, $entityId, $filter)
     {
-        $qb = $this->getRepository()->getBaseActivityListQueryBuilder(
-            $entityClass,
-            $entityId,
-            $this->config->get('oro_activity_list.sorting_field'),
-            $this->config->get('oro_activity_list.sorting_direction')
-        );
+        $qb = $this->getBaseQB($entityClass, $entityId);
 
         $qb->select('COUNT(activity.id)');
         $qb->resetDQLPart('orderBy');
@@ -179,6 +174,11 @@ class ActivityListManager
             $editorId   = $entity->getEditor()->getId();
         }
 
+        $numberOfComments = $this->commentManager->getCommentCount(
+            $entity->getRelatedActivityClass(),
+            $entity->getRelatedActivityId()
+        );
+
         $result = [
             'id'                   => $entity->getId(),
             'owner'                => $ownerName,
@@ -194,8 +194,26 @@ class ActivityListManager
             'updatedAt'            => $entity->getUpdatedAt()->format('c'),
             'editable'             => $this->securityFacade->isGranted('EDIT', $entity),
             'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
+            'commentCount'         => $numberOfComments,
+            'commentable'          => $this->commentManager->isCommentable(),
         ];
 
         return $result;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param string $entityId
+     *
+     * @return QueryBuilder
+     */
+    protected function getBaseQB($entityClass, $entityId)
+    {
+        return $this->getRepository()->getBaseActivityListQueryBuilder(
+            $entityClass,
+            $entityId,
+            $this->config->get('oro_activity_list.sorting_field'),
+            $this->config->get('oro_activity_list.sorting_direction')
+        );
     }
 }

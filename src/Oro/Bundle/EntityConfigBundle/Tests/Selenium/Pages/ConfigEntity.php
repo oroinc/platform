@@ -6,6 +6,8 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages;
  * Class ConfigEntity
  *
  * @package Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages
+ * @method ConfigEntity openConfigEntity() openConfigEntity(string)
+ * @method ConfigEntity assertTitle() assertTitle($title, $message = '')
  */
 class ConfigEntity extends CustomEntity
 {
@@ -191,6 +193,23 @@ class ConfigEntity extends CustomEntity
                     );
                     $field->clear();
                     $field->value($value);
+                } else {
+                    $dateField = "[contains(@id, '{$fieldName}') and contains(@id, 'date_selector_')]";
+                    $timeField = "[contains(@id, '{$fieldName}') and contains(@id, 'time_selector_')]";
+
+                    if ($fieldName === 'datetime_field'
+                        and $this->isElementPresent("//div[@class='control-group']//input{$dateField}")
+                        and $this->isElementPresent("//div[@class='control-group']//input{$timeField}")
+                        and preg_match('/^(.+\d{4}),?\s(\d{2}\:\d{2}\s\w{2})$/', $value, $value)
+                    ) {
+                        $field = $this->test->byXpath("//div[@class='control-group']//input{$dateField}");
+                        $field->clear();
+                        $field->value($value[1]);
+
+                        $field = $this->test->byXpath("//div[@class='control-group']//input{$timeField}");
+                        $field->clear();
+                        $field->value($value[2]);
+                    }
                 }
             }
         }

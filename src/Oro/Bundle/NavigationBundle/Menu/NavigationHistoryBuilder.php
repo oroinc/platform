@@ -39,7 +39,7 @@ class NavigationHistoryBuilder extends NavigationItemBuilder
      *
      * @param \Oro\Bundle\ConfigBundle\Config\UserConfigManager $config
      */
-    public function setOptions(\Oro\Bundle\ConfigBundle\Config\UserConfigManager $config)
+    public function setOptions($config)
     {
         $this->configOptions = $config;
     }

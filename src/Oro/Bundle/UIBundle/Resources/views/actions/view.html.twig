@@ -38,7 +38,13 @@
                                         {% endif %}
                                         {% if breadcrumbs.additional is defined %}
                                             {% for breadcrumb in breadcrumbs.additional %}
-                                                <div class="sub-title"><a href="{{ oro_url_add_query(breadcrumb.indexPath) }}">{{ breadcrumb.indexLabel }}</a></div>
+                                                <div class="sub-title">
+                                                {%- if breadcrumb.indexPath is defined -%}
+                                                    <a href="{{ breadcrumb.indexPath }}">{{ breadcrumb.indexLabel }}</a>
+                                                {%- else -%}
+                                                    {{ breadcrumb.indexLabel }}
+                                                {%- endif -%}
+                                                </div>
                                                 <span class="separator">/</span>
                                             {% endfor %}
                                         {% endif %}
@@ -56,7 +62,7 @@
                                     {% if isMobileVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
                                 </ul>
@@ -82,7 +88,7 @@
                                     {% if isDesktopVersion() %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
                                         {% if ownerLink %}
-                                            <li>{{ ownerLink }}</li>
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endif %}
 
@@ -92,7 +98,7 @@
                                             'entity': entity,
                                             'entity_class': audit_entity_class|default(null),
                                             'id': audit_entity_id,
-                                            'title': audit_title|default(entity),
+                                            'title': audit_title|default(entity.__toString is defined ? entity : null),
                                             'audit_path': audit_path|default('oro_dataaudit_history'),
                                             'audit_show_change_history': audit_show_change_history|default(false)
                                         } %}
@@ -161,6 +167,22 @@
                         ]
                     }]) %}
                 {% endif %}
+
+                {%- set commentsData  -%}
+                    {% placeholder view_content_data_comments with {entity: entity} %}
+                {%- endset -%}
+
+                {% if commentsData is not empty %}
+                    {% set dataBlocks = dataBlocks|merge([{
+                        'title': 'oro.comment.entity_plural_label'|trans,
+                        'subblocks': [
+                            {
+                                'spanClass': 'responsive-cell activity-list-widget',
+                                'data': [commentsData]
+                            }
+                        ]
+                    }]) %}
+                {% endif  %}
 
                 {% set data = data|merge({'dataBlocks': dataBlocks}) %}
             {% endif %}

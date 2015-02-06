@@ -73,35 +73,56 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
     {
         $registry      = $this->getRegistry();
         $processJobIds = $input->getOption('id');
-        $processJobs   = $registry->getRepository('OroWorkflowBundle:ProcessJob')->findByIds($processJobIds);
 
-        if (!$processJobs) {
-            $output->writeln('<error>Process jobs with passed identifiers do not exist</error>');
+        if (!$processJobIds) {
+            $output->writeln('<error>No process identifiers defined</error>');
             return;
         }
 
-        /** @var EntityManager $entityManager */
-        $entityManager  = $registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
         $processHandler = $this->getProcessHandler();
+        $firstException = null;
 
         /** @var ProcessJob $processJob */
-        foreach ($processJobs as $processJob) {
-            $processId = $processJob->getId();
+        foreach ($processJobIds as $processJobId) {
+            // make sure that every process will be handled with clear entity manager
+            $registry->resetManager();
+
+            $processJob = $registry->getRepository('OroWorkflowBundle:ProcessJob')->find($processJobId);
+            if (!$processJob) {
+                $output->writeln(sprintf('<error>Process job %s does not exist</error>', $processJobId));
+                continue;
+            }
+
+            /** @var EntityManager $entityManager */
+            $entityManager = $registry->getManager();
             $entityManager->beginTransaction();
+
             try {
                 $processHandler->handleJob($processJob);
                 $entityManager->remove($processJob);
                 $entityManager->flush();
                 $processHandler->finishJob($processJob);
+                $entityManager->clear();
                 $entityManager->commit();
 
-                $output->writeln(sprintf('<info>Process %s successfully finished</info>', $processId));
+                $output->writeln(sprintf('<info>Process job %s successfully finished</info>', $processJobId));
             } catch (\Exception $e) {
                 $processHandler->finishJob($processJob);
+                $entityManager->clear();
                 $entityManager->rollback();
 
-                $output->writeln(sprintf('<error>Process %s failed: %s</error>', $processId, $e->getMessage()));
+                // save first exception
+                if (!$firstException) {
+                    $firstException = $e;
+                }
+
+                $output->writeln(sprintf('<error>Process job %s failed: %s</error>', $processJobId, $e->getMessage()));
             }
+        }
+
+        // throw first exception
+        if ($firstException) {
+            throw $firstException;
         }
     }
 }

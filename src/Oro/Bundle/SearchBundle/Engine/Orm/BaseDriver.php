@@ -48,6 +48,7 @@ abstract class BaseDriver
 
     /**
      * Search query by Query builder object
+     * Can contains duplicates and we can not use HYDRATE_OBJECT because of performance issue. Will be fixed in BAP-7166
      *
      * @param \Oro\Bundle\SearchBundle\Query\Query $query
      *
@@ -70,7 +71,7 @@ abstract class BaseDriver
 
         return $qb
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
     }
 
     /**

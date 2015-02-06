@@ -130,7 +130,7 @@ class NavigationHistoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $n = rand(1, 10);
 
-        $configMock = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\UserConfigManager')
+        $configMock = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
                         ->disableOriginalConstructor()
                         ->getMock();
 

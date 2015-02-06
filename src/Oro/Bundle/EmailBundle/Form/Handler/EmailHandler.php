@@ -17,11 +17,21 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
+/**
+ * Class EmailHandler
+ *
+ * @package Oro\Bundle\EmailBundle\Form\Handler
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class EmailHandler
 {
     /**
@@ -133,7 +143,7 @@ class EmailHandler
         }
         $this->form->setData($model);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
@@ -141,10 +151,8 @@ class EmailHandler
                     $this->emailProcessor->process($model);
                     return true;
                 } catch (\Exception $ex) {
-                    $this->logger->error('Email sending failed.', array('exception' => $ex));
-                    $this->form->addError(
-                        new FormError($this->translator->trans('oro.email.handler.unable_to_send_email'))
-                    );
+                    $this->logger->error('Email sending failed.', ['exception' => $ex]);
+                    $this->form->addError(new FormError($ex->getMessage()));
                 }
             }
         }
@@ -171,6 +179,56 @@ class EmailHandler
         if ($this->request->query->has('entityId')) {
             $model->setEntityId($this->request->query->get('entityId'));
         }
+        $this->initFrom($model);
+        $this->initRecipients($model);
+        $this->initSubject($model);
+    }
+
+    /**
+     * @param Email $model
+     */
+    protected function initRecipients(Email $model)
+    {
+        $model->setTo($this->getRecipients($model, EmailRecipient::TO));
+        $model->setCc($this->getRecipients($model, EmailRecipient::CC));
+        $model->setBcc($this->getRecipients($model, EmailRecipient::BCC));
+    }
+
+    /**
+     * @param Email $model
+     * @param string $type
+     *
+     * @return array
+     */
+    protected function getRecipients(Email $model, $type)
+    {
+        $addresses = [];
+        if ($this->request->query->has($type)) {
+            $address = trim($this->request->query->get($type));
+            if (!empty($address)) {
+                $this->preciseFullEmailAddress($address, $model->getEntityClass(), $model->getEntityId());
+            }
+            $addresses = [$address];
+        }
+        return $addresses;
+    }
+
+    /**
+     * @param Email $model
+     */
+    protected function initSubject(Email $model)
+    {
+        if ($this->request->query->has('subject')) {
+            $subject = trim($this->request->query->get('subject'));
+            $model->setSubject($subject);
+        }
+    }
+
+    /**
+     * @param Email $model
+     */
+    protected function initFrom(Email $model)
+    {
         if ($this->request->query->has('from')) {
             $from = $this->request->query->get('from');
             if (!empty($from)) {
@@ -188,17 +246,6 @@ class EmailHandler
                 );
             }
         }
-        if ($this->request->query->has('to')) {
-            $to = trim($this->request->query->get('to'));
-            if (!empty($to)) {
-                $this->preciseFullEmailAddress($to, $model->getEntityClass(), $model->getEntityId());
-            }
-            $model->setTo(array($to));
-        }
-        if ($this->request->query->has('subject')) {
-            $subject = trim($this->request->query->get('subject'));
-            $model->setSubject($subject);
-        }
     }
 
     /**
@@ -211,7 +258,7 @@ class EmailHandler
         if (!$this->emailAddressHelper->isFullEmailAddress($emailAddress)) {
             if (!empty($ownerClass) && !empty($ownerId)) {
                 $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
-                if ($owner) {
+                if ($owner && $this->isFullQualifiedUser($owner)) {
                     $ownerName = $this->nameFormatter->format($owner);
                     if (!empty($ownerName)) {
                         $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
@@ -237,18 +284,31 @@ class EmailHandler
     /**
      * Get the current authenticated user
      *
-     * @return UserInterface|null
+     * @return UserInterface|EmailHolderInterface|EmailOwnerInterface|null
      */
     protected function getUser()
     {
         $token = $this->securityContext->getToken();
         if ($token) {
             $user = $token->getUser();
-            if ($user instanceof UserInterface) {
+            if (
+                $this->isFullQualifiedUser($user)
+            ) {
                 return $user;
             }
         }
 
         return null;
+    }
+
+    /**
+     * @param $entity
+     * @return bool
+     */
+    protected function isFullQualifiedUser($entity)
+    {
+        return $entity instanceof UserInterface
+        && $entity instanceof EmailHolderInterface
+        && $entity instanceof EmailOwnerInterface;
     }
 }

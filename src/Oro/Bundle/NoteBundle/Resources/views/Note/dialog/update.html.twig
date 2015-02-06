@@ -20,9 +20,11 @@
     {% else %}
         <div class="form-container">
             <form id="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
-                <fieldset class="form-horizontal">
+                <fieldset class="form-horizontal control-group">
                     {{ form_widget(form.message) }}
                     {{ form_errors(form.message) }}
+                </fieldset>
+                <fieldset class="form-horizontal">
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
                         <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>

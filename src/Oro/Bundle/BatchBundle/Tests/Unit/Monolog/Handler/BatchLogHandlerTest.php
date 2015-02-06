@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\Monolog\Handler;
 
-use  Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
+use Oro\Bundle\BatchBundle\Monolog\Handler\BatchLogHandler;
 
 class BatchLogHandlerTest extends \PHPUnit_Framework_TestCase
 {

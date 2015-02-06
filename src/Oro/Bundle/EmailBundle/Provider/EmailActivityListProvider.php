@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -14,7 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 
-class EmailActivityListProvider implements ActivityListProviderInterface
+class EmailActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
 
@@ -163,5 +164,15 @@ class EmailActivityListProvider implements ActivityListProviderInterface
     public function getTargetEntities($entity)
     {
         return $entity->getActivityTargetEntities();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasComments(ConfigManager $configManager, $entity)
+    {
+        $config = $configManager->getProvider('comment')->getConfig($entity);
+
+        return $config->is('enabled');
     }
 }

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\UserBundle\Entity;
 
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 
 use JMS\Serializer\Annotation as JMS;
 
@@ -334,6 +334,20 @@ class User extends ExtendUser implements
      * )
      */
     protected $passwordRequestedAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="password_changed", type="datetime", nullable=true)
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "excluded"=true
+     *          }
+     *      }
+     * )
+     */
+    protected $passwordChangedAt;
 
     /**
      * @var \DateTime
@@ -754,6 +768,16 @@ class User extends ExtendUser implements
     }
 
     /**
+     * Gets the timestamp that the administrator has changed user's password
+     *
+     * @return \DateTime
+     */
+    public function getPasswordChangedAt()
+    {
+        return $this->passwordChangedAt;
+    }
+
+    /**
      * Gets the last login time.
      *
      * @return \DateTime
@@ -1040,6 +1064,18 @@ class User extends ExtendUser implements
     public function setPasswordRequestedAt(\DateTime $time = null)
     {
         $this->passwordRequestedAt = $time;
+
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $time [optional] Password changed time. Null by default.
+     *
+     * @return User
+     */
+    public function setPasswordChangedAt(\DateTime $time = null)
+    {
+        $this->passwordChangedAt = $time;
 
         return $this;
     }
@@ -1344,10 +1380,16 @@ class User extends ExtendUser implements
      * Invoked before the entity is updated.
      *
      * @ORM\PreUpdate
+     *
+     * @param PreUpdateEventArgs $event
      */
-    public function preUpdate()
+    public function preUpdate(PreUpdateEventArgs $event)
     {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        $excludedFields = ['lastLogin', 'loginCount'];
+
+        if (array_diff_key($event->getEntityChangeSet(), array_flip($excludedFields))) {
+            $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
+        }
     }
 
     /**

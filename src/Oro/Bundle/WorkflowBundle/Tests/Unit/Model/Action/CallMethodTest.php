@@ -18,6 +18,10 @@ class CallMethodTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->action = new CallMethod(new ContextAccessor());
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     /**

@@ -20,6 +20,10 @@ class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
     {
         $contextAccessor = new ContextAccessor();
         $this->action    = new RemoveFieldsChangesAction($contextAccessor);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     /**

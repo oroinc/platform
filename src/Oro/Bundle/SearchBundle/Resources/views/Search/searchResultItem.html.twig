@@ -21,12 +21,20 @@
                 {% block additional_info %}
                 {% endblock %}
             </div>
-            {% if entityInfo is defined and entityInfo|length %}
+            {%- set searchItemEntityInfo -%}
+                {% placeholder search_item_entity_info with {entity: entity} %}
+            {%- endset -%}
+            {% if (entityInfo is defined and entityInfo|length) or searchItemEntityInfo is not null %}
                 <div class="clearfix">
                     <ul class="inline">
-                        {% for info in entityInfo %}
-                            <li>{{ info.title }}: {{ info.value }}</li>
-                        {% endfor %}
+                        {% if searchItemEntityInfo is not null %}
+                            {{ searchItemEntityInfo }}
+                        {% endif %}
+                        {% if entityInfo is defined and entityInfo|length %}
+                            {% for info in entityInfo %}
+                                <li>{{ info.title }}: {{ info.value }}</li>
+                            {% endfor %}
+                        {% endif %}
                     </ul>
                 </div>
             {% endif %}

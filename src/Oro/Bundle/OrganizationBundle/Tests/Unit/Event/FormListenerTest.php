@@ -32,7 +32,7 @@ class FormListenerTest extends \PHPUnit_Framework_TestCase
         $event->expects($this->once())->method('getFormData')->will($this->returnValue($formData));
         $event->expects($this->once())->method('getForm')->will($this->returnValue($formView));
 
-        $formData['dataBlocks'][0]['subblocks'][0]['data'][] = $newField;
+        array_unshift($formData['dataBlocks'][0]['subblocks'][0]['data'], $newField);
         $event->expects($this->once())->method('setFormData')->with($formData);
 
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')

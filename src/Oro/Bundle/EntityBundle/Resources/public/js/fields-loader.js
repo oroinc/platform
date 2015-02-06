@@ -43,8 +43,16 @@ define([
         },
 
         loadFields: function () {
+            var routeName = this.options.router,
+                routeParams = this.options.routingParams;
+
+            var additionalRequestParams = this.element.data('select2_query_additional_params');
+            if (additionalRequestParams) {
+                routeParams = $.extend({}, routeParams, additionalRequestParams )
+            }
+
             $.ajax({
-                url: routing.generate(this.options.router, this.options.routingParams),
+                url: routing.generate(routeName, routeParams),
                 success: $.proxy(this._onLoaded, this),
                 error: this._onError,
                 beforeSend: $.proxy(this._trigger, this, 'start'),

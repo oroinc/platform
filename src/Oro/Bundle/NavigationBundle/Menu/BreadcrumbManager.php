@@ -50,7 +50,6 @@ class BreadcrumbManager
         $currentItem = $this->getCurrentMenuItem($menu);
 
         if ($currentItem) {
-
             return $this->getBreadcrumbArray($menuName, $currentItem, $isInverse);
         }
     }
@@ -206,17 +205,13 @@ class BreadcrumbManager
     protected function routeMatch($pattern, $route)
     {
         if ($pattern == $route) {
-
             return true;
         } elseif (0 === strpos($pattern, '/') && strlen($pattern) - 1 === strrpos($pattern, '/')) {
-
             return preg_match($pattern, $route);
         } elseif (false !== strpos($pattern, '*')) {
             $pattern = sprintf('/^%s$/', str_replace('*', '\w+', $pattern));
-
             return preg_match($pattern, $route);
         } else {
-
             return false;
         }
     }

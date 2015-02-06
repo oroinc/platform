@@ -2,8 +2,9 @@
 /*global define*/
 define([
     'chaplin',
-    'oroui/js/mediator'
-], function (Chaplin, mediator) {
+    'oroui/js/mediator',
+    './ready-state-tracker'
+], function (Chaplin, mediator, readyStateTracker) {
     'use strict';
 
     var Application;
@@ -30,6 +31,10 @@ define([
                 this.router.changeURL(null, null, route, options);
                 mediator.trigger('route:change');
             }, this);
+
+            mediator.once('dispatcher:dispatch', function () {
+                readyStateTracker.markReady('app');
+            });
         },
 
         /**

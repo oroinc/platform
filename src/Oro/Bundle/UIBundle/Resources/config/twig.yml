@@ -13,6 +13,7 @@ parameters:
     oro_ui.twig.url.class:               Oro\Bundle\UIBundle\Twig\UrlExtension
     oro_ui.twig.js_template.class:       Oro\Bundle\UIBundle\Twig\JsTemplateExtension
     oro_ui.twig.merge_recursive.class:   Oro\Bundle\UIBundle\Twig\MergeRecursiveExtension
+    oro_ui.twig.block.class:             Oro\Bundle\UIBundle\Twig\BlockExtension
 
     twig.class:                          Oro\Bundle\UIBundle\Twig\Environment
     twig.cache_warmer.class:             Oro\Bundle\UIBundle\Cache\TemplateCacheCacheWarmer
@@ -115,3 +116,8 @@ services:
         class: %oro_ui.twig.merge_recursive.class%
         tags:
            - { name: twig.extension }
+
+    oro_ui.twig.block:
+        class: %oro_ui.twig.block.class%
+        tags:
+            - { name: twig.extension }

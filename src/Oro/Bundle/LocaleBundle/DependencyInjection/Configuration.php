@@ -111,7 +111,7 @@ class Configuration implements ConfigurationInterface
                 'format_address_by_address_country' => ['value' => true, 'type' => 'boolean'],
                 'qwerty'                            => ['value' => [], 'type' => 'array'],
                 'languages'                         => ['value' => ['en'], 'type' => 'array'],
-                'quarter_start'                     => ['value' => ['year' => '2009', 'month' => '1', 'day' => '1']],
+                'quarter_start'                     => ['value' => ['month' => '1', 'day' => '1']],
                 'temperature_unit'                  => ['value' => 'fahrenheit'],
                 'wind_speed_unit'                   => ['value' => 'miles_per_hour']
             )

@@ -49,6 +49,21 @@ oro:
     ui:
         widget_loading_filed: "Widget content loading failed"
         forbidden_error: You do not have permission to perform this action.
+        unexpected_error: Unexpected error occurred. Please contact system administrator.
         page_header:
             button:
                 more: "More"
+        datepicker:
+            today: Today
+            prev: Prev
+            next: Next
+            close: Close
+            wk: Wk
+        timepicker:
+            am: am
+            pm: pm
+            AM: AM
+            PM: PM
+            mins: mins
+            hr: hr
+            hrs: hrs

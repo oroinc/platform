@@ -41,11 +41,29 @@ class EmailType extends AbstractType
             ->add(
                 'from',
                 'oro_email_email_address',
-                ['required' => true, 'label' => 'oro.email.from_email_address.label']
+                [
+                    'required' => true,
+                    'label' => 'oro.email.from_email_address.label',
+                    'attr' => ['class' => 'from taggable-field']
+                ]
             )
-            ->add('to', 'oro_email_email_address', ['required' => true, 'multiple' => true])
+            ->add(
+                'to',
+                'oro_email_email_address',
+                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+            )
+            ->add(
+                'cc',
+                'oro_email_email_address',
+                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+            )
+            ->add(
+                'bcc',
+                'oro_email_email_address',
+                ['required' => false, 'multiple' => true, 'attr' => ['class' => 'taggable-field']]
+            )
             ->add('subject', 'text', ['required' => true, 'label' => 'oro.email.subject.label'])
-            ->add('body', 'textarea', ['required' => false, 'label' => 'oro.email.email_body.label'])
+            ->add('body', 'oro_rich_text', ['required' => false, 'label' => 'oro.email.email_body.label'])
             ->add(
                 'template',
                 'oro_email_template_list',
@@ -64,7 +82,7 @@ class EmailType extends AbstractType
                 [
                     'label'      => 'oro.email.type.label',
                     'required'   => true,
-                    'data'       => 'txt',
+                    'data'       => 'html',
                     'choices'  => [
                         'html' => 'oro.email.datagrid.emailtemplate.filter.type.html',
                         'txt'  => 'oro.email.datagrid.emailtemplate.filter.type.txt'
@@ -76,7 +94,6 @@ class EmailType extends AbstractType
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
-
     }
 
     /**

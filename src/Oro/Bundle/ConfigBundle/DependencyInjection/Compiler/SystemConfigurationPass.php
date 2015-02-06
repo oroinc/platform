@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
@@ -18,6 +19,14 @@ class SystemConfigurationPass implements CompilerPassInterface
     const CONFIG_DEFINITION_BAG_SERVICE = 'oro_config.config_definition_bag';
     const CONFIG_PROVIDER_TAG_NAME      = 'oro_config.configuration_provider';
 
+    const SCOPE_MANAGER_TAG_NAME  = 'oro_config.scope';
+    const MAIN_MANAGER_SERVICE_ID = 'oro_config.manager';
+
+    const API_MANAGER_SERVICE_ID = 'oro_config.manager.api';
+
+    const DEFAULT_SCOPE = 'app';
+    const DEFAULT_PRIORITY = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -26,21 +35,55 @@ class SystemConfigurationPass implements CompilerPassInterface
         $settings = $this->loadSettings($container);
         $container->getDefinition(self::CONFIG_DEFINITION_BAG_SERVICE)->replaceArgument(0, $settings);
 
-        $providers      = [];
-        $taggedServices = $container->findTaggedServiceIds(self::CONFIG_PROVIDER_TAG_NAME);
-        foreach ($taggedServices as $id => $attributes) {
-            $providers[$attributes[0]['scope']][] = $id;
-        }
-
         $processor = new ProcessorDecorator(
             new Processor(),
             $this->getDeclaredVariableNames($settings)
         );
-        foreach ($providers as $scope => $ids) {
-            $config = $processor->process($this->loadConfig($container, $processor, $scope));
-            foreach ($ids as $id) {
-                $container->getDefinition($id)->replaceArgument(0, $config);
+        $config         = $this->loadConfig($container, $processor);
+        $taggedServices = $container->findTaggedServiceIds(self::CONFIG_PROVIDER_TAG_NAME);
+        if ($taggedServices) {
+            $config = $processor->process($config);
+
+            foreach ($taggedServices as $id => $attributes) {
+                $container
+                    ->getDefinition($id)
+                    ->replaceArgument(0, $config);
             }
+        }
+
+        // find managers
+        $managers       = [];
+        $taggedServices = $container->findTaggedServiceIds(self::SCOPE_MANAGER_TAG_NAME);
+        foreach ($taggedServices as $id => $attributes) {
+            if (array_key_exists('priority', $attributes[0])) {
+                $priority = (int)$attributes[0]['priority'];
+            } else {
+                $priority = self::DEFAULT_PRIORITY;
+            }
+            if (array_key_exists('scope', $attributes[0])) {
+                $scope = $attributes[0]['scope'];
+            } else {
+                $scope = self::DEFAULT_SCOPE;
+            }
+            $managers[$priority][$scope] = new Reference($id);
+        }
+        if (count($managers) === 0) {
+            return;
+        }
+
+        // sort by priority and flatten
+        ksort($managers);
+        $managers      = call_user_func_array('array_merge', $managers);
+        $apiManagerDef = $container->getDefinition(self::API_MANAGER_SERVICE_ID);
+
+        // register
+        $serviceDef = $container->getDefinition(self::MAIN_MANAGER_SERVICE_ID);
+        foreach ($managers as $scope => $manager) {
+            $serviceDef->addMethodCall('addManager', [$scope, $manager]);
+            $serviceDef->addMethodCall('setScopeName', [$scope]);
+            $managerDef = clone $serviceDef;
+            $container->setDefinition('oro_config.' . $scope, $managerDef);
+            $apiManagerDef->addMethodCall('addConfigManager', [$scope, $managerDef]);
         }
     }
 
@@ -80,18 +123,15 @@ class SystemConfigurationPass implements CompilerPassInterface
     /**
      * @param ContainerBuilder   $container
      * @param ProcessorDecorator $processor
-     * @param string             $scope
-     *
      * @return array
      */
-    protected function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor, $scope)
+    protected function loadConfig(ContainerBuilder $container, ProcessorDecorator $processor)
     {
-        $config = array();
+        $config = [];
 
-        $alias        = $scope === 'app' ? 'system' : $scope;
         $configLoader = new CumulativeConfigLoader(
-            sprintf('oro_%s_configuration', $alias),
-            new YamlCumulativeFileLoader(sprintf('Resources/config/%s_configuration.yml', $alias))
+            'oro_system_configuration',
+            new YamlCumulativeFileLoader('Resources/config/system_configuration.yml')
         );
         $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
@@ -108,7 +148,7 @@ class SystemConfigurationPass implements CompilerPassInterface
      */
     protected function getDeclaredVariableNames($settings)
     {
-        $variables = array();
+        $variables = [];
         foreach ($settings as $alias => $items) {
             foreach ($items as $varName => $varData) {
                 if ($varName === SettingsBuilder::RESOLVED_KEY) {

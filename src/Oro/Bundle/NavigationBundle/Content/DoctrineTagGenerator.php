@@ -62,7 +62,6 @@ class DoctrineTagGenerator implements TagGeneratorInterface
     {
         $cacheKey = $this->getCacheIdentifier($data);
         if (!isset($this->generatedTags[$cacheKey])) {
-
             if ($data instanceof FormInterface) {
                 return $this->generate($data->getData(), $includeCollectionTag, $processNestedData);
             }

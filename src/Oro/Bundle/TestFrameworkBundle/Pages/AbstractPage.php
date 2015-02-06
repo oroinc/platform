@@ -168,12 +168,12 @@ abstract class AbstractPage
      * @param string $message
      * @return $this
      */
-    public function assertTitle($title, $message = '')
+    public function assertTitle($title, $message = null)
     {
         PHPUnit_Framework_Assert::assertEquals(
             $title,
             $this->test->title(),
-            $message
+            $message ?: $this->test->source()
         );
         return $this;
     }

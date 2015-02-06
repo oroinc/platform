@@ -9,7 +9,6 @@ parameters:
 
     oro_organization.twig.get_owner.class:                     Oro\Bundle\OrganizationBundle\Twig\OwnerTypeExtension
     oro_organization.twig.business_units.class:                Oro\Bundle\OrganizationBundle\Twig\BusinessUnitExtension
-    oro_organization.twig.organization.class:                  Oro\Bundle\OrganizationBundle\Twig\OrganizationExtension
 
     oro_organization.form.listener.class:                      Oro\Bundle\OrganizationBundle\Event\FormListener
     oro_organization.listener.config_subscriber.class:         Oro\Bundle\OrganizationBundle\Event\ConfigSubscriber
@@ -102,13 +101,6 @@ services:
         class: %oro_organization.twig.business_units.class%
         arguments:
             - @oro_organization.business_unit_manager
-        tags:
-            - { name: twig.extension }
-
-    oro_organization.twig.organization:
-        class: %oro_organization.twig.organization.class%
-        arguments:
-            - @doctrine.orm.entity_manager
         tags:
             - { name: twig.extension }
 

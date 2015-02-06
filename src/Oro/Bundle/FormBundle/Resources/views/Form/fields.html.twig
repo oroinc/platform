@@ -195,21 +195,6 @@
 {% block oro_multiple_entity_widget %}
     {{ form_widget(form) }}
 
-    <style type="text/css">
-        #{{ id }}-container .entity-item {
-            padding: 5px 7px;
-            margin-left: 0;
-            margin-right: 1.5%;
-            margin-top: 15px;
-            height: 80px;
-            min-width: 290px;
-        }
-
-        #{{ id }}-container .entity-item h4 {
-            margin: 3px 0;
-        }
-    </style>
-
     <div id="{{ id }}-container"></div>
 
     <script type="text/javascript">
@@ -317,112 +302,67 @@
 {% endblock %}
 
 {% block oro_date_widget %}
-    {% set actual_id = id %}
-    {% set selector_name = 'date_selector_' ~ id %}
-    {% set selector_id = selector_name %}
+    {% set options = {
+        view: 'oroui/js/app/views/datepicker/datepicker-view',
+        nativeMode: isMobileVersion(),
+        dateInputAttrs: {
+            placeholder: 'oro.form.choose_date'|trans,
+            id: 'date_selector_' ~ id,
+            name: 'date_selector_' ~ id,
+            'data-validation': '{"Date":{}}',
+        },
+        datePickerOptions: {
+            altFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: years|default('-80:+1')|json_encode|raw,
+            showButtonPanel: true
+        }
+    } %}
 
-    {# Actual date field that uses ISO format #}
-    <span style="display:none">{{ block('date_widget') }}</span>
+    {% set attr = attr|merge({
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))
+    }) %}
 
-    {# Visible fake datepicker field that uses localized format #}
-    {% set id = selector_id %}
-    {% set full_name = selector_name %}
-    <input type="text" {{ block('widget_attributes') }} />
-
-    <script type="text/javascript">
-        require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui'],
-        function($, datetimeFormatter) {
-            var selector = $("#{{ selector_id }}");
-            var actual = $("#{{ actual_id }}");
-            var sync = function() {
-                selector.val(datetimeFormatter.formatDate(actual.val()));
-            };
-            actual.on('change', sync);
-            if (actual.val() && actual.val().length) {
-                sync();
-            }
-            selector.datepicker({
-                altField: '#{{ actual_id }}',
-                altFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true,
-                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
-                showButtonPanel: true,
-                onSelect: function () {
-                    var form = selector.parents('form');
-
-                    if (form.length && form.data('validator')) {
-                        form.validate()
-                            .element(selector);
-                    }
-                    selector.trigger('change');
-                }
-            });
-            selector.keyup(
-                function () {
-                    var selectorValue = selector.val();
-                    if (datetimeFormatter.isDateValid(selectorValue)) {
-                        actual.val(datetimeFormatter.convertDateToBackendFormat(selectorValue));
-                    } else {
-                        actual.val('');
-                    }
-                }
-            );
-        });
-    </script>
+    {{ block('date_widget') }}
 {% endblock oro_date_widget %}
 
 {% block oro_datetime_widget %}
-    {% set actual_id = id %}
-    {% set selector_name = 'datetime_selector_' ~ id %}
-    {% set selector_id = selector_name %}
+    {% set options = {
+        view: 'oroui/js/app/views/datepicker/datetimepicker-view',
+        nativeMode: isMobileVersion(),
+        dateInputAttrs: {
+            placeholder: 'oro.form.choose_date'|trans,
+            id: 'date_selector_' ~ id,
+            name: 'date_selector_' ~ id,
+            class: 'input-small',
+            'data-validation': '{"Date":{}}',
+        },
+        datePickerOptions: {
+            altFormat: 'yy-mm-dd',
+            changeMonth: true,
+            changeYear: true,
+            yearRange: years|default('-80:+1')|json_encode|raw,
+            showButtonPanel: true
+        },
+        timeInputAttrs: {
+            placeholder: 'oro.form.choose_time'|trans,
+            id: 'time_selector_' ~ id,
+            name: 'time_selector_' ~ id,
+            class: 'input-small',
+            'data-validation': '{"Time":{}}',
+        },
+        timePickerOptions: {
+        }
+    } %}
 
-    {# Actual date field that uses ISO format #}
-    <span style="display:none">{{ block('datetime_widget') }}</span>
+    {% set attr = attr|merge({
+        'data-page-component-module': 'oroui/js/app/components/view-component',
+        'data-page-component-options': options|json_encode(constant('JSON_FORCE_OBJECT'))
+    }) %}
 
-    {# Visible fake datetimepicker field that uses localized format #}
-    {% set id = selector_id %}
-    {% set full_name = selector_name %}
-    <input type="text" {{ block('widget_attributes') }} />
-
-    <script type="text/javascript">
-        require(['jquery', 'orolocale/js/formatter/datetime', 'jquery-ui-timepicker'],
-        function($, datetimeFormatter) {
-            var selector = $("#{{ selector_id }}");
-            var actual = $("#{{ actual_id }}");
-            var sync = function() {
-                selector.val(datetimeFormatter.formatDateTime(actual.val()));
-            };
-            actual.on('change', sync);
-            if (actual.val() && actual.val().length) {
-                sync();
-            }
-            selector.datetimepicker({
-                altField: '#{{ actual_id }}',
-                altFormat: 'yy-mm-dd',
-                altTimeFormat: 'HH:mm:ssz',
-                altFieldTimeOnly: false,
-                altSeparator: 'T',
-                changeMonth: true,
-                changeYear: true,
-                yearRange: {{ years|default('-80:+1')|json_encode|raw }},
-                showButtonPanel: true,
-                onSelect: function () {
-                    selector.trigger('change');
-                }
-            });
-            selector.keyup(
-                function () {
-                    var selectorValue = selector.val();
-                    if (datetimeFormatter.isDateTimeValid(selectorValue)) {
-                        actual.val(datetimeFormatter.convertDateTimeToBackendFormat(selectorValue));
-                    } else {
-                        actual.val('');
-                    }
-                }
-            );
-        });
-    </script>
+    {{ block('datetime_widget') }}
 {% endblock oro_datetime_widget %}
 
 {% macro oro_collection_item_prototype(widget) %}
@@ -679,19 +619,20 @@
 
 {% block oro_link_type_widget %}
     {% if isPath or resource_granted(acl) %} {# @todo after BAP-4696 implementation remove isPath from condition #}
-        {# @todo after BAP-4696 implementation remove link class #}
-        {% if value is defined and value is iterable%}
-            {% for fileName, route in value %}
-                <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
-                    {{ fileName }}
-                </a>
-            {% endfor %}
-        {% else %}
-            <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
-                {{ title|trans }}
-            </a>
-        {% endif %}
+        <a href="{{ isPath ? route : path(route, routeParameters) }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+            {{ title|trans }}
+        </a>
     {% endif %}
+{% endblock %}
+
+{% block oro_download_links_type_widget %}
+    {% spaceless %}
+        {% for fileName, route in files %}
+            <a href="{{ route }}" class="{{ class is defined and class ? class : '' }}" style="display: block; margin-top: 5px;">
+                {{ fileName }}
+            </a>
+        {% endfor %}
+    {% endspaceless %}
 {% endblock %}
 
 {% block oro_simple_color_picker_row %}

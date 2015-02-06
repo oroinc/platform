@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class MultipleEntityType extends AbstractType
 {
     const TYPE = 'oro_entity_extend_multiple_entity';
 
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     protected $router;
 
     /**
@@ -31,13 +32,25 @@ class MultipleEntityType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!empty($options['default_element'])) {
-            $builder->add(
-                $options['default_element'],
-                'oro_entity_identifier',
-                [
-                    'class'    => $options['class'],
-                    'multiple' => false
-                ]
+            $builder->addEventListener(
+                FormEvents::PRE_SET_DATA,
+                function (FormEvent $event) use ($options) {
+                    // add field to parent in order to be mapped correctly automatically
+                    // because current field is filled by collection
+                    $parentForm   = $event->getForm()->getParent();
+                    $propertyName = $options['default_element'];
+
+                    if (!$parentForm->has($propertyName)) {
+                        $event->getForm()->getParent()->add(
+                            $propertyName,
+                            'oro_entity_identifier',
+                            [
+                                'class'    => $options['class'],
+                                'multiple' => false
+                            ]
+                        );
+                    }
+                }
             );
         }
     }
@@ -67,11 +80,22 @@ class MultipleEntityType extends AbstractType
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(['extend' => false /* deprecated since 1.5, not used anymore */]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::TYPE;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getParent()
     {
         return 'oro_multiple_entity';

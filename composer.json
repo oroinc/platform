@@ -35,7 +35,7 @@
         "symfony/monolog-bundle": "2.3.0",
         "sensio/distribution-bundle": "2.3.4",
         "sensio/framework-extra-bundle": "2.3.4",
-        "sensio/generator-bundle": "2.3.4",
+        "sensio/generator-bundle": "2.3.5",
         "incenteev/composer-parameter-handler": "2.1.0",
         "jms/job-queue-bundle": "1.1.*",
         "jms/serializer": "0.14.0",
@@ -60,7 +60,7 @@
         "guzzle/http": "3.7.*",
         "lexik/maintenance-bundle": "v1.0.3",
         "sylius/flow-bundle": "0.6.*",
-        "composer/composer": "1.0.0-alpha8",
+        "composer/composer": "1.0.0-alpha9",
         "akeneo/batch-bundle": "~0.3",
         "luxifer/doctrine-functions": "1.2.1",
         "nesbot/Carbon": "1.8.*",
@@ -68,7 +68,9 @@
         "ocramius/proxy-manager": "0.4.*",
         "knplabs/knp-gaufrette-bundle": "0.1.*",
         "rhumsaa/uuid": "2.7.*",
-        "oro/doctrine-extensions": "1.0.*"
+        "oro/doctrine-extensions": "1.0.*",
+        "tinymce/tinymce": "4.1.*",
+        "ezyang/htmlpurifier": "4.6.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

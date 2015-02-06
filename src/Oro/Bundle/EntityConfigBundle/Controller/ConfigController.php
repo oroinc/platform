@@ -5,21 +5,22 @@ namespace Oro\Bundle\EntityConfigBundle\Controller;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 
@@ -36,6 +37,10 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
  */
 class ConfigController extends Controller
 {
+    /**
+     * @var EntityRoutingHelper
+     */
+    protected $routingHelper;
 
     /**
      * Lists all configurable entities.
@@ -80,6 +85,10 @@ class ConfigController extends Controller
      *      group_name=""
      * )
      * @Template()
+     *
+     * @param string $id
+     *
+     * @return array|RedirectResponse
      */
     public function updateAction($id)
     {
@@ -131,6 +140,10 @@ class ConfigController extends Controller
      *      group_name=""
      * )
      * @Template()
+     *
+     * @param EntityConfigModel $entity
+     *
+     * @return array
      */
     public function viewAction(EntityConfigModel $entity)
     {
@@ -156,6 +169,10 @@ class ConfigController extends Controller
      * Lists Entity fields
      * @Route("/fields/{id}", name="oro_entityconfig_fields", requirements={"id"="\d+"}, defaults={"id"=0})
      * @Template()
+     *
+     * @param string $id
+     *
+     * @return array
      */
     public function fieldsAction($id)
     {
@@ -180,6 +197,10 @@ class ConfigController extends Controller
      *      group_name=""
      * )
      * @Template()
+     *
+     * @param string $id
+     *
+     * @return array|RedirectResponse
      */
     public function fieldUpdateAction($id)
     {
@@ -240,42 +261,36 @@ class ConfigController extends Controller
      *      type="action",
      *      group_name=""
      * )
+     * @param string $id
+     * @return Response
      */
     public function fieldSearchAction($id)
     {
         $fields = [];
         if ($id) {
-            $id = str_replace('_', '\\', $id);
+            $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+            $className           = $entityRoutingHelper->decodeClassName($id);
 
-            /** @var EntityConfigModel $entity */
-            $entity = $this->getDoctrine()->getRepository(EntityConfigModel::ENTITY_NAME)
-                ->findOneBy(['className' => $id]);
+            /** @var EntityFieldProvider $fieldProvider */
+            $fieldProvider = $this->get('oro_entity.entity_field_provider');
 
-            if ($entity) {
-                /** @var ConfigProvider $entityConfigProvider */
-                $entityConfigProvider = $this->get('oro_entity_config.provider.entity');
-
-                /** @var FieldConfigModel $fields */
-                $entityFields = $this->getDoctrine()->getRepository(FieldConfigModel::ENTITY_NAME)
-                    ->findBy(
-                        [
-                            'entity' => $entity->getId(),
-                            'type'   => array('integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money')
-                        ]
-                    );
-
-                /** @var Translator $translator */
-                $translator = $this->get('translator');
-
-                foreach ($entityFields as $field) {
-                    $label = $entityConfigProvider->getConfig($id, $field->getFieldName())->get('label');
-                    if (!$label) {
-                        $label = $field->getFieldName();
-                    }
-
-                    $fields[$field->getFieldName()] = $translator->trans($label);
+            $entityFields = $fieldProvider->getFields($className);
+            foreach ($entityFields as $field) {
+                if (!in_array(
+                    $field['type'],
+                    ['integer', 'string', 'smallint', 'decimal', 'bigint', 'text', 'money']
+                )) {
+                    continue;
                 }
+                $fields[$field['name']] = $field['label'] ? : $field['name'];
             }
+        }
+
+        /**
+         * in case no fields were found - add empty_value into result
+         */
+        if (empty($fields)) {
+            $fields[''] = $this->get('translator')->trans('oro.entity.form.choose_entity_field');
         }
 
         return new Response(json_encode($fields));
@@ -284,6 +299,10 @@ class ConfigController extends Controller
     /**
      * @Route("/widget/info/{id}", name="oro_entityconfig_widget_info")
      * @Template
+     *
+     * @param EntityConfigModel $entity
+     *
+     * @return array
      */
     public function infoAction(EntityConfigModel $entity)
     {
@@ -353,6 +372,8 @@ class ConfigController extends Controller
     /**
      * @Route("/widget/entity_fields/{id}", name="oro_entityconfig_widget_entity_fields")
      * @Template
+     * @param EntityConfigModel $entity
+     * @return array
      */
     public function entityFieldsAction(EntityConfigModel $entity)
     {
@@ -400,12 +421,24 @@ class ConfigController extends Controller
             if ($extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)) {
                 $link = $this->generateUrl(
                     'oro_entity_index',
-                    ['entityName' => str_replace('\\', '_', $entity->getClassName())]
+                    ['entityName' => $this->getRoutingHelper()->decodeClassName($entity->getClassName())]
                 );
             }
         }
 
         return $link;
+    }
+
+    /**
+     * @return EntityRoutingHelper
+     */
+    protected function getRoutingHelper()
+    {
+        if (!$this->routingHelper) {
+            $this->routingHelper = $this->get('oro_entity.routing_helper');
+        }
+
+        return $this->routingHelper;
     }
 
     /**

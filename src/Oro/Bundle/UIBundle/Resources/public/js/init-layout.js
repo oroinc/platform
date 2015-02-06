@@ -18,7 +18,7 @@ require(['oroui/js/mediator'], function (mediator) {
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
         'oroui/js/mediator', 'oroui/js/layout',
         'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
-        'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+        'bootstrap', 'jquery-ui'
     ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
@@ -193,9 +193,15 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 $target = $($elem.attr('data-target') || e.preventDefault() || $elem.attr('href'));
             $target.find('.collapse').collapse({toggle: false}).collapse(method);
         });
+        $(document).on('click.collapse.data-api', '[data-toggle=collapse]', function (e) {
+            var target, $toggle = $(this);
+            target = $toggle.attr('data-target') || $toggle.attr('href');
+            $toggle = $toggle.add('[data-target="' + target + '"]').add('[href="' + target + '"]');
+            $toggle.toggleClass('collapsed', !$(target).hasClass('in'));
+        });
         $(document).on('shown.collapse.data-api hidden.collapse.data-api', '.collapse', function (e) {
             var $toggle = $(e.target).closest('.accordion-group').find('[data-toggle=collapse]').first();
-            $toggle[e.type === 'shown' ? 'removeClass' : 'addClass']('collapsed');
+            $toggle.toggleClass('collapsed', e.type !== 'shown');
         });
     });
 
@@ -211,6 +217,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         if (tools.isMobile()) {
             adjustHeight = function () {
                 layout.updateResponsiveLayout();
+                mediator.trigger('layout:reposition');
             }
         } else {
             /* dynamic height for central column */
@@ -266,6 +273,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 $('.sidebar').css({
                     'margin-bottom': footersHeight
                 });
+
+                mediator.trigger('layout:reposition');
             };
 
             if (!anchor.length) {

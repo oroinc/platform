@@ -153,7 +153,8 @@ class SoapApiAclTest extends WebTestCase
                     array(
                         'oro_security', 'oro_login', 'oro_login_check', 'oro_logout', 'oro_reset_check_email',
                         'oro_reset_controller', 'oro_reset_password', 'oro_reset_request', 'oro_reset_send_mail')
-                )) { // root resource will be deleted after any resource delete
+                )) {
+                // root resource will be deleted after any resource delete
                 unset($expectedAcl[ $key ]);
             }
         }

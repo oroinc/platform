@@ -8,6 +8,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
@@ -55,6 +56,11 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
      * @var array
      */
     protected $sourceData;
+
+    /**
+     * @var DatasourceInterface
+     */
+    protected $gridDataSource;
 
     /**
      * @param ServiceLink $gridManagerLink
@@ -161,6 +167,12 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
      */
     protected function getGridData()
     {
+        if (null !== $this->gridDataSource) {
+            $this->grid->setDatasource(clone $this->gridDataSource);
+        } else {
+            $this->gridDataSource = clone $this->grid->getDatasource();
+        }
+
         $this->grid->getParameters()->set(
             PagerInterface::PAGER_ROOT_PARAM,
             [

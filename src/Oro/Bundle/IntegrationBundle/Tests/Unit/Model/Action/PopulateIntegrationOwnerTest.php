@@ -35,6 +35,10 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new PopulateIntegrationOwner($this->contextAccessor, $this->defaultOwnerHelper);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     /**
@@ -72,12 +76,12 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($integration, 'integration', $this->action);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @codingStandardsIgnoreStart
      * @expectedExceptionMessage Action "populate_channel_owner" expects an entity in parameter "attribute", string is given.
-     * @codingStandardsIgnoreEnd
      */
+    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectEntity()
     {
         $context = new \stdClass();
@@ -94,12 +98,12 @@ class PopulateIntegrationOwnerTest extends \PHPUnit_Framework_TestCase
         $this->action->execute($context);
     }
 
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @codingStandardsIgnoreStart
      * @expectedExceptionMessage Action "populate_channel_owner" expects Oro\Bundle\IntegrationBundle\Entity\Channel in parameter "integration", stdClass is given.
-     * @codingStandardsIgnoreEnd
      */
+    // @codingStandardsIgnoreEnd
     public function testExecuteIncorrectIntegration()
     {
         $context = new \stdClass();

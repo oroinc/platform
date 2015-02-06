@@ -9,7 +9,7 @@ define(function (require) {
         Backgrid = require('backgrid'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
+        LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         GridHeader = require('./header'),
         GridBody = require('./body'),
         GridFooter = require('./footer'),
@@ -20,6 +20,8 @@ define(function (require) {
         RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action'),
         ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
         ExportAction = require('oro/datagrid/action/export-action');
+
+    require('orodatagrid/lib/jquery.floatThead');
 
     /**
      * Basic grid class.
@@ -48,11 +50,10 @@ define(function (require) {
         template: _.template(
             '<div class="toolbar"></div>' +
                 '<div class="container-fluid grid-container-parent">' +
-                '<div class="grid-container">' +
-                '<table class="grid table-hover table table-bordered table-condensed"></table>' +
-                '<div class="no-data"></div>' +
-                '</div>' +
-                '<div class="loading-mask"></div>' +
+                    '<div class="grid-container">' +
+                        '<table class="grid table-hover table table-bordered table-condensed"></table>' +
+                        '<div class="no-data"></div>' +
+                    '</div>' +
                 '</div>'
         ),
 
@@ -64,8 +65,9 @@ define(function (require) {
             grid:        '.grid',
             toolbar:     '.toolbar',
             noDataBlock: '.no-data',
-            loadingMask: '.loading-mask',
-            filterBox:   '.filter-box'
+            filterBox:   '.filter-box',
+            loadingMaskContainer: '.grid-container-parent',
+            floatTheadContainer: '.floatThead-container'
         },
 
         /** @property {orodatagrid.datagrid.Header} */
@@ -80,8 +82,8 @@ define(function (require) {
         /** @property {orodatagrid.datagrid.Toolbar} */
         toolbar: Toolbar,
 
-        /** @property {oroui.LoadingMask} */
-        loadingMask: LoadingMask,
+        /** @property {LoadingMaskView|null} */
+        loadingMask: null,
 
         /** @property {orodatagrid.datagrid.column.ActionColumn} */
         actionsColumn: ActionColumn,
@@ -93,14 +95,33 @@ define(function (require) {
          * @property {Object} Default properties values
          */
         defaults: {
-            rowClickActionClass: 'row-click-action',
-            rowClassName:        '',
-            toolbarOptions:      {addResetAction: true, addRefreshAction: true},
-            rowClickAction:      undefined,
-            multipleSorting:     true,
-            rowActions:          [],
-            massActions:         []
+            rowClickActionClass:    'row-click-action',
+            rowClassName:           '',
+            toolbarOptions:         {addResetAction: true, addRefreshAction: true},
+            rowClickAction:         undefined,
+            multipleSorting:        true,
+            rowActions:             [],
+            massActions:            [],
+            enableFullScreenLayout: false
         },
+
+
+        /**
+         * @property {bool} becomes true if dropdown is opened when floatThead enabled
+         */
+        dropdownOpened: false,
+
+        /**
+         * @property {array} contains an array of currently opened dropdowns when floatThead enabled
+         * NOTE: All instances share this property
+         */
+        dropdownsToReset: [],
+
+        /**
+         * Interval id of height fix check function
+         * @private
+         */
+        heightFixIntervalId: null,
 
         /**
          * Initialize grid
@@ -158,7 +179,6 @@ define(function (require) {
                 opts.columns.unshift(this._createSelectRowColumn());
             }
 
-            this.loadingMask = this._createLoadingMask();
             this.toolbar = this._createToolbar(this.toolbarOptions);
 
             Grid.__super__.initialize.apply(this, arguments);
@@ -167,6 +187,8 @@ define(function (require) {
             this._listenToCollectionEvents();
             this._listenToBodyEvents();
             this._listenToCommands();
+
+            this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
         },
 
         /**
@@ -177,6 +199,8 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
+
+            this.setLayout('default', true);
 
             _.each(this.columns.models, function (column) {
                 column.dispose();
@@ -260,16 +284,6 @@ define(function (require) {
          */
         resetSelectionState: function () {
             this.collection.trigger('backgrid:selectNone');
-        },
-
-        /**
-         * Creates loading mask
-         *
-         * @return {oroui.LoadingMask}
-         * @private
-         */
-        _createLoadingMask: function () {
-            return new this.loadingMask();
         },
 
         /**
@@ -431,7 +445,9 @@ define(function (require) {
                 var always = xhr.always;
                 xhr.always = function () {
                     always.apply(this, arguments);
-                    self._afterRequest();
+                    if (!self.disposed) {
+                        self._afterRequest();
+                    }
                 };
             });
 
@@ -508,10 +524,13 @@ define(function (require) {
             this.$el.empty();
             this.$el.append(this.template());
 
+            this.$grid = this.$(this.selectors.grid);
+
             this.renderToolbar();
             this.renderGrid();
             this.renderNoDataBlock();
             this.renderLoadingMask();
+
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
             /**
@@ -527,22 +546,246 @@ define(function (require) {
             mediator.trigger('grid_render:complete', this.$el);
             mediator.execute('layout:init', this.$el, this);
 
+            this.updateLayout();
+
             return this;
+        },
+
+        /**
+         * Returns css expression to set what could be used as height of some block
+         * @returns {string}
+         */
+        getCssHeightCalcExpression: function () {
+            var documentHeight = $(document).height(),
+                availableHeight = mediator.execute('layout:getAvailableHeight', this.$grid.parent());
+            return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
+        },
+
+        /**
+         * Reflows floatThead dependent grid parts.
+         * Must be called on resize.
+         */
+        reflow: function () {
+            var self = this;
+            if (this.removeFloatTheadTimeoutId) {
+                // no need to reflow
+                clearTimeout(this.removeFloatTheadTimeoutId);
+                this.removeFloatTheadTimeoutId = setTimeout(function () {
+                    self.removeFloatThead();
+                    delete self.removeFloatTheadTimeoutId;
+                }, 200);
+                return;
+            }
+            if (this.floatThead) {
+                this.removeFloatTheadDropdowns();
+
+                /**
+                 * Additional styles should not affect floatThead plugin calculations
+                 * Remove that styles temporarily
+                 */
+                this.$el.removeClass('floatThead-move-header');
+                this.$grid.floatThead('reflow');
+                this.$el.addClass('floatThead-move-header');
+
+                // this code fixes horizontal scroll
+                this.$('.floatThead-container, .floatThead-container .grid').css({
+                    paddingRight: mediator.execute('layout:scrollbarWidth')
+                });
+
+                this.$grid.parent().css({
+                    maxHeight: this.getCssHeightCalcExpression()
+                });
+            }
+        },
+
+        /**
+         * Enables or disables float thead support
+         *
+         * @param newValue {boolean}
+         */
+        setFloatThead: function (newValue, instant) {
+            var self = this;
+            if (newValue !== this.floatThead) {
+                this.floatThead = newValue;
+                if (newValue) {
+                    if (this.removeFloatTheadTimeoutId) {
+                        // cancel remove request
+                        clearTimeout(this.removeFloatTheadTimeoutId);
+                        delete this.removeFloatTheadTimeoutId;
+                        return;
+                    }
+                    this.addFloatThead();
+                } else {
+                    // need stabilize UI before remove
+                    if (instant) {
+                        self.removeFloatThead();
+                    } else {
+                        this.removeFloatTheadTimeoutId = setTimeout(function () {
+                            self.removeFloatThead();
+                            delete self.removeFloatTheadTimeoutId;
+                        }, 200);
+                    }
+                }
+            }
+        },
+
+        addFloatThead: function () {
+            var containerClass = '.grid-container';
+            this.$el.addClass('floatThead-connected');
+            this.$grid.floatThead({
+                useAbsolutePositioning: false,
+                // reflow must be called in general resize flow, see this.reflow()
+                debounceResizeMs: 100000000,
+                scrollContainer: function($table){
+                    return $table.closest(containerClass);
+                }
+            });
+            this.reflow();
+            this.addFloatTheadDropdownsSupport();
+            this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
+        },
+
+        removeFloatThead: function () {
+            this.$el.removeClass('floatThead-connected');
+            this.$el.removeClass('floatThead-move-header');
+            this.$grid.floatThead('destroy');
+            this.$grid.parent().css({
+                maxHeight: ''
+            });
+            this.removeFloatTheadDropdownsSupport();
+            clearInterval(this.heightFixIntervalId);
+        },
+
+        fixHeightInFloatTheadMode: function () {
+            var currentTop = this.$grid.parent()[0].getBoundingClientRect().top;
+            if (this.lastTableParentTop !== currentTop) {
+                this.lastTableParentTop = currentTop;
+                this.reflow();
+            }
+        },
+
+        /**
+         * Removes all opened dropdowns in float thead mode
+         */
+        removeFloatTheadDropdowns: function () {
+            var self = this,
+                $container = this.$(this.selectors.floatTheadContainer);
+            if (this.dropdownOpened) {
+                $('body > .floatThead-dynamic-dropdown').remove();
+            }
+            $.each(this.dropdownsToReset, function (){
+                $(this).css({display: ''}).off('.floatThead-' + self.cid)
+                    .closest('.dropdown').removeClass('open');
+            });
+            this.dropdownOpened = false;
+
+            $container.css({
+                height: ''
+            });
+        },
+
+        /**
+         * Attaches logic required to support bootstrap dropdowns with float thead
+         */
+        addFloatTheadDropdownsSupport: function () {
+            var self = this,
+                $container = this.$(this.selectors.floatTheadContainer);
+            $(document).on('click.floatThead-' + this.cid, _.bind(this.removeFloatTheadDropdowns, this));
+            this.$grid.parent().scroll(_.bind(this.removeFloatTheadDropdowns, this));
+            this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
+                self.removeFloatTheadDropdowns();
+                self.dropdownOpened = true;
+
+                var $dropdown = $(e.target).closest('.dropdown'),
+                    $dropdownMenu = $dropdown.find('.dropdown-menu'),
+                    dropdownRect = $dropdown[0].getBoundingClientRect(),
+                    scrollableRect = self.$grid.parent()[0].getBoundingClientRect(),
+                    moveLeft;
+
+                if (dropdownRect.left < scrollableRect.left || dropdownRect.right > scrollableRect.right) {
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    moveLeft = dropdownRect.left < scrollableRect.left
+                        ? dropdownRect.left - scrollableRect.left
+                        : dropdownRect.right - scrollableRect.right;
+                    moveLeft += moveLeft > 0 ? 5 : -5;
+                    self.$grid.parent().scrollLeft(self.$grid.parent().scrollLeft() + moveLeft);
+                    setTimeout(function(){
+                        $dropdown.find('>*:first').trigger('click');
+                    }, 0);
+                } else {
+                    // let bootstrap show menu
+                    _.defer(function () {
+                        if (!$dropdown.hasClass('open')) {
+                            return;
+                        }
+
+                        var position = $dropdownMenu.offset(),
+                            $dropdownMenuCopy = $dropdownMenu.cloneWithStyles(),
+                        // required in IE, it counts width and height incorrectly
+                            clientRect = $dropdownMenu[0].getBoundingClientRect();
+
+                        $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
+                        $('body').append($dropdownMenuCopy);
+
+                        $dropdownMenuCopy.css({
+                            position: 'absolute',
+                            top: position.top + 1, // required to add 1px to exactly match position
+                            left: position.left,
+                            width: clientRect.width,
+                            height: clientRect.height
+                        });
+
+                        $dropdownMenu.hide();
+                        // need to reset after dropdown remove
+                        self.dropdownsToReset.push($dropdownMenu);
+
+                        $dropdownMenuCopy.show();
+
+                        /**
+                         * NOTE: This code switches menus between copy and real dropdown on mouseEnter and mouseLeave
+                         */
+                        $dropdownMenuCopy.on('mouseenter.floatThead-' + self.cid, function expandContainer() {
+                            $container.css({
+                                height: self.getCssHeightCalcExpression()
+                            });
+                            $dropdownMenuCopy.hide();
+                            $dropdownMenu.show();
+                        });
+                        $dropdownMenu.on('mouseleave.floatThead-' + self.cid, function collapseContainer() {
+                            $dropdownMenu.hide();
+                            $dropdownMenuCopy.show();
+                            $container.css({
+                                height: ''
+                            });
+                        });
+                    });
+                }
+            });
+        },
+
+        /**
+         * Detaches logic required to support bootstrap dropdowns with float thead
+         */
+        removeFloatTheadDropdownsSupport: function () {
+            this.$el.off('.floatThead-' + this.cid);
+            $(document).off('.floatThead-' + this.cid);
+            this.removeFloatTheadDropdowns();
         },
 
         /**
          * Renders the grid's header, then footer, then finally the body.
          */
         renderGrid: function () {
-            var $el = this.$(this.selectors.grid);
 
-            $el.append(this.header.render().$el);
+            this.$grid.append(this.header.render().$el);
             if (this.footer) {
-                $el.append(this.footer.render().$el);
+                this.$grid.append(this.footer.render().$el);
             }
-            $el.append(this.body.render().$el);
+            this.$grid.append(this.body.render().$el);
 
-            mediator.trigger("grid_load:complete", this.collection, $el);
+            mediator.trigger("grid_load:complete", this.collection, this.$grid);
         },
 
         /**
@@ -556,8 +799,12 @@ define(function (require) {
          * Renders loading mask.
          */
         renderLoadingMask: function () {
-            this.$(this.selectors.loadingMask).append(this.loadingMask.render().$el);
-            this.loadingMask.hide();
+            if (this.loadingMask) {
+                this.loadingMask.dispose();
+            }
+            this.loadingMask = new LoadingMaskView({
+                container: this.$(this.selectors.loadingMaskContainer)
+            });
         },
 
         /**
@@ -571,7 +818,7 @@ define(function (require) {
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
                 hint: __(message, placeholders).replace('\n', '<br />')
-            }))).hide();
+            })));
         },
 
         /**
@@ -599,6 +846,7 @@ define(function (require) {
                  */
                 mediator.trigger("grid_load:complete", this.collection, this.$el);
                 mediator.execute('layout:init', this.$el, this);
+                this.reflow();
             }
         },
 
@@ -627,17 +875,7 @@ define(function (require) {
          */
         renderNoDataBlock: function () {
             this._defineNoDataBlock();
-            if (this.collection.models.length > 0 && !this.noColumnsFlag) {
-                this.$(this.selectors.toolbar).show();
-                this.$(this.selectors.grid).show();
-                this.$(this.selectors.filterBox).show();
-                this.$(this.selectors.noDataBlock).hide();
-            } else {
-                this.$(this.selectors.grid).hide();
-                this.$(this.selectors.toolbar).hide();
-                this.$(this.selectors.filterBox).hide();
-                this.$(this.selectors.noDataBlock).show();
-            }
+            this.$el.toggleClass('no-data-visible', this.collection.models.length <= 0  || this.noColumnsFlag);
         },
 
         /**
@@ -677,6 +915,41 @@ define(function (require) {
             var state = this.collection.state;
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
+            }
+        },
+
+        /**
+         * Chooses layout on resize or during creation
+         */
+        updateLayout: function () {
+            var layout = 'default';
+            if (this.enableFullScreenLayout) {
+                layout = mediator.execute('layout:getPreferredLayout', this.$grid);
+            }
+            this.setLayout(layout);
+        },
+
+        /**
+         * Sets layout and perform all required operations
+         */
+        setLayout: function (newLayout, instant) {
+            if (newLayout === this.layout) {
+                this.reflow();
+                return;
+            }
+            this.layout = newLayout;
+            switch (newLayout) {
+                case 'fullscreen':
+                    mediator.execute('layout:disablePageScroll', this.$grid);
+                    this.setFloatThead(true, instant);
+                    break;
+                case 'scroll':
+                case 'default':
+                    this.setFloatThead(false, instant);
+                    mediator.execute('layout:enablePageScroll', this.$grid);
+                    break;
+                default:
+                    throw new Error('Unknown grid layout');
             }
         }
     });

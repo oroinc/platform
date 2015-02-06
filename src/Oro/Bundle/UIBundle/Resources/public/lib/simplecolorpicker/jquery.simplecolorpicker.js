@@ -381,19 +381,35 @@
         } : null;
     },
 
+    colorDifference: function (x, y) {
+        return Math.abs(x.r - y.r) * 299
+            + Math.abs(x.g - y.g) * 587
+            + Math.abs(x.b - y.b) * 114;
+    },
+
     /**
      * Calculates contrast color
-     * @see http://www.w3.org/WAI/ER/WD-AERT/#color-contrast
      *
      * @param {string} hex A color in six-digit hexadecimal form.
      * @returns {string} Calculated sufficient contrast color, black or white.
      *                   If the given color is invalid or cannot be parsed, returns black.
      */
-    getContrastColor: function (hex) {
+    getContrastColor: function (hex, blackPreference) {
         var rgb = this.hex2rgb(hex),
-            yiq = rgb ? ((299 * rgb.r + 587 * rgb.g + 114 * rgb.b) / 1000) : 255,
-            clrDiff = rgb ? (rgb.r + rgb.g + rgb.b) : 1000;
-        return yiq > 125 && clrDiff > 500 ? '#000000' : '#FFFFFF';
+            white = {
+                r: 255,
+                g: 255,
+                b: 255
+            },
+            black = {
+                r: 0,
+                g: 0,
+                b: 0
+            };
+        if (!blackPreference) {
+            blackPreference = 0.58;
+        }
+        return (this.colorDifference(rgb, black) * blackPreference > this.colorDifference(rgb, white)) ? '#000000' : '#FFFFFF';
     }
   };
 

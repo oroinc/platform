@@ -6,7 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
-
 use Oro\Bundle\NoteBundle\Migrations\Schema\v1_0\OroNoteBundle;
 use Oro\Bundle\NoteBundle\Migrations\Schema\v1_1\OroNoteBundle as NoteOrganization;
 

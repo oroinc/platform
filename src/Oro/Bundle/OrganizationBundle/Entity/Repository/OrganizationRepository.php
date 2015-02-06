@@ -59,15 +59,21 @@ class OrganizationRepository extends EntityRepository
     /**
      * Returns enabled organizations
      *
-     * @param bool $asArray
+     * @param bool  $asArray
+     * @param array $sortOrder array with order parameters. key - organization entity field, value - sort direction
      * @return Organization[]|array
      */
-    public function getEnabled($asArray = false)
+    public function getEnabled($asArray = false, $sortOrder = [])
     {
-        $organizationsQuery = $this->createQueryBuilder('org')
+        $organizationsQueryQB = $this->createQueryBuilder('org')
             ->select('org')
-            ->where('org.enabled = true')
-            ->getQuery();
+            ->where('org.enabled = true');
+        if (!empty($sortOrder)) {
+            foreach ($sortOrder as $fieldName => $direction) {
+                $organizationsQueryQB->addOrderBy('org.' . $fieldName, $direction);
+            }
+        }
+        $organizationsQuery = $organizationsQueryQB->getQuery();
 
         if ($asArray) {
             return $organizationsQuery->getArrayResult();
@@ -82,17 +88,21 @@ class OrganizationRepository extends EntityRepository
      * @param string  $tableName    table name to update, example: OroCRMAccountBundle:Account or OroUserBundle:Group
      * @param integer $id           Organization id
      * @param string  $relationName relation name to update. By default 'organization'
+     * @param bool    $onlyEmpty    Update data only for the records with empty relation
      *
      * @return integer Number of rows affected
      */
-    public function updateWithOrganization($tableName, $id, $relationName = 'organization')
+    public function updateWithOrganization($tableName, $id, $relationName = 'organization', $onlyEmpty = false)
     {
-        return $this->getEntityManager()
+        $qb = $this->getEntityManager()
             ->createQueryBuilder()
             ->update($tableName, 't')
             ->set('t.' . $relationName, ':id')
-            ->setParameter('id', $id)
-            ->getQuery()
+            ->setParameter('id', $id);
+        if ($onlyEmpty) {
+            $qb->where('t.' . $relationName . ' IS NULL ');
+        }
+        return $qb->getQuery()
             ->execute();
     }
 
@@ -101,7 +111,7 @@ class OrganizationRepository extends EntityRepository
      *
      * @param User   $user
      * @param string $name
-     * @param bool   $useLikeExpr Using expr()->like by default and expr()->eq otherwise
+     * @param bool   $useLikeExpr  Using expr()->like by default and expr()->eq otherwise
      * @param bool   $singleResult If we expected only one result
      *
      * @return Organization[]

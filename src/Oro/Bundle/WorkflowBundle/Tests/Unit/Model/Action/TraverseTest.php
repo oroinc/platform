@@ -27,6 +27,10 @@ class TraverseTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new Traverse(new ContextAccessor(), $this->configurableAction);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     /**

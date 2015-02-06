@@ -51,11 +51,14 @@ class FormListener
         );
 
         /**
-         * Setting owner field as last field in first data block
+         * Setting owner field as first field in first data block
          */
         if (!empty($data['dataBlocks'])) {
             if (isset($data['dataBlocks'][0]['subblocks'])) {
-                $data['dataBlocks'][0]['subblocks'][0]['data'][] = $ownerField;
+                if (!isset($data['dataBlocks'][0]['subblocks'][0])) {
+                    $data['dataBlocks'][0]['subblocks'][0] = ['data' => []];
+                }
+                array_unshift($data['dataBlocks'][0]['subblocks'][0]['data'], $ownerField);
             }
         }
 

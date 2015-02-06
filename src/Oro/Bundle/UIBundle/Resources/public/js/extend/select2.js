@@ -115,6 +115,12 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
                     return !option.children && matcher.apply(this, arguments);
                 };
             }
+
+            var additionalRequestParams = options.element.data('select2_query_additional_params');
+            if (additionalRequestParams && options.ajax !== undefined) {
+                options.ajax.url += (options.ajax.url.indexOf('?') == -1 ? '?' : '&') + $.param(additionalRequestParams);
+            }
+
             return prepareOpts.call(this, options);
         };
     }(window.Select2['class'].abstract.prototype));
@@ -188,6 +194,17 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
             clear.apply(this, arguments);
         };
     }(window.Select2['class'].single.prototype));
+
+    // Override methods of MultiSelect2 class
+    // Fix is valid for version 3.4.1
+    (function(prototype) {
+        var resizeSearch = prototype.resizeSearch;
+
+        prototype.resizeSearch = function() {
+            resizeSearch.apply(this, arguments);
+            this.search.width(Math.floor($(this.search).width()) - 1);
+        }
+    }(window.Select2['class'].multi.prototype));
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
         formatSearching: function() { return __('Searching...'); },

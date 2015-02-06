@@ -24,8 +24,12 @@
             });
         </script>
     {% else %}
-    <form id="{{ form.vars.name }}" action="{{ oro_url_add_query(formAction) }}" {{ form_enctype(form) }}
-          method="post" data-collect="true">
+
+    {% if addQueryParameters is not defined or addQueryParameters == true %}
+        {% set formAction = oro_url_add_query(formAction) %}
+    {% endif %}
+    <form id="{{ form.vars.name }}" action="{{ formAction }}" {{ form_enctype(form) }}
+          method="{{ form.vars.method }}" data-collect="true">
         {% if isWidgetContext %}
             <div class="widget-actions">
                 <button type="reset" class="btn">{{ 'Cancel'|trans }}</button>
@@ -92,7 +96,9 @@
                             {% block navButtons %}{% endblock navButtons %}
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
-                            <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
+                            {% if form.vars.method != 'GET' %}
+                                <input type="hidden" name="input_action" value="" data-form-id="{{ form.vars.name }}"/>
+                            {% endif %}
                         </div>
                         <div class="pull-right user-info-state">
                             <div class="inline-decorate-container">
@@ -106,7 +112,7 @@
                                                 'entity': entity|default(form.vars.value),
                                                 'entity_class': audit_entity_class|default(null),
                                                 'id': audit_entity_id,
-                                                'title': audit_title|default(form.vars.value),
+                                                'title': audit_title|default(form.vars.value.__toString is defined ? form.vars.value : null),
                                                 'audit_path': audit_path|default('oro_dataaudit_history'),
                                                 'audit_show_change_history': audit_show_change_history|default(false)
                                             } %}

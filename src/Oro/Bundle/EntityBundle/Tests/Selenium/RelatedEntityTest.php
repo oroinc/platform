@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Selenium;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntity;
 use Oro\Bundle\NavigationBundle\Tests\Selenium\Pages\Navigation;
 use Oro\Bundle\TestFrameworkBundle\Test\Selenium2TestCase;
 use Oro\Bundle\EntityConfigBundle\Tests\Selenium\Pages\ConfigEntities;
@@ -64,12 +65,14 @@ class RelatedEntityTest extends Selenium2TestCase
         $login = $this->login();
 
         /** @var Navigation $login */
-        $login->openNavigation('Oro\Bundle\NavigationBundle')
+        $login = $login->openNavigation('Oro\Bundle\NavigationBundle')
             ->tab('System')
             ->menu('Entities')
             ->menu($entityData['entityName'])
-            ->open()
-            ->openConfigEntity('Oro\Bundle\EntityConfigBundle')
+            ->open();
+
+        /** @var ConfigEntity $login */
+        $login->openConfigEntity('Oro\Bundle\EntityConfigBundle')
             ->newCustomEntityAdd()
             ->setStringField($entityData['stringField'], 'Some test text')
             ->addRelation($entityData['relationField'])

@@ -87,16 +87,18 @@ class BusinessUnitRepository extends EntityRepository
      * Or returns business units tree for given organization.
      *
      * @param int|null $organizationId
+     * @param array $sortOrder array with order parameters. key - organization entity field, value - sort direction
+     *
      * @return array
      */
-    public function getOrganizationBusinessUnitsTree($organizationId = null)
+    public function getOrganizationBusinessUnitsTree($organizationId = null, $sortOrder = [])
     {
         $tree          = [];
         $businessUnits = $this->getBusinessUnitsTree();
 
         $organizations = $this->_em
             ->getRepository('OroOrganizationBundle:Organization')
-            ->getEnabled(true);
+            ->getEnabled(true, $sortOrder);
         foreach ($organizations as $organizationItem) {
             $tree[$organizationItem['id']] = [
                 'id'       => $organizationItem['id'],

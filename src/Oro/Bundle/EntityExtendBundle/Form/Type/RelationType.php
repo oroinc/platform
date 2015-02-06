@@ -14,29 +14,35 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
 
 class RelationType extends AbstractType
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Config
-     */
+    /** @var Config */
     protected $config;
 
-    /**
-     * @var FormFactory
-     */
+    /** @var FormFactory */
     protected $formFactory;
 
-    public function __construct(ConfigManager $configManager)
+    /** @var TargetFieldType */
+    protected $targetFieldType;
+
+    /**
+     * @param ConfigManager   $configManager
+     * @param TargetFieldType $targetFieldType
+     */
+    public function __construct(ConfigManager $configManager, TargetFieldType $targetFieldType)
     {
-        $this->configManager = $configManager;
+        $this->configManager   = $configManager;
+        $this->targetFieldType = $targetFieldType;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->config      = $this->configManager
@@ -52,10 +58,13 @@ class RelationType extends AbstractType
             ]
         );
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSubmitData'));
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'preSubmitData'));
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSubmitData']);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmitData']);
     }
 
+    /**
+     * @param FormEvent $event
+     */
     public function preSubmitData(FormEvent $event)
     {
         $form = $event->getForm();
@@ -68,7 +77,7 @@ class RelationType extends AbstractType
             $targetEntity = $this->getArrayValue($data, 'target_entity');
             $relationType = $this->config->getId()->getFieldType();
 
-            if ($relationType == 'manyToOne') {
+            if ($relationType == RelationTypeBase::MANY_TO_ONE) {
                 $this->addTargetField(
                     $form,
                     'target_field',
@@ -108,6 +117,9 @@ class RelationType extends AbstractType
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
@@ -118,6 +130,9 @@ class RelationType extends AbstractType
         );
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'oro_entity_relation_type';
@@ -148,10 +163,13 @@ class RelationType extends AbstractType
             $options['multiple'] = true;
         }
 
+        $targetFieldType = $this->targetFieldType;
+        $targetFieldType->setEntityClass($targetEntityClass);
+
         $form->add(
             $this->formFactory->createNamed(
                 $name,
-                new TargetFieldType($this->configManager, $targetEntityClass),
+                $targetFieldType,
                 $data,
                 $options
             )

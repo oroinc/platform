@@ -21,6 +21,7 @@ define([
             subject: '',
             data: '',
             configuration: '',
+            commentCount: 0,
 
             activityEntityClass: '',
             activityEntityId: '',
@@ -32,7 +33,19 @@ define([
             contentHTML: '',
 
             editable: true,
-            removable: true
+            removable: true,
+            commentable: false
+        },
+
+        initialize: function () {
+            this.once('change:contentHTML', function () {
+                this.set('is_loaded', true);
+            });
+            ActivityModel.__super__.initialize.apply(this, arguments);
+        },
+
+        getRelatedActivityClass: function () {
+            return this.get('relatedActivityClass').replace(/\\/g, '_');
         }
     });
 

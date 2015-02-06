@@ -14,11 +14,14 @@ use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\SubRequestAclConditionStorage;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\AclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAclCondition;
 use Oro\Bundle\SecurityBundle\ORM\Walker\Condition\JoinAssociationCondition;
+use Oro\Bundle\SecurityBundle\Event\ProcessSelectAfter;
 
 /**
  * Class ACLHelper
@@ -41,14 +44,20 @@ class AclHelper
      */
     protected $em;
 
+    /** @var array */
     protected $entityAliases;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     * @param $builder
+     * @param OwnershipConditionDataBuilder $builder
+     * @param EventDispatcherInterface      $eventDispatcher
      */
-    public function __construct(OwnershipConditionDataBuilder $builder)
+    public function __construct(OwnershipConditionDataBuilder $builder, EventDispatcherInterface $eventDispatcher)
     {
-        $this->builder = $builder;
+        $this->builder         = $builder;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -57,6 +66,7 @@ class AclHelper
      * @param string   $className
      * @param Criteria $criteria
      * @param string   $permission
+     *
      * @return Criteria
      */
     public function applyAclToCriteria($className, Criteria $criteria, $permission)
@@ -86,6 +96,7 @@ class AclHelper
      * @param Query|QueryBuilder $query
      * @param string             $permission
      * @param bool               $checkRelations
+     *
      * @return Query
      */
     public function apply($query, $permission = "VIEW", $checkRelations = true)
@@ -176,6 +187,7 @@ class AclHelper
      *
      * @param Subselect $subSelect
      * @param           $permission
+     *
      * @return SubRequestAclConditionStorage
      */
     protected function processSubselect(Subselect $subSelect, $permission)
@@ -190,6 +202,7 @@ class AclHelper
      *
      * @param Subselect|SelectStatement $select
      * @param string                    $permission
+     *
      * @return array
      */
     protected function processSelect($select, $permission)
@@ -199,9 +212,10 @@ class AclHelper
         } else {
             $isSubRequest = true;
         }
+
         $whereConditions = [];
-        $joinConditions = [];
-        $fromClause = $isSubRequest ? $select->subselectFromClause : $select->fromClause;
+        $joinConditions  = [];
+        $fromClause      = $isSubRequest ? $select->subselectFromClause : $select->fromClause;
 
         foreach ($fromClause->identificationVariableDeclarations as $fromKey => $identificationVariableDeclaration) {
             $condition = $this->processRangeVariableDeclaration(
@@ -242,7 +256,13 @@ class AclHelper
             }
         }
 
-        return array($whereConditions, $joinConditions);
+        $event = new ProcessSelectAfter($select, $whereConditions, $joinConditions);
+        $this->eventDispatcher->dispatch(ProcessSelectAfter::NAME, $event);
+
+        $whereConditions = $event->getWhereConditions();
+        $joinConditions  = $event->getJoinConditions();
+
+        return [$whereConditions, $joinConditions];
     }
 
     /**
@@ -251,6 +271,7 @@ class AclHelper
      * @param IdentificationVariableDeclaration $declaration
      * @param                                   $key
      * @param                                   $permission
+     *
      * @return JoinAssociationCondition|null
      */
     protected function processJoinAssociationPathExpression(
@@ -310,6 +331,7 @@ class AclHelper
      * @param string                   $permission
      * @param bool                     $isJoin
      * @param bool                     $isSubRequest
+     *
      * @return null|AclCondition|JoinAclCondition
      */
     protected function processRangeVariableDeclaration(

@@ -1,0 +1,71 @@
+.comments-block {
+  min-width: initial;
+  .comment-form {
+    .comment-text-field {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .attachment-item {
+      margin-top: 5px;
+    }
+    span.filename {
+      width: 160px;
+    }
+  }
+  .comment-item {
+    border-bottom: 1px solid #f0f0f0;
+    min-height: 57px;
+    position: relative;
+    &:last-child {
+      border-bottom: none;
+    }
+    .title-item{
+      margin-left: 20px;
+      .accordion-icon {
+        margin-left: -20px;
+      }
+    }
+  }
+  .short-comment {
+    padding-top: 2px;
+    padding-left: 20px;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    height: 22px;
+  }
+  .accordion-icon:before {
+    vertical-align: top;
+  }
+  .accordion-heading {
+    padding: 5px 10px 9px 10px;
+    display: block;
+    > div {
+      display: block;
+    }
+    &:hover {
+      background-color: transparent;
+    }
+  }
+  .accordion-body {
+    margin-top: -29px;
+  }
+  .accordion-inner {
+    border-top: none;
+    padding-top: 0;
+    padding-left: 30px;
+    background-color: #fff;
+  }
+  .attachment-icon.accordion-toggle {
+    display: none;
+    &.collapsed {
+      display: inline-block;
+    }
+  }
+  .attachment-item {
+    .item-remove-attachment {
+      text-decoration: none;
+    }
+  }
+}

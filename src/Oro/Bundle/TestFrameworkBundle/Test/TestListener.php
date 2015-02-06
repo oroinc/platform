@@ -30,7 +30,6 @@ class TestListener implements \PHPUnit_Framework_TestListener
     private function storeAScreenshot(\PHPUnit_Framework_Test $test)
     {
         if ($test instanceof \PHPUnit_Extensions_Selenium2TestCase) {
-
             $className = explode('\\', get_class($test));
             try {
                 $file = getcwd() . DIRECTORY_SEPARATOR . $this->directory . DIRECTORY_SEPARATOR . end($className);
@@ -110,7 +109,8 @@ class TestListener implements \PHPUnit_Framework_TestListener
                     pclose(
                         popen(
                             "start /b " . PHPUNIT_TESTSUITE_BROWSER_PATH_WINNT .
-                            " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT,
+                            " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT .
+                            " --ignore-ssl-errors=true",
                             "r"
                         )
                     );
@@ -118,6 +118,7 @@ class TestListener implements \PHPUnit_Framework_TestListener
                     shell_exec(
                         "nohup " . PHPUNIT_TESTSUITE_BROWSER_PATH_LINUX .
                         " --webdriver=" . PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT .
+                        " --ignore-ssl-errors=true" .
                         " > /dev/null 2> /dev/null &"
                     );
                 }

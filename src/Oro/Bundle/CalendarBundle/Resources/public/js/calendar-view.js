@@ -32,7 +32,6 @@ define(function (require) {
      */
     return Backbone.View.extend({
         MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
-        CALENDAR_BOTTOM_PADDING: 10,
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
@@ -71,7 +70,7 @@ define(function (require) {
                 itemFormDeleteButtonSelector: null,
                 calendar: null,
                 subordinate: true,
-                defaultTimedEventDuration: moment.duration('02:00:00'),
+                defaultTimedEventDuration: moment.duration('00:30:00'),
                 defaultAllDayEventDuration: moment.duration('24:00:00'),
                 header: {
                     ignoreTimezone: false,
@@ -81,8 +80,7 @@ define(function (require) {
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
-                minimalHeightForFullScreenLayout: 500 // chrome 768px height and a lot
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
             },
             connectionsOptions: {
                 collection: null,
@@ -138,12 +136,6 @@ define(function (require) {
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
-
-            this.devToolbarHeight = 0;
-            var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
-            if (devToolbarComposition && devToolbarComposition.view) {
-                this.devToolbarHeight = devToolbarComposition.view.$el.height();
-            }
         },
 
         /**
@@ -315,7 +307,7 @@ define(function (require) {
 
         onFcSelect: function (start, end) {
             var attrs = {
-                allDay: start.time()._milliseconds === 0 && end.time()._milliseconds === 0,
+                allDay: start.time().as('ms') === 0 && end.time().as('ms') === 0,
                 start: start.clone(),
                 end: end.clone()
             }
@@ -383,22 +375,22 @@ define(function (require) {
                 end: fcEvent.end ? fcEvent.end.clone() : null
             }
         },
+
         onFcEventDrop: function (fcEvent, dateDiff, undo, jsEvent) {
             var realDuration,
+                currentView = this.getCalendarElement().fullCalendar('getView'),
                 oldState = fcEvent._beforeDragState,
-                // please do not change accessing _milliseconds property to milliseconds() call
-                // that will cause issues
                 isDroppedOnDayGrid =
-                    fcEvent.start.time()._milliseconds === 0
-                    && (fcEvent.end === null || fcEvent.end.time()._milliseconds === 0);
+                    fcEvent.start.time().as('ms') === 0
+                        && (fcEvent.end === null || fcEvent.end.time().as('ms') === 0);
 
             // when on week view all-day event is dropped at 12AM to hour view
             // previous condition gives false positive result
-            if (fcEvent.end === null && isDroppedOnDayGrid === true && fcEvent.start.time()._milliseconds === 0) {
+            if (fcEvent.end === null && isDroppedOnDayGrid === true && fcEvent.start.time().as('ms') === 0) {
                 isDroppedOnDayGrid = !$(jsEvent.target).parents(".fc-time-grid-event").length;
             }
 
-            fcEvent.allDay = isDroppedOnDayGrid;
+            fcEvent.allDay = (currentView.name === 'month') ? oldState.allDay : isDroppedOnDayGrid;
             if (isDroppedOnDayGrid) {
                 if (oldState.allDay) {
                     if (fcEvent.end === null && oldState.end === null) {
@@ -407,13 +399,17 @@ define(function (require) {
                         realDuration = oldState.end.diff(oldState.start);
                     }
                 } else {
-                    realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
+                    if (currentView.name === 'month') {
+                        realDuration = oldState.end ? oldState.end.diff(oldState.start) : 0;
+                    } else {
+                        realDuration = this.options.eventsOptions.defaultAllDayEventDuration;
+                    }
                 }
             } else {
                 if (oldState.allDay) {
                     realDuration = this.options.eventsOptions.defaultTimedEventDuration;
                 } else {
-                    realDuration = oldState.end.diff(oldState.start);
+                    realDuration = oldState.end ? oldState.end.diff(oldState.start) : 0;
                 }
             }
             fcEvent.end = fcEvent.start.clone().add(realDuration);
@@ -557,28 +553,24 @@ define(function (require) {
          */
         createViewModel: function (eventModel) {
             var fcEvent = _.pick(
-                eventModel.attributes,
-                ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
-            );
-            this.prepareViewModel(fcEvent);
-            this.applyTzCorrection(1, fcEvent);
-            return fcEvent;
-        },
+                    eventModel.attributes,
+                    ['id', 'title', 'start', 'end', 'allDay', 'backgroundColor', 'calendarUid', 'editable']
+                ),
+                colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
 
-        /**
-         * Prepares event entry for rendering in calendar plugin
-         *
-         * @param {Object} fcEvent
-         */
-        prepareViewModel: function (fcEvent) {
             // set an event text and background colors the same as the owning calendar
-            var colors = this.colorManager.getCalendarColors(fcEvent.calendarUid);
             fcEvent.color = colors.backgroundColor;
             if (fcEvent.backgroundColor) {
                 fcEvent.textColor = colorUtil.getContrastColor(fcEvent.backgroundColor);
             } else {
                 fcEvent.textColor = colors.color;
             }
+
+            this.applyTzCorrection(1, fcEvent);
+            if (fcEvent.end && fcEvent.end.diff(fcEvent.start) === 0) {
+                fcEvent.end = null;
+            }
+            return fcEvent;
         },
 
         /**
@@ -737,7 +729,6 @@ define(function (require) {
             };
             options.axisFormat = timeFormat;
 
-
             self = this;
             options.eventAfterAllRender = function () {
                 _.delay(_.bind(self.setTimeline, self));
@@ -746,7 +737,7 @@ define(function (require) {
             };
             options.windowResize = function () {
                 self.setTimeline();
-                _.delay(_.bind(self.checkLayout, self));
+                _.delay(_.bind(self.updateLayout, self));
             };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
@@ -758,7 +749,7 @@ define(function (require) {
             options.timezone = "UTC";
 
             this.getCalendarElement().fullCalendar(options);
-            this.checkLayout();
+            this.updateLayout();
             this.enableEventLoading = true;
         },
 
@@ -865,7 +856,7 @@ define(function (require) {
             if (currentView.name === 'agendaWeek') {
                 // week view, don't want the timeline to go the whole way across
                 dayCol = calendarElement.find('.fc-today:visible');
-                if (dayCol.position() !== null) {
+                if (dayCol.length !== 0 && dayCol.position() !== null) {
                     timelineElement.css({
                         left: (dayCol.position().left) + 'px',
                         width: (dayCol.width() + 3) + 'px'
@@ -901,40 +892,28 @@ define(function (require) {
             return result;
         },
 
-        getAvailableCalendarHeight: function () {
-            var $calendarEl = this.getCalendarElement(),
-                $scrollableParents = $calendarEl.parents('.scrollable-container'),
-                $viewEl = $calendarEl.find('.fc-view:first'),
-                heightDiff = $(document).height() - $viewEl[0].getBoundingClientRect().top;
-            $scrollableParents.each(function () {
-                heightDiff += this.scrollTop;
-            });
-            return heightDiff - this.devToolbarHeight - this.CALENDAR_BOTTOM_PADDING;
+        getAvailableHeight: function () {
+            var $fcView = this.getCalendarElement().find('.fc-view:first');
+            return mediator.execute('layout:getAvailableHeight', $fcView)
         },
 
-        getAvailableSidebarHeight: function () {
-            var $sidebarEl = $('.oro-page-sidebar'),
-                $scrollableParents = $sidebarEl.parents('.scrollable-container'),
-                heightDiff = $(document).height() - $sidebarEl[0].getBoundingClientRect().top;
-            $scrollableParents.each(function () {
-                heightDiff += this.scrollTop;
-            });
-            return heightDiff - this.devToolbarHeight;
-        },
 
-        checkLayout: function () {
+        /**
+         * Chooses layout on resize or during creation
+         */
+        updateLayout: function () {
             if (this.options.eventsOptions.aspectRatio) {
                 this.setLayout('default');
                 // do nothing
                 return;
             }
-            if (this.getAvailableCalendarHeight() > this.options.eventsOptions.minimalHeightForFullScreenLayout) {
-                this.setLayout('fullscreen');
-            } else {
-                this.setLayout('scroll');
-            }
+            var $fcView = this.getCalendarElement().find('.fc-view:first');
+            this.setLayout(mediator.execute('layout:getPreferredLayout', $fcView));
         },
 
+        /**
+         * Sets layout and perform all required operations
+         */
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 if (newLayout === 'fullscreen') {
@@ -949,19 +928,16 @@ define(function (require) {
                 height = '';
             switch (newLayout) {
                 case 'fullscreen':
-                    $('.calendars').height(this.getAvailableSidebarHeight());
-                    this.disablePageScroll();
-                    contentHeight = this.getAvailableCalendarHeight();
+                    mediator.execute('layout:disablePageScroll', $calendarEl);
+                    contentHeight = this.getAvailableHeight();
                     break;
                 case 'scroll':
                     height = 'auto';
                     contentHeight = 'auto';
-                    $('.calendars').height('');
-                    this.enablePageScroll();
+                    mediator.execute('layout:enablePageScroll', $calendarEl);
                     break;
                 case 'default':
-                    $('.calendars').height('');
-                    this.enablePageScroll();
+                    mediator.execute('layout:enablePageScroll', $calendarEl);
                     // default values
                     break;
                 default:
@@ -969,14 +945,6 @@ define(function (require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
-        },
-        disablePageScroll: function () {
-            var $scrollableParents = this.getCalendarElement().parents('.scrollable-container');
-            $scrollableParents.scrollTop(0);
-            $scrollableParents.addClass('disable-scroll');
-        },
-        enablePageScroll: function () {
-            this.getCalendarElement().parents('.scrollable-container').removeClass('disable-scroll');
         }
     });
 });

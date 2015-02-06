@@ -20,6 +20,10 @@ class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
     {
         $contextAccessor = new ContextAccessor();
         $this->action    = new SaveFieldsChangesAction($contextAccessor);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     /**

@@ -20,7 +20,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
  */
 abstract class AddActivityListsData extends AbstractFixture implements ContainerAwareInterface
 {
-    const BATCH_SIZE = 300;
+    const BATCH_SIZE = 2000;
 
     /** @var ContainerInterface */
     protected $container;
@@ -53,7 +53,6 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
             $queryBuilder = $manager->getRepository($activityClass)->createQueryBuilder('entity');
             $iterator     = new BufferedQueryResultIterator($queryBuilder);
             $iterator->setBufferSize(self::BATCH_SIZE);
-
             $itemsCount = 0;
             $entities   = [];
 
@@ -103,7 +102,9 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
                 $manager->persist($activityListEntity);
             }
         }
+
         $manager->flush();
+        $manager->clear();
     }
 
     /**

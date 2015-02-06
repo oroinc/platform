@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvent;
+use Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents;
 use Oro\Bundle\WorkflowBundle\Model\Condition\ConditionInterface;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
-abstract class AbstractAction implements ActionInterface
+abstract class AbstractAction implements ActionInterface, EventDispatcherAwareActionInterface
 {
     /**
      * @var ContextAccessor
@@ -16,6 +20,11 @@ abstract class AbstractAction implements ActionInterface
      * @var ConditionInterface
      */
     protected $condition;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * @param ContextAccessor $contextAccessor
@@ -34,12 +43,32 @@ abstract class AbstractAction implements ActionInterface
     }
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * @param mixed $context
      */
     public function execute($context)
     {
         if ($this->isAllowed($context)) {
+            // dispatch oro_workflow.action.handle_before event
+            $this->eventDispatcher->dispatch(
+                ExecuteActionEvents::HANDLE_BEFORE,
+                new ExecuteActionEvent($context, $this)
+            );
+
             $this->executeAction($context);
+
+            // dispatch oro_workflow.action.handle_after event
+            $this->eventDispatcher->dispatch(
+                ExecuteActionEvents::HANDLE_AFTER,
+                new ExecuteActionEvent($context, $this)
+            );
         }
     }
 

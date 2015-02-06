@@ -51,12 +51,9 @@ parameters:
     oro_security.ownership_tree.cache.warmer.class:            Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheWarmer
     oro_security.ownership_tree.cache.clearer.class:           Oro\Bundle\SecurityBundle\Cache\OwnerTreeCacheCleaner
     oro_security.ownership_tree_subscriber.class:              Oro\Bundle\SecurityBundle\EventListener\OwnerTreeListener
-    oro_security.authentication.listener.form.class:           Oro\Bundle\SecurityBundle\Http\Firewall\UsernamePasswordOrganizationFormAuthenticationListener
     oro-security.authentication.listener.basic.class:          Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener
-    oro_security.authentication.listener.organization_rememberme.class: Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationRememberMeListener
     oro_security.authentication.provider.username_password_organization.class: Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider
     oro_security.authentication.provider.organization_rememberme.class: Oro\Bundle\SecurityBundle\Authentication\Provider\OrganizationRememberMeAuthenticationProvider
-    oro_security.authentication.organization_rememberme.services.simplehash.class: Oro\Bundle\SecurityBundle\Http\RememberMe\OrganizationTokenBasedRememberMeServices
 
     oro_security.listener.context_listener.class:              Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener
     oro_security.listener.refresh_context_listener.class:      Oro\Bundle\SecurityBundle\EventListener\RefreshContextListener
@@ -346,6 +343,7 @@ services:
         class: %oro_security.acl_helper.class%
         arguments:
              - @oro_security.orm.ownership_sql_walker_builder
+             - @event_dispatcher
 
     oro_security.orm.ownership_sql_walker_builder:
         public: false
@@ -398,25 +396,6 @@ services:
         tags:
             - { name: doctrine.event_listener, event: onFlush }
 
-    oro_security.authentication.listener.form:
-        class: %oro_security.authentication.listener.form.class%
-        parent: security.authentication.listener.abstract
-        abstract: true
-        calls:
-            - [setEntityManager, [@doctrine.orm.entity_manager]]
-
-    oro_security.authentication.listener.organization_rememberme:
-        class: %oro_security.authentication.listener.organization_rememberme.class%
-        arguments:
-            - @security.context
-            - @security.authentication.rememberme
-            - @security.authentication.manager
-            - @logger
-            - @event_dispatcher
-        abstract: true
-        tags:
-          - {name: monolog.logger, channel: security }
-
     oro_security.authentication.listener.basic:
         class: %oro-security.authentication.listener.basic.class%
         arguments:
@@ -446,18 +425,6 @@ services:
             - @security.user_checker
         abstract: true
         public: false
-
-    oro_security.authentication.organization_rememberme.services.simplehash:
-        class: %oro_security.authentication.organization_rememberme.services.simplehash.class%
-        arguments:
-          - ~
-          - null
-          - null
-          - ~
-          - @logger
-        calls:
-          - [setEntityManager, [@doctrine.orm.entity_manager]]
-        abstract: true
 
     oro_security.listener.context_listener:
         class: %oro_security.listener.context_listener.class%

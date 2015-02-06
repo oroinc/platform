@@ -102,7 +102,7 @@ class UserAclHandler implements SearchHandlerInterface
         if ($this->getSecurityContext()->isGranted($permission, $object)) {
             $results = [];
             if ($searchById) {
-                $results[] = $this->searchById($query);
+                $results = $this->searchById($search);
             } else {
                 $page        = (int)$page > 0 ? (int)$page : 1;
                 $perPage     = (int)$perPage > 0 ? (int)$perPage : 10;
@@ -146,7 +146,7 @@ class UserAclHandler implements SearchHandlerInterface
      */
     protected function searchById($query)
     {
-        return $this->em->getRepository('OroUserBundle:User')->find((int)$query);
+        return $this->em->getRepository('OroUserBundle:User')->findBy(['id' => explode(',', $query)]);
     }
 
     /**
@@ -316,7 +316,8 @@ class UserAclHandler implements SearchHandlerInterface
                     $user->getId(),
                     $organization->getId()
                 );
-            } else { // AccessLevel::DEEP_LEVEL
+            } else {
+            // AccessLevel::DEEP_LEVEL
                 $resultBuIds = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
                     $user->getId(),
                     $organization->getId()
@@ -355,6 +356,8 @@ class UserAclHandler implements SearchHandlerInterface
      * @param string $className The encoded class name
      *
      * @return string The class name
+     *
+     * @deprecated since 1.6. Will be removed in 2.0. Use oro_entity.routing_helper->decodeClassName($entityName);
      */
     public function decodeClassName($className)
     {

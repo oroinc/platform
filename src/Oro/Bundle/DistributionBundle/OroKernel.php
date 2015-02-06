@@ -269,4 +269,22 @@ abstract class OroKernel extends Kernel
 
         parent::initializeContainer();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBundle($name, $first = true)
+    {
+        // if need to get this precise bundle
+        if (strpos($name, '!') === 0) {
+            $name = substr($name, 1);
+            if (isset($this->bundleMap[$name])) {
+                // current bundle is always the last
+                $bundle = end($this->bundleMap[$name]);
+                return $first ? $bundle : array($bundle);
+            }
+        }
+
+        return parent::getBundle($name, $first);
+    }
 }

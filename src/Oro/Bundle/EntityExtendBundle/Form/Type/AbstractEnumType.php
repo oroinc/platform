@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
@@ -10,8 +11,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -84,26 +88,85 @@ abstract class AbstractEnumType extends AbstractType
     /**
      * PRE_SET_DATA event handler
      *
+     * Sets default value for new entity in form in case if value is not set.
+     *
      * @param FormEvent $event
      */
     public function preSetData(FormEvent $event)
     {
-        $form     = $event->getForm();
-        $formData = $form->getRoot()->getData();
-        if ($formData && is_object($formData) && method_exists($formData, 'getId') && $formData->getId() === null) {
-            // set initial options for new entity
-            $formConfig = $form->getConfig();
-            /** @var EntityRepository $repo */
-            $repo = $this->doctrine->getRepository($formConfig->getOption('class'));
-            $data = $repo->createQueryBuilder('e')
-                ->where('e.default = true')
-                ->getQuery()
-                ->getResult();
-            if ($formConfig->getOption('multiple')) {
-                $event->setData($data ? $data : []);
-            } else {
-                $event->setData($data ? array_shift($data) : '');
-            }
+        $form = $event->getForm();
+        $formConfig = $form->getConfig();
+
+        $targetEntity = $this->getNewEntityFromNearestParentForm($form);
+
+        if (!$targetEntity) {
+            return null;
         }
+
+        if (!$this->isDataEmptyValue($targetEntity, $form)) {
+            return;
+        }
+
+        // Set initial options for new entity
+        /** @var EntityRepository $repo */
+        $repo = $this->doctrine->getRepository($formConfig->getOption('class'));
+        $data = $repo->createQueryBuilder('e')
+            ->where('e.default = true')
+            ->getQuery()
+            ->getResult();
+        if ($formConfig->getOption('multiple')) {
+            $event->setData($data ? $data : []);
+        } else {
+            $event->setData($data ? array_shift($data) : '');
+        }
+    }
+
+    /**
+     * @param mixed $targetEntity
+     * @param FormInterface $form
+     * @return bool
+     */
+    protected function isDataEmptyValue($targetEntity, FormInterface $form)
+    {
+        $formConfig = $form->getConfig();
+
+        // Check to see if there's a value provided by the form.
+        $accessor = PropertyAccess::createPropertyAccessor();
+        try {
+            $value = $accessor->getValue($targetEntity, $form->getPropertyPath());
+            if ($formConfig->getOption('multiple')) {
+                $result = ($value instanceof Collection && $value->isEmpty());
+            } else {
+                $result = (null == $value);
+            }
+        } catch (NoSuchPropertyException $exception) {
+            // If value cannot be get then treat it as value as empty and we need to suppress this exception.
+            $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param FormInterface $form
+     * @return mixed|null
+     */
+    protected function getNewEntityFromNearestParentForm(FormInterface $form)
+    {
+        $parent = $form->getParent();
+
+        if (!$parent) {
+            return null;
+        }
+
+        if ($parent->getConfig()->getOption('data_class')) {
+            $data = $parent->getData();
+            if ($data && is_object($data) && method_exists($data, 'getId') && $data->getId() === null) {
+                return $data;
+            }
+            return null;
+        }
+
+        return $this->getNewEntityFromNearestParentForm($parent);
     }
 }

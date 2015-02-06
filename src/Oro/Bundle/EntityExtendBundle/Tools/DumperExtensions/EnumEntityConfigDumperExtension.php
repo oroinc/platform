@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -109,7 +110,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
 
                     $fieldOptions['enum']['enum_code'] = $enumCode;
                 }
-                $isMultiple         = $this->fieldTypeHelper->getUnderlyingType($fieldType) === 'manyToMany';
+                $isMultiple = $this->fieldTypeHelper->getUnderlyingType($fieldType) === RelationType::MANY_TO_MANY;
                 $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
 
                 // create an entity is used to store enum values
@@ -177,7 +178,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                         continue;
                     }
 
-                    $mappingClassName   = $entityConfig->has('extend_class')
+                    $mappingClassName  = $entityConfig->has('extend_class')
                         ? $entityConfig->get('extend_class')
                         : $entityConfig->getId()->getClassName();
                     $fieldName         = $fieldConfigId->getFieldName();
@@ -243,18 +244,18 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
         $this->relationBuilder->updateEntityConfigs(
             $enumValueClassName,
             [
-                'entity'     => [
+                'entity' => [
                     'label'        => ExtendHelper::getEnumTranslationKey('label', $enumCode),
                     'plural_label' => ExtendHelper::getEnumTranslationKey('plural_label', $enumCode),
                     'description'  => ExtendHelper::getEnumTranslationKey('description', $enumCode)
                 ],
-                'extend'     => [
+                'extend' => [
                     'owner'     => ExtendScope::OWNER_SYSTEM,
                     'is_extend' => true,
                     'table'     => $this->nameGenerator->generateEnumTableName($enumCode, true),
                     'inherit'   => ExtendHelper::BASE_ENUM_VALUE_CLASS
                 ],
-                'enum'       => [
+                'enum'   => [
                     'code'     => $enumCode,
                     'public'   => $isPublic,
                     'multiple' => $isMultiple
@@ -282,9 +283,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                 ],
-                'importexport' => [
-                    'identity' => true
-                ]
+                'datagrid'     => ['is_visible' => false],
+                'importexport' => ['identity' => true]
             ]
         );
         $this->configManager->createConfigFieldModel($enumValueClassName, 'priority', 'integer');
@@ -295,7 +295,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 'entity' => [
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
-                ]
+                ],
+                'datagrid' => ['is_visible' => false]
             ]
         );
         $this->configManager->createConfigFieldModel($enumValueClassName, 'default', 'boolean');
@@ -306,7 +307,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                 'entity' => [
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
-                ]
+                ],
+                'datagrid' => ['is_visible' => false]
             ]
         );
     }

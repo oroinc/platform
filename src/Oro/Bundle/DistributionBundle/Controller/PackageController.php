@@ -127,7 +127,6 @@ class PackageController extends Controller
                 ];
 
                 if (!$forceDependenciesInstalling && $requirements = $manager->getRequirements($packageName)) {
-
                     $responseContent['requirements'] = array_map(
                         function (PackageRequirement $pr) {
                             return $pr->toArray();

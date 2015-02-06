@@ -35,7 +35,7 @@ class EmailController extends Controller
      */
     public function viewAction(Email $entity)
     {
-        $templateVars = array('entity' => $entity, 'noBodyFound' => false);
+        $templateVars = ['entity' => $entity, 'noBodyFound' => false];
         try {
             $this->getEmailCacheManager()->ensureEmailBodyCached($entity);
         } catch (LoadEmailBodyException $e) {
@@ -59,9 +59,9 @@ class EmailController extends Controller
      */
     public function activityAction($entityClass, $entityId)
     {
-        return array(
+        return [
             'entity' => $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId)
-        );
+        ];
     }
 
     /**
@@ -77,10 +77,10 @@ class EmailController extends Controller
     public function createAction()
     {
         $entity = new EmailModel();
-        $responseData = array(
+        $responseData = [
             'entity' => $entity,
             'saved' => false
-        );
+        ];
         if ($this->get('oro_email.form.handler.email')->process($entity)) {
             $responseData['saved'] = true;
         }
@@ -132,9 +132,9 @@ class EmailController extends Controller
      */
     public function emailsAction(Request $request)
     {
-        return array(
+        return [
             'datagridParameters' => $request->query->all()
-        );
+        ];
     }
 
     /**
@@ -147,9 +147,9 @@ class EmailController extends Controller
      */
     public function baseEmailsAction(Request $request)
     {
-        return array(
+        return [
             'datagridParameters' => $request->query->all()
-        );
+        ];
     }
 
     /**

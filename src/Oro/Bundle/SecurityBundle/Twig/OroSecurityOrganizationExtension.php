@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Twig;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class OroSecurityOrganizationExtension extends \Twig_Extension
@@ -49,6 +49,8 @@ class OroSecurityOrganizationExtension extends \Twig_Extension
     }
 
     /**
+     * Get list with all enabled organizations for current user
+     *
      * @return Organization[]
      */
     public function getOrganizations()
@@ -59,6 +61,8 @@ class OroSecurityOrganizationExtension extends \Twig_Extension
     }
 
     /**
+     * Returns current organization
+     *
      * @return Organization|null
      */
     public function getCurrentOrganization()

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle;
 
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -17,7 +18,7 @@ class OroWorkflowBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new AddConditionAndActionCompilerPass());
+        $container->addCompilerPass(new AddConditionAndActionCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new AddAttributeNormalizerCompilerPass());
     }
 }

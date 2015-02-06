@@ -27,6 +27,10 @@ class AssignConstantValueTest extends \PHPUnit_Framework_TestCase
         $this->contextAccessor = new ContextAccessor();
 
         $this->action = new AssignConstantValue($this->contextAccessor);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     /**

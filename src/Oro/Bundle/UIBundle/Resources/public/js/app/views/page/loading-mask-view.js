@@ -2,7 +2,7 @@
 /*global define*/
 define([
     'jquery',
-    'oroui/js/loading-mask'
+    '../loading-mask-view'
 ], function ($, LoadingMaskView) {
     'use strict';
 

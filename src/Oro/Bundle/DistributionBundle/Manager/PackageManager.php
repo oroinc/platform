@@ -9,6 +9,7 @@ use Composer\DependencyResolver\Pool;
 use Composer\Installer;
 use Composer\IO\BufferIO;
 use Composer\Json\JsonFile;
+use Composer\Package\BasePackage;
 use Composer\Package\Link;
 use Composer\Package\PackageInterface;
 use Composer\Package\Version\VersionParser;
@@ -527,7 +528,6 @@ class PackageManager
             $fetchPreviousInstalledPackageVersion = function ($packageName) use ($previousInstalled) {
                 foreach ($previousInstalled as $p) {
                     if ($p->getName() == $packageName) {
-
                         return $p->getVersion();
                     }
                 }
@@ -701,7 +701,7 @@ class PackageManager
             return $this->pool;
         }
 
-        $pool = new Pool('dev');
+        $pool = new Pool(array_search(BasePackage::STABILITY_DEV, BasePackage::$stabilities));
         $pool->addRepository(new CompositeRepository($this->getRepositories()));
 
         return $this->pool = $pool;

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DistributionBundle\Form\Type\Composer;
 
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 

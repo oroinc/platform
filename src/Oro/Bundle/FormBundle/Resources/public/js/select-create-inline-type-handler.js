@@ -17,9 +17,17 @@ function (routing, DialogWidget, widgetManager, __) {
         var handleGridSelect = function (e) {
             e.preventDefault();
 
+            var routeName = urlParts.grid.route,
+                routeParams = urlParts.grid.parameters;
+
+            var additionalRequestParams = selectorEl.data('select2_query_additional_params');
+            if (additionalRequestParams) {
+                routeParams = $.extend({}, routeParams, additionalRequestParams )
+            }
+
             var entitySelectDialog = new DialogWidget({
                 title: __('Select {{ entity }}', {'entity': label}),
-                url: routing.generate(urlParts.grid.route, urlParts.grid.parameters),
+                url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
                 incrementalPosition: true,
                 dialogOptions: {
@@ -47,9 +55,17 @@ function (routing, DialogWidget, widgetManager, __) {
         var handleCreate = function (e) {
             e.preventDefault();
 
+            var routeName = urlParts.create.route,
+                routeParams = urlParts.create.parameters;
+
+            var additionalRequestParams = selectorEl.data('select2_query_additional_params');
+            if (additionalRequestParams) {
+                routeParams = $.extend({}, routeParams, additionalRequestParams )
+            }
+
             var entityCreateDialog = new DialogWidget({
                 title: __('Create {{ entity }}', {'entity': label}),
-                url: routing.generate(urlParts.create.route, urlParts.create.parameters),
+                url: routing.generate(routeName, routeParams),
                 stateEnabled: false,
                 incrementalPosition: true,
                 dialogOptions: {

@@ -66,6 +66,7 @@ define(function (require) {
             $.when.apply($, promises).always(function () {
                 $(options.el).html(options.$el.children());
                 self.subComponents = _.compact(arguments);
+                self.grid.reflow();
                 self._resolveDeferredInit();
             });
         },
@@ -227,8 +228,21 @@ define(function (require) {
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
-                metadata: this.metadata
+                metadata: this.metadata,
+                enableFullScreenLayout: this.metadata.enableFullScreenLayout
             };
+        },
+        dispose: function () {
+            // disposes registered sub-components
+            if (this.subComponents) {
+                _.each(this.subComponents, function (component) {
+                    if (component && typeof component.dispose === 'function') {
+                        component.dispose();
+                    }
+                });
+                delete this.subComponents;
+            }
+            DataGridComponent.__super__.dispose.call(this);
         }
     });
 

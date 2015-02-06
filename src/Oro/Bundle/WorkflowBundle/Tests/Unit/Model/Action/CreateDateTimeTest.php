@@ -24,6 +24,10 @@ class CreateDateTimeTest extends \PHPUnit_Framework_TestCase
     {
         $this->contextAccessor = new ContextAccessor();
         $this->action = new CreateDateTime($this->contextAccessor);
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->action->setDispatcher($dispatcher);
     }
 
     protected function tearDown()

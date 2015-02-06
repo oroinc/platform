@@ -41,6 +41,9 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *              "acl"="oro_email_view",
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
+ *          },
+ *          "comment"={
+ *              "applicable"=true
  *          }
  *      }
  * )
@@ -588,5 +591,39 @@ class Email extends ExtendEmail
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTo()
+    {
+        return $this->getRecipients(EmailRecipient::TO);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getCc()
+    {
+        return $this->getRecipients(EmailRecipient::CC);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getBcc()
+    {
+        return $this->getRecipients(EmailRecipient::BCC);
+    }
+
+    /**
+     * @return EmailRecipient[]
+     */
+    public function getCcBcc()
+    {
+        return new ArrayCollection(
+            array_merge($this->getCc()->toArray(), $this->getBcc()->toArray())
+        );
     }
 }

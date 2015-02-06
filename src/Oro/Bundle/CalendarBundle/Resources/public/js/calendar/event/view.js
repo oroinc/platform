@@ -68,7 +68,6 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
                     title: this.model.isNew() ? __('Add New Event') : __('View Event'),
                     stateEnabled: false,
                     incrementalPosition: false,
-                    initLayout: true,
                     dialogOptions: _.defaults(widgetOptions.dialogOptions || {}, {
                         modal: true,
                         resizable: false,

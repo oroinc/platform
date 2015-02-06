@@ -651,20 +651,32 @@ class AclPrivilegeRepository
             } else {
                 foreach ($extension->getPermissions($mask) as $permission) {
                     if (!$privilege->hasPermission($permission) && in_array($permission, $permissions)) {
-                        $privilege->addPermission(
-                            new AclPermission(
-                                $permission,
-                                $extension->getAccessLevel(
-                                    $mask,
-                                    $permission,
-                                    $privilege->getIdentity()->getId()
-                                )
-                            )
-                        );
+                        $privilege->addPermission($this->getAclPermission($extension, $permission, $mask, $privilege));
                     }
                 }
             }
 
         }
+    }
+
+    /**
+     * Return AclPermission object for given permission, ACL mask and ACL privilege
+     *
+     * @param AclExtensionInterface $extension
+     * @param string                $permission
+     * @param string                $mask
+     * @param AclPrivilege          $privilege
+     * @return AclPermission
+     */
+    protected function getAclPermission(AclExtensionInterface $extension, $permission, $mask, AclPrivilege $privilege)
+    {
+        return new AclPermission(
+            $permission,
+            $extension->getAccessLevel(
+                $mask,
+                $permission,
+                $privilege->getIdentity()->getId()
+            )
+        );
     }
 }

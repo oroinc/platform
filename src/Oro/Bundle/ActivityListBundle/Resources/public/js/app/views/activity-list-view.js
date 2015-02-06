@@ -9,7 +9,6 @@ define(function (require) {
         __ = require('orotranslation/js/translator'),
         routing = require('routing'),
         mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
         DialogWidget = require('oro/dialog-widget'),
         DeleteConfirmation = require('oroui/js/delete-confirmation'),
         BaseCollectionView = require('oroui/js/app/views/base/collection-view');
@@ -49,7 +48,8 @@ define(function (require) {
                 deleteItemError: __('oro.activitylist.delete_error'),
 
                 loadItemsError: __('oro.activitylist.load_error'),
-                forbiddenError: __('oro.activitylist.forbidden_error')
+                forbiddenError: __('oro.activitylist.forbidden_error'),
+                forbiddenActivityDataError: __('oro.activitylist.forbidden_activity_data_view_error')
             });
 
             this.template = _.template($(this.options.template).html());
@@ -78,7 +78,6 @@ define(function (require) {
             }
 
             delete this.itemEditDialog;
-            delete this.$loadingMaskContainer;
 
             mediator.off('widget:doRefresh:activity-list-widget', this._reload, this );
             mediator.off('widget_success:activity_list:item:update', this._reload, this);
@@ -86,26 +85,24 @@ define(function (require) {
             ActivityListView.__super__.dispose.call(this);
         },
 
-        render: function () {
-            ActivityListView.__super__.render.apply(this, arguments);
-            this.$loadingMaskContainer = this.$('.loading-mask');
-            this._initActionMenus();
-            return this;
+        initItemView: function(model) {
+            var className = model.getRelatedActivityClass(),
+                configuration = this.options.configuration[className];
+            if (this.itemView) {
+                return new this.itemView({
+                    autoRender: false,
+                    model: model,
+                    configuration: configuration
+                });
+            } else {
+                ActivityListView.__super__.render.apply(this, arguments);
+            }
         },
 
         refresh: function () {
             this.collection.setPage(1);
             this._setPageNumber();
             this._reload();
-        },
-
-        _initActionMenus: function () {
-            $('.activity-list .dropdown-toggle').unbind('mouseover').bind('mouseover', function () {
-                $(this).trigger('click');
-            });
-            $('.activity-list .dropdown-menu').unbind('mouseleave').bind('mouseleave', function () {
-                $(this).parent().find('a.dropdown-toggle').trigger('click');
-            });
         },
 
         _initPager: function () {
@@ -116,6 +113,29 @@ define(function (require) {
             }
             $('.activity-list-widget .pagination-total-num').html(this.collection.pager.total);
             $('.activity-list-widget .pagination-total-count').html(this.collection.getCount());
+        },
+
+        /**
+         * Fetches loading container element
+         *
+         *  - returns loading container passed over options,
+         *    or the view element as default loading container
+         *
+         * @returns {HTMLElement|undefined}
+         * @protected
+         * @override
+         */
+        _getLoadingContainer: function () {
+            var loadingContainer = this.options.loadingContainer;
+            if (loadingContainer instanceof $) {
+                // fetches loading container from options
+                loadingContainer = loadingContainer.get(0);
+            }
+            if (!loadingContainer) {
+                // uses the element as default loading container
+                loadingContainer = this.$el.get(0);
+            }
+            return loadingContainer;
         },
 
         goto_previous: function () {
@@ -211,7 +231,6 @@ define(function (require) {
                     reset: true,
                     success: _.bind(function () {
                         this._hideLoading();
-                        this._initActionMenus();
                         this._initPager();
                     }, this),
                     error: _.bind(function (collection, response) {
@@ -223,10 +242,9 @@ define(function (require) {
             }
         },
 
-        _viewItem: function (model, modelView) {
+        _viewItem: function (model) {
             var that = this,
                 currentModel = model,
-                currentModelView = modelView,
                 options = {
                     url: this._getUrl('itemView', model),
                     type: 'get',
@@ -241,25 +259,38 @@ define(function (require) {
                 Backbone.$.ajax(options)
                     .done(function (data) {
                         var response = $('<html />').html(data);
-                        currentModel.set('is_loaded', true);
                         currentModel.set('contentHTML', $(response).find('.widget-content').html());
-
                         that._hideLoading();
-
-                        currentModelView.toggle();
-                        that._initActionMenus();
                     })
-                    .fail(_.bind(this._showLoadItemsError, this));
-            } else {
-                currentModelView.toggle();
+                    .fail(
+                        _.bind(function (response) {
+                            if (!_.isUndefined(response.status) && response.status === 403) {
+                                this._showForbiddenActivityDataError(response.responseJSON || {});
+                                currentModel.set('is_loaded', true);
+                            } else {
+                                this._showLoadItemsError(response.responseJSON || {});
+                            }
+                            this._hideLoading();
+                        }, this)
+                    );
             }
         },
 
         _editItem: function (model) {
             if (!this.itemEditDialog) {
+                var unescapeHTML = function unescapeHtml(unsafe) {
+                    return unsafe
+                        .replace(/&nbsp;/g, " ")
+                        .replace(/&amp;/g, "&")
+                        .replace(/&lt;/g, "<")
+                        .replace(/&gt;/g, ">")
+                        .replace(/&quot;/g, "\"")
+                        .replace(/&#039;/g, "'");
+                };
+
                 this.itemEditDialog = new DialogWidget({
                     'url': this._getUrl('itemEdit', model),
-                    'title': model.get('subject'),
+                    'title': unescapeHTML(model.get('subject')),
                     'regionEnabled': false,
                     'incrementalPosition': false,
                     'alias': 'activity_list:item:update',
@@ -322,7 +353,7 @@ define(function (require) {
          * @protected
          */
         _getUrl: function (actionKey, model) {
-            var className = model.get('relatedActivityClass').replace(/\\/g, '_');
+            var className = model.getRelatedActivityClass();
             var route = this.options.configuration[className].routes[actionKey];
             return routing.generate(route, {'id': model.get('relatedActivityId')});
         },
@@ -332,20 +363,11 @@ define(function (require) {
         },
 
         _showLoading: function () {
-            if (!this.$loadingMaskContainer.data('loading-mask-visible')) {
-                this.loadingMask = new LoadingMask();
-                this.$loadingMaskContainer.data('loading-mask-visible', true);
-                this.$loadingMaskContainer.append(this.loadingMask.render().$el);
-                this.loadingMask.show();
-            }
+            this.subview('loading').show();
         },
 
         _hideLoading: function () {
-            if (this.loadingMask) {
-                this.$loadingMaskContainer.data('loading-mask-visible', false);
-                this.loadingMask.remove();
-                this.loadingMask = null;
-            }
+            this.subview('loading').hide();
         },
 
         _showLoadItemsError: function (err) {
@@ -354,6 +376,10 @@ define(function (require) {
 
         _showDeleteItemError: function (err) {
             this._showError(this.options.messages.deleteItemError, err);
+        },
+
+        _showForbiddenActivityDataError: function (err) {
+            this._showError(this.options.messages.forbiddenActivityDataError, err);
         },
 
         _showForbiddenError: function (err) {

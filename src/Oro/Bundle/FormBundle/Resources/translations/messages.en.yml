@@ -7,6 +7,8 @@ Cancel: Cancel
 oro:
     form:
         choose_value: Choose a value...
+        choose_date: Choose a date
+        choose_time: time
         click_here_to_select: Click here to select...
         tooltip.read_more: Read more
         color:
@@ -250,3 +252,9 @@ oro:
             wrench: wrench
             zoom-in: zoom in
             zoom-out: zoom out
+        system_configuration:
+            groups:
+                wysiwyg_settings.title: 'WYSIWYG settings'
+            fields:
+                wysiwyg_enabled:
+                    label: 'Enable WYSIWYG editor'

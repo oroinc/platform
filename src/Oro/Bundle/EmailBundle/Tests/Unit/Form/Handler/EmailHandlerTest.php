@@ -153,6 +153,8 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->request->query->set('gridName', 'testGrid');
         $this->request->query->set('from', 'from@example.com');
         $this->request->query->set('to', 'to@example.com');
+        $this->request->query->set('cc', 'cc@example.com');
+        $this->request->query->set('bcc', 'bcc@example.com');
         $this->request->query->set('subject', 'testSubject');
 
         $this->nameFormatter->expects($this->any())
@@ -172,13 +174,19 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testGrid', $this->model->getGridName());
         $this->assertEquals('FirstName LastName <from@example.com>', $this->model->getFrom());
         $this->assertEquals(['FirstName LastName <to@example.com>'], $this->model->getTo());
+        $this->assertEquals(['FirstName LastName <cc@example.com>'], $this->model->getCc());
+        $this->assertEquals(['FirstName LastName <bcc@example.com>'], $this->model->getBcc());
         $this->assertEquals('testSubject', $this->model->getSubject());
     }
 
     /**
-     * @dataProvider supportedMethods
+     * @param string $method
+     * @param bool $valid
+     * @param bool $assert
+     *
+     * @dataProvider processData
      */
-    public function testProcessValidData($method)
+    public function testProcessData($method, $valid, $assert)
     {
         $this->request->setMethod($method);
         $this->model
@@ -191,23 +199,29 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('setData')
             ->with($this->model);
 
-        $this->form->expects($this->once())
-            ->method('submit')
-            ->with($this->request);
+        if (in_array($method, ['POST', 'PUT'])) {
+            $this->form->expects($this->once())
+                ->method('submit')
+                ->with($this->request);
 
-        $this->form->expects($this->once())
-            ->method('isValid')
-            ->will($this->returnValue(true));
+            $this->form->expects($this->once())
+                ->method('isValid')
+                ->will($this->returnValue($valid));
 
-        $this->emailProcessor->expects($this->once())
-            ->method('process')
-            ->with($this->model);
+            if ($valid) {
+                $this->emailProcessor->expects($this->once())
+                    ->method('process')
+                    ->with($this->model);
+            }
+        }
 
-        $this->assertTrue($this->handler->process($this->model));
+        $this->assertEquals($assert, $this->handler->process($this->model));
     }
 
     /**
-     * @dataProvider supportedMethods
+     * @param string $method
+     *
+     * @dataProvider methodsData
      */
     public function testProcessException($method)
     {
@@ -273,7 +287,6 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue(new TestUser($emailAddress, 'OwnerFirstName', 'OwnerLastName')));
         }
 
-        $srcEmailAddress = $emailAddress;
         $param = [&$emailAddress, $ownerClass, $ownerId];
         ReflectionUtil::callProtectedMethod($this->handler, 'preciseFullEmailAddress', $param);
 
@@ -304,7 +317,21 @@ class EmailHandlerTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function supportedMethods()
+    public function processData()
+    {
+        return [
+            ['POST', true, true],
+            ['POST', false, false],
+            ['PUT', true, true],
+            ['PUT', false, false],
+            ['GET', true, false],
+            ['GET', false, false],
+            ['DELETE', true, false],
+            ['DELETE', false, false]
+        ];
+    }
+
+    public function methodsData()
     {
         return [
             ['POST'],

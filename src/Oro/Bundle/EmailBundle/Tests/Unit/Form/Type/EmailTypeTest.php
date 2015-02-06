@@ -4,10 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
+use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
@@ -40,31 +41,38 @@ class EmailTypeTest extends TypeTestCase
         $select2ChoiceType = new Select2Type(TranslatableEntityType::NAME);
         $emailTemplateList = new EmailTemplateSelectType();
 
-        return array(
+        $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $richTextType = new OroRichTextType($configManager);
+
+        return [
             new PreloadedExtension(
                 [
                     TranslatableEntityType::NAME  => $translatableType,
                     $select2ChoiceType->getName() => $select2ChoiceType,
                     $emailTemplateList->getName() => $emailTemplateList,
                     $emailAddressType->getName()  => $emailAddressType,
+                    $richTextType->getName()      => $richTextType
                 ],
                 []
             )
-        );
+        ];
     }
 
-    public function testSubmitValidData()
+    /**
+     * @dataProvider messageDataProvider
+     * @param array $formData
+     * @param array $to
+     * @param array $cc
+     * @param array $bcc
+     */
+    public function testSubmitValidData($formData, $to, $cc, $bcc)
     {
-        $formData = [
-            'gridName' => 'test_grid',
-            'from'     => 'John Smith <john@example.com>',
-            'to'       => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
-            'subject'  => 'Test subject',
-            'body'     => 'Test body',
-            'type'     => 'text',
-            'template' => new EmailTemplate(),
-        ];
-
+        $body = '';
+        if (isset($formData['body'])) {
+            $body = $formData['body'];
+        }
         $type = new EmailType($this->securityContext);
         $form = $this->factory->create($type);
 
@@ -75,13 +83,12 @@ class EmailTypeTest extends TypeTestCase
         $result = $form->getData();
         $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
         $this->assertEquals('test_grid', $result->getGridName());
-        $this->assertEquals('John Smith <john@example.com>', $result->getFrom());
-        $this->assertEquals(
-            ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
-            $result->getTo()
-        );
-        $this->assertEquals('Test subject', $result->getSubject());
-        $this->assertEquals('Test body', $result->getBody());
+        $this->assertEquals($formData['from'], $result->getFrom());
+        $this->assertEquals($to, $result->getTo());
+        $this->assertEquals($cc, $result->getCc());
+        $this->assertEquals($bcc, $result->getBcc());
+        $this->assertEquals($formData['subject'], $result->getSubject());
+        $this->assertEquals($body, $result->getBody());
     }
 
     public function testSetDefaultOptions()
@@ -106,5 +113,41 @@ class EmailTypeTest extends TypeTestCase
     {
         $type = new EmailType($this->securityContext);
         $this->assertEquals('oro_email_email', $type->getName());
+    }
+
+
+    public function messageDataProvider()
+    {
+        return [
+            [
+                [
+                    'gridName' => 'test_grid',
+                    'from' => 'John Smith <john@example.com>',
+                    'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
+                    'subject' => 'Test subject',
+                    'type' => 'text',
+                    'template' => new EmailTemplate(),
+                ],
+                ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
+                [],
+                [],
+            ],
+            [
+                [
+                    'gridName' => 'test_grid',
+                    'from' => 'John Smith <john@example.com>',
+                    'to' => 'John Smith 1 <john1@example.com>; "John Smith 2" <john2@example.com>; john3@example.com',
+                    'cc' => 'John Smith 4 <john4@example.com>; "John Smith 5" <john5@example.com>; john6@example.com',
+                    'bcc' => 'John Smith 7 <john7@example.com>; "John Smith 8" <john8@example.com>; john9@example.com',
+                    'subject' => 'Test subject',
+                    'body' => 'Test body',
+                    'type' => 'text',
+                    'template' => new EmailTemplate(),
+                ],
+                ['John Smith 1 <john1@example.com>', '"John Smith 2" <john2@example.com>', 'john3@example.com'],
+                ['John Smith 4 <john4@example.com>', '"John Smith 5" <john5@example.com>', 'john6@example.com'],
+                ['John Smith 7 <john7@example.com>', '"John Smith 8" <john8@example.com>', 'john9@example.com'],
+            ],
+        ];
     }
 }

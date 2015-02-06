@@ -21,7 +21,7 @@ class Configurable implements ActionInterface
     /**
      * @var array
      */
-    protected $configuration = array();
+    protected $configuration = [];
 
     /**
      * @param ActionAssembler $assembler

@@ -1,3 +1,5 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{{ EA.recipient_email_addresses(value.toArray, false, true) }}
+{% if (value.toArray|length > 0) %}
+    {{ EA.recipient_email_addresses(value.toArray, false, true) }}
+{% endif %}

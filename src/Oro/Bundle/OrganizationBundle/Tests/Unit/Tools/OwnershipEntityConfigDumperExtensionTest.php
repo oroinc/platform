@@ -143,14 +143,14 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCa
                 )
             );
         if ($getOwnerClassMethodNameCalls == 1) {
-            $this->ownershipMetadataProvider->expects($this->exactly(1))
+            $this->ownershipMetadataProvider->expects($this->exactly(2))
                 ->method($getOwnerClassMethodName)
                 ->will($this->returnValue('Test\Owner'));
         } else {
             $this->ownershipMetadataProvider->expects($this->once())
                 ->method($getOwnerClassMethodName)
                 ->will($this->returnValue('Test\Owner'));
-            $this->ownershipMetadataProvider->expects($this->once())
+            $this->ownershipMetadataProvider->expects($this->any())
                 ->method('getOrganizationClass')
                 ->will($this->returnValue('Test\Organization'));
         }

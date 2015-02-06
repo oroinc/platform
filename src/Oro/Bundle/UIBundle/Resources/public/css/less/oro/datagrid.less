@@ -103,17 +103,21 @@
   .caret { margin-top:11px; }
 }
 .grid-container-parent {
-  position: relative;
-  .loading-wrapper {
-    width: auto;
+  > .loader-mask {
     left: @verticalPadding;
     right: @verticalPadding;
     top: @topPadding/2;
   }
 }
+.floatThead-connected {
+  .grid-container-parent > .loader-mask {
+    top: @topPadding/2 - 32 /* header height */;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+}
 .grid-container {
   width: 100%;
-  position: relative;
   margin-top: 10px;
   overflow-x: auto;
   overflow-y: visible;

@@ -53,7 +53,7 @@ define([
         method = method || $(element).data('violated');
         return _.find(validationHolders(element).reverse(), function (el) {
             return $(el).data('validation').hasOwnProperty(method);
-        });
+        }) || element;
     }
 
     /**
@@ -152,6 +152,59 @@ define([
     });
 
     /**
+     * Process server error response and shows messages on the form elements
+     *
+     * @param {Object} errors
+     */
+    $.validator.prototype.showBackendErrors = function (errors) {
+        var result = {};
+
+        /**
+         * Converts server error response:
+         * {
+         *   "children": {
+         *     "message": {"errors": ["This value should not be blank."]},
+         *     "attachment": {
+         *       "children": {
+         *         "file": {
+         *           "errors": ["The file is too large (1146138 bytes). Allowed maximum size is 1048576 bytes."]
+         *         }
+         *       }
+         *     }
+         *   }
+         * }
+         *
+         * to:
+         * {
+         *   "message": "This value should not be blank."
+         *   "attachment[file]": "The file is too large (1146138 bytes). Allowed maximum size is 1048576 bytes."
+         * }
+         *
+         * @param {Object} obj
+         * @param {string=} path
+         */
+        (function parseBackendErrors(obj, path) {
+            _.each(obj, function (item, name) {
+                var _path;
+                if (name === 'children') {
+                    // skip 'children' level
+                    parseBackendErrors(item, path);
+                } else {
+                    _path = path ? (path + '[' + name + ']') : name;
+                    if (_.isEqual(_.keys(item), ['errors']) && _.isArray(item.errors)) {
+                        // only first error to show
+                        result[_path] = item.errors[0];
+                    } else if (_.isObject(item)) {
+                        parseBackendErrors(item, _path);
+                    }
+                }
+            });
+        })(errors);
+
+        this.showErrors(result)
+    };
+
+    /**
      * Loader for custom validation methods
      *
      * @param {string|Array.<string>} module name of AMD module or list of modules
@@ -168,7 +221,9 @@ define([
         errorElement: 'span',
         errorClass: 'validation-failed',
         errorPlacement: function (label, $el) {
-            label.insertAfter(getErrorTarget($el));
+            var $targetElem = getErrorTarget($el),
+                $errorHolder = $targetElem.parent();
+            label.insertAfter($errorHolder.is('.fields-row') ? $errorHolder : $targetElem);
         },
         highlight: function (element) {
             this.settings.unhighlight.call(this, element);
@@ -199,6 +254,7 @@ define([
         'oroform/js/validator/range',
         'oroform/js/validator/regex',
         'oroform/js/validator/repeated',
+        'oroform/js/validator/time',
         'oroform/js/validator/url'
     ];
     $.validator.loadMethod(methods);
@@ -239,7 +295,7 @@ define([
 
     $.fn.validateDelegate = _.wrap($.fn.validateDelegate, function (validateDelegate, delegate, type, handler) {
         return validateDelegate.call(this, delegate, type, function () {
-            return this[0] && this[0].form && handler.apply(this, arguments);
+            return this[0] && this[0].form && $.data(this[0].form, "validator") && handler.apply(this, arguments);
         });
     });
 });

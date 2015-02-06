@@ -18,7 +18,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * @Config(
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-comment"
+ *              "icon"="icon-comment-alt"
  *          },
  *          "ownership"={
  *              "owner_type"="USER",
@@ -33,6 +33,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  *          },
  *          "activity"={
  *              "immutable"=true
+ *          },
+ *          "comment"={
+ *              "applicable"=true
  *          }
  *      }
  * )

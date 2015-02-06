@@ -44,8 +44,9 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
                 new AnnotationReader(),
                 new ArrayCache()
             );
-        } else { // if (version_compare(Version::VERSION, '2.2.0-DEV', '>='))
-            // Register the ORM Annotations in the AnnotationRegistry
+        } else {
+         // if (version_compare(Version::VERSION, '2.2.0-DEV', '>='))
+         // Register the ORM Annotations in the AnnotationRegistry
             $reader = new \Doctrine\Common\Annotations\SimpleAnnotationReader();
             $reader->addNamespace('Doctrine\ORM\Mapping');
             $reader = new \Doctrine\Common\Annotations\CachedReader($reader, new ArrayCache());
@@ -116,9 +117,11 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
      * Creates a mock for a statement which handles fetching the given records
      *
      * @param array $records
+     * @param array $params
+     * @param array $types
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createFetchStatementMock(array $records)
+    protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
     {
         $statement = $this->getMock('Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\StatementMock');
         $statement->expects($this->exactly(count($records) + 1))
@@ -128,6 +131,22 @@ abstract class OrmTestCase extends \PHPUnit_Framework_TestCase
                     array_merge($records, [false])
                 )
             );
+        if ($params) {
+            if ($types) {
+                $counter = 0;
+                foreach ($params as $key => $val) {
+                    $statement->expects($this->at($counter++))
+                        ->method('bindValue')
+                        ->with($key, $val, $types[$key]);
+                }
+                $statement->expects($this->once())
+                    ->method('execute');
+            } else {
+                $statement->expects($this->once())
+                    ->method('execute')
+                    ->with($params);
+            }
+        }
 
         return $statement;
     }

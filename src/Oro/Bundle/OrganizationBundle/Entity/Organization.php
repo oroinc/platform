@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
@@ -143,6 +144,15 @@ class Organization extends ExtendOrganization implements
      * )
      */
     protected $enabled;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->businessUnits = new ArrayCollection();
+        $this->users         = new ArrayCollection();
+    }
+
 
     /**
      * Get id
@@ -366,10 +376,48 @@ class Organization extends ExtendOrganization implements
 
     /**
      * @param ArrayCollection $users
+     * @deprecated since 1.6
      */
     public function setUsers(ArrayCollection $users)
     {
         $this->users = $users;
+    }
+
+    /**
+     * Add User to Organization
+     *
+     * @param User $user
+     */
+    public function addUser(User $user)
+    {
+        if (!$this->hasUser($user)) {
+            $this->getUsers()->add($user);
+            $user->addOrganization($this);
+        }
+    }
+
+    /**
+     * Delete User from Organization
+     *
+     * @param User $user
+     */
+    public function removeUser(User $user)
+    {
+        if ($this->hasUser($user)) {
+            $this->getUsers()->removeElement($user);
+            $user->removeOrganization($this);
+        }
+    }
+
+    /**
+     * Check if organization has specified user assigned to it
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function hasUser(User $user)
+    {
+        return $this->getUsers()->contains($user);
     }
 
     /**
