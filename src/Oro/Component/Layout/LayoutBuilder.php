@@ -113,6 +113,16 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function changeBlockType($id, $blockType, $optionsCallback = null)
+    {
+        $this->layoutManipulator->changeBlockType($id, $blockType, $optionsCallback);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setBlockTheme($themes, $id = null)
     {
         $this->layoutManipulator->setBlockTheme($themes, $id);

@@ -132,6 +132,22 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->layoutBuilder, $result);
     }
 
+    public function testChangeBlockType()
+    {
+        $id              = 'test_id';
+        $blockType       = 'test_block_type';
+        $optionsCallback = function (array $options) {
+            return $options;
+        };
+
+        $this->layoutManipulator->expects($this->once())
+            ->method('changeBlockType')
+            ->with($id, $blockType, $this->identicalTo($optionsCallback));
+
+        $result = $this->layoutBuilder->changeBlockType($id, $blockType, $optionsCallback);
+        $this->assertSame($this->layoutBuilder, $result);
+    }
+
     public function testClear()
     {
         $this->layoutManipulator->expects($this->once())

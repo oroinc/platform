@@ -195,51 +195,6 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The block type name must not be empty.
-     */
-    public function testAddWithEmptyBlockType($blockType)
-    {
-        $this->rawLayout->add('root', null, $blockType);
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAddWithInvalidBlockType()
-    {
-        $this->rawLayout->add('root', null, 123);
-    }
-
-    public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
-    {
-        $this->rawLayout->add('root', null, new ContainerType());
-    }
-
-    /**
-     * @dataProvider invalidBlockTypeNameDataProvider
-     */
-    public function testAddWithInvalidBlockTypeName($blockTypeName)
-    {
-        $this->setExpectedException(
-            '\Oro\Component\Layout\Exception\InvalidArgumentException',
-            sprintf(
-                'The "%s" string cannot be used as the name of the block type '
-                . 'because it contains illegal characters. '
-                . 'The valid block type name should start with a letter and only contain '
-                . 'letters, numbers and underscores ("_").',
-                $blockTypeName
-            )
-        );
-        $this->rawLayout->add('root', null, $blockTypeName);
-    }
-
-    /**
      * @expectedException \Oro\Component\Layout\Exception\ItemNotFoundException
      * @expectedExceptionMessage The "unknown" sibling item does not exist.
      */
@@ -1168,22 +1123,7 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
             ['?test'],
             ['test?'],
             ['\ntest'],
-            ['test\n'],
-        ];
-    }
-
-    public function invalidBlockTypeNameDataProvider()
-    {
-        return [
-            ['-test'],
-            ['_test'],
-            ['1test'],
-            ['?test'],
-            ['test?'],
-            ['\ntest'],
-            ['test\n'],
-            ['test-block'],
-            ['test:block'],
+            ['test\n']
         ];
     }
 }

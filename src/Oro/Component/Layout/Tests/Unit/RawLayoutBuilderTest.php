@@ -74,6 +74,59 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertTrue($this->rawLayoutBuilder->has('logo'));
     }
 
+    public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
+    {
+        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $this->rawLayoutBuilder->add('root', null, $type);
+        $this->assertSame(
+            $type,
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot add "root" item to the layout. ParentId: . BlockType: . SiblingId: . Reason: The block type name must not be empty.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddWithEmptyBlockType($blockType)
+    {
+        $this->rawLayoutBuilder->add('root', null, $blockType);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot add "root" item to the layout. ParentId: . BlockType: 123. SiblingId: . Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddWithInvalidBlockType()
+    {
+        $this->rawLayoutBuilder->add('root', null, 123);
+    }
+
+    /**
+     * @dataProvider invalidBlockTypeNameDataProvider
+     */
+    public function testAddWithInvalidBlockTypeName($blockType)
+    {
+        $this->setExpectedException(
+            '\Oro\Component\Layout\Exception\LogicException',
+            sprintf(
+                'Cannot add "root" item to the layout. ParentId: . BlockType: %1$s. SiblingId: . Reason: '
+                . 'The "%1$s" string cannot be used as the name of the block type '
+                . 'because it contains illegal characters. '
+                . 'The valid block type name should start with a letter and only contain '
+                . 'letters, numbers and underscores ("_").',
+                $blockType
+            )
+        );
+        $this->rawLayoutBuilder->add('root', null, $blockType);
+    }
+
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
@@ -208,6 +261,124 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->removeOption('root', 'test');
     }
 
+    public function testChangeBlockType()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+
+        $this->rawLayoutBuilder->changeBlockType('root', 'my_root');
+        $this->assertEquals(
+            'my_root',
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
+        );
+    }
+
+    public function testChangeBlockTypeAndOptions()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root', ['foo' => 'bar']);
+
+        $this->rawLayoutBuilder->changeBlockType(
+            'root',
+            'my_root',
+            function (array $options) {
+                $options['new_option'] = 'val';
+
+                return $options;
+            }
+        );
+        $this->assertEquals(
+            'my_root',
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
+        );
+        $this->assertEquals(
+            ['foo' => 'bar', 'new_option' => 'val'],
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::OPTIONS)
+        );
+    }
+
+    public function testChangeBlockTypeWithAlreadyCreatedBlockTypeObject()
+    {
+        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $this->rawLayoutBuilder->add('root', null, $type);
+        $this->assertSame(
+            $type,
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "my_root" for "root" item. Reason: Cannot change the block type if options are already resolved.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeForAlreadyResolvedItem()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root');
+        $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
+
+        $this->rawLayoutBuilder
+            ->changeBlockType('root', 'my_root');
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "" for "root" item. Reason: The block type name must not be empty.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeWithEmptyBlockType($blockType)
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', $blockType);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "123" for "root" item. Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeWithInvalidBlockType()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', 123);
+    }
+
+    /**
+     * @dataProvider invalidBlockTypeNameDataProvider
+     */
+    public function testChangeBlockTypeWithInvalidBlockTypeName($blockType)
+    {
+        $this->setExpectedException(
+            '\Oro\Component\Layout\Exception\LogicException',
+            sprintf(
+                'Cannot change block type to "%1$s" for "root" item. Reason: '
+                . 'The "%1$s" string cannot be used as the name of the block type '
+                . 'because it contains illegal characters. '
+                . 'The valid block type name should start with a letter and only contain '
+                . 'letters, numbers and underscores ("_").',
+                $blockType
+            )
+        );
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', $blockType);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "my_root" for "root" item. Reason: Invalid "optionsCallback" argument type. Expected "callable", "integer" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeWithInvalidOptionCallback()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', 'my_root', 123);
+    }
+
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage Cannot set theme(s) for "root" item. Reason: The "root" item does not exist.
@@ -259,6 +430,21 @@ class RawLayoutBuilderTest extends LayoutTestCase
         return [
             [null],
             ['']
+        ];
+    }
+
+    public function invalidBlockTypeNameDataProvider()
+    {
+        return [
+            ['-test'],
+            ['_test'],
+            ['1test'],
+            ['?test'],
+            ['test?'],
+            ['\ntest'],
+            ['test\n'],
+            ['test-block'],
+            ['test:block']
         ];
     }
 }

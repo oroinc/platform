@@ -9,7 +9,7 @@ namespace Oro\Component\Layout;
  */
 class RawLayout
 {
-    /** The block type; can be a string or BlockTypeInterface */
+    /** The block type */
     const BLOCK_TYPE = 'block_type';
 
     /** Additional options which are used for building the layout block */
@@ -122,15 +122,15 @@ class RawLayout
     /**
      * Adds a new item to the layout
      *
-     * @param string                    $id        The layout item id
-     * @param string                    $parentId  The id or alias of parent item. Set null to add the root item
-     * @param string|BlockTypeInterface $blockType The block type associated with the layout item
-     * @param array                     $options   The layout item options
-     * @param string|null               $siblingId The id or alias of an item which should be nearest neighbor
-     * @param bool                      $prepend   Determines whether the moving item should be located before or after
-     *                                             the specified sibling item
+     * @param string      $id        The layout item id
+     * @param string      $parentId  The id or alias of parent item. Set null to add the root item
+     * @param mixed       $blockType The block type associated with the layout item
+     * @param array       $options   The layout item options
+     * @param string|null $siblingId The id or alias of an item which should be nearest neighbor
+     * @param bool        $prepend   Determines whether the moving item should be located before or after
+     *                               the specified sibling item
      *
-     * @throws Exception\InvalidArgumentException if the id, parent id or block type are empty or invalid
+     * @throws Exception\InvalidArgumentException if the id or parent id are empty or invalid
      * @throws Exception\ItemAlreadyExistsException if the layout item with the same id already exists
      * @throws Exception\ItemNotFoundException if the parent layout item does not exist
      * @throws Exception\LogicException if the layout item cannot be added by other reasons
@@ -146,7 +146,6 @@ class RawLayout
         $prepend = false
     ) {
         $this->validateId($id, true);
-        $this->validateBlockType($blockType);
         if (isset($this->items[$id])) {
             throw new Exception\ItemAlreadyExistsException(
                 sprintf(
@@ -661,36 +660,6 @@ class RawLayout
                         . 'The valid alias should start with a letter and only contain '
                         . 'letters, numbers, underscores ("_"), hyphens ("-") and colons (":").',
                         $alias
-                    )
-                );
-            }
-        }
-    }
-
-    /**
-     * Checks if the given value can be used as the block type name
-     *
-     * @param string $blockType The name of the block type
-     *
-     * @throws Exception\InvalidArgumentException if the block type name is not valid
-     */
-    protected function validateBlockType($blockType)
-    {
-        if (!$blockType) {
-            throw new Exception\InvalidArgumentException('The block type name must not be empty.');
-        }
-        if (!$blockType instanceof BlockTypeInterface) {
-            if (!is_string($blockType)) {
-                throw new Exception\UnexpectedTypeException($blockType, 'string or BlockTypeInterface', 'blockType');
-            }
-            if (!preg_match('/^[a-z][a-z0-9_]*$/iD', $blockType)) {
-                throw new Exception\InvalidArgumentException(
-                    sprintf(
-                        'The "%s" string cannot be used as the name of the block type '
-                        . 'because it contains illegal characters. '
-                        . 'The valid block type name should start with a letter and only contain '
-                        . 'letters, numbers and underscores ("_").',
-                        $blockType
                     )
                 );
             }

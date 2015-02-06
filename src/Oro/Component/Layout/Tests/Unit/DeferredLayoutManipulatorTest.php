@@ -541,6 +541,36 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
+    public function testChangeBlockType()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->changeBlockType(
+                'header',
+                'logo',
+                function (array $options) {
+                    $options['title'] = 'test';
+
+                    return $options;
+                }
+            )
+            ->add('header', 'root', 'header');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header with changed block type
+                        'vars'     => ['id' => 'header', 'title' => 'test']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     public function testMoveUnknownItem()
     {
         $this->layoutManipulator

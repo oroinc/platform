@@ -36,6 +36,9 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** The action name for remove an option for the layout item */
     const REMOVE_OPTION = 'removeOption';
 
+    /** The action name for change the block type for the layout item */
+    const CHANGE_BLOCK_TYPE = 'changeBlockType';
+
     /** The action name for add the theme(s) to be used for rendering the layout item and its children */
     const SET_BLOCK_THEME = 'setBlockTheme';
 
@@ -169,6 +172,16 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * {@inheritdoc}
      */
+    public function changeBlockType($id, $blockType, $optionsCallback = null)
+    {
+        $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $blockType, $optionsCallback]];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setBlockTheme($themes, $id = null)
     {
         $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$themes, $id]];
@@ -282,6 +295,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      *  * addAlias
      *  * setOption
      *  * removeOption
+     *  * changeBlockType
      */
     protected function executeAddActions()
     {
@@ -369,6 +383,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             case self::REMOVE:
             case self::SET_OPTION:
             case self::REMOVE_OPTION:
+            case self::CHANGE_BLOCK_TYPE:
                 $id = $args[0];
 
                 return !$id || $this->rawLayoutBuilder->has($id);
@@ -516,11 +531,18 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         switch ($action['name']) {
             case self::ADD:
             case self::ADD_ALIAS:
+                // for add: "id, parentId"
+                // for addAlias: "alias, id"
                 return sprintf('%s, %s', $action['args'][0], $action['args'][1]);
             case self::SET_BLOCK_THEME:
+                // "id"
                 return sprintf('%s', $action['args'][1]);
         }
 
+        // use default args to string converter which does the following:
+        // - if args array is empty returns empty string
+        // - otherwise, convert the first argument to string
+        // @see Exception\DeferredUpdateFailureException
         return null;
     }
 }
