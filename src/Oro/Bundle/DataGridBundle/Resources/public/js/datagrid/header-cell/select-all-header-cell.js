@@ -44,8 +44,6 @@ define([
          * @param {Backbone.Collection} options.collection
          */
         initialize: function (options) {
-            Backgrid.requireOptions(options, ["column", "collection"]);
-
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
