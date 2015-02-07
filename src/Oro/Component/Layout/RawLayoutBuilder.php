@@ -293,6 +293,22 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function resolveId($id)
+    {
+        return $this->rawLayout->resolveId($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentId($id)
+    {
+        return $this->rawLayout->getParentId($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isParentFor($parentId, $id)
     {
         return
@@ -307,6 +323,30 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function hasAlias($alias)
     {
         return $this->rawLayout->hasAlias($alias);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockType($id)
+    {
+        try {
+            $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE);
+
+            return $blockType instanceof BlockTypeInterface
+                ? $blockType->getName()
+                : $blockType;
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot get block type for "%s" item. Reason: %s',
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
     }
 
     /**

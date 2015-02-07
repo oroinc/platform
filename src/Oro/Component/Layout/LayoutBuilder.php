@@ -144,7 +144,7 @@ class LayoutBuilder implements LayoutBuilderInterface
      */
     public function getLayout(ContextInterface $context, $rootId = null)
     {
-        $this->layoutManipulator->applyChanges();
+        $this->layoutManipulator->applyChanges($context);
         $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
         $rootView    = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
         $layout      = $this->layoutFactory->createLayout($rootView);

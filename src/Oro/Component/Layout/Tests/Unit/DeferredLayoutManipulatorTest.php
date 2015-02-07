@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
@@ -25,7 +26,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         // do test
         $this->layoutManipulator->clear();
-        $this->layoutManipulator->applyChanges();
+        $this->layoutManipulator->applyChanges($this->context);
         $this->assertTrue($this->rawLayoutBuilder->isEmpty());
         $this->assertSame(0, $this->layoutManipulator->getNumberOfAddedItems());
         $this->assertSame(0, $this->layoutManipulator->getNumberOfRemovedItems());
@@ -1062,9 +1063,9 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 [
                     'header' => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
-                                $layoutManipulator->add('logo2', 'root', 'logo');
-                                $layoutManipulator->add('logo3', 'header', 'logo');
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
                             }
                         )
                     ]
@@ -1112,16 +1113,16 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 [
                     'header' => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
-                                $layoutManipulator->add('logo2', 'root', 'logo');
-                                $layoutManipulator->add('logo3', 'header', 'logo');
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
                             }
                         )
                     ],
                     'root'   => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
-                                $layoutManipulator->add('header', 'root', 'header');
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('header', $item->getId(), 'header');
                             }
                         )
                     ]
@@ -1174,8 +1175,8 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 [
                     'logo1' => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
-                                $layoutManipulator->add('header', 'root', 'header');
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('header', $item->getParentId(), 'header');
                             }
                         )
                     ]
@@ -1202,10 +1203,10 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 [
                     'header' => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
-                                $layoutManipulator->add('logo2', 'root', 'logo');
-                                $layoutManipulator->add('logo3', 'header', 'logo');
-                                $layoutManipulator->add('logo4', 'header', 'logo');
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
+                                $layoutManipulator->add('logo4', $item->getId(), 'logo');
                             }
                         )
                     ]
@@ -1259,10 +1260,10 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 [
                     'header' => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
-                                $layoutManipulator->add('logo2', 'root', 'logo');
-                                $layoutManipulator->add('logo3', 'header', 'logo');
-                                $layoutManipulator->add('logo4', 'header', 'logo');
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
+                                $layoutManipulator->add('logo4', $item->getId(), 'logo');
                             }
                         )
                     ]

@@ -187,7 +187,8 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('TestTheme3', 'test_block');
 
         $this->layoutManipulator->expects($this->once())
-            ->method('applyChanges');
+            ->method('applyChanges')
+            ->with($this->identicalTo($context));
         $this->rawLayoutBuilder->expects($this->once())
             ->method('getRawLayout')
             ->will($this->returnValue($rawLayout));

@@ -47,7 +47,7 @@ interface BlockInterface
     public function getTypeHelper();
 
     /**
-     * Returns the execution context
+     * Returns the layout building context
      *
      * @return ContextInterface
      */

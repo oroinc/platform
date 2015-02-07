@@ -215,6 +215,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $id                = 'test';
         $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
+        $item              = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
 
         $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
@@ -228,9 +229,9 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([$layoutUpdate]));
         $layoutUpdate->expects($this->once())
             ->method('updateLayout')
-            ->with($this->identicalTo($layoutManipulator));
+            ->with($this->identicalTo($layoutManipulator), $this->identicalTo($item));
 
-        $this->extensionManager->updateLayout($id, $layoutManipulator);
+        $this->extensionManager->updateLayout($id, $layoutManipulator, $item);
     }
 
     public function emptyStringDataProvider()

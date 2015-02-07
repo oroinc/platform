@@ -153,7 +153,9 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     /**
      * Applies all scheduled changes
      *
+     * @param ContextInterface $context
+     *
      * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
      */
-    public function applyChanges();
+    public function applyChanges(ContextInterface $context);
 }

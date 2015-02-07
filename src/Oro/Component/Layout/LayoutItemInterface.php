@@ -2,14 +2,21 @@
 
 namespace Oro\Component\Layout;
 
-interface BlockBuilderInterface
+interface LayoutItemInterface
 {
     /**
-     * Returns the id of the block
+     * Returns the id of the layout item
      *
      * @return string
      */
     public function getId();
+
+    /**
+     * Returns the alias of the layout item
+     *
+     * @return string|null
+     */
+    public function getAlias();
 
     /**
      * Returns the name of the block type
@@ -19,18 +26,18 @@ interface BlockBuilderInterface
     public function getName();
 
     /**
-     * Returns the layout manipulator
+     * Returns layout item options
      *
-     * @return LayoutManipulatorInterface
+     * @return array
      */
-    public function getLayoutManipulator();
+    public function getOptions();
 
     /**
-     * Returns the block type helper
+     * Returns the id of the parent layout item
      *
-     * @return BlockTypeHelperInterface
+     * @return string|null
      */
-    public function getTypeHelper();
+    public function getParentId();
 
     /**
      * Returns the layout building context

@@ -40,7 +40,7 @@ final class BlockBuilder implements BlockBuilderInterface
     /**
      * Initializes the state of this object
      *
-     * @param string $id The the block id
+     * @param string $id The block id
      */
     public function initialize($id)
     {

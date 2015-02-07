@@ -68,6 +68,9 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     protected $actions = [];
 
+    /** @var LayoutItem */
+    protected $item;
+
     /** @var int */
     protected $addCounter = 0;
 
@@ -231,17 +234,25 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * {@inheritdoc}
      */
-    public function applyChanges()
+    public function applyChanges(ContextInterface $context)
     {
-        $total = $this->calculateActionCount();
-        if ($total !== 0) {
-            $this->executeAllActions();
-            $this->checkRemainingActions();
-            // check that all scheduled actions have been performed
-            $applied = $total - $this->calculateActionCount();
-            if ($applied === 0 && $applied !== $total) {
-                throw $this->createFailureException();
+        $this->item = new LayoutItem($this->rawLayoutBuilder, $context);
+        try {
+            $total = $this->calculateActionCount();
+            if ($total !== 0) {
+                $this->executeAllActions();
+                $this->checkRemainingActions();
+                // check that all scheduled actions have been performed
+                $applied = $total - $this->calculateActionCount();
+                if ($applied === 0 && $applied !== $total) {
+                    throw $this->createFailureException();
+                }
             }
+
+            $this->item = null;
+        } catch (\Exception $e) {
+            $this->item = null;
+            throw $e;
         }
     }
 
@@ -492,9 +503,12 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 
         switch ($name) {
             case self::ADD:
+                $this->item->initialize($args[0]);
+                $this->extensionManager->updateLayout($args[0], $this, $this->item);
+                break;
             case self::ADD_ALIAS:
-                // $args[0] contains $id for 'add' and $alias for 'addAlias'
-                $this->extensionManager->updateLayout($args[0], $this);
+                $this->item->initialize($this->rawLayoutBuilder->resolveId($args[1]), $args[0]);
+                $this->extensionManager->updateLayout($args[0], $this, $this->item);
                 break;
         }
     }

@@ -13,7 +13,7 @@ class CallbackLayoutUpdate implements LayoutUpdateInterface
 
     /**
      * @param callable $callback The callback function
-     *                           function (LayoutManipulatorInterface $layoutManipulator)
+     *                           function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
      *
      * @throws Exception\UnexpectedTypeException when the given callback is invalid
      */
@@ -29,8 +29,8 @@ class CallbackLayoutUpdate implements LayoutUpdateInterface
     /**
      * {@inheritdoc}
      */
-    public function updateLayout(LayoutManipulatorInterface $layoutManipulator)
+    public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
-        call_user_func($this->callback, $layoutManipulator);
+        call_user_func($this->callback, $layoutManipulator, $item);
     }
 }

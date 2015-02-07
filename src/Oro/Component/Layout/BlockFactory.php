@@ -132,7 +132,7 @@ class BlockFactory implements BlockFactoryInterface
         }
 
         // apply layout changes were made by built blocks and build newly added blocks
-        $this->layoutManipulator->applyChanges();
+        $this->layoutManipulator->applyChanges($this->context);
         if ($this->layoutManipulator->getNumberOfAddedItems() !== 0) {
             $this->buildBlocks($rootId);
         }

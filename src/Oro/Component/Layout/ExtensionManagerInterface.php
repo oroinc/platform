@@ -73,10 +73,11 @@ interface ExtensionManagerInterface
     /**
      * Executes layout updates for the given layout item.
      *
-     * @param string                     $id                The id of layout item
+     * @param string                     $id                The id or alias of the layout item
      * @param LayoutManipulatorInterface $layoutManipulator The layout manipulator
+     * @param LayoutItemInterface        $item              The layout item for which the update is executed
      *
      * @return mixed
      */
-    public function updateLayout($id, LayoutManipulatorInterface $layoutManipulator);
+    public function updateLayout($id, LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item);
 }

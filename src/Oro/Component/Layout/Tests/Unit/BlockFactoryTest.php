@@ -2,17 +2,18 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\BlockBuilderInterface;
-use Oro\Component\Layout\BlockInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockFactory;
+use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\RawLayoutBuilder;
@@ -69,7 +70,7 @@ class BlockFactoryTest extends LayoutTestCase
      */
     protected function getLayoutView($rootId = null)
     {
-        $this->layoutManipulator->applyChanges();
+        $this->layoutManipulator->applyChanges($this->context);
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
         return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);
@@ -229,7 +230,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->method('updateLayout')
             ->will(
                 $this->returnCallback(
-                    function (LayoutManipulatorInterface $layoutManipulator) {
+                    function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
                         $layoutManipulator->add('test', 'header', 'test');
                     }
                 )

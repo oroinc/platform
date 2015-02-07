@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\PreloadedExtension;
 
@@ -495,7 +496,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                 [
                     'header' => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
                                 $layoutManipulator->add('logo2', 'root_alias', 'logo');
                                 $layoutManipulator->add('logo3', 'header_alias', 'logo');
                             }
@@ -538,6 +539,67 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         );
     }
 
+    public function testLayoutItemPassedToLayoutUpdate()
+    {
+        $this->extensionManager->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header2' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add(
+                                    'logo',
+                                    $item->getId(),
+                                    'logo',
+                                    [
+                                        'title' => sprintf(
+                                            'id: %s, alias: %s, parentId: %s, name: %s',
+                                            $item->getId(),
+                                            $item->getAlias(),
+                                            $item->getParentId(),
+                                            $item->getName()
+                                        )
+                                    ]
+                                );
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root1', 'header')
+            ->addAlias('header1', 'header')
+            ->addAlias('header2', 'header1')
+            ->addAlias('root1', 'root');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo
+                                'vars' => [
+                                    'id'    => 'logo',
+                                    'title' => 'id: header, alias: header2, parentId: root, name: header'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     public function testLayoutUpdatesWhenParentIsAddedByAliasInUpdate()
     {
         $this->extensionManager->addExtension(
@@ -547,7 +609,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                 [
                     'header'     => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
                                 $layoutManipulator->add('logo2', 'root_alias', 'logo');
                                 $layoutManipulator->add('logo3', 'header_alias', 'logo');
                                 $layoutManipulator->addAlias('header_alias', 'header');
@@ -556,8 +618,8 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                     ],
                     'root_alias' => [
                         new CallbackLayoutUpdate(
-                            function (LayoutManipulatorInterface $layoutManipulator) {
-                                $layoutManipulator->add('header', 'root', 'header');
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('header', $item->getId(), 'header');
                             }
                         )
                     ]

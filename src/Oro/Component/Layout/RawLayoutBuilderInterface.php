@@ -148,6 +148,24 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
     public function has($id);
 
     /**
+     * Returns real id of the item
+     *
+     * @param string $id The id or alias of the item
+     *
+     * @return string The item id
+     */
+    public function resolveId($id);
+
+    /**
+     * Returns the id of the parent item
+     *
+     * @param string $id The item id
+     *
+     * @return string|null The id of the parent item or null if the given item is the root
+     */
+    public function getParentId($id);
+
+    /**
      * Checks whether the given item really has the given parent item
      *
      * @param string $parentId The parent item id
@@ -165,6 +183,15 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
      * @return bool
      */
     public function hasAlias($alias);
+
+    /**
+     * Returns the name of the block type associated with the given layout item
+     *
+     * @param string $id The item id
+     *
+     * @return string
+     */
+    public function getBlockType($id);
 
     /**
      * Returns all options for the given layout item
