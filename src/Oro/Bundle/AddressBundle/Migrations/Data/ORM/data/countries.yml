@@ -6223,66 +6223,6 @@ IT:
     iso2Code: IT
     iso3Code: ITA
     regions:
-        IT-21:
-            combinedCode: IT-21
-            code: '21'
-        IT-23:
-            combinedCode: IT-23
-            code: '23'
-        IT-25:
-            combinedCode: IT-25
-            code: '25'
-        IT-32:
-            combinedCode: IT-32
-            code: '32'
-        IT-34:
-            combinedCode: IT-34
-            code: '34'
-        IT-36:
-            combinedCode: IT-36
-            code: '36'
-        IT-42:
-            combinedCode: IT-42
-            code: '42'
-        IT-45:
-            combinedCode: IT-45
-            code: '45'
-        IT-52:
-            combinedCode: IT-52
-            code: '52'
-        IT-55:
-            combinedCode: IT-55
-            code: '55'
-        IT-57:
-            combinedCode: IT-57
-            code: '57'
-        IT-62:
-            combinedCode: IT-62
-            code: '62'
-        IT-65:
-            combinedCode: IT-65
-            code: '65'
-        IT-67:
-            combinedCode: IT-67
-            code: '67'
-        IT-72:
-            combinedCode: IT-72
-            code: '72'
-        IT-75:
-            combinedCode: IT-75
-            code: '75'
-        IT-77:
-            combinedCode: IT-77
-            code: '77'
-        IT-78:
-            combinedCode: IT-78
-            code: '78'
-        IT-82:
-            combinedCode: IT-82
-            code: '82'
-        IT-88:
-            combinedCode: IT-88
-            code: '88'
         IT-AG:
             combinedCode: IT-AG
             code: AG
