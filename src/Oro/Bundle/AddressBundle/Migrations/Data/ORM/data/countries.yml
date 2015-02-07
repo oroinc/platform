@@ -6376,6 +6376,9 @@ IT:
         IT-MB:
             combinedCode: IT-MB
             code: MB
+        IT-MC:
+            combinedCode: IT-MC
+            code: MC
         IT-ME:
             combinedCode: IT-ME
             code: ME
@@ -6478,9 +6481,6 @@ IT:
         IT-SA:
             combinedCode: IT-SA
             code: SA
-        IT-SC:
-            combinedCode: IT-SC
-            code: SC
         IT-SI:
             combinedCode: IT-SI
             code: SI

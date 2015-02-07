@@ -2214,6 +2214,7 @@ region:
     IT-LT: Latina
     IT-LU: Lucca
     IT-MB: 'Monza e della Brianza'
+    IT-MC: Macerata
     IT-ME: Messina
     IT-MI: Milano
     IT-MN: Mantova
@@ -2248,7 +2249,6 @@ region:
     IT-RN: Rimini
     IT-RO: Rovigo
     IT-SA: Salerno
-    IT-SC: Macerata
     IT-SI: Siena
     IT-SO: Sondrio
     IT-SP: 'La Spezia'
