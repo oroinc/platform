@@ -40,8 +40,6 @@ class BlockFactory implements BlockFactoryInterface
     ) {
         $this->extensionManager  = $extensionManager;
         $this->layoutManipulator = $layoutManipulator;
-        $this->optionsResolver   = $this->createOptionsResolver();
-        $this->typeHelper        = $this->createBlockTypeHelper();
     }
 
     /**
@@ -75,10 +73,22 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function initializeState(RawLayout $rawLayout, ContextInterface $context)
     {
-        $this->rawLayout    = $rawLayout;
-        $this->context      = $context;
-        $this->blockBuilder = $this->createBlockBuilder();
-        $this->block        = $this->createBlock();
+        $this->rawLayout = $rawLayout;
+        $this->context   = $context;
+
+        $this->optionsResolver = new BlockOptionsResolver($this->extensionManager);
+        $this->typeHelper      = new BlockTypeHierarchyRegistry($this->extensionManager);
+        $this->blockBuilder    = new BlockBuilder(
+            $this->layoutManipulator,
+            $this->rawLayout,
+            $this->typeHelper,
+            $this->context
+        );
+        $this->block           = new Block(
+            $this->rawLayout,
+            $this->typeHelper,
+            $this->context
+        );
     }
 
     /**
@@ -86,10 +96,12 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function clearState()
     {
-        $this->rawLayout    = null;
-        $this->context      = null;
-        $this->blockBuilder = null;
-        $this->block        = null;
+        $this->rawLayout       = null;
+        $this->context         = null;
+        $this->optionsResolver = null;
+        $this->typeHelper      = null;
+        $this->blockBuilder    = null;
+        $this->block           = null;
     }
 
     /**
@@ -243,46 +255,6 @@ class BlockFactory implements BlockFactoryInterface
             $type->finishView($view, $this->block, $options);
             $this->extensionManager->finishView($type->getName(), $view, $this->block, $options);
         }
-    }
-
-    /**
-     * Creates new instance of the option resolver
-     *
-     * @return BlockOptionsResolver
-     */
-    protected function createOptionsResolver()
-    {
-        return new BlockOptionsResolver($this->extensionManager);
-    }
-
-    /**
-     * Creates new instance of the block type hierarchy registry
-     *
-     * @return BlockTypeHelperInterface
-     */
-    protected function createBlockTypeHelper()
-    {
-        return new BlockTypeHierarchyRegistry($this->extensionManager);
-    }
-
-    /**
-     * Creates new instance of the block builder
-     *
-     * @return BlockBuilder
-     */
-    protected function createBlockBuilder()
-    {
-        return new BlockBuilder($this->layoutManipulator, $this->rawLayout, $this->typeHelper, $this->context);
-    }
-
-    /**
-     * Creates new instance of the block
-     *
-     * @return Block
-     */
-    protected function createBlock()
-    {
-        return new Block($this->rawLayout, $this->typeHelper, $this->context);
     }
 
     /**

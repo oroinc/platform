@@ -13,25 +13,25 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var BlockFactoryInterface */
     protected $blockFactory;
 
-    /** @var LayoutFactoryInterface */
-    protected $layoutFactory;
+    /** @var LayoutRendererRegistryInterface */
+    protected $rendererRegistry;
 
     /**
      * @param RawLayoutBuilderInterface          $rawLayoutBuilder
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
      * @param BlockFactoryInterface              $blockFactory
-     * @param LayoutFactoryInterface             $layoutFactory
+     * @param LayoutRendererRegistryInterface    $rendererRegistry
      */
     public function __construct(
         RawLayoutBuilderInterface $rawLayoutBuilder,
         DeferredLayoutManipulatorInterface $layoutManipulator,
         BlockFactoryInterface $blockFactory,
-        LayoutFactoryInterface $layoutFactory
+        LayoutRendererRegistryInterface $rendererRegistry
     ) {
         $this->rawLayoutBuilder  = $rawLayoutBuilder;
         $this->layoutManipulator = $layoutManipulator;
         $this->blockFactory      = $blockFactory;
-        $this->layoutFactory     = $layoutFactory;
+        $this->rendererRegistry  = $rendererRegistry;
     }
 
     /**
@@ -147,7 +147,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         $this->layoutManipulator->applyChanges($context);
         $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
         $rootView    = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
-        $layout      = $this->layoutFactory->createLayout($rootView);
+        $layout      = $this->createLayout($rootView);
         $rootBlockId = $rawLayout->getRootId();
         $blockThemes = $rawLayout->getBlockThemes();
         foreach ($blockThemes as $blockId => $themes) {
@@ -155,5 +155,15 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
 
         return $layout;
+    }
+
+    /**
+     * @param BlockView $rootView
+     *
+     * @return Layout
+     */
+    protected function createLayout(BlockView $rootView)
+    {
+        return new Layout($rootView, $this->rendererRegistry);
     }
 }

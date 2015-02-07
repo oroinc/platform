@@ -11,7 +11,6 @@ use Oro\Component\Layout\ExtensionInterface;
 use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutFactory;
 use Oro\Component\Layout\LayoutRendererRegistry;
 use Oro\Component\Layout\RawLayoutBuilder;
 
@@ -59,12 +58,11 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
         $rendererRegistry->addRenderer('test', $renderer);
         $rendererRegistry->setDefaultRenderer('test');
 
-        $layoutFactory       = new LayoutFactory($rendererRegistry);
         $this->layoutBuilder = new LayoutBuilder(
             $this->rawLayoutBuilder,
             $layoutManipulator,
             $blockFactory,
-            $layoutFactory
+            $rendererRegistry
         );
     }
 

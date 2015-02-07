@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\LayoutBuilder;
+use Oro\Component\Layout\LayoutRendererRegistry;
 
 class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,9 +17,9 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     protected $blockFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutFactory;
+    protected $renderer;
 
-    /** @var LayoutBuilder */
+    /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutBuilder;
 
     protected function setUp()
@@ -26,14 +27,23 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
         $this->blockFactory      = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
-        $this->layoutFactory     = $this->getMock('Oro\Component\Layout\LayoutFactoryInterface');
+        $this->renderer          = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
 
-        $this->layoutBuilder = new LayoutBuilder(
-            $this->rawLayoutBuilder,
-            $this->layoutManipulator,
-            $this->blockFactory,
-            $this->layoutFactory
-        );
+        $rendererRegistry = new LayoutRendererRegistry();
+        $rendererRegistry->addRenderer('test', $this->renderer);
+        $rendererRegistry->setDefaultRenderer('test');
+
+        $this->layoutBuilder = $this->getMockBuilder('Oro\Component\Layout\LayoutBuilder')
+            ->setConstructorArgs(
+                [
+                    $this->rawLayoutBuilder,
+                    $this->layoutManipulator,
+                    $this->blockFactory,
+                    $rendererRegistry
+                ]
+            )
+            ->setMethods(['createLayout'])
+            ->getMock();
     }
 
     public function testAdd()
@@ -196,7 +206,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('createBlockView')
             ->with($this->identicalTo($rawLayout), $this->identicalTo($context), $rootId)
             ->will($this->returnValue($rootView));
-        $this->layoutFactory->expects($this->once())
+        $this->layoutBuilder->expects($this->once())
             ->method('createLayout')
             ->with($this->identicalTo($rootView))
             ->will($this->returnValue($layout));

@@ -4,7 +4,6 @@ parameters:
     oro_layout.block_factory.class:             Oro\Component\Layout\BlockFactory
     oro_layout.raw_layout_builder.class:        Oro\Component\Layout\RawLayoutBuilder
     oro_layout.layout_manipulator.class:        Oro\Component\Layout\DeferredLayoutManipulator
-    oro_layout.layout_factory.class:            Oro\Component\Layout\LayoutFactory
     oro_layout.layout_builder.class:            Oro\Component\Layout\LayoutBuilder
     oro_layout.layout_renderer_registry.class:  Oro\Component\Layout\LayoutRendererRegistry
     oro_layout.layout_manager.class:            Oro\Component\Layout\LayoutManager
@@ -43,12 +42,6 @@ services:
             - @oro_layout.extension_manager
             - @oro_layout.layout_manipulator
 
-    oro_layout.layout_factory:
-        public: false
-        class: %oro_layout.layout_factory.class%
-        arguments:
-            - @oro_layout.layout_renderer_registry
-
     oro_layout.layout_builder:
         public: false
         class: %oro_layout.layout_builder.class%
@@ -56,7 +49,7 @@ services:
             - @oro_layout.raw_layout_builder
             - @oro_layout.layout_manipulator
             - @oro_layout.block_factory
-            - @oro_layout.layout_factory
+            - @oro_layout.layout_renderer_registry
 
     oro_layout.layout_renderer_registry:
         public: false
