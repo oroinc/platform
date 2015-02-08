@@ -12,15 +12,10 @@ services:
             - {}
             - {}
 
-    oro_layout.extension.core:
-        public: false
-        class: Oro\Component\Layout\Extension\Core\CoreExtension
-
     oro_layout.layout_factory_builder:
         public: false
         class: %oro_layout.layout_factory_builder.class%
         calls:
-            - [addExtension, [@oro_layout.extension.core, -10]]
             - [addExtension, [@oro_layout.extension]]
             - [setDefaultRenderer, [%oro_layout.templating.default%]]
 
