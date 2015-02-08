@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ConfigurationPass implements CompilerPassInterface
 {
-    const RENDERER_REGISTRY_SERVICE = 'oro_layout.layout_renderer_registry';
+    const LAYOUT_FACTORY_BUILDER_SERVICE = 'oro_layout.layout_factory_builder';
     const PHP_RENDERER_SERVICE = 'oro_layout.php.layout_renderer';
     const TWIG_RENDERER_SERVICE = 'oro_layout.twig.layout_renderer';
     const LAYOUT_EXTENSION_SERVICE = 'oro_layout.extension';
@@ -23,8 +23,8 @@ class ConfigurationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         // register renderers
-        if ($container->hasDefinition(self::RENDERER_REGISTRY_SERVICE)) {
-            $registryDef = $container->getDefinition(self::RENDERER_REGISTRY_SERVICE);
+        if ($container->hasDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE)) {
+            $registryDef = $container->getDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE);
             if ($container->hasDefinition(self::PHP_RENDERER_SERVICE)) {
                 $registryDef->addMethodCall(
                     'addRenderer',

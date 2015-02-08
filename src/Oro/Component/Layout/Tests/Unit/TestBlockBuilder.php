@@ -3,33 +3,33 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\LayoutBuilder;
-use Oro\Component\Layout\LayoutContext;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\LayoutBuilderInterface;
 
 class TestBlockBuilder
 {
     /** @var string */
     protected $id;
 
+    /** @var LayoutBuilderInterface */
+    protected $layoutBuilder;
+
+    /** @var ContextInterface */
+    protected $context;
+
     /** @var int */
     protected $childCount = 0;
 
-    /** @var LayoutContext */
-    protected $context;
-
-    /** @var LayoutBuilder */
-    protected $layoutBuilder;
-
     /**
-     * @param LayoutBuilder $layoutBuilder
-     * @param LayoutContext $context
-     * @param string        $id
-     * @param string        $blockType
-     * @param array         $options
+     * @param LayoutBuilderInterface $layoutBuilder
+     * @param ContextInterface       $context
+     * @param string                 $id
+     * @param string                 $blockType
+     * @param array                  $options
      */
     public function __construct(
-        LayoutBuilder $layoutBuilder,
-        LayoutContext $context,
+        LayoutBuilderInterface $layoutBuilder,
+        ContextInterface $context,
         $id = null,
         $blockType = null,
         array $options = []

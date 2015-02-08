@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\PreloadedExtension;
@@ -30,7 +31,10 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
 
     protected function setUp()
     {
+        $this->context = new LayoutContext();
+
         $this->extensionManager = new ExtensionManager();
+        $this->extensionManager->addExtension(new CoreExtension());
         $this->extensionManager->addExtension(
             new PreloadedExtension(
                 [
@@ -41,8 +45,6 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
                 ]
             )
         );
-
-        $this->context           = new LayoutContext();
         $this->rawLayoutBuilder  = new RawLayoutBuilder();
         $this->layoutManipulator = new DeferredLayoutManipulator(
             $this->rawLayoutBuilder,

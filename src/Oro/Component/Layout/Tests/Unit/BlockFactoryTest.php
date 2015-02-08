@@ -11,6 +11,7 @@ use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
+use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItemInterface;
@@ -40,6 +41,7 @@ class BlockFactoryTest extends LayoutTestCase
     protected function setUp()
     {
         $this->extensionManager = new ExtensionManager();
+        $this->extensionManager->addExtension(new CoreExtension());
         $this->extensionManager->addExtension(
             new PreloadedExtension(
                 [

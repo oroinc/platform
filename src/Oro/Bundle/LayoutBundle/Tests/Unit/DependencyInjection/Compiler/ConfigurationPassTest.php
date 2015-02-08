@@ -56,7 +56,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::RENDERER_REGISTRY_SERVICE, true],
+                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, true],
                         [ConfigurationPass::PHP_RENDERER_SERVICE, true],
                         [ConfigurationPass::TWIG_RENDERER_SERVICE, true],
                         [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, true]
@@ -68,7 +68,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::RENDERER_REGISTRY_SERVICE, $registryDef],
+                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, $registryDef],
                         [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef]
                     ]
                 )
@@ -151,7 +151,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::RENDERER_REGISTRY_SERVICE, false],
+                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, false],
                         [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, true]
                     ]
                 )
@@ -190,7 +190,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::RENDERER_REGISTRY_SERVICE, false],
+                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, false],
                         [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, true]
                     ]
                 )
@@ -235,7 +235,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::RENDERER_REGISTRY_SERVICE, false],
+                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, false],
                         [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, true]
                     ]
                 )

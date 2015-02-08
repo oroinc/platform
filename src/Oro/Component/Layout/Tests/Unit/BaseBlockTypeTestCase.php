@@ -2,17 +2,14 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\ExtensionInterface;
-use Oro\Component\Layout\ExtensionManager;
-use Oro\Component\Layout\LayoutBuilder;
 use Oro\Component\Layout\LayoutContext;
-use Oro\Component\Layout\LayoutRendererRegistry;
-use Oro\Component\Layout\RawLayoutBuilder;
+use Oro\Component\Layout\LayoutFactoryBuilderInterface;
+use Oro\Component\Layout\LayoutFactoryInterface;
+use Oro\Component\Layout\Layouts;
 
 /**
  * The base test case that helps testing block types
@@ -22,56 +19,30 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /** @var LayoutContext */
     protected $context;
 
-    /** @var BlockOptionsResolver */
-    protected $blockOptionsResolver;
-
-    /** @var RawLayoutBuilder */
-    protected $rawLayoutBuilder;
-
-    /** @var ExtensionManager */
-    protected $extensionManager;
-
-    /** @var LayoutBuilder */
-    protected $layoutBuilder;
+    /** @var LayoutFactoryInterface */
+    protected $layoutFactory;
 
     protected function setUp()
     {
-        $this->extensionManager = $this->createExtensionManager();
+        $this->context = new LayoutContext();
+
+        $layoutFactoryBuilder = Layouts::createLayoutFactoryBuilder();
+        $this->initializeLayoutFactoryBuilder($layoutFactoryBuilder);
         foreach ($this->getExtensions() as $extension) {
-            $this->extensionManager->addExtension($extension);
+            $layoutFactoryBuilder->addExtension($extension);
         };
-
-        $this->context              = new LayoutContext();
-        $this->blockOptionsResolver = new BlockOptionsResolver($this->extensionManager);
-        $this->rawLayoutBuilder     = new RawLayoutBuilder();
-        $layoutManipulator          = new DeferredLayoutManipulator(
-            $this->rawLayoutBuilder,
-            $this->extensionManager
-        );
-        $blockFactory               = new BlockFactory(
-            $this->extensionManager,
-            $layoutManipulator
-        );
-
-        $renderer         = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
-        $rendererRegistry = new LayoutRendererRegistry();
-        $rendererRegistry->addRenderer('test', $renderer);
-        $rendererRegistry->setDefaultRenderer('test');
-
-        $this->layoutBuilder = new LayoutBuilder(
-            $this->rawLayoutBuilder,
-            $layoutManipulator,
-            $blockFactory,
-            $rendererRegistry
-        );
+        $this->layoutFactory = $layoutFactoryBuilder->getLayoutFactory();
     }
 
     /**
-     * @return ExtensionManager
+     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
      */
-    protected function createExtensionManager()
+    protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
-        return new ExtensionManager();
+        $layoutFactoryBuilder->addRenderer(
+            'test',
+            $this->getMock('Oro\Component\Layout\LayoutRendererInterface')
+        );
     }
 
     /**
@@ -91,7 +62,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function getBlockType($blockType)
     {
-        return $this->extensionManager->getBlockType($blockType);
+        return $this->layoutFactory->getBlockType($blockType);
     }
 
     /**
@@ -104,7 +75,9 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function resolveOptions($blockType, array $options)
     {
-        return $this->blockOptionsResolver->resolveOptions($blockType, $options);
+        $blockOptionsResolver = new BlockOptionsResolver($this->layoutFactory->getExtensionManager());
+
+        return $blockOptionsResolver->resolveOptions($blockType, $options);
     }
 
     /**
@@ -117,10 +90,9 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function getBlockView($blockType, array $options = [])
     {
-        $this->rawLayoutBuilder->clear();
-
-        $this->layoutBuilder->add($blockType . '_id', null, $blockType, $options);
-        $layout = $this->layoutBuilder->getLayout($this->context);
+        $layoutBuilder = $this->layoutFactory->createLayoutBuilder();
+        $layoutBuilder->add($blockType . '_id', null, $blockType, $options);
+        $layout = $layoutBuilder->getLayout($this->context);
 
         return $layout->getView();
     }
@@ -135,10 +107,8 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function getBlockBuilder($blockType, array $options = [])
     {
-        $this->rawLayoutBuilder->clear();
-
         return new TestBlockBuilder(
-            $this->layoutBuilder,
+            $this->layoutFactory->createLayoutBuilder(),
             $this->context,
             $blockType . '_id',
             $blockType,

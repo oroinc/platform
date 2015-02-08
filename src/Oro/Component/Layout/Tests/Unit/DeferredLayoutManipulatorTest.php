@@ -1040,6 +1040,21 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 1 action(s) cannot be applied. Actions: setBlockTheme(logo).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testSetBlockThemeForUnknownItem()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'logo');
+
+        $this->getLayoutView();
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
      * @expectedExceptionMessage Failed to apply scheduled changes. 3 action(s) cannot be applied. Actions: add(header, logo1), add(logo1, logo2), add(logo2, header).
      */
     // @codingStandardsIgnoreEnd

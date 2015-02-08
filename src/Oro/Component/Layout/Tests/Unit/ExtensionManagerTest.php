@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\Extension\Core\CoreExtension;
 use Oro\Component\Layout\ExtensionManager;
 
 class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
@@ -17,7 +18,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->extensionManager = new ExtensionManager();
-
+        $this->extensionManager->addExtension(new CoreExtension());
         $this->extension = $this->getMock('Oro\Component\Layout\ExtensionInterface');
         $this->extensionManager->addExtension($this->extension);
     }

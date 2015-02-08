@@ -4,8 +4,6 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Component\Layout\Extension\Core\CoreExtension;
-
 class ExtensionManager implements ExtensionManagerInterface
 {
     /** @var array */
@@ -16,11 +14,6 @@ class ExtensionManager implements ExtensionManagerInterface
 
     /** @var BlockTypeInterface[] */
     private $types = [];
-
-    public function __construct()
-    {
-        $this->addExtension(new CoreExtension(), -10);
-    }
 
     /**
      * {@inheritdoc}
