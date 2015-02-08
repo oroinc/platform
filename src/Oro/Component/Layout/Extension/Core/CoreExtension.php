@@ -7,7 +7,7 @@ use Oro\Component\Layout\Block\Type;
 
 class CoreExtension extends AbstractExtension
 {
-    protected function loadBlockTypes()
+    protected function loadTypes()
     {
         return [
             new Type\BaseType(),

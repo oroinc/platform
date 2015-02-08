@@ -22,12 +22,12 @@ class AbstractExtensionStub extends AbstractExtension
         $this->loadedLayoutUpdates  = $loadedLayoutUpdates;
     }
 
-    protected function loadBlockTypes()
+    protected function loadTypes()
     {
         return $this->loadedTypes;
     }
 
-    protected function loadBlockTypeExtensions()
+    protected function loadTypeExtensions()
     {
         return $this->loadedTypeExtensions;
     }

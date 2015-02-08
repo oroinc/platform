@@ -130,7 +130,7 @@ abstract class AbstractExtension implements ExtensionInterface
      *
      * @return BlockTypeInterface[]
      */
-    protected function loadBlockTypes()
+    protected function loadTypes()
     {
         return [];
     }
@@ -140,7 +140,7 @@ abstract class AbstractExtension implements ExtensionInterface
      *
      * @return array of BlockTypeExtensionInterface[]
      */
-    protected function loadBlockTypeExtensions()
+    protected function loadTypeExtensions()
     {
         return [];
     }
@@ -171,7 +171,7 @@ abstract class AbstractExtension implements ExtensionInterface
     {
         $this->types = [];
 
-        foreach ($this->loadBlockTypes() as $type) {
+        foreach ($this->loadTypes() as $type) {
             if (!$type instanceof BlockTypeInterface) {
                 throw new Exception\UnexpectedTypeException(
                     $type,
@@ -193,7 +193,7 @@ abstract class AbstractExtension implements ExtensionInterface
     {
         $this->typeExtensions = [];
 
-        foreach ($this->loadBlockTypeExtensions() as $extension) {
+        foreach ($this->loadTypeExtensions() as $extension) {
             if (!$extension instanceof BlockTypeExtensionInterface) {
                 throw new Exception\UnexpectedTypeException(
                     $extension,

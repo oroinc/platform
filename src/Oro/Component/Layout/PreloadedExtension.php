@@ -57,8 +57,8 @@ class PreloadedExtension implements ExtensionInterface
      */
     public function __construct(array $types, array $typeExtensions = [], array $layoutUpdates = [])
     {
-        $this->validateBlockTypes($types);
-        $this->validateBlockTypeExtensions($typeExtensions);
+        $this->validateTypes($types);
+        $this->validateTypeExtensions($typeExtensions);
         $this->validateLayoutUpdates($layoutUpdates);
 
         $this->types          = $types;
@@ -129,7 +129,7 @@ class PreloadedExtension implements ExtensionInterface
      *
      * @throws Exception\InvalidArgumentException
      */
-    protected function validateBlockTypes(array $types)
+    protected function validateTypes(array $types)
     {
         foreach ($types as $key => $val) {
             if (!is_string($key)) {
@@ -150,7 +150,7 @@ class PreloadedExtension implements ExtensionInterface
      *
      * @throws Exception\InvalidArgumentException
      */
-    protected function validateBlockTypeExtensions(array $typeExtensions)
+    protected function validateTypeExtensions(array $typeExtensions)
     {
         foreach ($typeExtensions as $key => $val) {
             if (!is_string($key)) {
