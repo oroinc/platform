@@ -97,27 +97,27 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->assertTrue($this->rawLayoutBuilder->hasAlias('root_alias2'));
     }
 
-    public function testGetBlockType()
+    public function testGetType()
     {
         $this->rawLayoutBuilder->add('root', null, 'root');
 
-        $this->assertEquals('root', $this->rawLayoutBuilder->getBlockType('root'));
+        $this->assertEquals('root', $this->rawLayoutBuilder->getType('root'));
     }
 
-    public function testGetBlockTypeWithBlockTypeAsAlreadyCreatedBlockTypeObject()
+    public function testGetTypeWithBlockTypeAsAlreadyCreatedBlockTypeObject()
     {
         $this->rawLayoutBuilder->add('root', null, new RootType());
 
-        $this->assertEquals('root', $this->rawLayoutBuilder->getBlockType('root'));
+        $this->assertEquals('root', $this->rawLayoutBuilder->getType('root'));
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage Cannot get block type for "unknown" item. Reason: The "unknown" item does not exist.
      */
-    public function testGetBlockTypeWithException()
+    public function testGetTypeWithException()
     {
-        $this->rawLayoutBuilder->getBlockType('unknown');
+        $this->rawLayoutBuilder->getType('unknown');
     }
 
     public function testAdd()

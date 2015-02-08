@@ -62,7 +62,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function getBlockType($blockType)
     {
-        return $this->layoutFactory->getBlockType($blockType);
+        return $this->layoutFactory->getType($blockType);
     }
 
     /**

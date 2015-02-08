@@ -20,7 +20,7 @@ interface LayoutFactoryBuilderInterface
      *
      * @return self
      */
-    public function addBlockType(BlockTypeInterface $type);
+    public function addType(BlockTypeInterface $type);
 
     /**
      * Registers a block type extension.
@@ -29,7 +29,7 @@ interface LayoutFactoryBuilderInterface
      *
      * @return self
      */
-    public function addBlockTypeExtension(BlockTypeExtensionInterface $typeExtension);
+    public function addTypeExtension(BlockTypeExtensionInterface $typeExtension);
 
     /**
      * Registers a layout update.

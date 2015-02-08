@@ -8,19 +8,19 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 {
     public function testBlockTypes()
     {
-        $name      = 'test';
-        $blockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $name = 'test';
+        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
         $extension = new PreloadedExtension(
             [
-                $name => $blockType
+                $name => $type
             ]
         );
 
-        $this->assertTrue($extension->hasBlockType($name));
-        $this->assertFalse($extension->hasBlockType('unknown'));
+        $this->assertTrue($extension->hasType($name));
+        $this->assertFalse($extension->hasType('unknown'));
 
-        $this->assertSame($blockType, $extension->getBlockType($name));
+        $this->assertSame($type, $extension->getType($name));
     }
 
     /**
@@ -31,28 +31,28 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $extension = new PreloadedExtension([]);
 
-        $extension->getBlockType('unknown');
+        $extension->getType('unknown');
     }
 
     public function testBlockTypeExtensions()
     {
-        $name               = 'test';
-        $blockTypeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $name          = 'test';
+        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $extension = new PreloadedExtension(
             [],
             [
-                $name => [$blockTypeExtension]
+                $name => [$typeExtension]
             ]
         );
 
-        $this->assertTrue($extension->hasBlockTypeExtensions($name));
-        $this->assertFalse($extension->hasBlockTypeExtensions('unknown'));
+        $this->assertTrue($extension->hasTypeExtensions($name));
+        $this->assertFalse($extension->hasTypeExtensions('unknown'));
 
-        $this->assertCount(1, $extension->getBlockTypeExtensions($name));
-        $this->assertSame($blockTypeExtension, $extension->getBlockTypeExtensions($name)[0]);
+        $this->assertCount(1, $extension->getTypeExtensions($name));
+        $this->assertSame($typeExtension, $extension->getTypeExtensions($name)[0]);
 
-        $this->assertSame([], $extension->getBlockTypeExtensions('unknown'));
+        $this->assertSame([], $extension->getTypeExtensions('unknown'));
     }
 
     public function testLayoutUpdates()
@@ -79,7 +79,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $blockTypes array must be strings.
+     * @expectedExceptionMessage Keys of $types array must be strings.
      */
     public function testConstructWithInvalidKeysForBlockTypes()
     {
@@ -93,7 +93,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $blockTypes array must be BlockTypeInterface.
+     * @expectedExceptionMessage Each item of $types array must be BlockTypeInterface.
      */
     public function testConstructWithInvalidBlockTypes()
     {
@@ -107,7 +107,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Keys of $blockTypeExtensions array must be strings.
+     * @expectedExceptionMessage Keys of $typeExtensions array must be strings.
      */
     public function testConstructWithInvalidKeysForBlockTypeExtensions()
     {
@@ -122,7 +122,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $blockTypeExtensions[] array must be BlockTypeExtensionInterface.
+     * @expectedExceptionMessage Each item of $typeExtensions[] array must be BlockTypeExtensionInterface.
      */
     public function testConstructWithInvalidBlockTypeExtensions()
     {
@@ -137,7 +137,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Each item of $blockTypeExtensions array must be array of BlockTypeExtensionInterface.
+     * @expectedExceptionMessage Each item of $typeExtensions array must be array of BlockTypeExtensionInterface.
      */
     public function testConstructWithSingleBlockTypeExtensions()
     {

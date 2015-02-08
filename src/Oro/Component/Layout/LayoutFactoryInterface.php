@@ -25,7 +25,7 @@ interface LayoutFactoryInterface
      *
      * @return BlockTypeInterface
      */
-    public function getBlockType($name);
+    public function getType($name);
 
     /**
      * Creates the raw layout builder.

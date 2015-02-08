@@ -37,7 +37,7 @@ class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockTypeNames($blockType)
+    public function getTypeNames($blockType)
     {
         $name = $this->ensureInitialized($blockType);
 
@@ -47,7 +47,7 @@ class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockTypes($blockType)
+    public function getTypes($blockType)
     {
         $name = $this->ensureInitialized($blockType);
 
@@ -71,7 +71,7 @@ class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
 
         if (!isset($this->types[$name])) {
             if (!$type) {
-                $type = $this->extensionManager->getBlockType($name);
+                $type = $this->extensionManager->getType($name);
             }
 
             $types      = [$type];
@@ -79,7 +79,7 @@ class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
             $nameMap    = [$type->getName() => true];
             $parentName = $type->getParent();
             while ($parentName) {
-                $type = $this->extensionManager->getBlockType($parentName);
+                $type = $this->extensionManager->getType($parentName);
 
                 array_unshift($types, $type);
                 array_unshift($names, $type->getName());

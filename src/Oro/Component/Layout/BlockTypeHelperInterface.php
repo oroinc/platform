@@ -23,7 +23,7 @@ interface BlockTypeHelperInterface
      *
      * @return string[]
      */
-    public function getBlockTypeNames($blockType);
+    public function getTypeNames($blockType);
 
     /**
      * Returns the list of all parent block types as well as the given block type.
@@ -34,5 +34,5 @@ interface BlockTypeHelperInterface
      *
      * @return BlockTypeInterface[]
      */
-    public function getBlockTypes($blockType);
+    public function getTypes($blockType);
 }

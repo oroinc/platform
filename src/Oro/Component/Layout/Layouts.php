@@ -35,8 +35,8 @@ use Oro\Component\Layout\Extension\Core\CoreExtension;
  *
  * <code>
  * $layoutFactory = Layouts::createLayoutFactoryBuilder()
- *     ->addBlockType(new MyType())
- *     ->addBlockTypeExtension(new MyTypeExtension())
+ *     ->addType(new MyType())
+ *     ->addTypeExtension(new MyTypeExtension())
  *     ->addLayoutUpdate('my_item_id', new MyLayoutUpdate())
  *     ->getLayoutFactory();
  * </code>

@@ -16,7 +16,7 @@ interface ExtensionInterface
      *
      * @throws Exception\InvalidArgumentException if the given type is not supported by this extension
      */
-    public function getBlockType($name);
+    public function getType($name);
 
     /**
      * Checks whether the given block type is supported.
@@ -25,7 +25,7 @@ interface ExtensionInterface
      *
      * @return bool true, if the given type is supported by this extension; otherwise, false
      */
-    public function hasBlockType($name);
+    public function hasType($name);
 
     /**
      * Returns extensions for the given block type.
@@ -34,7 +34,7 @@ interface ExtensionInterface
      *
      * @return BlockTypeExtensionInterface[]
      */
-    public function getBlockTypeExtensions($name);
+    public function getTypeExtensions($name);
 
     /**
      * Checks whether this extension provides extensions for the given block type.
@@ -43,7 +43,7 @@ interface ExtensionInterface
      *
      * @return bool true, if the given block type has extensions; otherwise, false
      */
-    public function hasBlockTypeExtensions($name);
+    public function hasTypeExtensions($name);
 
     /**
      * Returns layout updates for the given layout item.

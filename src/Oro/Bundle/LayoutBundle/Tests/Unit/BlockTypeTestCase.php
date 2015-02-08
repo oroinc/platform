@@ -19,11 +19,11 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
     {
         parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
         $layoutFactoryBuilder
-            ->addBlockType(new Type\RootType())
-            ->addBlockType(new Type\BodyType())
-            ->addBlockType(new Type\HeadType())
-            ->addBlockType(new Type\MetaType())
-            ->addBlockType(new Type\ScriptType())
-            ->addBlockType(new Type\StyleType());
+            ->addType(new Type\RootType())
+            ->addType(new Type\BodyType())
+            ->addType(new Type\HeadType())
+            ->addType(new Type\MetaType())
+            ->addType(new Type\ScriptType())
+            ->addType(new Type\StyleType());
     }
 }

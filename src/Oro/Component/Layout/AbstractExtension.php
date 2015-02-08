@@ -46,10 +46,10 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockType($name)
+    public function getType($name)
     {
         if (null === $this->types) {
-            $this->initBlockTypes();
+            $this->initTypes();
         }
 
         if (!isset($this->types[$name])) {
@@ -64,10 +64,10 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasBlockType($name)
+    public function hasType($name)
     {
         if (null === $this->types) {
-            $this->initBlockTypes();
+            $this->initTypes();
         }
 
         return isset($this->types[$name]);
@@ -76,10 +76,10 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockTypeExtensions($name)
+    public function getTypeExtensions($name)
     {
         if (null === $this->typeExtensions) {
-            $this->initBlockTypeExtensions();
+            $this->initTypeExtensions();
         }
 
         return !empty($this->typeExtensions[$name])
@@ -90,10 +90,10 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasBlockTypeExtensions($name)
+    public function hasTypeExtensions($name)
     {
         if (null === $this->typeExtensions) {
-            $this->initBlockTypeExtensions();
+            $this->initTypeExtensions();
         }
 
         return !empty($this->typeExtensions[$name]);
@@ -167,7 +167,7 @@ abstract class AbstractExtension implements ExtensionInterface
      * @throws Exception\UnexpectedTypeException if any registered block type is not
      *                                           an instance of BlockTypeInterface
      */
-    private function initBlockTypes()
+    private function initTypes()
     {
         $this->types = [];
 
@@ -189,7 +189,7 @@ abstract class AbstractExtension implements ExtensionInterface
      * @throws Exception\UnexpectedTypeException if any registered block type extension is not
      *                                           an instance of BlockTypeExtensionInterface
      */
-    private function initBlockTypeExtensions()
+    private function initTypeExtensions()
     {
         $this->typeExtensions = [];
 

@@ -53,26 +53,26 @@ class DependencyInjectionExtension implements ExtensionInterface
 
     /**
      * @param ContainerInterface $container
-     * @param array              $blockTypeServiceIds          string[]
-     * @param array              $blockTypeExtensionServiceIds array of string[]
-     * @param array              $layoutUpdateServiceIds       array of string[]
+     * @param array              $typeServiceIds          string[]
+     * @param array              $typeExtensionServiceIds array of string[]
+     * @param array              $layoutUpdateServiceIds  array of string[]
      */
     public function __construct(
         ContainerInterface $container,
-        array $blockTypeServiceIds,
-        array $blockTypeExtensionServiceIds,
+        array $typeServiceIds,
+        array $typeExtensionServiceIds,
         array $layoutUpdateServiceIds
     ) {
         $this->container               = $container;
-        $this->typeServiceIds          = $blockTypeServiceIds;
-        $this->typeExtensionServiceIds = $blockTypeExtensionServiceIds;
+        $this->typeServiceIds          = $typeServiceIds;
+        $this->typeExtensionServiceIds = $typeExtensionServiceIds;
         $this->layoutUpdateServiceIds  = $layoutUpdateServiceIds;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockType($name)
+    public function getType($name)
     {
         if (!isset($this->typeServiceIds[$name])) {
             throw new Exception\InvalidArgumentException(
@@ -100,7 +100,7 @@ class DependencyInjectionExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasBlockType($name)
+    public function hasType($name)
     {
         return isset($this->typeServiceIds[$name]);
     }
@@ -108,7 +108,7 @@ class DependencyInjectionExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockTypeExtensions($name)
+    public function getTypeExtensions($name)
     {
         $extensions = array();
 
@@ -124,7 +124,7 @@ class DependencyInjectionExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasBlockTypeExtensions($name)
+    public function hasTypeExtensions($name)
     {
         return isset($this->typeExtensionServiceIds[$name]);
     }

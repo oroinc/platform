@@ -191,7 +191,7 @@ interface RawLayoutBuilderInterface extends LayoutManipulatorInterface
      *
      * @return string
      */
-    public function getBlockType($id);
+    public function getType($id);
 
     /**
      * Returns all options for the given layout item

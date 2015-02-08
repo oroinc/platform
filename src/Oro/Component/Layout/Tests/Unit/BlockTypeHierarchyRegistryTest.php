@@ -26,23 +26,23 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
         $containerBlockType = new ContainerType();
 
         $this->extensionManager->expects($this->at(0))
-            ->method('getBlockType')
+            ->method('getType')
             ->with(ContainerType::NAME)
             ->will($this->returnValue($containerBlockType));
         $this->extensionManager->expects($this->at(1))
-            ->method('getBlockType')
+            ->method('getType')
             ->with(BaseType::NAME)
             ->will($this->returnValue($baseBlockType));
         $this->extensionManager->expects($this->exactly(2))
-            ->method('getBlockType');
+            ->method('getType');
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
-            $this->registry->getBlockTypes(ContainerType::NAME)
+            $this->registry->getTypes(ContainerType::NAME)
         );
         $this->assertSame(
             [$baseBlockType->getName(), $containerBlockType->getName()],
-            $this->registry->getBlockTypeNames(ContainerType::NAME)
+            $this->registry->getTypeNames(ContainerType::NAME)
         );
         $this->assertTrue($this->registry->isInstanceOf(ContainerType::NAME, ContainerType::NAME));
         $this->assertTrue($this->registry->isInstanceOf(ContainerType::NAME, BaseType::NAME));
@@ -55,17 +55,17 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
         $containerBlockType = new ContainerType();
 
         $this->extensionManager->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with(BaseType::NAME)
             ->will($this->returnValue($baseBlockType));
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
-            $this->registry->getBlockTypes($containerBlockType)
+            $this->registry->getTypes($containerBlockType)
         );
         $this->assertSame(
             [$baseBlockType->getName(), $containerBlockType->getName()],
-            $this->registry->getBlockTypeNames($containerBlockType)
+            $this->registry->getTypeNames($containerBlockType)
         );
         $this->assertTrue($this->registry->isInstanceOf($containerBlockType, ContainerType::NAME));
         $this->assertTrue($this->registry->isInstanceOf($containerBlockType, BaseType::NAME));
@@ -74,20 +74,20 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testForBaseTypeByBlockName()
     {
-        $blockType = new BaseType();
+        $type = new BaseType();
 
         $this->extensionManager->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with(BaseType::NAME)
-            ->will($this->returnValue($blockType));
+            ->will($this->returnValue($type));
 
         $this->assertSame(
-            [$blockType],
-            $this->registry->getBlockTypes(BaseType::NAME)
+            [$type],
+            $this->registry->getTypes(BaseType::NAME)
         );
         $this->assertSame(
-            [$blockType->getName()],
-            $this->registry->getBlockTypeNames(BaseType::NAME)
+            [$type->getName()],
+            $this->registry->getTypeNames(BaseType::NAME)
         );
         $this->assertTrue($this->registry->isInstanceOf(BaseType::NAME, BaseType::NAME));
         $this->assertFalse($this->registry->isInstanceOf(BaseType::NAME, 'another'));
@@ -95,20 +95,20 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
 
     public function testForBaseTypeByAlreadyCreatedBlockTypeObject()
     {
-        $blockType = new BaseType();
+        $type = new BaseType();
 
         $this->extensionManager->expects($this->never())
-            ->method('getBlockType');
+            ->method('getType');
 
         $this->assertSame(
-            [$blockType],
-            $this->registry->getBlockTypes($blockType)
+            [$type],
+            $this->registry->getTypes($type)
         );
         $this->assertSame(
-            [$blockType->getName()],
-            $this->registry->getBlockTypeNames($blockType)
+            [$type->getName()],
+            $this->registry->getTypeNames($type)
         );
-        $this->assertTrue($this->registry->isInstanceOf($blockType, BaseType::NAME));
-        $this->assertFalse($this->registry->isInstanceOf($blockType, 'another'));
+        $this->assertTrue($this->registry->isInstanceOf($type, BaseType::NAME));
+        $this->assertFalse($this->registry->isInstanceOf($type, 'another'));
     }
 }

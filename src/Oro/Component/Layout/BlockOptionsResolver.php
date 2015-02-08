@@ -25,8 +25,8 @@ class BlockOptionsResolver
     /**
      * Returns the combination of the default options for the given block type and the passed options
      *
-     * @param string|BlockTypeInterface $blockType The block type
-     * @param array                     $options   The custom option values.
+     * @param string|BlockTypeInterface $blockType The block type name or instance of BlockTypeInterface
+     * @param array                     $options   The options
      *
      * @return array A list of options and their values
      *
@@ -57,7 +57,7 @@ class BlockOptionsResolver
 
         if (!isset($this->resolvers[$name])) {
             if (!$type) {
-                $type = $this->extensionManager->getBlockType($name);
+                $type = $this->extensionManager->getType($name);
             }
             $parentName = $type->getParent();
 

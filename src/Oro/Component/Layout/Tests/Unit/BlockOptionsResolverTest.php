@@ -23,15 +23,15 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
     public function testResolveOptionsByBlockName()
     {
         $this->extensionManager->expects($this->at(0))
-            ->method('getBlockType')
+            ->method('getType')
             ->with('logo')
             ->will($this->returnValue(new LogoType()));
         $this->extensionManager->expects($this->at(1))
-            ->method('getBlockType')
+            ->method('getType')
             ->with(BaseType::NAME)
             ->will($this->returnValue(new BaseType()));
         $this->extensionManager->expects($this->exactly(2))
-            ->method('getBlockType');
+            ->method('getType');
 
         $result = $this->blockOptionsResolver->resolveOptions(
             'logo',
@@ -44,7 +44,7 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
     public function testResolveOptionsByAlreadyCreatedBlockTypeObject()
     {
         $this->extensionManager->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with(BaseType::NAME)
             ->will($this->returnValue(new BaseType()));
 
@@ -59,7 +59,7 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
     public function testResolveOptionsForBaseTypeByBlockName()
     {
         $this->extensionManager->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with(BaseType::NAME)
             ->will($this->returnValue(new BaseType()));
 
@@ -73,7 +73,7 @@ class BlockOptionsResolverTest extends \PHPUnit_Framework_TestCase
     public function testResolveOptionsForBaseTypeByAlreadyCreatedBlockTypeObject()
     {
         $this->extensionManager->expects($this->never())
-            ->method('getBlockType');
+            ->method('getType');
 
         $result = $this->blockOptionsResolver->resolveOptions(
             new BaseType(),

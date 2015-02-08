@@ -71,7 +71,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addBlockType(BlockTypeInterface $type)
+    public function addType(BlockTypeInterface $type)
     {
         $this->types[$type->getName()] = $type;
 
@@ -81,7 +81,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function addBlockTypeExtension(BlockTypeExtensionInterface $typeExtension)
+    public function addTypeExtension(BlockTypeExtensionInterface $typeExtension)
     {
         $this->typeExtensions[$typeExtension->getExtendedType()][] = $typeExtension;
 

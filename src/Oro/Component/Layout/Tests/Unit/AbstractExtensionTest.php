@@ -6,19 +6,19 @@ use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 
 class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testHasBlockType()
+    public function testHasType()
     {
         $extension = $this->getAbstractExtension();
-        $this->assertTrue($extension->hasBlockType('test'));
-        $this->assertFalse($extension->hasBlockType('unknown'));
+        $this->assertTrue($extension->hasType('test'));
+        $this->assertFalse($extension->hasType('unknown'));
     }
 
-    public function testGetBlockType()
+    public function testGetType()
     {
         $extension = $this->getAbstractExtension();
         $this->assertInstanceOf(
             'Oro\Component\Layout\BlockTypeInterface',
-            $extension->getBlockType('test')
+            $extension->getType('test')
         );
     }
 
@@ -29,25 +29,25 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetUnknownBlockType()
     {
         $extension = $this->getAbstractExtension();
-        $extension->getBlockType('unknown');
+        $extension->getType('unknown');
     }
 
-    public function testHasBlockTypeExtensions()
+    public function testHasTypeExtensions()
     {
         $extension = $this->getAbstractExtension();
-        $this->assertTrue($extension->hasBlockTypeExtensions('test'));
-        $this->assertFalse($extension->hasBlockTypeExtensions('unknown'));
+        $this->assertTrue($extension->hasTypeExtensions('test'));
+        $this->assertFalse($extension->hasTypeExtensions('unknown'));
     }
 
-    public function testGetBlockTypeExtensions()
+    public function testGetTypeExtensions()
     {
         $extension = $this->getAbstractExtension();
-        $this->assertCount(1, $extension->getBlockTypeExtensions('test'));
+        $this->assertCount(1, $extension->getTypeExtensions('test'));
         $this->assertInstanceOf(
             'Oro\Component\Layout\BlockTypeExtensionInterface',
-            $extension->getBlockTypeExtensions('test')[0]
+            $extension->getTypeExtensions('test')[0]
         );
-        $this->assertSame([], $extension->getBlockTypeExtensions('unknown'));
+        $this->assertSame([], $extension->getTypeExtensions('unknown'));
     }
 
     public function testHasLayoutUpdates()
@@ -75,7 +75,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoadInvalidBlockTypes()
     {
         $extension = new AbstractExtensionStub([123], [], []);
-        $extension->hasBlockType('test');
+        $extension->hasType('test');
     }
 
     // @codingStandardsIgnoreStart
@@ -87,7 +87,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoadInvalidBlockTypeExtensions()
     {
         $extension = new AbstractExtensionStub([], [123], []);
-        $extension->hasBlockTypeExtensions('test');
+        $extension->hasTypeExtensions('test');
     }
 
     // @codingStandardsIgnoreStart

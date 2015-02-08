@@ -53,7 +53,7 @@ class BaseType extends AbstractType
         $id                                = $block->getId();
         $name                              = $block->getName();
         $uniqueBlockPrefix                 = '_' . $id;
-        $blockPrefixes                     = $block->getTypeHelper()->getBlockTypeNames($name);
+        $blockPrefixes                     = $block->getTypeHelper()->getTypeNames($name);
         $blockPrefixes[]                   = $uniqueBlockPrefix;
         $view->vars['id']                  = $id;
         $view->vars['block_type']          = $name;

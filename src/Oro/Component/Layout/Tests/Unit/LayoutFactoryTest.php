@@ -32,17 +32,17 @@ class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->rendererRegistry, $this->layoutFactory->getRendererRegistry());
     }
 
-    public function testGetBlockType()
+    public function testGetType()
     {
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
         $this->extensionManager->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with($name)
             ->will($this->returnValue($type));
 
-        $this->assertSame($type, $this->layoutFactory->getBlockType($name));
+        $this->assertSame($type, $this->layoutFactory->getType($name));
     }
 
     public function testCreateRawLayoutBuilder()

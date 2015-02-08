@@ -23,39 +23,39 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $this->extensionManager->addExtension($this->extension);
     }
 
-    public function testGetBlockTypeFromCoreExtension()
+    public function testGetTypeFromCoreExtension()
     {
         $this->extension->expects($this->never())
-            ->method('hasBlockType')
+            ->method('hasType')
             ->with(BaseType::NAME);
         $this->extension->expects($this->never())
-            ->method('getBlockType')
+            ->method('getType')
             ->with(BaseType::NAME);
 
-        $blockType = $this->extensionManager->getBlockType(BaseType::NAME);
-        $this->assertInstanceOf('Oro\Component\Layout\Block\Type\BaseType', $blockType);
+        $type = $this->extensionManager->getType(BaseType::NAME);
+        $this->assertInstanceOf('Oro\Component\Layout\Block\Type\BaseType', $type);
     }
 
-    public function testGetBlockType()
+    public function testGetType()
     {
-        $name      = 'test';
-        $blockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $name = 'test';
+        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
-        $blockType->expects($this->once())
+        $type->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));
         $this->extension->expects($this->once())
-            ->method('hasBlockType')
+            ->method('hasType')
             ->with($name)
             ->will($this->returnValue(true));
         $this->extension->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with($name)
-            ->will($this->returnValue($blockType));
+            ->will($this->returnValue($type));
 
-        $this->assertSame($blockType, $this->extensionManager->getBlockType($name));
+        $this->assertSame($type, $this->extensionManager->getType($name));
         // check that the created block type is cached
-        $this->assertSame($blockType, $this->extensionManager->getBlockType($name));
+        $this->assertSame($type, $this->extensionManager->getType($name));
     }
 
     /**
@@ -64,18 +64,18 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The block type name must not be empty.
      */
-    public function testGetBlockTypeWithEmptyName($name)
+    public function testGetTypeWithEmptyName($name)
     {
-        $this->extensionManager->getBlockType($name);
+        $this->extensionManager->getType($name);
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Expected argument of type "string", "integer" given.
      */
-    public function testGetBlockTypeWithNotStringName()
+    public function testGetTypeWithNotStringName()
     {
-        $this->extensionManager->getBlockType(1);
+        $this->extensionManager->getType(1);
     }
 
     // @codingStandardsIgnoreStart
@@ -84,23 +84,23 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage The block type name does not match the name declared in the class implementing this type. Expected "widget", given "button".
      */
     // @codingStandardsIgnoreEnd
-    public function testGetBlockTypeWhenGivenNameDoesNotMatchNameDeclaredInClass()
+    public function testGetTypeWhenGivenNameDoesNotMatchNameDeclaredInClass()
     {
-        $blockType = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
         $this->extension->expects($this->once())
-            ->method('hasBlockType')
+            ->method('hasType')
             ->with('widget')
             ->will($this->returnValue(true));
         $this->extension->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with('widget')
-            ->will($this->returnValue($blockType));
-        $blockType->expects($this->exactly(2))
+            ->will($this->returnValue($type));
+        $type->expects($this->exactly(2))
             ->method('getName')
             ->will($this->returnValue('button'));
 
-        $this->extensionManager->getBlockType('widget');
+        $this->extensionManager->getType('widget');
     }
 
     /**
@@ -110,13 +110,13 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     public function testGetUndefinedBlockType()
     {
         $this->extension->expects($this->once())
-            ->method('hasBlockType')
+            ->method('hasType')
             ->with('widget')
             ->will($this->returnValue(false));
         $this->extension->expects($this->never())
-            ->method('getBlockType');
+            ->method('getType');
 
-        $this->extensionManager->getBlockType('widget');
+        $this->extensionManager->getType('widget');
     }
 
     public function testSetDefaultOptions()
@@ -124,17 +124,17 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $name     = 'test';
         $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
 
-        $blockTypeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
-            ->method('hasBlockTypeExtensions')
+            ->method('hasTypeExtensions')
             ->with($name)
             ->will($this->returnValue(true));
         $this->extension->expects($this->once())
-            ->method('getBlockTypeExtensions')
+            ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$blockTypeExtension]));
-        $blockTypeExtension->expects($this->once())
+            ->will($this->returnValue([$typeExtension]));
+        $typeExtension->expects($this->once())
             ->method('setDefaultOptions')
             ->with($this->identicalTo($resolver));
 
@@ -147,17 +147,17 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $builder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
         $options = ['foo' => 'bar'];
 
-        $blockTypeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
-            ->method('hasBlockTypeExtensions')
+            ->method('hasTypeExtensions')
             ->with($name)
             ->will($this->returnValue(true));
         $this->extension->expects($this->once())
-            ->method('getBlockTypeExtensions')
+            ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$blockTypeExtension]));
-        $blockTypeExtension->expects($this->once())
+            ->will($this->returnValue([$typeExtension]));
+        $typeExtension->expects($this->once())
             ->method('buildBlock')
             ->with($this->identicalTo($builder), $options);
 
@@ -171,17 +171,17 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $options = ['foo' => 'bar'];
 
-        $blockTypeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
-            ->method('hasBlockTypeExtensions')
+            ->method('hasTypeExtensions')
             ->with($name)
             ->will($this->returnValue(true));
         $this->extension->expects($this->once())
-            ->method('getBlockTypeExtensions')
+            ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$blockTypeExtension]));
-        $blockTypeExtension->expects($this->once())
+            ->will($this->returnValue([$typeExtension]));
+        $typeExtension->expects($this->once())
             ->method('buildView')
             ->with($this->identicalTo($view), $this->identicalTo($block), $options);
 
@@ -195,17 +195,17 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $options = ['foo' => 'bar'];
 
-        $blockTypeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
         $this->extension->expects($this->once())
-            ->method('hasBlockTypeExtensions')
+            ->method('hasTypeExtensions')
             ->with($name)
             ->will($this->returnValue(true));
         $this->extension->expects($this->once())
-            ->method('getBlockTypeExtensions')
+            ->method('getTypeExtensions')
             ->with($name)
-            ->will($this->returnValue([$blockTypeExtension]));
-        $blockTypeExtension->expects($this->once())
+            ->will($this->returnValue([$typeExtension]));
+        $typeExtension->expects($this->once())
             ->method('finishView')
             ->with($this->identicalTo($view), $this->identicalTo($block), $options);
 

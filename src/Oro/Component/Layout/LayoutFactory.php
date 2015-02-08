@@ -41,9 +41,9 @@ class LayoutFactory implements LayoutFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockType($name)
+    public function getType($name)
     {
-        return $this->extensionManager->getBlockType($name);
+        return $this->extensionManager->getType($name);
     }
 
     /**

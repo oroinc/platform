@@ -328,7 +328,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockType($id)
+    public function getType($id)
     {
         try {
             $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE);

@@ -23,13 +23,13 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testHasBlockType()
+    public function testHasType()
     {
-        $this->assertTrue($this->extension->hasBlockType('test'));
-        $this->assertFalse($this->extension->hasBlockType('unknown'));
+        $this->assertTrue($this->extension->hasType('test'));
+        $this->assertFalse($this->extension->hasType('unknown'));
     }
 
-    public function testGetBlockType()
+    public function testGetType()
     {
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->once())
@@ -41,7 +41,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('block_type_service')
             ->will($this->returnValue($type));
 
-        $this->assertSame($type, $this->extension->getBlockType('test'));
+        $this->assertSame($type, $this->extension->getType('test'));
     }
 
     // @codingStandardsIgnoreStart
@@ -50,7 +50,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage The type name specified for the service "block_type_service" does not match the actual name. Expected "test", given "test1".
      */
     // @codingStandardsIgnoreEnd
-    public function testGetBlockTypeWithInvalidAlias()
+    public function testGetTypeWithInvalidAlias()
     {
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
         $type->expects($this->any())
@@ -62,7 +62,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('block_type_service')
             ->will($this->returnValue($type));
 
-        $this->extension->getBlockType('test');
+        $this->extension->getType('test');
     }
 
     /**
@@ -71,16 +71,16 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUnknownBlockType()
     {
-        $this->extension->getBlockType('unknown');
+        $this->extension->getType('unknown');
     }
 
-    public function testHasBlockTypeExtensions()
+    public function testHasTypeExtensions()
     {
-        $this->assertTrue($this->extension->hasBlockTypeExtensions('test'));
-        $this->assertFalse($this->extension->hasBlockTypeExtensions('unknown'));
+        $this->assertTrue($this->extension->hasTypeExtensions('test'));
+        $this->assertFalse($this->extension->hasTypeExtensions('unknown'));
     }
 
-    public function testGetBlockTypeExtensions()
+    public function testGetTypeExtensions()
     {
         $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
 
@@ -89,14 +89,14 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('block_type_extension_service')
             ->will($this->returnValue($typeExtension));
 
-        $typeExtensions = $this->extension->getBlockTypeExtensions('test');
+        $typeExtensions = $this->extension->getTypeExtensions('test');
         $this->assertCount(1, $typeExtensions);
         $this->assertSame($typeExtension, $typeExtensions[0]);
     }
 
     public function testGetUnknownBlockTypeExtensions()
     {
-        $this->assertSame([], $this->extension->getBlockTypeExtensions('unknown'));
+        $this->assertSame([], $this->extension->getTypeExtensions('unknown'));
     }
 
     public function testHasLayoutUpdates()

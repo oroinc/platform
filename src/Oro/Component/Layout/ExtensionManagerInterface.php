@@ -16,7 +16,7 @@ interface ExtensionManagerInterface
      * @throws Exception\InvalidArgumentException if the given name is not valid
      * @throws Exception\LogicException if the block type cannot be created
      */
-    public function getBlockType($name);
+    public function getType($name);
 
     /**
      * Sets the default options for this type.

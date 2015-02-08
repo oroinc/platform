@@ -18,7 +18,7 @@ class ExtensionManager implements ExtensionManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockType($name)
+    public function getType($name)
     {
         if (!$name) {
             throw new Exception\InvalidArgumentException('The block type name must not be empty.');
@@ -58,10 +58,10 @@ class ExtensionManager implements ExtensionManagerInterface
     public function setDefaultOptions($name, OptionsResolverInterface $resolver)
     {
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasBlockTypeExtensions($name)) {
-                $blockTypeExtensions = $extension->getBlockTypeExtensions($name);
-                foreach ($blockTypeExtensions as $blockTypeExtension) {
-                    $blockTypeExtension->setDefaultOptions($resolver);
+            if ($extension->hasTypeExtensions($name)) {
+                $typeExtensions = $extension->getTypeExtensions($name);
+                foreach ($typeExtensions as $typeExtension) {
+                    $typeExtension->setDefaultOptions($resolver);
                 }
             }
         }
@@ -73,10 +73,10 @@ class ExtensionManager implements ExtensionManagerInterface
     public function buildBlock($name, BlockBuilderInterface $builder, array $options)
     {
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasBlockTypeExtensions($name)) {
-                $blockTypeExtensions = $extension->getBlockTypeExtensions($name);
-                foreach ($blockTypeExtensions as $blockTypeExtension) {
-                    $blockTypeExtension->buildBlock($builder, $options);
+            if ($extension->hasTypeExtensions($name)) {
+                $typeExtensions = $extension->getTypeExtensions($name);
+                foreach ($typeExtensions as $typeExtension) {
+                    $typeExtension->buildBlock($builder, $options);
                 }
             }
         }
@@ -88,10 +88,10 @@ class ExtensionManager implements ExtensionManagerInterface
     public function buildView($name, BlockView $view, BlockInterface $block, array $options)
     {
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasBlockTypeExtensions($name)) {
-                $blockTypeExtensions = $extension->getBlockTypeExtensions($name);
-                foreach ($blockTypeExtensions as $blockTypeExtension) {
-                    $blockTypeExtension->buildView($view, $block, $options);
+            if ($extension->hasTypeExtensions($name)) {
+                $typeExtensions = $extension->getTypeExtensions($name);
+                foreach ($typeExtensions as $typeExtension) {
+                    $typeExtension->buildView($view, $block, $options);
                 }
             }
         }
@@ -103,10 +103,10 @@ class ExtensionManager implements ExtensionManagerInterface
     public function finishView($name, BlockView $view, BlockInterface $block, array $options)
     {
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasBlockTypeExtensions($name)) {
-                $blockTypeExtensions = $extension->getBlockTypeExtensions($name);
-                foreach ($blockTypeExtensions as $blockTypeExtension) {
-                    $blockTypeExtension->finishView($view, $block, $options);
+            if ($extension->hasTypeExtensions($name)) {
+                $typeExtensions = $extension->getTypeExtensions($name);
+                foreach ($typeExtensions as $typeExtension) {
+                    $typeExtension->finishView($view, $block, $options);
                 }
             }
         }
@@ -151,8 +151,8 @@ class ExtensionManager implements ExtensionManagerInterface
     protected function createBlockType($name)
     {
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasBlockType($name)) {
-                return $extension->getBlockType($name);
+            if ($extension->hasType($name)) {
+                return $extension->getType($name);
             }
         }
 

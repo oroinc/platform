@@ -11,7 +11,7 @@ class LayoutsTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertInstanceOf(
             'Oro\Component\Layout\Block\Type\BaseType',
-            Layouts::createLayoutFactory()->getBlockType(BaseType::NAME)
+            Layouts::createLayoutFactory()->getType(BaseType::NAME)
         );
     }
 }

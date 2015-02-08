@@ -83,21 +83,21 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->getLayoutFactory();
 
         $extension->expects($this->once())
-            ->method('hasBlockType')
+            ->method('hasType')
             ->with($name)
             ->will($this->returnValue(true));
         $extension->expects($this->once())
-            ->method('getBlockType')
+            ->method('getType')
             ->with($name)
             ->will($this->returnValue($type));
 
         $this->assertSame(
             $type,
-            $layoutFactory->getExtensionManager()->getBlockType($name)
+            $layoutFactory->getExtensionManager()->getType($name)
         );
     }
 
-    public function testAddBlockType()
+    public function testAddType()
     {
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
@@ -106,16 +106,16 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($name));
 
         $layoutFactory = $this->layoutFactoryBuilder
-            ->addBlockType($type)
+            ->addType($type)
             ->getLayoutFactory();
 
         $this->assertSame(
             $type,
-            $layoutFactory->getExtensionManager()->getBlockType($name)
+            $layoutFactory->getExtensionManager()->getType($name)
         );
     }
 
-    public function testAddBlockTypeExtension()
+    public function testAddTypeExtension()
     {
         $name          = 'test';
         $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
@@ -125,7 +125,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $blockBuilder = $this->getMock('Oro\Component\Layout\BlockBuilderInterface');
 
         $layoutFactory = $this->layoutFactoryBuilder
-            ->addBlockTypeExtension($typeExtension)
+            ->addTypeExtension($typeExtension)
             ->getLayoutFactory();
 
         $typeExtension->expects($this->once())

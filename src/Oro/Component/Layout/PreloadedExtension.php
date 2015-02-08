@@ -49,27 +49,27 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * Creates a new preloaded extension.
      *
-     * @param array $blockTypes          BlockTypeInterface[]
-     * @param array $blockTypeExtensions array of BlockTypeExtensionInterface[]
-     * @param array $layoutUpdates       array of LayoutUpdateInterface[]
+     * @param array $types          BlockTypeInterface[]
+     * @param array $typeExtensions array of BlockTypeExtensionInterface[]
+     * @param array $layoutUpdates  array of LayoutUpdateInterface[]
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct(array $blockTypes, array $blockTypeExtensions = [], array $layoutUpdates = [])
+    public function __construct(array $types, array $typeExtensions = [], array $layoutUpdates = [])
     {
-        $this->validateBlockTypes($blockTypes);
-        $this->validateBlockTypeExtensions($blockTypeExtensions);
+        $this->validateBlockTypes($types);
+        $this->validateBlockTypeExtensions($typeExtensions);
         $this->validateLayoutUpdates($layoutUpdates);
 
-        $this->types          = $blockTypes;
-        $this->typeExtensions = $blockTypeExtensions;
+        $this->types          = $types;
+        $this->typeExtensions = $typeExtensions;
         $this->layoutUpdates  = $layoutUpdates;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBlockType($name)
+    public function getType($name)
     {
         if (!isset($this->types[$name])) {
             throw new Exception\InvalidArgumentException(
@@ -83,7 +83,7 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasBlockType($name)
+    public function hasType($name)
     {
         return isset($this->types[$name]);
     }
@@ -91,7 +91,7 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getBlockTypeExtensions($name)
+    public function getTypeExtensions($name)
     {
         return isset($this->typeExtensions[$name])
             ? $this->typeExtensions[$name]
@@ -101,7 +101,7 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasBlockTypeExtensions($name)
+    public function hasTypeExtensions($name)
     {
         return !empty($this->typeExtensions[$name]);
     }
@@ -125,48 +125,48 @@ class PreloadedExtension implements ExtensionInterface
     }
 
     /**
-     * @param array $blockTypes
+     * @param array $types
      *
      * @throws Exception\InvalidArgumentException
      */
-    protected function validateBlockTypes(array $blockTypes)
+    protected function validateBlockTypes(array $types)
     {
-        foreach ($blockTypes as $key => $val) {
+        foreach ($types as $key => $val) {
             if (!is_string($key)) {
                 throw new Exception\InvalidArgumentException(
-                    'Keys of $blockTypes array must be strings.'
+                    'Keys of $types array must be strings.'
                 );
             }
             if (!$val instanceof BlockTypeInterface) {
                 throw new Exception\InvalidArgumentException(
-                    'Each item of $blockTypes array must be BlockTypeInterface.'
+                    'Each item of $types array must be BlockTypeInterface.'
                 );
             }
         }
     }
 
     /**
-     * @param array $blockTypeExtensions
+     * @param array $typeExtensions
      *
      * @throws Exception\InvalidArgumentException
      */
-    protected function validateBlockTypeExtensions(array $blockTypeExtensions)
+    protected function validateBlockTypeExtensions(array $typeExtensions)
     {
-        foreach ($blockTypeExtensions as $key => $val) {
+        foreach ($typeExtensions as $key => $val) {
             if (!is_string($key)) {
                 throw new Exception\InvalidArgumentException(
-                    'Keys of $blockTypeExtensions array must be strings.'
+                    'Keys of $typeExtensions array must be strings.'
                 );
             }
             if (!is_array($val)) {
                 throw new Exception\InvalidArgumentException(
-                    'Each item of $blockTypeExtensions array must be array of BlockTypeExtensionInterface.'
+                    'Each item of $typeExtensions array must be array of BlockTypeExtensionInterface.'
                 );
             }
             foreach ($val as $subVal) {
                 if (!$subVal instanceof BlockTypeExtensionInterface) {
                     throw new Exception\InvalidArgumentException(
-                        'Each item of $blockTypeExtensions[] array must be BlockTypeExtensionInterface.'
+                        'Each item of $typeExtensions[] array must be BlockTypeExtensionInterface.'
                     );
                 }
             }

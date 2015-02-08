@@ -61,7 +61,7 @@ final class LayoutItem implements LayoutItemInterface
      */
     public function getName()
     {
-        return $this->rawLayoutBuilder->getBlockType($this->id);
+        return $this->rawLayoutBuilder->getType($this->id);
     }
 
     /**

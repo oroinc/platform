@@ -195,7 +195,7 @@ class BlockFactory implements BlockFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::OPTIONS, true);
-        $types     = $this->typeHelper->getBlockTypes($blockType);
+        $types     = $this->typeHelper->getTypes($blockType);
 
         // resolve options
         $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
@@ -222,7 +222,7 @@ class BlockFactory implements BlockFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
-        $types     = $this->typeHelper->getBlockTypes($blockType);
+        $types     = $this->typeHelper->getTypes($blockType);
         $view      = new BlockView($parentView);
 
         // point the block view state to the current block
@@ -246,7 +246,7 @@ class BlockFactory implements BlockFactoryInterface
     {
         $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $options   = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);
-        $types     = $this->typeHelper->getBlockTypes($blockType);
+        $types     = $this->typeHelper->getTypes($blockType);
 
         // point the block view state to the current block
         $this->block->initialize($id);
