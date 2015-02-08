@@ -41,9 +41,6 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
-        $type->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($name));
         $this->extension->expects($this->once())
             ->method('hasType')
             ->with($name)
@@ -59,14 +56,21 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
-     *
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage The block type name must not be empty.
+     * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
      */
-    public function testGetTypeWithEmptyName($name)
+    public function testGetTypeWithNullName()
     {
-        $this->extensionManager->getType($name);
+        $this->extensionManager->getType(null);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Could not load block type "".
+     */
+    public function testGetTypeWithEmptyName()
+    {
+        $this->extensionManager->getType('');
     }
 
     /**
@@ -78,34 +82,9 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $this->extensionManager->getType(1);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The block type name does not match the name declared in the class implementing this type. Expected "widget", given "button".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testGetTypeWhenGivenNameDoesNotMatchNameDeclaredInClass()
-    {
-        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
-
-        $this->extension->expects($this->once())
-            ->method('hasType')
-            ->with('widget')
-            ->will($this->returnValue(true));
-        $this->extension->expects($this->once())
-            ->method('getType')
-            ->with('widget')
-            ->will($this->returnValue($type));
-        $type->expects($this->exactly(2))
-            ->method('getName')
-            ->will($this->returnValue('button'));
-
-        $this->extensionManager->getType('widget');
-    }
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The block type named "widget" was not found.
+     * @expectedExceptionMessage Could not load block type "widget".
      */
     public function testGetUndefinedBlockType()
     {
@@ -233,13 +212,5 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($layoutManipulator), $this->identicalTo($item));
 
         $this->extensionManager->updateLayout($id, $layoutManipulator, $item);
-    }
-
-    public function emptyStringDataProvider()
-    {
-        return [
-            [null],
-            ['']
-        ];
     }
 }

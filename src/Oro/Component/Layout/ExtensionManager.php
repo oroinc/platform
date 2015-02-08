@@ -20,36 +20,27 @@ class ExtensionManager implements ExtensionManagerInterface
      */
     public function getType($name)
     {
-        if (!$name) {
-            throw new Exception\InvalidArgumentException('The block type name must not be empty.');
-        }
         if (!is_string($name)) {
             throw new Exception\UnexpectedTypeException($name, 'string');
         }
 
-        if (!isset($this->types[$name])) {
-            $type = $this->createBlockType($name);
-            if (!$type) {
-                throw new Exception\LogicException(
-                    sprintf('The block type named "%s" was not found.', $name)
-                );
-            }
-            if ($type->getName() !== $name) {
-                throw new Exception\LogicException(
-                    sprintf(
-                        'The block type name does not match the name declared in the class implementing this type. '
-                        . 'Expected "%s", given "%s".',
-                        $name,
-                        $type->getName()
-                    )
-                );
-            }
-
-            // add the created block type to the local cache
-            $this->types[$name] = $type;
+        if (isset($this->types[$name])) {
+            return $this->types[$name];
         }
 
-        return $this->types[$name];
+        $type = null;
+        foreach ($this->getExtensions() as $extension) {
+            if ($extension->hasType($name)) {
+                $type = $extension->getType($name);
+                break;
+            }
+        }
+        if (!$type) {
+            throw new Exception\LogicException(sprintf('Could not load block type "%s".', $name));
+        }
+        $this->types[$name] = $type;
+
+        return $type;
     }
 
     /**
@@ -139,24 +130,6 @@ class ExtensionManager implements ExtensionManagerInterface
     {
         $this->extensions[$priority][] = $extension;
         $this->sorted                  = null;
-    }
-
-    /**
-     * Creates a block type.
-     *
-     * @param string $name The name of the block type
-     *
-     * @return BlockTypeInterface|null
-     */
-    protected function createBlockType($name)
-    {
-        foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasType($name)) {
-                return $extension->getType($name);
-            }
-        }
-
-        return null;
     }
 
     /**

@@ -73,9 +73,6 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
-        $type->expects($this->once())
-            ->method('getName')
-            ->will($this->returnValue($name));
 
         $extension     = $this->getMock('Oro\Component\Layout\ExtensionInterface');
         $layoutFactory = $this->layoutFactoryBuilder
@@ -101,7 +98,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
-        $type->expects($this->exactly(2))
+        $type->expects($this->once())
             ->method('getName')
             ->will($this->returnValue($name));
 
