@@ -7,6 +7,9 @@ use Oro\Component\Layout\Extension\AbstractExtension;
 
 class CoreExtension extends AbstractExtension
 {
+    /**
+     * {@inheritdoc}
+     */
     protected function loadTypes()
     {
         return [
