@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit;
+namespace Oro\Component\Layout\Extension\Tests\Unit;
 
-use Oro\Component\Layout\PreloadedExtension;
+use Oro\Component\Layout\Extension\PreloadedExtension;
 
 class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 {

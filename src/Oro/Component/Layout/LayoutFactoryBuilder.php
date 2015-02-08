@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout;
 
+use Oro\Component\Layout\Extension\ExtensionInterface;
+use Oro\Component\Layout\Extension\PreloadedExtension;
+
 class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
 {
     /**

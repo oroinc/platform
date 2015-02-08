@@ -1,6 +1,11 @@
 <?php
 
-namespace Oro\Component\Layout;
+namespace Oro\Component\Layout\Extension;
+
+use Oro\Component\Layout\BlockTypeExtensionInterface;
+use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\Exception;
+use Oro\Component\Layout\LayoutUpdateInterface;
 
 abstract class AbstractExtension implements ExtensionInterface
 {

@@ -4,6 +4,8 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Component\Layout\Extension\ExtensionInterface;
+
 class LayoutRegistry implements LayoutRegistryInterface
 {
     /** @var array */

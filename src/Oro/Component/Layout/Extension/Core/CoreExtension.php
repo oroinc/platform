@@ -2,8 +2,8 @@
 
 namespace Oro\Component\Layout\Extension\Core;
 
-use Oro\Component\Layout\AbstractExtension;
 use Oro\Component\Layout\Block\Type;
+use Oro\Component\Layout\Extension\AbstractExtension;
 
 class CoreExtension extends AbstractExtension
 {

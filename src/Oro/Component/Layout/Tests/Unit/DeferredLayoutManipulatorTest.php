@@ -4,9 +4,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
-use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 
 /**

@@ -6,9 +6,9 @@ use Oro\Component\Layout\BlockFactory;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
+use Oro\Component\Layout\Extension\PreloadedExtension;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutRegistry;
-use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type;
 

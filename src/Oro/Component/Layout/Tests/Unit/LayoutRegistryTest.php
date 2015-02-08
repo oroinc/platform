@@ -19,7 +19,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
     {
         $this->registry = new LayoutRegistry();
         $this->registry->addExtension(new CoreExtension());
-        $this->extension = $this->getMock('Oro\Component\Layout\ExtensionInterface');
+        $this->extension = $this->getMock('Oro\Component\Layout\Extension\ExtensionInterface');
         $this->registry->addExtension($this->extension);
     }
 

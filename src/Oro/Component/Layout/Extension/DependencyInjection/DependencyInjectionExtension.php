@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Extension\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Component\Layout\Exception;
-use Oro\Component\Layout\ExtensionInterface;
+use Oro\Component\Layout\Extension\ExtensionInterface;
 
 class DependencyInjectionExtension implements ExtensionInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Component\Layout\Tests\Unit;
+namespace Oro\Component\Layout\Extension\Tests\Unit;
 
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 

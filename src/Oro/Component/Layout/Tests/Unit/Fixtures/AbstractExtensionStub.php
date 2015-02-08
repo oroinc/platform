@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Fixtures;
 
-use Oro\Component\Layout\AbstractExtension;
+use Oro\Component\Layout\Extension\AbstractExtension;
 
 class AbstractExtensionStub extends AbstractExtension
 {

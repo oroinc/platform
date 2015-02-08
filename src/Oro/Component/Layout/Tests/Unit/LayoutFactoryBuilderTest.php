@@ -74,7 +74,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
-        $extension     = $this->getMock('Oro\Component\Layout\ExtensionInterface');
+        $extension     = $this->getMock('Oro\Component\Layout\Extension\ExtensionInterface');
         $layoutFactory = $this->layoutFactoryBuilder
             ->addExtension($extension)
             ->getLayoutFactory();
