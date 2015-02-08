@@ -56,7 +56,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
      */
     public function testGetTypeWithNullName()
@@ -65,7 +65,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Could not load block type "".
      */
     public function testGetTypeWithEmptyName()
@@ -74,7 +74,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "string", "integer" given.
      */
     public function testGetTypeWithNotStringName()
@@ -83,7 +83,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Could not load block type "widget".
      */
     public function testGetUndefinedBlockType()

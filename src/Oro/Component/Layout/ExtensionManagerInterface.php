@@ -13,8 +13,8 @@ interface ExtensionManagerInterface
      *
      * @return BlockTypeInterface
      *
-     * @throws Exception\InvalidArgumentException if the given name is not valid
-     * @throws Exception\LogicException if the block type cannot be created
+     * @throws Exception\UnexpectedTypeException  if the passed name is not a string
+     * @throws Exception\InvalidArgumentException if the block type cannot be loaded
      */
     public function getType($name);
 

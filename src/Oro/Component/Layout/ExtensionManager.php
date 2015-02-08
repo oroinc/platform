@@ -36,7 +36,7 @@ class ExtensionManager implements ExtensionManagerInterface
             }
         }
         if (!$type) {
-            throw new Exception\LogicException(sprintf('Could not load block type "%s".', $name));
+            throw new Exception\InvalidArgumentException(sprintf('Could not load block type "%s".', $name));
         }
         $this->types[$name] = $type;
 
