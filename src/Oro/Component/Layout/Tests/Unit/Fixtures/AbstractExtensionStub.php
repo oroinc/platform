@@ -36,5 +36,4 @@ class AbstractExtensionStub extends AbstractExtension
     {
         return $this->loadedLayoutUpdates;
     }
-
 }

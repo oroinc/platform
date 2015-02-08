@@ -110,7 +110,7 @@ class DependencyInjectionExtension implements ExtensionInterface
      */
     public function getTypeExtensions($name)
     {
-        $extensions = array();
+        $extensions = [];
 
         if (isset($this->typeExtensionServiceIds[$name])) {
             foreach ($this->typeExtensionServiceIds[$name] as $serviceId) {
@@ -134,7 +134,7 @@ class DependencyInjectionExtension implements ExtensionInterface
      */
     public function getLayoutUpdates($id)
     {
-        $layoutUpdates = array();
+        $layoutUpdates = [];
 
         if (isset($this->layoutUpdateServiceIds[$id])) {
             foreach ($this->layoutUpdateServiceIds[$id] as $serviceId) {

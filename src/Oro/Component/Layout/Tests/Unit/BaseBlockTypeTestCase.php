@@ -5,7 +5,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\BlockOptionsResolver;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\ExtensionInterface;
+use Oro\Component\Layout\Extension\ExtensionInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\LayoutFactoryInterface;
