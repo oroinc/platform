@@ -5,22 +5,22 @@ namespace Oro\Component\Layout\Tests\Unit;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
-use Oro\Component\Layout\ExtensionManager;
+use Oro\Component\Layout\LayoutRegistry;
 
-class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
+class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ExtensionManager */
-    protected $extensionManager;
+    /** @var LayoutRegistry */
+    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extension;
 
     protected function setUp()
     {
-        $this->extensionManager = new ExtensionManager();
-        $this->extensionManager->addExtension(new CoreExtension());
+        $this->registry = new LayoutRegistry();
+        $this->registry->addExtension(new CoreExtension());
         $this->extension = $this->getMock('Oro\Component\Layout\ExtensionInterface');
-        $this->extensionManager->addExtension($this->extension);
+        $this->registry->addExtension($this->extension);
     }
 
     public function testGetTypeFromCoreExtension()
@@ -32,7 +32,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getType')
             ->with(BaseType::NAME);
 
-        $type = $this->extensionManager->getType(BaseType::NAME);
+        $type = $this->registry->getType(BaseType::NAME);
         $this->assertInstanceOf('Oro\Component\Layout\Block\Type\BaseType', $type);
     }
 
@@ -50,9 +50,9 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->with($name)
             ->will($this->returnValue($type));
 
-        $this->assertSame($type, $this->extensionManager->getType($name));
+        $this->assertSame($type, $this->registry->getType($name));
         // check that the created block type is cached
-        $this->assertSame($type, $this->extensionManager->getType($name));
+        $this->assertSame($type, $this->registry->getType($name));
     }
 
     /**
@@ -61,7 +61,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTypeWithNullName()
     {
-        $this->extensionManager->getType(null);
+        $this->registry->getType(null);
     }
 
     /**
@@ -70,7 +70,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTypeWithEmptyName()
     {
-        $this->extensionManager->getType('');
+        $this->registry->getType('');
     }
 
     /**
@@ -79,7 +79,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetTypeWithNotStringName()
     {
-        $this->extensionManager->getType(1);
+        $this->registry->getType(1);
     }
 
     /**
@@ -95,7 +95,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
         $this->extension->expects($this->never())
             ->method('getType');
 
-        $this->extensionManager->getType('widget');
+        $this->registry->getType('widget');
     }
 
     public function testSetDefaultOptions()
@@ -117,7 +117,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('setDefaultOptions')
             ->with($this->identicalTo($resolver));
 
-        $this->extensionManager->setDefaultOptions($name, $resolver);
+        $this->registry->setDefaultOptions($name, $resolver);
     }
 
     public function testBuildBlock()
@@ -140,7 +140,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('buildBlock')
             ->with($this->identicalTo($builder), $options);
 
-        $this->extensionManager->buildBlock($name, $builder, $options);
+        $this->registry->buildBlock($name, $builder, $options);
     }
 
     public function testBuildView()
@@ -164,7 +164,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('buildView')
             ->with($this->identicalTo($view), $this->identicalTo($block), $options);
 
-        $this->extensionManager->buildView($name, $view, $block, $options);
+        $this->registry->buildView($name, $view, $block, $options);
     }
 
     public function testFinishView()
@@ -188,7 +188,7 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('finishView')
             ->with($this->identicalTo($view), $this->identicalTo($block), $options);
 
-        $this->extensionManager->finishView($name, $view, $block, $options);
+        $this->registry->finishView($name, $view, $block, $options);
     }
 
     public function testUpdateLayout()
@@ -211,6 +211,6 @@ class ExtensionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('updateLayout')
             ->with($this->identicalTo($layoutManipulator), $this->identicalTo($item));
 
-        $this->extensionManager->updateLayout($id, $layoutManipulator, $item);
+        $this->registry->updateLayout($id, $layoutManipulator, $item);
     }
 }

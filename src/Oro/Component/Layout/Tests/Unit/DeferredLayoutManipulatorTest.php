@@ -1071,7 +1071,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
     public function testLayoutUpdates()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],
@@ -1121,7 +1121,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
     public function testLayoutUpdatesWhenParentIsAddedInUpdate()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],
@@ -1183,7 +1183,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreEnd
     public function testLayoutUpdatesWhenParentIsAddedInUpdateLinkedWithChild()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],
@@ -1211,7 +1211,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
      */
     public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndAddDependsToUpdate()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],
@@ -1268,7 +1268,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
      */
     public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndMoveDependsToUpdate()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],

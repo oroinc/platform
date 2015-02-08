@@ -4,8 +4,8 @@ namespace Oro\Component\Layout;
 
 class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
 {
-    /** @var ExtensionManagerInterface */
-    protected $extensionManager;
+    /** @var LayoutRegistryInterface */
+    protected $registry;
 
     /** @var array */
     protected $types = [];
@@ -17,11 +17,11 @@ class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
     protected $nameMap = [];
 
     /**
-     * @param ExtensionManagerInterface $extensionManager
+     * @param LayoutRegistryInterface $registry
      */
-    public function __construct(ExtensionManagerInterface $extensionManager)
+    public function __construct(LayoutRegistryInterface $registry)
     {
-        $this->extensionManager = $extensionManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -71,7 +71,7 @@ class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
 
         if (!isset($this->types[$name])) {
             if (!$type) {
-                $type = $this->extensionManager->getType($name);
+                $type = $this->registry->getType($name);
             }
 
             $types      = [$type];
@@ -79,7 +79,7 @@ class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
             $nameMap    = [$type->getName() => true];
             $parentName = $type->getParent();
             while ($parentName) {
-                $type = $this->extensionManager->getType($parentName);
+                $type = $this->registry->getType($parentName);
 
                 array_unshift($types, $type);
                 array_unshift($names, $type->getName());

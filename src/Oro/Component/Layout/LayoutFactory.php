@@ -4,30 +4,30 @@ namespace Oro\Component\Layout;
 
 class LayoutFactory implements LayoutFactoryInterface
 {
-    /** @var ExtensionManagerInterface */
-    protected $extensionManager;
+    /** @var LayoutRegistryInterface */
+    protected $registry;
 
     /** @var LayoutRendererRegistryInterface */
     protected $rendererRegistry;
 
     /**
-     * @param ExtensionManagerInterface       $extensionManager
+     * @param LayoutRegistryInterface         $registry
      * @param LayoutRendererRegistryInterface $rendererRegistry
      */
     public function __construct(
-        ExtensionManagerInterface $extensionManager,
+        LayoutRegistryInterface $registry,
         LayoutRendererRegistryInterface $rendererRegistry
     ) {
-        $this->extensionManager = $extensionManager;
+        $this->registry         = $registry;
         $this->rendererRegistry = $rendererRegistry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getExtensionManager()
+    public function getRegistry()
     {
-        return $this->extensionManager;
+        return $this->registry;
     }
 
     /**
@@ -43,7 +43,7 @@ class LayoutFactory implements LayoutFactoryInterface
      */
     public function getType($name)
     {
-        return $this->extensionManager->getType($name);
+        return $this->registry->getType($name);
     }
 
     /**
@@ -59,7 +59,7 @@ class LayoutFactory implements LayoutFactoryInterface
      */
     public function createLayoutManipulator(RawLayoutBuilderInterface $rawLayoutBuilder)
     {
-        return new DeferredLayoutManipulator($rawLayoutBuilder, $this->extensionManager);
+        return new DeferredLayoutManipulator($this->registry, $rawLayoutBuilder);
     }
 
     /**
@@ -67,7 +67,7 @@ class LayoutFactory implements LayoutFactoryInterface
      */
     public function createBlockFactory(DeferredLayoutManipulatorInterface $layoutManipulator)
     {
-        return new BlockFactory($this->extensionManager, $layoutManipulator);
+        return new BlockFactory($this->registry, $layoutManipulator);
     }
 
     /**

@@ -90,7 +90,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $type,
-            $layoutFactory->getExtensionManager()->getType($name)
+            $layoutFactory->getRegistry()->getType($name)
         );
     }
 
@@ -108,7 +108,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $type,
-            $layoutFactory->getExtensionManager()->getType($name)
+            $layoutFactory->getRegistry()->getType($name)
         );
     }
 
@@ -129,7 +129,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('buildBlock')
             ->with($this->identicalTo($blockBuilder), []);
 
-        $layoutFactory->getExtensionManager()->buildBlock($name, $blockBuilder, []);
+        $layoutFactory->getRegistry()->buildBlock($name, $blockBuilder, []);
     }
 
     public function testAddLayoutUpdate()
@@ -147,6 +147,6 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('updateLayout')
             ->with($this->identicalTo($layoutManipulator), $this->identicalTo($layoutItem));
 
-        $layoutFactory->getExtensionManager()->updateLayout($id, $layoutManipulator, $layoutItem);
+        $layoutFactory->getRegistry()->updateLayout($id, $layoutManipulator, $layoutItem);
     }
 }

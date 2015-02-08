@@ -5,11 +5,11 @@ namespace Oro\Component\Layout;
 interface LayoutFactoryInterface
 {
     /**
-     * Returns the layout extension manager.
+     * Returns the layout registry.
      *
-     * @return ExtensionManagerInterface
+     * @return LayoutRegistryInterface
      */
-    public function getExtensionManager();
+    public function getRegistry();
 
     /**
      * Returns the layout renderer registry.

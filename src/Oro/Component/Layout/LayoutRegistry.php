@@ -4,7 +4,7 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class ExtensionManager implements ExtensionManagerInterface
+class LayoutRegistry implements LayoutRegistryInterface
 {
     /** @var array */
     private $extensions = [];

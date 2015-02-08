@@ -7,7 +7,7 @@ use Oro\Component\Layout\LayoutFactory;
 class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $extensionManager;
+    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $rendererRegistry;
@@ -17,14 +17,14 @@ class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->extensionManager = $this->getMock('Oro\Component\Layout\ExtensionManagerInterface');
+        $this->registry         = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->rendererRegistry = $this->getMock('Oro\Component\Layout\LayoutRendererRegistryInterface');
-        $this->layoutFactory    = new LayoutFactory($this->extensionManager, $this->rendererRegistry);
+        $this->layoutFactory    = new LayoutFactory($this->registry, $this->rendererRegistry);
     }
 
-    public function testGetExtensionManager()
+    public function testGetRegistry()
     {
-        $this->assertSame($this->extensionManager, $this->layoutFactory->getExtensionManager());
+        $this->assertSame($this->registry, $this->layoutFactory->getRegistry());
     }
 
     public function testGetRendererRegistry()
@@ -37,7 +37,7 @@ class LayoutFactoryTest extends \PHPUnit_Framework_TestCase
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
 
-        $this->extensionManager->expects($this->once())
+        $this->registry->expects($this->once())
             ->method('getType')
             ->with($name)
             ->will($this->returnValue($type));

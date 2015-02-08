@@ -489,7 +489,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
 
     public function testLayoutUpdatesWithAliases()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],
@@ -541,7 +541,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
 
     public function testLayoutItemPassedToLayoutUpdate()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],
@@ -602,7 +602,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
 
     public function testLayoutUpdatesWhenParentIsAddedByAliasInUpdate()
     {
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [],
                 [],

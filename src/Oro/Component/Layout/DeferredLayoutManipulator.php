@@ -42,11 +42,11 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** The action name for add the theme(s) to be used for rendering the layout item and its children */
     const SET_BLOCK_THEME = 'setBlockTheme';
 
+    /** @var LayoutRegistryInterface */
+    protected $registry;
+
     /** @var RawLayoutBuilderInterface */
     protected $rawLayoutBuilder;
-
-    /** @var ExtensionManagerInterface */
-    protected $extensionManager;
 
     /**
      * The list of all scheduled actions to be executed by applyChanges method
@@ -78,15 +78,15 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     protected $removeCounter = 0;
 
     /**
+     * @param LayoutRegistryInterface   $registry
      * @param RawLayoutBuilderInterface $rawLayoutBuilder
-     * @param ExtensionManagerInterface $extensionManager
      */
     public function __construct(
-        RawLayoutBuilderInterface $rawLayoutBuilder,
-        ExtensionManagerInterface $extensionManager
+        LayoutRegistryInterface $registry,
+        RawLayoutBuilderInterface $rawLayoutBuilder
     ) {
+        $this->registry         = $registry;
         $this->rawLayoutBuilder = $rawLayoutBuilder;
-        $this->extensionManager = $extensionManager;
     }
 
     /**
@@ -504,11 +504,11 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         switch ($name) {
             case self::ADD:
                 $this->item->initialize($args[0]);
-                $this->extensionManager->updateLayout($args[0], $this, $this->item);
+                $this->registry->updateLayout($args[0], $this, $this->item);
                 break;
             case self::ADD_ALIAS:
                 $this->item->initialize($this->rawLayoutBuilder->resolveId($args[1]), $args[0]);
-                $this->extensionManager->updateLayout($args[0], $this, $this->item);
+                $this->registry->updateLayout($args[0], $this, $this->item);
                 break;
         }
     }

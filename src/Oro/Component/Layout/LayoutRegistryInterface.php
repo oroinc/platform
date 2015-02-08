@@ -4,7 +4,10 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-interface ExtensionManagerInterface
+/**
+ * The central registry of the Layout component.
+ */
+interface LayoutRegistryInterface
 {
     /**
      * Returns a block type by name.

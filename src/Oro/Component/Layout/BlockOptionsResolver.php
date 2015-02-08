@@ -8,18 +8,18 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class BlockOptionsResolver
 {
-    /** @var ExtensionManagerInterface */
-    protected $extensionManager;
+    /** @var LayoutRegistryInterface */
+    protected $registry;
 
     /** @var OptionsResolverInterface[] */
     protected $resolvers = [];
 
     /**
-     * @param ExtensionManagerInterface $extensionManager
+     * @param LayoutRegistryInterface $registry
      */
-    public function __construct(ExtensionManagerInterface $extensionManager)
+    public function __construct(LayoutRegistryInterface $registry)
     {
-        $this->extensionManager = $extensionManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -57,7 +57,7 @@ class BlockOptionsResolver
 
         if (!isset($this->resolvers[$name])) {
             if (!$type) {
-                $type = $this->extensionManager->getType($name);
+                $type = $this->registry->getType($name);
             }
             $parentName = $type->getParent();
 
@@ -66,7 +66,7 @@ class BlockOptionsResolver
                 : new OptionsResolver();
 
             $type->setDefaultOptions($optionsResolver);
-            $this->extensionManager->setDefaultOptions($name, $optionsResolver);
+            $this->registry->setDefaultOptions($name, $optionsResolver);
 
             $this->resolvers[$name] = $optionsResolver;
         }

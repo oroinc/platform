@@ -12,10 +12,10 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DeferredLayoutManipulator;
 use Oro\Component\Layout\Extension\Core\CoreExtension;
-use Oro\Component\Layout\ExtensionManager;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Component\Layout\LayoutRegistry;
 use Oro\Component\Layout\PreloadedExtension;
 use Oro\Component\Layout\RawLayoutBuilder;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
@@ -32,17 +32,17 @@ class BlockFactoryTest extends LayoutTestCase
     /** @var DeferredLayoutManipulator */
     protected $layoutManipulator;
 
-    /** @var ExtensionManager */
-    protected $extensionManager;
+    /** @var LayoutRegistry */
+    protected $registry;
 
     /** @var BlockFactory */
     protected $blockFactory;
 
     protected function setUp()
     {
-        $this->extensionManager = new ExtensionManager();
-        $this->extensionManager->addExtension(new CoreExtension());
-        $this->extensionManager->addExtension(
+        $this->registry = new LayoutRegistry();
+        $this->registry->addExtension(new CoreExtension());
+        $this->registry->addExtension(
             new PreloadedExtension(
                 [
                     'root'                         => new Type\RootType(),
@@ -55,14 +55,8 @@ class BlockFactoryTest extends LayoutTestCase
 
         $this->context           = new LayoutContext();
         $this->rawLayoutBuilder  = new RawLayoutBuilder();
-        $this->layoutManipulator = new DeferredLayoutManipulator(
-            $this->rawLayoutBuilder,
-            $this->extensionManager
-        );
-        $this->blockFactory      = new BlockFactory(
-            $this->extensionManager,
-            $this->layoutManipulator
-        );
+        $this->layoutManipulator = new DeferredLayoutManipulator($this->registry, $this->rawLayoutBuilder);
+        $this->blockFactory      = new BlockFactory($this->registry, $this->layoutManipulator);
     }
 
     /**
@@ -286,7 +280,7 @@ class BlockFactoryTest extends LayoutTestCase
                 )
             );
 
-        $this->extensionManager->addExtension(
+        $this->registry->addExtension(
             new AbstractExtensionStub(
                 [$testBlockType],
                 [$headerBlockTypeExtension],

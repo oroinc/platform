@@ -75,7 +75,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      */
     protected function resolveOptions($blockType, array $options)
     {
-        $blockOptionsResolver = new BlockOptionsResolver($this->layoutFactory->getExtensionManager());
+        $blockOptionsResolver = new BlockOptionsResolver($this->layoutFactory->getRegistry());
 
         return $blockOptionsResolver->resolveOptions($blockType, $options);
     }

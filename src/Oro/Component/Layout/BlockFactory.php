@@ -6,8 +6,8 @@ use Oro\Component\Layout\Block\Type\ContainerType;
 
 class BlockFactory implements BlockFactoryInterface
 {
-    /** @var ExtensionManagerInterface */
-    protected $extensionManager;
+    /** @var LayoutRegistryInterface */
+    protected $registry;
 
     /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
@@ -31,14 +31,14 @@ class BlockFactory implements BlockFactoryInterface
     protected $block;
 
     /**
-     * @param ExtensionManagerInterface          $extensionManager
+     * @param LayoutRegistryInterface            $registry
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
      */
     public function __construct(
-        ExtensionManagerInterface $extensionManager,
+        LayoutRegistryInterface $registry,
         DeferredLayoutManipulatorInterface $layoutManipulator
     ) {
-        $this->extensionManager  = $extensionManager;
+        $this->registry          = $registry;
         $this->layoutManipulator = $layoutManipulator;
     }
 
@@ -76,8 +76,8 @@ class BlockFactory implements BlockFactoryInterface
         $this->rawLayout = $rawLayout;
         $this->context   = $context;
 
-        $this->optionsResolver = new BlockOptionsResolver($this->extensionManager);
-        $this->typeHelper      = new BlockTypeHierarchyRegistry($this->extensionManager);
+        $this->optionsResolver = new BlockOptionsResolver($this->registry);
+        $this->typeHelper      = new BlockTypeHierarchyRegistry($this->registry);
         $this->blockBuilder    = new BlockBuilder(
             $this->layoutManipulator,
             $this->rawLayout,
@@ -206,7 +206,7 @@ class BlockFactory implements BlockFactoryInterface
         // iterate from parent to current
         foreach ($types as $type) {
             $type->buildBlock($this->blockBuilder, $resolvedOptions);
-            $this->extensionManager->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
+            $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
         }
     }
 
@@ -230,7 +230,7 @@ class BlockFactory implements BlockFactoryInterface
         // build the view
         foreach ($types as $type) {
             $type->buildView($view, $this->block, $options);
-            $this->extensionManager->buildView($type->getName(), $view, $this->block, $options);
+            $this->registry->buildView($type->getName(), $view, $this->block, $options);
         }
 
         return $view;
@@ -253,7 +253,7 @@ class BlockFactory implements BlockFactoryInterface
         // finish the view
         foreach ($types as $type) {
             $type->finishView($view, $this->block, $options);
-            $this->extensionManager->finishView($type->getName(), $view, $this->block, $options);
+            $this->registry->finishView($type->getName(), $view, $this->block, $options);
         }
     }
 

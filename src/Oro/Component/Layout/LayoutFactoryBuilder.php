@@ -124,12 +124,12 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
     public function getLayoutFactory()
     {
         // initialize extension manager
-        $extensionManager = new ExtensionManager();
+        $registry = new LayoutRegistry();
         foreach ($this->extensions as $extension) {
-            $extensionManager->addExtension($extension);
+            $registry->addExtension($extension);
         }
         if (!empty($this->types) || !empty($this->typeExtensions) || !empty($this->layoutUpdates)) {
-            $extensionManager->addExtension(
+            $registry->addExtension(
                 new PreloadedExtension(
                     $this->types,
                     $this->typeExtensions,
@@ -151,6 +151,6 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
             $rendererRegistry->setDefaultRenderer($defaultRenderer);
         }
 
-        return new LayoutFactory($extensionManager, $rendererRegistry);
+        return new LayoutFactory($registry, $rendererRegistry);
     }
 }
