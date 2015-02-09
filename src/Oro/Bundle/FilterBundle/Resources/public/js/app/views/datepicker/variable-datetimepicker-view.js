@@ -24,6 +24,15 @@ define(function (require) {
         },
 
         /**
+         * Initializes variable-date-time-picker view
+         * @param {Object} options
+         */
+        initialize: function (options) {
+            _.extend(this, _.pick(options, ['timezoneShift']));
+            VariableDateTimePickerView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
          * Updates state of time field
          *  - hides/shows the field, depending on whether date has variable value or not
          */

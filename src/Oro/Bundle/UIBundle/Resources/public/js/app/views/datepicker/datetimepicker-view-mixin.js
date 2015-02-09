@@ -144,6 +144,23 @@ define(function (require) {
         updateTimeFieldState: $.noop,
 
         /**
+         * Sets datetime picker timezone
+         */
+        setTimeZoneShift: function (timezoneShift) {
+            this.timezoneShift = timezoneShift;
+        },
+
+        /**
+         * Gets datetime picker timezone
+         */
+        getTimeZoneShift: function () {
+            if (this.timezoneShift !== undefined) {
+                return this.timezoneShift;
+            }
+            return localeSettings.getTimeZoneShift();
+        },
+
+        /**
          * Reads value of original field and converts it to frontend format
          *
          * @returns {string}
@@ -152,7 +169,7 @@ define(function (require) {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.add(localeSettings.getTimeZoneShift(), 'm').format(this.getTimeFormat());
+                value = momentInstance.add(this.getTimeZoneShift(), 'm').format(this.getTimeFormat());
             }
             return value;
         },
@@ -172,6 +189,36 @@ define(function (require) {
             if (momentInstance.isValid()) {
                 return momentInstance;
             }
+        },
+
+
+        /**
+         * Reads value of front field and converts it to backend format
+         *
+         * @returns {string}
+         */
+        getBackendFormattedValue: function () {
+            var value = '',
+                momentInstance = this.getFrontendMoment(),
+                format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
+            if (momentInstance) {
+                value = momentInstance.subtract(this.getTimeZoneShift(), 'm').format(format);
+            }
+            return value;
+        },
+
+        /**
+         * Reads value of original field and converts it to frontend format
+         *
+         * @returns {string}
+         */
+        getFrontendFormattedDate: function () {
+            var value = '',
+                momentInstance = this.getOriginalMoment();
+            if (momentInstance) {
+                value = momentInstance.add(this.getTimeZoneShift(), 'm').format(this.getDateFormat());
+            }
+            return value;
         },
 
         /**
