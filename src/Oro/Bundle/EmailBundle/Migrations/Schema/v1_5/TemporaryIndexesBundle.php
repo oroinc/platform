@@ -15,13 +15,12 @@ class TemporaryIndexesBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        try {
+        if ($schema->hasTable('oro_activity_list')) {
             $table = $schema->getTable('oro_activity_list');
             $table->addIndex(['related_activity_class'], 'tmp1');
             $table->addIndex(['related_activity_id'], 'tmp2');
 
             $queries->addQuery(new UpdateDateActivityListQuery());
-        } catch (SchemaException $e) {
         }
     }
 }

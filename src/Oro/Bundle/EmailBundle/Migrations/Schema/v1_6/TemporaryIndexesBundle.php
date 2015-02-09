@@ -15,11 +15,10 @@ class TemporaryIndexesBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        try {
+        if ($schema->hasTable('oro_activity_list')) {
             $table = $schema->getTable('oro_activity_list');
             $table->dropIndex('tmp1');
             $table->dropIndex('tmp2');
-        } catch (SchemaException $e) {
         }
     }
 }
