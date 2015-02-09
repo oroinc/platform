@@ -6,6 +6,7 @@ define(function (require) {
 
     var _               = require('underscore'),
         Backbone        = require('backbone'),
+        Chaplin         = require('chaplin'),
         moment          = require('moment'),
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
@@ -30,7 +31,7 @@ define(function (require) {
      * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return Chaplin.View.extend({
         MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
         /** @property */
         eventsTemplate: _.template(
@@ -108,6 +109,10 @@ define(function (require) {
          */
         eventsLoaded: {},
 
+        listen: {
+            'layout:reposition mediator': 'onWindowResize'
+        },
+
         /**
          * One of 'fullscreen' | 'scroll' | 'default'
          * @property
@@ -136,6 +141,11 @@ define(function (require) {
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
+        },
+
+        onWindowResize: function () {
+            this.setTimeline();
+            this.updateLayout();
         },
 
         /**
@@ -281,6 +291,7 @@ define(function (require) {
 
         onConnectionAdded: function () {
             this.smartRefetch();
+            this.updateLayout();
         },
 
         onConnectionChanged: function (connectionModel) {
@@ -303,6 +314,7 @@ define(function (require) {
 
         onConnectionDeleted: function () {
             this.smartRefetch();
+            this.updateLayout();
         },
 
         onFcSelect: function (start, end) {
@@ -735,10 +747,6 @@ define(function (require) {
                 clearInterval(self.timelineUpdateIntervalId);
                 self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
             };
-            options.windowResize = function () {
-                self.setTimeline();
-                _.delay(_.bind(self.updateLayout, self));
-            };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
                 var event = this.collection.get(fcEvent.id);
@@ -907,8 +915,13 @@ define(function (require) {
                 // do nothing
                 return;
             }
-            var $fcView = this.getCalendarElement().find('.fc-view:first');
-            this.setLayout(mediator.execute('layout:getPreferredLayout', $fcView));
+            var $fcView = this.getCalendarElement().find('.fc-view:first'),
+                $sidebar = $('.oro-page-sidebar'),
+                preferredLayout = mediator.execute('layout:getPreferredLayout', $fcView);
+            if (preferredLayout == 'fullscreen' && $sidebar.height() > mediator.execute('layout:getAvailableHeight', $sidebar)) {
+                preferredLayout = 'scroll';
+            }
+            this.setLayout(preferredLayout);
         },
 
         /**
@@ -917,8 +930,7 @@ define(function (require) {
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 if (newLayout === 'fullscreen') {
-                    this.getCalendarElement().fullCalendar('option', 'contentHeight', this.getAvailableCalendarHeight());
-                    $('.calendars').height(this.getAvailableSidebarHeight());
+                    this.getCalendarElement().fullCalendar('option', 'contentHeight', this.getAvailableHeight());
                 }
                 return;
             }
