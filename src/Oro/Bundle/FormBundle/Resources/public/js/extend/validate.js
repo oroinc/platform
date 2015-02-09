@@ -221,7 +221,9 @@ define([
         errorElement: 'span',
         errorClass: 'validation-failed',
         errorPlacement: function (label, $el) {
-            label.insertAfter(getErrorTarget($el));
+            var $targetElem = getErrorTarget($el),
+                $errorHolder = $targetElem.parent();
+            label.insertAfter($errorHolder.is('.fields-row') ? $errorHolder : $targetElem);
         },
         highlight: function (element) {
             this.settings.unhighlight.call(this, element);
@@ -252,6 +254,7 @@ define([
         'oroform/js/validator/range',
         'oroform/js/validator/regex',
         'oroform/js/validator/repeated',
+        'oroform/js/validator/time',
         'oroform/js/validator/url'
     ];
     $.validator.loadMethod(methods);
@@ -292,7 +295,7 @@ define([
 
     $.fn.validateDelegate = _.wrap($.fn.validateDelegate, function (validateDelegate, delegate, type, handler) {
         return validateDelegate.call(this, delegate, type, function () {
-            return this[0] && this[0].form && handler.apply(this, arguments);
+            return this[0] && this[0].form && $.data(this[0].form, "validator") && handler.apply(this, arguments);
         });
     });
 });

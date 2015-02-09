@@ -52,7 +52,7 @@ define([
          * Removes trace of wrapper from the view
          *  - unbind event listener from body element
          *  - removes properties which belongs to wrapper
-         *  - call original dispose method
+         *  - calls original dispose method
          */
         dispose: function () {
             if (this.disposed) {

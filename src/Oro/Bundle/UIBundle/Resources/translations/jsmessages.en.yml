@@ -53,3 +53,17 @@ oro:
         page_header:
             button:
                 more: "More"
+        datepicker:
+            today: Today
+            prev: Prev
+            next: Next
+            close: Close
+            wk: Wk
+        timepicker:
+            am: am
+            pm: pm
+            AM: AM
+            PM: PM
+            mins: mins
+            hr: hr
+            hrs: hrs
