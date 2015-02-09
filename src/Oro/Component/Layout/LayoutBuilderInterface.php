@@ -17,7 +17,7 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
      * Adds a new item to the layout
      *
      * @param string                    $id        The item id
-     * @param string                    $parentId  The parent item id or alias
+     * @param string|null               $parentId  The parent item id or alias
      * @param string|BlockTypeInterface $blockType The block type associated with the item
      * @param array                     $options   The item options
      * @param string|null               $siblingId The id or alias of an item which should be nearest neighbor
@@ -28,8 +28,8 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
      */
     public function add(
         $id,
-        $parentId = null,
-        $blockType = null,
+        $parentId,
+        $blockType,
         array $options = [],
         $siblingId = null,
         $prepend = false

@@ -559,7 +559,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
                                             $item->getId(),
                                             $item->getAlias(),
                                             $item->getParentId(),
-                                            $item->getName()
+                                            $item->getTypeName()
                                         )
                                     ]
                                 );

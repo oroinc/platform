@@ -6,7 +6,7 @@ use Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer;
 
 class TwigLayoutRendererTest extends \PHPUnit_Framework_TestCase
 {
-    public function testEnviromentSet()
+    public function testEnvironmentSet()
     {
         $innerRenderer = $this->getMock('Symfony\Bridge\Twig\Form\TwigRendererInterface');
         $environment   = $this->getMockBuilder('\Twig_Environment')->getMock();

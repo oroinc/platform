@@ -31,7 +31,7 @@ class CallbackLayoutUpdateTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue('parentId'));
         $item->expects($this->once())
-            ->method('getName')
+            ->method('getTypeName')
             ->will($this->returnValue('blockType'));
 
         $layoutUpdate->updateLayout($layoutManipulator, $item);
@@ -43,6 +43,6 @@ class CallbackLayoutUpdateTest extends \PHPUnit_Framework_TestCase
      */
     public function callbackFunction(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
-        $layoutManipulator->add('id', $item->getId(), $item->getName());
+        $layoutManipulator->add('id', $item->getId(), $item->getTypeName());
     }
 }

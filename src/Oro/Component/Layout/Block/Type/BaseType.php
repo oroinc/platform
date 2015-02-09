@@ -51,7 +51,7 @@ class BaseType extends AbstractType
 
         // add core variables to the block view, like id, block type and variables required for rendering engine
         $id                                = $block->getId();
-        $name                              = $block->getName();
+        $name                              = $block->getTypeName();
         $uniqueBlockPrefix                 = '_' . $id;
         $blockPrefixes                     = $block->getTypeHelper()->getTypeNames($name);
         $blockPrefixes[]                   = $uniqueBlockPrefix;

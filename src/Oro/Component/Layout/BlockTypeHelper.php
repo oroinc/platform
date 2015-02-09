@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-class BlockTypeHierarchyRegistry implements BlockTypeHelperInterface
+class BlockTypeHelper implements BlockTypeHelperInterface
 {
     /** @var LayoutRegistryInterface */
     protected $registry;

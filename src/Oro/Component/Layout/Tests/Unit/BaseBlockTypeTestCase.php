@@ -30,7 +30,7 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
         $this->initializeLayoutFactoryBuilder($layoutFactoryBuilder);
         foreach ($this->getExtensions() as $extension) {
             $layoutFactoryBuilder->addExtension($extension);
-        };
+        }
         $this->layoutFactory = $layoutFactoryBuilder->getLayoutFactory();
     }
 

@@ -16,7 +16,7 @@ interface BlockInterface
      *
      * @return string
      */
-    public function getName();
+    public function getTypeName();
 
     /**
      * Returns a list of all aliases registered for the block

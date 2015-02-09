@@ -74,9 +74,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** @var int */
     protected $addCounter = 0;
 
-    /** @var int */
-    protected $removeCounter = 0;
-
     /**
      * @param LayoutRegistryInterface   $registry
      * @param RawLayoutBuilderInterface $rawLayoutBuilder
@@ -94,8 +91,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
      */
     public function add(
         $id,
-        $parentId = null,
-        $blockType = null,
+        $parentId,
+        $blockType,
         array $options = [],
         $siblingId = null,
         $prepend = false
@@ -104,7 +101,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             __FUNCTION__,
             [$id, $parentId, $blockType, $options, $siblingId, $prepend]
         ];
-        $this->addCounter++;
 
         return $this;
     }
@@ -115,7 +111,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function remove($id)
     {
         $this->actions[self::GROUP_REMOVE][] = [__FUNCTION__, [$id]];
-        $this->removeCounter++;
 
         return $this;
     }
@@ -126,8 +121,6 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     public function move($id, $parentId = null, $siblingId = null, $prepend = false)
     {
         $this->actions[self::GROUP_ADD][] = [__FUNCTION__, [$id, $parentId, $siblingId, $prepend]];
-        $this->addCounter++;
-        $this->removeCounter++;
 
         return $this;
     }
@@ -199,13 +192,11 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     {
         $this->rawLayoutBuilder->clear();
         $this->actions = [];
-        $this->resetCounters();
+        $this->addCounter = 0;
     }
 
     /**
-     * Returns the number of added items
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function getNumberOfAddedItems()
     {
@@ -213,29 +204,11 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     }
 
     /**
-     * Returns the number of removed items
-     *
-     * @return int
-     */
-    public function getNumberOfRemovedItems()
-    {
-        return $this->removeCounter;
-    }
-
-    /**
-     * Sets all counters to zero
-     */
-    public function resetCounters()
-    {
-        $this->addCounter    = 0;
-        $this->removeCounter = 0;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function applyChanges(ContextInterface $context)
     {
+        $this->addCounter = 0;
         $this->item = new LayoutItem($this->rawLayoutBuilder, $context);
         try {
             $total = $this->calculateActionCount();
@@ -503,12 +476,16 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 
         switch ($name) {
             case self::ADD:
+                $this->addCounter++;
                 $this->item->initialize($args[0]);
                 $this->registry->updateLayout($args[0], $this, $this->item);
                 break;
             case self::ADD_ALIAS:
                 $this->item->initialize($this->rawLayoutBuilder->resolveId($args[1]), $args[0]);
                 $this->registry->updateLayout($args[0], $this, $this->item);
+                break;
+            case self::MOVE:
+                $this->addCounter++;
                 break;
         }
     }
