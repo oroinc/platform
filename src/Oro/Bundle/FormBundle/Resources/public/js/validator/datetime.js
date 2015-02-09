@@ -4,7 +4,7 @@ define(['underscore', 'orotranslation/js/translator', 'orolocale/js/formatter/da
     'use strict';
 
     var defaultParam = {
-        message: 'This value is not a valid date.'
+        message: 'This value is not a valid datetime.'
     };
 
     /**

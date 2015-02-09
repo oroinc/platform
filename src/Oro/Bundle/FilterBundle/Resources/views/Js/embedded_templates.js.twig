@@ -41,9 +41,15 @@
     <span> <%= _.__('oro.filter.embedded.date.field_to_value') %> </span>
     <%= parts.join('') %>:
     <div />
-    <input type="text" class="<%= inputClass %>" value="<%- value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
+    <div class="filter-start-date">
+        <input type="text" class="<%= inputClass %>"
+               value="<%- value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
+    </div>
     <span class="filter-separator">-</span>
-    <input type="text" class="<%= inputClass %>" value="<%- value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
+    <div class="filter-end-date">
+        <input type="text" class="<%= inputClass %>"
+               value="<%- value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
+    </div>
 </script>
 
 <script type="text/template" id="select-filter-template-embedded">

@@ -14,7 +14,7 @@ define([
      */
     $.widget('orofilter.dateVariables', {
         options: {
-            $input: null,
+            onSelect: $.noop,
             value: null,
             part:  'value',
             dateParts: null,
@@ -31,10 +31,13 @@ define([
 
         _create: function () {
             this.render();
+            this._on({
+                'click .ui-datevariables-div a.ui_date_variable': 'onSelectVar'
+            });
         },
 
         _destroy: function () {
-            this.widget().find('.ui-datevariables-div a.ui_date_variable').off();
+            this.element.empty();
         },
 
         setPart: function (part) {
@@ -46,12 +49,7 @@ define([
 
         onSelectVar: function (e) {
             var variable = e.target.text;
-
-            //dvInst.inst.settings.timepicker.timeDefined = false;
-
-            this.options.$input.val(variable);
-            this.options.$input.trigger("change");
-
+            this.options.onSelect(variable);
             e.preventDefault();
         },
 
@@ -72,14 +70,8 @@ define([
                 dateVars:    dateVars
             }));
 
-            var widget = this.widget();
-            widget.empty().append($dv);
-
-            layout.initPopover(widget);
-
-            widget.find('.ui-datevariables-div a.ui_date_variable').click(
-                _.bind(this.onSelectVar, this)
-            );
+            this.element.html($dv);
+            layout.initPopover(this.element);
         },
 
         _getVariablesByPart: function (datePart) {

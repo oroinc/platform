@@ -42,6 +42,7 @@ config:
         'oroform/js/validator/range': 'bundles/oroform/js/validator/range.js'
         'oroform/js/validator/regex': 'bundles/oroform/js/validator/regex.js'
         'oroform/js/validator/repeated': 'bundles/oroform/js/validator/repeated.js'
+        'oroform/js/validator/time': 'bundles/oroform/js/validator/time.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
 
         'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
@@ -57,6 +58,7 @@ config:
 
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
 
+        'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view.js'
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
