@@ -62,6 +62,20 @@ class AliasCollection
     }
 
     /**
+     * Returns a list of all aliases registered for the given item
+     *
+     * @param string $id The item id
+     *
+     * @return string[] The list of all aliases for the item with the given id
+     */
+    public function getAliases($id)
+    {
+        return isset($this->ids[$id])
+            ? $this->ids[$id]
+            : [];
+    }
+
+    /**
      * Registers an alias for the specified identifier
      *
      * @param string $alias A string that can be used as an alias for the item id

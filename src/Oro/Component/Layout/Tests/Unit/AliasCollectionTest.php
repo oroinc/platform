@@ -33,6 +33,20 @@ class AliasCollectionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->aliasCollection->isEmpty());
     }
 
+    public function testGetAliases()
+    {
+        $this->aliasCollection->add('test_alias', 'test_id');
+        $this->aliasCollection->add('another_alias', 'test_alias');
+        $this->assertEquals(
+            ['test_alias', 'another_alias'],
+            $this->aliasCollection->getAliases('test_id')
+        );
+        $this->assertEquals(
+            [],
+            $this->aliasCollection->getAliases('unknown')
+        );
+    }
+
     public function testAdd()
     {
         $this->aliasCollection->add('test_alias', 'test_id');

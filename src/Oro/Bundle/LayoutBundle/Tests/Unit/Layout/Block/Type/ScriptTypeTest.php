@@ -105,14 +105,14 @@ class ScriptTypeTest extends BlockTypeTestCase
 
     public function testGetName()
     {
-        $type = $this->factory->createBlockType(ScriptType::NAME);
+        $type = $this->getBlockType(ScriptType::NAME);
 
         $this->assertSame(ScriptType::NAME, $type->getName());
     }
 
     public function testGetParent()
     {
-        $type = $this->factory->createBlockType(ScriptType::NAME);
+        $type = $this->getBlockType(ScriptType::NAME);
 
         $this->assertSame(BaseType::NAME, $type->getParent());
     }

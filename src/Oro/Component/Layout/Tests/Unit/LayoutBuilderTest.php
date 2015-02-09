@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\LayoutBuilder;
+use Oro\Component\Layout\LayoutRendererRegistry;
 
 class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,27 +14,36 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
     protected $layoutManipulator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutViewFactory;
+    protected $blockFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $layoutFactory;
+    protected $renderer;
 
-    /** @var LayoutBuilder */
+    /** @var LayoutBuilder|\PHPUnit_Framework_MockObject_MockObject */
     protected $layoutBuilder;
 
     protected function setUp()
     {
         $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
-        $this->layoutViewFactory = $this->getMock('Oro\Component\Layout\LayoutViewFactoryInterface');
-        $this->layoutFactory     = $this->getMock('Oro\Component\Layout\LayoutFactoryInterface');
+        $this->blockFactory      = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
+        $this->renderer          = $this->getMock('Oro\Component\Layout\LayoutRendererInterface');
 
-        $this->layoutBuilder = new LayoutBuilder(
-            $this->rawLayoutBuilder,
-            $this->layoutManipulator,
-            $this->layoutViewFactory,
-            $this->layoutFactory
-        );
+        $rendererRegistry = new LayoutRendererRegistry();
+        $rendererRegistry->addRenderer('test', $this->renderer);
+        $rendererRegistry->setDefaultRenderer('test');
+
+        $this->layoutBuilder = $this->getMockBuilder('Oro\Component\Layout\LayoutBuilder')
+            ->setConstructorArgs(
+                [
+                    $this->rawLayoutBuilder,
+                    $this->layoutManipulator,
+                    $this->blockFactory,
+                    $rendererRegistry
+                ]
+            )
+            ->setMethods(['createLayout'])
+            ->getMock();
     }
 
     public function testAdd()
@@ -132,6 +142,22 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->layoutBuilder, $result);
     }
 
+    public function testChangeBlockType()
+    {
+        $id              = 'test_id';
+        $blockType       = 'test_block_type';
+        $optionsCallback = function (array $options) {
+            return $options;
+        };
+
+        $this->layoutManipulator->expects($this->once())
+            ->method('changeBlockType')
+            ->with($id, $blockType, $this->identicalTo($optionsCallback));
+
+        $result = $this->layoutBuilder->changeBlockType($id, $blockType, $optionsCallback);
+        $this->assertSame($this->layoutBuilder, $result);
+    }
+
     public function testClear()
     {
         $this->layoutManipulator->expects($this->once())
@@ -171,15 +197,16 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->with('TestTheme3', 'test_block');
 
         $this->layoutManipulator->expects($this->once())
-            ->method('applyChanges');
+            ->method('applyChanges')
+            ->with($this->identicalTo($context));
         $this->rawLayoutBuilder->expects($this->once())
             ->method('getRawLayout')
             ->will($this->returnValue($rawLayout));
-        $this->layoutViewFactory->expects($this->once())
-            ->method('createView')
+        $this->blockFactory->expects($this->once())
+            ->method('createBlockView')
             ->with($this->identicalTo($rawLayout), $this->identicalTo($context), $rootId)
             ->will($this->returnValue($rootView));
-        $this->layoutFactory->expects($this->once())
+        $this->layoutBuilder->expects($this->once())
             ->method('createLayout')
             ->with($this->identicalTo($rootView))
             ->will($this->returnValue($layout));

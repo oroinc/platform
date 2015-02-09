@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit;
 
+use Oro\Component\Layout\LayoutFactoryBuilderInterface;
 use Oro\Component\Layout\Tests\Unit\BaseBlockTypeTestCase;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type;
@@ -11,16 +12,18 @@ use Oro\Bundle\LayoutBundle\Layout\Block\Type;
  */
 abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
 {
-    protected function setUp()
+    /**
+     * {@inheritdoc}
+     */
+    protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
-        parent::setUp();
-
-        $this->factory
-            ->addBlockType(new Type\RootType())
-            ->addBlockType(new Type\BodyType())
-            ->addBlockType(new Type\HeadType())
-            ->addBlockType(new Type\MetaType())
-            ->addBlockType(new Type\ScriptType())
-            ->addBlockType(new Type\StyleType());
+        parent::initializeLayoutFactoryBuilder($layoutFactoryBuilder);
+        $layoutFactoryBuilder
+            ->addType(new Type\RootType())
+            ->addType(new Type\BodyType())
+            ->addType(new Type\HeadType())
+            ->addType(new Type\MetaType())
+            ->addType(new Type\ScriptType())
+            ->addType(new Type\StyleType());
     }
 }

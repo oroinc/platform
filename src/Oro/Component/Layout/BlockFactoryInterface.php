@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout;
 
-interface LayoutViewFactoryInterface
+interface BlockFactoryInterface
 {
     /**
      * Creates the object represents the hierarchy of block view objects starting with the given root
@@ -13,5 +13,5 @@ interface LayoutViewFactoryInterface
      *
      * @return BlockView
      */
-    public function createView(RawLayout $rawLayout, ContextInterface $context, $rootId = null);
+    public function createBlockView(RawLayout $rawLayout, ContextInterface $context, $rootId = null);
 }

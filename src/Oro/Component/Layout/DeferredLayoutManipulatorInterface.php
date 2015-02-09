@@ -98,6 +98,23 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     public function removeOption($id, $optionName);
 
     /**
+     * Changes the block type for the item
+     *
+     * @param string                    $id              The item id
+     * @param string|BlockTypeInterface $blockType       The new block type associated with the item
+     * @param callable|null             $optionsCallback The callback function is called before
+     *                                                   the block type is changed
+     *                                                   This function can be used to provide options
+     *                                                   for the new block type
+     *                                                   signature: function (array $options) : array
+     *                                                   $options argument contains current options
+     *                                                   returned array contains new options
+     *
+     * @return self
+     */
+    public function changeBlockType($id, $blockType, $optionsCallback = null);
+
+    /**
      * Sets the theme(s) to be used for rendering the layout item and its children
      *
      * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
@@ -136,7 +153,9 @@ interface DeferredLayoutManipulatorInterface extends LayoutManipulatorInterface
     /**
      * Applies all scheduled changes
      *
+     * @param ContextInterface $context
+     *
      * @throws Exception\DeferredUpdateFailureException if not all scheduled action have been performed
      */
-    public function applyChanges();
+    public function applyChanges(ContextInterface $context);
 }

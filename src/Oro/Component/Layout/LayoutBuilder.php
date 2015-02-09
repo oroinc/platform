@@ -10,28 +10,28 @@ class LayoutBuilder implements LayoutBuilderInterface
     /** @var DeferredLayoutManipulatorInterface */
     protected $layoutManipulator;
 
-    /** @var LayoutViewFactoryInterface */
-    protected $layoutViewFactory;
+    /** @var BlockFactoryInterface */
+    protected $blockFactory;
 
-    /** @var LayoutFactoryInterface */
-    protected $layoutFactory;
+    /** @var LayoutRendererRegistryInterface */
+    protected $rendererRegistry;
 
     /**
      * @param RawLayoutBuilderInterface          $rawLayoutBuilder
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
-     * @param LayoutViewFactoryInterface         $layoutViewFactory
-     * @param LayoutFactoryInterface             $layoutFactory
+     * @param BlockFactoryInterface              $blockFactory
+     * @param LayoutRendererRegistryInterface    $rendererRegistry
      */
     public function __construct(
         RawLayoutBuilderInterface $rawLayoutBuilder,
         DeferredLayoutManipulatorInterface $layoutManipulator,
-        LayoutViewFactoryInterface $layoutViewFactory,
-        LayoutFactoryInterface $layoutFactory
+        BlockFactoryInterface $blockFactory,
+        LayoutRendererRegistryInterface $rendererRegistry
     ) {
         $this->rawLayoutBuilder  = $rawLayoutBuilder;
         $this->layoutManipulator = $layoutManipulator;
-        $this->layoutViewFactory = $layoutViewFactory;
-        $this->layoutFactory     = $layoutFactory;
+        $this->blockFactory      = $blockFactory;
+        $this->rendererRegistry  = $rendererRegistry;
     }
 
     /**
@@ -113,6 +113,16 @@ class LayoutBuilder implements LayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function changeBlockType($id, $blockType, $optionsCallback = null)
+    {
+        $this->layoutManipulator->changeBlockType($id, $blockType, $optionsCallback);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setBlockTheme($themes, $id = null)
     {
         $this->layoutManipulator->setBlockTheme($themes, $id);
@@ -134,10 +144,10 @@ class LayoutBuilder implements LayoutBuilderInterface
      */
     public function getLayout(ContextInterface $context, $rootId = null)
     {
-        $this->layoutManipulator->applyChanges();
+        $this->layoutManipulator->applyChanges($context);
         $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
-        $rootView    = $this->layoutViewFactory->createView($rawLayout, $context, $rootId);
-        $layout      = $this->layoutFactory->createLayout($rootView);
+        $rootView    = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
+        $layout      = $this->createLayout($rootView);
         $rootBlockId = $rawLayout->getRootId();
         $blockThemes = $rawLayout->getBlockThemes();
         foreach ($blockThemes as $blockId => $themes) {
@@ -145,5 +155,15 @@ class LayoutBuilder implements LayoutBuilderInterface
         }
 
         return $layout;
+    }
+
+    /**
+     * @param BlockView $rootView
+     *
+     * @return Layout
+     */
+    protected function createLayout(BlockView $rootView)
+    {
+        return new Layout($rootView, $this->rendererRegistry);
     }
 }

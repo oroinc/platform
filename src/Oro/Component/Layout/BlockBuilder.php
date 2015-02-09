@@ -2,35 +2,49 @@
 
 namespace Oro\Component\Layout;
 
-class BlockBuilder implements BlockBuilderInterface
+final class BlockBuilder implements BlockBuilderInterface
 {
     /** @var LayoutManipulatorInterface */
-    protected $layoutManipulator;
+    private $layoutManipulator;
 
     /** @var ContextInterface */
-    protected $context;
+    private $context;
+
+    /** @var RawLayout */
+    private $rawLayout;
+
+    /** @var BlockTypeHelperInterface */
+    private $typeHelper;
 
     /** @var string */
-    protected $blockId;
+    private $id;
 
     /**
      * @param LayoutManipulatorInterface $layoutManipulator
-     * @param ContextInterface           $context
+     * @param RawLayout                $rawLayout
+     * @param BlockTypeHelperInterface $typeHelper
+     * @param ContextInterface         $context
      */
-    public function __construct(LayoutManipulatorInterface $layoutManipulator, ContextInterface $context)
-    {
+    public function __construct(
+        LayoutManipulatorInterface $layoutManipulator,
+        RawLayout $rawLayout,
+        BlockTypeHelperInterface $typeHelper,
+        ContextInterface $context
+    ) {
         $this->layoutManipulator = $layoutManipulator;
+        $this->rawLayout         = $rawLayout;
+        $this->typeHelper        = $typeHelper;
         $this->context           = $context;
     }
 
     /**
      * Initializes the state of this object
      *
-     * @param string $blockId
+     * @param string $id The block id
      */
-    public function initialize($blockId)
+    public function initialize($id)
     {
-        $this->blockId = $blockId;
+        $this->id = $id;
     }
 
     /**
@@ -38,7 +52,19 @@ class BlockBuilder implements BlockBuilderInterface
      */
     public function getId()
     {
-        return $this->blockId;
+        return $this->id;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        $blockType = $this->rawLayout->getProperty($this->id, RawLayout::BLOCK_TYPE, true);
+
+        return $blockType instanceof BlockTypeInterface
+            ? $blockType->getName()
+            : $blockType;
     }
 
     /**
@@ -47,6 +73,14 @@ class BlockBuilder implements BlockBuilderInterface
     public function getLayoutManipulator()
     {
         return $this->layoutManipulator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTypeHelper()
+    {
+        return $this->typeHelper;
     }
 
     /**

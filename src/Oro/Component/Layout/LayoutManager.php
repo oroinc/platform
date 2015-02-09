@@ -4,15 +4,15 @@ namespace Oro\Component\Layout;
 
 class LayoutManager
 {
-    /** @var LayoutBuilderInterface */
-    protected $layoutBuilder;
+    /** @var LayoutFactoryBuilderInterface */
+    protected $layoutFactoryBuilder;
 
     /**
-     * @param LayoutBuilderInterface $layoutBuilder
+     * @param LayoutFactoryBuilderInterface $layoutFactoryBuilder
      */
-    public function __construct(LayoutBuilderInterface $layoutBuilder)
+    public function __construct(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
-        $this->layoutBuilder = $layoutBuilder;
+        $this->layoutFactoryBuilder = $layoutFactoryBuilder;
     }
 
     /**
@@ -20,8 +20,6 @@ class LayoutManager
      */
     public function getLayoutBuilder()
     {
-        $this->layoutBuilder->clear();
-
-        return $this->layoutBuilder;
+        return $this->layoutFactoryBuilder->getLayoutFactory()->createLayoutBuilder();
     }
 }
