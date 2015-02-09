@@ -1,2 +1,2 @@
 bundles:
-    - { name: Oro\Bundle\ActivityListBundle\OroActivityListBundle, priority: -87 }
+    - { name: Oro\Bundle\ActivityListBundle\OroActivityListBundle }
