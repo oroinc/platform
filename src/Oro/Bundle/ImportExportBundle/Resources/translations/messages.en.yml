@@ -25,5 +25,7 @@ oro:
             tempate:        Download Data Template
             file:           File
             strategy:       Strategy
+            importance:     Important
+            columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
 
 "Identity only": "Identity only"
