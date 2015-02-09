@@ -24,14 +24,14 @@ var requirejs, require, define;
         apsp = ap.splice,
         isBrowser = !!(typeof window !== 'undefined' && typeof navigator !== 'undefined' && window.document),
         isWebWorker = !isBrowser && typeof importScripts !== 'undefined',
-    //PS3 indicates loaded and complete, but need to wait for complete
-    //specifically. Sequence is 'loading', 'loaded', execution,
-    // then 'complete'. The UA check is unfortunate, but not sure how
-    //to feature test w/o causing perf issues.
+        //PS3 indicates loaded and complete, but need to wait for complete
+        //specifically. Sequence is 'loading', 'loaded', execution,
+        // then 'complete'. The UA check is unfortunate, but not sure how
+        //to feature test w/o causing perf issues.
         readyRegExp = isBrowser && navigator.platform === 'PLAYSTATION 3' ?
-            /^complete$/ : /^(complete|loaded)$/,
+                      /^complete$/ : /^(complete|loaded)$/,
         defContextName = '_',
-    //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
+        //Oh the tragedy, detecting opera. See the usage of isOpera for reason.
         isOpera = typeof opera !== 'undefined' && opera.toString() === '[object Opera]',
         contexts = {},
         cfg = {},
@@ -210,9 +210,9 @@ var requirejs, require, define;
                 config: {}
             },
             registry = {},
-        //registry of just enabled modules, to speed
-        //cycle breaking code when lots of modules
-        //are registered, but not activated.
+            //registry of just enabled modules, to speed
+            //cycle breaking code when lots of modules
+            //are registered, but not activated.
             enabledRegistry = {},
             undefEvents = {},
             defQueue = [],
@@ -357,7 +357,7 @@ var requirejs, require, define;
             if (isBrowser) {
                 each(scripts(), function (scriptNode) {
                     if (scriptNode.getAttribute('data-requiremodule') === name &&
-                        scriptNode.getAttribute('data-requirecontext') === context.contextName) {
+                            scriptNode.getAttribute('data-requirecontext') === context.contextName) {
                         scriptNode.parentNode.removeChild(scriptNode);
                         return true;
                     }
@@ -452,8 +452,8 @@ var requirejs, require, define;
                         // loading of a loader plugin. But for now, fixes the
                         // common uses. Details in #1131
                         normalizedName = name.indexOf('!') === -1 ?
-                            normalize(name, parentName, applyMap) :
-                            name;
+                                         normalize(name, parentName, applyMap) :
+                                         name;
                     }
                 } else {
                     //A regular module.
@@ -475,8 +475,8 @@ var requirejs, require, define;
             //normalization, stamp it with a unique ID so two matching relative
             //ids that may conflict can be separate.
             suffix = prefix && !pluginModule && !isNormalized ?
-                '_unnormalized' + (unnormalizedCounter += 1) :
-                '';
+                     '_unnormalized' + (unnormalizedCounter += 1) :
+                     '';
 
             return {
                 prefix: prefix,
@@ -487,8 +487,8 @@ var requirejs, require, define;
                 originalName: originalName,
                 isDefine: isDefine,
                 id: (prefix ?
-                    prefix + '!' + normalizedName :
-                    normalizedName) + suffix
+                        prefix + '!' + normalizedName :
+                        normalizedName) + suffix
             };
         }
 
@@ -508,7 +508,7 @@ var requirejs, require, define;
                 mod = getOwn(registry, id);
 
             if (hasProp(defined, id) &&
-                (!mod || mod.defineEmitComplete)) {
+                    (!mod || mod.defineEmitComplete)) {
                 if (name === 'defined') {
                     fn(defined[id]);
                 }
@@ -558,7 +558,7 @@ var requirejs, require, define;
                 //local var ref to defQueue, so cannot just reassign the one
                 //on context.
                 apsp.apply(defQueue,
-                    [defQueue.length, 0].concat(globalDefQueue));
+                           [defQueue.length, 0].concat(globalDefQueue));
                 globalDefQueue = [];
             }
         }
@@ -634,7 +634,7 @@ var requirejs, require, define;
         function checkLoaded() {
             var err, usingPathFallback,
                 waitInterval = config.waitSeconds * 1000,
-            //It is possible to disable the wait interval by using waitSeconds of 0.
+                //It is possible to disable the wait interval by using waitSeconds of 0.
                 expired = waitInterval && (context.startTime + waitInterval) < new Date().getTime(),
                 noLoads = [],
                 reqCalls = [],
@@ -729,9 +729,9 @@ var requirejs, require, define;
             this.depCount = 0;
 
             /* this.exports this.factory
-             this.depMaps = [],
-             this.enabled, this.fetched
-             */
+               this.depMaps = [],
+               this.enabled, this.fetched
+            */
         };
 
         Module.prototype = {
@@ -811,8 +811,8 @@ var requirejs, require, define;
                     context.makeRequire(this.map, {
                         enableBuildCallback: true
                     })(this.shim.deps || [], bind(this, function () {
-                            return map.prefix ? this.callPlugin() : this.load();
-                        }));
+                        return map.prefix ? this.callPlugin() : this.load();
+                    }));
                 } else {
                     //Regular dependency.
                     return map.prefix ? this.callPlugin() : this.load();
@@ -932,7 +932,7 @@ var requirejs, require, define;
             callPlugin: function () {
                 var map = this.map,
                     id = map.id,
-                //Map already normalized the prefix.
+                    //Map already normalized the prefix.
                     pluginMap = makeModuleMap(map.prefix);
 
                 //Mark this as a dependency for this plugin, so it
@@ -961,7 +961,7 @@ var requirejs, require, define;
                         //prefix and name should already be normalized, no need
                         //for applying map config again either.
                         normalizedMap = makeModuleMap(map.prefix + '!' + name,
-                            this.map.parentMap);
+                                                      this.map.parentMap);
                         on(normalizedMap,
                             'defined', bind(this, function (value) {
                                 this.init([], function () { return value; }, null, {
@@ -1052,10 +1052,10 @@ var requirejs, require, define;
                             req.exec(text);
                         } catch (e) {
                             return onError(makeError('fromtexteval',
-                                'fromText eval for ' + id +
-                                    ' failed: ' + e,
-                                e,
-                                [id]));
+                                             'fromText eval for ' + id +
+                                            ' failed: ' + e,
+                                             e,
+                                             [id]));
                         }
 
                         if (hasInteractive) {
@@ -1102,9 +1102,9 @@ var requirejs, require, define;
                         //Dependency needs to be converted to a depMap
                         //and wired up to this module.
                         depMap = makeModuleMap(depMap,
-                            (this.map.isDefine ? this.map : this.map.parentMap),
-                            false,
-                            !this.skipMap);
+                                               (this.map.isDefine ? this.map : this.map.parentMap),
+                                               false,
+                                               !this.skipMap);
                         this.depMaps[i] = depMap;
 
                         handler = getOwn(handlers, depMap.id);
@@ -1327,8 +1327,8 @@ var requirejs, require, define;
                         //envs have different conventions: some use a module name,
                         //some use a file name.
                         config.pkgs[name] = pkgObj.name + '/' + (pkgObj.main || 'main')
-                            .replace(currDirRegExp, '')
-                            .replace(jsSuffixRegExp, '');
+                                     .replace(currDirRegExp, '')
+                                     .replace(jsSuffixRegExp, '');
                     });
                 }
 
@@ -1398,10 +1398,10 @@ var requirejs, require, define;
 
                         if (!hasProp(defined, id)) {
                             return onError(makeError('notloaded', 'Module name "' +
-                                id +
-                                '" has not been loaded yet for context: ' +
-                                contextName +
-                                (relMap ? '' : '. Use require([])')));
+                                        id +
+                                        '" has not been loaded yet for context: ' +
+                                        contextName +
+                                        (relMap ? '' : '. Use require([])')));
                         }
                         return defined[id];
                     }
@@ -1453,7 +1453,7 @@ var requirejs, require, define;
                         }
 
                         return context.nameToUrl(normalize(moduleNamePlusExt,
-                            relMap && relMap.id, true), ext,  true);
+                                                relMap && relMap.id, true), ext,  true);
                     },
 
                     defined: function (id) {
@@ -1562,9 +1562,9 @@ var requirejs, require, define;
                             return;
                         } else {
                             return onError(makeError('nodefine',
-                                'No define call for ' + moduleName,
-                                null,
-                                [moduleName]));
+                                             'No define call for ' + moduleName,
+                                             null,
+                                             [moduleName]));
                         }
                     } else {
                         //A script that does not call define(), so just simulate
@@ -1637,8 +1637,8 @@ var requirejs, require, define;
                 }
 
                 return config.urlArgs ? url +
-                    ((url.indexOf('?') === -1 ? '?' : '&') +
-                        config.urlArgs) : url;
+                                        ((url.indexOf('?') === -1 ? '?' : '&') +
+                                         config.urlArgs) : url;
             },
 
             //Delegates to req.load. Broken out as a separate function to
@@ -1669,7 +1669,7 @@ var requirejs, require, define;
                 //all old browsers will be supported, but this one was easy enough
                 //to support and still makes sense.
                 if (evt.type === 'load' ||
-                    (readyRegExp.test((evt.currentTarget || evt.srcElement).readyState))) {
+                        (readyRegExp.test((evt.currentTarget || evt.srcElement).readyState))) {
                     //Reset interactive script so a script node is not held onto for
                     //to long.
                     interactiveScript = null;
@@ -1822,8 +1822,8 @@ var requirejs, require, define;
      */
     req.createNode = function (config, moduleName, url) {
         var node = config.xhtml ?
-            document.createElementNS('http://www.w3.org/1999/xhtml', 'html:script') :
-            document.createElement('script');
+                document.createElementNS('http://www.w3.org/1999/xhtml', 'html:script') :
+                document.createElement('script');
         node.type = config.scriptType || 'text/javascript';
         node.charset = 'utf-8';
         node.async = true;
@@ -1858,15 +1858,15 @@ var requirejs, require, define;
             //UNFORTUNATELY Opera implements attachEvent but does not follow the script
             //script execution mode.
             if (node.attachEvent &&
-                //Check if node.attachEvent is artificially added by custom script or
-                //natively supported by browser
-                //read https://github.com/jrburke/requirejs/issues/187
-                //if we can NOT find [native code] then it must NOT natively supported.
-                //in IE8, node.attachEvent does not have toString()
-                //Note the test for "[native code" with no closing brace, see:
-                //https://github.com/jrburke/requirejs/issues/273
-                !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
-                !isOpera) {
+                    //Check if node.attachEvent is artificially added by custom script or
+                    //natively supported by browser
+                    //read https://github.com/jrburke/requirejs/issues/187
+                    //if we can NOT find [native code] then it must NOT natively supported.
+                    //in IE8, node.attachEvent does not have toString()
+                    //Note the test for "[native code" with no closing brace, see:
+                    //https://github.com/jrburke/requirejs/issues/273
+                    !(node.attachEvent.toString && node.attachEvent.toString().indexOf('[native code') < 0) &&
+                    !isOpera) {
                 //Probably IE. IE (at least 6-8) do not fire
                 //script onload right after executing the script, so
                 //we cannot tie the anonymous define call to a name.
@@ -1919,10 +1919,10 @@ var requirejs, require, define;
                 context.completeLoad(moduleName);
             } catch (e) {
                 context.onError(makeError('importscripts',
-                    'importScripts failed for ' +
-                        moduleName + ' at ' + url,
-                    e,
-                    [moduleName]));
+                                'importScripts failed for ' +
+                                    moduleName + ' at ' + url,
+                                e,
+                                [moduleName]));
             }
         }
     };
@@ -1973,7 +1973,7 @@ var requirejs, require, define;
                 //like a module name.
                 mainScript = mainScript.replace(jsSuffixRegExp, '');
 
-                //If mainScript is still a path, fall back to dataMain
+                 //If mainScript is still a path, fall back to dataMain
                 if (req.jsExtRegExp.test(mainScript)) {
                     mainScript = dataMain;
                 }
