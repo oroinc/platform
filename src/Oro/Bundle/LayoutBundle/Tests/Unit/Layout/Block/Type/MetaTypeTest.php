@@ -39,14 +39,14 @@ class MetaTypeTest extends BlockTypeTestCase
 
     public function testGetName()
     {
-        $type = $this->factory->createBlockType(MetaType::NAME);
+        $type = $this->getBlockType(MetaType::NAME);
 
         $this->assertSame(MetaType::NAME, $type->getName());
     }
 
     public function testGetParent()
     {
-        $type = $this->factory->createBlockType(MetaType::NAME);
+        $type = $this->getBlockType(MetaType::NAME);
 
         $this->assertSame(BaseType::NAME, $type->getParent());
     }

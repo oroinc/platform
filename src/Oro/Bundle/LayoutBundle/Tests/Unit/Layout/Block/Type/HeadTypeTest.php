@@ -42,14 +42,14 @@ class HeadTypeTest extends BlockTypeTestCase
 
     public function testGetName()
     {
-        $type = $this->factory->createBlockType(HeadType::NAME);
+        $type = $this->getBlockType(HeadType::NAME);
 
         $this->assertSame(HeadType::NAME, $type->getName());
     }
 
     public function testGetParent()
     {
-        $type = $this->factory->createBlockType(HeadType::NAME);
+        $type = $this->getBlockType(HeadType::NAME);
 
         $this->assertSame(ContainerType::NAME, $type->getParent());
     }

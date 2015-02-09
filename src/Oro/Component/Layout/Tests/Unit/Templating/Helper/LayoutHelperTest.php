@@ -26,7 +26,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testSetBlockTheme()
     {
-        $view  = new BlockView(['base', 'root']);
+        $view  = new BlockView();
         $theme = 'MyBundle:Layout\php';
 
         $this->renderer->expects($this->once())
@@ -38,7 +38,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testWidgetRendering()
     {
-        $view      = new BlockView(['base', 'root']);
+        $view      = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -50,7 +50,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testRowRendering()
     {
-        $view      = new BlockView(['base', 'root']);
+        $view      = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -62,7 +62,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testLabelRendering()
     {
-        $view      = new BlockView(['base', 'root']);
+        $view      = new BlockView();
         $label     = 'test_label';
         $variables = ['foo' => 'bar'];
 
@@ -75,7 +75,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testLabelRenderingWithLabelInVariables()
     {
-        $view      = new BlockView(['base', 'root']);
+        $view      = new BlockView();
         $label     = 'test_label';
         $variables = ['foo' => 'bar', 'label' => 'original_label'];
 
@@ -88,7 +88,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testLabelRenderingWithNoLabelSpecified()
     {
-        $view      = new BlockView(['base', 'root']);
+        $view      = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -100,7 +100,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testLabelRenderingWithEmptyLabel()
     {
-        $view      = new BlockView(['base', 'root']);
+        $view      = new BlockView();
         $variables = ['foo' => 'bar'];
 
         $this->renderer->expects($this->once())
@@ -112,7 +112,7 @@ class LayoutHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testBlockRendering()
     {
-        $view      = new BlockView(['base', 'root']);
+        $view      = new BlockView();
         $blockName = 'test';
         $variables = ['foo' => 'bar'];
 

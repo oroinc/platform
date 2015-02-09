@@ -3,10 +3,16 @@
 namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\ContainerType;
+use Oro\Component\Layout\CallbackLayoutUpdate;
+use Oro\Component\Layout\Extension\PreloadedExtension;
+use Oro\Component\Layout\LayoutItemInterface;
+use Oro\Component\Layout\LayoutManipulatorInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\HeaderType;
 
 /**
  * This class contains unit tests which are NOT RELATED to ALIASES and CHANGE COUNTERS
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 {
@@ -20,7 +26,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         // do test
         $this->layoutManipulator->clear();
-        $this->layoutManipulator->applyChanges();
+        $this->layoutManipulator->applyChanges($this->context);
         $this->assertTrue($this->rawLayoutBuilder->isEmpty());
         $this->assertSame(0, $this->layoutManipulator->getNumberOfAddedItems());
         $this->assertSame(0, $this->layoutManipulator->getNumberOfRemovedItems());
@@ -536,6 +542,36 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
         );
     }
 
+    public function testChangeBlockType()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->changeBlockType(
+                'header',
+                'logo',
+                function (array $options) {
+                    $options['title'] = 'test';
+
+                    return $options;
+                }
+            )
+            ->add('header', 'root', 'header');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header with changed block type
+                        'vars'     => ['id' => 'header', 'title' => 'test']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
     public function testMoveUnknownItem()
     {
         $this->layoutManipulator
@@ -998,6 +1034,290 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 ]
             ],
             $blockThemes
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 1 action(s) cannot be applied. Actions: setBlockTheme(logo).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testSetBlockThemeForUnknownItem()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'logo');
+
+        $this->getLayoutView();
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 3 action(s) cannot be applied. Actions: add(header, logo1), add(logo1, logo2), add(logo2, header).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testCyclicDependency()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'logo1', 'header')
+            ->add('logo1', 'logo2', 'logo')
+            ->add('logo2', 'header', 'logo');
+
+        $this->getLayoutView();
+    }
+
+    public function testLayoutUpdates()
+    {
+        $this->registry->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo1', 'header', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    public function testLayoutUpdatesWhenParentIsAddedInUpdate()
+    {
+        $this->registry->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
+                            }
+                        )
+                    ],
+                    'root'   => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('header', $item->getId(), 'header');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\DeferredUpdateFailureException
+     * @expectedExceptionMessage Failed to apply scheduled changes. 1 action(s) cannot be applied. Actions: add(logo1, header).
+     */
+    // @codingStandardsIgnoreEnd
+    public function testLayoutUpdatesWhenParentIsAddedInUpdateLinkedWithChild()
+    {
+        $this->registry->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'logo1' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('header', $item->getParentId(), 'header');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo');
+
+        $this->getLayoutView();
+    }
+
+    /**
+     * test the case when removing siblingId for 'add' does not help and siblingId must be restored
+     */
+    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndAddDependsToUpdate()
+    {
+        $this->registry->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
+                                $layoutManipulator->add('logo4', $item->getId(), 'logo');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('logo1', 'header', 'logo', [], 'logo4', true)
+            ->add('header', 'root', 'header', [], 'unknown');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo4
+                                'vars' => ['id' => 'logo4', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
+        );
+    }
+
+    /**
+     * test the case when removing siblingId for 'move' does not help and siblingId must be restored
+     */
+    public function testLayoutUpdatesWhenUpdateLinkedWithAddToUndefinedSiblingAndMoveDependsToUpdate()
+    {
+        $this->registry->addExtension(
+            new PreloadedExtension(
+                [],
+                [],
+                [
+                    'header' => [
+                        new CallbackLayoutUpdate(
+                            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) {
+                                $layoutManipulator->add('logo2', $item->getParentId(), 'logo');
+                                $layoutManipulator->add('logo3', $item->getId(), 'logo');
+                                $layoutManipulator->add('logo4', $item->getId(), 'logo');
+                            }
+                        )
+                    ]
+                ]
+            )
+        );
+
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->move('logo1', 'header', 'logo4', true)
+            ->add('logo1', 'header', 'logo', [])
+            ->add('header', 'root', 'header', [], 'unknown');
+
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo3
+                                'vars' => ['id' => 'logo3', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ],
+                            [ // logo4
+                                'vars' => ['id' => 'logo4', 'title' => '']
+                            ]
+                        ]
+                    ],
+                    [ // logo2
+                        'vars' => ['id' => 'logo2', 'title' => '']
+                    ]
+                ]
+            ],
+            $view
         );
     }
 }

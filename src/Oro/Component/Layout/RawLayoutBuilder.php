@@ -33,6 +33,7 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
         $prepend = false
     ) {
         try {
+            $this->validateBlockType($blockType);
             $this->rawLayout->add($id, $parentId, $blockType, $options, $siblingId, $prepend);
         } catch (\Exception $e) {
             throw new Exception\LogicException(
@@ -208,6 +209,41 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function changeBlockType($id, $blockType, $optionsCallback = null)
+    {
+        try {
+            if ($this->rawLayout->hasProperty($id, RawLayout::RESOLVED_OPTIONS)) {
+                throw new Exception\LogicException('Cannot change the block type if options are already resolved.');
+            }
+            $this->validateBlockType($blockType);
+            $this->rawLayout->setProperty($id, RawLayout::BLOCK_TYPE, $blockType);
+            if ($optionsCallback !== null) {
+                if (!is_callable($optionsCallback)) {
+                    throw new Exception\UnexpectedTypeException($optionsCallback, 'callable', 'optionsCallback');
+                }
+                $options = $this->rawLayout->getProperty($id, RawLayout::OPTIONS);
+                $options = call_user_func($optionsCallback, $options);
+                $this->rawLayout->setProperty($id, RawLayout::OPTIONS, $options);
+            }
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot change block type to "%s" for "%s" item. Reason: %s',
+                    $blockType instanceof BlockTypeInterface ? $blockType->getName() : $blockType,
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setBlockTheme($themes, $id = null)
     {
         try {
@@ -257,6 +293,22 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function resolveId($id)
+    {
+        return $this->rawLayout->resolveId($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentId($id)
+    {
+        return $this->rawLayout->getParentId($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isParentFor($parentId, $id)
     {
         return
@@ -271,6 +323,30 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function hasAlias($alias)
     {
         return $this->rawLayout->hasAlias($alias);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getType($id)
+    {
+        try {
+            $blockType = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE);
+
+            return $blockType instanceof BlockTypeInterface
+                ? $blockType->getName()
+                : $blockType;
+        } catch (\Exception $e) {
+            throw new Exception\LogicException(
+                sprintf(
+                    'Cannot get block type for "%s" item. Reason: %s',
+                    $id,
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
     }
 
     /**
@@ -299,5 +375,36 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function getRawLayout()
     {
         return $this->rawLayout;
+    }
+
+
+    /**
+     * Checks if the given value can be used as the block type name
+     *
+     * @param string|BlockTypeInterface $blockType The block type
+     *
+     * @throws Exception\InvalidArgumentException if the block type name is not valid
+     */
+    protected function validateBlockType($blockType)
+    {
+        if (!$blockType) {
+            throw new Exception\InvalidArgumentException('The block type name must not be empty.');
+        }
+        if (!$blockType instanceof BlockTypeInterface) {
+            if (!is_string($blockType)) {
+                throw new Exception\UnexpectedTypeException($blockType, 'string or BlockTypeInterface', 'blockType');
+            }
+            if (!preg_match('/^[a-z][a-z0-9_]*$/iD', $blockType)) {
+                throw new Exception\InvalidArgumentException(
+                    sprintf(
+                        'The "%s" string cannot be used as the name of the block type '
+                        . 'because it contains illegal characters. '
+                        . 'The valid block type name should start with a letter and only contain '
+                        . 'letters, numbers and underscores ("_").',
+                        $blockType
+                    )
+                );
+            }
+        }
     }
 }

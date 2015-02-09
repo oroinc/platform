@@ -31,14 +31,14 @@ class RootTypeTest extends BlockTypeTestCase
 
     public function testGetName()
     {
-        $type = $this->factory->createBlockType(RootType::NAME);
+        $type = $this->getBlockType(RootType::NAME);
 
         $this->assertSame(RootType::NAME, $type->getName());
     }
 
     public function testGetParent()
     {
-        $type = $this->factory->createBlockType(RootType::NAME);
+        $type = $this->getBlockType(RootType::NAME);
 
         $this->assertSame(ContainerType::NAME, $type->getParent());
     }

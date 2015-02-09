@@ -94,14 +94,14 @@ class StyleTypeTest extends BlockTypeTestCase
 
     public function testGetName()
     {
-        $type = $this->factory->createBlockType(StyleType::NAME);
+        $type = $this->getBlockType(StyleType::NAME);
 
         $this->assertSame(StyleType::NAME, $type->getName());
     }
 
     public function testGetParent()
     {
-        $type = $this->factory->createBlockType(StyleType::NAME);
+        $type = $this->getBlockType(StyleType::NAME);
 
         $this->assertSame(BaseType::NAME, $type->getParent());
     }

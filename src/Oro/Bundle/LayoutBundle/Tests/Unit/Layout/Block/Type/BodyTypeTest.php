@@ -21,14 +21,14 @@ class BodyTypeTest extends BlockTypeTestCase
 
     public function testGetName()
     {
-        $type = $this->factory->createBlockType(BodyType::NAME);
+        $type = $this->getBlockType(BodyType::NAME);
 
         $this->assertSame(BodyType::NAME, $type->getName());
     }
 
     public function testGetParent()
     {
-        $type = $this->factory->createBlockType(BodyType::NAME);
+        $type = $this->getBlockType(BodyType::NAME);
 
         $this->assertSame(ContainerType::NAME, $type->getParent());
     }

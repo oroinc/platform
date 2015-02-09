@@ -2,69 +2,27 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\Block\Type\BaseType;
-use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\BlockOptionsResolver;
-use Oro\Component\Layout\BlockTypeRegistry;
-use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\DeferredLayoutManipulator;
-use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\RawLayout;
 use Oro\Component\Layout\RawLayoutBuilder;
-use Oro\Component\Layout\LayoutViewFactory;
-use Oro\Component\Layout\Tests\Unit\Fixtures\BlockTypeFactoryStub;
+use Oro\Component\Layout\Tests\Unit\Fixtures\Layout\Block\Type\RootType;
 
 class RawLayoutBuilderTest extends LayoutTestCase
 {
-    /** @var BlockTypeFactoryStub */
-    protected $blockTypeFactory;
-
-    /** @var LayoutContext */
-    protected $context;
-
     /** @var RawLayoutBuilder */
     protected $rawLayoutBuilder;
 
-    /** @var LayoutViewFactory */
-    protected $layoutViewFactory;
-
     protected function setUp()
     {
-        $this->context           = new LayoutContext();
-        $this->rawLayoutBuilder  = new RawLayoutBuilder();
-        $this->blockTypeFactory  = new BlockTypeFactoryStub();
-        $blockTypeRegistry       = new BlockTypeRegistry($this->blockTypeFactory);
-        $blockOptionsResolver    = new BlockOptionsResolver($blockTypeRegistry);
-        $this->layoutViewFactory = new LayoutViewFactory(
-            $blockTypeRegistry,
-            $blockOptionsResolver,
-            new DeferredLayoutManipulator($this->rawLayoutBuilder)
-        );
+        $this->rawLayoutBuilder = new RawLayoutBuilder();
     }
 
-    /**
-     * @param string|null $rootId
-     *
-     * @return BlockView
-     */
-    protected function getLayoutView($rootId = null)
-    {
-        $rawLayout = $this->rawLayoutBuilder->getRawLayout();
-
-        return $this->layoutViewFactory->createView($rawLayout, $this->context, $rootId);
-    }
-
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The root item does not exist.
-     */
     public function testClear()
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
 
         $this->rawLayoutBuilder->clear();
-        $this->getLayoutView();
+        $this->assertTrue($this->rawLayoutBuilder->isEmpty());
     }
 
     public function testIsEmpty()
@@ -75,6 +33,28 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->add('root', null, 'root');
 
         $this->assertFalse($this->rawLayoutBuilder->isEmpty());
+    }
+
+    public function testResolveId()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root')
+            ->addAlias('root_alias1', 'root')
+            ->addAlias('root_alias2', 'root_alias1');
+
+        $this->assertEquals('root', $this->rawLayoutBuilder->resolveId('root'));
+        $this->assertEquals('root', $this->rawLayoutBuilder->resolveId('root_alias1'));
+        $this->assertEquals('root', $this->rawLayoutBuilder->resolveId('root_alias2'));
+    }
+
+    public function testGetParentId()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header');
+
+        $this->assertNull($this->rawLayoutBuilder->getParentId('root'));
+        $this->assertEquals('root', $this->rawLayoutBuilder->getParentId('header'));
     }
 
     /**
@@ -105,31 +85,104 @@ class RawLayoutBuilderTest extends LayoutTestCase
         ];
     }
 
-    public function testSimpleLayout()
+    public function testHasAlias()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root')
+            ->addAlias('root_alias1', 'root')
+            ->addAlias('root_alias2', 'root_alias1');
+
+        $this->assertFalse($this->rawLayoutBuilder->hasAlias('root'));
+        $this->assertTrue($this->rawLayoutBuilder->hasAlias('root_alias1'));
+        $this->assertTrue($this->rawLayoutBuilder->hasAlias('root_alias2'));
+    }
+
+    public function testGetType()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+
+        $this->assertEquals('root', $this->rawLayoutBuilder->getType('root'));
+    }
+
+    public function testGetTypeWithBlockTypeAsAlreadyCreatedBlockTypeObject()
+    {
+        $this->rawLayoutBuilder->add('root', null, new RootType());
+
+        $this->assertEquals('root', $this->rawLayoutBuilder->getType('root'));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot get block type for "unknown" item. Reason: The "unknown" item does not exist.
+     */
+    public function testGetTypeWithException()
+    {
+        $this->rawLayoutBuilder->getType('unknown');
+    }
+
+    public function testAdd()
     {
         $this->rawLayoutBuilder
             ->add('root', null, 'root')
             ->add('header', 'root', 'header')
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
-        $view = $this->getLayoutView();
+        $this->assertTrue($this->rawLayoutBuilder->has('root'));
+        $this->assertTrue($this->rawLayoutBuilder->has('header'));
+        $this->assertTrue($this->rawLayoutBuilder->has('logo'));
+    }
 
-        $this->assertBlockView(
-            [ // root
-                'vars'     => ['id' => 'root'],
-                'children' => [
-                    [ // header
-                        'vars'     => ['id' => 'header'],
-                        'children' => [
-                            [ // logo
-                                'vars' => ['id' => 'logo', 'title' => 'test']
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            $view
+    public function testAddWithBlockTypeAsAlreadyCreatedBlockTypeObject()
+    {
+        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $this->rawLayoutBuilder->add('root', null, $type);
+        $this->assertSame(
+            $type,
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
         );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot add "root" item to the layout. ParentId: . BlockType: . SiblingId: . Reason: The block type name must not be empty.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddWithEmptyBlockType($blockType)
+    {
+        $this->rawLayoutBuilder->add('root', null, $blockType);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot add "root" item to the layout. ParentId: . BlockType: 123. SiblingId: . Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testAddWithInvalidBlockType()
+    {
+        $this->rawLayoutBuilder->add('root', null, 123);
+    }
+
+    /**
+     * @dataProvider invalidBlockTypeNameDataProvider
+     */
+    public function testAddWithInvalidBlockTypeName($blockType)
+    {
+        $this->setExpectedException(
+            '\Oro\Component\Layout\Exception\LogicException',
+            sprintf(
+                'Cannot add "root" item to the layout. ParentId: . BlockType: %1$s. SiblingId: . Reason: '
+                . 'The "%1$s" string cannot be used as the name of the block type '
+                . 'because it contains illegal characters. '
+                . 'The valid block type name should start with a letter and only contain '
+                . 'letters, numbers and underscores ("_").',
+                $blockType
+            )
+        );
+        $this->rawLayoutBuilder->add('root', null, $blockType);
     }
 
     // @codingStandardsIgnoreStart
@@ -266,6 +319,124 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->removeOption('root', 'test');
     }
 
+    public function testChangeBlockType()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+
+        $this->rawLayoutBuilder->changeBlockType('root', 'my_root');
+        $this->assertEquals(
+            'my_root',
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
+        );
+    }
+
+    public function testChangeBlockTypeAndOptions()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root', ['foo' => 'bar']);
+
+        $this->rawLayoutBuilder->changeBlockType(
+            'root',
+            'my_root',
+            function (array $options) {
+                $options['new_option'] = 'val';
+
+                return $options;
+            }
+        );
+        $this->assertEquals(
+            'my_root',
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
+        );
+        $this->assertEquals(
+            ['foo' => 'bar', 'new_option' => 'val'],
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::OPTIONS)
+        );
+    }
+
+    public function testChangeBlockTypeWithAlreadyCreatedBlockTypeObject()
+    {
+        $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
+        $this->rawLayoutBuilder->add('root', null, $type);
+        $this->assertSame(
+            $type,
+            $this->rawLayoutBuilder->getRawLayout()->getProperty('root', RawLayout::BLOCK_TYPE)
+        );
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "my_root" for "root" item. Reason: Cannot change the block type if options are already resolved.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeForAlreadyResolvedItem()
+    {
+        $this->rawLayoutBuilder
+            ->add('root', null, 'root');
+        $this->rawLayoutBuilder->getRawLayout()->setProperty('root', RawLayout::RESOLVED_OPTIONS, []);
+
+        $this->rawLayoutBuilder
+            ->changeBlockType('root', 'my_root');
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @dataProvider             emptyStringDataProvider
+     *
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "" for "root" item. Reason: The block type name must not be empty.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeWithEmptyBlockType($blockType)
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', $blockType);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "123" for "root" item. Reason: Invalid "blockType" argument type. Expected "string or BlockTypeInterface", "integer" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeWithInvalidBlockType()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', 123);
+    }
+
+    /**
+     * @dataProvider invalidBlockTypeNameDataProvider
+     */
+    public function testChangeBlockTypeWithInvalidBlockTypeName($blockType)
+    {
+        $this->setExpectedException(
+            '\Oro\Component\Layout\Exception\LogicException',
+            sprintf(
+                'Cannot change block type to "%1$s" for "root" item. Reason: '
+                . 'The "%1$s" string cannot be used as the name of the block type '
+                . 'because it contains illegal characters. '
+                . 'The valid block type name should start with a letter and only contain '
+                . 'letters, numbers and underscores ("_").',
+                $blockType
+            )
+        );
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', $blockType);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\LogicException
+     * @expectedExceptionMessage Cannot change block type to "my_root" for "root" item. Reason: Invalid "optionsCallback" argument type. Expected "callable", "integer" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testChangeBlockTypeWithInvalidOptionCallback()
+    {
+        $this->rawLayoutBuilder->add('root', null, 'root');
+        $this->rawLayoutBuilder->changeBlockType('root', 'my_root', 123);
+    }
+
     /**
      * @expectedException \Oro\Component\Layout\Exception\LogicException
      * @expectedExceptionMessage Cannot set theme(s) for "root" item. Reason: The "root" item does not exist.
@@ -312,116 +483,26 @@ class RawLayoutBuilderTest extends LayoutTestCase
             ->getOptions('root');
     }
 
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Oro\Component\Layout\Exception\LogicException
-     * @expectedExceptionMessage The "header" item cannot be added as a child to "logo" item (block type: logo) because only container blocks can have children.
-     */
-    // @codingStandardsIgnoreEnd
-    public function testAddChildToNotContainer()
-    {
-        $this->rawLayoutBuilder
-            ->add('root', null, 'root')
-            ->add('logo', 'root', 'logo')
-            ->add('header', 'logo', 'header');
-
-        $this->getLayoutView();
-    }
-
-    public function testCoreVariablesForRootItemOnly()
-    {
-        $this->rawLayoutBuilder
-            ->add('rootId', null, 'root');
-
-        $view = $this->getLayoutView();
-
-        $this->assertBlockView(
-            [ // root
-                'vars'     => [
-                    'id'                  => 'rootId',
-                    'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_rootId',
-                    'block_prefixes'      => [
-                        BaseType::NAME,
-                        ContainerType::NAME,
-                        'root',
-                        '_rootId',
-                    ],
-                    'cache_key'           => '_rootId_root',
-                ],
-                'children' => []
-            ],
-            $view,
-            false
-        );
-    }
-
-    public function testCoreVariables()
-    {
-        $this->rawLayoutBuilder
-            ->add('rootId', null, 'root')
-            ->add('headerId', 'rootId', 'header')
-            ->add('logoId', 'headerId', 'logo', ['title' => 'test']);
-
-        $view = $this->getLayoutView();
-
-        $this->assertBlockView(
-            [ // root
-                'vars'     => [
-                    'id'                  => 'rootId',
-                    'translation_domain'  => 'messages',
-                    'unique_block_prefix' => '_rootId',
-                    'block_prefixes'      => [
-                        BaseType::NAME,
-                        ContainerType::NAME,
-                        'root',
-                        '_rootId',
-                    ],
-                    'cache_key'           => '_rootId_root',
-                ],
-                'children' => [
-                    [ // header
-                        'vars'     => [
-                            'id'                  => 'headerId',
-                            'translation_domain'  => 'messages',
-                            'unique_block_prefix' => '_headerId',
-                            'block_prefixes'      => [
-                                BaseType::NAME,
-                                ContainerType::NAME,
-                                'header',
-                                '_headerId',
-                            ],
-                            'cache_key'           => '_headerId_header',
-                        ],
-                        'children' => [
-                            [ // logo
-                                'vars' => [
-                                    'id'                  => 'logoId',
-                                    'translation_domain'  => 'messages',
-                                    'unique_block_prefix' => '_logoId',
-                                    'block_prefixes'      => [
-                                        BaseType::NAME,
-                                        'logo',
-                                        '_logoId',
-                                    ],
-                                    'cache_key'           => '_logoId_logo',
-                                    'title'               => 'test'
-                                ],
-                            ]
-                        ]
-                    ]
-                ]
-            ],
-            $view,
-            false
-        );
-    }
-
     public function emptyStringDataProvider()
     {
         return [
             [null],
             ['']
+        ];
+    }
+
+    public function invalidBlockTypeNameDataProvider()
+    {
+        return [
+            ['-test'],
+            ['_test'],
+            ['1test'],
+            ['?test'],
+            ['test?'],
+            ['\ntest'],
+            ['test\n'],
+            ['test-block'],
+            ['test:block']
         ];
     }
 }

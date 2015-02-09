@@ -4,37 +4,11 @@ namespace Oro\Component\Layout;
 
 use Symfony\Component\Form\FormView;
 
+/**
+ * @method BlockView getParent()
+ */
 class BlockView extends FormView
 {
-    /**
-     * The list of names if block types based on which this view is built
-     *
-     * @var array key = name, value true
-     */
-    private $types;
-
-    /**
-     * @param string[]  $types
-     * @param BlockView $parent
-     */
-    public function __construct(array $types, BlockView $parent = null)
-    {
-        parent::__construct($parent);
-        $this->types = array_fill_keys($types, true);
-    }
-
-    /**
-     * Checks whether this view is built based on the given block type
-     *
-     * @param string $blockType The name of the block type
-     *
-     * @return bool
-     */
-    public function isInstanceOf($blockType)
-    {
-        return isset($this->types[$blockType]);
-    }
-
     /**
      * Returns a child from any level of a hierarchy by id (implements \ArrayAccess)
      *
@@ -59,7 +33,7 @@ class BlockView extends FormView
     }
 
     /**
-     * Returns whether the given child exists on any level of a hierarchy (implements \ArrayAccess)
+     * Checks whether the given child exists on any level of a hierarchy (implements \ArrayAccess)
      *
      * @param string $id The child id
      *
