@@ -126,7 +126,6 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             });
             // subscribe to toggle context menu
             $el.on('click', '.context-menu-button', _.bind(function (e) {
-                e.stopPropagation();
                 var $currentTarget = $(e.currentTarget),
                     $contextMenu = $currentTarget.closest(this.selectors.item).find('.context-menu');
                 if ($contextMenu.length) {
