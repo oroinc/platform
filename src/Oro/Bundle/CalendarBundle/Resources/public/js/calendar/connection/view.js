@@ -126,11 +126,17 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
             });
             // subscribe to toggle context menu
             $el.on('click', '.context-menu-button', _.bind(function (e) {
+                e.stopPropagation();
+
                 var $currentTarget = $(e.currentTarget),
                     $contextMenu = $currentTarget.closest(this.selectors.item).find('.context-menu');
                 if ($contextMenu.length) {
                     $contextMenu.remove();
                 } else {
+                    if (this._closeContextMenu) {
+                        this._closeContextMenu();
+                    }
+
                     this.showContextMenu($currentTarget, model, e.pageX, e.pageY);
                 }
             }, this));
@@ -192,12 +198,15 @@ define(['jquery', 'underscore', 'backbone', 'orotranslation/js/translator', 'oro
                     $('.context-menu-button').css('display', '');
                     $contextMenu.remove();
                     $(document).off('.' + this.cid);
+                    delete this._closeContextMenu;
                 }, this),
                 modules = _.uniq($contextMenu.find("li[data-module]").map(function () {
                     return $(this).data('module');
                 }).get()),
                 buttonHtml = $button.html(),
                 showLoadingTimeout;
+
+            this._closeContextMenu = closeContextMenu;
 
             if (modules.length > 0 && this._initActionSyncObject()) {
                 // show loading message, if loading takes more than 100ms
