@@ -189,9 +189,9 @@ class EmailHandler
      */
     protected function initRecipients(Email $model)
     {
-        $model->setTo($this->getRecipients($model, EmailRecipient::TO));
-        $model->setCc($this->getRecipients($model, EmailRecipient::CC));
-        $model->setBcc($this->getRecipients($model, EmailRecipient::BCC));
+        $model->setTo(array_merge($model->getTo(), $this->getRecipients($model, EmailRecipient::TO)));
+        $model->setCc(array_merge($model->getCc(), $this->getRecipients($model, EmailRecipient::CC)));
+        $model->setBcc(array_merge($model->getBcc(), $this->getRecipients($model, EmailRecipient::BCC)));
     }
 
     /**

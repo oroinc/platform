@@ -118,6 +118,8 @@ oro:
                     items:
                         available_in_template: Available in email templates
 
+        reply:                    Reply
+
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
 "Sent": "Sent"

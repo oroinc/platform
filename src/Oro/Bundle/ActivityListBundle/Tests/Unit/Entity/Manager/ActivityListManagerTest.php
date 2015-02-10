@@ -246,7 +246,8 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'editable'             => true,
                 'removable'            => true,
                 'commentCount'         => '',
-                'commentable'          => ''
+                'commentable'          => '',
+                'targetEntityData'     => [],
             ],
             $this->activityListManager->getItem(105)
         );

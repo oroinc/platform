@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -76,17 +77,21 @@ class EmailController extends Controller
      */
     public function createAction()
     {
-        $entity = new EmailModel();
-        $responseData = [
-            'entity' => $entity,
-            'saved' => false
-        ];
-        if ($this->get('oro_email.form.handler.email')->process($entity)) {
-            $responseData['saved'] = true;
-        }
-        $responseData['form'] = $this->get('oro_email.form.email')->createView();
+        return $this->createEmail(new EmailModel());
+    }
 
-        return $responseData;
+    /**
+     * @Route("/reply/{id}", name="oro_email_email_reply", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_create")
+     * @Template("OroEmailBundle:Email:update.html.twig")
+     */
+    public function replyAction(Email $email)
+    {
+        $emailModel = new EmailModel();
+        $emailModel->setParentEmailId($email->getId());
+        $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
+
+        return $this->createEmail($emailModel);
     }
 
     /**
@@ -170,5 +175,24 @@ class EmailController extends Controller
     protected function getEmailCacheManager()
     {
         return $this->container->get('oro_email.email.cache.manager');
+    }
+
+    /**
+     * @param EmailModel $emailModel
+     *
+     * @return array
+     */
+    protected function createEmail(EmailModel $emailModel)
+    {
+        $responseData = [
+            'entity' => $emailModel,
+            'saved' => false
+        ];
+        if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
+            $responseData['saved'] = true;
+        }
+        $responseData['form'] = $this->get('oro_email.form.email')->createView();
+
+        return $responseData;
     }
 }
