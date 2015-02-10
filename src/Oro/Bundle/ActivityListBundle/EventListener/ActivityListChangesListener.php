@@ -61,11 +61,7 @@ class ActivityListChangesListener
         }
 
         /** @var ActivityList $entity */
-        if (
-            !($this->activityListChainProvider->getProviderByClass(
-                $entity->getRelatedActivityClass()
-            ) instanceof ActivityListDateProviderInterface)
-        ) {
+        if ($this->isDateUpdatable($entity)) {
             $this->setUpdatedProperties($entity, $args->getEntityManager(), true);
         }
     }
@@ -124,5 +120,20 @@ class ActivityListChangesListener
 
         $activityList->setUpdatedAt($newUpdatedAt);
         $activityList->setEditor($newUpdatedBy);
+    }
+
+    /**
+     * @param ActivityList $entity
+     *
+     * @return bool
+     */
+    protected function isDateUpdatable($entity)
+    {
+        $provider = $this->activityListChainProvider->getProviderByClass($entity->getRelatedActivityClass());
+        if ($provider instanceof ActivityListDateProviderInterface) {
+            return $provider->isDateUpdatable();
+        } else {
+            return true;
+        }
     }
 }
