@@ -704,7 +704,12 @@ define(function (require) {
             this.trigger('renderComplete', this.$el, this);
             this.renderDeffered = $.Deferred();
             mediator.execute('layout:init', this.widget, this)
-                .done(_.bind(this._afterLayoutInit, this));
+                .done(_.bind(function () {
+                    if (this.disposed) {
+                        return;
+                    }
+                    this._afterLayoutInit();
+                }, this));
         },
 
         _afterLayoutInit: function () {

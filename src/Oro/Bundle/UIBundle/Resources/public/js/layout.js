@@ -120,6 +120,10 @@ define(function (require) {
                     loadDeferred = $.Deferred();
 
                     require([module], function (component) {
+                        if (options.parent && options.parent.disposed) {
+                            loadDeferred.resolve();
+                            return;
+                        }
                         if (typeof component.init === "function") {
                             loadDeferred.resolve(component.init(options));
                         } else {
