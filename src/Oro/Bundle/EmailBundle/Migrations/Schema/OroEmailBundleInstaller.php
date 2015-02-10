@@ -51,7 +51,7 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle13::addOrganization($schema);
 
-        OroEmailBundle14::up($schema, $queries);
-        OroEmailBundle15::up($schema, $queries);
+        OroEmailBundle14::addColumns($schema);
+        OroEmailBundle15::addColumns($schema);
     }
 }

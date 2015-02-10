@@ -54,9 +54,6 @@ class Email extends ExtendEmail
     const NORMAL_IMPORTANCE = 0;
     const HIGH_IMPORTANCE   = 1;
 
-    const DIRECTION_NORMAL     = 0;
-    const DIRECTION_REPLY      = 1;
-
     /**
      * @var integer
      *
@@ -175,20 +172,20 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
+     * @ORM\Column(name="thread_id", type="string", length=255, nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     */
+    protected $threadId;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="x_thread_id", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
     protected $xThreadId;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="direction", type="integer")
-     * @Soap\ComplexType("string", nillable=true)
-     * @JMS\Type("string")
-     */
-    protected $direction;
 
     /**
      * @var string
@@ -222,7 +219,6 @@ class Email extends ExtendEmail
         parent::__construct();
 
         $this->importance = self::NORMAL_IMPORTANCE;
-        $this->direction  = self::DIRECTION_NORMAL;
         $this->recipients = new ArrayCollection();
         $this->emailBody  = new ArrayCollection();
         $this->folders    = new ArrayCollection();
@@ -506,6 +502,30 @@ class Email extends ExtendEmail
      *
      * @return string
      */
+    public function getThreadId()
+    {
+        return $this->threadId;
+    }
+
+    /**
+     * Set email thread id uses for group related messages
+     *
+     * @param string $threadId
+     *
+     * @return Email
+     */
+    public function setThreadId($threadId)
+    {
+        $this->threadId = $threadId;
+
+        return $this;
+    }
+
+    /**
+     * Get email thread id uses for group related messages
+     *
+     * @return string
+     */
     public function getXThreadId()
     {
         return $this->xThreadId;
@@ -521,30 +541,6 @@ class Email extends ExtendEmail
     public function setXThreadId($xThreadId)
     {
         $this->xThreadId = $xThreadId;
-
-        return $this;
-    }
-
-    /**
-     * Get email direction
-     *
-     * @return int
-     */
-    public function getDirection()
-    {
-        return $this->direction;
-    }
-
-    /**
-     * Set email direction
-     *
-     * @param $direction
-     *
-     * @return Email
-     */
-    public function setDirection($direction)
-    {
-        $this->direction = $direction;
 
         return $this;
     }

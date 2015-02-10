@@ -14,8 +14,13 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::addColumns($schema);
+    }
+
+    public static function addColumns(Schema $schema)
+    {
         $table = $schema->getTable('oro_email');
-        $table->addColumn('direction', 'integer', []);
+        $table->addColumn('thread_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('refs', 'text', ['notnull' => false]);
     }
 }
