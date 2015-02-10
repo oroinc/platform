@@ -10,6 +10,7 @@ use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
+use Oro\Bundle\EntityBundle\ORM\QueryBuilderHelper;
 use Oro\Bundle\SoapBundle\Event\FindAfter;
 use Oro\Bundle\SoapBundle\Event\GetListBefore;
 
@@ -170,7 +171,11 @@ class ApiEntityManager
         $criteria = $this->prepareQueryCriteria($limit, $page, $criteria, $orderBy);
 
         $qb = $this->getRepository()->createQueryBuilder('e');
-        $qb->addCriteria($criteria);
+        // fix of doctrine error with Same Field, Multiple Values, Criteria and QueryBuilder
+        // http://www.doctrine-project.org/jira/browse/DDC-2798
+        // TODO revert changes when doctrine version >= 2.5 in scope of BAP-5577
+        QueryBuilderHelper::addCriteria($qb, $criteria);
+        // $qb->addCriteria($criteria);
 
         return $qb;
     }
