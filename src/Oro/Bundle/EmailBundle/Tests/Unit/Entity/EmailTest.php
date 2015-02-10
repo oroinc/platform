@@ -112,6 +112,15 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
     }
 
+    public function testIsHeadGetterAndSetter()
+    {
+        $entity = new Email();
+        $this->assertFalse($entity->isHead());
+
+        $entity->setIsHead(true);
+        $this->assertTrue($entity->isHead());
+    }
+
     /**
      * @dataProvider propertiesDataProvider
      * @param string $property

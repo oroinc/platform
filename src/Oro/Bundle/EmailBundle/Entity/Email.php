@@ -152,6 +152,15 @@ class Email extends ExtendEmail
     protected $internalDate;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_head", type="boolean")
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $isHead = false;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="message_id", type="string", length=255)
@@ -445,6 +454,30 @@ class Email extends ExtendEmail
     public function setInternalDate($internalDate)
     {
         $this->internalDate = $internalDate;
+
+        return $this;
+    }
+
+    /**
+     * Get if email is either first unread, or the last item in the thread
+     *
+     * @return bool
+     */
+    public function isHead()
+    {
+        return $this->isHead;
+    }
+
+    /**
+     * Set email is_head flag
+     *
+     * @param boolean $isHead
+     *
+     * @return $this
+     */
+    public function setIsHead($isHead)
+    {
+        $this->isHead = $isHead;
 
         return $this;
     }
