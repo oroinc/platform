@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_5;
+namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_7;
 
 use Doctrine\DBAL\Schema\Schema;
 
@@ -14,8 +14,18 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::addColumns($schema);
+    }
+
+    /**
+     * @param Schema $schema
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public static function addColumns(Schema $schema)
+    {
         $table = $schema->getTable('oro_email');
-        $table->addColumn('direction', 'integer', []);
+        $table->addColumn('is_head', 'boolean', []);
+        $table->addColumn('thread_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('refs', 'text', ['notnull' => false]);
     }
 }

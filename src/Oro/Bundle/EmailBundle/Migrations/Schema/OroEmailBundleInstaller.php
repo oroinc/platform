@@ -10,7 +10,7 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_0\OroEmailBundle;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_1\OroEmailBundle as OroEmailBundle11;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_3\OroEmailBundle as OroEmailBundle13;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_4\OroEmailBundle as OroEmailBundle14;
-use Oro\Bundle\EmailBundle\Migrations\Schema\v1_5\OroEmailBundle as OroEmailBundle15;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_7\OroEmailBundle as OroEmailBundle17;
 
 class OroEmailBundleInstaller implements Installation
 {
@@ -19,7 +19,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_5';
+        return 'v1_7';
     }
 
     /**
@@ -51,7 +51,7 @@ class OroEmailBundleInstaller implements Installation
 
         OroEmailBundle13::addOrganization($schema);
 
-        OroEmailBundle14::up($schema, $queries);
-        OroEmailBundle15::up($schema, $queries);
+        OroEmailBundle14::addColumns($schema);
+        OroEmailBundle17::addColumns($schema);
     }
 }
