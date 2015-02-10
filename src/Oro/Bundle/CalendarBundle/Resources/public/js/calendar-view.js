@@ -6,12 +6,12 @@ define(function (require) {
 
     var _               = require('underscore'),
         Backbone        = require('backbone'),
-        Chaplin         = require('chaplin'),
         moment          = require('moment'),
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
         LoadingMask     = require('oroui/js/loading-mask'),
+        BaseView        = require('oroui/js/app/views/base/view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
         EventView       = require('orocalendar/js/calendar/event/view'),
@@ -31,7 +31,7 @@ define(function (require) {
      * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
-    return Chaplin.View.extend({
+    return BaseView.extend({
         MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
         /** @property */
         eventsTemplate: _.template(
