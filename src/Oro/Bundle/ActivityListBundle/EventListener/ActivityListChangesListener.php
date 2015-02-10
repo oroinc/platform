@@ -13,6 +13,13 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
+/**
+ * Class ActivityListChangesListener
+ *
+ * @package Oro\Bundle\ActivityListBundle\EventListener
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ActivityListChangesListener
 {
     /** @var ServiceLink */
