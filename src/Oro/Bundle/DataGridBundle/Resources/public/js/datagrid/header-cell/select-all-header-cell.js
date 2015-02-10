@@ -201,7 +201,7 @@ define([
          * @returns {orodatagrid.datagrid.cell.SelectAllHeaderCell}
          */
         render: function () {
-            this.$el.html(_.template($(this.template).text()));
+            this.$el.html(_.template($(this.template).text())());
             return this;
         },
 
