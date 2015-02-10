@@ -5,7 +5,8 @@ define(function (require) {
     var VariableDateTimePickerView,
         _ = require('underscore'),
         VariableDatePickerView = require('./variable-datepicker-view'),
-        dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
+        dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin'),
+        moment = require('moment');
 
     VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
         /**
@@ -14,22 +15,14 @@ define(function (require) {
         defaults: _.extend({}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         /**
-         * Returns supper prototype
+         * Returns supper prototype for datetime picker view mixin
          *
          * @returns {Object}
+         * @final
          * @protected
          */
         _super: function () {
             return VariableDateTimePickerView.__super__;
-        },
-
-        /**
-         * Initializes variable-date-time-picker view
-         * @param {Object} options
-         */
-        initialize: function (options) {
-            _.extend(this, _.pick(options, ['timezoneShift']));
-            VariableDateTimePickerView.__super__.initialize.apply(this, arguments);
         },
 
         /**

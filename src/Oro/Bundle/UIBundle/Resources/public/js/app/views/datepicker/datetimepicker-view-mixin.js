@@ -32,6 +32,25 @@ define(function (require) {
         backendFormat: datetimeFormatter.backendFormats.datetime,
 
         /**
+         * Returns supper prototype
+         *
+         * @returns {Object}
+         * @protected
+         */
+        _super: function () {
+            throw new Error("_super() should be defined");
+        },
+
+        /**
+         * Initializes variable-date-time-picker view
+         * @param {Object} options
+         */
+        initialize: function (options) {
+            _.extend(this, _.pick(options, ['timezoneShift']));
+            this._super().initialize.apply(this, arguments);
+        },
+
+        /**
          * Cleans up HTML
          *  - destroys picker widget
          *  - removes front field
