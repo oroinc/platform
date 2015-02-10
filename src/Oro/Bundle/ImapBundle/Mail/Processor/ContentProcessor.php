@@ -77,7 +77,18 @@ class ContentProcessor
         if ($contentTypeHeader !== null) {
             $contentType = $contentTypeHeader->getType();
             $charset     = $contentTypeHeader->getParameter('charset');
-            $encoding    = $charset !== null ? $charset : 'ASCII';
+
+            // TODO BAP-7343 Remove this quick fix
+            if (null === $charset) {
+                foreach ($contentTypeHeader->getParameters() as $key => $paramValue) {
+                    if ('charset' === trim($key)) {
+                        $charset = $paramValue;
+                        break;
+                    }
+                }
+            }
+
+            $encoding = $charset !== null ? $charset : 'ASCII';
         } else {
             $contentType = 'text/plain';
             $encoding    = 'ASCII';

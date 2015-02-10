@@ -406,6 +406,9 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                 $fieldValue = $data[$fieldName];
                 $entityClass = $field['expectedEntityClass'];
                 $context = array_merge($context, ['fieldName' => $fieldName]);
+                if (array_key_exists('type', $field) && in_array($field['type'], ['date', 'datetime', 'time'], true)) {
+                    $context = array_merge($context, ['type' => $field['type']]);
+                }
                 $denormalizedMap[] = array($fieldValue, $entityClass, null, $context, $field['denormalizedValue']);
             }
         }
@@ -432,7 +435,9 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
         $expected = new Stub\DenormalizationStub();
         $expected->id = 1;
         $expected->name = 'test';
-        $expected->created = 'dDate';
+        $expected->created = 'dDateTime';
+        $expected->birthday = 'dDate';
+        $expected->time = 'dTime';
         $expected->obj = 'dObj';
         $expected->collection = 'dCollection';
 
@@ -442,6 +447,8 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                     'id' => 1,
                     'name' => 'test',
                     'created' => new \DateTime('2011-11-11'),
+                    'birthday' => new \DateTime('2011-11-11'),
+                    'time' => new \DateTime('2011-11-11 12:12:12'),
                     'obj' => (object) array('key' => 'val'),
                     'collection' => array(1, 2),
                     'unknown' => 'not_included'
@@ -459,7 +466,23 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit_Framework_TestCase
                         'related_entity_name' => 'DateTime',
                         'relation_type' => null,
                         'type' => 'datetime',
+                        'denormalizedValue' => 'dDateTime',
+                        'expectedEntityClass' => 'DateTime'
+                    ),
+                    array(
+                        'name' => 'birthday',
+                        'related_entity_name' => 'DateTime',
+                        'relation_type' => null,
+                        'type' => 'date',
                         'denormalizedValue' => 'dDate',
+                        'expectedEntityClass' => 'DateTime'
+                    ),
+                    array(
+                        'name' => 'time',
+                        'related_entity_name' => 'DateTime',
+                        'relation_type' => null,
+                        'type' => 'time',
+                        'denormalizedValue' => 'dTime',
                         'expectedEntityClass' => 'DateTime'
                     ),
                     array(

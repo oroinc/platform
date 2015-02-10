@@ -36,6 +36,7 @@ class DateTimeParserTest extends \PHPUnit_Framework_TestCase
             ['Thu, 30 06 2011 23:59:59'],
             ['Fri, 31 06 2011 10:59:59 +1100'],
             ['Fri, 31 06 2011 10:59:59 +1100 (GMT+11:00)'],
+            ['Sum, 30 Jun 2011 21:59:59 -0200'],
         ];
     }
 
@@ -62,6 +63,11 @@ class DateTimeParserTest extends \PHPUnit_Framework_TestCase
             [
                 'Fri, 31 06 2011 10:59:aa +1100',
                 'Failed to parse time string "Fri, 31 06 2011 10:59:aa +1100" at position 5: Unexpected character.'
+            ],
+            [
+                'Sum, 15/06/2012 20:39:26 -0200',
+                'Failed to parse time string "Sum, 15/06/2012 20:39:26 -0200" at position 0:'
+                . ' The timezone could not be found in the database.'
             ],
         ];
     }

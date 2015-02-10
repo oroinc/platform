@@ -18,7 +18,7 @@ require(['oroui/js/mediator'], function (mediator) {
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
         'oroui/js/mediator', 'oroui/js/layout',
         'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
-        'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+        'bootstrap', 'jquery-ui'
     ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 
@@ -217,6 +217,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         if (tools.isMobile()) {
             adjustHeight = function () {
                 layout.updateResponsiveLayout();
+                mediator.trigger('layout:reposition');
             }
         } else {
             /* dynamic height for central column */
@@ -272,6 +273,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                 $('.sidebar').css({
                     'margin-bottom': footersHeight
                 });
+
+                mediator.trigger('layout:reposition');
             };
 
             if (!anchor.length) {

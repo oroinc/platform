@@ -20,42 +20,28 @@ use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 
 class UserHandler extends AbstractUserHandler implements TagHandlerInterface
 {
-    /**
-     * @var DelegatingEngine
-     */
+    /** @var DelegatingEngine */
     protected $templating;
 
     /** ConfigManager */
     protected $cm;
 
-    /**
-     * @var \Swift_Mailer
-     */
+    /** @var \Swift_Mailer */
     protected $mailer;
 
-    /**
-     * @var FlashBagInterface
-     */
+    /** @var FlashBagInterface */
     protected $flashBag;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var TagManager
-     */
+    /** @var TagManager */
     protected $tagManager;
 
-    /**
-     * @var BusinessUnitManager
-     */
+    /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
     /**
@@ -97,7 +83,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     {
         $this->form->setData($user);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
@@ -142,7 +128,7 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
             try {
                 $this->sendInviteMail($user, $this->form->get('plainPassword')->getViewData()['first']);
             } catch (\Exception $ex) {
-                $this->logger->error('Invitation email sending failed.', array('exception' => $ex));
+                $this->logger->error('Invitation email sending failed.', ['exception' => $ex]);
                 $this->flashBag->add(
                     'warning',
                     $this->translator->trans('oro.user.controller.invite.fail.message')
