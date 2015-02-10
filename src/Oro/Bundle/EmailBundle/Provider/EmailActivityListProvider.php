@@ -108,6 +108,14 @@ class EmailActivityListProvider implements
     }
 
     /**
+     *  {@inheritdoc}
+     */
+    public function isDateUpdatable()
+    {
+        return false;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getOrganization($activityEntity)
