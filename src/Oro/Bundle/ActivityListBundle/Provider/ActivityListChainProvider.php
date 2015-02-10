@@ -205,7 +205,19 @@ class ActivityListChainProvider
      */
     public function getProviderForEntity($activityEntity)
     {
-        return $this->providers[$this->doctrineHelper->getEntityClass($activityEntity)];
+        return $this->getProviderByClass($this->doctrineHelper->getEntityClass($activityEntity));
+    }
+
+    /**
+     * Get activity list provider for entity class name
+     *
+     * @param string $className
+     *
+     * @return ActivityListProviderInterface
+     */
+    public function getProviderByClass($className)
+    {
+        return $this->providers[$className];
     }
 
     /**

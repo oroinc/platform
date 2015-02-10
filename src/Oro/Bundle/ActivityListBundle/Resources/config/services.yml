@@ -64,6 +64,7 @@ services:
         class:  %oro_activity_list.event_listener.actitity_list_changes_listener.class%
         arguments:
             - @oro_security.security_facade.link
+            - @oro_activity_list.provider.chain
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
