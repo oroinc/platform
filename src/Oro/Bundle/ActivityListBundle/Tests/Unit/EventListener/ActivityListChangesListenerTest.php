@@ -26,6 +26,16 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
+            ->setMethods(['getLoggedUser'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $activityListChainProvider =
+            $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $securityFacadeLink = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->setMethods(['getService'])
@@ -36,7 +46,7 @@ class ActivityListChangesListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getService')
             ->will($this->returnValue($this->securityFacade));
 
-        $this->listener = new ActivityListChangesListener($securityFacadeLink);
+        $this->listener = new ActivityListChangesListener($securityFacadeLink, $activityListChainProvider);
     }
 
     protected function tearDown()
