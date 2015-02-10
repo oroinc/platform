@@ -24,15 +24,15 @@ class ConfigurationPass implements CompilerPassInterface
     {
         // register renderers
         if ($container->hasDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE)) {
-            $registryDef = $container->getDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE);
+            $factoryBuilderDef = $container->getDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE);
             if ($container->hasDefinition(self::PHP_RENDERER_SERVICE)) {
-                $registryDef->addMethodCall(
+                $factoryBuilderDef->addMethodCall(
                     'addRenderer',
                     ['php', new Reference(self::PHP_RENDERER_SERVICE)]
                 );
             }
             if ($container->hasDefinition(self::TWIG_RENDERER_SERVICE)) {
-                $registryDef->addMethodCall(
+                $factoryBuilderDef->addMethodCall(
                     'addRenderer',
                     ['twig', new Reference(self::TWIG_RENDERER_SERVICE)]
                 );

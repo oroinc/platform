@@ -52,7 +52,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($id, $this->block->getId());
     }
 
-    public function testGetName()
+    public function testGetTypeName()
     {
         $id   = 'test_id';
         $name = 'test_name';
@@ -61,10 +61,10 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->block->initialize($id);
 
-        $this->assertEquals($name, $this->block->getName());
+        $this->assertEquals($name, $this->block->getTypeName());
     }
 
-    public function testGetNameWhenBlockTypeIsAddedAsObject()
+    public function testGetTypeNameWhenBlockTypeIsAddedAsObject()
     {
         $id   = 'test_id';
         $name = 'test_name';
@@ -78,7 +78,7 @@ class BlockTest extends \PHPUnit_Framework_TestCase
 
         $this->block->initialize($id);
 
-        $this->assertEquals($name, $this->block->getName());
+        $this->assertEquals($name, $this->block->getTypeName());
     }
 
     public function testGetAliases()

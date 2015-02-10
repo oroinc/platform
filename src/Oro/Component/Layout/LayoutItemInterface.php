@@ -23,7 +23,7 @@ interface LayoutItemInterface
      *
      * @return string
      */
-    public function getName();
+    public function getTypeName();
 
     /**
      * Returns layout item options

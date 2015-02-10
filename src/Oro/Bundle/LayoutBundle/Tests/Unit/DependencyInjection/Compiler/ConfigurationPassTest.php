@@ -13,11 +13,11 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess()
     {
-        $container    = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+        $container         = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->getMock();
-        $registryDef  = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $factoryBuilderDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
-        $extensionDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+        $extensionDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
 
         $blockTypeServiceIds          = [
@@ -68,19 +68,19 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, $registryDef],
+                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, $factoryBuilderDef],
                         [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, $extensionDef]
                     ]
                 )
             );
 
-        $registryDef->expects($this->at(0))
+        $factoryBuilderDef->expects($this->at(0))
             ->method('addMethodCall')
             ->with(
                 'addRenderer',
                 ['php', new Reference(ConfigurationPass::PHP_RENDERER_SERVICE)]
             );
-        $registryDef->expects($this->at(1))
+        $factoryBuilderDef->expects($this->at(1))
             ->method('addMethodCall')
             ->with(
                 'addRenderer',

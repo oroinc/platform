@@ -31,7 +31,7 @@ class StyleType extends AbstractType
         $resolver->setOptional($optionalOptions);
         $resolver->setAllowedTypes(
             [
-                'scoped' => 'bool',
+                'scoped' => 'bool'
             ]
         );
         $resolver->setAllowedValues(
@@ -47,7 +47,7 @@ class StyleType extends AbstractType
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         foreach (self::$attributes as $attr => $opt) {
-            if (!empty($options[$opt])) {
+            if (isset($options[$opt])) {
                 switch ($opt) {
                     case 'scoped':
                         if ($options[$opt]) {

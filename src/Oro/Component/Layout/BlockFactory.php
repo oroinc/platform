@@ -77,7 +77,7 @@ class BlockFactory implements BlockFactoryInterface
         $this->context   = $context;
 
         $this->optionsResolver = new BlockOptionsResolver($this->registry);
-        $this->typeHelper      = new BlockTypeHierarchyRegistry($this->registry);
+        $this->typeHelper      = new BlockTypeHelper($this->registry);
         $this->blockBuilder    = new BlockBuilder(
             $this->layoutManipulator,
             $this->rawLayout,
@@ -113,8 +113,6 @@ class BlockFactory implements BlockFactoryInterface
      */
     protected function buildBlocks($rootId)
     {
-        $this->layoutManipulator->resetCounters();
-
         // build the root block
         if (!$this->rawLayout->hasProperty($rootId, RawLayout::RESOLVED_OPTIONS, true)) {
             $this->buildBlock($rootId);

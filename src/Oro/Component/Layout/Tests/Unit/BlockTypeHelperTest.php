@@ -4,20 +4,20 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
-use Oro\Component\Layout\BlockTypeHierarchyRegistry;
+use Oro\Component\Layout\BlockTypeHelper;
 
-class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
+class BlockTypeHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
 
-    /** @var BlockTypeHierarchyRegistry */
-    protected $typeHierarchyRegistry;
+    /** @var BlockTypeHelper */
+    protected $typeHelper;
 
     protected function setUp()
     {
-        $this->registry              = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
-        $this->typeHierarchyRegistry = new BlockTypeHierarchyRegistry($this->registry);
+        $this->registry   = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
+        $this->typeHelper = new BlockTypeHelper($this->registry);
     }
 
     public function testByBlockName()
@@ -38,15 +38,15 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
-            $this->typeHierarchyRegistry->getTypes(ContainerType::NAME)
+            $this->typeHelper->getTypes(ContainerType::NAME)
         );
         $this->assertSame(
             [$baseBlockType->getName(), $containerBlockType->getName()],
-            $this->typeHierarchyRegistry->getTypeNames(ContainerType::NAME)
+            $this->typeHelper->getTypeNames(ContainerType::NAME)
         );
-        $this->assertTrue($this->typeHierarchyRegistry->isInstanceOf(ContainerType::NAME, ContainerType::NAME));
-        $this->assertTrue($this->typeHierarchyRegistry->isInstanceOf(ContainerType::NAME, BaseType::NAME));
-        $this->assertFalse($this->typeHierarchyRegistry->isInstanceOf(ContainerType::NAME, 'another'));
+        $this->assertTrue($this->typeHelper->isInstanceOf(ContainerType::NAME, ContainerType::NAME));
+        $this->assertTrue($this->typeHelper->isInstanceOf(ContainerType::NAME, BaseType::NAME));
+        $this->assertFalse($this->typeHelper->isInstanceOf(ContainerType::NAME, 'another'));
     }
 
     public function testByAlreadyCreatedBlockTypeObject()
@@ -61,15 +61,15 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$baseBlockType, $containerBlockType],
-            $this->typeHierarchyRegistry->getTypes($containerBlockType)
+            $this->typeHelper->getTypes($containerBlockType)
         );
         $this->assertSame(
             [$baseBlockType->getName(), $containerBlockType->getName()],
-            $this->typeHierarchyRegistry->getTypeNames($containerBlockType)
+            $this->typeHelper->getTypeNames($containerBlockType)
         );
-        $this->assertTrue($this->typeHierarchyRegistry->isInstanceOf($containerBlockType, ContainerType::NAME));
-        $this->assertTrue($this->typeHierarchyRegistry->isInstanceOf($containerBlockType, BaseType::NAME));
-        $this->assertFalse($this->typeHierarchyRegistry->isInstanceOf($containerBlockType, 'another'));
+        $this->assertTrue($this->typeHelper->isInstanceOf($containerBlockType, ContainerType::NAME));
+        $this->assertTrue($this->typeHelper->isInstanceOf($containerBlockType, BaseType::NAME));
+        $this->assertFalse($this->typeHelper->isInstanceOf($containerBlockType, 'another'));
     }
 
     public function testForBaseTypeByBlockName()
@@ -83,14 +83,14 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$type],
-            $this->typeHierarchyRegistry->getTypes(BaseType::NAME)
+            $this->typeHelper->getTypes(BaseType::NAME)
         );
         $this->assertSame(
             [$type->getName()],
-            $this->typeHierarchyRegistry->getTypeNames(BaseType::NAME)
+            $this->typeHelper->getTypeNames(BaseType::NAME)
         );
-        $this->assertTrue($this->typeHierarchyRegistry->isInstanceOf(BaseType::NAME, BaseType::NAME));
-        $this->assertFalse($this->typeHierarchyRegistry->isInstanceOf(BaseType::NAME, 'another'));
+        $this->assertTrue($this->typeHelper->isInstanceOf(BaseType::NAME, BaseType::NAME));
+        $this->assertFalse($this->typeHelper->isInstanceOf(BaseType::NAME, 'another'));
     }
 
     public function testForBaseTypeByAlreadyCreatedBlockTypeObject()
@@ -102,13 +102,13 @@ class BlockTypeHierarchyRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             [$type],
-            $this->typeHierarchyRegistry->getTypes($type)
+            $this->typeHelper->getTypes($type)
         );
         $this->assertSame(
             [$type->getName()],
-            $this->typeHierarchyRegistry->getTypeNames($type)
+            $this->typeHelper->getTypeNames($type)
         );
-        $this->assertTrue($this->typeHierarchyRegistry->isInstanceOf($type, BaseType::NAME));
-        $this->assertFalse($this->typeHierarchyRegistry->isInstanceOf($type, 'another'));
+        $this->assertTrue($this->typeHelper->isInstanceOf($type, BaseType::NAME));
+        $this->assertFalse($this->typeHelper->isInstanceOf($type, 'another'));
     }
 }

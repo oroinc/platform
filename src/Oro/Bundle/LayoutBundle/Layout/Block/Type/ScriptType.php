@@ -32,7 +32,7 @@ class ScriptType extends AbstractType
         $resolver->setAllowedTypes(
             [
                 'async' => 'bool',
-                'defer' => 'bool',
+                'defer' => 'bool'
             ]
         );
         $resolver->setAllowedValues(
@@ -48,7 +48,7 @@ class ScriptType extends AbstractType
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         foreach (self::$attributes as $attr => $opt) {
-            if (!empty($options[$opt])) {
+            if (isset($options[$opt])) {
                 switch ($opt) {
                     case 'async':
                     case 'defer':

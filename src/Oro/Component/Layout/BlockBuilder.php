@@ -58,7 +58,7 @@ final class BlockBuilder implements BlockBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getTypeName()
     {
         $blockType = $this->rawLayout->getProperty($this->id, RawLayout::BLOCK_TYPE, true);
 

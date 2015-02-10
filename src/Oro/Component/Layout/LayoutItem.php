@@ -59,7 +59,7 @@ final class LayoutItem implements LayoutItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getTypeName()
     {
         return $this->rawLayoutBuilder->getType($this->id);
     }

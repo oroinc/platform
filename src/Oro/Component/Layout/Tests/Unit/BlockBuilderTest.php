@@ -63,7 +63,7 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($id, $this->blockBuilder->getId());
     }
 
-    public function testGetName()
+    public function testGetTypeName()
     {
         $id   = 'test_id';
         $name = 'test_name';
@@ -72,10 +72,10 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->blockBuilder->initialize($id);
 
-        $this->assertEquals($name, $this->blockBuilder->getName());
+        $this->assertEquals($name, $this->blockBuilder->getTypeName());
     }
 
-    public function testGetNameWhenBlockTypeIsAddedAsObject()
+    public function testGetTypeNameWhenBlockTypeIsAddedAsObject()
     {
         $id   = 'test_id';
         $name = 'test_name';
@@ -89,6 +89,6 @@ class BlockBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->blockBuilder->initialize($id);
 
-        $this->assertEquals($name, $this->blockBuilder->getName());
+        $this->assertEquals($name, $this->blockBuilder->getTypeName());
     }
 }

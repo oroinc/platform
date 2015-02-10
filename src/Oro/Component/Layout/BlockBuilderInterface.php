@@ -16,7 +16,7 @@ interface BlockBuilderInterface
      *
      * @return string
      */
-    public function getName();
+    public function getTypeName();
 
     /**
      * Returns the layout manipulator

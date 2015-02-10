@@ -43,7 +43,7 @@ class LayoutItemTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($alias, $this->item->getAlias());
     }
 
-    public function testGetName()
+    public function testGetTypeName()
     {
         $id        = 'test_id';
         $blockType = 'test_block_type';
@@ -52,7 +52,7 @@ class LayoutItemTest extends \PHPUnit_Framework_TestCase
 
         $this->item->initialize($id);
 
-        $this->assertEquals($blockType, $this->item->getName());
+        $this->assertEquals($blockType, $this->item->getTypeName());
     }
 
     public function testGetOptions()

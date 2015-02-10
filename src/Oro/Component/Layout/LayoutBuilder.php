@@ -39,8 +39,8 @@ class LayoutBuilder implements LayoutBuilderInterface
      */
     public function add(
         $id,
-        $parentId = null,
-        $blockType = null,
+        $parentId,
+        $blockType,
         array $options = [],
         $siblingId = null,
         $prepend = false
