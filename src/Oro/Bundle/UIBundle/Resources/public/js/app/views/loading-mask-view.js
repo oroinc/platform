@@ -4,7 +4,8 @@ define(function (require) {
 
     var LoadingMaskView,
         BaseView = require('./base/view'),
-        template = require('text!../../../templates/loading-mask-view.html');
+        template = require('text!../../../templates/loading-mask-view.html'),
+        _ = require('underscore');
 
     LoadingMaskView = BaseView.extend({
         autoRender: true,
@@ -49,7 +50,7 @@ define(function (require) {
          * Shows loading mask
          */
         show: function (hint) {
-            if (hint) {
+            if (hint && _.isString(hint)) {
                 this.setLoadingHint(hint);
             }
             this.$parent = this.$el.parent();

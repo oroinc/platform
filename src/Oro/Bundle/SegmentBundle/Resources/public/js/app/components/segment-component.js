@@ -25,6 +25,7 @@ define(function (require) {
             entityChoice: '',
             valueSource: '',
             fieldsLoader: {
+                loadingMaskParent: '',
                 router: null,
                 routingParams: {},
                 fieldsData: [],
@@ -177,8 +178,6 @@ define(function (require) {
             this.options = {};
             $.extend(true, this.options, this.defaults, options);
 
-            this.loadingMaskContainer = options._sourceElement.closest('form');
-
             // common extra options for all choice inputs
             this.options.fieldChoiceOptions = {
                 select2: {
@@ -222,7 +221,7 @@ define(function (require) {
             options = this.options.fieldsLoader;
 
             loadingMask = new LoadingMask({
-                container: this.loadingMaskContainer
+                container: $(options.loadingMaskParent)
             });
 
             confirm = new DeleteConfirmation({
