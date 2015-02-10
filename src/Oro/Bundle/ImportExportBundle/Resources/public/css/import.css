@@ -1,3 +1,9 @@
 .import-file span.validation-failed:before{
     margin-left: 0;
 }
+.ui-dialog .alert.alert-info.import-notice {
+    background-color: #d9edf7;
+    background-image: none;
+    border-color: #bce8f1;
+    padding: 8px 20px 8px 14px;
+}

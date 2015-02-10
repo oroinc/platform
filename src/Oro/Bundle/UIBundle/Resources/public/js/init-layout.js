@@ -18,7 +18,7 @@ require(['oroui/js/mediator'], function (mediator) {
 require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools',
         'oroui/js/mediator', 'oroui/js/layout',
         'oroui/js/delete-confirmation', 'oroui/js/scrollspy',
-        'bootstrap', 'jquery-ui', 'jquery-ui-timepicker'
+        'bootstrap', 'jquery-ui'
     ], function ($, _, __, tools, mediator, layout, DeleteConfirmation, scrollspy) {
     'use strict';
 

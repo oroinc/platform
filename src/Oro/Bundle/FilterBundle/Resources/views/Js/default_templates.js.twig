@@ -62,9 +62,15 @@
     <div>
         <%= parts.join('') %>
         <div>
-            <input type="text" class="<%= inputClass %>" value="<%= value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
+            <div class="filter-start-date">
+                <input type="text" class="<%= inputClass %>"
+                       value="<%= value.value.start %>" name="start" placeholder="<%- _.__('from') %>">
+            </div>
             <span class="filter-separator">-</span>
-            <input type="text" class="<%= inputClass %>" value="<%= value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
+            <div class="filter-end-date">
+                <input type="text" class="<%= inputClass %>"
+                       value="<%= value.value.end %>" name="end" placeholder="<%- _.__('to') %>">
+            </div>
         </div>
         <div class="oro-action">
             <div class="btn-group">
@@ -74,22 +80,20 @@
     </div>
 </script>
 <script type="text/template" id="date-filter-dropdown-template">
-    <div class="dropdown-menu dropdown-menu-calendar">
-        <% if (!tabs.length) { %>
-        <div id="calendar<%= suffix %>"></div>
-        <% } else { %>
-        <ul class="nav nav-tabs nav-tabs-oro">
-            <% _.each(tabs, function (tab, i) { %>
-            <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
-            <% }); %>
-        </ul>
-        <div class="tab-content">
-            <% _.each(tabs, function (tab, i) { %>
-            <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
-            <% }); %>
-        </div>
-        <% } %>
+    <% if (!tabs.length) { %>
+    <div id="calendar<%= suffix %>"></div>
+    <% } else { %>
+    <ul class="nav nav-tabs nav-tabs-oro">
+        <% _.each(tabs, function (tab, i) { %>
+        <li<% if (i === 0) { %> class="active"<% } %>><a class="<%= tab.name %>" href="#<%= tab.name %><%= suffix %>"><%= tab.label %></a></li>
+        <% }); %>
+    </ul>
+    <div class="tab-content">
+        <% _.each(tabs, function (tab, i) { %>
+        <div class="tab-pane<% if (i === 0) { %> active<% } %>" id="<%= tab.name %><%= suffix %>"></div>
+        <% }); %>
     </div>
+    <% } %>
 </script>
 <script type="text/template" id="select-filter-template">
     <div class="filter-item oro-drop">

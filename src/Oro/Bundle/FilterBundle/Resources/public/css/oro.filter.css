@@ -214,8 +214,8 @@
 button.ui-multiselect.select-filter-widget.ui-state-hover{
     text-decoration: none;
 }
-.filter-criteria .date-visual-element {
-    width: 80px;
+.date-visual-element {
+    width: 95px;
 }
 .filter-criteria .dropdown-menu a {
     color:#444;
@@ -240,7 +240,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
     background: transparent;
 }
 .filter-criteria .datetime-visual-element {
-    width: 120px;
+    width: 100px;
 }
 .filter-criteria:focus {
     outline: none;
