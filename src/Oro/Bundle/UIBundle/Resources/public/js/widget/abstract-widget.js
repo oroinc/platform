@@ -146,10 +146,12 @@ define(function (require) {
          *
          * @private
          */
-        _showLoading: function() {
-            var loadingElement = this._getLoadingElement();
-            this.loadingMask = new LoadingMask({container: loadingElement});
-            this.loadingMask.show();
+
+        _showLoading: function () {
+            this.subview('loadingMask', new LoadingMask({
+                container: this._getLoadingElement()
+            }));
+            this.subview('loadingMask').show();
         },
 
         /**
@@ -157,11 +159,8 @@ define(function (require) {
          *
          * @private
          */
-        _hideLoading: function() {
-            if (this.loadingMask) {
-                this.loadingMask.dispose();
-                this.loadingMask = null;
-            }
+        _hideLoading: function () {
+            this.removeSubview('loadingMask');
         },
 
         /**

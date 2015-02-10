@@ -57,10 +57,10 @@ define(function (require) {
                 if (!loadingMaskContainer.length) {
                     loadingMaskContainer = this.$el.parent();
                 }
-                loadingMask = new LoadingMask({
+                this.subview('loadingMask', new LoadingMask({
                     container: loadingMaskContainer
-                });
-                loadingMask.show();
+                }));
+                this.subview('loadingMask').show();
                 if (!this.firstRender) {
                     if (this.htmlValue && this.$el.val() === this.strippedValue) {
                         // if content is not modified, return html representation back
@@ -83,7 +83,7 @@ define(function (require) {
                             focusedElement.focus();
                         }, 0);
 
-                        loadingMask.dispose();
+                        self.removeSubview('loadingMask');
                         self.tinymceInstance = editor;
                         self.renderDeffered.resolve();
                         delete self.renderDeffered;

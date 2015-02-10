@@ -24,6 +24,9 @@ define(function (require) {
         /** @property {jQuery} */
         $parent: null,
 
+        /**
+         * @inheritDoc
+         */
         initialize: function (options) {
             _.extend(this, _.pick(options, ['loadingHint']));
             LoadingMaskView.__super__.initialize.apply(this, arguments);
@@ -78,6 +81,11 @@ define(function (require) {
             this[visible ? 'show' : 'hide']();
         },
 
+        /**
+         * Sets loading hint for this mask
+         *
+         * @param {string} newHint
+         */
         setLoadingHint: function (newHint) {
             var oldHint = this.loadingHint;
             this.loadingHint = newHint;
@@ -85,6 +93,9 @@ define(function (require) {
             return oldHint;
         },
 
+        /**
+         * @inheritDoc
+         */
         dispose: function () {
             if (this.disposed) {
                 return;

@@ -226,20 +226,21 @@ define(function (require) {
             }
         },
 
+        /**
+         * Shows loading indicator
+         */
         _showLoading: function () {
-            if (!this.loadingMask) {
-                this.loadingMask = new LoadingMask({
-                    container: this.$el
-                });
-                this.loadingMask.show();
-            }
+            this.subview('loadingMask', new LoadingMask({
+                container: this.$el
+            }));
+            this.subview('loadingMask').show();
         },
 
+        /**
+         * Hides loading indicator
+         */
         _hideLoading: function () {
-            if (this.loadingMask) {
-                this.loadingMask.dispose();
-                this.loadingMask = null;
-            }
+            this.removeSubview('loadingMask');
         },
 
         _showLoadItemsError: function (err) {
