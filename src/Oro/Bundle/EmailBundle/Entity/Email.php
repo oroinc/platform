@@ -152,6 +152,15 @@ class Email extends ExtendEmail
     protected $internalDate;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_head", type="boolean")
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $isHead = false;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="message_id", type="string", length=255)
@@ -172,11 +181,29 @@ class Email extends ExtendEmail
     /**
      * @var string
      *
+     * @ORM\Column(name="thread_id", type="string", length=255, nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     */
+    protected $threadId;
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="x_thread_id", type="string", length=255, nullable=true)
      * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
     protected $xThreadId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="refs", type="text", nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     */
+    protected $refs;
 
     /**
      * @var ArrayCollection|EmailFolder[] $folders
@@ -432,6 +459,30 @@ class Email extends ExtendEmail
     }
 
     /**
+     * Get if email is either first unread, or the last item in the thread
+     *
+     * @return bool
+     */
+    public function isHead()
+    {
+        return $this->isHead;
+    }
+
+    /**
+     * Set email is_head flag
+     *
+     * @param boolean $isHead
+     *
+     * @return $this
+     */
+    public function setIsHead($isHead)
+    {
+        $this->isHead = $isHead;
+
+        return $this;
+    }
+
+    /**
      * Get value of email Message-ID header
      *
      * @return string
@@ -484,6 +535,30 @@ class Email extends ExtendEmail
      *
      * @return string
      */
+    public function getThreadId()
+    {
+        return $this->threadId;
+    }
+
+    /**
+     * Set email thread id uses for group related messages
+     *
+     * @param string $threadId
+     *
+     * @return Email
+     */
+    public function setThreadId($threadId)
+    {
+        $this->threadId = $threadId;
+
+        return $this;
+    }
+
+    /**
+     * Get email thread id uses for group related messages
+     *
+     * @return string
+     */
     public function getXThreadId()
     {
         return $this->xThreadId;
@@ -499,6 +574,30 @@ class Email extends ExtendEmail
     public function setXThreadId($xThreadId)
     {
         $this->xThreadId = $xThreadId;
+
+        return $this;
+    }
+
+    /**
+     * Get email references
+     *
+     * @return string
+     */
+    public function getRefs()
+    {
+        return $this->refs;
+    }
+
+    /**
+     * Set email references
+     *
+     * @param $refs
+     *
+     * @return $this
+     */
+    public function setRefs($refs)
+    {
+        $this->refs = $refs;
 
         return $this;
     }
