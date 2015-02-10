@@ -41,7 +41,7 @@ class ChoiceFilterType extends AbstractChoiceType
         $resolver->setDefaults(
             array(
                 'field_type'       => 'choice',
-                'field_options'    => array('choices' => array()),
+                'field_options'    => array(),
                 'operator_choices' => $choices,
                 'populate_default' => false,
                 'default_value'    => null,

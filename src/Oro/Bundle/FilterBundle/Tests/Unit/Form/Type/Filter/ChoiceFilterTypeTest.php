@@ -45,7 +45,7 @@ class ChoiceFilterTypeTest extends AbstractTypeTestCase
             array(
                 'defaultOptions' => array(
                     'field_type' => 'choice',
-                    'field_options' => array('choices' => array()),
+                    'field_options' => array(),
                     'operator_choices' => array(
                         ChoiceFilterType::TYPE_CONTAINS => 'oro.filter.form.label_type_contains',
                         ChoiceFilterType::TYPE_NOT_CONTAINS => 'oro.filter.form.label_type_not_contains',
