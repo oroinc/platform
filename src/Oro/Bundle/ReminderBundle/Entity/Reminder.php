@@ -55,7 +55,7 @@ class Reminder
     /**
      * @var string
      *
-     * @ORM\Column(name="subject", type="string", length=32, nullable=false)
+     * @ORM\Column(name="subject", type="string", length=255, nullable=false)
      */
     protected $subject;
 
