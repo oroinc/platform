@@ -112,9 +112,9 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      * Walk through results in reverse order
      * Useful when selected records are being updated in between page load
      *
-     * @var bool|null
+     * @var bool
      */
-    private $isReverse;
+    private $reverse = false;
 
     /**
      * Constructor
@@ -173,15 +173,15 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     }
 
     /**
-     * Sets reverse mode to be used to iterate results
+     * Sets iteration order
      *
-     * @param bool $isReverse
+     * @param bool $reverse Determines the iteration order
      * @return BufferedQueryResultIterator
      */
-    public function setIsReverse($isReverse)
+    public function setReverse($reverse)
     {
         $this->assertQueryWasNotExecuted('reverse mode');
-        $this->isReverse = $isReverse;
+        $this->reverse = $reverse;
 
         return $this;
     }
@@ -333,7 +333,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
         $query = $this->getQuery();
 
         $totalPages = ceil($this->count() / $query->getMaxResults());
-        if ($this->isReverse) {
+        if ($this->reverse) {
             if ($this->page == -1) {
                 $this->page = $totalPages;
             }

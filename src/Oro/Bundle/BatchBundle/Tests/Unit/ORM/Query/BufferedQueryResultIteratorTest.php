@@ -536,7 +536,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             ->from('Stub:Entity', 'o');
 
         $iterator = new BufferedQueryResultIterator($source);
-        $iterator->setIsReverse(true);
+        $iterator->setReverse(true);
         $iterator->setBufferSize(2);
 
         $this->assertEquals(count($records), $iterator->count());
