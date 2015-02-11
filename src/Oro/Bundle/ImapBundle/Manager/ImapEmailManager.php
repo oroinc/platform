@@ -17,6 +17,13 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Util\DateTimeParser;
 
+/**
+ * Class ImapEmailManager
+ *
+ * @package Oro\Bundle\ImapBundle\Manager
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ImapEmailManager
 {
     /** @var ImapConnector */
@@ -156,6 +163,7 @@ class ImapEmailManager
                 ->setInternalDate($this->getDateTime($headers, 'InternalDate'))
                 ->setImportance($this->getImportance($headers))
                 ->setMessageId($this->getString($headers, 'Message-ID'))
+                ->setRefs($this->getReferences($headers, 'References'))
                 ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'));
             foreach ($this->getRecipients($headers, 'To') as $val) {
@@ -215,6 +223,33 @@ class ImapEmailManager
         }
 
         return $header->getFieldValue();
+    }
+
+    /**
+     * Gets a email references header
+     *
+     * @param Headers $headers
+     * @param string  $name
+     *
+     * @return string|null
+     */
+    protected function getReferences(Headers $headers, $name)
+    {
+        $values = [];
+        $header = $headers->get($name);
+        if ($header === false) {
+            return null;
+        } elseif ($header instanceof \ArrayIterator) {
+            $header->rewind();
+            while ($header->valid()) {
+                $values[] = sprintf('"%s"', $header->current()->getFieldValue());
+                $header->next();
+            }
+        } else {
+            $values[] = $header->getFieldValue();
+        }
+
+        return implode(',', $values);
     }
 
     /**
