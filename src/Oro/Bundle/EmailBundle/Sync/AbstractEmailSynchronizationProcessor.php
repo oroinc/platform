@@ -100,12 +100,13 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /**
      * Creates email entity and register it in the email entity batch processor
      *
-     * @param EmailHeader       $email
+     * @param EmailHeader $email
      * @param EmailFolder $folder
+     * @param bool        $isSeen
      *
      * @return EmailEntity
      */
-    protected function addEmail(EmailHeader $email, EmailFolder $folder)
+    protected function addEmail(EmailHeader $email, EmailFolder $folder, $isSeen = false)
     {
         $emailEntity = $this->emailEntityBuilder->email(
             $email->getSubject(),
@@ -124,6 +125,9 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             ->setRefs($email->getRefs())
             ->setXMessageId($email->getXMessageId())
             ->setXThreadId($email->getXThreadId());
+        if ($isSeen) {
+            $emailEntity->setSeen($isSeen);
+        }
 
         return $emailEntity;
     }
