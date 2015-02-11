@@ -134,7 +134,7 @@
         valueSource: '#' ~ type ~ '_form_definition',
         fieldsLoader: {
             entityChoice:      '#' ~ type ~ '_form_entity',
-            loadingMaskParent: '#' ~ type ~ '-designer',
+            loadingMaskParent: '#' ~ form.vars.name,
             router:            'oro_api_querydesigner_fields_entity',
             routingParams:     entityFieldsRouteParams,
             fieldsData:        fieldsData,

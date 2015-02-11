@@ -140,6 +140,10 @@ body {
     }
   }
   .ui-datevariables-div {
+    &,.popover{
+      // must match datepicker width
+      width: 224px;
+    }
     padding: 14px 15px 10px;
     ul{
       color: #006cc6;
@@ -166,7 +170,7 @@ body {
     -webkit-box-sizing: border-box;
     margin: 0;
     border: 0;
-
+    min-height: 35px;
     .ui-datepicker-header{
       border-top: 0;
       padding-top: 7px;
@@ -174,12 +178,12 @@ body {
     &  > li{
       display: table-cell;
       min-width: 50%;
-
-      a{
+      > a {
         -webkit-border-radius: 0;
         border-radius:0;
-        border: solid #dedede;
-        border-width: 0 0 1px 1px;
+        border-style: solid;
+        border-width: 0 1px 1px 1px;
+        border-color: #eee #eee #ddd;
         display: block;
         background: #efefef;
         padding: 8px 0 5px;
@@ -210,20 +214,23 @@ body {
           content: "\f0ca";
         }
       }
-
-      &.active{
-        a{
-          border-width: 0 0 0 1px;
+      &.active a {
+        &, &:hover, &:focus {
+          border-width: 0 1px 1px 1px;
           color: #6d6d6d;
           background: #fff;
-          &:hover{
-            border-width: 0 0 0 1px;
-            color: #6d6d6d;
-            background: #fff;
-          }
         }
-        &:first-child a{
+      }
+      &:first-child a,
+      &.active:first-child a {
+        &, &:hover, &:focus {
           border-left: 0;
+        }
+      }
+      &:last-child a,
+      &.active:last-child a {
+        &, &:hover, &:focus {
+          border-right: 0;
         }
       }
     }
