@@ -26,7 +26,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                     '<div class="pull-right widget-actions-container"></div>' +
                     '<span class="widget-title"><%- title %></span>' +
                 '</div>' +
-                '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
+                '<div class="row-fluid <%= contentClasses.length ? contentClasses.join(\' \') : "" %>"></div>' +
             '</div>')
         }),
 

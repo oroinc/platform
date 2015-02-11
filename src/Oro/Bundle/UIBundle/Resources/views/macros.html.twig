@@ -498,7 +498,10 @@
         style="display: none"
         {% endif -%}
         {% if parameters.widget is defined and parameters.widget|length %}
-            {{ _self.renderWidgetDataAttributes(parameters.widget) }}
+            {% set options = parameters.widget|merge({
+                'listenToDomEvent' : 1
+            }) %}
+            {{ _self.renderWidgetDataAttributes(options) }}
         {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}

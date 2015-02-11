@@ -89,6 +89,8 @@ define(function (require) {
             // (to prevent recursion from remove method)
             this.disposing = true;
 
+            this.disposePageComponents();
+
             // trigger all events before handlers got undelegated
             this.trigger('widgetRemove', this.$el);
             mediator.trigger('widget_remove', this.getWid());
@@ -609,6 +611,7 @@ define(function (require) {
             if (widgetContent.length === 0) {
                 throw new Error("Invalid server response: " + content);
             }
+            this.disposePageComponents();
             this.setElement(widgetContent);
             this._show();
         },

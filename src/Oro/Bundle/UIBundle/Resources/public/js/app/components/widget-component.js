@@ -22,6 +22,11 @@ define(function (require) {
         widget: null,
 
         /**
+         * @property {oroui.widget.AbstractWidget}
+         */
+        widgetInstance: null,
+
+        /**
          * @property {boolean}
          */
         opened: false,
@@ -45,7 +50,12 @@ define(function (require) {
                 if (!this.options.options.url) {
                     this.options.options.url = this.$element.data('url') || this.$element.attr('href');
                 }
-                this._bindOpenEvent();
+                if (this.options.listenToDomEvent) {
+                    this._bindOpenEvent();
+                } else {
+                    this._deferredInit();
+                    this.openWidget();
+                }
             }
         },
 
@@ -122,6 +132,9 @@ define(function (require) {
             }
 
             widget.render();
+            widget.listenTo(this, 'dispose', widget.dispose);
+
+            this._resolveDeferredInit();
         },
 
         /**
