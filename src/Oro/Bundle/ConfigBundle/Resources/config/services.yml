@@ -1,7 +1,7 @@
 parameters:
     oro_config.config_definition_bag.class:                                      Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag
-    oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\ConfigManager
-    oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserConfigManager
+    oro_config.global.class:                                                     Oro\Bundle\ConfigBundle\Config\GlobalScopeManager
+    oro_config.user.class:                                                       Oro\Bundle\ConfigBundle\Config\UserScopeManager
     oro_config.twig_extension.class:                                             Oro\Bundle\ConfigBundle\Twig\ConfigExtension
     oro_config.provider.system_configuration.form_provider.class:                Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
 
@@ -15,32 +15,40 @@ parameters:
 
     oro_config.manager.api.class:                                                Oro\Bundle\ConfigBundle\Config\ConfigApiManager
 
+    oro_config.manager.class:                                                    Oro\Bundle\ConfigBundle\Config\ConfigManager
+
 services:
     oro_config.config_definition_bag:
         class: %oro_config.config_definition_bag.class%
         arguments:
             - []
 
-    oro_config.user:
+    oro_config.scope.user:
         class:                        %oro_config.user.class%
         arguments:
-           - @event_dispatcher
-           - @doctrine.orm.entity_manager
-           - @oro_config.config_definition_bag
+            - @doctrine.orm.entity_manager
         calls:
-             - [setSecurity, ["@security.context"]]
+            - [setSecurity, ["@security.context"]]
+        tags:
+            - { name: oro_config.scope, scope: user, priority: 255 }
 
-    oro_config.global:
+    oro_config.scope.global:
         class:                        %oro_config.global.class%
         arguments:
-           - @event_dispatcher
-           - @doctrine.orm.entity_manager
-           - @oro_config.config_definition_bag
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_config.scope, scope: global, priority: -255 }
+
+    oro_config.manager:
+        class: %oro_config.manager.class%
+        arguments:
+            - @oro_config.config_definition_bag
+            - @event_dispatcher
 
     oro_config.twig.config_extension:
         class: %oro_config.twig_extension.class%
         arguments:
-           - @oro_config.global
+           - @oro_config.user
            - @oro_entity_config.config_manager
         tags:
             - { name: twig.extension }
@@ -52,7 +60,7 @@ services:
             - @form.factory
             - @oro_security.security_facade
         tags:
-            -  { name: oro_config.configuration_provider, scope: app }
+            -  { name: oro_config.configuration_provider }
         lazy: true
 
     oro_config.form.config_subscriber:
@@ -91,5 +99,4 @@ services:
         class: %oro_config.manager.api.class%
         arguments:
             - @oro_config.provider.system_configuration.form_provider
-            - @oro_config.global
         lazy: true

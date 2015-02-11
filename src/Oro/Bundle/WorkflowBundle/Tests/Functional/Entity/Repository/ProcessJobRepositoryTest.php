@@ -16,7 +16,6 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class ProcessJobRepositoryTest extends WebTestCase
 {
@@ -38,12 +37,35 @@ class ProcessJobRepositoryTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
+        $this->dropJobsRecords();
 
         $this->registry      = $this->getContainer()->get('doctrine');
         $this->entityManager = $this->registry->getManagerForClass('OroWorkflowBundle:ProcessJob');
         $this->repository    = $this->registry->getRepository('OroWorkflowBundle:ProcessJob');
 
         $this->loadFixtures(array('Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities'));
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->dropJobsRecords();
+    }
+
+    protected function dropJobsRecords()
+    {
+        // clear DB from separate connection
+        $batchJobManager = $this->getContainer()->get('akeneo_batch.job_repository')->getJobManager();
+        $batchJobManager->createQuery('DELETE AkeneoBatchBundle:JobInstance')->execute();
+        $batchJobManager->createQuery('DELETE AkeneoBatchBundle:JobExecution')->execute();
+        $batchJobManager->createQuery('DELETE AkeneoBatchBundle:StepExecution')->execute();
+
+        $this->getContainer()
+            ->get('doctrine')
+            ->getManager()
+            ->createQuery('DELETE OroWorkflowBundle:ProcessJob')
+            ->execute();
     }
 
     public function testDeleteByHashes()
@@ -65,7 +87,7 @@ class ProcessJobRepositoryTest extends WebTestCase
 
         $expectedJobs = $this->repository->findAll();
 
-        $this->assertEquals($count, count($expectedJobs));
+        $this->assertCount($count, $expectedJobs);
 
         $ids = array();
         /** @var ProcessJob $job */
@@ -73,7 +95,7 @@ class ProcessJobRepositoryTest extends WebTestCase
             $ids[] = $job->getId();
         }
 
-        $this->assertEquals($count, count($ids));
+        $this->assertCount($count, $ids);
 
         $actualJobs = $this->repository->findByIds($ids);
 
@@ -83,7 +105,7 @@ class ProcessJobRepositoryTest extends WebTestCase
 
         $actualJobs = $this->repository->findByIds($ids);
 
-        $this->assertEquals($count - 1, count($actualJobs));
+        $this->assertCount($count - 1, $actualJobs);
     }
 
     /**

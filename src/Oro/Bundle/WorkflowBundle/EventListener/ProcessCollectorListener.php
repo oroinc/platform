@@ -351,6 +351,8 @@ class ProcessCollectorListener implements OptionalListenerInterface
             return;
         }
 
+        $jmsJobList = [];
+
         foreach ($this->queuedJobs as $timeShift => $processJobBatch) {
             foreach ($processJobBatch as $priority => $processJobs) {
                 $args = array();
@@ -361,7 +363,7 @@ class ProcessCollectorListener implements OptionalListenerInterface
                     $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
                 }
 
-                $jmsJob = new Job(ExecuteProcessJobCommand::NAME, $args, true, Job::DEFAULT_QUEUE, $priority);
+                $jmsJob = new Job(ExecuteProcessJobCommand::NAME, $args, false, Job::DEFAULT_QUEUE, $priority);
 
                 if ($timeShift) {
                     $timeShiftInterval = ProcessTrigger::convertSecondsToDateInterval($timeShift);
@@ -371,10 +373,27 @@ class ProcessCollectorListener implements OptionalListenerInterface
                 }
 
                 $entityManager->persist($jmsJob);
+                $jmsJobList[] = $jmsJob;
             }
         }
 
         $this->queuedJobs = array();
+
+        $entityManager->flush();
+
+        $this->confirmJobs($entityManager, $jmsJobList);
+    }
+
+    /**
+     * @param \Doctrine\ORM\EntityManager $entityManager
+     * @param Job[] $jmsJobList
+     */
+    protected function confirmJobs($entityManager, $jmsJobList)
+    {
+        foreach ($jmsJobList as $jmsJob) {
+            $jmsJob->setState(Job::STATE_PENDING);
+            $entityManager->persist($jmsJob);
+        }
 
         $entityManager->flush();
     }

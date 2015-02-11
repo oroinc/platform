@@ -13,7 +13,6 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
     require('jquery-ui');
-    require('jquery-ui-timepicker');
     require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
 
@@ -121,6 +120,10 @@ define(function (require) {
                     loadDeferred = $.Deferred();
 
                     require([module], function (component) {
+                        if (options.parent && options.parent.disposed) {
+                            loadDeferred.resolve();
+                            return;
+                        }
                         if (typeof component.init === "function") {
                             loadDeferred.resolve(component.init(options));
                         } else {

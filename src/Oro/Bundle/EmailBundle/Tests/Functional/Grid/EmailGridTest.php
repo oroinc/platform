@@ -32,7 +32,7 @@ class EmailGridTest extends AbstractDatagridTestCase
      *
      * @param array $requestData
      */
-    public function testGrid(array $requestData)
+    public function testGrid($requestData)
     {
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['userId'] =
             $this->getReference('simple_user')->getId();
@@ -53,17 +53,7 @@ class EmailGridTest extends AbstractDatagridTestCase
                     ],
                     'gridFilters' => [],
                     'assert' => [],
-                    'expectedResultCount' => 19,
-                ],
-            ],
-            'Email grid filtered by from' => [
-                [
-                    'gridParameters' => [
-                        'gridName' => 'user-email-grid',
-                    ],
-                    'gridFilters' => [],
-                    'assert' => [],
-                    'expectedResultCount' => 19,
+                    'expectedResultCount' => 10,
                 ],
             ],
             'Email grid filtered by from (admin)' => [
@@ -85,30 +75,6 @@ class EmailGridTest extends AbstractDatagridTestCase
                     ],
                     'gridFilters' => [
                         'user-email-grid[_filter][to][value]' => 'simple_user@example.com',
-                    ],
-                    'assert' => [],
-                    'expectedResultCount' => 19,
-                ],
-            ],
-            'Email grid filtered by cc' => [
-                [
-                    'gridParameters' => [
-                        'gridName' => 'user-email-grid'
-                    ],
-                    'gridFilters' => [
-                        'user-email-grid[_filter][cc][value]' => "cc1%",
-                    ],
-                    'assert' => [],
-                    'expectedResultCount' => 10,
-                ],
-            ],
-            'Email grid filtered by bcc' => [
-                [
-                    'gridParameters' => [
-                        'gridName' => 'user-email-grid'
-                    ],
-                    'gridFilters' => [
-                        'user-email-grid[_filter][bcc][value]' => "bcc1%",
                     ],
                     'assert' => [],
                     'expectedResultCount' => 10,

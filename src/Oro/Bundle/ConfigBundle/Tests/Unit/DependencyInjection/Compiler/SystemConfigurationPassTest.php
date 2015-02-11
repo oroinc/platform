@@ -25,8 +25,7 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->compiler);
-        unset($this->container);
+        unset($this->compiler, $this->container);
     }
 
     public function testProcess()
@@ -36,7 +35,6 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
         CumulativeResourceManager::getInstance()
             ->clear()
             ->setBundles($bundles);
-
         $this->container->expects($this->once())
             ->method('getExtensions')
             ->will($this->returnValue(['test_bundle' => null]));
@@ -54,54 +52,74 @@ class SystemConfigurationPassTest extends \PHPUnit_Framework_TestCase
                                     'scope' => 'app'
                                 ],
                                 'some_another_field'          => [
-                                    'value' => 'some_another_val',
-                                    'scope' => 'app'
-                                ],
+                                    'value' => 'some_another_val'
+                                ]
                             ]
                         ]
                     ]
                 )
             );
-
         $bagServiceDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
         $providerServiceDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->container->expects($this->once())
+        $this->container->expects($this->exactly(2))
             ->method('findTaggedServiceIds')
-            ->with(SystemConfigurationPass::CONFIG_PROVIDER_TAG_NAME)
             ->will(
-                $this->returnValue(
-                    [
-                        'provider_service' => [
-                            ['scope' => 'app']
-                        ]
-                    ]
+                $this->returnCallback(
+                    function ($input) {
+                        if ($input === SystemConfigurationPass::CONFIG_PROVIDER_TAG_NAME) {
+                            return [
+                                'provider_service' => [
+                                    ['scope' => 'app']
+                                ]
+                            ];
+                        }
+
+                        if ($input === SystemConfigurationPass::SCOPE_MANAGER_TAG_NAME) {
+                            return [
+                                'first_scope_service' => [
+                                    ['scope' => 'app', 'priority' => 100]
+                                ],
+                                'second_scope_service' => [
+                                    ['scope' => 'user', 'priority' => -100]
+                                ]
+                            ];
+                        }
+
+                        return [];
+                    }
                 )
             );
-
-        $this->container->expects($this->exactly(2))
+        $apiManagerServiceDef     = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configManagerServiceDef     = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->container->expects($this->exactly(4))
             ->method('getDefinition')
             ->will(
                 $this->returnValueMap(
                     [
                         [SystemConfigurationPass::CONFIG_DEFINITION_BAG_SERVICE, $bagServiceDef],
                         ['provider_service', $providerServiceDef],
+                        [SystemConfigurationPass::MAIN_MANAGER_SERVICE_ID, $configManagerServiceDef],
+                        [SystemConfigurationPass::API_MANAGER_SERVICE_ID, $apiManagerServiceDef],
                     ]
                 )
             );
+        $apiManagerServiceDef->expects($this->exactly(2))
+            ->method('addMethodCall');
 
         $bagServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'));
-
         $providerServiceDef->expects($this->once())
             ->method('replaceArgument')
             ->with($this->equalTo(0), $this->isType('array'));
-
         $this->compiler->process($this->container);
     }
 }

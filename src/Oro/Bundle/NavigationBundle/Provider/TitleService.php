@@ -98,7 +98,7 @@ class TitleService implements TitleServiceInterface
         Translator $translator,
         ObjectManager $em,
         Serializer $serializer,
-        UserConfigManager $userConfigManager,
+        $userConfigManager,
         BreadcrumbManager $breadcrumbManager
     ) {
         $this->readers = array($reader, $configReader);

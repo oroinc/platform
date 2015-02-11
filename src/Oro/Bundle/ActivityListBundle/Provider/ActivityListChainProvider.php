@@ -13,7 +13,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 
+/**
+ * Class ActivityListChainProvider
+ * @package Oro\Bundle\ActivityListBundle\Provider
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ActivityListChainProvider
 {
     /** @var DoctrineHelper */
@@ -207,7 +213,19 @@ class ActivityListChainProvider
      */
     public function getProviderForEntity($activityEntity)
     {
-        return $this->providers[$this->doctrineHelper->getEntityClass($activityEntity)];
+        return $this->getProviderByClass($this->doctrineHelper->getEntityClass($activityEntity));
+    }
+
+    /**
+     * Get activity list provider for entity class name
+     *
+     * @param string $className
+     *
+     * @return ActivityListProviderInterface
+     */
+    public function getProviderByClass($className)
+    {
+        return $this->providers[$className];
     }
 
     /**
@@ -230,6 +248,10 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
+            if ($provider instanceof ActivityListDateProviderInterface) {
+                $list->setCreatedAt($provider->getDate($entity));
+                $list->setUpdatedAt($provider->getDate($entity));
+            }
             $list->setVerb($verb);
 
             if ($verb === ActivityList::VERB_UPDATE) {
