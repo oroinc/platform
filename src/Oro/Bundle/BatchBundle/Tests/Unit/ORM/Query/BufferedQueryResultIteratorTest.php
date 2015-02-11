@@ -502,4 +502,63 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
             $actualSqls[1]
         );
     }
+
+    public function testIteratorInReverseDirection()
+    {
+        $records = [
+            ['a0' => '1'],
+            ['a0' => '2'],
+            ['a0' => '3'],
+        ];
+        $actualSqls = [];
+        $statementCounter = 0;
+        $statements = [
+            $this->createFetchStatementMock([['sclr0' => count($records)]]),
+            $this->createFetchStatementMock([$records[0], $records[1]]),
+            $this->createFetchStatementMock([$records[2]])
+        ];
+
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
+            ->method('query')
+            ->will(
+                $this->returnCallback(
+                    function ($sql) use (&$statements, &$statementCounter, &$actualSqls) {
+                        $actualSqls[$statementCounter] = $sql;
+                        $statement = $statements[$statementCounter];
+                        $statementCounter++;
+                        return $statement;
+                    }
+                )
+            );
+
+        $source = $this->em->createQueryBuilder()
+            ->select('o')
+            ->from('Stub:Entity', 'o');
+
+        $iterator = new BufferedQueryResultIterator($source);
+        $iterator->setReverse(true);
+        $iterator->setBufferSize(2);
+
+        $this->assertEquals(count($records), $iterator->count());
+        $count = 0;
+        foreach ($iterator as $record) {
+            $this->assertInstanceOf('Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity', $record);
+            $this->assertEquals($records[$count]['a0'], $record->a);
+            $count++;
+        }
+        $this->assertEquals(count($records), $count);
+        $this->assertCount(3, $actualSqls);
+        $this->assertEquals(
+            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
+            $actualSqls[0]
+        );
+        $this->assertEquals(
+            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 2',
+            $actualSqls[1]
+        );
+        $this->assertEquals(
+            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            $actualSqls[2]
+        );
+    }
 }
