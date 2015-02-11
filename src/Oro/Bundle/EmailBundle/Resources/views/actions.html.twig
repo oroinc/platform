@@ -18,12 +18,12 @@
                 entityId: entity.id
         }),
         'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-        'label' : email,
-        'widget' : {
-            'type' : 'dialog',
-            'multiple' : true,
-            'reload-grid-name' : 'activity-email-grid',
-            'options' : {
+        'label': email,
+        'widget': {
+            'type': 'dialog',
+            'multiple': true,
+            'reload-grid-name': 'activity-email-grid',
+            'options': {
                 'alias': 'email-dialog',
                 'dialogOptions' : {
                     'title' : 'oro.email.send_email'|trans,
@@ -37,33 +37,3 @@
         }
     }) -}}
 {% endmacro -%}
-
-{% macro replyToEmailLink(parentEmailId, entityId, entityClass, parameters) %}
-    {% import 'OroUIBundle::macros.html.twig' as UI %}
-    {{- UI.clientLink({
-        'dataUrl': path(
-            'oro_email_email_reply', {
-                id: parentEmailId,
-                entityClass: entityClass,
-                entityId: entityId
-        }),
-        'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-        'iCss': parameters.iCss,
-        'widget' : {
-            'type' : 'dialog',
-            'multiple' : true,
-            'reload-grid-name' : 'activity-email-grid',
-            'options' : {
-                'alias': 'email-dialog',
-                'dialogOptions' : {
-                    'title' : 'oro.email.send_email'|trans,
-                    'allowMaximize': true,
-                    'allowMinimize': true,
-                    'dblclick': 'maximize',
-                    'maximizedHeightDecreaseBy': 'minimize-bar',
-                    'width': 1000
-                }
-            }
-        }
-    }) -}}
-{% endmacro %}
