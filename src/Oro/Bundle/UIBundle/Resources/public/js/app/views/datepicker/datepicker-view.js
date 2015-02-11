@@ -162,7 +162,7 @@ define(function (require) {
                 momentInstance = this.getFrontendMoment(),
                 format = _.isArray(this.backendFormat) ? this.backendFormat[0] : this.backendFormat;
             if (momentInstance) {
-                value = momentInstance.subtract(localeSettings.getTimeZoneShift(), 'm').format(format);
+                value = momentInstance.format(format);
             }
             return value;
         },
@@ -176,7 +176,7 @@ define(function (require) {
             var value = '',
                 momentInstance = this.getOriginalMoment();
             if (momentInstance) {
-                value = momentInstance.add(localeSettings.getTimeZoneShift(), 'm').format(this.getDateFormat());
+                value = momentInstance.format(this.getDateFormat());
             }
             return value;
         },
