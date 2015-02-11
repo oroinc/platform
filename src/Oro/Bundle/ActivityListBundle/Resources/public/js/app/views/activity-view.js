@@ -4,10 +4,11 @@ define([
     'jquery',
     'underscore',
     'backbone',
+    'oroui/js/mediator',
     'oroui/js/app/views/base/view',
     'routing',
     'orolocale/js/formatter/datetime'
-], function ($, _, Backbone, BaseView, routing, dateTimeFormatter) {
+], function ($, _, Backbone, mediator, BaseView, routing, dateTimeFormatter) {
     'use strict';
 
     var ActivityView;
@@ -70,6 +71,7 @@ define([
             }else {
                 data.editor_url = '';
             }
+            data.routing = routing;
 
             return data;
         },
@@ -82,6 +84,7 @@ define([
             this.$('.dropdown-menu.activity-item').on('mouseleave', function () {
                 $(this).parent().find('a.dropdown-toggle').trigger('click');
             });
+            mediator.execute('layout:init', this.$el, this);
             return this;
         },
 
