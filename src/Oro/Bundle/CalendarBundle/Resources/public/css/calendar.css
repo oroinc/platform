@@ -14,12 +14,8 @@
     z-index: 500;
 }
 
-.calendars {
+.calendars .connection-item, .calendars > form{
     padding-left: 10px;
-}
-
-.calendars li {
-    color: #444;
 }
 
 .calendars li .calendar-color {
@@ -27,41 +23,10 @@
     height: 14px;
     -webkit-border-radius: 2px;
     border-radius: 2px;
-    margin: 2px 0 0;
+    margin: 2px 10px 0 0;
     float: left;
     cursor: pointer;
 }
-
-.calendars .media-body {
-    margin-top:  2px;
-    margin-left: 20px;
-}
-
-.calendars .media-body .user-calendar {
-    display:       inline-block;
-    font-size:     13px;
-    font-weight:   bold;
-    line-height:   17px;
-    margin-top:    0;
-    overflow:      hidden;
-    text-overflow: ellipsis;
-    white-space:   nowrap;
-    width:         80%;
-}
-
-.calendars .connection-item .user-calendar {
-    color: #999;
-}
-.calendars .connection-item.active .user-calendar {
-    color: #444;
-}
-
-.calendars .icons-holder .icons-holder-text [class^="icon-"] {
-    margin-right: 1px;
-    margin-top: 1px;
-    width: 16px;
-}
-
 .calendars form .control-group {
     padding-top: 5px;
 }
@@ -158,7 +123,6 @@
 }
 
 #calendar {
-    overflow: hidden;
     border-top: 1px solid #f2f2f2;
     background-color: #f6f6f6;
 }
@@ -198,37 +162,15 @@
     font-weight: bold;
 }
 
-#calendar > .span2 {
-    width: 15.8936%;
-    overflow: auto !important;
+.calendars .controls {
+    margin-right: 8px;
+    margin-top: 5px;
 }
-
-#calendar > .span2 .calendars {
-    padding: 10px 15px 0;
-}
-
-#calendar > .span10 {
-    background-color: #fff;
-    width: 83.9787%;
-    padding-left: 1.11766%;
-    margin: 0;
-}
-
-#calendar .calendar-events {
-}
-
-.connection-container .media > .pull-right {
-    margin-top: -3px;
-}
-
-.connection-item {
-    overflow: visible;
-    position: relative;
-}
-
 .calendar-connections .context-menu-button {
     display: none;
-    color: #444;
+}
+.mobile-version .calendar-connections .context-menu-button {
+    display: block;
 }
 
 .calendar-connections .connection-item:hover .context-menu-button {
@@ -258,15 +200,6 @@
     position: absolute;
     top: -2px;
     left: 2px;
-}
-
-.connection-item .custom-color-link {
-    cursor: pointer;
-    color: #666;
-}
-
-.connection-item .custom-color-link:hover {
-    color: #333;
 }
 
 .fc-content.invitation-status-declined {
@@ -313,4 +246,10 @@ i.invitation-status.icon-question-sign {
 .fc-event:hover {
     /* less than 900 - popups z-index */
     z-index: 500 !important;
+}
+.connection-menu-container {
+    margin-right: 5px;
+}
+.connection-menu-container > .dropdown-menu {
+    display: block;
 }
