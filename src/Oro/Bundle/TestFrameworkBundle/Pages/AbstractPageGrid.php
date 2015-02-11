@@ -449,12 +449,12 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function checkActionMenu($actionName)
     {
-        $actionMenu =  $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $actionMenu =  $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $actionMenu->click();
         $actionMenu->click();
         $this->waitForAjax();
-        $this->assertElementNotPresent("//td[@class='action-cell']//a[@title= '{$actionName}']");
+        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 
         return $this;
     }
