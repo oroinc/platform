@@ -10,7 +10,7 @@ define(function (require) {
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
-        LoadingMask     = require('oroui/js/loading-mask'),
+        LoadingMask     = require('oroui/js/app/views/loading-mask-view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
         EventView       = require('orocalendar/js/calendar/event/view'),
@@ -37,7 +37,6 @@ define(function (require) {
             '<div>' +
                 '<div class="calendar-container">' +
                     '<div class="calendar"></div>' +
-                    '<div class="loading-mask"></div>' +
                 '</div>' +
             '</div>'
         ),
@@ -189,8 +188,9 @@ define(function (require) {
          */
         getLoadingMask: function () {
             if (!this.loadingMask) {
-                this.loadingMask = new LoadingMask();
-                this.$el.find(this.selectors.loadingMask).append(this.loadingMask.render().$el);
+                this.loadingMask = new LoadingMask({
+                    container: this.getCalendarElement()
+                });
             }
             return this.loadingMask;
         },
@@ -454,7 +454,7 @@ define(function (require) {
 
         smartRefetch: function () {
             try {
-                this._showMask();
+                this.showLoadingMask();
                 // load events from a server
                 this.collection.fetch({
                     reset: true,
@@ -602,21 +602,11 @@ define(function (require) {
         },
 
         showSavingMask: function () {
-            this._showMask(__('Saving...'));
+            this.getLoadingMask().show(__('Saving...'));
         },
 
         showLoadingMask: function () {
-            this._showMask(__('Loading...'));
-        },
-
-        _showMask: function (message) {
-            if (this.enableEventLoading) {
-                var loadingMaskInstance = this.getLoadingMask();
-                loadingMaskInstance.$el
-                    .find(this.selectors.loadingMaskContent)
-                    .text(message);
-                loadingMaskInstance.show();
-            }
+            this.getLoadingMask().show(__('Loading...'));
         },
 
         _hideMask: function () {
