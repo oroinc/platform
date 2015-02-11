@@ -13,6 +13,13 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\RestrictionBuilderInterface;
 
 class OrmDatasourceExtension extends AbstractExtension
 {
+    const NAME_PATH = '[name]';
+
+    /**
+     * @var string[]
+     */
+    protected $appliedFor;
+
     /** @var RestrictionBuilderInterface */
     protected $restrictionBuilder;
 
@@ -38,10 +45,17 @@ class OrmDatasourceExtension extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
+        $gridName = $config->offsetGetByPath(self::NAME_PATH);
+
+        if (!empty($this->appliedFor[$gridName])) {
+            return;
+        }
+
         /** @var QueryBuilder $qb */
         $qb      = $datasource->getQueryBuilder();
         $ds      = new GroupingOrmFilterDatasourceAdapter($qb);
         $filters = $config->offsetGetByPath('[source][query_config][filters]');
         $this->restrictionBuilder->buildRestrictions($filters, $ds);
+        $this->appliedFor[$gridName] = true;
     }
 }
