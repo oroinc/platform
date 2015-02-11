@@ -89,6 +89,15 @@ class ActivityList extends ExtendActivityList
     protected $subject;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_head", type="boolean")
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $head = false;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="related_activity_class", type="string", length=255, nullable=false)
@@ -202,6 +211,30 @@ class ActivityList extends ExtendActivityList
     public function setSubject($subject)
     {
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * Get head item in the thread
+     *
+     * @return bool
+     */
+    public function isHead()
+    {
+        return $this->head;
+    }
+
+    /**
+     * Set head flag
+     *
+     * @param boolean $head
+     *
+     * @return self
+     */
+    public function setHead($head)
+    {
+        $this->head = (bool)$head;
 
         return $this;
     }

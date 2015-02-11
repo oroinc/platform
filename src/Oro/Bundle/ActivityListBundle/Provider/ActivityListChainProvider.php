@@ -12,8 +12,9 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
-use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListThreadProviderInterface;
+use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 
 /**
  * Class ActivityListChainProvider
@@ -248,9 +249,12 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            if ($provider instanceof ActivityListDateProviderInterface) {
+            if ($this->isDateProvider($provider)) {
                 $list->setCreatedAt($provider->getDate($entity));
                 $list->setUpdatedAt($provider->getDate($entity));
+            }
+            if ($this->isThreadProvider($provider)) {
+                $list->setHead($provider->isHead($entity));
             }
             $list->setVerb($verb);
 
@@ -277,5 +281,25 @@ class ActivityListChainProvider
         }
 
         return null;
+    }
+
+    /**
+     * @param ActivityListProviderInterface $provider
+     *
+     * @return bool
+     */
+    protected function isDateProvider(ActivityListProviderInterface $provider)
+    {
+        return $provider instanceof ActivityListDateProviderInterface;
+    }
+
+    /**
+     * @param ActivityListProviderInterface $provider
+     *
+     * @return bool
+     */
+    protected function isThreadProvider(ActivityListProviderInterface $provider)
+    {
+        return $provider instanceof ActivityListThreadProviderInterface;
     }
 }
