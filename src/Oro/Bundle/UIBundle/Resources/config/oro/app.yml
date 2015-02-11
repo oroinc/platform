@@ -20,7 +20,7 @@ assetic:
         underscore:
             inputs:
                 - %kernel.root_dir%/../vendor/components/underscore/underscore.js
-            output: bundles/components/underscorer/underscore.js
+            output: bundles/components/underscore/underscore.js
         backbone:
             inputs:
                 - %kernel.root_dir%/../vendor/components/backbone/backbone.js
