@@ -110,7 +110,7 @@ class DQLNameFormatter
      *
      * @return array
      */
-    private function extractNamePartsPaths($className, $relationAlias)
+    public function extractNamePartsPaths($className, $relationAlias)
     {
         $nameParts  = array_fill_keys(array_keys($this->namePartsMap), null);
         $interfaces = class_implements($className);
