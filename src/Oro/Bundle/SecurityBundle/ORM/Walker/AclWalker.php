@@ -83,25 +83,18 @@ class AclWalker extends TreeWalkerAdapter
                     ->whereClause
                     ->conditionalExpression;
 
-                $subSelect = null;
-
                 if (isset($conditionalExpression->conditionalFactors)) {
                     $factorId = $subRequest->getFactorId();
                     foreach ($conditionalExpression->conditionalFactors as $factor) {
-                        $subSelectFromFactor = $this->getSubSelectFromFactor(
-                            $factor,
-                            $factorId
-                        );
+                        $subSelect = $this->getSubSelectFromFactor($factor, $factorId);
 
-                        if ($subSelectFromFactor) {
-                            $subSelect = $subSelectFromFactor;
+                        if ($subSelect) {
+                            $this->addRequestConditions($subSelect, $subRequest);
                         }
                     }
                 } elseif (isset($conditionalExpression->simpleConditionalExpression)) {
                     $subSelect = $conditionalExpression->simpleConditionalExpression->subselect;
-                }
 
-                if ($subSelect) {
                     $this->addRequestConditions($subSelect, $subRequest);
                 }
             }
