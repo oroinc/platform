@@ -1,9 +1,8 @@
-/*jslint browser:true, nomen:true*/
-/*global define, alert*/
 define(function (require) {
     'use strict';
 
     var CommentFormView,
+        HIDE_ERRORS_TIMEOUT = 3000, // 3 sec
         $ = require('jquery'),
         _ = require('underscore'),
         mediator = require('oroui/js/mediator'),
@@ -40,6 +39,12 @@ define(function (require) {
             attachmentSize: null
         },
 
+        /**
+         * Stores timeoutId for delayed hideErrors handler
+         * @type {number}
+         */
+        hideErrorsTimeoutId: null,
+
         initialize: function (options) {
             this.template = _.template($(options.template ).html());
             this.isAddForm = this.model.isNew();
@@ -48,6 +53,17 @@ define(function (require) {
                 this.original = this.model.clone();
             }
             CommentFormView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this._clearHideErrorsTimeout();
+            CommentFormView.__super__.dispose.apply(this, arguments);
         },
 
         getTemplateData: function () {
@@ -59,14 +75,14 @@ define(function (require) {
         },
 
         render: function () {
-            var loading;
+            var loading, self = this;
 
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
                 .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate({invalidHandler: function(event, validator) {
-                    _.delay(_.bind(validator.resetForm, validator), 3000);
+                    self.scheduleHideErrors(_.bind(validator.resetFormErrors, validator));
                 }});
             mediator.execute('layout:init', this.$('form'));
             if (!this.isAddForm) {
@@ -95,14 +111,16 @@ define(function (require) {
         onSubmit: function (e) {
             e.stopPropagation();
             e.preventDefault();
-            this.trigger('submit', this);
+            if (!this.subview('loading').isShown()) {
+                this.trigger('submit', this);
+            }
         },
 
         onReset: function (e) {
             e.stopPropagation();
             e.preventDefault();
             if (this.isAddForm) {
-                this._clearFrom();
+                this._clearForm();
             } else {
                 this.bindData();
                 this.trigger('reset', this);
@@ -113,13 +131,34 @@ define(function (require) {
             return this.$('input, select, textarea').not(':submit, :reset, :image');
         },
 
-        _clearFrom: function () {
+        _clearForm: function () {
             this.stopListening();
             this.model = this.original.clone();
             this.delegateListeners();
             this._elements().each(function () {
                 setValue($(this), '');
             });
+        },
+
+        /**
+         * Schedule hideErrors handler
+         *
+         * @param {function} hideErrors
+         */
+        scheduleHideErrors: function (hideErrors) {
+            this._clearHideErrorsTimeout();
+            this.hideErrorsTimeoutId = _.delay(hideErrors, HIDE_ERRORS_TIMEOUT);
+        },
+
+        /**
+         * Stops delayed hideErrors handler
+         * @protected
+         */
+        _clearHideErrorsTimeout: function () {
+            if (this.hideErrorsTimeoutId) {
+                clearTimeout(this.hideErrorsTimeoutId);
+                this.hideErrorsTimeoutId = null;
+            }
         },
 
         /**
@@ -150,7 +189,7 @@ define(function (require) {
         onSuccess: function () {
             this.subview('loading').hide();
             if (this.isAddForm) {
-                this._clearFrom();
+                this._clearForm();
             }
         },
 
@@ -164,10 +203,14 @@ define(function (require) {
          * @param {Object} jqxhr
          */
         onError: function (model, jqxhr) {
+            var validator;
             this.subview('loading').hide();
-            if (jqxhr.status === 400 &&
-                jqxhr.responseJSON && jqxhr.responseJSON.errors) {
-                this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
+            if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
+                validator = this.$('form').data('validator');
+                if (validator) {
+                    validator.showBackendErrors(jqxhr.responseJSON.errors);
+                    this.scheduleHideErrors(_.bind(validator.resetFormErrors, validator));
+                }
             }
         }
     });
