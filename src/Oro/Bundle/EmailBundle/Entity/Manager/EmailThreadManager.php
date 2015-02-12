@@ -83,16 +83,16 @@ class EmailThreadManager
                 return;
             }
             if (!$this->setHeadFirstNotSeenEmail($entityManager, $threadEmails)) {
-                $this->setHeadFirstEmail($entityManager);
+                $this->setHeadFirstEmail($entityManager, $threadEmails);
             }
         }
     }
 
     /**
-     * Set for first not seen email
+     * Set head first not seen email
      *
      * @param EntityManager $entityManager
-     * @param $threadEmails
+     * @param Email[] $threadEmails
      *
      * @return bool
      */
@@ -110,10 +110,23 @@ class EmailThreadManager
     }
 
     /**
+     * Set head for first  email
+     *
+     * @param EntityManager $entityManager
+     * @param Email[] $threadEmails
+     */
+    protected function setHeadFirstEmail(EntityManager $entityManager, $threadEmails)
+    {
+        $email = end($threadEmails);
+        $email->setHead(true);
+        $entityManager->persist($email);
+    }
+
+    /**
      * Reset head for thread
      *
      * @param EntityManager $entityManager
-     * @param $threadEmails
+     * @param Email[] $threadEmails
      */
     protected function resetHead(EntityManager $entityManager, $threadEmails)
     {
@@ -122,15 +135,5 @@ class EmailThreadManager
             $email->setHead(false);
             $entityManager->persist($email);
         }
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     */
-    protected function setHeadFirstEmail(EntityManager $entityManager)
-    {
-        $email = end($threadEmails);
-        $email->setHead(true);
-        $entityManager->persist($email);
     }
 }
