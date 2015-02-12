@@ -93,7 +93,6 @@ class ActivityList extends ExtendActivityList
      *
      * @ORM\Column(name="is_head", type="boolean")
      * @Soap\ComplexType("boolean")
-     * @JMS\Type("boolean")
      */
     protected $head = false;
 
