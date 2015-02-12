@@ -30,13 +30,20 @@ class Email extends EmailHeader
     protected $attachments;
 
     /**
+     * @var string[]
+     */
+    protected $flags;
+
+    /**
      * Constructor
      *
      * @param Message $message
+     * @param string[] $flags
      */
-    public function __construct(Message $message)
+    public function __construct(Message $message, array $flags)
     {
         $this->message = $message;
+        $this->flags = $flags;
     }
 
     /**
@@ -109,5 +116,19 @@ class Email extends EmailHeader
         }
 
         return $this->attachments;
+    }
+
+    /**
+     * Check exists flag
+     *
+     * @param string $flag
+     *
+     * @return bool
+     */
+    public function hasFlag($flag) {
+        if (in_array($flag, $this->flags)) {
+            return true;
+        }
+        return false;
     }
 }

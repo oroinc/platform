@@ -394,9 +394,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
                 $this->logger->notice(
                     sprintf('Persisting "%s" email (UID: %d) ...', $email->getSubject(), $email->getId()->getUid())
                 );
+                $emailEntity = $this->addEmail($email, $folder, $email->hasFlag("\\Seen"));
                 $imapEmail       = $this->createImapEmail(
                     $email->getId()->getUid(),
-                    $this->addEmail($email, $folder),
+                    $emailEntity,
                     $imapFolder
                 );
                 $newImapEmails[] = $imapEmail;

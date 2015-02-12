@@ -158,7 +158,16 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
-    protected $isHead = false;
+    protected $head = false;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_seen", type="boolean")
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $seen = false;
 
     /**
      * @var string
@@ -465,19 +474,43 @@ class Email extends ExtendEmail
      */
     public function isHead()
     {
-        return $this->isHead;
+        return $this->head;
     }
 
     /**
      * Set email is_head flag
      *
-     * @param boolean $isHead
+     * @param boolean $head
      *
-     * @return $this
+     * @return self
      */
-    public function setIsHead($isHead)
+    public function setHead($head)
     {
-        $this->isHead = $isHead;
+        $this->head = (bool)$head;
+
+        return $this;
+    }
+
+    /**
+     * Get if email is seen
+     *
+     * @return bool
+     */
+    public function isSeen()
+    {
+        return $this->seen;
+    }
+
+    /**
+     * Set email is read flag
+     *
+     * @param boolean $seen
+     *
+     * @return self
+     */
+    public function setSeen($seen)
+    {
+        $this->seen = (bool)$seen;
 
         return $this;
     }

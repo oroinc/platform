@@ -24,8 +24,9 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $sentAt = new \DateTime('now');
         $receivedAt = new \DateTime('now');
         $internalDate = new \DateTime('now');
+        $flags = ["\\Test"];
 
-        $obj = new Email($message);
+        $obj = new Email($message, $flags);
         $obj
             ->setId($id)
             ->setSubject('testSubject')
@@ -57,6 +58,8 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testMessageId', $obj->getMessageId());
         $this->assertEquals('testXMessageId', $obj->getXMessageId());
         $this->assertEquals('testXThreadId', $obj->getXThreadId());
+        $this->assertTrue($obj->hasFlag("\\Test"));
+        $this->assertFalse($obj->hasFlag("\\Test2"));
 
         $srcBodyContent = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Content')
             ->disableOriginalConstructor()

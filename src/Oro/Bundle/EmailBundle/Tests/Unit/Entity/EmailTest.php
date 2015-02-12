@@ -117,7 +117,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $entity = new Email();
         $this->assertFalse($entity->isHead());
 
-        $entity->setIsHead(true);
+        $entity->setHead(true);
         $this->assertTrue($entity->isHead());
     }
 
@@ -149,6 +149,10 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['threadId', ['testThreadId']],
             ['xThreadId', 'testxXThreadId'],
             ['refs', 'testRefs'],
+            ['seen', true],
+            ['seen', ''],
+            ['seen', 0],
+            ['seen', 1],
         ];
     }
 }
