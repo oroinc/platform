@@ -85,12 +85,18 @@ class AclWalker extends TreeWalkerAdapter
 
                 $subSelect = null;
 
-                if (isset($conditionalExpression->conditionalFactors)
-                    && isset($conditionalExpression->conditionalFactors[0])) {
-                    $subSelect = $this->getSubSelectFromFactor(
-                        $conditionalExpression->conditionalFactors[0],
-                        $subRequest->getFactorId()
-                    );
+                if (isset($conditionalExpression->conditionalFactors)) {
+                    $factorId = $subRequest->getFactorId();
+                    foreach ($conditionalExpression->conditionalFactors as $factor) {
+                        $subSelectFromFactor = $this->getSubSelectFromFactor(
+                            $factor,
+                            $factorId
+                        );
+
+                        if ($subSelectFromFactor) {
+                            $subSelect = $subSelectFromFactor;
+                        }
+                    }
                 } elseif (isset($conditionalExpression->simpleConditionalExpression)) {
                     $subSelect = $conditionalExpression->simpleConditionalExpression->subselect;
                 }
@@ -110,6 +116,8 @@ class AclWalker extends TreeWalkerAdapter
      */
     protected function getSubSelectFromFactor(ConditionalPrimary $factor, $factorId)
     {
+        $subSelect = null;
+
         if (isset($factor->conditionalExpression->conditionalFactors)) {
             $subSelect = $factor
                 ->conditionalExpression
@@ -122,7 +130,7 @@ class AclWalker extends TreeWalkerAdapter
                 ->conditionalTerms[$factorId]
                 ->simpleConditionalExpression
                 ->subselect;
-        } else {
+        } elseif (isset($factor->simpleConditionalExpression->subselect)) {
             $subSelect = $factor->simpleConditionalExpression->subselect;
         }
 
