@@ -250,7 +250,7 @@ class ImapEmailManager
             $values[] = $header->getFieldValue();
         }
 
-        return implode(',', $values);
+        return implode(' ', $values);
     }
 
     /**
