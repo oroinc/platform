@@ -110,6 +110,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                     if ($configKey === 'oro_activity_list.sorting_field') {
                         return 'createdBy';
                     }
+                    if ($configKey === 'oro_activity_list.grouping') {
+                        return false;
+                    }
                     return 'ASC';
                 }
             );
@@ -147,6 +150,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                     if ($configKey === 'oro_activity_list.sorting_field') {
                         return 'createdBy';
                     }
+                    if ($configKey === 'oro_activity_list.grouping') {
+                        return true;
+                    }
                     return 'DESC';
                 }
             );
@@ -174,7 +180,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityListManager->getListCount($testClass, $testId, $filter);
 
         $expectedDQL = 'SELECT COUNT(activity.id) FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
-            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId';
+            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId AND activity.head = 1';
         $this->assertEquals($expectedDQL, $qb->getDQL());
         $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }
