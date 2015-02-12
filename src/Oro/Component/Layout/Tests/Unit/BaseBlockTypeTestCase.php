@@ -68,8 +68,8 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /**
      * Asks the given block type to resolve options
      *
-     * @param string $blockType
-     * @param array  $options
+     * @param string|BlockTypeInterface $blockType
+     * @param array                     $options
      *
      * @return array The resolved options
      */
@@ -83,8 +83,8 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /**
      * Creates a view for the given block type
      *
-     * @param string $blockType
-     * @param array  $options
+     * @param string|BlockTypeInterface $blockType
+     * @param array                     $options
      *
      * @return BlockView
      */
@@ -100,8 +100,8 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     /**
      * Creates a builder which can be used to build block hierarchy
      *
-     * @param       $blockType
-     * @param array $options
+     * @param string $blockType
+     * @param array  $options
      *
      * @return TestBlockBuilder
      */
