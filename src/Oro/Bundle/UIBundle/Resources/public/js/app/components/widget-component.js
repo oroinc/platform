@@ -22,11 +22,6 @@ define(function (require) {
         widget: null,
 
         /**
-         * @property {oroui.widget.AbstractWidget}
-         */
-        widgetInstance: null,
-
-        /**
          * @property {boolean}
          */
         opened: false,
