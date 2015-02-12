@@ -97,7 +97,12 @@ class ActivityListManager
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
         $pager->init();
 
-        return $this->getEntityViewModels($pager->getResults());
+        $targetEntityData = [
+            'class' => $entityClass,
+            'id'    => $entityId,
+        ];
+
+        return $this->getEntityViewModels($pager->getResults(), $targetEntityData);
     }
 
     /**
@@ -138,14 +143,15 @@ class ActivityListManager
 
     /**
      * @param ActivityList[] $entities
+     * @param array          $targetEntityData
      *
      * @return array
      */
-    public function getEntityViewModels($entities)
+    public function getEntityViewModels($entities, $targetEntityData = [])
     {
         $result = [];
         foreach ($entities as $entity) {
-            $result[] = $this->getEntityViewModel($entity);
+            $result[] = $this->getEntityViewModel($entity, $targetEntityData);
         }
 
         return $result;
@@ -153,10 +159,11 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
+     * @param []           $targetEntityData
      *
      * @return array
      */
-    public function getEntityViewModel(ActivityList $entity)
+    public function getEntityViewModel(ActivityList $entity, $targetEntityData = [])
     {
         $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
 
@@ -196,6 +203,7 @@ class ActivityListManager
             'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
+            'targetEntityData'     => $targetEntityData,
         ];
 
         return $result;

@@ -110,4 +110,20 @@ class Email extends EmailHeader
 
         return $this->attachments;
     }
+
+    /**
+     * Check exists flag
+     *
+     * @param string $flag
+     *
+     * @return bool
+     */
+    public function hasFlag($flag)
+    {
+        $flags = $this->message->getFlags();
+        if (in_array($flag, $flags)) {
+            return true;
+        }
+        return false;
+    }
 }

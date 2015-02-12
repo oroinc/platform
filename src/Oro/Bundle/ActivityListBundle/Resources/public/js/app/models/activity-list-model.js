@@ -34,7 +34,9 @@ define([
 
             editable: true,
             removable: true,
-            commentable: false
+            commentable: false,
+
+            targetEntityData: ''
         },
 
         initialize: function () {
