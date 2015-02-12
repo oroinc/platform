@@ -15,6 +15,9 @@ define([
     original.viewDispose = Chaplin.View.prototype.dispose;
 
     Chaplin.View.prototype.dispose = function () {
+        if (this.disposed) {
+            return;
+        }
         this.disposePageComponents();
         original.viewDispose.call(this, arguments);
     };

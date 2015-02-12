@@ -71,7 +71,7 @@ define(function (require) {
          */
         _bindOpenEvent: function () {
             var eventName, handler;
-            eventName = this.options.createOnEvent || 'click';
+            eventName = this.options.createOnEvent;
             handler = _.bind(function (e) {
                 e.preventDefault();
                 this.openWidget();

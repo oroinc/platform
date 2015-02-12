@@ -504,7 +504,7 @@
                     'createOnEvent' : options.event|default('click')
                 }) %}
             {% endif %}
-            {{ _self.bindWidget(options) }}
+            {{ _self.renderWidgetAttributes(options) }}
         {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
@@ -517,13 +517,13 @@
     </a>
 {% endmacro %}
 
-{% macro bindWidget(options) %}
+{% macro renderWidgetAttributes(options) %}
     data-page-component-module="oroui/js/app/components/widget-component"
     data-page-component-options="{{ options|json_encode }}"
 {% endmacro %}
 {#
     @deprecated
-    Please use bindWidget() with createOnEvent option specified instead
+    Please use renderWidgetAttributes() with createOnEvent option specified instead
 #}
 {% macro renderWidgetDataAttributes(options) %}
     {% if (options.createOnEvent is not defined) %}
@@ -531,7 +531,7 @@
             'createOnEvent' : options.event|default('click')
         }) %}
     {% endif %}
-    {{ _self.bindWidget(options) }}
+    {{ _self.renderWidgetAttributes(options) }}
 {% endmacro %}
 
 {% macro renderAttributes(options, prefix) %}
