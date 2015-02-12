@@ -71,7 +71,7 @@ class EmailThreadManager
      * @param EntityManager $entityManager
      * @param Email $entity
      */
-    protected function updateThreadHead(EntityManager $entityManager, Email $entity)
+    public function updateThreadHead(EntityManager $entityManager, Email $entity)
     {
         if ($entity->getThreadId()) {
             $threadEmails = $this->emailThreadProvider->getThreadEmails($entityManager, $entity);
