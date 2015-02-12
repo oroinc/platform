@@ -50,7 +50,7 @@ define(function (require) {
                 if (!this.options.options.url) {
                     this.options.options.url = this.$element.data('url') || this.$element.attr('href');
                 }
-                if (this.options.listenToDomEvent) {
+                if (this.options.createOnEvent) {
                     this._bindOpenEvent();
                 } else {
                     this._deferredInit();
@@ -76,7 +76,7 @@ define(function (require) {
          */
         _bindOpenEvent: function () {
             var eventName, handler;
-            eventName = this.options.event || 'click';
+            eventName = this.options.createOnEvent || 'click';
             handler = _.bind(function (e) {
                 e.preventDefault();
                 this.openWidget();

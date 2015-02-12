@@ -3,7 +3,7 @@
     'type' : widgetType,
     'options' : options
 } %}
-<div id="{{ elementId }}" {{ UI.renderWidgetDataAttributes(widgetComponentOptions) }} data-layout="separate">
+<div id="{{ elementId }}" {{ UI.bindWidget(widgetComponentOptions) }} data-layout="separate">
     {% if options.elementFirst %}
         {% render options.url %}
     {% endif %}
