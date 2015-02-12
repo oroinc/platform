@@ -66,7 +66,7 @@ define(function (require) {
             this.$('form')
                 .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate({invalidHandler: function(event, validator) {
-                    _.delay(_.bind(validator.resetForm, validator), 3000);
+                    _.delay(_.bind(validator.resetFormErrors, validator), 3000);
                 }});
             mediator.execute('layout:init', this.$('form'));
             if (!this.isAddForm) {
