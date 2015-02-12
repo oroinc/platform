@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\EventListener;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 
 class EntityListener
@@ -19,12 +20,19 @@ class EntityListener
      */
     protected $emailActivityManager;
 
+    /**
+     * @var EmailThreadManager
+     */
+    protected $emailThreadManager;
+
     public function __construct(
-        EmailOwnerManager $emailOwnerManager,
-        EmailActivityManager $emailActivityManager
+        EmailOwnerManager    $emailOwnerManager,
+        EmailActivityManager $emailActivityManager,
+        EmailThreadManager   $emailThreadManager
     ) {
         $this->emailOwnerManager    = $emailOwnerManager;
         $this->emailActivityManager = $emailActivityManager;
+        $this->emailThreadManager   = $emailThreadManager;
     }
 
     /**
@@ -34,5 +42,6 @@ class EntityListener
     {
         $this->emailOwnerManager->handleOnFlush($event);
         $this->emailActivityManager->handleOnFlush($event);
+        $this->emailThreadManager->handleOnFlush($event);
     }
 }
