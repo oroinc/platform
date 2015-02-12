@@ -249,11 +249,11 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
-            if ($this->isDateProvider($provider)) {
+            if ($this->hasCustomDate($provider)) {
                 $list->setCreatedAt($provider->getDate($entity));
                 $list->setUpdatedAt($provider->getDate($entity));
             }
-            if ($this->isThreadProvider($provider)) {
+            if ($this->hasGrouping($provider)) {
                 $list->setHead($provider->isHead($entity));
             }
             $list->setVerb($verb);
@@ -288,7 +288,7 @@ class ActivityListChainProvider
      *
      * @return bool
      */
-    protected function isDateProvider(ActivityListProviderInterface $provider)
+    protected function hasCustomDate(ActivityListProviderInterface $provider)
     {
         return $provider instanceof ActivityListDateProviderInterface;
     }
@@ -298,8 +298,8 @@ class ActivityListChainProvider
      *
      * @return bool
      */
-    protected function isThreadProvider(ActivityListProviderInterface $provider)
+    protected function hasGrouping(ActivityListProviderInterface $provider)
     {
-        return $provider instanceof ActivityListThreadProviderInterface;
+        return $provider instanceof ActivityListGroupProviderInterface;
     }
 }

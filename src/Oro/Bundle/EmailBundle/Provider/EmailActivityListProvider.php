@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListThreadProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -20,7 +20,7 @@ use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
-    ActivityListThreadProviderInterface,
+    ActivityListGroupProviderInterface,
     CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';

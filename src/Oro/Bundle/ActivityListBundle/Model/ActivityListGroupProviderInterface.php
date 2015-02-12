@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-interface ActivityListThreadProviderInterface
+interface ActivityListGroupProviderInterface
 {
     /**
      * Get thread head state from entity.
