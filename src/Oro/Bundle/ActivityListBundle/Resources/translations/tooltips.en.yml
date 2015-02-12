@@ -1,0 +1,5 @@
+oro:
+    activitylist:
+        system_configuration:
+            fields:
+              grouping.tooltip: Enables grouping of records in activity lists. For example, this option allows to group emails by threads.
