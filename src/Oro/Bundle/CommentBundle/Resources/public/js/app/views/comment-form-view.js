@@ -1,5 +1,3 @@
-/*jslint browser:true, nomen:true*/
-/*global define, alert*/
 define(function (require) {
     'use strict';
 
@@ -40,6 +38,12 @@ define(function (require) {
             attachmentSize: null
         },
 
+        /**
+         * Stores timeoutId for delayed hideErrors handler
+         * @type {number}
+         */
+        hideErrorsTimeoutId: null,
+
         initialize: function (options) {
             this.template = _.template($(options.template ).html());
             this.isAddForm = this.model.isNew();
@@ -48,6 +52,17 @@ define(function (require) {
                 this.original = this.model.clone();
             }
             CommentFormView.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this._clearHideErrorsTimeout();
+            CommentFormView.__super__.dispose.apply(this, arguments);
         },
 
         getTemplateData: function () {
@@ -59,14 +74,14 @@ define(function (require) {
         },
 
         render: function () {
-            var loading;
+            var loading, self = this;
 
             CommentFormView.__super__.render.call(this);
 
             this.$('form')
                 .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate({invalidHandler: function(event, validator) {
-                    _.delay(_.bind(validator.resetFormErrors, validator), 3000);
+                    self.setHideErrorsHandler(_.bind(validator.resetFormErrors, validator));
                 }});
             mediator.execute('layout:init', this.$('form'));
             if (!this.isAddForm) {
@@ -123,6 +138,27 @@ define(function (require) {
         },
 
         /**
+         * Schedule hideErrors handler
+         *
+         * @param {function} hideErrors
+         */
+        setHideErrorsHandler: function (hideErrors) {
+            this._clearHideErrorsTimeout();
+            this.hideErrorsTimeoutId = _.delay(hideErrors, 3000);
+        },
+
+        /**
+         * Stops delayed hideErrors handler
+         * @protected
+         */
+        _clearHideErrorsTimeout: function () {
+            if (this.hideErrorsTimeoutId) {
+                clearTimeout(this.hideErrorsTimeoutId);
+                this.hideErrorsTimeoutId = null;
+            }
+        },
+
+        /**
          * Fetches options with form-data to send it over ajax
          *
          * @param {Object=} options initial options
@@ -164,10 +200,14 @@ define(function (require) {
          * @param {Object} jqxhr
          */
         onError: function (model, jqxhr) {
+            var validator;
             this.subview('loading').hide();
-            if (jqxhr.status === 400 &&
-                jqxhr.responseJSON && jqxhr.responseJSON.errors) {
-                this.$('form').data('validator').showBackendErrors(jqxhr.responseJSON.errors);
+            if (jqxhr.status === 400 && jqxhr.responseJSON && jqxhr.responseJSON.errors) {
+                validator = this.$('form').data('validator');
+                if (validator) {
+                    validator.showBackendErrors(jqxhr.responseJSON.errors);
+                    this.setHideErrorsHandler(_.bind(validator.resetFormErrors, validator));
+                }
             }
         }
     });
