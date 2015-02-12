@@ -123,6 +123,12 @@ class ImapEmailIterator implements \Iterator, \Countable
         // call the underlying iterator to make sure a batch is loaded
         // actually $this->batch is initialized at this moment
         $this->iterator->next();
+
+        // skip invalid messages (they are not added to $this->batch)
+        while (!isset($this->batch[$this->iterationPos]) && $this->iterator->valid()) {
+            $this->iterationPos++;
+            $this->iterator->next();
+        }
     }
 
     /**
@@ -138,11 +144,6 @@ class ImapEmailIterator implements \Iterator, \Countable
      */
     public function valid()
     {
-        // enforce next batch loading if all entries in batch were invalid
-        while (empty($this->batch) && $this->iterator->valid()) {
-            $this->iterator->next();
-        }
-
         return isset($this->batch[$this->iterationPos]);
     }
 
@@ -166,23 +167,24 @@ class ImapEmailIterator implements \Iterator, \Countable
     {
         $this->batch = [];
 
-        // enforce increment keys
-        $added = 0;
+        $counter = 0;
         foreach ($batch as $key => $val) {
             try {
                 $email = $this->manager->convertToEmail($val);
             } catch (\Exception $e) {
                 if (null !== $this->onConvertError) {
                     call_user_func($this->onConvertError, $e);
-
-                    continue;
+                    $email = null;
+                } else {
+                    throw $e;
                 }
-
-                throw $e;
             }
 
-            $this->batch[$this->iterationPos + $added] = $email;
-            $added++;
+            // do not add invalid messages to $this->batch
+            if ($email !== null) {
+                $this->batch[$this->iterationPos + $counter] = $email;
+            }
+            $counter++;
         }
     }
 }
