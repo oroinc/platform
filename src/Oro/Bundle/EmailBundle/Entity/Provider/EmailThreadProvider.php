@@ -16,7 +16,6 @@ class EmailThreadProvider
      * @param EntityManager $entityManager
      * @param Email $entity
      *
-     *
      * @return string
      */
     public function getEmailThreadId(EntityManager $entityManager, Email $entity)
