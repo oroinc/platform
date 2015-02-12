@@ -2,6 +2,7 @@ define(function (require) {
     'use strict';
 
     var CommentFormView,
+        HIDE_ERRORS_TIMEOUT = 3000, // 3 sec
         $ = require('jquery'),
         _ = require('underscore'),
         mediator = require('oroui/js/mediator'),
@@ -81,7 +82,7 @@ define(function (require) {
             this.$('form')
                 .addClass(this.isAddForm ? 'add-form' : 'edit-form')
                 .validate({invalidHandler: function(event, validator) {
-                    self.setHideErrorsHandler(_.bind(validator.resetFormErrors, validator));
+                    self.scheduleHideErrors(_.bind(validator.resetFormErrors, validator));
                 }});
             mediator.execute('layout:init', this.$('form'));
             if (!this.isAddForm) {
@@ -110,14 +111,16 @@ define(function (require) {
         onSubmit: function (e) {
             e.stopPropagation();
             e.preventDefault();
-            this.trigger('submit', this);
+            if (!this.subview('loading').isShown()) {
+                this.trigger('submit', this);
+            }
         },
 
         onReset: function (e) {
             e.stopPropagation();
             e.preventDefault();
             if (this.isAddForm) {
-                this._clearFrom();
+                this._clearForm();
             } else {
                 this.bindData();
                 this.trigger('reset', this);
@@ -128,7 +131,7 @@ define(function (require) {
             return this.$('input, select, textarea').not(':submit, :reset, :image');
         },
 
-        _clearFrom: function () {
+        _clearForm: function () {
             this.stopListening();
             this.model = this.original.clone();
             this.delegateListeners();
@@ -142,9 +145,9 @@ define(function (require) {
          *
          * @param {function} hideErrors
          */
-        setHideErrorsHandler: function (hideErrors) {
+        scheduleHideErrors: function (hideErrors) {
             this._clearHideErrorsTimeout();
-            this.hideErrorsTimeoutId = _.delay(hideErrors, 3000);
+            this.hideErrorsTimeoutId = _.delay(hideErrors, HIDE_ERRORS_TIMEOUT);
         },
 
         /**
@@ -186,7 +189,7 @@ define(function (require) {
         onSuccess: function () {
             this.subview('loading').hide();
             if (this.isAddForm) {
-                this._clearFrom();
+                this._clearForm();
             }
         },
 
@@ -206,7 +209,7 @@ define(function (require) {
                 validator = this.$('form').data('validator');
                 if (validator) {
                     validator.showBackendErrors(jqxhr.responseJSON.errors);
-                    this.setHideErrorsHandler(_.bind(validator.resetFormErrors, validator));
+                    this.scheduleHideErrors(_.bind(validator.resetFormErrors, validator));
                 }
             }
         }
