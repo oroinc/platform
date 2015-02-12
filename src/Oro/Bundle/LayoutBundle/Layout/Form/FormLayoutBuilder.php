@@ -75,7 +75,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
-     * Initializes the state of this builder
+     * Initializes the state of this builder.
      *
      * @param BlockBuilderInterface $builder
      * @param array                 $options
@@ -89,7 +89,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
-     * Clears the state of this builder
+     * Clears the state of this builder.
      */
     protected function clearState()
     {
@@ -100,6 +100,8 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
+     * Returns a form for the given field.
+     *
      * @param FormInterface $form
      * @param string        $fieldPath
      *
@@ -116,6 +118,8 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
+     * Returns the layout item id for the given field.
+     *
      * @param string $fieldPath
      *
      * @return string
@@ -126,6 +130,8 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
+     * Returns the path of the parent field.
+     *
      * @param string $fieldPath
      *
      * @return string|null
@@ -140,6 +146,8 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
+     * Add all fields of the given form to the layout.
+     *
      * @param FormInterface $form
      * @param string        $parentFieldPath
      */
@@ -165,6 +173,8 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
+     * Add the given field to the layout.
+     *
      * @param string      $fieldPath
      * @param string|null $parentId
      */
@@ -179,6 +189,8 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
+     * Checks whether the given form should be processed as a compound form or as a simple field.
+     *
      * @param FormInterface $form
      *
      * @return bool

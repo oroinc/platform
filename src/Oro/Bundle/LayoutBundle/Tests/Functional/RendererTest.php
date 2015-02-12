@@ -223,36 +223,48 @@ HTML;
         $expected = <<<HTML
 <fieldset>
     <legend>General Info</legend>
-    <input type="text"
-        id="form_for_layout_renderer_test_user_lastName"
-        name="form_for_layout_renderer_test[user][lastName]"
-        required="required"/>
-    <input type="text"
-        id="form_for_layout_renderer_test_user_firstName"
-        name="form_for_layout_renderer_test[user][firstName]"
-        required="required"/>
+    <div>
+        <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
+        <input type="text"
+            id="form_for_layout_renderer_test_user_lastName"
+            name="form_for_layout_renderer_test[user][lastName]"
+            required="required"/>
+    </div>
+    <div>
+        <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
+        <input type="text"
+            id="form_for_layout_renderer_test_user_firstName"
+            name="form_for_layout_renderer_test[user][firstName]"
+            required="required"/>
+    </div>
 </fieldset>
 <fieldset>
     <legend>Additional Info</legend>
-    <input type="text"
-        id="form_for_layout_renderer_test_jobTitle"
-        name="form_for_layout_renderer_test[jobTitle]"/>
-    <div id="form_for_layout_renderer_test_gender">
-        <input type="radio"
-            id="form_for_layout_renderer_test_gender_placeholder"
-            name="form_for_layout_renderer_test[gender]"
-            value="" checked="checked"/>
-        <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
-        <input type="radio"
-            id="form_for_layout_renderer_test_gender_0"
-            name="form_for_layout_renderer_test[gender]"
-            value="male"/>
-        <label for="form_for_layout_renderer_test_gender_0">Male</label>
-        <input type="radio"
-            id="form_for_layout_renderer_test_gender_1"
-            name="form_for_layout_renderer_test[gender]"
-            value="female"/>
-        <label for="form_for_layout_renderer_test_gender_1">Female</label>
+    <div>
+        <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
+        <input type="text"
+            id="form_for_layout_renderer_test_jobTitle"
+            name="form_for_layout_renderer_test[jobTitle]"/>
+    </div>
+    <div>
+        <label>Gender</label>
+        <div id="form_for_layout_renderer_test_gender">
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_placeholder"
+                name="form_for_layout_renderer_test[gender]"
+                value="" checked="checked"/>
+            <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_0"
+                name="form_for_layout_renderer_test[gender]"
+                value="male"/>
+            <label for="form_for_layout_renderer_test_gender_0">Male</label>
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_1"
+                name="form_for_layout_renderer_test[gender]"
+                value="female"/>
+            <label for="form_for_layout_renderer_test_gender_1">Female</label>
+        </div>
     </div>
 </fieldset>
 HTML;

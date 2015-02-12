@@ -66,12 +66,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
      */
     protected function addField($fieldPath, $parentId = null)
     {
-        $groupName = null;
-        if (isset($this->fieldToGroupMap[$fieldPath])) {
-            $groupName = $this->fieldToGroupMap[$fieldPath];
-        } elseif ($this->defaultGroupName) {
-            $groupName = $this->defaultGroupName;
-        }
+        $groupName = $this->findGroupName($fieldPath);
         if ($groupName) {
             $this->groups[$groupName]['hasFields'] = true;
 
@@ -80,6 +75,9 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
         parent::addField($fieldPath, $parentId);
     }
 
+    /**
+     * Add all groups to the layout.
+     */
     protected function addGroups()
     {
         foreach ($this->groups as $group) {
@@ -90,6 +88,8 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
     }
 
     /**
+     * Add the given group to the layout.
+     *
      * @param array $group
      */
     protected function addGroup($group)
@@ -100,5 +100,30 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
             FieldsetType::NAME,
             ['title' => isset($group['title']) ? $group['title'] : '']
         );
+    }
+
+    /**
+     * Returns the name of a group the given field should be added.
+     *
+     * @param string $fieldPath
+     *
+     * @return string|null
+     */
+    protected function findGroupName($fieldPath)
+    {
+        $groupName = null;
+        while ($fieldPath) {
+            if (isset($this->fieldToGroupMap[$fieldPath])) {
+                $groupName = $this->fieldToGroupMap[$fieldPath];
+                break;
+            }
+            $fieldPath = $this->getParentFieldPath($fieldPath);
+        }
+
+        if (!$groupName && $this->defaultGroupName) {
+            $groupName = $this->defaultGroupName;
+        }
+
+        return $groupName;
     }
 }
