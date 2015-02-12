@@ -190,9 +190,6 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $msg->expects($this->once())
             ->method('getHeaders')
             ->will($this->returnValue($headers));
-//        $msg->expects($this->once())
-//            ->method('getFlags')
-//            ->will($this->returnValue([]));
         $headers->expects($this->any())
             ->method('get')
             ->will(
