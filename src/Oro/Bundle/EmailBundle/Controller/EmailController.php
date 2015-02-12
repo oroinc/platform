@@ -87,11 +87,7 @@ class EmailController extends Controller
      */
     public function replyAction(Email $email)
     {
-        $emailModel = new EmailModel();
-        $emailModel->setParentEmailId($email->getId());
-        $emailModel->setTo([$email->getFromEmailAddress()->getEmail()]);
-
-        return $this->createEmail($emailModel);
+        return $this->createEmail(new EmailModel(), $email);
     }
 
     /**
@@ -182,12 +178,33 @@ class EmailController extends Controller
      *
      * @return array
      */
-    protected function createEmail(EmailModel $emailModel)
+    protected function createEmail(EmailModel $emailModel, Email $parentEmail = null)
     {
         $responseData = [
             'entity' => $emailModel,
             'saved' => false
         ];
+        if ($parentEmail) {
+            $emailModel->setParentEmailId($parentEmail->getId());
+            $emailModel->setTo([$parentEmail->getFromEmailAddress()->getEmail()]);
+
+            $subject = $parentEmail->getSubject();
+            if (preg_match('/^Re:*/', $subject)) {
+                $emailModel->setSubject($subject);
+            } else {
+                $emailModel->setSubject('Re: ' . $subject);
+            }
+
+            try {
+                $this->getEmailCacheManager()->ensureEmailBodyCached($parentEmail);
+            } catch (LoadEmailBodyException $e) {
+            }
+
+            $body = $this->get('templating')
+                ->render('OroEmailBundle:Email/Reply:parentBody.html.twig', ['email' => $parentEmail]);
+
+            $emailModel->setBody($body);
+        }
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;
         }
@@ -195,4 +212,5 @@ class EmailController extends Controller
 
         return $responseData;
     }
+
 }
