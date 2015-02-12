@@ -147,8 +147,7 @@ class ImapEmailManager
     public function convertToEmail(Message $msg)
     {
         $headers = $msg->getHeaders();
-        $flags = $msg->getFlags();
-        $email = new Email($msg, $flags);
+        $email = new Email($msg);
         try {
             $email
                 ->setId(
