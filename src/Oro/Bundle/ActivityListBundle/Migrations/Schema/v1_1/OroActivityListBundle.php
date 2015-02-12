@@ -18,8 +18,9 @@ class OroActivityListBundle implements Migration
     }
 
     /**
+     * Add group head field
+     *
      * @param Schema $schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addColumns(Schema $schema)
     {
