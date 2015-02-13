@@ -22,6 +22,7 @@ parameters:
     oro_email.email_synchronization_manager.class:  Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager
     oro_email.known_email_address_checker_factory.class: Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory
     oro_email.twig.extension.email.class:         Oro\Bundle\EmailBundle\Twig\EmailExtension
+    oro_email.email.manager.class:                Oro\Bundle\EmailBundle\Entity\Manager\EmailManager
     oro_email.email.thread.manager.class:         Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager
     oro_email.email.thread.provider.class:        Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider
 
@@ -390,6 +391,12 @@ services:
         class: %oro_email.email.thread.manager.class%
         arguments:
             - @oro_email.email.thread.provider
+
+    oro_email.email.manager:
+        class: %oro_email.email.manager.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_email.email.thread.manager
 
     oro_email.twig.extension.email:
         class: %oro_email.twig.extension.email.class%

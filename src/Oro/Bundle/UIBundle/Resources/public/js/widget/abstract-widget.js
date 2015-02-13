@@ -8,7 +8,7 @@ define(function (require) {
         _ = require('underscore'),
         BaseView = require('oroui/js/app/views/base/view'),
         mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/loading-mask'),
+        LoadingMask = require('oroui/js/app/views/loading-mask-view'),
         __ = require('orotranslation/js/translator');
     require('jquery.form');
 
@@ -146,19 +146,12 @@ define(function (require) {
          *
          * @private
          */
-        _showLoading: function() {
-            var loadingElement = this._getLoadingElement();
-            if (this.options.loadingMaskEnabled && !loadingElement.data('loading-mask-visible')) {
-                if (loadingElement && loadingElement.length) {
-                    if (loadingElement[0].tagName.toLowerCase() !== 'body' && loadingElement.css('position') == 'static') {
-                        loadingElement.css('position', 'relative');
-                    }
-                    this.loadingMask = new LoadingMask({loadingElement: loadingElement});
-                    loadingElement.data('loading-mask-visible', true);
-                    loadingElement.append(this.loadingMask.render().$el);
-                    this.loadingMask.show();
-                }
-            }
+
+        _showLoading: function () {
+            this.subview('loadingMask', new LoadingMask({
+                container: this._getLoadingElement()
+            }));
+            this.subview('loadingMask').show();
         },
 
         /**
@@ -166,12 +159,8 @@ define(function (require) {
          *
          * @private
          */
-        _hideLoading: function() {
-            if (this.loadingMask) {
-                this._getLoadingElement().data('loading-mask-visible', false);
-                this.loadingMask.dispose();
-                this.loadingMask = null;
-            }
+        _hideLoading: function () {
+            this.removeSubview('loadingMask');
         },
 
         /**
@@ -611,9 +600,17 @@ define(function (require) {
          * @param {String} content
          */
         setContent: function (content) {
+            var widgetContent = $(content).filter('.widget-content:first');
+
             this.actionsEl = null;
             this.actions = {};
-            this.setElement($(content).filter('.widget-content:first'));
+
+            // creating of jqUI dialog could throw exception
+            if (widgetContent.length === 0) {
+                throw new Error("Invalid server response: " + content);
+            }
+            this.disposePageComponents();
+            this.setElement(widgetContent);
             this._show();
         },
 
@@ -708,7 +705,12 @@ define(function (require) {
             this.trigger('renderComplete', this.$el, this);
             this.renderDeffered = $.Deferred();
             mediator.execute('layout:init', this.widget, this)
-                .done(_.bind(this._afterLayoutInit, this));
+                .done(_.bind(function () {
+                    if (this.disposed) {
+                        return;
+                    }
+                    this._afterLayoutInit();
+                }, this));
         },
 
         _afterLayoutInit: function () {

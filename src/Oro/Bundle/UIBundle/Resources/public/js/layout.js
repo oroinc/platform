@@ -96,7 +96,9 @@ define(function (require) {
                     // find nearest marked container with separate layout
                     $separateLayout = $elem.closest('[data-layout="separate"]');
                     // if it placed inside container - prevent component creation from here
-                    if ($separateLayout.length && $.contains(container[0], $separateLayout[0])) {
+                    if ($separateLayout.length
+                            && $.contains(container[0], $separateLayout[0])
+                            && this !== $separateLayout[0]) {
                         // optimize load time - push components to preload queue
                         preloadQueue.push(module);
                         return;
@@ -120,6 +122,10 @@ define(function (require) {
                     loadDeferred = $.Deferred();
 
                     require([module], function (component) {
+                        if (options.parent && options.parent.disposed) {
+                            loadDeferred.resolve();
+                            return;
+                        }
                         if (typeof component.init === "function") {
                             loadDeferred.resolve(component.init(options));
                         } else {
@@ -148,7 +154,7 @@ define(function (require) {
                 });
 
                 // optimize load time - preload components in separate layouts
-                require(preloadQueue, function (){});
+                require(preloadQueue, _.noop);
 
                 $.when.apply($, loadPromises).always(function () {
                     var initPromises = _.flatten(_.toArray(arguments), true);
