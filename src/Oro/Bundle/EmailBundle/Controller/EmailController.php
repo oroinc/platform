@@ -204,6 +204,7 @@ class EmailController extends Controller
                 ->render('OroEmailBundle:Email/Reply:parentBody.html.twig', ['email' => $parentEmail]);
 
             $emailModel->setBody($body);
+            $emailModel->setBodyFooter($body);
         }
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
             $responseData['saved'] = true;
