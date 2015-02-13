@@ -17,10 +17,6 @@ define(function (require) {
 
     /**
      * Date filter: filter type as option + interval begin and end dates
-     *
-     * @export  oro/filter/date-filter
-     * @class   oro.filter.DateFilter
-     * @extends oro.filter.ChoiceFilter
      */
     DateFilter = ChoiceFilter.extend({
         /**
