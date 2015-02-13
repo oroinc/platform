@@ -69,7 +69,7 @@ class CustomEntity extends AbstractPageEntity
     {
         $element = $this->test->byXpath(
             "//tr[td[normalize-space(text())='{$entityData[0]}'] and td[normalize-space(text())=" .
-            "'{$entityData[1]}']]//td[@class='boolean-cell']/input"
+            "'{$entityData[1]}']]//td[contains(@class,'boolean-cell')]/input"
         );
         $this->test->moveto($element);
 

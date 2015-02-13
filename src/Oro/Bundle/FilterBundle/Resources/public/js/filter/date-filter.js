@@ -409,9 +409,13 @@ define(function (require) {
          * @inheritDoc
          */
         _writeDOMValue: function (value) {
+            var $typeInput;
             this._setInputValue(this.criteriaValueSelectors.value.start, value.value.start);
             this._setInputValue(this.criteriaValueSelectors.value.end, value.value.end);
-            this._setInputValue(this.criteriaValueSelectors.date_type, value.type);
+            $typeInput = this.$(this.criteriaValueSelectors.date_type);
+            if ($typeInput.val() !== value.type) {
+                $typeInput.val(value.type).trigger('change');
+            }
             if (value.part) {
                 this._setInputValue(this.criteriaValueSelectors.date_part, value.part);
             }

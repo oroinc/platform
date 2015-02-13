@@ -30,7 +30,7 @@ function(_, Backbone) {
 
             this.showSelect = options.showSelect;
 
-            this.template = $('#region-chooser-template').html();
+            this.template = _.template($('#region-chooser-template').html());
 
             this.displaySelect2(this.showSelect);
             this.target.on('select2-init', _.bind(function() {
@@ -109,7 +109,7 @@ function(_, Backbone) {
 
                 this.target.val('').trigger('change');
                 this.target.find('option[value!=""]').remove();
-                this.target.append(_.template(this.template, {regions: this.collection.models}));
+                this.target.append(this.template({regions: this.collection.models}));
 
                 this.$simpleEl.hide();
                 this.$simpleEl.val('');

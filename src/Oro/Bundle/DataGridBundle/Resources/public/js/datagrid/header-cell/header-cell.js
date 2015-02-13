@@ -82,8 +82,8 @@ define([
                         direction = 'ascending';
                     }
                 }
-                if (direction !== this.direction()) {
-                    this.direction(direction);
+                if (direction !== this.column.get('direction')) {
+                    this.column.set({'direction':direction});
                 }
             }
         },
@@ -127,7 +127,7 @@ define([
             var columnName = this.column.get("name");
 
             if (this.column.get("sortable")) {
-                if (this.direction() === "ascending") {
+                if (this.column.get('direction') === "ascending") {
                     this.sort(columnName, "descending", function (left, right) {
                         var leftVal, rightVal, res;
                         leftVal = left.get(columnName);
@@ -140,7 +140,7 @@ define([
                         }
                         return res;
                     });
-                } else if (this.allowNoSorting && this.direction() === "descending") {
+                } else if (this.allowNoSorting && this.column.get('direction') === "descending") {
                     this.sort(columnName, null);
                 } else {
                     this.sort(columnName, "ascending", function (left, right) {
