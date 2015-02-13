@@ -72,3 +72,14 @@
         {{ block_widget(block) }}
     </body>
 {% endblock %}
+
+{% block form_field_widget %}
+    {{ form_row(form) }}
+{% endblock %}
+
+{% block fieldset_widget %}
+    <fieldset{{ block('block_attributes') }}>
+        <legend>{{ title|trans({}, translation_domain) }}</legend>
+        {{ block_widget(block) }}
+    </fieldset>
+{% endblock %}

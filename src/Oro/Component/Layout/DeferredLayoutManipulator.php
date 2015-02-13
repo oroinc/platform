@@ -206,19 +206,21 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * {@inheritdoc}
      */
-    public function applyChanges(ContextInterface $context)
+    public function applyChanges(ContextInterface $context, $finalize = false)
     {
         $this->addCounter = 0;
         $this->item = new LayoutItem($this->rawLayoutBuilder, $context);
         try {
             $total = $this->calculateActionCount();
             if ($total !== 0) {
-                $this->executeAllActions();
-                $this->checkRemainingActions();
-                // check that all scheduled actions have been performed
-                $applied = $total - $this->calculateActionCount();
-                if ($applied === 0 && $applied !== $total) {
-                    throw $this->createFailureException();
+                $this->executeAllActions($finalize);
+                if ($finalize) {
+                    $this->removeNotImportantRemainingActions();
+                    // check that all scheduled actions have been performed
+                    $applied = $total - $this->calculateActionCount();
+                    if ($applied === 0 && $applied !== $total) {
+                        throw $this->createFailureException();
+                    }
                 }
             }
 
@@ -246,17 +248,22 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
 
     /**
      * Executes actions from all groups
+     *
+     * @param boolean $finalize
      */
-    protected function executeAllActions()
+    protected function executeAllActions($finalize)
     {
         $this->executeAddActions();
+        if ($finalize) {
+            $this->executeAdaptiveAddActions();
+        }
         $this->executeRemoveActions();
     }
 
     /**
      * Checks if there are any not executed actions and remove actions which are not important
      */
-    protected function checkRemainingActions()
+    protected function removeNotImportantRemainingActions()
     {
         // remove remaining 'move' actions
         if (!empty($this->actions[self::GROUP_ADD])) {
@@ -286,7 +293,14 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         if (!empty($this->actions[self::GROUP_ADD])) {
             $this->executeDependedActions(self::GROUP_ADD);
         }
+    }
 
+    /**
+     * Executes all add new items related actions which were skipped by {@see executeAddActions} method,
+     * but may be executed after removing/modifying some arguments
+     */
+    protected function executeAdaptiveAddActions()
+    {
         // Here are several special rules:
         // 1) the siblingId argument in the 'add' action is "optional", this means that
         //    if it is not possible to add an item near to the sibling item due to it does not exist
@@ -381,7 +395,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                     && (!$parentId || $this->rawLayoutBuilder->has($parentId))
                     && (
                         !$siblingId
-                        || (!$parentId || $this->rawLayoutBuilder->isParentFor($parentId, $siblingId))
+                        || ($parentId && $this->rawLayoutBuilder->isParentFor($parentId, $siblingId))
+                        || (!$parentId && $this->rawLayoutBuilder->has($siblingId))
                     );
             case self::SET_BLOCK_THEME:
                 $id = $args[1];
