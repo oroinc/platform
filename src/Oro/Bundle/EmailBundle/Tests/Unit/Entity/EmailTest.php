@@ -115,10 +115,10 @@ class EmailTest extends \PHPUnit_Framework_TestCase
     public function testIsHeadGetterAndSetter()
     {
         $entity = new Email();
-        $this->assertFalse($entity->isHead());
-
-        $entity->setHead(true);
         $this->assertTrue($entity->isHead());
+
+        $entity->setHead(false);
+        $this->assertFalse($entity->isHead());
     }
 
     /**
