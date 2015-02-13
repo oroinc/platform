@@ -8,10 +8,19 @@ define([
 ], function ($, _, tools, Chaplin) {
     'use strict';
 
-    var utils, location;
+    var utils, location, original = {};
 
     utils = Chaplin.utils;
     location = window.location;
+    original.viewDispose = Chaplin.View.prototype.dispose;
+
+    Chaplin.View.prototype.dispose = function () {
+        if (this.disposed) {
+            return;
+        }
+        this.disposePageComponents();
+        original.viewDispose.call(this, arguments);
+    };
 
     /**
      * Fixes issue where path '/' was converted to boolean false value

@@ -205,6 +205,19 @@ define([
     };
 
     /**
+     * Resets form validation state
+     *  - clears errors and validation history
+     * (similar to validator.resetForm(), but does not change form elements' values)
+     */
+    $.validator.prototype.resetFormErrors = function () {
+        this.submitted = {};
+        this.lastElement = null;
+        this.prepareForm();
+        this.hideErrors();
+        this.elements().removeClass(this.settings.errorClass);
+    };
+
+    /**
      * Loader for custom validation methods
      *
      * @param {string|Array.<string>} module name of AMD module or list of modules
