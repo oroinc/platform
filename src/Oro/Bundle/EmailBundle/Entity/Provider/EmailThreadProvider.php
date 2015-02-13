@@ -52,11 +52,37 @@ class EmailThreadProvider
     public function getEmailReferences(EntityManager $entityManager, Email $entity)
     {
         $result = [];
-        if ($entity->getRefs()) {
+        $refs = $entity->getRefs();
+        if ($refs) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->in('messageId', explode(' ', $entity->getRefs())));
+            $criteria->where($criteria->expr()->in('messageId', explode(' ', $refs)));
+            $queryBuilder->addCriteria($criteria);
+            $result = $queryBuilder->getQuery()->getResult();
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get emails in thread of current one
+     *
+     * @param EntityManager $entityManager
+     * @param Email $entity
+     *
+     * @return Email[]
+     */
+    public function getThreadEmails(EntityManager $entityManager, Email $entity)
+    {
+        $result = [];
+        $threadId = $entity->getThreadId();
+        if ($threadId) {
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
+            $criteria = new Criteria();
+            $criteria->where($criteria->expr()->eq('threadId', $threadId));
+            $criteria->orderBy(['sentAt'=>Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
         }
