@@ -77,9 +77,18 @@ define(function (require) {
          */
         toggle: function (visible) {
             if (typeof visible === 'undefined') {
-                visible = !this.hasClass('shown');
+                visible = !this.isShown();
             }
             this[visible ? 'show' : 'hide']();
+        },
+
+        /**
+         * Returns state of loading mask
+         *
+         * @returns {boolean}
+         */
+        isShown: function () {
+            return this.$el.hasClass('shown');
         },
 
         /**
