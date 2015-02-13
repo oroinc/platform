@@ -90,7 +90,7 @@ class EmailType extends AbstractType
                     'expanded'   => true
                 ]
             )
-        ;
+            ->add('bodyFooter', 'hidden');
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'initChoicesByEntityName']);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'initChoicesByEntityName']);
