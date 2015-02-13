@@ -1,0 +1,13 @@
+parameters:
+    oro_layout.theme_factory.class:      Oro\Bundle\LayoutBundle\Theme\ThemeFactory
+    oro_layout.theme_manager.class:      Oro\Bundle\LayoutBundle\Theme\ThemeManager
+
+services:
+    oro_layout.theme_factory:
+        class: %oro_layout.theme_factory.class%
+
+    oro_layout.theme_manager:
+        class: %oro_layout.theme_manager.class%
+        arguments:
+            - @oro_layout.theme_factory
+            - []
