@@ -115,7 +115,7 @@ class Search extends AbstractPage
     public function assertEntity($entityType, $entityCount)
     {
         $this->assertElementPresent(
-            "//li[@class='entity-type']//a[contains(., '{$entityType} ({$entityCount})')]"
+            "//li//a[contains(., '{$entityType} ({$entityCount})')]"
         );
 
         return $this;

@@ -10,7 +10,8 @@ define(function (require) {
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
-        LoadingMask     = require('oroui/js/loading-mask'),
+        LoadingMask     = require('oroui/js/app/views/loading-mask-view'),
+        BaseView        = require('oroui/js/app/views/base/view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
         EventView       = require('orocalendar/js/calendar/event/view'),
@@ -30,14 +31,13 @@ define(function (require) {
      * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return BaseView.extend({
         MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
                 '<div class="calendar-container">' +
                     '<div class="calendar"></div>' +
-                    '<div class="loading-mask"></div>' +
                 '</div>' +
             '</div>'
         ),
@@ -108,6 +108,10 @@ define(function (require) {
          */
         eventsLoaded: {},
 
+        listen: {
+            'layout:reposition mediator': 'onWindowResize'
+        },
+
         /**
          * One of 'fullscreen' | 'scroll' | 'default'
          * @property
@@ -136,6 +140,11 @@ define(function (require) {
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
+        },
+
+        onWindowResize: function () {
+            this.setTimeline();
+            this.updateLayout();
         },
 
         /**
@@ -189,8 +198,9 @@ define(function (require) {
          */
         getLoadingMask: function () {
             if (!this.loadingMask) {
-                this.loadingMask = new LoadingMask();
-                this.$el.find(this.selectors.loadingMask).append(this.loadingMask.render().$el);
+                this.loadingMask = new LoadingMask({
+                    container: this.getCalendarElement()
+                });
             }
             return this.loadingMask;
         },
@@ -281,6 +291,7 @@ define(function (require) {
 
         onConnectionAdded: function () {
             this.smartRefetch();
+            this.updateLayout();
         },
 
         onConnectionChanged: function (connectionModel) {
@@ -303,6 +314,7 @@ define(function (require) {
 
         onConnectionDeleted: function () {
             this.smartRefetch();
+            this.updateLayout();
         },
 
         onFcSelect: function (start, end) {
@@ -454,7 +466,7 @@ define(function (require) {
 
         smartRefetch: function () {
             try {
-                this._showMask();
+                this.showLoadingMask();
                 // load events from a server
                 this.collection.fetch({
                     reset: true,
@@ -602,21 +614,11 @@ define(function (require) {
         },
 
         showSavingMask: function () {
-            this._showMask(__('Saving...'));
+            this.getLoadingMask().show(__('Saving...'));
         },
 
         showLoadingMask: function () {
-            this._showMask(__('Loading...'));
-        },
-
-        _showMask: function (message) {
-            if (this.enableEventLoading) {
-                var loadingMaskInstance = this.getLoadingMask();
-                loadingMaskInstance.$el
-                    .find(this.selectors.loadingMaskContent)
-                    .text(message);
-                loadingMaskInstance.show();
-            }
+            this.getLoadingMask().show(__('Loading...'));
         },
 
         _hideMask: function () {
@@ -734,10 +736,6 @@ define(function (require) {
                 _.delay(_.bind(self.setTimeline, self));
                 clearInterval(self.timelineUpdateIntervalId);
                 self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
-            };
-            options.windowResize = function () {
-                self.setTimeline();
-                _.delay(_.bind(self.updateLayout, self));
             };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
@@ -907,8 +905,13 @@ define(function (require) {
                 // do nothing
                 return;
             }
-            var $fcView = this.getCalendarElement().find('.fc-view:first');
-            this.setLayout(mediator.execute('layout:getPreferredLayout', $fcView));
+            var $fcView = this.getCalendarElement().find('.fc-view:first'),
+                $sidebar = $('.oro-page-sidebar'),
+                preferredLayout = mediator.execute('layout:getPreferredLayout', $fcView);
+            if (preferredLayout == 'fullscreen' && $sidebar.height() > mediator.execute('layout:getAvailableHeight', $sidebar)) {
+                preferredLayout = 'scroll';
+            }
+            this.setLayout(preferredLayout);
         },
 
         /**

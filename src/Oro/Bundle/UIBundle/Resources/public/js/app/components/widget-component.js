@@ -45,7 +45,12 @@ define(function (require) {
                 if (!this.options.options.url) {
                     this.options.options.url = this.$element.data('url') || this.$element.attr('href');
                 }
-                this._bindOpenEvent();
+                if (this.options.createOnEvent) {
+                    this._bindOpenEvent();
+                } else {
+                    this._deferredInit();
+                    this.openWidget();
+                }
             }
         },
 
@@ -66,7 +71,7 @@ define(function (require) {
          */
         _bindOpenEvent: function () {
             var eventName, handler;
-            eventName = this.options.event || 'click';
+            eventName = this.options.createOnEvent;
             handler = _.bind(function (e) {
                 e.preventDefault();
                 this.openWidget();
@@ -122,6 +127,9 @@ define(function (require) {
             }
 
             widget.render();
+            widget.listenTo(this, 'dispose', widget.dispose);
+
+            this._resolveDeferredInit();
         },
 
         /**

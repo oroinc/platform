@@ -21,6 +21,9 @@
         border-left: 1px solid @baseGradientColorBorder;
         .box-shadow(inset 0 -1px 2px rgba(0, 0, 0, .15));
       }
+      &:hover{
+        background: lighten(@logoBackgroundColor, 3%);
+      }
     }
     > span {
       display: block;
@@ -245,6 +248,10 @@
       .box-shadow(inset 0 -1px 2px rgba(0, 0, 0, .15));
       a {
         color: @headerTextColor;
+        white-space: nowrap;
+        margin: 0px -1px 0 -19px;
+        display: inline-block;
+        padding-left: 19px;
         &:hover {
           text-decoration: none;
         }
@@ -254,6 +261,18 @@
           -moz-binding:url("ellipsisxul.xml#ellipsis");
           text-overflow:ellipsis;
           -o-text-overflow:ellipsis;
+        }
+        &:hover{
+          color: lighten(@headerTextColor, 20%);
+          &.icon-remove {
+            color: transparent;
+            &:before {
+              color:@headerTextColor;
+            }
+            &:hover:before {
+              color: lighten(@headerTextColor, 20%);
+            }
+          }
         }
       }
       .icon-remove {
@@ -276,23 +295,6 @@
         &:hover:before {
           color: lighten(@headerTextColor, 20%);
         }
-      }
-      &:hover {
-        a {
-          color: lighten(@headerTextColor, 20%);
-          &.icon-remove {
-            color: transparent;
-            &:before {
-              color:@headerTextColor;
-            }
-            &:hover:before {
-              color: lighten(@headerTextColor, 20%);
-            }
-          }
-        }
-      }
-      a{
-        white-space: nowrap;
       }
     }
     &.active {
