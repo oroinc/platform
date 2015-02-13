@@ -119,6 +119,7 @@ oro:
                         available_in_template: Available in email templates
 
         reply:                    Reply
+        parent_message_header:    "On %date% %user% wrote:"
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
