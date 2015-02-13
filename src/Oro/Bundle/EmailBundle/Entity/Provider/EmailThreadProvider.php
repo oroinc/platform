@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Provider;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -82,9 +83,12 @@ class EmailThreadProvider
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $criteria = new Criteria();
             $criteria->where($criteria->expr()->eq('threadId', $threadId));
-            $criteria->orderBy(['sentAt'=>Criteria::DESC]);
+            $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
+            $result[] = $entity;
+            $collection = new ArrayCollection($result);
+            $result = $collection->matching($criteria)->toArray();
         }
 
         return $result;

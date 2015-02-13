@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 
@@ -75,13 +76,7 @@ class EmailThreadManager
     {
         if ($entity->getThreadId()) {
             $threadEmails = $this->emailThreadProvider->getThreadEmails($entityManager, $entity);
-            /** @var Email $email */
             $this->resetHead($entityManager, $threadEmails);
-            if (!$entity->isSeen()) {
-                $entity->setHead(true);
-                $entityManager->persist($entity);
-                return;
-            }
             if (!$this->setHeadFirstNotSeenEmail($entityManager, $threadEmails)) {
                 $this->setHeadFirstEmail($entityManager, $threadEmails);
             }
