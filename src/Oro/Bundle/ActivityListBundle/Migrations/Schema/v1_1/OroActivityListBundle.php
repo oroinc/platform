@@ -25,6 +25,10 @@ class OroActivityListBundle implements Migration
     public static function addColumns(Schema $schema)
     {
         $table = $schema->getTable('oro_activity_list');
-        $table->addColumn('is_head', 'boolean');
+        $table->addColumn('is_head', 'boolean', ['default' => '1']);
+
+        $table->addIndex(['related_activity_class'], 'al_related_activity_class');
+        $table->addIndex(['related_activity_id'], 'al_related_activity_id');
+        $table->addIndex(['is_head'], 'al_is_head');
     }
 }
