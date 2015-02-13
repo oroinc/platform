@@ -15,7 +15,10 @@
         "oro/config": "dev-master",
         "oro/requirejs-bundle": "dev-master",
         "oro/locale-bundle": "dev-master",
-        "oro/theme-bundle": "dev-master"
+        "oro/theme-bundle": "dev-master",
+        "components/jquery": "2.1.*",
+        "components/underscore": "1.7.*",
+        "components/backbone": "1.1.*"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\UIBundle": "" }
