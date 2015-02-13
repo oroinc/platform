@@ -94,7 +94,7 @@ class ActivityList extends ExtendActivityList
      * @ORM\Column(name="is_head", type="boolean")
      * @Soap\ComplexType("boolean")
      */
-    protected $head = false;
+    protected $head = true;
 
     /**
      * @var string
