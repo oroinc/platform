@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\EmailBundle\Migrations\Schema\v1_7;
+namespace Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_1;
 
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class OroEmailBundle implements Migration
+class OroActivityListBundle implements Migration
 {
     /**
      * @inheritdoc
@@ -18,16 +18,13 @@ class OroEmailBundle implements Migration
     }
 
     /**
-     * Add additional fields
+     * Add group head field
      *
      * @param Schema $schema
      */
     public static function addColumns(Schema $schema)
     {
-        $table = $schema->getTable('oro_email');
+        $table = $schema->getTable('oro_activity_list');
         $table->addColumn('is_head', 'boolean');
-        $table->addColumn('is_seen', 'boolean');
-        $table->addColumn('thread_id', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('refs', 'text', ['notnull' => false]);
     }
 }

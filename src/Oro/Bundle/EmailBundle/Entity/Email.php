@@ -158,7 +158,7 @@ class Email extends ExtendEmail
      * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
-    protected $head = false;
+    protected $head = true;
 
     /**
      * @var bool

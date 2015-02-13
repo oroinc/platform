@@ -18,8 +18,9 @@ class OroEmailBundle implements Migration
     }
 
     /**
+     * Add fields
+     *
      * @param Schema $schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public static function addColumns(Schema $schema)
     {

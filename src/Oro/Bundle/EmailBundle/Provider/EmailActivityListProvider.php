@@ -8,17 +8,19 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
+    ActivityListGroupProviderInterface,
     CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
@@ -105,6 +107,15 @@ class EmailActivityListProvider implements
     {
         /** @var $entity Email */
         return $entity->getSentAt();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isHead($entity)
+    {
+        /** @var $entity Email */
+        return $entity->isHead();
     }
 
     /**
