@@ -31,14 +31,6 @@ class ThemeManager
     }
 
     /**
-     * @return string
-     */
-    public function getActiveTheme()
-    {
-        return $this->activeTheme;
-    }
-
-    /**
      * @param string $activeTheme Theme name
      */
     public function setActiveTheme($activeTheme)
@@ -49,7 +41,7 @@ class ThemeManager
     /**
      * Returns all known themes names
      *
-     * @return string[]|array
+     * @return string[]
      */
     public function getThemeNames()
     {
@@ -75,9 +67,13 @@ class ThemeManager
      *
      * @return Theme
      */
-    public function getTheme($themeName)
+    public function getTheme($themeName = null)
     {
-        if (!$this->hasTheme($themeName)) {
+        $themeName = null === $themeName ? $this->activeTheme : $themeName;
+
+        if (null === $themeName) {
+            throw new \LogicException('Impossible to retrieve active theme due to miss configuration');
+        } elseif (!$this->hasTheme($themeName)) {
             throw new \LogicException(sprintf('Unable to retrieve definition for theme "%s"', $themeName));
         }
 

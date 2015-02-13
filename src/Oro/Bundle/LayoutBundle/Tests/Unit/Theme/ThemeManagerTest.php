@@ -20,23 +20,6 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
         unset($this->factory);
     }
 
-    public function testActiveThemePassedThroughConstructor()
-    {
-        $manager = $this->createManager([], 'base');
-
-        $this->assertSame('base', $manager->getActiveTheme());
-    }
-
-    public function testActiveThemeSetter()
-    {
-        $manager = $this->createManager();
-
-        $this->assertNull($manager->getActiveTheme());
-
-        $manager->setActiveTheme('base');
-        $this->assertSame('base', $manager->getActiveTheme());
-    }
-
     public function testManagerWorkWithoutKnownThemes()
     {
         $manager = $this->createManager();
@@ -73,6 +56,41 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($themeMock, $manager->getTheme('base'));
         $this->assertSame($themeMock, $manager->getTheme('base'), 'Should instantiate model once');
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Impossible to retrieve active theme due to miss configuration
+     */
+    public function testTryingToGetActiveThemeModelWhenNotConfigured()
+    {
+        $manager = $this->createManager();
+        $manager->getTheme();
+    }
+
+    public function testActiveThemePassedThroughConstructor()
+    {
+        $manager = $this->createManager(['base' => []], 'base');
+
+        $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+
+        $this->factory->expects($this->once())->method('create')
+            ->with($this->equalTo('base'))->willReturn($themeMock);
+
+        $this->assertSame($themeMock, $manager->getTheme());
+    }
+
+    public function testActiveThemePassedThroughSetter()
+    {
+        $manager = $this->createManager(['base' => []]);
+        $manager->setActiveTheme('base');
+
+        $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+
+        $this->factory->expects($this->once())->method('create')
+            ->with($this->equalTo('base'))->willReturn($themeMock);
+
+        $this->assertSame($themeMock, $manager->getTheme());
     }
 
     public function testGetThemeNames()
