@@ -29,5 +29,8 @@ class OroEmailBundle implements Migration
         $table->addColumn('is_seen', 'boolean');
         $table->addColumn('thread_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('refs', 'text', ['notnull' => false]);
+
+        $table->addIndex(['is_head'], 'oro_email_is_head');
+        $table->addIndex(['thread_id'], 'oro_email_thread_id');
     }
 }
