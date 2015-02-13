@@ -16,10 +16,10 @@ class DeferredLayoutManipulatorCountersTest extends DeferredLayoutManipulatorTes
         $this->layoutManipulator->add('root', null, 'root');
         $this->assertEquals(0, $this->layoutManipulator->getNumberOfAddedItems());
 
-        $this->layoutManipulator->applyChanges(new LayoutContext());
+        $this->layoutManipulator->applyChanges(new LayoutContext(), true);
         $this->assertEquals(1, $this->layoutManipulator->getNumberOfAddedItems());
 
-        $this->layoutManipulator->applyChanges(new LayoutContext());
+        $this->layoutManipulator->applyChanges(new LayoutContext(), true);
         $this->assertEquals(0, $this->layoutManipulator->getNumberOfAddedItems());
     }
 
@@ -29,16 +29,16 @@ class DeferredLayoutManipulatorCountersTest extends DeferredLayoutManipulatorTes
         $this->layoutManipulator->add('header', 'root', 'header');
         $this->layoutManipulator->add('logo', 'header', 'logo');
 
-        $this->layoutManipulator->applyChanges(new LayoutContext());
+        $this->layoutManipulator->applyChanges(new LayoutContext(), true);
         $this->assertEquals(3, $this->layoutManipulator->getNumberOfAddedItems());
 
         $this->layoutManipulator->move('logo', 'root');
         $this->assertEquals(3, $this->layoutManipulator->getNumberOfAddedItems());
 
-        $this->layoutManipulator->applyChanges(new LayoutContext());
+        $this->layoutManipulator->applyChanges(new LayoutContext(), true);
         $this->assertEquals(1, $this->layoutManipulator->getNumberOfAddedItems());
 
-        $this->layoutManipulator->applyChanges(new LayoutContext());
+        $this->layoutManipulator->applyChanges(new LayoutContext(), true);
         $this->assertEquals(0, $this->layoutManipulator->getNumberOfAddedItems());
     }
 }

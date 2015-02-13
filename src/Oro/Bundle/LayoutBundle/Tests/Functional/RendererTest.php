@@ -97,6 +97,9 @@ class RendererTest extends LayoutTestCase
                     ]
                 ]
             )
+            // swap 'general' and 'additional' groups to check that a layout update
+            // can be applied for items added by a block type
+            ->move('form:group_general', null, 'form:group_additional')
             ->getLayout($context);
 
         return $layout;
@@ -165,6 +168,35 @@ HTML;
     {
         $expected = <<<HTML
 <fieldset>
+    <legend>Additional Info</legend>
+    <div>
+        <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
+        <input type="text"
+            id="form_for_layout_renderer_test_jobTitle"
+            name="form_for_layout_renderer_test[jobTitle]"/>
+    </div>
+    <div>
+        <label>Gender</label>
+        <div id="form_for_layout_renderer_test_gender">
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_placeholder"
+                name="form_for_layout_renderer_test[gender]"
+                value="" checked="checked"/>
+            <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_0"
+                name="form_for_layout_renderer_test[gender]"
+                value="male"/>
+            <label for="form_for_layout_renderer_test_gender_0">Male</label>
+            <input type="radio"
+                id="form_for_layout_renderer_test_gender_1"
+                name="form_for_layout_renderer_test[gender]"
+                value="female"/>
+            <label for="form_for_layout_renderer_test_gender_1">Female</label>
+        </div>
+    </div>
+</fieldset>
+<fieldset>
     <legend>General Info</legend>
     <div>
         <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
@@ -181,6 +213,17 @@ HTML;
             required="required"/>
     </div>
 </fieldset>
+HTML;
+
+        return $expected;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPhpFormLayoutResult()
+    {
+        $expected = <<<HTML
 <fieldset>
     <legend>Additional Info</legend>
     <div>
@@ -210,17 +253,6 @@ HTML;
         </div>
     </div>
 </fieldset>
-HTML;
-
-        return $expected;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getPhpFormLayoutResult()
-    {
-        $expected = <<<HTML
 <fieldset>
     <legend>General Info</legend>
     <div>
@@ -236,35 +268,6 @@ HTML;
             id="form_for_layout_renderer_test_user_firstName"
             name="form_for_layout_renderer_test[user][firstName]"
             required="required"/>
-    </div>
-</fieldset>
-<fieldset>
-    <legend>Additional Info</legend>
-    <div>
-        <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_jobTitle"
-            name="form_for_layout_renderer_test[jobTitle]"/>
-    </div>
-    <div>
-        <label>Gender</label>
-        <div id="form_for_layout_renderer_test_gender">
-            <input type="radio"
-                id="form_for_layout_renderer_test_gender_placeholder"
-                name="form_for_layout_renderer_test[gender]"
-                value="" checked="checked"/>
-            <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
-            <input type="radio"
-                id="form_for_layout_renderer_test_gender_0"
-                name="form_for_layout_renderer_test[gender]"
-                value="male"/>
-            <label for="form_for_layout_renderer_test_gender_0">Male</label>
-            <input type="radio"
-                id="form_for_layout_renderer_test_gender_1"
-                name="form_for_layout_renderer_test[gender]"
-                value="female"/>
-            <label for="form_for_layout_renderer_test_gender_1">Female</label>
-        </div>
     </div>
 </fieldset>
 HTML;

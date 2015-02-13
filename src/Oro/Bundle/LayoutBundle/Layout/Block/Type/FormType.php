@@ -14,6 +14,14 @@ use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
 
+/**
+ * This block type is responsible to build the layout for a Symfony's form object.
+ * Naming convention:
+ *  field id = $options['form_field_prefix'] + field path (path separator is replaced with colon (:))
+ *      for example: form_firstName or form_address:city  where 'form_' is the prefix
+ *  group id = $options['form_group_prefix'] + group name
+ *      for example: form:group_myGroup where 'form:group_' is the prefix
+ */
 class FormType extends AbstractContainerType
 {
     const NAME = 'form';
