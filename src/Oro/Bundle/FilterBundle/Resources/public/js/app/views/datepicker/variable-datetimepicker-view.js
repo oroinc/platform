@@ -57,6 +57,36 @@ define(function (require) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
+        },
+
+        /**
+         * Reads value of front field and converts it to backend format
+         *
+         * @returns {string}
+         */
+        getBackendFormattedValue: function () {
+            var value = this.$frontDateField.val();
+            if (this.dateVariableHelper.isDateVariable(value)) {
+                value = this.dateVariableHelper.formatRawValue(value);
+            } else {
+                value = dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+            }
+            return value;
+        },
+
+        /**
+         * Reads value of original field and converts it to frontend format
+         *
+         * @returns {string}
+         */
+        getFrontendFormattedDate: function () {
+            var value = this.$el.val();
+            if (this.dateVariableHelper.isDateVariable(value)) {
+                value = this.dateVariableHelper.formatDisplayValue(value);
+            } else {
+                value = dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
+            }
+            return value;
         }
     }));
 
