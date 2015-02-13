@@ -59,49 +59,59 @@
             }
         }
     %}
-    <div class="row-fluid" id="calendar"
+    <div class="oro-page collapsible-sidebar clearfix" id="calendar"
          data-page-component-module="orocalendar/js/app/components/calendar-component"
          data-page-component-options="{{ calendarOptions | json_encode }}">
-        <div class="span2 scrollable-container">
-            <div class="calendars">
-                <div class="calendar-connections"></div>
-                <form action="#">
-                    {{ form_row(user_select_form) }}
-                </form>
+        <div class="oro-page-sidebar search-entity-types-column dropdown">
+            <a href="javascript: void(0);" class="dropdown-toggle" data-toggle="dropdown">
+                <i class="icon-filter"></i>
+                Select calendars
+                <i class="icon-sort-down"></i>
+            </a>
+            <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                <div class="calendars">
+                    <div class="calendar-connections"></div>
+                    <form action="#">
+                        {{ form_row(user_select_form) }}
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="span10 calendar-events scrollable-container"></div>
+        <div class="oro-page-body search-results-column">
+            <div class="calendar-events"></div>
+        </div>
     </div>
-
     <script type="text/html" id="template-calendar-menu">
         {{ oro_menu_render('calendar_menu') }}
     </script>
 
     <script type="text/html" id="template-calendar-connections">
-        <ul class="media-list connection-container">
+        <ul class="oro-page-menu-items connection-container">
         </ul>
     </script>
 
     <script type="text/html" id="template-calendar-connection-item">
-        <li class="media connection-item<% if (visible) { %> active<% } %>" >
-            <span
-                <% if (visible) { %>
-                class="calendar-color"
-                    <% if (!_.isEmpty(backgroundColor)) { %>
-                    style="background-color: <%- backgroundColor %>; border-color: <%- backgroundColor %>"
-                    <% } %>
-                <% } else { %>
-                    class="calendar-color un-color"
-                <% } %>
-            ></span>
-            <div class="media-body">
-                <div class="user-calendar" title="<%- calendarName %>"><%- calendarName %></div>
-                <div class="pull-right icons-holder">
+        <li class="connection-item<% if (visible) { %> active<% } %>" >
+            <div class="pull-right">
+                <div class="connection-menu-container dropdown pull-left icons-holder">
                     <a href="javascript: void(0);" class="icons-holder-text no-hash context-menu-button">
                         <i class="icon-ellipsis-horizontal"></i>
                     </a>
                 </div>
             </div>
+            <a href="javascript: void(0);" class="no-action">
+                <span
+                    <% if (visible) { %>
+                    class="calendar-color"
+                        <% if (!_.isEmpty(backgroundColor)) { %>
+                        style="background-color: <%- backgroundColor %>; border-color: <%- backgroundColor %>"
+                        <% } %>
+                    <% } else { %>
+                        class="calendar-color un-color"
+                    <% } %>
+                ></span>
+                <span class="user-calendar" title="<%- calendarName %>"><%- calendarName %></span>
+            </a>
         </li>
     </script>
 

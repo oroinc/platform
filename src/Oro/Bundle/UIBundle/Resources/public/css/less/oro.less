@@ -36,11 +36,14 @@ body.error-page {
   }
 }
 a {
-  color:@linkColor;
+  color: @linkColor;
   &:hover,
   &:active,
   &:focus {
     text-decoration: none;
+  }
+  &.no-action {
+    color: @textColor;
   }
 }
 form {
@@ -121,18 +124,6 @@ label, input, button, select, textarea { font-size:13px;}
         width: auto;
       }
     }
-  }
-}
-.context-menu {
-    display: block;
-    position: fixed;
-    z-index: 999;
-    margin: 0;
-    min-width: 170px;
-  a {
-      color: #444 !important;
-      font-weight: normal;
-      line-height: 20px;
   }
 }
 .simplecolorpicker {
@@ -313,7 +304,7 @@ body .select2-container {
 .dropdown-menu > li > a {
   padding-left:13px;
   padding-right:13px;
-  color:@linkColor;
+  color: @menuItemColor;
 }
 .dropdown-menu > li > a:hover,
 .dropdown-menu > li > a:focus,
@@ -323,7 +314,7 @@ body .select2-container {
 .dropdown-menu > .active > a:hover,
 .dropdown-menu > .active > a:focus {
   background:#f3f3f3;
-  color:@linkColor;
+  color: @menuItemColor;
 }
 
 .navbar .nav li.dropdown.open > .dropdown-toggle,
@@ -3004,10 +2995,11 @@ span.validation-failed {
 .popover {
   max-width: 315px; /* little increase to fit usual content */
   .popover-content {
-    padding: 6px 25px 6px 8px;
+    padding: 6px 8px;
   }
   .oro-popover-content {
     overflow-y: auto;
+    margin-right: 15px;
     max-height: 60px;
   }
   .popover-close {

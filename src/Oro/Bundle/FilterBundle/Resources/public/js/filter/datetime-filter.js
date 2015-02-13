@@ -87,7 +87,8 @@ define(function (require) {
         _getPickerConfigurationOptions: function (options) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
             _.extend(options, {
-                backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat]
+                backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
+                timezoneShift: 0
             });
             return options;
         },

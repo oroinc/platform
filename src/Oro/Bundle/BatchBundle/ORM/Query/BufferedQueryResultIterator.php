@@ -109,6 +109,14 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     private $useCountWalker;
 
     /**
+     * Walk through results in reverse order
+     * Useful when selected records are being updated in between page load
+     *
+     * @var bool
+     */
+    private $reverse = false;
+
+    /**
      * Constructor
      *
      * @param Query|QueryBuilder $source
@@ -160,6 +168,20 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     {
         $this->assertQueryWasNotExecuted('hydration mode');
         $this->requestedHydrationMode = $hydrationMode;
+
+        return $this;
+    }
+
+    /**
+     * Sets iteration order
+     *
+     * @param bool $reverse Determines the iteration order
+     * @return BufferedQueryResultIterator
+     */
+    public function setReverse($reverse)
+    {
+        $this->assertQueryWasNotExecuted('reverse mode');
+        $this->reverse = $reverse;
 
         return $this;
     }
@@ -311,13 +333,25 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
         $query = $this->getQuery();
 
         $totalPages = ceil($this->count() / $query->getMaxResults());
-        if (!$totalPages || $totalPages <= $this->page + 1) {
-            unset($this->rows);
+        if ($this->reverse) {
+            if ($this->page == -1) {
+                $this->page = $totalPages;
+            }
+            if ($this->page < 1) {
+                unset($this->rows);
 
-            return false;
+                return false;
+            }
+            $this->page--;
+        } else {
+            if (!$totalPages || $totalPages <= $this->page + 1) {
+                unset($this->rows);
+
+                return false;
+            }
+            $this->page++;
         }
 
-        $this->page++;
         $this->offset = 0;
 
         $this->prepareQueryToExecute($query);
