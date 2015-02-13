@@ -26,7 +26,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
 
         // do test
         $this->layoutManipulator->clear();
-        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator->applyChanges($this->context, true);
         $this->assertTrue($this->rawLayoutBuilder->isEmpty());
         $this->assertSame(0, $this->layoutManipulator->getNumberOfAddedItems());
     }
@@ -563,7 +563,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 'vars'     => ['id' => 'root'],
                 'children' => [
                     [ // header with changed block type
-                        'vars'     => ['id' => 'header', 'title' => 'test']
+                        'vars' => ['id' => 'header', 'title' => 'test']
                     ]
                 ]
             ],
@@ -949,6 +949,46 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                             ],
                         ]
                     ],
+                ]
+            ],
+            $view
+        );
+    }
+
+    /**
+     * tests 'move' item within the same parent when the target item is added only in second iteration
+     * and as result it is expected that this 'move' action is executed in the second iteration as well
+     */
+    public function testMoveWithinSameParentBeforeButInSecondIteration()
+    {
+        // first iteration
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->add('header', 'root', 'header')
+            ->add('logo2', 'header', 'logo')
+            ->move('logo2', null, 'logo1', true);
+        $this->layoutManipulator->applyChanges($this->context);
+
+        // second iteration
+        $this->layoutManipulator
+            ->add('logo1', 'header', 'logo');
+        $view = $this->getLayoutView();
+
+        $this->assertBlockView(
+            [ // root
+                'vars'     => ['id' => 'root'],
+                'children' => [
+                    [ // header
+                        'vars'     => ['id' => 'header'],
+                        'children' => [
+                            [ // logo2
+                                'vars' => ['id' => 'logo2', 'title' => '']
+                            ],
+                            [ // logo1
+                                'vars' => ['id' => 'logo1', 'title' => '']
+                            ]
+                        ]
+                    ]
                 ]
             ],
             $view

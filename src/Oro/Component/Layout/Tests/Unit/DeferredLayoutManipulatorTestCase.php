@@ -57,7 +57,7 @@ class DeferredLayoutManipulatorTestCase extends LayoutTestCase
      */
     protected function getLayoutView($rootId = null)
     {
-        $this->layoutManipulator->applyChanges($this->context);
+        $this->layoutManipulator->applyChanges($this->context, true);
         $rawLayout = $this->rawLayoutBuilder->getRawLayout();
 
         return $this->blockFactory->createBlockView($rawLayout, $this->context, $rootId);

@@ -54,6 +54,7 @@ class BlockFactory implements BlockFactoryInterface
                 : $this->rawLayout->getRootId();
 
             $this->buildBlocks($rootId);
+            $this->layoutManipulator->applyChanges($this->context, true);
             $rootView = $this->buildBlockViews($rootId);
 
             $this->clearState();

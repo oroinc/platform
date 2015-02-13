@@ -14,25 +14,38 @@ class LayoutTestCase extends WebTestCase
      */
     protected function assertHtmlEquals($expected, $actual)
     {
-        $this->assertEquals($this->prepareHtml($expected), $this->prepareHtml($actual));
+        $this->assertEquals($this->normalizeHtml($expected), $this->normalizeHtml($actual));
     }
 
     /**
-     * Removes not important whitespaces from the given HTML string
+     * Normalizes HTML string
      *
      * @param string $html
      *
      * @return string
      */
-    protected function prepareHtml($html)
+    protected function normalizeHtml($html)
     {
-        $html = preg_replace('/\\n\s*\\n/', "\n", $html);
-        $html = preg_replace('/\\n\s+\</', "\n<", $html);
-        $html = preg_replace('/\>\s*\</', ">\n<", $html);
-        $html = preg_replace('/\s+\/\>/', '/>', $html);
-        $html = preg_replace('/\s+\>/', '>', $html);
+        // add line break after tag and its content
+        $html = preg_replace('/\>\s*(\w)/', ">\n\${1}", $html);
+        // add line break before closing tags
         $html = preg_replace('/\s+\<\//', "\n</", $html);
+        // add line break between tags
+        $html = preg_replace('/\>\s*\</', ">\n<", $html);
+
+        // remove redundant spaces inside tag
+        // for example
+        // <label  for="element"   class="test"
+        //        title="some title" >
+        // will be converted to
+        // <label for="element" class="test" title="some title">
+        $html = preg_replace('/\"\s+(\w+=)/', '" ${1}', $html);
+        $html = preg_replace('/(\<\w+)\s+/', '${1} ', $html);
+        $html = preg_replace('/\s+([\/]*\>)/', '${1}', $html);
+
+        // remove spaces at the begin of a line
         $html = preg_replace('/^\s+/m', '', $html);
+
         $html = rtrim($html);
 
         return $html;
