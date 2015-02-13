@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Controller;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -185,9 +184,18 @@ class EmailController extends Controller
             'saved' => false
         ];
         if ($parentEmail) {
+            // setting Parent email id
             $emailModel->setParentEmailId($parentEmail->getId());
-            $emailModel->setTo([$parentEmail->getFromEmailAddress()->getEmail()]);
 
+            // setting To
+            $fromAddress = $parentEmail->getFromEmailAddress();
+            if ($fromAddress->getOwner() == $this->getUser()) {
+                $emailModel->setTo([$parentEmail->getTo()->first()->getEmailAddress()->getEmail()]);
+            } else {
+                $emailModel->setTo([$fromAddress->getEmail()]);
+            }
+
+            // setting Subject
             $subject = $parentEmail->getSubject();
             if (preg_match('/^Re:*/', $subject)) {
                 $emailModel->setSubject($subject);
@@ -195,14 +203,14 @@ class EmailController extends Controller
                 $emailModel->setSubject('Re: ' . $subject);
             }
 
+            // setting Body
             try {
                 $this->getEmailCacheManager()->ensureEmailBodyCached($parentEmail);
             } catch (LoadEmailBodyException $e) {
+                $this->get('logger')->notice(sprintf('Reply To email exception: %s', $e->getMessage()));
             }
-
             $body = $this->get('templating')
                 ->render('OroEmailBundle:Email/Reply:parentBody.html.twig', ['email' => $parentEmail]);
-
             $emailModel->setBody($body);
         }
         if ($this->get('oro_email.form.handler.email')->process($emailModel)) {
@@ -212,5 +220,4 @@ class EmailController extends Controller
 
         return $responseData;
     }
-
 }

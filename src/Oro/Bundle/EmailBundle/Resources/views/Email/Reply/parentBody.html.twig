@@ -3,7 +3,7 @@
     <div class="quote">
         <p>
             {{ 'oro.email.parent_message_header'|trans({
-                '%date%': email.sentAt|date('d.m.Y H:i'),
+                '%date%': email.sentAt|oro_format_date,
                 '%user%': email.fromName
             }) }}
         </p>
