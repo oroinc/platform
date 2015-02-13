@@ -17,7 +17,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetEmailThreadIdFoundInThreadIdAttributes()
     {
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->exactly(2))
+        $email->expects($this->exactly(1))
             ->method('getRefs')
             ->will($this->returnValue('testMessageId'));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -61,7 +61,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetEmailThreadIdFoundInXThreadIdAttributes()
     {
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->exactly(4))
+        $email->expects($this->exactly(2))
             ->method('getRefs')
             ->will($this->returnValue('testMessageId'));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')

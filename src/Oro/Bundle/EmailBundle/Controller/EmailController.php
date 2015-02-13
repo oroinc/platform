@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Controller;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -13,6 +14,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -42,6 +44,7 @@ class EmailController extends Controller
         } catch (LoadEmailBodyException $e) {
             $templateVars['noBodyFound'] = true;
         }
+        $this->getEmailManager()->setEmailSeen($entity);
 
         return $templateVars;
     }
@@ -175,6 +178,16 @@ class EmailController extends Controller
     protected function getEmailCacheManager()
     {
         return $this->container->get('oro_email.email.cache.manager');
+    }
+
+    /**
+     * Get email cache manager
+     *
+     * @return EmailManager
+     */
+    protected function getEmailManager()
+    {
+        return $this->container->get('oro_email.email.manager');
     }
 
     /**

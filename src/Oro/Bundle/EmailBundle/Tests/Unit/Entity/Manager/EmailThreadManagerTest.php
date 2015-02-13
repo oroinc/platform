@@ -37,7 +37,7 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $email->expects($this->once())
             ->method('setThreadId')
             ->with($threadId);
-        $email->expects($this->exactly(2))
+        $email->expects($this->exactly(3))
             ->method('getThreadId')
             ->will($this->returnValue($threadId));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
