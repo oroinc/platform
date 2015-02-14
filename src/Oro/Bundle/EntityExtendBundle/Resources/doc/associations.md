@@ -60,7 +60,7 @@ Pros and cons of both approaches:
     Cons:
 
      - You need to create a bit more code than for association based approach.
-     - If you heed to add other types of owners you have to change email entity manually.
+     - If you heed to add other types of owners you have to modyfy email entity to add new relations as well as update `getOwner` and `setOwner` methods.
      - There is only one way to add other types of owners from external bundle - ask you to modify email entity.
      - It is not possible to use custom entities as an owner.
 
@@ -68,7 +68,7 @@ Pros and cons of both approaches:
 
     Pros:
 
-     - Associations provide a some kind of "standard" approach in Oro Platform to add relations between some entity and other entities.
+     - Associations provide common an well tested approach in Oro Platform to add relations between entities when types of target entities are unknown in design stage or when you need unified access to relations to different entities.
      - It is easy to add other types of owners from any external bundle or even by an administrator using entity management UI.
 
     Cons:
