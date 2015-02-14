@@ -43,7 +43,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
      */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
-        if (!$this->cm->get('oro_user.enable_google_sso')) {
+        if (!$this->cm->get('oro_sso.enable_google_sso')) {
             throw new \Exception('SSO is not enabled');
         }
 
