@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
@@ -16,9 +16,17 @@ class EmailThreadManager
      */
     protected $emailThreadProvider;
 
+    /**
+     * Emails for head updates after flush
+     *
+     * @var Email[]
+     */
+    protected $queue;
+
     public function __construct(EmailThreadProvider $emailThreadProvider)
     {
         $this->emailThreadProvider = $emailThreadProvider;
+        $this->resetQueue();
     }
 
     /**
@@ -36,6 +44,17 @@ class EmailThreadManager
     }
 
     /**
+     * Handles postFlush event
+     *
+     * @param PostFlushEventArgs $event
+     */
+    public function handlePostFlush(PostFlushEventArgs $event)
+    {
+        $entityManager = $event->getEntityManager();
+        $this->handleEmailUpdates($entityManager);
+    }
+
+    /**
      * Handles email insertions
      *
      * @param EntityManager $entityManager
@@ -47,9 +66,24 @@ class EmailThreadManager
             if ($entity instanceof Email) {
                 $entity->setThreadId($this->emailThreadProvider->getEmailThreadId($entityManager, $entity));
                 $this->updateRefs($entityManager, $entity);
+                $this->addEntityToUpdateQueue($entity);
+            }
+        }
+    }
+
+    /**
+     * Handles email updates
+     *
+     * @param EntityManager $entityManager
+     */
+    protected function handleEmailUpdates(EntityManager $entityManager)
+    {
+        foreach ($this->queue as $entity) {
+            if ($entity instanceof Email) {
                 $this->updateThreadHead($entityManager, $entity);
             }
         }
+        $this->resetQueue();
     }
 
     /**
@@ -64,6 +98,7 @@ class EmailThreadManager
             foreach ($this->emailThreadProvider->getEmailReferences($entityManager, $entity) as $email) {
                 $email->setThreadId($entity->getThreadId());
                 $entityManager->persist($email);
+                $this->addEntityToUpdateQueue($email);
             }
         }
     }
@@ -130,5 +165,21 @@ class EmailThreadManager
             $email->setHead(false);
             $entityManager->persist($email);
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function resetQueue()
+    {
+        $this->queue = [];
+    }
+
+    /**
+     * @param $email
+     */
+    protected function addEntityToUpdateQueue($email)
+    {
+        $this->queue[] = $email;
     }
 }
