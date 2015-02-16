@@ -12,10 +12,6 @@ define(function (require) {
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
-     *
-     * @export  oro/filter/datetime-filter
-     * @class   oro.filter.DatetimeFilter
-     * @extends oro.filter.DateFilter
      */
     DatetimeFilter = DateFilter.extend({
         /**

@@ -57,6 +57,62 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                 },
                 name: {
                     en_US: '%prefix% %first_name% %middle_name% %last_name% %suffix%'
+                },
+                number: {
+                    decimal: {
+                        grouping_size: 3,
+                        grouping_used: 1,
+                        max_fraction_digits: 3,
+                        min_fraction_digits: 0,
+                        negative_prefix: '-',
+                        negative_suffix: '',
+                        positive_prefix: '',
+                        positive_suffix: '',
+                        currency_code: '',
+                        padding_character: '*',
+                        decimal_separator_symbol: '.',
+                        grouping_separator_symbol: ',',
+                        monetary_separator_symbol: '.',
+                        monetary_grouping_separator_symbol: ',',
+                        currency_symbol: '¤',
+                        zero_digit_symbol: '0'
+                    },
+                    percent: {
+                        grouping_size: 3,
+                        grouping_used: 1,
+                        max_fraction_digits: 3,
+                        min_fraction_digits: 0,
+                        negative_prefix: '-',
+                        negative_suffix: '%',
+                        positive_prefix: '',
+                        positive_suffix: '%',
+                        currency_code: '',
+                        padding_character: '*',
+                        decimal_separator_symbol: '.',
+                        grouping_separator_symbol: ',',
+                        monetary_separator_symbol: '.',
+                        monetary_grouping_separator_symbol: ',',
+                        currency_symbol: '¤',
+                        zero_digit_symbol: '0'
+                    },
+                    currency: {
+                        grouping_size: 3,
+                        grouping_used: 1,
+                        max_fraction_digits: 2,
+                        min_fraction_digits: 2,
+                        negative_prefix: '-¤',
+                        negative_suffix: '',
+                        positive_prefix: '¤',
+                        positive_suffix: '',
+                        currency_code: '',
+                        padding_character: '*',
+                        decimal_separator_symbol: '.',
+                        grouping_separator_symbol: ',',
+                        monetary_separator_symbol: '.',
+                        monetary_grouping_separator_symbol: ',',
+                        currency_symbol: '¤',
+                        zero_digit_symbol: '0'
+                    }
                 }
             },
             calendar: {
