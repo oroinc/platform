@@ -86,7 +86,7 @@ class Processor
     {
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $parentMessageId = $this->getMessageId($model);
+        $parentMessageId = $this->getParentMessageId($model);
 
         /** @var \Swift_Message $message */
         $message = $this->mailer->createMessage();
@@ -264,7 +264,7 @@ class Processor
      *
      * @return string
      */
-    protected function getMessageId(EmailModel $model)
+    protected function getParentMessageId(EmailModel $model)
     {
         $messageId = '';
         $parentEmailId = $model->getParentEmailId();
