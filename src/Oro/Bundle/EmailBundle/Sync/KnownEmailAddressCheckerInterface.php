@@ -15,6 +15,17 @@ interface KnownEmailAddressCheckerInterface
     public function isAtLeastOneKnownEmailAddress($_);
 
     /**
+     * Check if at least one of the given email addresses belongs to the given user
+     *
+     * @param int   $userId The id of the user
+     * @param mixed $_      Email address(es) to check
+     *                      Each parameter can be a string or array of strings
+     *
+     * @return bool
+     */
+    public function isAtLeastOneUserEmailAddress($userId, $_);
+
+    /**
      * Performs pre-loading of the given email addresses
      *
      * @param array $emails Each item can be a string or array of strings
