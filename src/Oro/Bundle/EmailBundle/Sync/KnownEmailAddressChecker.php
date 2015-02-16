@@ -12,6 +12,9 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
@@ -31,8 +34,14 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     /** @var array */
     protected $exclusions;
 
-    /** @var array key = email address, value = 1 - known, -1 - unknown */
-    protected $knownEmailAddresses = [];
+    /**
+     * @var array
+     *  key   = email address
+     *  value = array
+     *      known => true/false
+     *      user  => user id
+     */
+    protected $emails = [];
 
     /**
      * Constructor
@@ -48,7 +57,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
-        $exclusions = []
+        array $exclusions = []
     ) {
         $this->em                        = $em;
         $this->emailAddressManager       = $emailAddressManager;
@@ -79,8 +88,8 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
                 if (empty($email)) {
                     continue;
                 }
-                if (isset($this->knownEmailAddresses[$email])) {
-                    if ($this->knownEmailAddresses[$email] === 1) {
+                if (isset($this->emails[$email])) {
+                    if ($this->emails[$email]['known']) {
                         return true;
                     }
                 } elseif (!isset($emailsToLoad[$email])) {
@@ -92,7 +101,48 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         if (!empty($emailsToLoad)) {
             $this->loadKnownEmailAddresses($emailsToLoad);
             foreach ($emailsToLoad as $email) {
-                if (isset($this->knownEmailAddresses[$email]) && $this->knownEmailAddresses[$email] === 1) {
+                if ($this->emails[$email]['known']) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAtLeastOneUserEmailAddress($userId, $_)
+    {
+        $emailsToLoad = [];
+
+        $args = func_get_args();
+        unset($args[0]);
+        foreach ($args as $arg) {
+            if (empty($arg)) {
+                continue;
+            }
+            foreach ($this->normalizeEmailAddresses((array)$arg) as $email) {
+                if (empty($email)) {
+                    continue;
+                }
+                if (isset($this->emails[$email])) {
+                    if (isset($this->emails[$email]['user'])
+                        && $userId === $this->emails[$email]['user']
+                    ) {
+                        return true;
+                    }
+                } elseif (!isset($emailsToLoad[$email])) {
+                    $emailsToLoad[$email] = $email;
+                }
+            }
+        }
+
+        if (!empty($emailsToLoad)) {
+            $this->loadKnownEmailAddresses($emailsToLoad);
+            foreach ($emailsToLoad as $email) {
+                if ($this->emails[$email]['known']) {
                     return true;
                 }
             }
@@ -112,10 +162,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
                 continue;
             }
             foreach ($this->normalizeEmailAddresses((array)$arg) as $email) {
-                if (!empty($email)
-                    && !isset($this->knownEmailAddresses[$email])
-                    && !isset($emailsToLoad[$email])
-                ) {
+                if (!empty($email) && !isset($this->emails[$email]) && !isset($emailsToLoad[$email])) {
                     $emailsToLoad[$email] = $email;
                 }
             }
@@ -127,7 +174,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     }
 
     /**
-     * Loads the given emails into $this->knownEmailAddresses
+     * Loads the given emails into $this->emails
      *
      * @param string[] $emailsToLoad
      */
@@ -137,45 +184,77 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 
         $emails = $this->getKnownEmailAddresses($emailsToLoad);
 
-        $loadedEmailCount = count($emails);
-
-        foreach ($emails as $item) {
-            $email = strtolower($item['email']);
-
-            $this->knownEmailAddresses[$email] = 1; // known
-            unset($emailsToLoad[$email]);
-        }
         foreach ($emailsToLoad as $email) {
-            $this->knownEmailAddresses[$email] = -1; // unknown
+            $this->emails[$email] = isset($emails[$email])
+                ? $emails[$email]
+                : ['known' => false];
         }
 
-        $this->logger->notice(sprintf('Loaded %d email address(es).', $loadedEmailCount));
+        $this->logger->notice(sprintf('Loaded %d email address(es).', count($emails)));
     }
 
     /**
      * @param string[] $emailsToLoad
      *
      * @return array
+     *  key   = email address
+     *  value = array
+     *      known => true/false
+     *          false if the address belongs to user only
+     *          true if the address belongs to not excluded owners
+     *      user  => user id
      */
     protected function getKnownEmailAddresses(array $emailsToLoad)
     {
         $repo = $this->emailAddressManager->getEmailAddressRepository($this->em);
         $qb   = $repo->createQueryBuilder('a')
-            ->select('a.email')
             ->where('a.hasOwner = :hasOwner AND a.email IN (:emails)')
             ->setParameter('hasOwner', true)
             ->setParameter('emails', $emailsToLoad);
 
-        if (!empty($this->exclusions)) {
-            foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
-                if (isset($this->exclusions[$provider->getEmailOwnerClass()])) {
-                    $fieldName = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
-                    $qb->andWhere(sprintf('a.%s IS NULL', $fieldName));
+        $select        = 'a.email';
+        $userIdField   = null;
+        $ownerIdFields = [];
+        foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
+            $ownerClass = $provider->getEmailOwnerClass();
+            $isUser     = $ownerClass === 'Oro\Bundle\UserBundle\Entity\User';
+            $field      = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
+            if ($isUser) {
+                $userIdField = $field;
+            }
+            if (isset($this->exclusions[$ownerClass])) {
+                if ($isUser) {
+                    $select .= sprintf(',IDENTITY(a.%1$s) AS %1$s', $field);
+                } else {
+                    $qb->andWhere(sprintf('a.%s IS NULL', $field));
                 }
+            } else {
+                $select .= sprintf(',IDENTITY(a.%1$s) AS %1$s', $field);
+                $ownerIdFields[] = $field;
             }
         }
+        $qb->select($select);
 
-        return $qb->getQuery()->getArrayResult();
+        $result = [];
+        $data   = $qb->getQuery()->getArrayResult();
+        foreach ($data as $item) {
+            $known = false;
+            foreach ($ownerIdFields as $field) {
+                if ($item[$field] !== null) {
+                    $known = true;
+                    break;
+                }
+            }
+
+            $email  = strtolower($item['email']);
+            $userId = $item[$userIdField];
+
+            $result[$email] = $userId === null
+                ? ['known' => $known]
+                : ['known' => $known, 'user' => (int)$userId];
+        }
+
+        return $result;
     }
 
     /**
