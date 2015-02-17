@@ -199,15 +199,24 @@ class Orm extends AbstractEngine
                 if (is_array($item)) {
                     $item = $item['item'];
                 }
-                /** @var $item Item  */
-                $results[] = new ResultItem(
-                    $this->registry->getManagerForClass($item->getEntity()),
-                    $item->getEntity(),
-                    $item->getRecordId(),
-                    $item->getTitle(),
+
+                /**
+                 * Search result can contains duplicates and we can not use HYDRATE_OBJECT because of performance issue.
+                 * @todo: update after fix BAP-7166. Remove check for existing result.
+                 */
+                $id = $item['id'];
+                if (isset($results[$id])) {
+                    continue;
+                }
+
+                $results[$id] = new ResultItem(
+                    $this->registry->getManagerForClass($item['entity']),
+                    $item['entity'],
+                    $item['recordId'],
+                    $item['title'],
                     null,
-                    $item->getRecordText(),
-                    $this->mapper->getEntityConfig($item->getEntity())
+                    null,
+                    $this->mapper->getEntityConfig($item['entity'])
                 );
             }
         }

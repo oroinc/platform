@@ -34,7 +34,8 @@ and then methods `addStatusData` and `getStatusData` will be available.
 
 
     // retrieve data from status
-    $status = $this->channel->getStatusesForConnector($this->getType(), Status::STATUS_COMPLETED)->first();
+    $status = $this->container->get('doctrine')->getRepository('OroIntegrationBundle:Channel')
+        ->getLastStatusForConnector($channel, $this->getType(), Status::STATUS_COMPLETED);
     /** @var array **/
     $data = $status->getData();
     $lastItemUpdatedAt = $data['lastItemUpdatedAt'];

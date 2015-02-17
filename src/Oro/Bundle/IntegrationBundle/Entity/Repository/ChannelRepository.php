@@ -10,6 +10,36 @@ use Oro\Bundle\IntegrationBundle\Entity\Status;
 class ChannelRepository extends EntityRepository
 {
     /**
+     * Returns latest status for integration's connector and code if it exists.
+     *
+     * @param Integration $integration
+     * @param string $connector
+     * @param int|null $code
+     * @return Status|null
+     */
+    public function getLastStatusForConnector(Integration $integration, $connector, $code = null)
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder()
+            ->select('status')
+            ->from('OroIntegrationBundle:Status', 'status')
+            ->where('status.channel = :integration')
+            ->andWhere('status.connector = :connector')
+            ->setParameters(['integration' => $integration, 'connector' => (string)$connector])
+            ->orderBy('status.date', 'DESC')
+            ->setFirstResult(0)
+            ->setMaxResults(1);
+
+        if ($code) {
+            $queryBuilder->andWhere('status.code = :code')
+                ->setParameter('code', (string)$code);
+        };
+
+        $statuses = $queryBuilder->getQuery()->execute();
+
+        return $statuses ? reset($statuses) : null;
+    }
+
+    /**
      * Returns channels that have configured transports
      * Assume that they are ready for sync
      *
