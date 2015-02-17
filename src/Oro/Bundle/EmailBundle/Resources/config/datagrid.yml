@@ -75,9 +75,9 @@ datagrid:
 
         properties:
           id: ~
-          view_link:
+          view_thread_link:
               type: url
-              route: oro_email_view
+              route: oro_email_thread_view
               params: [ id ]
 
     dashboard-recent-emails-grid:

@@ -34,7 +34,7 @@ class GroupingGridListener
                 'test' => [
                     'type'  => 'dialog',
                     'label' => 'oro.grid.action.view',
-                    'link'  => 'view_link', // todo change url to view thread
+                    'link'  => 'view_thread_link', // todo change url to view thread
                     'icon'  => 'eye-open',
                     'widgetOptions' => [
                         'reload-grid-name' => $event->getDatagrid()->getName(),
