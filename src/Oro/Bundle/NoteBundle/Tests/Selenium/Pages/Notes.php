@@ -29,7 +29,7 @@ class Notes extends AbstractPageEntity
             )->click();
             $this->waitForAjax();
             $this->assertElementPresent(
-                "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
+                "//div[contains(@class,'ui-dialog-titlebar')]".
                 "/span[normalize-space(.)='Add note']",
                 'Add Note window is not opened'
             );
@@ -144,7 +144,7 @@ class Notes extends AbstractPageEntity
         $this->test->byXPath($editAction)->click();
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
+            "//div[contains(@class,'ui-dialog-titlebar')]".
             "/span[normalize-space(.)='{$note}']",
             'Update Note window is not opened'
         );
