@@ -73,6 +73,13 @@ datagrid:
     user-email-grid:
         extends: email-grid
 
+        properties:
+          id: ~
+          view_link:
+              type: url
+              route: oro_email_view
+              params: [ id ]
+
     dashboard-recent-emails-grid:
         source:
             type: orm
