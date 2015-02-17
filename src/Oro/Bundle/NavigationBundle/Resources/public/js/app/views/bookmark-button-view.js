@@ -46,7 +46,8 @@ define([
 
             data = this.getTemplateData();
             if (!data) {
-                return;
+                // no data, it is initial auto render, skip rendering
+                return this;
             }
 
             if (data.navigationElements && data.navigationElements[this.navigationElementType]) {
@@ -63,6 +64,9 @@ define([
             } else {
                 this.$el.hide();
             }
+
+            this._resolveDeferredRender();
+            return this;
         },
 
         updateState: function () {
@@ -89,8 +93,8 @@ define([
             title = this.$el.data('title');
             attrs = {
                 url: mediator.execute('currentUrl'),
-                title_rendered: document.title,
-                title_rendered_short: this.$el.data('title-rendered-short') || document.title,
+                'title_rendered': document.title,
+                'title_rendered_short': this.$el.data('title-rendered-short') || document.title,
                 title: title ? JSON.stringify(title) : '{"template": "' + document.title + '"}'
             };
             return attrs;

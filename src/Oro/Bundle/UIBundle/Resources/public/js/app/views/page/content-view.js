@@ -19,19 +19,15 @@ define([
 
         render: function () {
             var data;
-            data = this.getTemplateData();
-            if (!data) {
-                return;
-            }
-
-            mediator.execute('layout:dispose', this.$el);
-
             PageContentView.__super__.render.call(this);
 
             // @TODO discuss if scripts section is still in use
-            if (data.scripts.length) {
+            data = this.getTemplateData();
+            if (data && data.scripts) {
                 this.$el.append(data.scripts);
             }
+
+            return this;
         },
 
         /**
