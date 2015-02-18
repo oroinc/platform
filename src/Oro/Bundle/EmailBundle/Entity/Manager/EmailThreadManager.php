@@ -51,7 +51,7 @@ class EmailThreadManager
     public function handlePostFlush(PostFlushEventArgs $event)
     {
         $entityManager = $event->getEntityManager();
-        $this->handleEmailUpdates($entityManager);
+        $this->processEmailsHead($entityManager);
     }
 
     /**
@@ -66,19 +66,19 @@ class EmailThreadManager
             if ($entity instanceof Email) {
                 $entity->setThreadId($this->emailThreadProvider->getEmailThreadId($entityManager, $entity));
                 $this->updateRefs($entityManager, $entity);
-                $this->addEntityToUpdateQueue($entity);
+                $this->addEmailToQueue($entity);
             }
         }
     }
 
     /**
-     * Handles email updates
+     * Handles email queue
      *
      * @param EntityManager $entityManager
      */
-    protected function handleEmailUpdates(EntityManager $entityManager)
+    protected function processEmailsHead(EntityManager $entityManager)
     {
-        foreach ($this->queue as $entity) {
+        foreach ($this->getQueue() as $entity) {
             if ($entity instanceof Email) {
                 $this->updateThreadHead($entityManager, $entity);
             }
@@ -95,21 +95,24 @@ class EmailThreadManager
     protected function updateRefs(EntityManager $entityManager, Email $entity)
     {
         if ($entity->getThreadId()) {
+            /** @var Email $email */
             foreach ($this->emailThreadProvider->getEmailReferences($entityManager, $entity) as $email) {
                 $email->setThreadId($entity->getThreadId());
                 $entityManager->persist($email);
-                $this->addEntityToUpdateQueue($email);
+                $this->addEmailToQueue($email);
             }
         }
     }
 
     /**
+     * Update head entity for entity thread
+     *
      * @param EntityManager $entityManager
      * @param Email $entity
      */
-    public function updateThreadHead(EntityManager $entityManager, Email $entity)
+    protected function updateThreadHead(EntityManager $entityManager, Email $entity)
     {
-        if ($entity->getThreadId()) {
+        if ($entity->getThreadId() && $entity->getId()) {
             $threadEmails = $this->emailThreadProvider->getThreadEmails($entityManager, $entity);
             $this->resetHead($entityManager, $threadEmails);
             if (!$this->setHeadFirstNotSeenEmail($entityManager, $threadEmails)) {
@@ -168,17 +171,27 @@ class EmailThreadManager
     }
 
     /**
-     * @return array
+     * Reset queue
      */
-    protected function resetQueue()
+    public function resetQueue()
     {
         $this->queue = [];
     }
 
     /**
-     * @param $email
+     * @return Email[]
      */
-    protected function addEntityToUpdateQueue($email)
+    public function getQueue()
+    {
+        return $this->queue;
+    }
+
+    /**
+     * Add email to queue
+     *
+     * @param Email $email
+     */
+    public function addEmailToQueue(Email $email)
     {
         $this->queue[] = $email;
     }
