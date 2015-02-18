@@ -11,14 +11,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\ImportExport\Job\Executor;
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry as ImportExportProcessorRegistry;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 
 abstract class AbstractSyncProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var ProcessorRegistry */
+    /** @var ImportExportProcessorRegistry */
     protected $processorRegistry;
 
     /** @var Executor */
@@ -31,14 +31,14 @@ abstract class AbstractSyncProcessor implements LoggerAwareInterface
     protected $eventDispatcher;
 
     /**
-     * @param ProcessorRegistry        $processorRegistry
+     * @param ImportExportProcessorRegistry $processorRegistry
      * @param Executor                 $jobExecutor
      * @param TypesRegistry            $registry
      * @param EventDispatcherInterface $eventDispatcher
      * @param LoggerStrategy|null      $logger
      */
     public function __construct(
-        ProcessorRegistry $processorRegistry,
+        ImportExportProcessorRegistry $processorRegistry,
         Executor $jobExecutor,
         TypesRegistry $registry,
         EventDispatcherInterface $eventDispatcher,

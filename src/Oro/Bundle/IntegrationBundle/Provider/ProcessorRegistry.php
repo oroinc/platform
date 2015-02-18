@@ -50,7 +50,7 @@ class ProcessorRegistry
      * @param Channel $integration
      * @return bool
      */
-    protected function hasProcessorForIntegration(Channel $integration)
+    public function hasProcessorForIntegration(Channel $integration)
     {
         return array_key_exists($integration->getType(), $this->processors);
     }
