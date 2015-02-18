@@ -58,6 +58,7 @@ parameters:
     oro_email.listener.datagrid.activity.class:     Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener
     oro_email.listener.datagrid.user_emails.recent.class: Oro\Bundle\EmailBundle\EventListener\Datagrid\RecentEmailGridListener
     oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
+    oro_email.listener.datagrid.grouping.class:           Oro\Bundle\EmailBundle\EventListener\Datagrid\GroupingGridListener
 
     #Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
@@ -332,6 +333,14 @@ services:
         arguments:
             - @oro_email.datagrid_query_factory
         tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
+
+    oro_email.listener.datagrid.grouping:
+        class: %oro_email.listener.datagrid.grouping.class%
+        arguments:
+            - @oro_config.global
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.base-email-grid, method: onBuildBefore }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
     oro_email.listener.datagrid.activity:

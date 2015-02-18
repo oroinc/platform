@@ -282,17 +282,18 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $folder             = $imapFolder->getFolder();
         $folderType         = $folder->getType();
         $lastSynchronizedAt = $folder->getSynchronizedAt();
+        $userId             = $this->getUserId($folder->getOrigin());
 
         $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
         $this->logger->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
 
-        $count = $processed = $invalid = 0;
+        $count = $processed = $invalid = $totalInvalid = 0;
 
         $emails = $this->manager->getEmails($searchQuery);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
         $emails->setBatchCallback(
-            function ($batch) use ($folderType) {
-                $this->registerEmailsInKnownEmailAddressChecker($batch, $folderType);
+            function ($batch) {
+                $this->registerEmailsInKnownEmailAddressChecker($batch);
             }
         );
         $emails->setConvertErrorCallback(
@@ -313,11 +314,18 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $processed++;
             if ($processed % self::READ_HINT_COUNT === 0) {
                 $this->logger->notice(
-                    sprintf('Processed %d of %d emails %d were invalid ...', $processed, $emails->count(), $invalid)
+                    sprintf(
+                        'Processed %d of %d emails.%s',
+                        $processed,
+                        $emails->count(),
+                        $invalid === 0 ? '' : sprintf(' Detected %d invalid email(s).', $invalid)
+                    )
                 );
+                $totalInvalid += $invalid;
+                $invalid = 0;
             }
 
-            if (!$this->isApplicableEmail($email, $folderType)) {
+            if (!$this->isApplicableEmail($email, $folderType, $userId)) {
                 continue;
             }
 
@@ -335,6 +343,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
         if ($count > 0) {
             $this->saveEmails($batch, $imapFolder);
+        }
+
+        $totalInvalid += $invalid;
+        if ($totalInvalid > 0) {
+            $this->logger->warning(
+                sprintf('Detected %d invalid email(s) in "%s" folder.', $totalInvalid, $folder->getFullName())
+            );
         }
 
         return $lastSynchronizedAt;
@@ -365,7 +380,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         foreach ($emails as $email) {
             if (in_array($email->getId()->getUid(), $existingUids)) {
-                $this->logger->notice(
+                $this->logger->info(
                     sprintf(
                         'Skip "%s" (UID: %d) email, because it is already synchronised.',
                         $email->getSubject(),
@@ -391,18 +406,31 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if ($existingImapEmail) {
                 $this->moveEmailToOtherFolder($existingImapEmail, $imapFolder, $email->getId()->getUid());
             } else {
-                $this->logger->notice(
-                    sprintf('Persisting "%s" email (UID: %d) ...', $email->getSubject(), $email->getId()->getUid())
-                );
-                $emailEntity = $this->addEmail($email, $folder, $email->hasFlag("\\Seen"));
-                $imapEmail       = $this->createImapEmail(
-                    $email->getId()->getUid(),
-                    $emailEntity,
-                    $imapFolder
-                );
-                $newImapEmails[] = $imapEmail;
-                $this->em->persist($imapEmail);
-                $this->logger->notice(sprintf('The "%s" email was persisted.', $email->getSubject()));
+                try {
+                    $imapEmail       = $this->createImapEmail(
+                        $email->getId()->getUid(),
+                        $this->addEmail($email, $folder, $email->hasFlag("\\Seen")),
+                        $imapFolder
+                    );
+                    $newImapEmails[] = $imapEmail;
+                    $this->em->persist($imapEmail);
+                    $this->logger->notice(
+                        sprintf(
+                            'The "%s" (UID: %d) email was persisted.',
+                            $email->getSubject(),
+                            $email->getId()->getUid()
+                        )
+                    );
+                } catch (\Exception $e) {
+                    $this->logger->warning(
+                        sprintf(
+                            'Failed to persist "%s" (UID: %d) email. Error: %s',
+                            $email->getSubject(),
+                            $email->getId()->getUid(),
+                            $e->getMessage()
+                        )
+                    );
+                }
             }
 
             $this->removeEmailFromOutdatedFolders($relatedExistingImapEmails);

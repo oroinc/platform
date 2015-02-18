@@ -35,6 +35,8 @@ define(function (require) {
         initialize: function (id, options) {
             var self = this;
             this.options = _.extend({}, this.options, options);
+            this.childSelectorTemplate = _.template(this.options.childTemplate);
+            this.optionsTemplate = _.template(this.options.optionsTemplate);
             this.items = [];
 
             mediator.on('items-manager:table:reset:' + self.options.fieldsTableIdentifier, function (collection) {
@@ -83,7 +85,7 @@ define(function (require) {
          */
         validateSelect2: function (id) {
             var self = this;
-            var childSelector = _.template(this.options.childTemplate, {id: id});
+            var childSelector = this.childSelectorTemplate({id: id});
             $('#' + id).find(childSelector).each(function () {
                 var value = $(this).val();
                 if (value) {
@@ -99,7 +101,7 @@ define(function (require) {
          * @param {String} id
          */
         initSelect2: function (id) {
-            var childSelector = _.template(this.options.childTemplate, {id: id});
+            var childSelector = this.childSelectorTemplate({id: id});
             var self = this;
             $('#' + id).find(childSelector).each(function () {
                 var exclude = $(this).data('type-filter');
@@ -136,7 +138,7 @@ define(function (require) {
                 return data;
             }
 
-            optionsTemplate = _.template(this.options.optionsTemplate);
+            optionsTemplate = this.optionsTemplate;
 
             $.each(this.items, function () {
                 var options, chain, entity, items;

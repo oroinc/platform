@@ -44,8 +44,6 @@ define([
          * @param {Backbone.Collection} options.collection
          */
         initialize: function (options) {
-            Backgrid.requireOptions(options, ["column", "collection"]);
-
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
@@ -203,7 +201,7 @@ define([
          * @returns {orodatagrid.datagrid.cell.SelectAllHeaderCell}
          */
         render: function () {
-            this.$el.html(_.template($(this.template).text()));
+            this.$el.html(_.template($(this.template).text())());
             return this;
         },
 
