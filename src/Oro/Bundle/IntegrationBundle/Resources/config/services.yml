@@ -14,6 +14,7 @@ parameters:
     oro_integration.manager.fields_changes.class:                         Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager
 
     oro_integration.sync.processor.class:                                 Oro\Bundle\IntegrationBundle\Provider\SyncProcessor
+    oro_integration.processor_registry.class:                             Oro\Bundle\IntegrationBundle\Provider\ProcessorRegistry
     oro_integration.provider.connector_context_mediator.class:            Oro\Bundle\IntegrationBundle\Provider\ConnectorContextMediator
 
     # Import/export utils
@@ -162,6 +163,11 @@ services:
           - @event_dispatcher
           - @oro_integration.logger.strategy
         lazy: true
+
+    oro_integration.processor_registry:
+        class: %oro_integration.processor_registry.class%
+        calls:
+            - [setDefaultProcessor, [@oro_integration.sync.processor]]
 
     oro_integration.provider.connector_context_mediator:
         class: %oro_integration.provider.connector_context_mediator.class%
