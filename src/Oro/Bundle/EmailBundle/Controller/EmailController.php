@@ -49,6 +49,19 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_view")
+     * @Template("OroEmailBundle:Email/Thread:view.html.twig")
+     *
+     * todo Blank action
+     * todo Will be implemented in CRM-2495
+     */
+    public function viewThreadAction(Email $entity)
+    {
+        return ['entity' => $entity];
+    }
+
+    /**
      * This action is used to render the list of emails associated with the given entity
      * on the view page of this entity
      *
