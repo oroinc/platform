@@ -2,16 +2,19 @@
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
+use Psr\Log\LoggerInterface;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Component\Log\OutputLogger;
-
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
+use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
+use Oro\Bundle\IntegrationBundle\Provider\ProcessorRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
+use Oro\Component\Log\OutputLogger;
 
 /**
  * Class SyncCommand
@@ -22,9 +25,15 @@ use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 class SyncCommand extends AbstractSyncCronCommand
 {
     const COMMAND_NAME = 'oro:cron:integration:sync';
+    const SYNC_PROCESSOR_REGISTRY = 'oro_integration.processor_registry';
 
     const STATUS_SUCCESS = 0;
-    const STATUS_FAILED  = 255;
+    const STATUS_FAILED = 255;
+
+    /**
+     * @var ProcessorRegistry
+     */
+    protected $processorRegistry;
 
     /**
      * {@inheritdoc}
@@ -86,17 +95,14 @@ class SyncCommand extends AbstractSyncCronCommand
 
         /** @var ChannelRepository $repository */
         /** @var SyncProcessor $processor */
-        $connector           = $input->getOption('connector');
-        $integrationId       = $input->getOption('integration-id');
-        $batchSize           = $input->getOption('transport-batch-size');
+        $connector = $input->getOption('connector');
+        $integrationId = $input->getOption('integration-id');
+        $batchSize = $input->getOption('transport-batch-size');
         $connectorParameters = $this->getConnectorParameters($input);
-        $entityManager       = $this->getService('doctrine.orm.entity_manager');
-        $repository          = $entityManager->getRepository('OroIntegrationBundle:Channel');
-        $logger              = new OutputLogger($output);
-        $processor           = $this->getService(self::SYNC_PROCESSOR);
-        $exitCode            = self::STATUS_SUCCESS;
-
-        $processor->getLoggerStrategy()->setLogger($logger);
+        $entityManager = $this->getService('doctrine.orm.entity_manager');
+        $repository = $entityManager->getRepository('OroIntegrationBundle:Channel');
+        $logger = new OutputLogger($output);
+        $exitCode = self::STATUS_SUCCESS;
         $entityManager->getConnection()->getConfiguration()->setSQLLogger(null);
 
         if ($this->isJobRunning($integrationId)) {
@@ -126,8 +132,9 @@ class SyncCommand extends AbstractSyncCronCommand
                     $integration->getTransport()->getSettingsBag()->set('page_size', $batchSize);
                 }
 
-                $result   = $processor->process($integration, $connector, $connectorParameters);
-                $exitCode = $result ? : self::STATUS_FAILED;
+                $processor = $this->getSyncProcessor($integration, $logger);
+                $result = $processor->process($integration, $connector, $connectorParameters);
+                $exitCode = $result ?: self::STATUS_FAILED;
             } catch (\Exception $e) {
                 $logger->critical($e->getMessage(), ['exception' => $e]);
 
@@ -166,5 +173,22 @@ class SyncCommand extends AbstractSyncCronCommand
         }
 
         return $result;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param LoggerInterface $logger
+     * @return AbstractSyncProcessor
+     */
+    protected function getSyncProcessor(Integration $integration, $logger)
+    {
+        if (!$this->processorRegistry) {
+            $this->processorRegistry = $this->getService(self::SYNC_PROCESSOR_REGISTRY);
+        }
+
+        $processor = $this->processorRegistry->getProcessorForIntegration($integration);
+        $processor->getLoggerStrategy()->setLogger($logger);
+
+        return $processor;
     }
 }
