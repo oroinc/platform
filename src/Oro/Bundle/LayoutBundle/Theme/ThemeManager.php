@@ -85,13 +85,15 @@ class ThemeManager
     }
 
     /**
-     * @return Theme[]
+     * @param null|string|array $groups
+     *
+     * @return \Oro\Bundle\LayoutBundle\Model\Theme[]
      */
-    public function getAllThemes()
+    public function getAllThemes($groups = null)
     {
         $names = $this->getThemeNames();
 
-        return array_combine(
+        $themes = array_combine(
             $names,
             array_map(
                 function ($themeName) {
@@ -100,5 +102,17 @@ class ThemeManager
                 $names
             )
         );
+
+        if (!empty($groups)) {
+            $groups = is_array($groups) ? $groups : [$groups];
+            $themes = array_filter(
+                $themes,
+                function (Theme $theme) use ($groups) {
+                    return count(array_intersect($groups, $theme->getGroups())) > 0;
+                }
+            );
+        }
+
+        return $themes;
     }
 }

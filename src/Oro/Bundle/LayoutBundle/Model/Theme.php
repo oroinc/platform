@@ -22,8 +22,8 @@ class Theme
     /** @var string */
     protected $directory;
 
-    /** @var bool */
-    protected $hidden = false;
+    /** @var string[] */
+    protected $groups = [];
 
     /**
      * @param string $name
@@ -124,18 +124,18 @@ class Theme
     }
 
     /**
-     * @return boolean
+     * @param array $groups
      */
-    public function isHidden()
+    public function setGroups(array $groups)
     {
-        return $this->hidden;
+        $this->groups = $groups;
     }
 
     /**
-     * @param boolean $hidden
+     * @return string[]
      */
-    public function setHidden($hidden)
+    public function getGroups()
     {
-        $this->hidden = $hidden;
+        return $this->groups;
     }
 }

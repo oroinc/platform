@@ -54,12 +54,12 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('screenshot.png', $this->theme->getScreenshot());
     }
 
-    public function testHiddenMethods()
+    public function testGroupsMethods()
     {
-        $this->assertFalse($this->theme->isHidden());
+        $this->assertEmpty($this->theme->getGroups());
 
-        $this->theme->setHidden(true);
-        $this->assertTrue($this->theme->isHidden());
+        $this->theme->setGroups(['test']);
+        $this->assertSame(['test'], $this->theme->getGroups());
     }
 
     public function testParentThemeMethods()

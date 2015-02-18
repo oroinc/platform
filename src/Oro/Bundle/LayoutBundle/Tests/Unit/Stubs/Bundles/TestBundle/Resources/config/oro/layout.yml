@@ -4,3 +4,4 @@ oro_layout:
             label:     Oro Black theme
             logo:      bundles/oroui/images/oro-black-logo.png
             directory: OroBlack
+            groups:    [main, frontend]

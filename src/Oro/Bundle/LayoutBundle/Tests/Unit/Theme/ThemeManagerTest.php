@@ -122,6 +122,25 @@ class ThemeManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(['base' => $theme1Mock, 'oro-black' => $theme2Mock], $manager->getAllThemes());
     }
 
+    public function testGetAllByGroupThemes()
+    {
+        $manager = $this->createManager(['base' => [], 'oro-black' => []]);
+
+        $theme1Mock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $theme1Mock->expects($this->any())->method('getGroups')->willReturn(['base', 'frontend']);
+        $theme2Mock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
+        $theme2Mock->expects($this->any())->method('getGroups')->willReturn(['frontend']);
+
+        $this->factory->expects($this->exactly(2))->method('create')
+            ->willReturnOnConsecutiveCalls($theme1Mock, $theme2Mock);
+
+        $this->assertCount(2, $manager->getAllThemes());
+        $this->assertCount(1, $manager->getAllThemes('base'));
+        $this->assertCount(2, $manager->getAllThemes('frontend'));
+        $this->assertCount(1, $manager->getAllThemes(['base', 'embedded']));
+        $this->assertCount(2, $manager->getAllThemes(['base', 'frontend']));
+    }
+
     /**
      * @param array       $definitions
      * @param string|null $activeTheme

@@ -12,7 +12,6 @@ class ThemeFactory implements ThemeFactoryInterface
     public function create($themeName, array $themeDefinition)
     {
         $theme = new Theme($themeName, $themeDefinition['parent']);
-        $theme->setHidden($themeDefinition['hidden']);
 
         if (isset($themeDefinition['label'])) {
             $theme->setLabel($themeDefinition['label']);
@@ -25,6 +24,9 @@ class ThemeFactory implements ThemeFactoryInterface
         }
         if (isset($themeDefinition['directory'])) {
             $theme->setDirectory($themeDefinition['directory']);
+        }
+        if (isset($themeDefinition['groups'])) {
+            $theme->setGroups((array) $themeDefinition['groups']);
         }
 
         return $theme;

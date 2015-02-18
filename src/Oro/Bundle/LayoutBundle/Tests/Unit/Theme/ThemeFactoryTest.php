@@ -40,14 +40,13 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
     public function themeDefinitionDataProvider()
     {
         $minimalDefinition = new Theme('base');
-        $minimalDefinition->setHidden(true);
 
         $fullDefinition = new Theme('oro-black', 'base');
-        $fullDefinition->setHidden(false);
         $fullDefinition->setLogo('oro-black-logo.png');
         $fullDefinition->setScreenshot('oro-black-screenshot.png');
         $fullDefinition->setLabel('Oro Black Theme');
         $fullDefinition->setDirectory('OroBlack');
+        $fullDefinition->setGroups(['main', 'frontend']);
 
         return [
             'minimal definition given' => [
@@ -59,7 +58,7 @@ class ThemeFactoryTest extends \PHPUnit_Framework_TestCase
                 '$name'           => 'oro-black',
                 '$definition'     => [
                     'parent'     => 'base',
-                    'hidden'     => false,
+                    'groups'     => ['main', 'frontend'],
                     'label'      => 'Oro Black Theme',
                     'screenshot' => 'oro-black-screenshot.png',
                     'logo'       => 'oro-black-logo.png',

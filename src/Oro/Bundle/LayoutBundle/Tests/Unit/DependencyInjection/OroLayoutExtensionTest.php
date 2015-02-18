@@ -175,7 +175,7 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $manager = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID);
         $result  = $manager->getTheme('gold');
 
-        $this->assertFalse($result->isHidden());
+        $this->assertNotEmpty($result->getGroups());
         $this->assertSame(Configuration::BASE_THEME_IDENTIFIER, $result->getParentTheme());
         $this->assertSame('Gold theme', $result->getLabel());
         $this->assertSame('gold', $result->getDirectory());

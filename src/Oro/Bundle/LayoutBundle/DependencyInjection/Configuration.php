@@ -13,6 +13,8 @@ class Configuration implements ConfigurationInterface
 
     const BASE_THEME_IDENTIFIER = 'base';
 
+    const MAIN_PLATFORM_GROUP = 'main';
+
     /**
      * {@inheritdoc}
      */
@@ -121,10 +123,12 @@ class Configuration implements ConfigurationInterface
                         ->info('Parent theme identifier')
                         ->defaultValue(self::BASE_THEME_IDENTIFIER)
                     ->end()
-                    ->booleanNode('hidden')
-                        ->info('Makes the theme hidden in theme management UI, internal setting.')
-                        ->defaultFalse()
-                        ->cannotBeOverwritten()
+                    ->arrayNode('groups')
+                        ->info('Layout groups for which it\'s applicable.')
+                        ->defaultValue([self::MAIN_PLATFORM_GROUP])
+                        ->example('[main, embedded_forms, frontend]')
+                        ->prototype('scalar')->end()
+                        ->cannotBeEmpty()
                     ->end()
                 ->end()
             ->end()
