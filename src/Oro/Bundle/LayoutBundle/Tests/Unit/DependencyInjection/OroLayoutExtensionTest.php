@@ -4,8 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
+use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
+
+use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle\TestBundle;
 
 class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,9 +52,14 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
             $container->has('oro_layout.twig.extension.layout'),
             'Failed asserting that TWIG extension service is registered'
         );
+
+        $this->assertTrue(
+            $container->has(OroLayoutExtension::THEME_MANAGER_SERVICE_ID),
+            'Failed asserting that theme manager is registered'
+        );
     }
 
-    public function testLoadWithAppConfig()
+    public function testLoadWithTemplatingAppConfig()
     {
         $container = new ContainerBuilder();
 
@@ -144,5 +152,48 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
             $container->has('oro_layout.twig.extension.layout'),
             'Failed asserting that TWIG extension service is not registered'
         );
+    }
+
+    public function testLoadWithThemesAppConfig()
+    {
+        $container = new ContainerBuilder();
+
+        $extensionConfig = [
+            [
+                'themes'       => [
+                    'gold' => [
+                        'label' => 'Gold theme'
+                    ]
+                ],
+                'active_theme' => 'gold'
+            ]
+        ];
+
+        $extension = new OroLayoutExtension();
+        $extension->load($extensionConfig, $container);
+
+        $manager = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID);
+        $result  = $manager->getTheme('gold');
+
+        $this->assertNotEmpty($result->getGroups());
+        $this->assertSame(Configuration::BASE_THEME_IDENTIFIER, $result->getParentTheme());
+        $this->assertSame('Gold theme', $result->getLabel());
+        $this->assertSame('gold', $result->getDirectory());
+    }
+
+    public function testLoadWithBundleThemesConfig()
+    {
+        $container = new ContainerBuilder();
+
+        $bundle = new TestBundle();
+        CumulativeResourceManager::getInstance()->clear()
+            ->setBundles([$bundle->getName() => get_class($bundle)]);
+
+        $extension = new OroLayoutExtension();
+        $extension->load([], $container);
+
+        $expectedResult = ['base', 'oro-black'];
+        $result         = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
+        $this->assertSame(sort($expectedResult), sort($result));
     }
 }

@@ -7,13 +7,27 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+
 class OroLayoutExtension extends Extension
 {
+    const THEME_MANAGER_SERVICE_ID = 'oro_layout.theme_manager';
+
     /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $configLoader     = new CumulativeConfigLoader(
+            'oro_layout',
+            new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
+        );
+        $resources        = $configLoader->load($container);
+        foreach ($resources as $resource) {
+            $configs[] = $resource->data['oro_layout'];
+        }
+
         $configuration = new Configuration();
         $config        = $this->processConfiguration($configuration, $configs);
 
@@ -39,5 +53,10 @@ class OroLayoutExtension extends Extension
                 $config['templating']['twig']['resources']
             );
         }
+
+        $loader->load('theme_services.yml');
+        $managerDefinition = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
+        $managerDefinition->addMethodCall('setActiveTheme', array($config['active_theme']));
+        $managerDefinition->replaceArgument(1, $config['themes']);
     }
 }
