@@ -58,5 +58,25 @@ class OroLayoutExtension extends Extension
         $managerDefinition = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
         $managerDefinition->addMethodCall('setActiveTheme', array($config['active_theme']));
         $managerDefinition->replaceArgument(1, $config['themes']);
+
+        $foundThemeLayoutUpdates = [];
+        /*$updatesLoader           = new CumulativeConfigLoader(
+            'oro_layout_updates_list',
+            []
+        );*/
+
+        $resources = [];//$updatesLoader->load($container);
+        foreach ($resources as $resource) {
+            /**
+             * $resource->data contains data in following format
+             * [
+             *    'directory-where-updates-found' => [
+             *       'found update absolute filename',
+             *       ...
+             *    ]
+             * ]
+             */
+            array_merge_recursive($foundThemeLayoutUpdates, $resource->data);
+        }
     }
 }
