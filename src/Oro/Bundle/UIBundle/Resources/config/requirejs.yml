@@ -1,9 +1,5 @@
 config:
     shim:
-        'jquery-ui':
-            deps:
-                - 'jquery'
-
         'jquery.mousewheel':
             deps:
                 - 'jquery'
@@ -76,8 +72,8 @@ config:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
         'base64': 'bundles/oroui/lib/base64.js'
-        'jquery': 'bundles/oroui/lib/jquery-2.0.2.js'
-        'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.10.4.js'
+        'jquery': 'bundles/components/jquery/jquery.js'
+        'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.11.2.js'
         'jquery-outer-html': 'bundles/oroui/lib/outerHTML-2.1.0-min.js'
         'jquery.mousewheel': 'bundles/oroui/lib/jquery/jquery.mousewheel.min.js'
         'jquery.numeric': 'bundles/oroui/lib/jquery/jquery.numeric.js'
@@ -90,8 +86,8 @@ config:
         'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
         'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
-        'underscore': 'bundles/oroui/lib/underscore.js'
-        'backbone': 'bundles/oroui/lib/backbone.js'
+        'underscore': 'bundles/components/underscore/underscore.js'
+        'backbone': 'bundles/components/backbone/backbone.js'
         'chaplin': 'bundles/oroui/lib/chaplin-1.0.0.js'
         'backbone-bootstrap-modal': 'bundles/oroui/lib/backbone.bootstrap-modal.js'
         'oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker': 'bundles/oroui/lib/jquery.timepicker-1.4.13/jquery.timepicker.min.js'

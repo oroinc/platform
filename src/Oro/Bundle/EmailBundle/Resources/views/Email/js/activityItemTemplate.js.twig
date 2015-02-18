@@ -23,9 +23,11 @@
                         %>
                         <%= _.template(
                             {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
-                            { user: ownerLink, date: '<i class="date">' + updatedAt + '</i>'},
                             { interpolate: /\{\{(.+?)\}\}/g }
-                        ) %>
+                        )({
+                            user: ownerLink,
+                            date: '<i class="date">' + updatedAt + '</i>'
+                        }) %>
                     </span>
                     <span class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
                           title="<%= _.__('oro.activitylist.comment.quantity_label') %>">

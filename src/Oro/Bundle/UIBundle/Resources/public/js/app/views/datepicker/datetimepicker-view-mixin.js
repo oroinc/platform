@@ -210,7 +210,6 @@ define(function (require) {
             }
         },
 
-
         /**
          * Reads value of front field and converts it to backend format
          *

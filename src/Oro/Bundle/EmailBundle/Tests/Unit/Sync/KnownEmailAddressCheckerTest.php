@@ -8,7 +8,9 @@ use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 
 class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\Test';
+    const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
+    const TEST_CONTACT_CLASS = 'Entity\TestContact';
+    const USER_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
 
     /** @var KnownEmailAddressChecker */
     private $checker;
@@ -31,11 +33,10 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
         $this->em                     = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->emailAddressManager    = $this->getMockBuilder(
-            'Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->emailAddressManager    =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager')
+                ->disableOriginalConstructor()
+                ->getMock();
         $this->emailAddressRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
@@ -50,231 +51,133 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->emailAddressManager,
             new EmailAddressHelper(),
-            new EmailOwnerProviderStorage(),
+            $this->getEmailOwnerProviderStorage(),
             []
         );
         $this->checker->setLogger($this->logger);
     }
 
-    public function testIsAtLeastOneKnownEmailAddressWithExclusions()
+    public function testCheckEmailAddressWithUserExclusion()
     {
-        $emailAddress = '1@test.com';
-
-        $provider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
-        $emailOwnerProviderStorage = new EmailOwnerProviderStorage();
-        $emailOwnerProviderStorage->addProvider($provider);
-
-        $provider->expects($this->once())
-            ->method('getEmailOwnerClass')
-            ->will($this->returnValue('Test\Exclude1'));
+        $emailOwnerProviderStorage = $this->getEmailOwnerProviderStorage();
 
         $checker = new KnownEmailAddressChecker(
             $this->em,
             $this->emailAddressManager,
             new EmailAddressHelper(),
             $emailOwnerProviderStorage,
-            ['Test\Exclude1']
+            [self::USER_CLASS]
         );
         $checker->setLogger($this->logger);
 
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getArrayResult'))
-            ->getMockForAbstractClass();
+        $query        = $this->getLoadEmailAddressesQuery(
+            [
+                ['email' => 'contact@test.com', 'userId' => null, 'contactId' => 10],
+                ['email' => 'user@test.com', 'userId' => 1, 'contactId' => null],
+            ]
+        );
+        $queryBuilder = $this->getLoadEmailAddressesQueryBuilder(
+            $query,
+            [
+                'contact@test.com' => 'contact@test.com',
+                'user@test.com'    => 'user@test.com'
+            ]
+        );
+        $queryBuilder->expects($this->never())
+            ->method('andWhere');
 
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $queryBuilder->expects($this->at(0))
-            ->method('select')
-            ->with('a.email')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(1))
-            ->method('where')
-            ->with('a.hasOwner = :hasOwner AND a.email IN (:emails)')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(2))
-            ->method('setParameter')
-            ->with('hasOwner', true)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(3))
-            ->method('setParameter')
-            ->with('emails', [$emailAddress => $emailAddress])
-            ->will($this->returnSelf());
+        $this->emailAddressRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('a')
+            ->will($this->returnValue($queryBuilder));
+
+        $checker->preLoadEmailAddresses(['contact@test.com', 'user@test.com']);
+        $this->assertTrue($checker->isAtLeastOneKnownEmailAddress('contact@test.com'));
+        $this->assertFalse($checker->isAtLeastOneKnownEmailAddress('user@test.com'));
+        $this->assertFalse($checker->isAtLeastOneUserEmailAddress(1, 'contact@test.com'));
+        $this->assertTrue($checker->isAtLeastOneUserEmailAddress(1, 'user@test.com'));
+        $this->assertFalse($checker->isAtLeastOneUserEmailAddress(2, 'user@test.com'));
+    }
+
+    public function testCheckEmailAddressWithContactExclusion()
+    {
+        $emailOwnerProviderStorage = $this->getEmailOwnerProviderStorage();
+
+        $checker = new KnownEmailAddressChecker(
+            $this->em,
+            $this->emailAddressManager,
+            new EmailAddressHelper(),
+            $emailOwnerProviderStorage,
+            [self::TEST_CONTACT_CLASS]
+        );
+        $checker->setLogger($this->logger);
+
+        $query        = $this->getLoadEmailAddressesQuery(
+            [
+                ['email' => 'user@test.com', 'userId' => 1]
+            ]
+        );
+        $queryBuilder = $this->getLoadEmailAddressesQueryBuilder(
+            $query,
+            [
+                'user@test.com' => 'user@test.com'
+            ],
+            'a.email,IDENTITY(a.userId) AS userId'
+        );
         $queryBuilder->expects($this->once())
             ->method('andWhere')
-            ->with('a.owner1 IS NULL')
+            ->with('a.contactId IS NULL')
             ->will($this->returnSelf());
-        $queryBuilder->expects($this->once())
-            ->method('getQuery')
-            ->will($this->returnValue($query));
 
         $this->emailAddressRepository->expects($this->once())
             ->method('createQueryBuilder')
             ->with('a')
             ->will($this->returnValue($queryBuilder));
 
-        $query->expects($this->once())
-            ->method('getArrayResult')
-            ->will($this->returnValue([['email' => $emailAddress]]));
-
-        $this->assertTrue($checker->isAtLeastOneKnownEmailAddress($emailAddress));
+        $checker->preLoadEmailAddresses(['user@test.com']);
+        $this->assertTrue($checker->isAtLeastOneKnownEmailAddress('user@test.com'));
+        $this->assertTrue($checker->isAtLeastOneUserEmailAddress(1, 'user@test.com'));
+        $this->assertFalse($checker->isAtLeastOneUserEmailAddress(2, 'user@test.com'));
     }
 
-    /**
-     * @dataProvider emailAddressProvider
-     */
-    public function testIsAtLeastOneKnownEmailAddress(
-        $emailAddress,
-        $setParameterArg,
-        $result,
-        $expected
-    ) {
-        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getArrayResult'))
-            ->getMockForAbstractClass();
-
-        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('select', 'where', 'setParameter', 'getQuery'))
-            ->getMock();
-        $queryBuilder->expects($this->at(0))
-            ->method('select')
-            ->with('a.email')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(1))
-            ->method('where')
-            ->with('a.hasOwner = :hasOwner AND a.email IN (:emails)')
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(2))
-            ->method('setParameter')
-            ->with('hasOwner', true)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(3))
-            ->method('setParameter')
-            ->with('emails', $setParameterArg)
-            ->will($this->returnSelf());
-        $queryBuilder->expects($this->at(4))
-            ->method('getQuery')
-            ->will($this->returnValue($query));
-
-        $this->emailAddressRepository->expects($this->once())
-            ->method('createQueryBuilder')
-            ->with('a')
-            ->will($this->returnValue($queryBuilder));
-
-        $query->expects($this->once())
-            ->method('getArrayResult')
-            ->will($this->returnValue($result));
-
-        $this->checker->isAtLeastOneKnownEmailAddress($emailAddress);
-
-        foreach ($expected as $email => $expectedResult) {
-            if ($expectedResult) {
-                $this->assertTrue($this->checker->isAtLeastOneKnownEmailAddress($email));
-                // check that result is cached
-                $this->assertTrue($this->checker->isAtLeastOneKnownEmailAddress($email));
-            } else {
-                $this->assertFalse($this->checker->isAtLeastOneKnownEmailAddress($email));
-                // check that result is cached
-                $this->assertFalse($this->checker->isAtLeastOneKnownEmailAddress($email));
-            }
-        }
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
     public function testIsAtLeastOneKnownEmailAddressSequence()
     {
-        $query1 = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getArrayResult'))
-            ->getMockForAbstractClass();
-        $queryBuilder1 = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('select', 'where', 'setParameter', 'getQuery'))
-            ->getMock();
-        $queryBuilder1->expects($this->at(0))
-            ->method('select')
-            ->with('a.email')
-            ->will($this->returnSelf());
-        $queryBuilder1->expects($this->at(1))
-            ->method('where')
-            ->with('a.hasOwner = :hasOwner AND a.email IN (:emails)')
-            ->will($this->returnSelf());
-        $queryBuilder1->expects($this->at(2))
-            ->method('setParameter')
-            ->with('hasOwner', true)
-            ->will($this->returnSelf());
-        $queryBuilder1->expects($this->at(3))
-            ->method('setParameter')
-            ->with(
-                'emails',
-                [
-                    '1@test.com' => '1@test.com',
-                    '2@test.com' => '2@test.com',
-                    '3@test.com' => '3@test.com',
-                    '4@test.com' => '4@test.com',
-                ]
-            )
-            ->will($this->returnSelf());
-        $queryBuilder1->expects($this->at(4))
-            ->method('getQuery')
-            ->will($this->returnValue($query1));
+        $query1        = $this->getLoadEmailAddressesQuery(
+            [
+                ['email' => '1@test.com', 'userId' => null, 'contactId' => 1],
+                ['email' => '3@test.com', 'userId' => null, 'contactId' => 2],
+            ]
+        );
+        $queryBuilder1 = $this->getLoadEmailAddressesQueryBuilder(
+            $query1,
+            [
+                '1@test.com' => '1@test.com',
+                '2@test.com' => '2@test.com',
+                '3@test.com' => '3@test.com',
+                '4@test.com' => '4@test.com'
+            ]
+        );
+        $queryBuilder1->expects($this->never())
+            ->method('andWhere');
 
-        $query2 = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-            ->disableOriginalConstructor()
-            ->setMethods(array('getArrayResult'))
-            ->getMockForAbstractClass();
-        $queryBuilder2 = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-            ->disableOriginalConstructor()
-            ->setMethods(array('select', 'where', 'setParameter', 'getQuery'))
-            ->getMock();
-        $queryBuilder2->expects($this->at(0))
-            ->method('select')
-            ->with('a.email')
-            ->will($this->returnSelf());
-        $queryBuilder2->expects($this->at(1))
-            ->method('where')
-            ->with('a.hasOwner = :hasOwner AND a.email IN (:emails)')
-            ->will($this->returnSelf());
-        $queryBuilder2->expects($this->at(2))
-            ->method('setParameter')
-            ->with('hasOwner', true)
-            ->will($this->returnSelf());
-        $queryBuilder2->expects($this->at(3))
-            ->method('setParameter')
-            ->with('emails', ['10@test.com' => '10@test.com', '11@test.com' => '11@test.com'])
-            ->will($this->returnSelf());
-        $queryBuilder2->expects($this->at(4))
-            ->method('getQuery')
-            ->will($this->returnValue($query2));
+        $query2        = $this->getLoadEmailAddressesQuery(
+            [
+                ['email' => '11@test.com', 'userId' => null, 'contactId' => 3],
+            ]
+        );
+        $queryBuilder2 = $this->getLoadEmailAddressesQueryBuilder(
+            $query2,
+            [
+                '10@test.com' => '10@test.com',
+                '11@test.com' => '11@test.com'
+            ]
+        );
+        $queryBuilder2->expects($this->never())
+            ->method('andWhere');
 
         $this->emailAddressRepository->expects($this->exactly(2))
             ->method('createQueryBuilder')
             ->will($this->onConsecutiveCalls($queryBuilder1, $queryBuilder2));
-
-        $query1->expects($this->once())
-            ->method('getArrayResult')
-            ->will(
-                $this->returnValue(
-                    [
-                        ['email' => '1@test.com'],
-                        ['email' => '3@test.com'],
-                    ]
-                )
-            );
-        $query2->expects($this->once())
-            ->method('getArrayResult')
-            ->will(
-                $this->returnValue(
-                    [
-                        ['email' => '11@test.com'],
-                    ]
-                )
-            );
 
         $this->assertTrue(
             $this->checker->isAtLeastOneKnownEmailAddress(
@@ -300,21 +203,221 @@ class KnownEmailAddressCheckerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function emailAddressProvider()
+    /**
+     * @dataProvider isAtLeastOneKnownEmailAddressProvider
+     */
+    public function testIsAtLeastOneKnownEmailAddress($emailAddress, $emailsToLoad, $queryResult, $expected)
+    {
+        $query        = $this->getLoadEmailAddressesQuery(
+            $queryResult
+        );
+        $queryBuilder = $this->getLoadEmailAddressesQueryBuilder(
+            $query,
+            $emailsToLoad
+        );
+        $queryBuilder->expects($this->never())
+            ->method('andWhere');
+
+        $this->emailAddressRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('a')
+            ->will($this->returnValue($queryBuilder));
+
+        $this->checker->isAtLeastOneKnownEmailAddress($emailAddress);
+
+        foreach ($expected as $email => $expectedResult) {
+            $this->assertSame($expectedResult, $this->checker->isAtLeastOneKnownEmailAddress($email));
+            // check that result is cached
+            $this->assertSame($expectedResult, $this->checker->isAtLeastOneKnownEmailAddress($email));
+        }
+    }
+
+    public function isAtLeastOneKnownEmailAddressProvider()
     {
         return [
             [
-                '1@test.com',
-                ['1@test.com' => '1@test.com'],
-                [['email' => '1@test.com']],
-                ['1@test.com' => true]
+                'emailAddress' => '1@test.com',
+                'emailsToLoad' => ['1@test.com' => '1@test.com'],
+                'queryResult'  => [
+                    ['email' => '1@test.com', 'userId' => null, 'contactId' => 1]
+                ],
+                'expected'     => [
+                    '1@test.com' => true
+                ]
             ],
             [
-                ['1@test.com', '2@test.com', '', null],
-                ['1@test.com' => '1@test.com', '2@test.com' => '2@test.com'],
-                [['email' => '1@test.com']],
-                ['1@test.com' => true, '2@test.com' => false]
+                'emailAddress' => ['1@test.com', '2@test.com', '3@test.com', '', null],
+                'emailsToLoad' => [
+                    '1@test.com' => '1@test.com',
+                    '2@test.com' => '2@test.com',
+                    '3@test.com' => '3@test.com'
+                ],
+                'queryResult'  => [
+                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null],
+                    ['email' => '2@test.com', 'userId' => null, 'contactId' => 10]
+                ],
+                'expected'     => [
+                    '1@test.com' => true,
+                    '2@test.com' => true,
+                    '3@test.com' => false
+                ]
             ],
         ];
+    }
+
+    /**
+     * @dataProvider isAtLeastOneUserEmailAddressProvider
+     */
+    public function testIsAtLeastOneUserEmailAddress($emailAddress, $emailsToLoad, $queryResult, $expected)
+    {
+        $query        = $this->getLoadEmailAddressesQuery(
+            $queryResult
+        );
+        $queryBuilder = $this->getLoadEmailAddressesQueryBuilder(
+            $query,
+            $emailsToLoad
+        );
+        $queryBuilder->expects($this->never())
+            ->method('andWhere');
+
+        $this->emailAddressRepository->expects($this->once())
+            ->method('createQueryBuilder')
+            ->with('a')
+            ->will($this->returnValue($queryBuilder));
+
+        $this->checker->isAtLeastOneUserEmailAddress(1, $emailAddress);
+
+        foreach ($expected as $email => $expectedResult) {
+            $this->assertSame($expectedResult, $this->checker->isAtLeastOneUserEmailAddress(1, $email));
+            // check that result is cached
+            $this->assertSame($expectedResult, $this->checker->isAtLeastOneUserEmailAddress(1, $email));
+            // check for other user
+            $this->assertFalse($this->checker->isAtLeastOneUserEmailAddress(2, $email));
+        }
+    }
+
+    public function isAtLeastOneUserEmailAddressProvider()
+    {
+        return [
+            [
+                'emailAddress' => '1@test.com',
+                'emailsToLoad' => ['1@test.com' => '1@test.com'],
+                'queryResult'  => [
+                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null]
+                ],
+                'expected'     => [
+                    '1@test.com' => true
+                ]
+            ],
+            [
+                'emailAddress' => ['1@test.com', '2@test.com', '3@test.com', '', null],
+                'emailsToLoad' => [
+                    '1@test.com' => '1@test.com',
+                    '2@test.com' => '2@test.com',
+                    '3@test.com' => '3@test.com'
+                ],
+                'queryResult'  => [
+                    ['email' => '1@test.com', 'userId' => 1, 'contactId' => null],
+                    ['email' => '2@test.com', 'userId' => null, 'contactId' => 10]
+                ],
+                'expected'     => [
+                    '1@test.com' => true,
+                    '2@test.com' => false,
+                    '3@test.com' => false
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @return EmailOwnerProviderStorage
+     */
+    public function getEmailOwnerProviderStorage()
+    {
+        $userProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $userProvider->expects($this->any())
+            ->method('getEmailOwnerClass')
+            ->will($this->returnValue(self::USER_CLASS));
+
+        $contactProvider = $this->getMock('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface');
+        $contactProvider->expects($this->any())
+            ->method('getEmailOwnerClass')
+            ->will($this->returnValue(self::TEST_CONTACT_CLASS));
+
+        $emailOwnerProviderStorage =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage')
+                ->disableOriginalConstructor()
+                ->getMock();
+        $emailOwnerProviderStorage->expects($this->any())
+            ->method('getProviders')
+            ->will($this->returnValue([$userProvider, $contactProvider]));
+        $emailOwnerProviderStorage->expects($this->any())
+            ->method('getEmailOwnerFieldName')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$userProvider, 'userId'],
+                        [$contactProvider, 'contactId']
+                    ]
+                )
+            );
+
+        return $emailOwnerProviderStorage;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_MockObject_MockObject $query
+     * @param array                                    $emailsToLoad
+     * @param string                                   $select
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLoadEmailAddressesQueryBuilder(
+        $query,
+        $emailsToLoad,
+        $select = 'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.contactId) AS contactId'
+    ) {
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $queryBuilder->expects($this->once())
+            ->method('select')
+            ->with($select)
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('a.hasOwner = :hasOwner AND a.email IN (:emails)')
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->at(1))
+            ->method('setParameter')
+            ->with('hasOwner', true)
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->at(2))
+            ->method('setParameter')
+            ->with('emails', $emailsToLoad)
+            ->will($this->returnSelf());
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+
+        return $queryBuilder;
+    }
+
+    /**
+     * @param array $result
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLoadEmailAddressesQuery($result)
+    {
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getArrayResult'])
+            ->getMockForAbstractClass();
+        $query->expects($this->once())
+            ->method('getArrayResult')
+            ->will($this->returnValue($result));
+
+        return $query;
     }
 }

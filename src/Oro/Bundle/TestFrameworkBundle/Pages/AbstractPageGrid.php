@@ -286,14 +286,14 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $entity = $this->getEntity($entityData);
         $element = $entity->element(
-            $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]")
+            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '...')]")
         );
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $element->click();
         $element->click();
 
         $entity->element(
-            $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '{$actionName}')]")
+            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
         )->click();
         if ($confirmation) {
             $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[contains(., 'Yes')]")->click();
@@ -449,12 +449,12 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function checkActionMenu($actionName)
     {
-        $actionMenu =  $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $actionMenu =  $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $actionMenu->click();
         $actionMenu->click();
         $this->waitForAjax();
-        $this->assertElementNotPresent("//td[@class='action-cell']//a[@title= '{$actionName}']");
+        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 
         return $this;
     }
