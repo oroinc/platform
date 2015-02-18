@@ -33,6 +33,11 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     protected $emailEntityBuilder;
 
     /**
+     * @var array
+     */
+    private $emailOriginUsers = [];
+
+    /**
      * Constructor
      *
      * @param EntityManager                     $em
@@ -58,49 +63,162 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     abstract public function process(EmailOrigin $origin, $syncStartTime);
 
     /**
+     * Returns the id of a user the given email origin belongs to.
+     *
+     * @param EmailOrigin $origin
+     *
+     * @return int|null
+     */
+    protected function getUserId(EmailOrigin $origin)
+    {
+        if (isset($this->emailOriginUsers[$origin->getId()])
+            || array_key_exists($origin->getId(), $this->emailOriginUsers)
+        ) {
+            return $this->emailOriginUsers[$origin->getId()];
+        }
+
+        $this->logger->notice(sprintf('Finding an user for email origin "%s" ...', (string)$origin));
+        $qb = $this->em->getRepository('Oro\Bundle\UserBundle\Entity\User')
+            ->createQueryBuilder('u')
+            ->select('u.id')
+            ->innerJoin('u.emailOrigins', 'o')
+            ->where('o.id = :originId')
+            ->setParameter('originId', $origin->getId())
+            ->setMaxResults(1);
+
+        $result = $qb->getQuery()->getArrayResult();
+        $userId = !empty($result) ? $result[0]['id'] : null;
+        if ($userId === null) {
+            $this->logger->notice('The user was not found.');
+        } else {
+            $this->logger->notice(sprintf('The user id: %s.', $userId));
+        }
+        $this->emailOriginUsers[$origin->getId()] = $userId;
+
+        return $userId;
+    }
+
+    /**
      * @param EmailHeader $email
      * @param string      $folderType
+     * @param int|null    $userId
      *
      * @return bool
      */
-    protected function isApplicableEmail(EmailHeader $email, $folderType)
+    protected function isApplicableEmail(EmailHeader $email, $folderType, $userId = null)
     {
+        if ($userId === null) {
+            return $this->isKnownSender($email) && $this->isKnownRecipient($email);
+        }
+
         if ($folderType === FolderType::SENT) {
-            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
-                $email->getToRecipients(),
-                $email->getCcRecipients(),
-                $email->getBccRecipients()
-            );
+            return $this->isUserSender($userId, $email) && $this->isKnownRecipient($email);
         } else {
-            return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
-                $email->getFrom()
-            );
+            return $this->isKnownSender($email) && $this->isUserRecipient($userId, $email);
         }
     }
 
     /**
-     * @param EmailHeader[] $emails
-     * @param string        $folderType
+     * Check if a sender of the given email is registered in the system
+     *
+     * @param EmailHeader $email
+     *
+     * @return bool
      */
-    protected function registerEmailsInKnownEmailAddressChecker(array $emails, $folderType)
+    protected function isKnownSender(EmailHeader $email)
+    {
+        return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+            $email->getFrom()
+        );
+    }
+
+    /**
+     * Check if at least one recipient of the given email is registered in the system
+     *
+     * @param EmailHeader $email
+     *
+     * @return bool
+     */
+    protected function isKnownRecipient(EmailHeader $email)
+    {
+        return $this->knownEmailAddressChecker->isAtLeastOneKnownEmailAddress(
+            $email->getToRecipients(),
+            $email->getCcRecipients(),
+            $email->getBccRecipients()
+        );
+    }
+
+    /**
+     * Check if a sender of the given email is the given user
+     *
+     * @param int         $userId
+     * @param EmailHeader $email
+     *
+     * @return bool
+     */
+    protected function isUserSender($userId, EmailHeader $email)
+    {
+        return $this->knownEmailAddressChecker->isAtLeastOneUserEmailAddress(
+            $userId,
+            $email->getFrom()
+        );
+    }
+
+    /**
+     * Check if the given user is a recipient of the given email
+     *
+     * @param int         $userId
+     * @param EmailHeader $email
+     *
+     * @return bool
+     */
+    protected function isUserRecipient($userId, EmailHeader $email)
+    {
+        return $this->knownEmailAddressChecker->isAtLeastOneUserEmailAddress(
+            $userId,
+            $email->getToRecipients(),
+            $email->getCcRecipients(),
+            $email->getBccRecipients()
+        );
+    }
+
+    /**
+     * @param EmailHeader[] $emails
+     */
+    protected function registerEmailsInKnownEmailAddressChecker(array $emails)
     {
         $addresses = [];
         foreach ($emails as $email) {
-            if ($folderType === FolderType::SENT) {
-                $addresses[] = $email->getToRecipients();
-                $addresses[] = $email->getCcRecipients();
-                $addresses[] = $email->getBccRecipients();
-            } else {
-                $addresses[] = $email->getFrom();
+            $from = $email->getFrom();
+            if (!isset($addresses[$from])) {
+                $addresses[$from] = $from;
             }
+            $this->addRecipients($addresses, $email->getToRecipients());
+            $this->addRecipients($addresses, $email->getCcRecipients());
+            $this->addRecipients($addresses, $email->getBccRecipients());
         }
         $this->knownEmailAddressChecker->preLoadEmailAddresses($addresses);
     }
 
     /**
+     * @param string[] $addresses
+     * @param string[] $recipients
+     */
+    protected function addRecipients(&$addresses, $recipients)
+    {
+        if (!empty($recipients)) {
+            foreach ($recipients as $recipient) {
+                if (!isset($addresses[$recipient])) {
+                    $addresses[$recipient] = $recipient;
+                }
+            }
+        }
+    }
+
+    /**
      * Creates email entity and register it in the email entity batch processor
      *
-     * @param EmailHeader       $email
+     * @param EmailHeader $email
      * @param EmailFolder $folder
      *
      * @return EmailEntity
@@ -148,10 +266,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         if ($folderType2 === FolderType::OTHER) {
             $folderType2 = FolderType::INBOX;
         }
-        if ($folderType1 === $folderType2) {
-            return true;
-        }
 
-        return false;
+        return ($folderType1 === $folderType2);
     }
 }
