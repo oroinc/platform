@@ -50,8 +50,12 @@ class EmailThreadManager
      */
     public function handlePostFlush(PostFlushEventArgs $event)
     {
-        $entityManager = $event->getEntityManager();
-        $this->processEmailsHead($entityManager);
+        if ($this->getQueue()) {
+            $entityManager = $event->getEntityManager();
+            $this->processEmailsHead($entityManager);
+            $this->resetQueue();
+            $entityManager->flush();
+        }
     }
 
     /**
@@ -83,7 +87,6 @@ class EmailThreadManager
                 $this->updateThreadHead($entityManager, $entity);
             }
         }
-        $this->resetQueue();
     }
 
     /**

@@ -62,6 +62,28 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandlePostFlush()
     {
+        $threadId = 'id';
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email->expects($this->exactly(1))
+            ->method('getThreadId')
+            ->will($this->returnValue($threadId));
+        $email->expects($this->exactly(1))
+            ->method('getId')
+            ->will($this->returnValue(1));
+
+        $this->manager->addEmailToQueue($email);
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailThreadProvider->expects($this->once())
+            ->method('getThreadEmails')
+            ->will($this->returnValue([$email]));
+
+        $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
+    }
+
+    public function testHandlePostFlushWithEmptyQueue()
+    {
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
