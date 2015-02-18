@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Provider;
 
-use Oro\Bundle\IntegrationBundle\Provider\ProcessorRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 
 class ProcessorRegistryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ProcessorRegistry
+     * @var SyncProcessorRegistry
      */
     protected $registry;
 
     protected function setUp()
     {
-        $this->registry = new ProcessorRegistry();
+        $this->registry = new SyncProcessorRegistry();
     }
 
     protected function tearDown()
