@@ -109,15 +109,13 @@ class SyncProcessor extends AbstractSyncProcessor
      * @param Integration $integration Integration object
      * @param string      $connector   Connector name
      * @param array       $parameters  Connector additional parameters
-     * @param boolean     $saveStatus  Do we need to save new status to bd
      *
      * @return boolean
      */
     protected function processIntegrationConnector(
         Integration $integration,
         $connector,
-        array $parameters = [],
-        $saveStatus = true
+        array $parameters = []
     ) {
         if (!$integration->isEnabled()) {
             return false;
@@ -162,7 +160,7 @@ class SyncProcessor extends AbstractSyncProcessor
                 ),
         ];
 
-        return $this->processImport($connector, $jobName, $configuration, $integration, $saveStatus);
+        return $this->processImport($connector, $jobName, $configuration, $integration);
     }
 
     /**
@@ -170,11 +168,10 @@ class SyncProcessor extends AbstractSyncProcessor
      * @param string      $jobName
      * @param array       $configuration
      * @param Integration $integration
-     * @param boolean     $saveStatus
      *
      * @return boolean
      */
-    protected function processImport($connector, $jobName, $configuration, Integration $integration, $saveStatus)
+    protected function processImport($connector, $jobName, $configuration, Integration $integration)
     {
         $event = new SyncEvent($jobName, $configuration);
         $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
@@ -220,14 +217,12 @@ class SyncProcessor extends AbstractSyncProcessor
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         }
 
-        if ($saveStatus) {
-            $this->doctrineRegistry
-                ->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($integration, $status);
+        $this->doctrineRegistry
+            ->getRepository('OroIntegrationBundle:Channel')
+            ->addStatus($integration, $status);
 
-            if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
-                $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
-            }
+        if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
+            $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
         }
 
         return $isSuccess;
