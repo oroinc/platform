@@ -189,7 +189,10 @@ class ActivityListManager
             $entity->getRelatedActivityId()
         );
 
-        $isHead = $entityProvider instanceof ActivityListGroupProviderInterface ? $entity->isHead() : false;
+        $isHead = false;
+        if ($this->isGroupingApplicable($entityProvider)) {
+            $isHead = $entity->isHead();
+        }
         $data = $entityProvider->getData($entity);
         if (isset($data['isHead']) && !$data['isHead']) {
             $isHead = false;
@@ -248,7 +251,7 @@ class ActivityListManager
     {
         $results = [];
         $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
-        if ($entityProvider instanceof ActivityListGroupProviderInterface) {
+        if ($this->isGroupingApplicable($entityProvider)) {
             $groupedActivities = $entityProvider->getGroupedEntities($entity);
             $activityResults   = $this->getEntityViewModels($groupedActivities);
 
@@ -280,5 +283,14 @@ class ActivityListManager
         }
 
         return $results;
+    }
+
+    /**
+     * @param object $entityProvider
+     * @return bool
+     */
+    protected function isGroupingApplicable($entityProvider)
+    {
+        return $entityProvider instanceof ActivityListGroupProviderInterface;
     }
 }
