@@ -136,17 +136,39 @@ table.grid {
   }
 }
 
-.floatThead {
-  .grid-container-parent {
-    position: relative;
+.floatThead{
+  .thead-sizing-row {
+    display: none;
   }
-  thead {
-    position: absolute;
-    width: auto;
-    display: block;
-    border-bottom: 1px solid #ddd;
-    tr {
+  &.floatThead-relative{
+    .thead-sizing-row {
       display: block;
+    }
+    .grid-container-parent {
+      position: relative;
+    }
+    thead {
+      position: absolute;
+      width: auto;
+      display: block;
+      border-bottom: 1px solid #ddd;
+      tr {
+        display: block;
+      }
+    }
+  }
+  &.floatThead-fixed{
+    .thead-sizing-row {
+      display: block;
+    }
+    thead {
+      position: fixed;
+      display: block;
+      overflow: hidden;
+      border-bottom: 1px solid #ddd;
+      tr {
+        display: block;
+      }
     }
   }
 }

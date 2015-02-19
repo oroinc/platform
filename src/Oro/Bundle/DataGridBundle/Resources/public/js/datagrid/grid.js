@@ -626,12 +626,10 @@ define(function (require) {
             this.reposition();
         },
 
-        reposition: function () {
-            // get gridRect
-            var grid = this.$grid[0],
-                current = grid,
-                midRect = current.getBoundingClientRect(),
-                tableRect = midRect,
+        getVisibleRect: function (el) {
+            var current = el,
+                tableRect = current.getBoundingClientRect(),
+                midRect = tableRect,
                 resultRect = {
                     top: midRect.top - this.headerHeight,
                     left: midRect.left,
@@ -655,19 +653,79 @@ define(function (require) {
                 }
                 current = current.parentNode;
             }
-            this.$grid.find('thead:first').css({
-                top: resultRect.top - tableRect.top
-            });
-            var theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
-            this.$grid.find('thead:first tr:first').css({
-                marginLeft: tableRect.left - theadRect.left
-            })
+            return resultRect;
+        },
+
+        reposition: function () {
+            // get gridRect
+            var tableRect = this.$grid[0].getBoundingClientRect(),
+                visibleRect = this.getVisibleRect(this.$grid[0]),
+                mode = 'default';
+            if (visibleRect.top !== tableRect.top) {
+                mode = 'fixed';
+                if (this.$grid.find('thead:first .dropdown.open').length) {
+                    mode = 'relative';
+                }
+            }
+            this.setFloatTheadMode(mode, visibleRect, tableRect);
+        },
+
+        setFloatTheadMode: function (mode, visibleRect, tableRect) {
+            var theadRect;
+            // pass this argument to avoid expensive calculations
+            if (!visibleRect) {
+                visibleRect = this.getVisibleRect(this.$grid[0]);
+            }
+            if (!tableRect) {
+                tableRect = this.$grid[0].getBoundingClientRect();
+            }
+            switch (mode) {
+                case 'relative':
+                    if (this.currentFloatTheadMode !== mode) {
+                        this.$el.removeClass('floatThead-fixed');
+                        this.$el.addClass('floatThead-relative');
+                    }
+                    this.$grid.find('thead:first').css({
+                        top: visibleRect.top - tableRect.top
+                    });
+                    theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
+                    this.$grid.find('thead:first tr:first').css({
+                        marginLeft: tableRect.left - theadRect.left
+                    });
+                    break;
+                case 'fixed':
+                    if (this.currentFloatTheadMode !== mode) {
+                        this.$el.removeClass('floatThead-relative');
+                        this.$el.addClass('floatThead-fixed');
+                    }
+                    this.$grid.find('thead:first').css({
+                        top: visibleRect.top,
+                        width: visibleRect.right - visibleRect.left
+                    });
+                    theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
+                    this.$grid.find('thead:first tr:first').css({
+                        marginLeft: tableRect.left - theadRect.left
+                    });
+                    break;
+                default:
+                    if (this.currentFloatTheadMode !== mode) {
+                        this.$el.removeClass('floatThead-relative floatThead-fixed');
+                        // remove extra styles
+                        this.$grid.find('thead:first, thead:first tr:first'). attr('style', '');
+                        // cleanup
+                    }
+                    break;
+            }
+            this.currentFloatTheadMode = mode;
         },
 
         addFloatThead: function () {
             this.headerHeight = this.$grid.find('thead tr:first').height();
             this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:' + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
             this.fixHeaderCellWidth();
+            this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
+                setTimeout(_.bind(this.reposition, this), 0);
+            }, this));
             this.$grid.parents().on('scroll', this.reposition);
         },
 
@@ -692,7 +750,6 @@ define(function (require) {
          * Renders the grid's header, then footer, then finally the body.
          */
         renderGrid: function () {
-
             this.$grid.append(this.header.render().$el);
             if (this.footer) {
                 this.$grid.append(this.footer.render().$el);
@@ -845,7 +902,7 @@ define(function (require) {
             if (this.enableFullScreenLayout) {
                 layout = mediator.execute('layout:getPreferredLayout', this.$grid);
             }
-            this.setLayout(layout);
+            this.setLayout('default');
         },
 
         /**
