@@ -71,6 +71,35 @@ class EmailThreadProvider
     }
 
     /**
+     * Get head email
+     *
+     * @param EntityManager $entityManager
+     * @param Email $entity
+     *
+     * @return Email
+     */
+    public function getHeadEmail(EntityManager $entityManager, Email $entity)
+    {
+        $threadId = $entity->getThreadId();
+        if ($threadId) {
+            /** @var QueryBuilder $queryBuilder */
+            $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
+            $criteria = new Criteria();
+            $criteria->where($criteria->expr()->eq('threadId', $threadId));
+            $criteria->andWhere($criteria->expr()->eq('seen', false));
+            $criteria->orderBy(['sentAt' => Criteria::DESC]);
+            $criteria->setMaxResults(1);
+            $queryBuilder->addCriteria($criteria);
+            $result = $queryBuilder->getQuery()->getSingleResult();
+            if ($result) {
+                return $result;
+            }
+        }
+
+        return $entity;
+    }
+
+    /**
      * Get emails in thread of current one
      *
      * @param EntityManager $entityManager

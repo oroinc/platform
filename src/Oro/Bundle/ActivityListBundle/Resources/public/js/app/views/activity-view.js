@@ -74,6 +74,7 @@ define([
                 data.editor_url = '';
             }
             data.routing = routing;
+            data.dateFormatter = dateTimeFormatter;
 
             return data;
         },

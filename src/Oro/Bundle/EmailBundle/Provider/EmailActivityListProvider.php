@@ -13,6 +13,7 @@ use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -42,25 +43,31 @@ class EmailActivityListProvider implements
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var EmailThreadProvider */
+    protected $emailThreadProvider;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ServiceLink    $doctrineRegistryLink
-     * @param ServiceLink    $nameFormatterLink
-     * @param Router         $router
-     * @param ConfigManager  $configManager
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ServiceLink         $doctrineRegistryLink
+     * @param ServiceLink         $nameFormatterLink
+     * @param Router              $router
+     * @param ConfigManager       $configManager
+     * @param EmailThreadProvider $emailThreadProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $doctrineRegistryLink,
         ServiceLink $nameFormatterLink,
         Router $router,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        EmailThreadProvider $emailThreadProvider
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
         $this->nameFormatterLink    = $nameFormatterLink;
         $this->router               = $router;
         $this->configManager        = $configManager;
+        $this->emailThreadProvider  = $emailThreadProvider;
     }
 
     /**
@@ -147,11 +154,18 @@ class EmailActivityListProvider implements
         $email = $this->doctrineRegistryLink->getService()
             ->getRepository($activityListEntity->getRelatedActivityClass())
             ->find($activityListEntity->getRelatedActivityId());
+        $headEmail = $this->emailThreadProvider->getHeadEmail(
+            $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),
+            $email
+        );
 
         $data = [
-            'ownerName' => $email->getFromName(),
-            'ownerLink' => null,
-            'emailId'   => $email->getId(),
+            'ownerName'     => $email->getFromName(),
+            'ownerLink'     => null,
+            'emailId'       => $email->getId(),
+            'headOwnerName' => $headEmail->getFromName(),
+            'headSubject'   => $headEmail->getSubject(),
+            'headSentAt'    => $headEmail->getSentAt()->format('c')
         ];
 
         if ($email->getFromEmailAddress()->hasOwner()) {
