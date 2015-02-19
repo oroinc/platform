@@ -1,11 +1,11 @@
 <div class="activity-list sub-list"></div>
 <script type="text/javascript">
     require(['jquery', 'oroactivitylist/js/app/components/activity-list-component'],
-    function($, ActivityListComponent){
+    function($, ActivityListComponent) {
         $(function() {
             var opt = $.extend(true, {}, {{ results|json_encode|raw }});
-            opt._sourceElement = $('#emails-sub-grid-' + opt.emailId);
-            new ActivityListComponent(extOpt);
+            opt._sourceElement = $('#grouped-entity-' + opt.entityId);
+            new ActivityListComponent(opt);
         });
     });
 </script>
