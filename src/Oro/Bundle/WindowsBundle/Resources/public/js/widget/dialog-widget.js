@@ -9,6 +9,7 @@ define(function (require) {
         tools = require('oroui/js/tools'),
         error = require('oroui/js/error'),
         messenger = require('oroui/js/messenger'),
+        mediator = require('oroui/js/mediator'),
         layout = require('oroui/js/layout'),
         AbstractWidget = require('oroui/js/widget/abstract-widget'),
         StateModel = require('orowindows/js/dialog/state/model');
@@ -59,6 +60,10 @@ define(function (require) {
                 minWidth: 375,
                 minHeight: 150
             });
+            if (tools.isMobile()) {
+                options.incrementalPosition = false;
+                options.dialogOptions.limitTo = 'body';
+            }
 
             // it's possible to track state only for not modal dialogs
             options.stateEnabled = options.stateEnabled && !dialogOptions.modal;
@@ -250,7 +255,9 @@ define(function (require) {
                 if (dialogOptions.state !== 'minimized') {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
                 }
-                this.widget = $('<div/>').append(this.$el).dialog(dialogOptions);
+                this.widget = $('<div/>');
+                this._transmitDialogEvents(this.widget);
+                this.widget.html(this.$el).dialog(dialogOptions);
                 this.widget.attr('data-layout', 'separate');
             } else {
                 this.widget.html(this.$el);
@@ -350,6 +357,34 @@ define(function (require) {
                 my: offset,
                 at: DialogWidget.prototype.defaultPos
             };
+        },
+
+        /**
+         * Transmits dialog window state events over system message bus
+         *
+         * @param {jQuery} $dialog
+         * @protected
+         */
+        _transmitDialogEvents: function ($dialog) {
+            var id = this.cid;
+            function transmit(action, state) {
+                mediator.trigger('widget_dialog:' + action, {
+                    id: id,
+                    state: state
+                });
+            }
+            $dialog.on('dialogbeforeclose', function () {
+                transmit('close', $dialog.dialog('state'));
+            });
+            $dialog.on('dialogopen', function () {
+                transmit('open', $dialog.dialog('state'));
+            });
+            $dialog.on('dialogstatechange', function (event, data) {
+                if (data.state === data.oldState) {
+                    return;
+                }
+                transmit('stateChange', data.state);
+            });
         }
     });
 
