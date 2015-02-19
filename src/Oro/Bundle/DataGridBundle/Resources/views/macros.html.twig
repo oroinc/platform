@@ -22,6 +22,7 @@
         {% set gridId   = oro_datagrid_generate_element_id(datagrid) %}
         {% set options  = {
             el: '#' ~ gridId,
+            gridId: gridId,
             gridName: oro_datagrid_build_fullname(datagrid.name, datagrid.scope),
             builders: metaData.requireJSModules,
             metadata: metaData,
