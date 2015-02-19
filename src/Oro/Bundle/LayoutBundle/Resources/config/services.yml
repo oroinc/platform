@@ -18,6 +18,7 @@ services:
         class: %oro_layout.layout_factory_builder.class%
         calls:
             - [addExtension, [@oro_layout.extension]]
+            - [addExtension, [@oro_layout.theme_extension]]
             - [setDefaultRenderer, [%oro_layout.templating.default%]]
 
     oro_layout.layout_manager:

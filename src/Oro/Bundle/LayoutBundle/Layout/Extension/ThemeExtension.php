@@ -21,19 +21,27 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
     protected $manager;
 
     /** @var FileLoaderInterface[] */
-    protected $loaders;
+    protected $loaders = [];
 
     /**
      * @param array                 $resources
      * @param ThemeManager          $manager
      * @param FileLoaderInterface[] $loaders
      */
-    public function __construct(array $resources, ThemeManager $manager, $loaders)
+    public function __construct(array $resources, ThemeManager $manager, $loaders = [])
     {
         $this->resources = $resources;
         $this->manager   = $manager;
         $this->loaders   = $loaders;
         $this->setLogger(new NullLogger());
+    }
+
+    /**
+     * @param FileLoaderInterface $loader
+     */
+    public function addLoader(FileLoaderInterface $loader)
+    {
+        $this->loaders[] = $loader;
     }
 
     /**

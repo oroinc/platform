@@ -1,13 +1,36 @@
 parameters:
-    oro_layout.theme_factory.class:      Oro\Bundle\LayoutBundle\Theme\ThemeFactory
-    oro_layout.theme_manager.class:      Oro\Bundle\LayoutBundle\Theme\ThemeManager
+    oro_layout.theme_factory.class:                 Oro\Bundle\LayoutBundle\Theme\ThemeFactory
+    oro_layout.theme_manager.class:                 Oro\Bundle\LayoutBundle\Theme\ThemeManager
+    oro_layout.theme_extension.class:               Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension
+
+    oro_layout.loader.php_file_loader.class:        Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader
+    oro_layout.loader.yml_file_loader.class:        Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader
 
 services:
     oro_layout.theme_factory:
         class: %oro_layout.theme_factory.class%
+        public: false
 
     oro_layout.theme_manager:
         class: %oro_layout.theme_manager.class%
         arguments:
             - @oro_layout.theme_factory
             - []
+
+    oro_layout.loader.php_file_loader:
+        class: %oro_layout.loader.php_file_loader.class%
+
+    oro_layout.loader.yml_file_loader:
+        class: %oro_layout.loader.yml_file_loader.class%
+
+    oro_layout.theme_extension:
+        class: %oro_layout.theme_extension.class%
+        public: false
+        arguments:
+            - []
+            - @oro_layout.theme_manager
+        calls:
+            - [addLoader, [@oro_layout.loader.yml_file_loader]]
+            - [addLoader, [@oro_layout.loader.php_file_loader]]
+        tags:
+            - { name: monolog.logger, channel: main }

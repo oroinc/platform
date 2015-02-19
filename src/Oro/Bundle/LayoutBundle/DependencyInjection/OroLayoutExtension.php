@@ -9,21 +9,23 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\FolderContentsCummulativeLoader;
 
 class OroLayoutExtension extends Extension
 {
-    const THEME_MANAGER_SERVICE_ID = 'oro_layout.theme_manager';
+    const THEME_MANAGER_SERVICE_ID       = 'oro_layout.theme_manager';
+    const THEME_EXTENSION_SERVICE_ID = 'oro_layout.theme_extension';
 
     /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configLoader     = new CumulativeConfigLoader(
+        $configLoader = new CumulativeConfigLoader(
             'oro_layout',
             new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
         );
-        $resources        = $configLoader->load($container);
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $configs[] = $resource->data['oro_layout'];
         }
@@ -60,12 +62,12 @@ class OroLayoutExtension extends Extension
         $managerDefinition->replaceArgument(1, $config['themes']);
 
         $foundThemeLayoutUpdates = [];
-        /*$updatesLoader           = new CumulativeConfigLoader(
+        $updatesLoader           = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            []
-        );*/
+            [new FolderContentsCummulativeLoader('Resources/layouts/', 5, false)]
+        );
 
-        $resources = [];//$updatesLoader->load($container);
+        $resources = $updatesLoader->load($container);
         foreach ($resources as $resource) {
             /**
              * $resource->data contains data in following format
@@ -76,7 +78,10 @@ class OroLayoutExtension extends Extension
              *    ]
              * ]
              */
-            array_merge_recursive($foundThemeLayoutUpdates, $resource->data);
+            $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resource->data);
         }
+
+        $themeExtensionDefinition = $container->getDefinition(self::THEME_EXTENSION_SERVICE_ID);
+        $themeExtensionDefinition->replaceArgument(0, $foundThemeLayoutUpdates);
     }
 }

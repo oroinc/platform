@@ -1,10 +1,7 @@
 <?php
 
-use Oro\Component\Layout\LayoutItemInterface;
-use Oro\Component\Layout\LayoutManipulatorInterface;
-
-/** @var LayoutManipulatorInterface $layoutManipulator */
-/** @var LayoutItemInterface $item */
+/** @var Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator */
+/** @var Oro\Component\Layout\LayoutItemInterface $item */
 
 $layoutManipulator
     ->add('header', 'root_alias', 'header')

@@ -9,6 +9,7 @@ use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension;
 
 use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle\TestBundle;
+use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle2\TestBundle2;
 
 class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -195,5 +196,67 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedResult = ['base', 'oro-black'];
         $result         = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
         $this->assertSame(sort($expectedResult), sort($result));
+    }
+
+    public function testLoadingLayoutUpdates()
+    {
+        $container = new ContainerBuilder();
+
+        $bundle1 = new TestBundle();
+        $bundle2 = new TestBundle2();
+        CumulativeResourceManager::getInstance()->clear()
+            ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
+
+        $bundle1Dir = dirname((new \ReflectionClass($bundle1))->getFileName());
+        $bundle2Dir = dirname((new \ReflectionClass($bundle2))->getFileName());
+
+        $extension = new OroLayoutExtension();
+        $extension->load([], $container);
+
+        $expectedResult = [
+            'base'  => [
+                'route_name'  => [
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $bundle1Dir . '/Resources/layouts/base/route_name/update1.yml'
+                    ),
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $bundle2Dir . '/Resources/layouts/base/route_name/update1.yml'
+                    ),
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $bundle2Dir . '/Resources/layouts/base/route_name/update2.yml'
+                    ),
+                ],
+                'route_name2' => [
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $bundle1Dir . '/Resources/layouts/base/route_name2/update1.yml'
+                    ),
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $bundle2Dir . '/Resources/layouts/base/route_name2/update1.yml'
+                    ),
+                ],
+            ],
+            'black' => [
+                'route_name' => [
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $bundle2Dir . '/Resources/layouts/black/route_name/update1.php'
+                    ),
+                ]
+            ]
+        ];
+
+        $result = $container->getDefinition(OroLayoutExtension::THEME_EXTENSION_SERVICE_ID)->getArgument(0);
+        $this->assertSame($expectedResult, $result);
     }
 }

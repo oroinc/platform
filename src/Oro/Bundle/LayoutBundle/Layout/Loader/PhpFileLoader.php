@@ -15,6 +15,7 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
  *         // @var LayoutItemInterface $item
  *
  *         $layoutManipulator->add('menu', 'content', 'knp_menu');
+ *
  * @see src/Oro/Bundle/LayoutBundle/Tests/Unit/Stubs/Updates/layout_update.php
  */
 class PhpFileLoader implements FileLoaderInterface
