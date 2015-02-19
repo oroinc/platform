@@ -16,8 +16,8 @@ class TemporaryIndexesBundle implements Migration
     {
         if ($schema->hasTable('oro_activity_list')) {
             $table = $schema->getTable('oro_activity_list');
-            $table->dropIndex('tmp1');
-            $table->dropIndex('tmp2');
+            $table->dropIndex('tmp_al_related_activity_class');
+            $table->dropIndex('tmp_al_related_activity_id');
         }
     }
 }
