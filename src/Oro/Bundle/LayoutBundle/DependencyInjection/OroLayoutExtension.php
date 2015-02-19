@@ -13,7 +13,7 @@ use Oro\Component\Config\Loader\FolderContentsCummulativeLoader;
 
 class OroLayoutExtension extends Extension
 {
-    const THEME_MANAGER_SERVICE_ID       = 'oro_layout.theme_manager';
+    const THEME_MANAGER_SERVICE_ID   = 'oro_layout.theme_manager';
     const THEME_EXTENSION_SERVICE_ID = 'oro_layout.theme_extension';
 
     /**
@@ -64,7 +64,7 @@ class OroLayoutExtension extends Extension
         $foundThemeLayoutUpdates = [];
         $updatesLoader           = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            [new FolderContentsCummulativeLoader('Resources/layouts/', 5, false)]
+            [new FolderContentsCummulativeLoader('Resources/layouts/', 3, false)]
         );
 
         $resources = $updatesLoader->load($container);
