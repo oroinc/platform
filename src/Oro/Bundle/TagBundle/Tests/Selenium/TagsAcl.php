@@ -21,13 +21,7 @@ class TagsAcl extends Selenium2TestCase
             ->setEntity('User', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setEntity('Group', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setEntity('Role', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
-            ->setCapability(
-                array(
-                    'Tag assign/unassign',
-                    'Unassign all tags from entities',
-                    'View tag cloud'),
-                'System'
-            )
+            ->setEntity('Tag', ['view'], 'System')
             ->save()
             ->assertMessage('Role saved')
             ->close();
@@ -199,7 +193,7 @@ class TagsAcl extends Selenium2TestCase
         $login = $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
-            ->setCapability(array('Unassign all tags from entities'), 'None')
+            ->setEntity('Tag', ['view'], 'None')
             ->save();
         /** @var Users $login*/
         $login = $login->openUsers('Oro\Bundle\UserBundle')
@@ -236,7 +230,7 @@ class TagsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $role)
             ->open(array($role))
-            ->setCapability(array('Tag assign/unassign'), 'None')
+            ->setEntity('Tag', ['view'], 'None')
             ->save()
             ->logout()
             ->setUsername($username)

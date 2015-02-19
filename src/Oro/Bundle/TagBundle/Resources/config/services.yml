@@ -108,7 +108,7 @@ services:
             - %oro_tag.tag.entity.class%
             - ["name"]
         tags:
-            - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
+            - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_view }
 
     # Autocomplete form type
     oro_tag.form.type.tag_autocomplete:

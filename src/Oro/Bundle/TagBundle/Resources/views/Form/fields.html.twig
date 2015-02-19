@@ -1,7 +1,7 @@
 
 {% block oro_tag_select_row %}
-    {% if resource_granted('oro_tag_view_tag_cloud') %}
-        {% if resource_granted('oro_tag_assign_unassign') %}
+    {% if resource_granted('oro_tag_view') %}
+        {% if resource_granted('oro_tag_view') %}
             <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}">
                 {{ form_label(form, '' , { label_attr: label_attr|merge({ class: 'control-label' })}) }}
 
@@ -20,7 +20,7 @@
                     </div>
 
                     <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}">
-                        {% if not resource_granted('oro_tag_assign_unassign') %}
+                        {% if not resource_granted('oro_tag_view') %}
                             {{ form_label(form, '' , { label_attr: label_attr|merge({ class: 'control-label' })}) }}
                         {% endif %}
                         {% set tagOverlayId = 'tag-overlay-' ~ random() %}
@@ -35,8 +35,8 @@
                                                 , autocompleteFieldId: '#{{ form.autocomplete.vars.id }}'
                                                 , fieldId: '#{{ form.all.vars.id }}'
                                                 , ownFieldId: '#{{ form.owner.vars.id }}'
-                                                {% if resource_granted('oro_tag_assign_unassign') %}, unassign: true{% endif %}
-                                                {% if resource_granted('oro_tag_unassign_global') %}, unassignGlobal: true{% endif %}
+                                                {% if resource_granted('oro_tag_view') %}, unassign: true{% endif %}
+                                                {% if resource_granted('oro_tag_view') %}, unassignGlobal: true{% endif %}
                                             });
                                         });
                                     });
