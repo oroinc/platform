@@ -23,6 +23,13 @@ use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
+/**
+ * Class EmailController
+ *
+ * @package Oro\Bundle\EmailBundle\Controller
+ *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class EmailController extends Controller
 {
     /**
@@ -52,13 +59,36 @@ class EmailController extends Controller
      * @Route("/view/thread/{id}", name="oro_email_thread_view", requirements={"id"="\d+"})
      * @AclAncestor("oro_email_view")
      * @Template("OroEmailBundle:Email/Thread:view.html.twig")
-     *
-     * todo Blank action
-     * todo Will be implemented in CRM-2495
      */
     public function viewThreadAction(Email $entity)
     {
-        return ['entity' => $entity];
+        return ['entity' => $entity,];
+    }
+
+    /**
+     * @Route("/widget/thread/{id}", name="oro_email_thread_widget", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_view")
+     * @Template("OroEmailBundle:Email/widget:thread.html.twig")
+     */
+    public function threadWidgetAction(Email $entity)
+    {
+        $thread = $this->get('oro_email.email.thread.provider')->getThreadEmails(
+            $this->get('doctrine')->getManager(),
+            $entity
+        );
+
+        foreach ($thread as $email) {
+            try {
+                $this->getEmailCacheManager()->ensureEmailBodyCached($email);
+            } catch (LoadEmailBodyException $e) {
+                // do nothing
+            }
+        }
+
+        return [
+            'entity' => $entity,
+            'thread' => $thread,
+        ];
     }
 
     /**

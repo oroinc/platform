@@ -1,0 +1,51 @@
+{% import "OroEmailBundle::actions.html.twig" as Actions %}
+{% import 'OroEmailBundle::macros.html.twig' as EA %}
+
+<div class="widget-content thread-view">
+    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+        {% for email in thread %}
+            <div id="{{ email.id }}" class="panel panel-default">
+                <div class="panel-heading email-head" role="tab" id="heading{{ loop.index }}">
+                    <div class="panel-title pull-left">
+                        <a class="subject" data-toggle="collapse" data-parent="#accordion" href="#collapse{{ loop.index }}" aria-expanded="false" aria-controls="collapse{{ loop.index }}">
+                            {{ email.subject }}
+                        </a>
+                        <div class="clearfix"></div>
+                        <span class="recipients">{{ EA.recipient_email_addresses(email.recipients, false, false) }}</span>
+                        <br/>
+                        <span class="sentAt">{{ email.sentAt|oro_format_datetime }}</span>
+                    </div>
+                    <div class="pull-right">
+                        {{ Actions.replyButton(email) }}
+                    </div>
+                </div>
+                <div id="collapse{{ loop.index }}"
+                     class="panel-collapse collapse {{ loop.first ? 'in' : '' }} email-body"
+                     role="tabpanel" aria-labelledby="heading{{ loop.index }}">
+                    <div class="panel-body email-body">
+                        {% if email.emailBody %}
+                            {{ email.emailBody.bodyContent|raw }}
+                        {% else %}
+                            {{ 'oro.email.body_is_unavailable'|trans }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .thread-view .email-head {
+        border-bottom: 1px solid #eee;
+        overflow: hidden;
+        padding: 10px;
+    }
+    .thread-view .email-head a.subject {
+        font-size: 16px;
+    }
+    .thread-view .email-body {
+        background-color: #eee;
+        margin: 10px;
+    }
+</style>

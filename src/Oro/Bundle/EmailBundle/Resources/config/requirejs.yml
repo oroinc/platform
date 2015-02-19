@@ -6,3 +6,4 @@ config:
 
         'oroemail/js/app/components/email-variable-component': 'bundles/oroemail/js/app/components/email-variable-component.js'
         'oroemail/js/app/apply-template-confirmation': 'bundles/oroemail/js/app/apply-template-confirmation.js'
+        'oroemail/js/app/views/thread-view': 'bundles/oroemail/js/app/views/thread-view.js'

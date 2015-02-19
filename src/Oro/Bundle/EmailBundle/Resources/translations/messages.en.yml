@@ -111,6 +111,7 @@ oro:
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
+        body_is_unavailable:      Body is unavailable
 
         entity_config:
             email:

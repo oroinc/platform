@@ -1,5 +1,35 @@
-<div class="email-body-holder widget-content">
-    {% block content %}
-        Blank page
-    {% endblock %}
-</div>
+{% extends "OroUIBundle:actions:view.html.twig" %}
+
+{% oro_title_set({params : {"%subject%": entity.subject} }) %}
+
+{% block pageHeader %}
+    {% set breadcrumbs = {
+        'entity':      entity,
+        'indexPath':   path('oro_email_user_emails'),
+        'indexLabel':  'oro.email.entity_plural_label'|trans,
+        'entityTitle': entity.subject,
+    } %}
+    {{ parent() }}
+{% endblock pageHeader %}
+
+{% block breadcrumb %}
+    {% set breadcrumbs = [
+        {'label': "Thread view"|trans },
+        {'label': entity.subject }
+    ] %}
+    {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
+{% endblock breadcrumb %}
+
+{% block stats %}
+{% endblock stats %}
+
+{% block content_data %}
+    <div class="container-fluid">
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'wid': 'thread-view',
+            'url': path('oro_email_thread_widget', {'id': entity.id}),
+            'alias': 'thread-view'
+        }) }}
+    </div>
+{% endblock content_data %}
