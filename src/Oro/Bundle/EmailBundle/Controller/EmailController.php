@@ -62,6 +62,28 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/view-group/{id}", name="oro_email_view_group", requirements={"id"="\d+"})
+     * @Acl(
+     *      id="oro_email_view",
+     *      type="entity",
+     *      class="OroEmailBundle:Email",
+     *      permission="VIEW"
+     * )
+     * @Template
+     */
+    public function viewGroupAction(Email $email)
+    {
+        $results = $this->get('oro_activity_list.manager')->getGroupedEntities(
+            $email,
+            $this->getRequest()->get('_wid'),
+            $this->get('oro_filter.datetime_range_filter')->getMetadata()
+        );
+
+        return ['results' => $results];
+    }
+
+
+    /**
      * This action is used to render the list of emails associated with the given entity
      * on the view page of this entity
      *

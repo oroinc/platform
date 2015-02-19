@@ -7,7 +7,7 @@
     <div class="accordion-group">
         <div class="accordion-heading">
             <div class="title-item">
-                <a href="#accordion-item<%= id %>" data-toggle="collapse"
+                <a href="#accordion-item<%= id %><% if(is_head && !ignoreHead) { %>head<% } %>" data-toggle="collapse"
                    class="accordion-icon accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
                 <span class="icon">
                     <i class="{{ oro_entity_config_value(entityClass, 'icon')|raw }}"></i>
@@ -29,12 +29,14 @@
                             date: '<i class="date">' + updatedAt + '</i>'
                         }) %>
                     </span>
+                    <% if(!is_head || ignoreHead) { %>
                     <span class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
                           title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
                         <i class="icon icon-comment"></i><span class="count"><%= commentCount %></span>
                     </span>
+                    <% } %>
                     <span class="message-item message">
-                        <a href="#accordion-item<%= id %>" data-toggle="collapse"
+                        <a href="#accordion-item<%= id %><% if(is_head && !ignoreHead) { %>head<% } %>" data-toggle="collapse"
                            class="accordion-toggle<% if (collapsed) { %> collapsed<% } %>"><%= subject %></a>
                     </span>
                 </span>
@@ -70,11 +72,11 @@
                 </div>
             </div>
         </div>
-        <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">
+        <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %><% if(is_head && !ignoreHead) { %>head<% } %>">
             <div class="message">
                 {# Do NOT remove. Placeholder for activity view #}
-                <div class="info responsive-cell"></div>
-                <% if (has_comments && commentable) { %>
+                <div class="info responsive-cell" id="grouped-entity-<%= data.entityId %>"></div>
+                <% if (has_comments && commentable && (!is_head || ignoreHead)) { %>
                 <div class="responsive-cell">
                     <h5 class="user-fieldset">
                         <span><%= _.__('oro.comment.entity_plural_label') %></span>
