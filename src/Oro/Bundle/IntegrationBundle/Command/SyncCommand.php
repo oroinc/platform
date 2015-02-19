@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
-use Oro\Bundle\IntegrationBundle\Provider\ProcessorRegistry;
+use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessor;
 use Oro\Component\Log\OutputLogger;
 
@@ -31,7 +31,7 @@ class SyncCommand extends AbstractSyncCronCommand
     const STATUS_FAILED = 255;
 
     /**
-     * @var ProcessorRegistry
+     * @var SyncProcessorRegistry
      */
     protected $processorRegistry;
 

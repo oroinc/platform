@@ -5,7 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
 
-class ProcessorRegistry
+class SyncProcessorRegistry
 {
     /**
      * @var AbstractSyncProcessor[]
@@ -20,7 +20,7 @@ class ProcessorRegistry
     /**
      * @param string $integrationName
      * @param AbstractSyncProcessor $processor
-     * @return ProcessorRegistry
+     * @return SyncProcessorRegistry
      */
     public function addProcessor($integrationName, AbstractSyncProcessor $processor)
     {
@@ -50,7 +50,7 @@ class ProcessorRegistry
      * @param Channel $integration
      * @return bool
      */
-    protected function hasProcessorForIntegration(Channel $integration)
+    public function hasProcessorForIntegration(Channel $integration)
     {
         return array_key_exists($integration->getType(), $this->processors);
     }
@@ -65,7 +65,7 @@ class ProcessorRegistry
 
     /**
      * @param AbstractSyncProcessor $defaultProcessor
-     * @return ProcessorRegistry
+     * @return SyncProcessorRegistry
      */
     public function setDefaultProcessor(AbstractSyncProcessor $defaultProcessor)
     {
