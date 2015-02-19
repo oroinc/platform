@@ -70,7 +70,7 @@ class JobExecutor
      * @param array $configuration
      * @return JobResult
      */
-    public function executeJob($jobType, $jobName, array $configuration = array())
+    public function executeJob($jobType, $jobName, array $configuration = [])
     {
         $this->initialize();
 
@@ -83,6 +83,19 @@ class JobExecutor
         // persist batch entities
         $this->batchJobRepository->getJobManager()->persist($jobInstance);
         $jobExecution = $this->batchJobRepository->createJobExecution($jobInstance);
+
+        // load configuration to context
+        if ($configuration) {
+            foreach ($configuration as $typeConfiguration) {
+                if (!is_array($typeConfiguration)) {
+                    continue;
+                }
+
+                foreach ($typeConfiguration as $name => $option) {
+                    $jobExecution->getExecutionContext()->put($name, $option);
+                }
+            }
+        }
 
         // do job
         $jobResult = $this->doJob($jobInstance, $jobExecution);
@@ -194,7 +207,7 @@ class JobExecutor
     protected function getJobExecutionByJobInstanceCode($jobCode)
     {
         /** @var JobInstance $jobInstance */
-        $jobInstance = $this->getJobInstanceRepository()->findOneBy(array('code' => $jobCode));
+        $jobInstance = $this->getJobInstanceRepository()->findOneBy(['code' => $jobCode]);
         if (!$jobInstance) {
             throw new LogicException(sprintf('No job instance found with code %s', $jobCode));
         }
@@ -222,7 +235,7 @@ class JobExecutor
      */
     protected function collectFailureExceptions(JobExecution $jobExecution)
     {
-        $failureExceptions = array();
+        $failureExceptions = [];
         foreach ($jobExecution->getAllFailureExceptions() as $exceptionData) {
             if (!empty($exceptionData['message'])) {
                 $failureExceptions[] = $exceptionData['message'];
@@ -238,7 +251,7 @@ class JobExecutor
      */
     protected function collectErrors(JobExecution $jobExecution)
     {
-        $errors = array();
+        $errors = [];
         foreach ($jobExecution->getStepExecutions() as $stepExecution) {
             $errors = array_merge(
                 $errors,
