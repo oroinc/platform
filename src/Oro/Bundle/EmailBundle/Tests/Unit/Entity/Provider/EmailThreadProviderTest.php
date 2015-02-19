@@ -174,7 +174,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
         $entityManager->expects($this->never())
             ->method('getRepository');
 
-        $this->assertEquals([], $this->provider->getThreadEmails($entityManager, $email));
+        $this->assertEquals([$email], $this->provider->getThreadEmails($entityManager, $email));
     }
 
     public function testGetThreadEmailWithThread()

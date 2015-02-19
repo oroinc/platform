@@ -76,3 +76,15 @@
 #showCc:hover, #showBcc:hover {
     text-decoration: underline;
 }
+.thread-view .email-head {
+    border-bottom: 1px solid #eee;
+    overflow: hidden;
+    padding: 10px;
+}
+.thread-view .email-head a.subject {
+    font-size: 16px;
+}
+.thread-view .email-body {
+    background-color: #eee;
+    margin: 10px;
+}
