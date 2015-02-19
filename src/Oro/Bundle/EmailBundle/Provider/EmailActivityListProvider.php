@@ -4,6 +4,8 @@ namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Doctrine\ORM\QueryBuilder;
+
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -79,7 +81,8 @@ class EmailActivityListProvider implements
     public function getRoutes()
     {
         return [
-            'itemView' => 'oro_email_view',
+            'itemView'  => 'oro_email_view',
+            'groupView' => 'oro_email_view_group',
         ];
     }
 
@@ -147,7 +150,8 @@ class EmailActivityListProvider implements
 
         $data = [
             'ownerName' => $email->getFromName(),
-            'ownerLink' => null
+            'ownerLink' => null,
+            'emailId'   => $email->getId(),
         ];
 
         if ($email->getFromEmailAddress()->hasOwner()) {
@@ -206,5 +210,24 @@ class EmailActivityListProvider implements
         $config = $configManager->getProvider('comment')->getConfig($entity);
 
         return $config->is('enabled');
+    }
+
+    public function getActivityTreadEmails(Email $email)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->doctrineRegistryLink->getService()
+            ->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('a');
+
+        $queryBuilder->innerJoin(
+            'OroEmailBundle:Email',
+            'e',
+            'INNER',
+            'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
+        )
+            ->setParameter('class', self::ACTIVITY_CLASS)
+            ->andWhere('e.threadId = :threadId')
+            ->setParameter('threadId', $email->getThreadId());
+
+        return $queryBuilder->getQuery()->getResult();
     }
 }
