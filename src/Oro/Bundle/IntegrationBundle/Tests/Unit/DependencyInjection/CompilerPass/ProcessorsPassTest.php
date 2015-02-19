@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\ProcessorsPass;
@@ -30,6 +31,7 @@ class ProcessorsPassTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder $containerBuilder */
         $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()
             ->setMethods(['getDefinition', 'findTaggedServiceIds'])
@@ -61,6 +63,7 @@ class ProcessorsPassTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder $containerBuilder */
         $containerBuilder = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
             ->disableOriginalConstructor()
             ->setMethods(['getDefinition', 'findTaggedServiceIds'])
