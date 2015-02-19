@@ -161,11 +161,11 @@ class EmailActivityListProvider implements
         $data = [
             'ownerName'     => $email->getFromName(),
             'ownerLink'     => null,
-            'emailId'       => $email->getId(),
+            'entityId'      => $email->getId(),
             'headOwnerName' => $headEmail->getFromName(),
             'headSubject'   => $headEmail->getSubject(),
             'headSentAt'    => $headEmail->getSentAt()->format('c'),
-            'isHead'    => $email->isHead() && $email->getThreadId()
+            'isHead'        => $email->isHead() && $email->getThreadId()
         ];
 
         if ($email->getFromEmailAddress()->hasOwner()) {

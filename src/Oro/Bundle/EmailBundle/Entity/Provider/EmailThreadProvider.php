@@ -90,9 +90,9 @@ class EmailThreadProvider
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $criteria->setMaxResults(1);
             $queryBuilder->addCriteria($criteria);
-            $result = $queryBuilder->getQuery()->getSingleResult();
-            if ($result) {
-                return $result;
+            $result = $queryBuilder->getQuery()->getResult();
+            if (count($result)) {
+                return $result[0];
             }
         }
 
