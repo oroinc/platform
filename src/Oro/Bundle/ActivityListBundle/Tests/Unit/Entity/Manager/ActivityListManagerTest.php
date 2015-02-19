@@ -12,6 +12,7 @@ use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivity
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityGroupedProvider;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -254,8 +255,18 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'commentCount'         => '',
                 'commentable'          => '',
                 'targetEntityData'     => [],
+                'is_head'              => false,
             ],
             $this->activityListManager->getItem(105)
         );
+    }
+
+    public function testGetGroupedEntitiesEmpty()
+    {
+        $this->provider
+            ->expects($this->once())
+            ->method('getProviderForEntity')
+            ->willReturn($this->returnValue(new TestActivityProvider()));
+        $this->assertCount(0, $this->activityListManager->getGroupedEntities(new \stdClass(), 0, []));
     }
 }

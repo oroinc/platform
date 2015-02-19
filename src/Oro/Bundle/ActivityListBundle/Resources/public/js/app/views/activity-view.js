@@ -25,7 +25,8 @@ define([
             },
             infoBlock: '.accordion-body .message .info',
             commentsBlock: '.accordion-body .message .comment',
-            commentsCountBlock: '.comment-count .count'
+            commentsCountBlock: '.comment-count .count',
+            ignoreHead: false
         },
         attributes: {
             'class': 'list-item'
@@ -57,6 +58,7 @@ define([
         getTemplateData: function () {
             var data = ActivityView.__super__.getTemplateData.call(this);
             data.has_comments = this.options.configuration.has_comments;
+            data.ignoreHead = this.options.ignoreHead;
             data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatDateTime(data.createdAt);
             data.updatedAt = dateTimeFormatter.formatDateTime(data.updatedAt);
@@ -98,7 +100,11 @@ define([
 
         onToggle: function (e) {
             e.preventDefault();
-            this.model.collection.trigger('toView', this.model);
+            if (!this.options.ignoreHead && this.model.get('is_head')) {
+                this.model.collection.trigger('toViewGroup', this.model);
+            } else {
+                this.model.collection.trigger('toView', this.model);
+            }
         },
 
         isCollapsed: function () {

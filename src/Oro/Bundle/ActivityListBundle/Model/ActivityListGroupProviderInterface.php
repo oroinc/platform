@@ -12,4 +12,12 @@ interface ActivityListGroupProviderInterface
      * @return bool
      */
     public function isHead($entity);
+
+    /**
+     * Get Grouped Entities by Activity Entity
+     *
+     * @param object $entity
+     * @return array
+     */
+    public function getGroupedEntities($entity);
 }
