@@ -140,11 +140,14 @@ table.grid {
   .thead-sizing-row {
     display: none;
   }
+  thead {
+    z-index: 1;
+  }
   &.floatThead-relative{
     .thead-sizing-row {
       display: block;
     }
-    .grid-container-parent {
+    .grid-scrollable-container {
       position: relative;
     }
     thead {

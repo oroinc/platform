@@ -47,8 +47,9 @@ define(function (require) {
         /** @property */
         template: _.template(
             '<div class="toolbar"></div>' +
-            '<div class="grid-container-parent-parent">' +
-                '<div class="container-fluid grid-container-parent">' +
+            '<div class="other-scroll-container">' +
+                '<div class="other-scroll"><div></div></div>' +
+                '<div class="container-fluid grid-scrollable-container">' +
                     '<div class="grid-container">' +
                         '<table class="grid table-hover table table-bordered table-condensed"></table>' +
                         '<div class="no-data"></div>' +
@@ -66,7 +67,7 @@ define(function (require) {
             toolbar:     '.toolbar',
             noDataBlock: '.no-data',
             filterBox:   '.filter-box',
-            loadingMaskContainer: '.grid-container-parent',
+            loadingMaskContainer: '.grid-scrollable-container',
             floatTheadContainer: '.floatThead-container'
         },
 
@@ -568,6 +569,9 @@ define(function (require) {
          * Must be called on resize.
          */
         reflow: function () {
+            if (!this.floatThead) {
+                return;
+            }
             this.fixHeaderCellWidth();
         },
 
@@ -597,24 +601,37 @@ define(function (require) {
         },
 
         fixHeaderCellWidth: function () {
-            var headerCells = this.getHeaderCells(),
+            var headerCell, i, cellWidth,
+                headerCells = this.getHeaderCells(),
                 firstRowCells = this.getFirstRowCells(),
                 thead = this.$grid.find('thead:first'),
-                totalWidth = 0;
+                totalWidth = 0,
+                scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             // remove style
             headerCells.attr('style', '');
             firstRowCells.attr('style', '');
+            this.$grid.css({width: ''});
+            this.$grid.parent().css({width: ''});
+            if (this.scrollVisible) {
+                this.$grid.css({borderRight: scrollBarWidth + 'px solid darkblue'});
+            }
             this.$el.removeClass('floatThead');
-            headerCells.each(function (i) {
-                totalWidth += this.offsetWidth;
-                this.style.minWidth = this.style.width = this.offsetWidth + 'px';
-                this.style.boxSizing = 'border-box';
+            for (i = 0; i < headerCells.length; i++) {
+                headerCell = headerCells[i];
+                cellWidth = headerCell.offsetWidth;
+                if (this.scrollVisible && i === headerCells.length - 1) {
+                    cellWidth += scrollBarWidth;
+                }
+                totalWidth += cellWidth;
+                headerCell.style.minWidth = headerCell.style.width = cellWidth + 'px';
+                headerCell.style.boxSizing = 'border-box';
                 if (firstRowCells[i]) {
-                    firstRowCells[i].style.minWidth = firstRowCells[i].style.width = this.offsetWidth + 'px';
+                    firstRowCells[i].style.minWidth = firstRowCells[i].style.width = cellWidth + 'px';
                     firstRowCells[i].style.boxSizing = 'border-box';
                 }
-            });
+            }
 
+            this.$grid.css({borderRight: 'none'});
             this.$el.addClass('floatThead');
             this.$grid.css({
                 width: totalWidth
@@ -690,6 +707,7 @@ define(function (require) {
         },
 
         reposition: function () {
+            this.rescrollCb();
             // get gridRect
             var tableRect = this.$grid[0].getBoundingClientRect(),
                 visibleRect = this.getVisibleRect(this.$grid[0]),
@@ -755,8 +773,10 @@ define(function (require) {
         },
 
         addFloatThead: function () {
+            this.rescrollCb = this.rescroll();
             this.headerHeight = this.$grid.find('thead tr:first').height();
-            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:' + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
+            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:'
+                + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
             this.fixHeaderCellWidth();
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
                 setTimeout(_.bind(this.reposition, this), 0);
@@ -771,6 +791,36 @@ define(function (require) {
             this.$grid.find('thead:first, thead:first tr:first').parent().attr('style', '');
             this.getHeaderCells().attr('style', '');
             this.getFirstRowCells().attr('style', '');
+        },
+
+        rescroll: function () {
+            var self = this,
+                scrollContainer = this.$('.grid-scrollable-container'),
+                otherScroll = this.$('.other-scroll'),
+                otherScrollInner = this.$('.other-scroll > div'),
+                scrollBarWidth = mediator.execute('layout:scrollbarWidth');
+            function setup() {
+                var heightDec = self.headerHeight + 1; // compensate border
+                self.scrollVisible = scrollContainer[0].clientHeight !== scrollContainer[0].scrollHeight;
+                scrollContainer.css({
+                    width: 'calc(100% + ' + scrollBarWidth + 'px)'
+                });
+                otherScroll.css({
+                    height: scrollContainer[0].clientHeight - heightDec,
+                    width: scrollBarWidth,
+                    top: heightDec,
+                    display: self.scrollVisible ? 'block' : 'none'
+                }).scrollTop(scrollContainer[0].scrollTop);
+                otherScrollInner.css({
+                    height: scrollContainer[0].scrollHeight - heightDec
+                });
+            }
+            otherScroll.on('scroll', function () {
+                scrollContainer.scrollTop(otherScroll.scrollTop());
+                self.reposition();
+            });
+            setup();
+            return setup;
         },
 
         fixHeightInFloatTheadMode: function () {
@@ -951,14 +1001,14 @@ define(function (require) {
             this.layout = newLayout;
             switch (newLayout) {
                 case 'fullscreen':
-                    this.$grid.parents('.grid-container-parent').css({
+                    this.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: this.getCssHeightCalcExpression()
                     });
                     mediator.execute('layout:disablePageScroll', this.$el);
                     break;
                 case 'scroll':
                 case 'default':
-                    this.$grid.parents('.grid-container-parent').css({
+                    this.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: ''
                     });
                     mediator.execute('layout:enablePageScroll', this.$el);

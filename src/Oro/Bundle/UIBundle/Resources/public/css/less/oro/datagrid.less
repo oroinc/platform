@@ -102,13 +102,24 @@
   }
   .caret { margin-top:11px; }
 }
-.grid-container-parent {
+.other-scroll-container {
+  overflow: hidden;
+  position: relative;
   margin: 20px 20px 50px 20px;
-  padding: 0;
-  overflow: auto;
-  max-width: calc(~"100% - 20px");
   border: 1px solid #ddd;
   border-radius: 4px;
+  .other-scroll{
+    position: absolute;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    z-index: 700;
+    right: -1px;
+  }
+}
+.grid-scrollable-container {
+  margin: 0;
+  padding: 0;
+  overflow: auto;
   > .loader-mask {
     left: @verticalPadding;
     right: @verticalPadding;
