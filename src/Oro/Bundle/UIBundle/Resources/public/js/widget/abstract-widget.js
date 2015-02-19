@@ -675,8 +675,8 @@ define(function (require) {
             this.loading = false;
             this.disposePageComponents();
             this.setContent(content, true);
-            if (this.renderDeffered) {
-                this.renderDeffered
+            if (this.renderDeferred) {
+                this.renderDeferred
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
                     .fail(function () {
                         throw new Error("Widget rendering failed");
@@ -703,7 +703,7 @@ define(function (require) {
             this.show();
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
-            this.renderDeffered = $.Deferred();
+            this.renderDeferred = $.Deferred();
             mediator.execute('layout:init', this.widget, this)
                 .done(_.bind(function () {
                     if (this.disposed) {
@@ -715,8 +715,8 @@ define(function (require) {
 
         _afterLayoutInit: function () {
             this.widget.removeClass('invisible');
-            this.renderDeffered.resolve();
-            delete this.renderDeffered;
+            this.renderDeferred.resolve();
+            delete this.renderDeferred;
         },
 
         /**

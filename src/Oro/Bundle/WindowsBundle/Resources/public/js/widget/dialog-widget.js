@@ -239,17 +239,17 @@ define(function (require) {
         /**
          * Show dialog
          */
-        show: function() {
+        show: function () {
             var dialogOptions;
             if (!this.widget) {
-                if (typeof this.options.dialogOptions.position === 'undefined') {
-                    this.options.dialogOptions.position = this._getWindowPlacement();
+                dialogOptions = _.extend({}, this.options.dialogOptions);
+                if (typeof dialogOptions.position === 'undefined') {
+                    dialogOptions.position = this._getWindowPlacement();
                 }
-                this.options.dialogOptions.stateChange = _.bind(this.handleStateChange, this);
-                dialogOptions = _.extend(
-                    {dialogClass: 'invisible'},
-                    this.options.dialogOptions
-                );
+                dialogOptions.stateChange = _.bind(this.handleStateChange, this);
+                if (dialogOptions.state !== 'minimized') {
+                    dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
+                }
                 this.widget = $('<div/>').append(this.$el).dialog(dialogOptions);
                 this.widget.attr('data-layout', 'separate');
             } else {
@@ -274,8 +274,8 @@ define(function (require) {
 
         _afterLayoutInit: function () {
             this.widget.closest('.invisible').removeClass('invisible');
-            this.renderDeffered.resolve();
-            delete this.renderDeffered;
+            this.renderDeferred.resolve();
+            delete this.renderDeferred;
         },
 
         _initAdjustHeight: function(content) {

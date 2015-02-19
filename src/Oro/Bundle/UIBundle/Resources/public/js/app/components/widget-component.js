@@ -4,6 +4,7 @@ define(function (require) {
 
     var WidgetComponent,
         $ = require('jquery'),
+        _ = require('underscore'),
         BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools'),
@@ -127,7 +128,15 @@ define(function (require) {
             }
 
             widget.render();
-            widget.listenTo(this, 'dispose', widget.dispose);
+
+            if (this.options.type !== 'dialog') {
+                /**
+                 * dialog has independent lifecycle,
+                 * and should not to be disposed with page content
+                 * (dialog have its own implementation of tracking pageChange event)
+                 */
+                widget.listenTo(this, 'dispose', widget.dispose);
+            }
 
             this._resolveDeferredInit();
         },
