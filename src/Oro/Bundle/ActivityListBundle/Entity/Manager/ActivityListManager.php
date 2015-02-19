@@ -6,6 +6,9 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
+use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -186,6 +189,12 @@ class ActivityListManager
             $entity->getRelatedActivityId()
         );
 
+        $isHead = $entityProvider instanceof ActivityListGroupProviderInterface ? $entity->isHead() : false;
+        $data = $entityProvider->getData($entity);
+        if (isset($data['isHead']) && !$data['isHead']) {
+            $isHead = false;
+        }
+
         $result = [
             'id'                   => $entity->getId(),
             'owner'                => $ownerName,
@@ -194,7 +203,7 @@ class ActivityListManager
             'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
-            'data'                 => $entityProvider->getData($entity),
+            'data'                 => $data,
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
@@ -204,7 +213,7 @@ class ActivityListManager
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
             'targetEntityData'     => $targetEntityData,
-            'is_head'              => $entity->isHead(),
+            'is_head'              => $isHead,
         ];
 
         return $result;
@@ -225,5 +234,51 @@ class ActivityListManager
             $this->config->get('oro_activity_list.sorting_direction'),
             $this->config->get('oro_activity_list.grouping')
         );
+    }
+
+    /**
+     * Get Grouped Entities by Activity Entity
+     *
+     * @param object $entity
+     * @param string $widgetId
+     * @param array $filterMetadata
+     * @return array
+     */
+    public function getGroupedEntities($entity, $widgetId, $filterMetadata)
+    {
+        $results = [];
+        $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
+        if ($entityProvider instanceof ActivityListGroupProviderInterface) {
+            $groupedActivities = $entityProvider->getGroupedEntities($entity);
+            $activityResults   = $this->getEntityViewModels($groupedActivities);
+
+            $results = [
+                'entityId'            => $entity->getId(),
+                'ignoreHead'          => true,
+                'widgetId'            => $widgetId,
+                'activityListData'    => json_encode(['count' => count($activityResults), 'data'  => $activityResults]),
+                'commentOptions'      => [
+                    'listTemplate' => '#template-activity-item-comment',
+                    'canCreate'    => true,
+                ],
+                'activityListOptions' => [
+                    'configuration'            => $this->chainProvider->getActivityListOption(),
+                    'template'                 => '#template-activity-list',
+                    'itemTemplate'             => '#template-activity-item',
+                    'urls'                     => [],
+                    'loadingContainerSelector' => '.activity-list.sub-list',
+                    'dateRangeFilterMetadata'  => $filterMetadata,
+                    'routes'                   => [],
+                    'pager'                    => [
+                        'current'  => 1,
+                        'pagesize' => 0,
+                        'total'    => 1,
+                        'count'    => 1,
+                    ],
+                ],
+            ];
+        }
+
+        return $results;
     }
 }

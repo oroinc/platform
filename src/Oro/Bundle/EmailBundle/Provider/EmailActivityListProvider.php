@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
@@ -166,6 +165,10 @@ class EmailActivityListProvider implements
             'headOwnerName' => $headEmail->getFromName(),
             'headSubject'   => $headEmail->getSubject(),
             'headSentAt'    => $headEmail->getSentAt()->format('c')
+            'ownerName' => $email->getFromName(),
+            'ownerLink' => null,
+            'entityId'  => $email->getId(),
+            'isHead'    => $email->isHead() && $email->getThreadId(),
         ];
 
         if ($email->getFromEmailAddress()->hasOwner()) {
@@ -226,7 +229,10 @@ class EmailActivityListProvider implements
         return $config->is('enabled');
     }
 
-    public function getActivityTreadEmails(Email $email)
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupedEntities($email)
     {
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->doctrineRegistryLink->getService()
