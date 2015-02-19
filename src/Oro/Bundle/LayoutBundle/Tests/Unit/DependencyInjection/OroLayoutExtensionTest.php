@@ -256,7 +256,6 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $result = $container->getDefinition(OroLayoutExtension::THEME_EXTENSION_SERVICE_ID)->getArgument(0);
-        $this->assertSame($expectedResult, $result);
+        $this->assertSame($expectedResult, $container->getParameter('oro_layout.theme_updates_resources'));
     }
 }

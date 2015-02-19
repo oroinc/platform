@@ -13,8 +13,7 @@ use Oro\Component\Config\Loader\FolderContentsCummulativeLoader;
 
 class OroLayoutExtension extends Extension
 {
-    const THEME_MANAGER_SERVICE_ID   = 'oro_layout.theme_manager';
-    const THEME_EXTENSION_SERVICE_ID = 'oro_layout.theme_extension';
+    const THEME_MANAGER_SERVICE_ID = 'oro_layout.theme_manager';
 
     /**
      * {@inheritdoc}
@@ -81,7 +80,6 @@ class OroLayoutExtension extends Extension
             $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resource->data);
         }
 
-        $themeExtensionDefinition = $container->getDefinition(self::THEME_EXTENSION_SERVICE_ID);
-        $themeExtensionDefinition->replaceArgument(0, $foundThemeLayoutUpdates);
+        $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
     }
 }
