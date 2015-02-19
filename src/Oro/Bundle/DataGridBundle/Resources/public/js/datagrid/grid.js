@@ -21,8 +21,6 @@ define(function (require) {
         ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
         ExportAction = require('oro/datagrid/action/export-action');
 
-    require('orodatagrid/lib/jquery.floatThead');
-
     /**
      * Basic grid class.
      *
@@ -49,12 +47,14 @@ define(function (require) {
         /** @property */
         template: _.template(
             '<div class="toolbar"></div>' +
+            '<div class="grid-container-parent-parent">' +
                 '<div class="container-fluid grid-container-parent">' +
                     '<div class="grid-container">' +
                         '<table class="grid table-hover table table-bordered table-condensed"></table>' +
                         '<div class="no-data"></div>' +
                     '</div>' +
-                '</div>'
+                '</div>' +
+            '</div>'
         ),
 
         /** @property */
@@ -189,6 +189,7 @@ define(function (require) {
             this._listenToCommands();
 
             this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
+            this.reposition = _.bind(this.reposition, this);
         },
 
         /**
@@ -200,7 +201,8 @@ define(function (require) {
                 return;
             }
 
-            this.setLayout('default', true);
+            this.setLayout('default');
+            this.setFloatThead(false);
 
             _.each(this.columns.models, function (column) {
                 column.dispose();
@@ -566,36 +568,7 @@ define(function (require) {
          * Must be called on resize.
          */
         reflow: function () {
-            var self = this;
-            if (this.removeFloatTheadTimeoutId) {
-                // no need to reflow
-                clearTimeout(this.removeFloatTheadTimeoutId);
-                this.removeFloatTheadTimeoutId = setTimeout(function () {
-                    self.removeFloatThead();
-                    delete self.removeFloatTheadTimeoutId;
-                }, 200);
-                return;
-            }
-            if (this.floatThead) {
-                this.removeFloatTheadDropdowns();
-
-                /**
-                 * Additional styles should not affect floatThead plugin calculations
-                 * Remove that styles temporarily
-                 */
-                this.$el.removeClass('floatThead-move-header');
-                this.$grid.floatThead('reflow');
-                this.$el.addClass('floatThead-move-header');
-
-                // this code fixes horizontal scroll
-                this.$('.floatThead-container, .floatThead-container .grid').css({
-                    paddingRight: mediator.execute('layout:scrollbarWidth')
-                });
-
-                this.$grid.parent().css({
-                    maxHeight: this.getCssHeightCalcExpression()
-                });
-            }
+            this.fixHeaderCellWidth();
         },
 
         /**
@@ -603,57 +576,108 @@ define(function (require) {
          *
          * @param newValue {boolean}
          */
-        setFloatThead: function (newValue, instant) {
+        setFloatThead: function (newValue) {
             var self = this;
             if (newValue !== this.floatThead) {
                 this.floatThead = newValue;
                 if (newValue) {
-                    if (this.removeFloatTheadTimeoutId) {
-                        // cancel remove request
-                        clearTimeout(this.removeFloatTheadTimeoutId);
-                        delete this.removeFloatTheadTimeoutId;
-                        return;
-                    }
                     this.addFloatThead();
                 } else {
-                    // need stabilize UI before remove
-                    if (instant) {
-                        self.removeFloatThead();
-                    } else {
-                        this.removeFloatTheadTimeoutId = setTimeout(function () {
-                            self.removeFloatThead();
-                            delete self.removeFloatTheadTimeoutId;
-                        }, 200);
-                    }
+                    self.removeFloatThead();
                 }
             }
         },
 
-        addFloatThead: function () {
-            var containerClass = '.grid-container';
-            this.$el.addClass('floatThead-connected');
-            this.$grid.floatThead({
-                useAbsolutePositioning: false,
-                // reflow must be called in general resize flow, see this.reflow()
-                debounceResizeMs: 100000000,
-                scrollContainer: function($table){
-                    return $table.closest(containerClass);
+        getHeaderCells: function () {
+            return this.$grid.find('th:first').parent().find('th');
+        },
+
+        getFirstRowCells: function () {
+            return this.$grid.find('tbody tr:not(.thead-sizing-row):first td');
+        },
+
+        fixHeaderCellWidth: function () {
+            var headerCells = this.getHeaderCells(),
+                firstRowCells = this.getFirstRowCells(),
+                thead = this.$grid.find('thead:first'),
+                totalWidth = 0;
+            // remove style
+            headerCells.attr('style', '');
+            firstRowCells.attr('style', '');
+            this.$el.removeClass('floatThead');
+            headerCells.each(function (i) {
+                totalWidth += this.offsetWidth;
+                this.style.minWidth = this.style.width = this.offsetWidth + 'px';
+                this.style.boxSizing = 'border-box';
+                if (firstRowCells[i]) {
+                    firstRowCells[i].style.minWidth = firstRowCells[i].style.width = this.offsetWidth + 'px';
+                    firstRowCells[i].style.boxSizing = 'border-box';
                 }
             });
-            this.reflow();
-            this.addFloatTheadDropdownsSupport();
-            this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
+
+            this.$el.addClass('floatThead');
+            this.$grid.css({
+                width: totalWidth
+            });
+            this.$grid.parent().css({
+                width: totalWidth
+            });
+
+            this.reposition();
+        },
+
+        reposition: function () {
+            // get gridRect
+            var grid = this.$grid[0],
+                current = grid,
+                midRect = current.getBoundingClientRect(),
+                tableRect = midRect,
+                resultRect = {
+                    top: midRect.top - this.headerHeight,
+                    left: midRect.left,
+                    bottom: midRect.bottom,
+                    right: midRect.right
+                };
+            current = current.parentNode;
+            while (current !== document) {
+                midRect = current.getBoundingClientRect();
+                if (resultRect.top < midRect.top) {
+                    resultRect.top = midRect.top;
+                }
+                if (resultRect.bottom > midRect.bottom) {
+                    resultRect.bottom = midRect.bottom;
+                }
+                if (resultRect.left < midRect.left) {
+                    resultRect.left = midRect.left;
+                }
+                if (resultRect.right > midRect.right) {
+                    resultRect.right = midRect.right;
+                }
+                current = current.parentNode;
+            }
+            this.$grid.find('thead:first').css({
+                top: resultRect.top - tableRect.top
+            });
+            var theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
+            this.$grid.find('thead:first tr:first').css({
+                marginLeft: tableRect.left - theadRect.left
+            })
+        },
+
+        addFloatThead: function () {
+            this.headerHeight = this.$grid.find('thead tr:first').height();
+            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:' + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
+            this.fixHeaderCellWidth();
+            this.$grid.parents().on('scroll', this.reposition);
         },
 
         removeFloatThead: function () {
-            this.$el.removeClass('floatThead-connected');
-            this.$el.removeClass('floatThead-move-header');
-            this.$grid.floatThead('destroy');
-            this.$grid.parent().css({
-                maxHeight: ''
-            });
-            this.removeFloatTheadDropdownsSupport();
-            clearInterval(this.heightFixIntervalId);
+            this.$grid.find('tbody .thead-sizing-row').remove();
+            this.$grid.parents().off('scroll', this.reposition);
+            // remove css
+            this.$grid.find('thead:first, thead:first tr:first').parent().attr('style', '');
+            this.getHeaderCells().attr('style', '');
+            this.getFirstRowCells().attr('style', '');
         },
 
         fixHeightInFloatTheadMode: function () {
@@ -662,116 +686,6 @@ define(function (require) {
                 this.lastTableParentTop = currentTop;
                 this.reflow();
             }
-        },
-
-        /**
-         * Removes all opened dropdowns in float thead mode
-         */
-        removeFloatTheadDropdowns: function () {
-            var self = this,
-                $container = this.$(this.selectors.floatTheadContainer);
-            if (this.dropdownOpened) {
-                $('body > .floatThead-dynamic-dropdown').remove();
-            }
-            $.each(this.dropdownsToReset, function (){
-                $(this).css({display: ''}).off('.floatThead-' + self.cid)
-                    .closest('.dropdown').removeClass('open');
-            });
-            this.dropdownOpened = false;
-
-            $container.css({
-                height: ''
-            });
-        },
-
-        /**
-         * Attaches logic required to support bootstrap dropdowns with float thead
-         */
-        addFloatTheadDropdownsSupport: function () {
-            var self = this,
-                $container = this.$(this.selectors.floatTheadContainer);
-            $(document).on('click.floatThead-' + this.cid, _.bind(this.removeFloatTheadDropdowns, this));
-            this.$grid.parent().scroll(_.bind(this.removeFloatTheadDropdowns, this));
-            this.$el.on('click.floatThead-' + this.cid, '.floatThead-container .dropdown', function (e) {
-                self.removeFloatTheadDropdowns();
-                self.dropdownOpened = true;
-
-                var $dropdown = $(e.target).closest('.dropdown'),
-                    $dropdownMenu = $dropdown.find('.dropdown-menu'),
-                    dropdownRect = $dropdown[0].getBoundingClientRect(),
-                    scrollableRect = self.$grid.parent()[0].getBoundingClientRect(),
-                    moveLeft;
-
-                if (dropdownRect.left < scrollableRect.left || dropdownRect.right > scrollableRect.right) {
-                    e.stopPropagation();
-                    e.preventDefault();
-
-                    moveLeft = dropdownRect.left < scrollableRect.left
-                        ? dropdownRect.left - scrollableRect.left
-                        : dropdownRect.right - scrollableRect.right;
-                    moveLeft += moveLeft > 0 ? 5 : -5;
-                    self.$grid.parent().scrollLeft(self.$grid.parent().scrollLeft() + moveLeft);
-                    setTimeout(function(){
-                        $dropdown.find('>*:first').trigger('click');
-                    }, 0);
-                } else {
-                    // let bootstrap show menu
-                    _.defer(function () {
-                        if (!$dropdown.hasClass('open')) {
-                            return;
-                        }
-
-                        var position = $dropdownMenu.offset(),
-                            $dropdownMenuCopy = $dropdownMenu.cloneWithStyles(),
-                        // required in IE, it counts width and height incorrectly
-                            clientRect = $dropdownMenu[0].getBoundingClientRect();
-
-                        $dropdownMenuCopy.addClass('floatThead-dynamic-dropdown');
-                        $('body').append($dropdownMenuCopy);
-
-                        $dropdownMenuCopy.css({
-                            position: 'absolute',
-                            top: position.top + 1, // required to add 1px to exactly match position
-                            left: position.left,
-                            width: clientRect.width,
-                            height: clientRect.height
-                        });
-
-                        $dropdownMenu.hide();
-                        // need to reset after dropdown remove
-                        self.dropdownsToReset.push($dropdownMenu);
-
-                        $dropdownMenuCopy.show();
-
-                        /**
-                         * NOTE: This code switches menus between copy and real dropdown on mouseEnter and mouseLeave
-                         */
-                        $dropdownMenuCopy.on('mouseenter.floatThead-' + self.cid, function expandContainer() {
-                            $container.css({
-                                height: self.getCssHeightCalcExpression()
-                            });
-                            $dropdownMenuCopy.hide();
-                            $dropdownMenu.show();
-                        });
-                        $dropdownMenu.on('mouseleave.floatThead-' + self.cid, function collapseContainer() {
-                            $dropdownMenu.hide();
-                            $dropdownMenuCopy.show();
-                            $container.css({
-                                height: ''
-                            });
-                        });
-                    });
-                }
-            });
-        },
-
-        /**
-         * Detaches logic required to support bootstrap dropdowns with float thead
-         */
-        removeFloatTheadDropdownsSupport: function () {
-            this.$el.off('.floatThead-' + this.cid);
-            $(document).off('.floatThead-' + this.cid);
-            this.removeFloatTheadDropdowns();
         },
 
         /**
@@ -922,6 +836,11 @@ define(function (require) {
          * Chooses layout on resize or during creation
          */
         updateLayout: function () {
+            if(!this.$grid.parents('body').length) {
+                // not ready to apply layout
+                return;
+            }
+            this.setFloatThead(true);
             var layout = 'default';
             if (this.enableFullScreenLayout) {
                 layout = mediator.execute('layout:getPreferredLayout', this.$grid);
@@ -932,7 +851,7 @@ define(function (require) {
         /**
          * Sets layout and perform all required operations
          */
-        setLayout: function (newLayout, instant) {
+        setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 this.reflow();
                 return;
@@ -940,13 +859,17 @@ define(function (require) {
             this.layout = newLayout;
             switch (newLayout) {
                 case 'fullscreen':
-                    mediator.execute('layout:disablePageScroll', this.$grid);
-                    this.setFloatThead(true, instant);
+                    this.$grid.parents('.grid-container-parent').css({
+                        maxHeight: this.getCssHeightCalcExpression()
+                    });
+                    mediator.execute('layout:disablePageScroll', this.$el);
                     break;
                 case 'scroll':
                 case 'default':
-                    this.setFloatThead(false, instant);
-                    mediator.execute('layout:enablePageScroll', this.$grid);
+                    this.$grid.parents('.grid-container-parent').css({
+                        maxHeight: ''
+                    });
+                    mediator.execute('layout:enablePageScroll', this.$el);
                     break;
                 default:
                     throw new Error('Unknown grid layout');

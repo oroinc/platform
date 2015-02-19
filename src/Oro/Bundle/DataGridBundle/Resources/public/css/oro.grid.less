@@ -136,76 +136,17 @@ table.grid {
   }
 }
 
-.floatThead-connected {
-  table th{
-    border-bottom-left-radius: 0 !important;
-    border-top-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-  }
-
+.floatThead {
   .grid-container-parent {
-    margin-top: 33px;
+    position: relative;
   }
-
-  .grid-container {
-    border: 1px solid rgb(221, 221, 221);
-    border-bottom-left-radius: 2px;
-    border-bottom-right-radius: 2px;
-  }
-
-  &.no-data-visible .grid-container {
-    border: none;
-  }
-
-  .grid {
-    border: none !important;
-    border-radius: 0 !important;
-    margin-bottom: 0;
-    margin-left: -1px; /* IE fix */
-    &.table-bordered tr > th:first-child {
-      border-left: none !important;
-    }
-  }
-
-  .floatThead-container {
-    /* float thead should be under loading mask and submenus */
-    z-index: 899 !important;
-    .grid{
-      border-bottom: 1px solid rgb(221, 221, 221) !important;
-      margin: 0 !important;
-    }
-  }
-}
-
-/**
- * Additional styles should not affect floatThead plugin calculations
- * These styles removed before floatThead reflow method call
- */
-.floatThead-move-header {
-  .grid {
-    margin-top: -33px;
-  }
-  .floatThead-container {
-    margin-top: -33px !important;
-    box-sizing: content-box;
-    border: solid #dddddd;
-    border-width: 1px 1px 0px 1px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-
-    .grid {
-      margin-top: 0;
-
-      /* copy thead background style*/
-      background-color: #f2f2f2;
-      background-image: -moz-linear-gradient(top,#f5f5f5,#eeeeee);
-      background-image: -webkit-gradient(linear,0 0,0 100%,from(#f5f5f5),to(#eeeeee));
-      background-image: -webkit-linear-gradient(top,#f5f5f5,#eeeeee);
-      background-image: -o-linear-gradient(top,#f5f5f5,#eeeeee);
-      background-image: linear-gradient(to bottom,#f5f5f5,#eeeeee);
-      background-repeat: repeat-x;
-      filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fff5f5f5', endColorstr='#ffeeeeee', GradientType=0);
+  thead {
+    position: absolute;
+    width: auto;
+    display: block;
+    border-bottom: 1px solid #ddd;
+    tr {
+      display: block;
     }
   }
 }
