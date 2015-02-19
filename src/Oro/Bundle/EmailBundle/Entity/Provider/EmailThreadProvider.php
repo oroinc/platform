@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Provider;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -22,14 +21,15 @@ class EmailThreadProvider
     public function getEmailThreadId(EntityManager $entityManager, Email $entity)
     {
         // search among threadId
-        foreach ($this->getEmailReferences($entityManager, $entity) as $email) {
+        $emailReferences = $this->getEmailReferences($entityManager, $entity);
+        foreach ($emailReferences as $email) {
             /** @var Email $email */
             if ($email->getThreadId()) {
                 return $email->getThreadId();
             }
         }
         // search among xThreadId
-        foreach ($this->getEmailReferences($entityManager, $entity) as $email) {
+        foreach ($emailReferences as $email) {
             /** @var Email $email */
             if ($email->getXThreadId()) {
                 return $email->getXThreadId();
@@ -38,6 +38,10 @@ class EmailThreadProvider
         $threadId = $entity->getThreadId();
         if (!$threadId && $entity->getXThreadId()) {
             $threadId = $entity->getXThreadId();
+        }
+        // generate new thread if need
+        if (!$threadId && count($emailReferences) > 0) {
+            $threadId = $this->generateThreadId();
         }
         return $threadId;
     }
@@ -86,11 +90,16 @@ class EmailThreadProvider
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
-            $result[] = $entity;
-            $collection = new ArrayCollection($result);
-            $result = $collection->matching($criteria)->toArray();
         }
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    protected function generateThreadId()
+    {
+        return md5(getmypid() . '.' . time() . '.' . uniqid(mt_rand(), true));
     }
 }
