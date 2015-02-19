@@ -204,6 +204,7 @@ class ActivityListManager
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
             'targetEntityData'     => $targetEntityData,
+            'is_head'              => $entity->isHead(),
         ];
 
         return $result;

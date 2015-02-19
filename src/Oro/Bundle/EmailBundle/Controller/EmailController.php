@@ -62,6 +62,54 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/view-group/{id}", name="oro_email_view_group", requirements={"id"="\d+"})
+     * @Acl(
+     *      id="oro_email_view",
+     *      type="entity",
+     *      class="OroEmailBundle:Email",
+     *      permission="VIEW"
+     * )
+     * @Template
+     */
+    public function viewGroupAction(Email $email)
+    {
+        $emailActivities = $this->get('oro_email.activity_list.provider')->getActivityTreadEmails($email);
+        $activityResults = $this->get('oro_activity_list.manager')->getEntityViewModels($emailActivities);
+
+        $results = [
+            'widgetId' => $this->getRequest()->get('_wid'),
+            'activityListData' => json_encode([
+                'count' => count($activityResults),
+                'data'  => $activityResults
+            ]),
+            'activityListOptions' => [
+                'configuration' => $this->get('oro_activity_list.provider.chain')->getActivityListOption(),
+                'template' => '#template-activity-list',
+                'itemTemplate' => '#template-activity-item',
+                'urls' => [],
+                'loadingContainerSelector' => '.activity-list.sub-list',
+                'pager' => [
+                    'current' => 1,
+                    'pagesize' => 10,
+                    'total' => 1,
+                    'count' => 1,
+                ],
+                'dateRangeFilterMetadata' => $this->get('oro_filter.datetime_range_filter')->getMetadata(),
+                'routes' => [],
+            ],
+            'commentOptions' => [
+                'listTemplate' => '#template-activity-item-comment',
+                'canCreate' => true,
+            ],
+            'emailId' => $email->getId(),
+            'ignoreHead' => true,
+        ];
+
+        return ['results' => $results];
+    }
+
+
+    /**
      * This action is used to render the list of emails associated with the given entity
      * on the view page of this entity
      *
