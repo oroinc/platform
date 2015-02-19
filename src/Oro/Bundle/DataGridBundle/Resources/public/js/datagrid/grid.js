@@ -626,10 +626,41 @@ define(function (require) {
             this.reposition();
         },
 
+        /**
+         * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
+         */
+        getBorders: function (elem) {
+            var computed = window.getComputedStyle(elem, null);
+            function convertBorderToPx(cssValue) {
+                switch (cssValue) {
+                    case "thin":
+                        return 1;
+                    case "medium":
+                        return 2;
+                    case "thick":
+                        return 5;
+                    default:
+                        return Math.round(parseFloat(cssValue));
+                }
+            }
+
+            return {
+                top: convertBorderToPx(computed.getPropertyValue( "borderTopWidth" )
+                    || computed[ "borderTopWidth" ]),
+                bottom: convertBorderToPx(computed.getPropertyValue( "borderBottomWidth" )
+                    || computed[ "borderBottomWidth" ]),
+                left: convertBorderToPx(computed.getPropertyValue( "borderLeftWidth" )
+                    || computed[ "borderLeftWidth" ]),
+                right: convertBorderToPx(computed.getPropertyValue( "borderRightWidth" )
+                    || computed[ "borderRightWidth" ])
+            };
+        },
+
         getVisibleRect: function (el) {
             var current = el,
                 tableRect = current.getBoundingClientRect(),
                 midRect = tableRect,
+                borders,
                 resultRect = {
                     top: midRect.top - this.headerHeight,
                     left: midRect.left,
@@ -639,17 +670,19 @@ define(function (require) {
             current = current.parentNode;
             while (current !== document) {
                 midRect = current.getBoundingClientRect();
-                if (resultRect.top < midRect.top) {
-                    resultRect.top = midRect.top;
+                borders = this.getBorders(current);
+
+                if (resultRect.top < midRect.top + borders.top) {
+                    resultRect.top = midRect.top + borders.top;
                 }
-                if (resultRect.bottom > midRect.bottom) {
-                    resultRect.bottom = midRect.bottom;
+                if (resultRect.bottom > midRect.bottom - borders.bottom) {
+                    resultRect.bottom = midRect.bottom - borders.bottom;
                 }
-                if (resultRect.left < midRect.left) {
-                    resultRect.left = midRect.left;
+                if (resultRect.left < midRect.left + borders.left) {
+                    resultRect.left = midRect.left + borders.left;
                 }
-                if (resultRect.right > midRect.right) {
-                    resultRect.right = midRect.right;
+                if (resultRect.right > midRect.right - borders.right) {
+                    resultRect.right = midRect.right - borders.right;
                 }
                 current = current.parentNode;
             }
@@ -681,6 +714,7 @@ define(function (require) {
             }
             switch (mode) {
                 case 'relative':
+                    // works well with dropdowns, but causes jumps while scrolling
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-fixed');
                         this.$el.addClass('floatThead-relative');
@@ -694,6 +728,7 @@ define(function (require) {
                     });
                     break;
                 case 'fixed':
+                    // provides good scroll experience
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-relative');
                         this.$el.addClass('floatThead-fixed');
@@ -902,7 +937,7 @@ define(function (require) {
             if (this.enableFullScreenLayout) {
                 layout = mediator.execute('layout:getPreferredLayout', this.$grid);
             }
-            this.setLayout('default');
+            this.setLayout(layout);
         },
 
         /**
