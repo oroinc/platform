@@ -200,6 +200,7 @@ class EmailController extends Controller
 
     /**
      * @param EmailModel $emailModel
+     * @param Email $parentEmail
      *
      * @return array
      */

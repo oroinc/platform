@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 
@@ -25,9 +26,6 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $threadId = 'testThreadId';
         $emailFromThread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromThread->expects($this->once())
-            ->method('setHead')
-            ->with(false);
-        $emailFromThread->expects($this->once())
             ->method('setThreadId')
             ->with($threadId);
         $this->emailThreadProvider->expects($this->once())
@@ -36,14 +34,11 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $this->emailThreadProvider->expects($this->once())
             ->method('getEmailReferences')
             ->will($this->returnValue([$emailFromThread]));
-        $this->emailThreadProvider->expects($this->once())
-            ->method('getThreadEmails')
-            ->will($this->returnValue([$emailFromThread]));
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->once())
             ->method('setThreadId')
             ->with($threadId);
-        $email->expects($this->exactly(3))
+        $email->expects($this->exactly(2))
             ->method('getThreadId')
             ->will($this->returnValue($threadId));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -55,7 +50,7 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $entityManager->expects($this->once())
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
-        $entityManager->expects($this->exactly(3))
+        $entityManager->expects($this->exactly(1))
             ->method('persist');
 
         $uow->expects($this->once())
@@ -65,73 +60,170 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager->handleOnFlush(new OnFlushEventArgs($entityManager));
     }
 
+    public function testHandlePostFlush()
+    {
+        $threadId = 'id';
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email->expects($this->exactly(1))
+            ->method('getThreadId')
+            ->will($this->returnValue($threadId));
+        $email->expects($this->exactly(1))
+            ->method('getId')
+            ->will($this->returnValue(1));
+
+        $this->manager->addEmailToQueue($email);
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailThreadProvider->expects($this->once())
+            ->method('getThreadEmails')
+            ->will($this->returnValue([$email]));
+
+        $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
+    }
+
+    public function testHandlePostFlushWithEmptyQueue()
+    {
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityManager->expects($this->exactly(0))
+            ->method('persist');
+
+        $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
+    }
+
+    public function testAddResetQueue()
+    {
+        $emailFromThread1 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $emailFromThread2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $this->manager->addEmailToQueue($emailFromThread1);
+        $this->manager->addEmailToQueue($emailFromThread2);
+        $this->assertCount(2, $this->manager->getQueue());
+        $this->manager->resetQueue();
+        $this->assertEmpty($this->manager->getQueue());
+    }
+
     /**
      * @dataProvider dataProvider
      *
-     * @param $head
-     * @param $firstHead
-     * @param $secondHead
-     * @param $seen
-     * @param $firstSeen
-     * @param $secondSeen
-     * @param $calls
+     * @param array $heads
+     * @param array $seens
+     * @param array $calls
      */
-    public function testUpdateThreadHead($head, $firstHead, $secondHead, $seen, $firstSeen, $secondSeen, $calls)
+    public function testUpdateThreadHead(
+        $heads,
+        $seens,
+        $calls)
     {
         $threadId = 'testThreadId';
         $emailFromThread1 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromThread2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $emailFromThread1->expects($this->at($calls[0]))
+        $emailFromThread3 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+
+        // reset
+        $emailFromThread1->expects($this->at(0))
             ->method('setHead')
-            ->with($firstHead);
-        $emailFromThread2->expects($this->at($calls[1]))
+            ->with(false);
+        $emailFromThread2->expects($this->at(0))
             ->method('setHead')
-            ->with($secondHead);
-        if ($calls[6]) {
-            $emailFromThread2->expects($this->at(2))
+            ->with(false);
+        $emailFromThread3->expects($this->at(0))
+            ->method('setHead')
+            ->with(false);
+
+        // set heads
+        if ($calls[0]) {
+            $emailFromThread1->expects($this->at($calls[0]))
                 ->method('setHead')
-                ->with(true);
+                ->with($heads[0]);
         }
-        $emailFromThread1->expects($this->exactly($calls[2]))
+        if ($calls[1]) {
+            $emailFromThread2->expects($this->at($calls[1]))
+                ->method('setHead')
+                ->with($heads[1]);
+        }
+        if ($calls[2]) {
+            $emailFromThread3->expects($this->at($calls[2]))
+                ->method('setHead')
+                ->with($heads[2]);
+        }
+
+        // mock seen
+        $emailFromThread1->expects($this->exactly($calls[3]))
             ->method('isSeen')
-            ->will($this->returnValue($firstSeen));
-        $emailFromThread2->expects($this->exactly($calls[3]))
+            ->will($this->returnValue($seens[0]));
+        $emailFromThread2->expects($this->exactly($calls[4]))
             ->method('isSeen')
-            ->will($this->returnValue($secondSeen));
+            ->will($this->returnValue($seens[1]));
+        $emailFromThread3->expects($this->exactly($calls[5]))
+            ->method('isSeen')
+            ->will($this->returnValue($seens[2]));
+
         $this->emailThreadProvider->expects($this->once())
             ->method('getThreadEmails')
-            ->will($this->returnValue([$emailFromThread1, $emailFromThread2]));
+            ->will($this->returnValue([$emailFromThread1, $emailFromThread2, $emailFromThread3]));
 
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->exactly($calls[4]))
+        $email->expects($this->exactly(1))
             ->method('getThreadId')
             ->will($this->returnValue($threadId));
-        $email->expects($this->exactly($calls[5]))
-            ->method('setHead')
-            ->with($head);
-        $email->expects($this->once())
-            ->method('isSeen')
-            ->will($this->returnValue($seen));
+        $email->expects($this->exactly(1))
+            ->method('getId')
+            ->will($this->returnValue(1));
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $entityManager->expects($this->exactly(3))
+        $entityManager->expects($this->exactly(4))
             ->method('persist');
 
-        $this->manager->updateThreadHead($entityManager, $email);
+        $this->manager->addEmailToQueue($email);
+        $this->manager->handlePostFlush(new PostFlushEventArgs($entityManager));
+
+        $this->assertEmpty($this->manager->getQueue());
     }
 
     public function dataProvider()
     {
         return [
             'last unseen' =>
-                [true, false, false, false, false, false, [0, 0, 0, 0, 1, 1, 0]],
+                [
+                    'setHead' => [true, false, false],
+                    'isSeen' => [false, false, false],
+                    'calls' => [2, 0, 0, 1, 0, 0]
+                ],
             'first all seen' =>
-                [true, false, false, true, true, true, [0, 0, 1, 1, 1, 0, 0]],
+                [
+                    'setHead' => [false, false, true],
+                    'isSeen' => [true, true, true],
+                    'calls' => [0, 0, 2, 1, 1, 1]
+                ],
             'last unseen if the lastest is seen' =>
-                [false, false, false, true, true, false, [0, 0, 1, 1, 1, 0, 1]],
+                [
+                    'setHead' => [false, true, false],
+                    'isSeen' => [true, false, false],
+                    'calls' => [0, 2, 0, 1, 1, 0]
+                ],
+            'last unseen if and it is first' =>
+                [
+                    'setHead' => [true, false, false],
+                    'isSeen' => [false, true, false],
+                    'calls' => [2, 0, 0, 1, 0, 0]
+                ],
+            'unseen is single and last in list' =>
+                [
+                    'setHead' => [false, false, true],
+                    'isSeen' => [true, true, false],
+                    'calls' => [0, 0, 2, 1, 1, 1]
+                ],
+            'unseen is single and second in list' =>
+                [
+                    'setHead' => [false, true, false],
+                    'isSeen' => [true, false, true],
+                    'calls' => [0, 2, 0, 1, 1, 0]
+                ],
         ];
     }
 }

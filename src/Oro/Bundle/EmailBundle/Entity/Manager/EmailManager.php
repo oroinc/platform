@@ -31,8 +31,8 @@ class EmailManager
     {
         if (!$entity->isSeen()) {
             $entity->setSeen(true);
+            $this->emailThreadManager->addEmailToQueue($entity);
             $this->em->persist($entity);
-            $this->emailThreadManager->updateThreadHead($this->em, $entity);
             $this->em->flush();
         }
     }

@@ -61,7 +61,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
     public function testGetEmailThreadIdFoundInXThreadIdAttributes()
     {
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->exactly(2))
+        $email->expects($this->exactly(1))
             ->method('getRefs')
             ->will($this->returnValue('testMessageId'));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -84,17 +84,17 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getXThreadId')
             ->will($this->returnValue($treadId));
 
-        $query->expects($this->exactly(2))
+        $query->expects($this->exactly(1))
             ->method('getResult')
             ->will($this->returnValue([$emailFromTread]));
-        $queryBuilder->expects($this->exactly(2))
+        $queryBuilder->expects($this->exactly(1))
             ->method('getQuery')
             ->will($this->returnValue($query));
-        $repository->expects($this->exactly(2))
+        $repository->expects($this->exactly(1))
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($queryBuilder);
-        $entityManager->expects($this->exactly(2))
+        $entityManager->expects($this->exactly(1))
             ->method('getRepository')
             ->with('OroEmailBundle:Email')
             ->will($this->returnValue($repository));
@@ -106,7 +106,7 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
     {
         $treadId = 'testXTreadId';
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $email->expects($this->exactly(2))
+        $email->expects($this->exactly(1))
             ->method('getRefs')
             ->will($this->returnValue(null));
         $email->expects($this->exactly(2))
@@ -117,6 +117,49 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->assertEquals($treadId, $this->provider->getEmailThreadId($entityManager, $email));
+    }
+
+    public function testGetEmailThreadIdGenerated()
+    {
+        $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $email->expects($this->exactly(1))
+            ->method('getRefs')
+            ->will($this->returnValue('testMessageId'));
+        $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $queryBuilder = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getResult'])
+            ->getMockForAbstractClass();
+
+        $emailFromTread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
+        $emailFromTread->expects($this->exactly(1))
+            ->method('getXThreadId')
+            ->will($this->returnValue(null));
+
+        $query->expects($this->exactly(1))
+            ->method('getResult')
+            ->will($this->returnValue([$emailFromTread]));
+        $queryBuilder->expects($this->exactly(1))
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $repository->expects($this->exactly(1))
+            ->method('createQueryBuilder')
+            ->with('e')
+            ->willReturn($queryBuilder);
+        $entityManager->expects($this->exactly(1))
+            ->method('getRepository')
+            ->with('OroEmailBundle:Email')
+            ->will($this->returnValue($repository));
+
+        $this->assertNotEmpty($this->provider->getEmailThreadId($entityManager, $email));
     }
 
     public function testGetThreadEmailWithoutThread()
