@@ -7,6 +7,8 @@ oro:
             change_entity_confirmation: The template data can contain variables related to the previous selected entity. Do you want to clear all template data?
             apply_template_confirmation_title: Apply Template Confirmation
             apply_template_confirmation_content: Body content will be replaced by an other template. Are you sure you want to proceed?
+        thread:
+            load_error: Sorry, email thread was not loaded correctly.
 
 "The email was sent": "The email was sent"
 "Preview": "Preview"
