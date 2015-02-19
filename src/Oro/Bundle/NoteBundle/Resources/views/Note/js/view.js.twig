@@ -32,14 +32,13 @@
                 <div>
                     <%= _.template(
                         {{ 'oro.note.updated_by'|trans|json_encode|raw }},
-                        {
-                            user: updatedBy_url
-                                ? '<a class="user" href="' + updatedBy_url + '">' +  _.escape(updatedBy) + '</a>'
-                                : '<i class="user">' +  _.escape(updatedBy) + '</i>',
-                            date: '<i class="date">' + updatedAt + '</i>'
-                        },
                         { interpolate: /\{\{(.+?)\}\}/g }
-                    ) %>
+                    )({
+                        user: updatedBy_url
+                            ? '<a class="user" href="' + updatedBy_url + '">' +  _.escape(updatedBy) + '</a>'
+                            : '<i class="user">' +  _.escape(updatedBy) + '</i>',
+                        date: '<i class="date">' + updatedAt + '</i>'
+                    }) %>
                 </div>
             </div>
             <% } %>

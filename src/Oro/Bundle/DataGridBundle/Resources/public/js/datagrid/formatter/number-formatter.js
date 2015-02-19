@@ -35,20 +35,22 @@ define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
          * @inheritDoc
          */
         fromRaw: function (rawData) {
-            if (rawData === null || rawData === '') {
-                return '';
+            var formattedData = '';
+            if (rawData !== null && rawData !== '') {
+                formattedData = this.formatter.call(this, rawData);
             }
-            return this.formatter.apply(this, arguments);
+            return formattedData;
         },
 
         /**
          * @inheritDoc
          */
         toRaw: function (formattedData) {
-            if (formattedData === null || formattedData === '') {
-                return null;
+            var rawData = null;
+            if (formattedData !== null && formattedData !== '') {
+                rawData = formatter.unformat(formattedData)
             }
-            return formatter.unformat(formattedData);
+            return rawData;
         }
     });
 

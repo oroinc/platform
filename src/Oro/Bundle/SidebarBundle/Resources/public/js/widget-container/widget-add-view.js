@@ -30,7 +30,7 @@ define(function (require) {
 
         initialize: function (options) {
             this.options = _.defaults(options || {}, this.options);
-            options.content = _.template(widgetAddTemplate, {
+            options.content = _.template(widgetAddTemplate)({
                 'availableWidgets': options.sidebar.getAvailableWidgets()
             });
             options.title = __('oro.sidebar.widget.add.dialog.title');
