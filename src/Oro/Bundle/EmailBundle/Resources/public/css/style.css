@@ -88,3 +88,21 @@
     background-color: #eee;
     margin: 10px;
 }
+.accordion-group .accordion-heading .title-item span.icon.head {
+    position: relative;
+    left: 2px;
+}
+.accordion-group .accordion-heading .title-item span.icon  i.icon-envelope {
+    background: white;
+}
+.accordion-group .accordion-heading .title-item span.icon.head-alt {
+    position: absolute;
+}
+.accordion-group .accordion-heading .title-item span.icon  i.icon-envelope-alt {
+    position: absolute;
+    top: 6px;
+    left: -32px;
+    background: white;
+    line-height: 16px;
+    border-radius: 2px;
+}
