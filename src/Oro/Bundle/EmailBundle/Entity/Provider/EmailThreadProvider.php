@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Provider;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -71,7 +72,7 @@ class EmailThreadProvider
     }
 
     /**
-     * Get head email
+     * Get head email in thread
      *
      * @param EntityManager $entityManager
      * @param Email $entity
@@ -80,23 +81,23 @@ class EmailThreadProvider
      */
     public function getHeadEmail(EntityManager $entityManager, Email $entity)
     {
+        $headEmail = $entity;
         $threadId = $entity->getThreadId();
         if ($threadId) {
-            /** @var QueryBuilder $queryBuilder */
-            $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
+            $emails = new ArrayCollection($this->getThreadEmails($entityManager, $entity));
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->eq('threadId', $threadId));
             $criteria->andWhere($criteria->expr()->eq('seen', false));
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $criteria->setMaxResults(1);
-            $queryBuilder->addCriteria($criteria);
-            $result = $queryBuilder->getQuery()->getResult();
-            if (count($result)) {
-                return $result[0];
+            $unseenEmails = $emails->matching($criteria);
+            if (count($unseenEmails)) {
+                $headEmail = $unseenEmails[0];
+            } else if (count($emails)) {
+                $headEmail = $emails[0];
             }
         }
 
-        return $entity;
+        return $headEmail;
     }
 
     /**
