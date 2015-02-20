@@ -75,6 +75,8 @@ class EmailController extends Controller
     {
         $results = $this->get('oro_activity_list.manager')->getGroupedEntities(
             $email,
+            $this->getRequest()->get('targetActivityClass'),
+            $this->getRequest()->get('targetActivityId'),
             $this->getRequest()->get('_wid'),
             $this->get('oro_filter.datetime_range_filter')->getMetadata()
         );

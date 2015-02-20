@@ -69,7 +69,9 @@ define(function (require) {
 
             ActivityListView.__super__.initialize.call(this, options);
 
-            this._initPager();
+            if (!this.doNotFetch) {
+                this._initPager();
+            }
         },
 
         /**
@@ -292,7 +294,9 @@ define(function (require) {
                     type: 'get',
                     dataType: 'html',
                     data: {
-                        _widgetContainer: 'dialog'
+                        _widgetContainer: 'dialog',
+                        targetActivityClass: model.get('targetEntityData').class,
+                        targetActivityId: model.get('targetEntityData').id
                     }
                 };
 

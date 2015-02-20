@@ -99,8 +99,10 @@ define(function (require) {
             });
             collection.route = activityOptions.urls.route;
             collection.routeParameters = activityOptions.urls.parameters;
-            collection.setPageSize(this.options.activityListOptions.pager.pagesize);
-            collection.setCount(this.options.activityListCount);
+            if (this.options.activityListOptions.pager) {
+                collection.setPageSize(this.options.activityListOptions.pager.pagesize);
+                collection.setCount(this.options.activityListCount);
+            }
 
             activityOptions.collection = collection;
 

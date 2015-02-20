@@ -247,17 +247,16 @@ class ActivityListManager
      * @param array $filterMetadata
      * @return array
      */
-    public function getGroupedEntities($entity, $widgetId, $filterMetadata)
+    public function getGroupedEntities($entity, $targetActivityClass, $targetActivityId, $widgetId, $filterMetadata)
     {
         $results = [];
         $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
         if ($this->isGroupingApplicable($entityProvider)) {
             $groupedActivities = $entityProvider->getGroupedEntities($entity);
-            $targetEntityData = [
-                'class' => ClassUtils::getRealClass($entity),
-                'id'    => $entity->getId(),
-            ];
-            $activityResults = $this->getEntityViewModels($groupedActivities, $targetEntityData);
+            $activityResults = $this->getEntityViewModels($groupedActivities, [
+                'class' => $targetActivityClass,
+                'id' => $targetActivityId,
+            ]);
 
             $results = [
                 'entityId'            => $entity->getId(),
@@ -276,12 +275,7 @@ class ActivityListManager
                     'loadingContainerSelector' => '.activity-list.sub-list',
                     'dateRangeFilterMetadata'  => $filterMetadata,
                     'routes'                   => [],
-                    'pager'                    => [
-                        'current'  => 1,
-                        'pagesize' => 0,
-                        'total'    => 1,
-                        'count'    => 1,
-                    ],
+                    'pager'                    => false,
                 ],
             ];
         }
