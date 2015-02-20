@@ -749,6 +749,13 @@ class Email extends ExtendEmail
         return $this->getRecipients(EmailRecipient::BCC);
     }
 
+    public function getToCc()
+    {
+        return new ArrayCollection(
+            array_merge($this->getTo()->toArray(), $this->getCc()->toArray())
+        );
+    }
+
     /**
      * @return EmailRecipient[]
      */

@@ -11,7 +11,7 @@
                             {{ email.subject }}
                         </a>
                         <div class="clearfix"></div>
-                        <span class="recipients">{{ EA.recipient_email_addresses(email.recipients, false, false) }}</span>
+                        <span class="recipients">{{ 'To'|trans }}: {{ EA.recipient_email_addresses(email.toCc, false, false) }}</span>
                         <br/>
                         <span class="sentAt">{{ email.sentAt|oro_format_datetime }}</span>
                     </div>
