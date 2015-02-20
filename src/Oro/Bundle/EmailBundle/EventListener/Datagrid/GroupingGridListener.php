@@ -32,20 +32,10 @@ class GroupingGridListener
 
             $config->offsetAddToArray('actions', [
                 'test' => [
-                    'type'  => 'dialog',
+                    'type'  => 'navigate',
                     'label' => 'oro.grid.action.view',
-                    'link'  => 'view_thread_link', // todo change url to view thread
+                    'link'  => 'view_thread_link',
                     'icon'  => 'eye-open',
-                    'widgetOptions' => [
-                        'reload-grid-name' => $event->getDatagrid()->getName(),
-                        'options' => [
-                            'dialogOptions' => [
-                                'title' => 'Thread view',
-                                'width' => 550,
-                                'modal' => true,
-                            ],
-                        ],
-                    ],
                 ]
             ]);
         }

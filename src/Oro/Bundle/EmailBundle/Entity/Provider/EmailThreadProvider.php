@@ -80,7 +80,6 @@ class EmailThreadProvider
      */
     public function getThreadEmails(EntityManager $entityManager, Email $entity)
     {
-        $result = [];
         $threadId = $entity->getThreadId();
         if ($threadId) {
             /** @var QueryBuilder $queryBuilder */
@@ -90,6 +89,8 @@ class EmailThreadProvider
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
+        } else {
+            $result = [$entity];
         }
 
         return $result;
