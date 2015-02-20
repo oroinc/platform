@@ -118,31 +118,8 @@ class EmailThreadManager
         if ($entity->getThreadId() && $entity->getId()) {
             $threadEmails = $this->emailThreadProvider->getThreadEmails($entityManager, $entity);
             $this->resetHead($entityManager, $threadEmails);
-            if (!$this->setHeadFirstNotSeenEmail($entityManager, $threadEmails)) {
-                $this->setHeadFirstEmail($entityManager, $threadEmails);
-            }
+            $this->setHeadLastEmail($entityManager, $threadEmails);
         }
-    }
-
-    /**
-     * Set head first not seen email
-     *
-     * @param EntityManager $entityManager
-     * @param Email[] $threadEmails
-     *
-     * @return bool
-     */
-    protected function setHeadFirstNotSeenEmail(EntityManager $entityManager, $threadEmails)
-    {
-        /** @var Email $email */
-        foreach ($threadEmails as $email) {
-            if (!$email->isSeen()) {
-                $email->setHead(true);
-                $entityManager->persist($email);
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -151,9 +128,9 @@ class EmailThreadManager
      * @param EntityManager $entityManager
      * @param Email[] $threadEmails
      */
-    protected function setHeadFirstEmail(EntityManager $entityManager, $threadEmails)
+    protected function setHeadLastEmail(EntityManager $entityManager, $threadEmails)
     {
-        $email = end($threadEmails);
+        $email = $threadEmails[0];
         $email->setHead(true);
         $entityManager->persist($email);
     }

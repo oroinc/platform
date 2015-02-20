@@ -16,8 +16,8 @@ class TemporaryIndexesBundle implements Migration
     {
         if ($schema->hasTable('oro_activity_list')) {
             $table = $schema->getTable('oro_activity_list');
-            $table->addIndex(['related_activity_class'], 'tmp1');
-            $table->addIndex(['related_activity_id'], 'tmp2');
+            $table->addIndex(['related_activity_class'], 'tmp_al_related_activity_class');
+            $table->addIndex(['related_activity_id'], 'tmp_al_related_activity_id');
 
             $queries->addQuery(new UpdateDateActivityListQuery());
         }

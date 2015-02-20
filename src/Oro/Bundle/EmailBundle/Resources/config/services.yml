@@ -428,6 +428,7 @@ services:
            - @oro_email.link.formatter.name
            - @router
            - @oro_entity_config.config_manager
+           - @oro_email.email.thread.provider
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 

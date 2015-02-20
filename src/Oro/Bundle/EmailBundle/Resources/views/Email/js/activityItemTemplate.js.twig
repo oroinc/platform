@@ -23,8 +23,18 @@
                         <%
                             var hasLink   = !!data.ownerLink;
                             var ownerLink = hasLink
-                                ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.ownerName) + '</a>'
-                                : '<span class="user">' + _.escape(data.ownerName) + '</span>';
+                                    ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.ownerName) + '</a>'
+                                    : '<span class="user">' + _.escape(data.ownerName) + '</span>';
+                            var updatedAt = updatedAt;
+                            var subject = subject;
+                            if(is_head && !ignoreHead) {
+                                ownerLink = hasLink
+                                    ? '<a class="user" href="' + data.ownerLink + '">' +  _.escape(data.headOwnerName) + '</a>'
+                                    : '<span class="user">' + _.escape(data.headOwnerName) + '</span>';
+                                updatedAt = dateFormatter.formatDateTime(data.headSentAt);
+                                subject = data.headSubject;
+                            }
+
                         %>
                         <%= _.template(
                             {{ 'oro.email.sent_by.label'|trans|json_encode|raw }},
