@@ -29,7 +29,8 @@ define(function (require) {
                 deleteItem: null
             },
             messages: {},
-            ignoreHead: false
+            ignoreHead: false,
+            doNotFetch: false
         },
         listen: {
             'toView collection': '_viewItem',
@@ -68,7 +69,9 @@ define(function (require) {
 
             ActivityListView.__super__.initialize.call(this, options);
 
-            this._initPager();
+            if (!this.doNotFetch) {
+                this._initPager();
+            }
         },
 
         /**
@@ -229,6 +232,10 @@ define(function (require) {
 
         _reload: function () {
             this._showLoading();
+            if (this.options.doNotFetch) {
+                this._hideLoading();
+                return;
+            }
             try {
                 this.collection.fetch({
                     reset: true,
@@ -287,7 +294,9 @@ define(function (require) {
                     type: 'get',
                     dataType: 'html',
                     data: {
-                        _widgetContainer: 'dialog'
+                        _widgetContainer: 'dialog',
+                        targetActivityClass: model.get('targetEntityData').class,
+                        targetActivityId: model.get('targetEntityData').id
                     }
                 };
 

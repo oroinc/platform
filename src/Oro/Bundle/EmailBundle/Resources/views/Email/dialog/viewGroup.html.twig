@@ -16,6 +16,7 @@
                 });
             }
             opt._sourceElement = $('#grouped-entity-' + opt.entityId);
+            opt.doNotFetch = true;
             new ActivityListComponent(opt);
         });
     });
