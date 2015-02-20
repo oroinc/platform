@@ -36,7 +36,8 @@ define(function (require) {
             activityListCount: 0,
             widgetId: '',
             modules: {},
-            ignoreHead: false
+            ignoreHead: false,
+            doNotFetch: false
         },
 
         /** @type MultiSelectFilter */
@@ -85,6 +86,7 @@ define(function (require) {
                 this.options.modules.itemModel = this.options.activityListOptions.itemModel;
             }
             this.options.activityListOptions.ignoreHead = this.options.ignoreHead;
+            this.options.activityListOptions.doNotFetch = this.options.doNotFetch;
         },
 
         _init: function () {

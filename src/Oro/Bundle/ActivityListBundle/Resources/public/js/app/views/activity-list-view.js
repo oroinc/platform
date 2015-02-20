@@ -29,7 +29,8 @@ define(function (require) {
                 deleteItem: null
             },
             messages: {},
-            ignoreHead: false
+            ignoreHead: false,
+            doNotFetch: false
         },
         listen: {
             'toView collection': '_viewItem',
@@ -229,6 +230,10 @@ define(function (require) {
 
         _reload: function () {
             this._showLoading();
+            if (this.options.doNotFetch) {
+                this._hideLoading();
+                return;
+            }
             try {
                 this.collection.fetch({
                     reset: true,

@@ -253,7 +253,11 @@ class ActivityListManager
         $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
         if ($this->isGroupingApplicable($entityProvider)) {
             $groupedActivities = $entityProvider->getGroupedEntities($entity);
-            $activityResults   = $this->getEntityViewModels($groupedActivities);
+            $targetEntityData = [
+                'class' => ClassUtils::getRealClass($entity),
+                'id'    => $entity->getId(),
+            ];
+            $activityResults = $this->getEntityViewModels($groupedActivities, $targetEntityData);
 
             $results = [
                 'entityId'            => $entity->getId(),
