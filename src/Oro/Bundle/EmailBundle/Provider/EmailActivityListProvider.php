@@ -153,10 +153,7 @@ class EmailActivityListProvider implements
         $email = $this->doctrineRegistryLink->getService()
             ->getRepository($activityListEntity->getRelatedActivityClass())
             ->find($activityListEntity->getRelatedActivityId());
-        $headEmail = $this->emailThreadProvider->getHeadEmail(
-            $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),
-            $email
-        );
+        $headEmail = $this->getHeadEmail($activityListEntity, $email);
 
         $data = [
             'ownerName'     => $email->getFromName(),
@@ -246,5 +243,23 @@ class EmailActivityListProvider implements
             ->setParameter('threadId', $email->getThreadId());
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param ActivityList $activityListEntity
+     * @param $email
+     *
+     * @return Email
+     */
+    protected function getHeadEmail(ActivityList $activityListEntity, $email)
+    {
+        if ($email->isHead() && $email->getThreadId()) {
+            return $this->emailThreadProvider->getHeadEmail(
+                $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),
+                $email
+            );
+        } else {
+            return $email;
+        }
     }
 }
