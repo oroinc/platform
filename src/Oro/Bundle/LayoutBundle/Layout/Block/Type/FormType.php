@@ -6,8 +6,10 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Component\Layout\Block\Type\AbstractContainerType;
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
+use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\Exception\UnexpectedTypeException;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
@@ -100,6 +102,24 @@ class FormType extends AbstractContainerType
     /**
      * {@inheritdoc}
      */
+    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    {
+        /** @var FormAccessorInterface $formAccessor */
+        $formAccessor = $block->getContext()->get($options['form_name']);
+        if (!$formAccessor instanceof FormAccessorInterface) {
+            throw new UnexpectedTypeException(
+                $formAccessor,
+                'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface',
+                sprintf('context[%s]', $options['form_name'])
+            );
+        }
+
+        $view->vars['form'] = $formAccessor->getView();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::NAME;
@@ -110,6 +130,8 @@ class FormType extends AbstractContainerType
      * @param array                 $options
      *
      * @return FormInterface
+     *
+     * @throws UnexpectedTypeException
      */
     protected function getForm(BlockBuilderInterface $builder, array $options)
     {
