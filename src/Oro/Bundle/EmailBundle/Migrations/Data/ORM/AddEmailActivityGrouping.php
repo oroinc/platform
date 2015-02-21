@@ -11,6 +11,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
 class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtureInterface
 {
@@ -31,22 +32,22 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
      */
     public function load(ObjectManager $manager)
     {
-        $query = <<<SQL
-UPDATE oro_email
-   SET thread_id = x_thread_id
- WHERE thread_id IS NULL
-   AND x_thread_id IS NOT NULL
-SQL;
-
-        /** @var Connection $connection */
-        $connection = $manager->getConnection();
-        $connection->executeUpdate($query);
+//        $query = <<<SQL
+//UPDATE oro_email
+//   SET thread_id = x_thread_id
+// WHERE thread_id IS NULL
+//   AND x_thread_id IS NOT NULL
+//SQL;
+//
+//        /** @var Connection $connection */
+//        $connection = $manager->getConnection();
+//        $connection->executeUpdate($query);
 
         $criteria = new Criteria();
-        $criteria->where($criteria->expr()->neq('threadId', null));
+        $criteria->where($criteria->expr()->neq('xThreadId', null));
         /** @var QueryBuilder $threadQueryBuilder */
         $threadQueryBuilder = $manager->getRepository('OroEmailBundle:Email')->createQueryBuilder('entity');
-        $threadQueryBuilder->distinct()->select('entity.threadId');
+        $threadQueryBuilder->distinct()->select('entity.xThreadId');
         $threadQueryBuilder->addCriteria($criteria);
 
         $iterator = new BufferedQueryResultIterator($threadQueryBuilder);
@@ -56,11 +57,11 @@ SQL;
         $entities   = [];
 
         foreach ($iterator as $threadResult) {
-            $threadId = $threadResult['threadId'];
+            $threadId = $threadResult['xThreadId'];
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $manager->getRepository('OroEmailBundle:Email')->createQueryBuilder('entity');
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->eq('threadId', $threadId));
+            $criteria->where($criteria->expr()->eq('xThreadId', $threadId));
             $criteria->orderBy(['created' => 'ASC']);
             $queryBuilder->addCriteria($criteria);
             $queryBuilder->setFirstResult(0);
@@ -68,6 +69,10 @@ SQL;
             if (count($emails)) {
                 foreach ($emails as $key => $email) {
                     /** @var Email $email */
+                    $newThread = new EmailThread();
+                    $newThread->setSubject($email->getSubject());
+                    $newThread->setSentAt($email->getSentAt());
+                    $email->setThread($newThread);
                     if ($key == 0) {
                         $email->setHead(true);
                     } else {

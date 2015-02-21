@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 
 class EmailThreadProvider
 {
@@ -17,34 +18,41 @@ class EmailThreadProvider
      * @param EntityManager $entityManager
      * @param Email $entity
      *
-     * @return string
+     * @return EmailThread
      */
-    public function getEmailThreadId(EntityManager $entityManager, Email $entity)
+    public function getEmailThread(EntityManager $entityManager, Email $entity)
     {
+        $thread = null;
+
         // search among threadId
         $emailReferences = $this->getEmailReferences($entityManager, $entity);
         foreach ($emailReferences as $email) {
             /** @var Email $email */
-            if ($email->getThreadId()) {
-                return $email->getThreadId();
+            if ($email->getThread()) {
+                return $email->getThread();
             }
         }
+
         // search among xThreadId
-        foreach ($emailReferences as $email) {
-            /** @var Email $email */
-            if ($email->getXThreadId()) {
-                return $email->getXThreadId();
-            }
-        }
-        $threadId = $entity->getThreadId();
-        if (!$threadId && $entity->getXThreadId()) {
-            $threadId = $entity->getXThreadId();
-        }
+//        foreach ($emailReferences as $email) {
+//            /** @var Email $email */
+//            if ($email->getXThreadId()) {
+//                return $email->getThread();
+//            }
+//        }
+//        $threadId = $entity->getThreadId();
+//        if (!$threadId && $entity->getXThreadId()) {
+//            $threadId = $thread->getId();
+////            $threadId = $entity->getXThreadId();
+//        }
+
         // generate new thread if need
-        if (!$threadId && count($emailReferences) > 0) {
-            $threadId = $this->generateThreadId();
+        if (count($emailReferences) > 0) {
+            $thread = new EmailThread();
+            $thread->setSubject($entity->getSubject());
+            $thread->setSentAt($entity->getSentAt());
         }
-        return $threadId;
+        return $thread;
     }
 
     /**
@@ -82,8 +90,8 @@ class EmailThreadProvider
     public function getHeadEmail(EntityManager $entityManager, Email $entity)
     {
         $headEmail = $entity;
-        $threadId = $entity->getThreadId();
-        if ($threadId) {
+        $thread = $entity->getThread();
+        if ($thread) {
             $emails = new ArrayCollection($this->getThreadEmails($entityManager, $entity));
             $criteria = new Criteria();
             $criteria->andWhere($criteria->expr()->eq('seen', false));
@@ -110,12 +118,15 @@ class EmailThreadProvider
      */
     public function getThreadEmails(EntityManager $entityManager, Email $entity)
     {
-        $threadId = $entity->getThreadId();
-        if ($threadId) {
+//        $threadId = $entity->getThreadId();
+//        if ($threadId) {
+        $result = [];
+        $thread = $entity->getThread();
+        if ($thread) {
             /** @var QueryBuilder $queryBuilder */
             $queryBuilder = $entityManager->getRepository('OroEmailBundle:Email')->createQueryBuilder('e');
             $criteria = new Criteria();
-            $criteria->where($criteria->expr()->eq('threadId', $threadId));
+            $criteria->where($criteria->expr()->eq('thread', $thread));
             $criteria->orderBy(['sentAt' => Criteria::DESC]);
             $queryBuilder->addCriteria($criteria);
             $result = $queryBuilder->getQuery()->getResult();
@@ -126,11 +137,11 @@ class EmailThreadProvider
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    protected function generateThreadId()
-    {
-        return md5(getmypid() . '.' . time() . '.' . uniqid(mt_rand(), true));
-    }
+//    /**
+//     * @return string
+//     */
+//    protected function generateThreadId()
+//    {
+//        return md5(getmypid() . '.' . time() . '.' . uniqid(mt_rand(), true));
+//    }
 }

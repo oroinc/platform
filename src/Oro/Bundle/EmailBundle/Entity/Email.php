@@ -187,14 +187,24 @@ class Email extends ExtendEmail
      */
     protected $xMessageId;
 
+//    /**
+//     * @var string
+//     *
+//     * @ORM\Column(name="thread_id_txt", type="string", length=255, nullable=true)
+//     * @Soap\ComplexType("string", nillable=true)
+//     * @JMS\Type("string")
+//     */
+//    protected $threadId;
+
     /**
-     * @var string
+     * @var EmailThread
      *
-     * @ORM\Column(name="thread_id", type="string", length=255, nullable=true)
+     * @ORM\ManyToOne(targetEntity="EmailThread", inversedBy="emails", fetch="EAGER")
+     * @ORM\JoinColumn(name="thread_id", referencedColumnName="id", nullable=true)
      * @Soap\ComplexType("string", nillable=true)
-     * @JMS\Type("string")
+     * @JMS\Exclude
      */
-    protected $threadId;
+    protected $thread;
 
     /**
      * @var string
@@ -209,7 +219,7 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="refs", type="text", nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
+     * @Soap\ComplexType("integer", nillable=true)
      * @JMS\Type("string")
      */
     protected $refs;
@@ -563,29 +573,29 @@ class Email extends ExtendEmail
         return $this;
     }
 
-    /**
-     * Get email thread id uses for group related messages
-     *
-     * @return string
-     */
-    public function getThreadId()
-    {
-        return $this->threadId;
-    }
-
-    /**
-     * Set email thread id uses for group related messages
-     *
-     * @param string $threadId
-     *
-     * @return Email
-     */
-    public function setThreadId($threadId)
-    {
-        $this->threadId = $threadId;
-
-        return $this;
-    }
+//    /**
+//     * Get email thread id uses for group related messages
+//     *
+//     * @return string
+//     */
+//    public function getThreadId()
+//    {
+//        return $this->threadId;
+//    }
+//
+//    /**
+//     * Set email thread id uses for group related messages
+//     *
+//     * @param string $threadId
+//     *
+//     * @return Email
+//     */
+//    public function setThreadId($threadId)
+//    {
+//        $this->threadId = $threadId;
+//
+//        return $this;
+//    }
 
     /**
      * Get email thread id uses for group related messages
@@ -607,6 +617,30 @@ class Email extends ExtendEmail
     public function setXThreadId($xThreadId)
     {
         $this->xThreadId = $xThreadId;
+
+        return $this;
+    }
+
+    /**
+     * Get thread
+     *
+     * @return EmailThread
+     */
+    public function getThread()
+    {
+        return $this->thread;
+    }
+
+    /**
+     * Set thread
+     *
+     * @param EmailThread|null $thread
+     *
+     * @return Email
+     */
+    public function setThread($thread)
+    {
+        $this->thread = $thread;
 
         return $this;
     }

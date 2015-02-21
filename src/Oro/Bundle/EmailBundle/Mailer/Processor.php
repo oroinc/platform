@@ -126,6 +126,7 @@ class Processor
         $email->addFolder($origin->getFolder(FolderType::SENT));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
+        $email->setSeen(true);
         if ($parentMessageId) {
             $email->setRefs($parentMessageId);
         }
