@@ -20,7 +20,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
         $extensionDef      = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
             ->getMock();
 
-        $blockTypeServiceIds          = [
+        $blockTypeServiceIds           = [
             'block1' => [
                 ['class' => 'Test\BlockType1', 'alias' => 'test_block_name1']
             ],
@@ -28,7 +28,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 ['class' => 'Test\BlockType2', 'alias' => 'test_block_name2']
             ]
         ];
-        $blockTypeExtensionServiceIds = [
+        $blockTypeExtensionServiceIds  = [
             'extension1' => [
                 ['class' => 'Test\BlockTypeExtension1', 'alias' => 'test_block_name1']
             ],
@@ -39,7 +39,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 ['class' => 'Test\BlockTypeExtension3', 'alias' => 'test_block_name1', 'priority' => -10]
             ]
         ];
-        $layoutUpdateServiceIds       = [
+        $layoutUpdateServiceIds        = [
             'update1' => [
                 ['class' => 'Test\LayoutUpdate1', 'id' => 'test_block_id1']
             ],
@@ -48,6 +48,14 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ],
             'update3' => [
                 ['class' => 'Test\LayoutUpdate3', 'id' => 'test_block_id1', 'priority' => -10]
+            ]
+        ];
+        $contextConfiguratorServiceIds = [
+            'contextConfigurator1' => [
+                ['class' => 'Test\ContextConfigurator1']
+            ],
+            'contextConfigurator2' => [
+                ['class' => 'Test\ContextConfigurator2']
             ]
         ];
 
@@ -87,14 +95,15 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 ['twig', new Reference(ConfigurationPass::TWIG_RENDERER_SERVICE)]
             );
 
-        $container->expects($this->exactly(3))
+        $container->expects($this->exactly(4))
             ->method('findTaggedServiceIds')
             ->will(
                 $this->returnValueMap(
                     [
                         [ConfigurationPass::BLOCK_TYPE_TAG_NAME, $blockTypeServiceIds],
                         [ConfigurationPass::BLOCK_TYPE_EXTENSION_TAG_NAME, $blockTypeExtensionServiceIds],
-                        [ConfigurationPass::LAYOUT_UPDATE_TAG_NAME, $layoutUpdateServiceIds]
+                        [ConfigurationPass::LAYOUT_UPDATE_TAG_NAME, $layoutUpdateServiceIds],
+                        [ConfigurationPass::CONTEXT_CONFIGURATOR_TAG_NAME, $contextConfiguratorServiceIds]
                     ]
                 )
             );
@@ -124,6 +133,15 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 [
                     'test_block_id1' => ['update3', 'update1'],
                     'test_block_id2' => ['update2']
+                ]
+            );
+        $extensionDef->expects($this->at(3))
+            ->method('replaceArgument')
+            ->with(
+                4,
+                [
+                    'contextConfigurator1',
+                    'contextConfigurator2'
                 ]
             );
 

@@ -22,7 +22,8 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                 'attr'               => ['test_attr' => 'test_attr_val'],
                 'label'              => 'Test Label',
                 'label_attr'         => ['test_label_attr' => 'test_label_attr_val'],
-                'translation_domain' => 'test_translation_domain'
+                'translation_domain' => 'test_translation_domain',
+                'visible'            => false
             ],
             $this->resolveOptions(
                 BaseType::NAME,
@@ -30,7 +31,8 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                     'attr'               => ['test_attr' => 'test_attr_val'],
                     'label'              => 'Test Label',
                     'label_attr'         => ['test_label_attr' => 'test_label_attr_val'],
-                    'translation_domain' => 'test_translation_domain'
+                    'translation_domain' => 'test_translation_domain',
+                    'visible'            => false
                 ]
             )
         );
@@ -71,7 +73,8 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                         '_block_id'
                     ],
                     'cache_key'           => '_block_id_block',
-                    'translation_domain'  => 'messages'
+                    'translation_domain'  => 'messages',
+                    'visible'             => true
                 ]
             ],
             $view,
@@ -85,7 +88,8 @@ class BaseTypeTest extends BaseBlockTypeTestCase
             'attr'               => ['test_attr' => 'test_attr_val'],
             'label'              => 'Test Label',
             'label_attr'         => ['test_label_attr' => 'test_label_attr_val'],
-            'translation_domain' => 'test_translation_domain'
+            'translation_domain' => 'test_translation_domain',
+            'visible'            => false
         ];
 
         $view = $this->getBlockBuilder(BaseType::NAME, $options)
@@ -106,6 +110,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                     ],
                     'cache_key'           => '_block_id_block',
                     'translation_domain'  => 'test_translation_domain',
+                    'visible'             => false,
                     'attr'                => ['test_attr' => 'test_attr_val'],
                     'label'               => 'Test Label',
                     'label_attr'          => ['test_label_attr' => 'test_label_attr_val']

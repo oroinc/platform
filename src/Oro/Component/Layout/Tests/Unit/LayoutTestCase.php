@@ -42,9 +42,6 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         if (!isset($view['vars']['attr'])) {
             $view['vars']['attr'] = [];
         }
-        if (!isset($view['vars']['value'])) {
-            $view['vars']['value'] = null;
-        }
         if (!isset($view['children'])) {
             $view['children'] = [];
         }
@@ -74,6 +71,7 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
 
         if ($removeAuxiliaryVariables) {
             unset($result['vars']['translation_domain']);
+            unset($result['vars']['visible']);
             unset($result['vars']['label']);
             unset($result['vars']['block_type']);
             unset($result['vars']['unique_block_prefix']);

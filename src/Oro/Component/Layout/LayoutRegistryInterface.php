@@ -22,7 +22,23 @@ interface LayoutRegistryInterface
     public function getType($name);
 
     /**
-     * Sets the default options for this type.
+     * Returns all registered extensions for the given block type.
+     *
+     * @param string $name The block type name
+     *
+     * @return BlockTypeExtensionInterface[]
+     */
+    public function getTypeExtensions($name);
+
+    /**
+     * Returns all registered layout context configurators.
+     *
+     * @return ContextConfiguratorInterface[]
+     */
+    public function getContextConfigurators();
+
+    /**
+     * Sets the default options for a block type.
      *
      * @param string                   $name     The block type name
      * @param OptionsResolverInterface $resolver The resolver for the options.
@@ -83,4 +99,11 @@ interface LayoutRegistryInterface
      * @return mixed
      */
     public function updateLayout($id, LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item);
+
+    /**
+     * Configures the layout context.
+     *
+     * @param ContextInterface $context The context
+     */
+    public function configureContext(ContextInterface $context);
 }

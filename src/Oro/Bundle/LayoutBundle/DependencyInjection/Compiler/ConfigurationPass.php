@@ -16,6 +16,7 @@ class ConfigurationPass implements CompilerPassInterface
     const BLOCK_TYPE_TAG_NAME = 'layout.block_type';
     const BLOCK_TYPE_EXTENSION_TAG_NAME = 'layout.block_type_extension';
     const LAYOUT_UPDATE_TAG_NAME = 'layout.layout_update';
+    const CONTEXT_CONFIGURATOR_TAG_NAME = 'layout.context_configurator';
 
     /**
      * {@inheritdoc}
@@ -44,6 +45,7 @@ class ConfigurationPass implements CompilerPassInterface
             $extensionDef->replaceArgument(1, $this->getBlockTypes($container));
             $extensionDef->replaceArgument(2, $this->getBlockTypeExtensions($container));
             $extensionDef->replaceArgument(3, $this->getLayoutUpdates($container));
+            $extensionDef->replaceArgument(4, $this->getContextConfigurators($container));
         }
     }
 
@@ -123,5 +125,20 @@ class ConfigurationPass implements CompilerPassInterface
         }
 
         return $layoutUpdates;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array
+     */
+    protected function getContextConfigurators(ContainerBuilder $container)
+    {
+        $configurators = [];
+        foreach ($container->findTaggedServiceIds(self::CONTEXT_CONFIGURATOR_TAG_NAME) as $serviceId => $tag) {
+            $configurators[] = $serviceId;
+        }
+
+        return $configurators;
     }
 }

@@ -8,6 +8,9 @@ use Oro\Component\Layout\LayoutRendererRegistry;
 class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $registry;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $rawLayoutBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -24,6 +27,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
+        $this->registry          = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->rawLayoutBuilder  = $this->getMock('Oro\Component\Layout\RawLayoutBuilderInterface');
         $this->layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
         $this->blockFactory      = $this->getMock('Oro\Component\Layout\BlockFactoryInterface');
@@ -36,6 +40,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutBuilder = $this->getMockBuilder('Oro\Component\Layout\LayoutBuilder')
             ->setConstructorArgs(
                 [
+                    $this->registry,
                     $this->rawLayoutBuilder,
                     $this->layoutManipulator,
                     $this->blockFactory,
@@ -182,6 +187,15 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $layout    = $this->getMockBuilder('Oro\Component\Layout\Layout')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $context->expects($this->once())
+            ->method('isResolved')
+            ->will($this->returnValue(false));
+        $context->expects($this->once())
+            ->method('resolve');
+        $this->registry->expects($this->once())
+            ->method('configureContext')
+            ->with($this->identicalTo($context));
 
         $this->layoutManipulator->expects($this->at(0))
             ->method('setBlockTheme')

@@ -21,7 +21,9 @@
 
 {% block container_widget -%}
     {% for child in block -%}
-        {{ block_widget(child) }}
+        {% if child.vars.visible -%}
+            {{ block_widget(child) }}
+        {%- endif %}
     {%- endfor %}
 {%- endblock %}
 

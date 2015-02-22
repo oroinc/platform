@@ -4,6 +4,9 @@ namespace Oro\Component\Layout;
 
 class LayoutBuilder implements LayoutBuilderInterface
 {
+    /** @var LayoutRegistryInterface */
+    protected $registry;
+
     /** @var RawLayoutBuilderInterface */
     protected $rawLayoutBuilder;
 
@@ -17,17 +20,20 @@ class LayoutBuilder implements LayoutBuilderInterface
     protected $rendererRegistry;
 
     /**
+     * @param LayoutRegistryInterface            $registry
      * @param RawLayoutBuilderInterface          $rawLayoutBuilder
      * @param DeferredLayoutManipulatorInterface $layoutManipulator
      * @param BlockFactoryInterface              $blockFactory
      * @param LayoutRendererRegistryInterface    $rendererRegistry
      */
     public function __construct(
+        LayoutRegistryInterface $registry,
         RawLayoutBuilderInterface $rawLayoutBuilder,
         DeferredLayoutManipulatorInterface $layoutManipulator,
         BlockFactoryInterface $blockFactory,
         LayoutRendererRegistryInterface $rendererRegistry
     ) {
+        $this->registry          = $registry;
         $this->rawLayoutBuilder  = $rawLayoutBuilder;
         $this->layoutManipulator = $layoutManipulator;
         $this->blockFactory      = $blockFactory;
@@ -144,6 +150,10 @@ class LayoutBuilder implements LayoutBuilderInterface
      */
     public function getLayout(ContextInterface $context, $rootId = null)
     {
+        if (!$context->isResolved()) {
+            $this->registry->configureContext($context);
+            $context->resolve();
+        }
         $this->layoutManipulator->applyChanges($context);
         $rawLayout   = $this->rawLayoutBuilder->getRawLayout();
         $rootView    = $this->blockFactory->createBlockView($rawLayout, $context, $rootId);
