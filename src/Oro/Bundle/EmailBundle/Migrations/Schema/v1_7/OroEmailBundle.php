@@ -28,8 +28,7 @@ class OroEmailBundle implements Migration
     {
         $table = $schema->createTable('oro_email_thread');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('subject', 'string', ['length' => 500]);
-        $table->addColumn('sent', 'datetime', []);
+        $table->addColumn('last_unseen_email_id', 'integer', ['notnull' => false]);
         $table->addColumn('created', 'datetime', []);
         $table->setPrimaryKey(['id']);
     }
@@ -61,6 +60,13 @@ class OroEmailBundle implements Migration
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_thread'),
             ['thread_id'],
+            ['id'],
+            ['onDelete' => null, 'onUpdate' => null]
+        );
+        $table = $schema->getTable('oro_email_thread');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_email'),
+            ['last_unseen_email_id'],
             ['id'],
             ['onDelete' => null, 'onUpdate' => null]
         );

@@ -49,8 +49,8 @@ class EmailThreadProvider
         // generate new thread if need
         if (count($emailReferences) > 0) {
             $thread = new EmailThread();
-            $thread->setSubject($entity->getSubject());
-            $thread->setSentAt($entity->getSentAt());
+//            $thread->setSubject($entity->getSubject());
+//            $thread->setSentAt($entity->getSentAt());
         }
         return $thread;
     }

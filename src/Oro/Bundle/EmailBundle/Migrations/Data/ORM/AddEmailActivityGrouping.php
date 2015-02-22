@@ -70,8 +70,8 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
                 foreach ($emails as $key => $email) {
                     /** @var Email $email */
                     $newThread = new EmailThread();
-                    $newThread->setSubject($email->getSubject());
-                    $newThread->setSentAt($email->getSentAt());
+//                    $newThread->setSubject($email->getSubject());
+//                    $newThread->setSentAt($email->getSentAt());
                     $email->setThread($newThread);
                     if ($key == 0) {
                         $email->setHead(true);

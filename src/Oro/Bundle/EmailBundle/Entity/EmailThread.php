@@ -36,14 +36,6 @@ class EmailThread
     protected $id;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="subject", type="string", length=500)
-     * @JMS\Type("string")
-     */
-    protected $subject;
-
-    /**
      * @var ArrayCollection|Email[] $emails
      *
      * @ORM\OneToMany(targetEntity="Email", mappedBy="thread", cascade={"persist", "remove"}, orphanRemoval=true)
@@ -52,12 +44,14 @@ class EmailThread
     protected $emails;
 
     /**
-     * @var \DateTime
+     * @var Email
      *
-     * @ORM\Column(name="sent", type="datetime")
-     * @JMS\Type("DateTime")
+     * @ORM\ManyToOne(targetEntity="Email")
+     * @ORM\JoinColumn(name="last_unseen_email_id", referencedColumnName="id", nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Exclude
      */
-    protected $sentAt;
+    protected $lastUnseenEmail;
 
     /**
      * @var \DateTime
@@ -100,54 +94,6 @@ class EmailThread
     }
 
     /**
-     * Get email subject
-     *
-     * @return string
-     */
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-
-    /**
-     * Set email subject
-     *
-     * @param string $subject
-     *
-     * @return Email
-     */
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
-
-        return $this;
-    }
-
-    /**
-     * Get date/time when email sent
-     *
-     * @return \DateTime
-     */
-    public function getSentAt()
-    {
-        return $this->sentAt;
-    }
-
-    /**
-     * Set date/time when email sent
-     *
-     * @param \DateTime $sentAt
-     *
-     * @return Email
-     */
-    public function setSentAt($sentAt)
-    {
-        $this->sentAt = $sentAt;
-
-        return $this;
-    }
-
-    /**
      * @param Email $email
      *
      * @return bool
@@ -160,7 +106,7 @@ class EmailThread
     /**
      * @param Email $email
      *
-     * @return Email
+     * @return EmailThread
      */
     public function removeEmail(Email $email)
     {
@@ -186,7 +132,7 @@ class EmailThread
      *
      * @param Email $email
      *
-     * @return Email
+     * @return EmailThread
      */
     public function addEmail(Email $email)
     {
@@ -207,4 +153,27 @@ class EmailThread
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
+    /**
+     * Get last unseen email
+     *
+     * @return EmailThread
+     */
+    public function getLastUnseenEmail()
+    {
+        return $this->lastUnseenEmail;
+    }
+
+    /**
+     * Set last unseen email
+     *
+     * @param Email $lastUnseenEmail
+     *
+     * @return EmailThread
+     */
+    public function setLastUnseenEmail($lastUnseenEmail)
+    {
+        $this->lastUnseenEmail = $lastUnseenEmail;
+
+        return $this;
+    }
 }
