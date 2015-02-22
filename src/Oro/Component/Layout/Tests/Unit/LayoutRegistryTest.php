@@ -98,6 +98,41 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
         $this->registry->getType('widget');
     }
 
+    public function testGetTypeExtensions()
+    {
+        $name          = 'test';
+        $typeExtension = $this->getMock('Oro\Component\Layout\BlockTypeExtensionInterface');
+
+        $this->extension->expects($this->once())
+            ->method('hasTypeExtensions')
+            ->with($name)
+            ->will($this->returnValue(true));
+        $this->extension->expects($this->once())
+            ->method('getTypeExtensions')
+            ->with($name)
+            ->will($this->returnValue([$typeExtension]));
+
+        $result = $this->registry->getTypeExtensions($name);
+        $this->assertCount(1, $result);
+        $this->assertSame($typeExtension, $result[0]);
+    }
+
+    public function testGetContextConfigurators()
+    {
+        $configurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+
+        $this->extension->expects($this->once())
+            ->method('hasContextConfigurators')
+            ->will($this->returnValue(true));
+        $this->extension->expects($this->once())
+            ->method('getContextConfigurators')
+            ->will($this->returnValue([$configurator]));
+
+        $result = $this->registry->getContextConfigurators();
+        $this->assertCount(1, $result);
+        $this->assertSame($configurator, $result[0]);
+    }
+
     public function testSetDefaultOptions()
     {
         $name     = 'test';
@@ -212,5 +247,24 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($layoutManipulator), $this->identicalTo($item));
 
         $this->registry->updateLayout($id, $layoutManipulator, $item);
+    }
+
+    public function testConfigureContext()
+    {
+        $context = $this->getMock('Oro\Component\Layout\ContextInterface');
+
+        $contextConfigurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+
+        $this->extension->expects($this->once())
+            ->method('hasContextConfigurators')
+            ->will($this->returnValue(true));
+        $this->extension->expects($this->once())
+            ->method('getContextConfigurators')
+            ->will($this->returnValue([$contextConfigurator]));
+        $contextConfigurator->expects($this->once())
+            ->method('configureContext')
+            ->with($this->identicalTo($context));
+
+        $this->registry->configureContext($context);
     }
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Functional;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
+use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
@@ -27,7 +28,8 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $form    = $this->getTestForm();
+        $context->getDataResolver()->setOptional(['form']);
+        $form = $this->getTestForm();
         $context->set('form', new FormAccessor($form));
 
         // revert TWIG form renderer to Symfony's default theme
@@ -51,7 +53,8 @@ class RendererTest extends LayoutTestCase
         }
 
         $context = new LayoutContext();
-        $form    = $this->getTestForm();
+        $context->getDataResolver()->setOptional(['form']);
+        $form = $this->getTestForm();
         $context->set('form', new FormAccessor($form));
 
         $result   = $this->getCoreBlocksTestLayout($context)->setRenderer('php')->render();
@@ -100,6 +103,25 @@ class RendererTest extends LayoutTestCase
             // swap 'general' and 'additional' groups to check that a layout update
             // can be applied for items added by a block type
             ->move('form:group_general', null, 'form:group_additional')
+            // test 'visible' option
+            ->add('invisible_container', 'root', 'head', ['visible' => false])
+            ->add('invisible_child', 'invisible_container', 'meta', ['charset' => 'invisible'])
+            // test 'visible' option when its value is an expression
+            ->add(
+                'invisible_by_expr_raw_container',
+                'root',
+                'head',
+                ['visible' => ['@false' => null]]
+            )
+            ->add(
+                'invisible_by_expr_raw_child',
+                'invisible_by_expr_raw_container',
+                'meta',
+                ['charset' => 'invisible_by_expr_raw']
+            )
+            // test 'visible' option when its value is already assembled expression
+            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\False()])
+            ->add('invisible_by_expr_child', 'invisible_by_expr_container', 'meta', ['charset' => 'invisible_by_expr'])
             ->getLayout($context);
 
         return $layout;

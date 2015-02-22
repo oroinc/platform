@@ -80,6 +80,7 @@ class LayoutFactory implements LayoutFactoryInterface
         $blockFactory      = $this->createBlockFactory($layoutManipulator);
 
         return new LayoutBuilder(
+            $this->registry,
             $rawLayoutBuilder,
             $layoutManipulator,
             $blockFactory,

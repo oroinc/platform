@@ -15,11 +15,19 @@ class AbstractExtensionStub extends AbstractExtension
     /** @var array */
     protected $loadedLayoutUpdates;
 
-    public function __construct($loadedTypes, $loadedTypeExtensions, $loadedLayoutUpdates)
-    {
-        $this->loadedTypes          = $loadedTypes;
-        $this->loadedTypeExtensions = $loadedTypeExtensions;
-        $this->loadedLayoutUpdates  = $loadedLayoutUpdates;
+    /** @var array */
+    protected $loadedContextConfigurators;
+
+    public function __construct(
+        $loadedTypes,
+        $loadedTypeExtensions,
+        $loadedLayoutUpdates,
+        $loadedContextConfigurators
+    ) {
+        $this->loadedTypes                = $loadedTypes;
+        $this->loadedTypeExtensions       = $loadedTypeExtensions;
+        $this->loadedLayoutUpdates        = $loadedLayoutUpdates;
+        $this->loadedContextConfigurators = $loadedContextConfigurators;
     }
 
     protected function loadTypes()
@@ -35,5 +43,10 @@ class AbstractExtensionStub extends AbstractExtension
     protected function loadLayoutUpdates()
     {
         return $this->loadedLayoutUpdates;
+    }
+
+    protected function loadContextConfigurators()
+    {
+        return $this->loadedContextConfigurators;
     }
 }

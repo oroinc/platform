@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Extension;
 
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
@@ -52,23 +53,37 @@ class PreloadedExtension implements ExtensionInterface
     private $layoutUpdates;
 
     /**
+     * The layout context configurators provided by this extension
+     *
+     * @var ContextConfiguratorInterface[]
+     */
+    private $contextConfigurators;
+
+    /**
      * Creates a new preloaded extension.
      *
-     * @param array $types          BlockTypeInterface[]
-     * @param array $typeExtensions array of BlockTypeExtensionInterface[]
-     * @param array $layoutUpdates  array of LayoutUpdateInterface[]
+     * @param array $types                BlockTypeInterface[]
+     * @param array $typeExtensions       array of BlockTypeExtensionInterface[]
+     * @param array $layoutUpdates        array of LayoutUpdateInterface[]
+     * @param array $contextConfigurators ContextConfiguratorInterface[]
      *
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct(array $types, array $typeExtensions = [], array $layoutUpdates = [])
-    {
+    public function __construct(
+        array $types,
+        array $typeExtensions = [],
+        array $layoutUpdates = [],
+        array $contextConfigurators = []
+    ) {
         $this->validateTypes($types);
         $this->validateTypeExtensions($typeExtensions);
         $this->validateLayoutUpdates($layoutUpdates);
+        $this->validateContextConfigurators($contextConfigurators);
 
         $this->types          = $types;
         $this->typeExtensions = $typeExtensions;
         $this->layoutUpdates  = $layoutUpdates;
+        $this->contextConfigurators  = $contextConfigurators;
     }
 
     /**
@@ -127,6 +142,22 @@ class PreloadedExtension implements ExtensionInterface
     public function hasLayoutUpdates($id)
     {
         return !empty($this->layoutUpdates[$id]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContextConfigurators()
+    {
+        return $this->contextConfigurators;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasContextConfigurators()
+    {
+        return !empty($this->contextConfigurators);
     }
 
     /**
@@ -202,6 +233,22 @@ class PreloadedExtension implements ExtensionInterface
                         'Each item of $layoutUpdates[] array must be LayoutUpdateInterface.'
                     );
                 }
+            }
+        }
+    }
+
+    /**
+     * @param array $contextConfigurators
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    protected function validateContextConfigurators(array $contextConfigurators)
+    {
+        foreach ($contextConfigurators as $val) {
+            if (!$val instanceof ContextConfiguratorInterface) {
+                throw new Exception\InvalidArgumentException(
+                    'Each item of $contextConfigurators array must be ContextConfiguratorInterface.'
+                );
             }
         }
     }

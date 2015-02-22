@@ -27,7 +27,8 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
                         '_container_id'
                     ],
                     'cache_key'           => '_container_id_container',
-                    'translation_domain'  => 'messages'
+                    'translation_domain'  => 'messages',
+                    'visible'             => true
                 ]
             ],
             $view,
@@ -63,6 +64,7 @@ class ContainerTypeTest extends BaseBlockTypeTestCase
                     ],
                     'cache_key'           => '_container_id_container',
                     'translation_domain'  => 'test_translation_domain',
+                    'visible'             => true,
                     'attr'                => ['test_attr' => 'test_attr_val'],
                     'label'               => 'Test Label',
                     'label_attr'          => ['test_label_attr' => 'test_label_attr_val']

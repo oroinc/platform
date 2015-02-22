@@ -52,21 +52,31 @@ class DependencyInjectionExtension implements ExtensionInterface
     private $layoutUpdateServiceIds;
 
     /**
+     * The context configurator services registered in DI container
+     *
+     * @var string[]
+     */
+    private $contextConfiguratorServiceIds;
+
+    /**
      * @param ContainerInterface $container
-     * @param array              $typeServiceIds          string[]
+     * @param string[]           $typeServiceIds
      * @param array              $typeExtensionServiceIds array of string[]
      * @param array              $layoutUpdateServiceIds  array of string[]
+     * @param string[]           $contextConfiguratorServiceIds
      */
     public function __construct(
         ContainerInterface $container,
         array $typeServiceIds,
         array $typeExtensionServiceIds,
-        array $layoutUpdateServiceIds
+        array $layoutUpdateServiceIds,
+        array $contextConfiguratorServiceIds
     ) {
-        $this->container               = $container;
-        $this->typeServiceIds          = $typeServiceIds;
-        $this->typeExtensionServiceIds = $typeExtensionServiceIds;
-        $this->layoutUpdateServiceIds  = $layoutUpdateServiceIds;
+        $this->container                     = $container;
+        $this->typeServiceIds                = $typeServiceIds;
+        $this->typeExtensionServiceIds       = $typeExtensionServiceIds;
+        $this->layoutUpdateServiceIds        = $layoutUpdateServiceIds;
+        $this->contextConfiguratorServiceIds = $contextConfiguratorServiceIds;
     }
 
     /**
@@ -151,5 +161,27 @@ class DependencyInjectionExtension implements ExtensionInterface
     public function hasLayoutUpdates($id)
     {
         return isset($this->layoutUpdateServiceIds[$id]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContextConfigurators()
+    {
+        $configurators = [];
+
+        foreach ($this->contextConfiguratorServiceIds as $serviceId) {
+            $configurators[] = $this->container->get($serviceId);
+        }
+
+        return $configurators;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasContextConfigurators()
+    {
+        return !empty($this->contextConfiguratorServiceIds);
     }
 }
