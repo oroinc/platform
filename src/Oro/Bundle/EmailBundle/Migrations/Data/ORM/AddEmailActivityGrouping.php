@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
@@ -32,17 +31,6 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
      */
     public function load(ObjectManager $manager)
     {
-//        $query = <<<SQL
-//UPDATE oro_email
-//   SET thread_id = x_thread_id
-// WHERE thread_id IS NULL
-//   AND x_thread_id IS NOT NULL
-//SQL;
-//
-//        /** @var Connection $connection */
-//        $connection = $manager->getConnection();
-//        $connection->executeUpdate($query);
-
         $criteria = new Criteria();
         $criteria->where($criteria->expr()->neq('xThreadId', null));
         /** @var QueryBuilder $threadQueryBuilder */
@@ -67,11 +55,9 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
             $queryBuilder->setFirstResult(0);
             $emails = $queryBuilder->getQuery()->execute();
             if (count($emails)) {
+                $newThread = new EmailThread();
                 foreach ($emails as $key => $email) {
                     /** @var Email $email */
-                    $newThread = new EmailThread();
-//                    $newThread->setSubject($email->getSubject());
-//                    $newThread->setSentAt($email->getSentAt());
                     $email->setThread($newThread);
                     if ($key == 0) {
                         $email->setHead(true);

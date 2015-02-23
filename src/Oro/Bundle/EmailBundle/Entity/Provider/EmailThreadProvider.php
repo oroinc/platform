@@ -34,24 +34,18 @@ class EmailThreadProvider
         }
 
         // search among xThreadId
-//        foreach ($emailReferences as $email) {
-//            /** @var Email $email */
-//            if ($email->getXThreadId()) {
-//                return $email->getThread();
-//            }
-//        }
-//        $threadId = $entity->getThreadId();
-//        if (!$threadId && $entity->getXThreadId()) {
-//            $threadId = $thread->getId();
-////            $threadId = $entity->getXThreadId();
-//        }
+        foreach ($emailReferences as $email) {
+            /** @var Email $email */
+            if ($email->getXThreadId() && $email->getThread()) {
+                return $email->getThread();
+            }
+        }
 
         // generate new thread if need
         if (count($emailReferences) > 0) {
             $thread = new EmailThread();
-//            $thread->setSubject($entity->getSubject());
-//            $thread->setSentAt($entity->getSentAt());
         }
+
         return $thread;
     }
 
@@ -118,9 +112,6 @@ class EmailThreadProvider
      */
     public function getThreadEmails(EntityManager $entityManager, Email $entity)
     {
-//        $threadId = $entity->getThreadId();
-//        if ($threadId) {
-        $result = [];
         $thread = $entity->getThread();
         if ($thread) {
             /** @var QueryBuilder $queryBuilder */
@@ -136,12 +127,4 @@ class EmailThreadProvider
 
         return $result;
     }
-
-//    /**
-//     * @return string
-//     */
-//    protected function generateThreadId()
-//    {
-//        return md5(getmypid() . '.' . time() . '.' . uniqid(mt_rand(), true));
-//    }
 }
