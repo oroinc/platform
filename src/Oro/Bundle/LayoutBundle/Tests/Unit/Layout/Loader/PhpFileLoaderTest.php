@@ -7,11 +7,10 @@ use Symfony\Component\Filesystem\Filesystem;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader;
 use Oro\Bundle\LayoutBundle\Layout\Loader\RouteFileResource;
-use Oro\Component\Layout\Tests\Unit\DeferredLayoutManipulatorTestCase;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
-class PhpFileLoaderTest extends DeferredLayoutManipulatorTestCase
+class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider supportsDataProvider
