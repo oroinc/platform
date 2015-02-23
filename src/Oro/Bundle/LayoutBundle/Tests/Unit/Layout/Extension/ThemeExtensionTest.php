@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
-use Oro\Bundle\LayoutBundle\Layout\Loader\FileLoaderInterface;
+use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 
 use Symfony\Component\HttpKernel\Tests\Logger;
 
@@ -16,10 +16,10 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ThemeManager */
     protected $themeManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FileLoaderInterface */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
     protected $phpLoader;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FileLoaderInterface */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|LoaderInterface */
     protected $yamlLoader;
 
     /** @var Logger */

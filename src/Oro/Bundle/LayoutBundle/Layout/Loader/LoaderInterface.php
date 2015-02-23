@@ -4,19 +4,19 @@ namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
 use Oro\Component\Layout\LayoutUpdateInterface;
 
-interface FileLoaderInterface
+interface LoaderInterface
 {
     /**
-     * @param string $resource
+     * @param FileResource $resource
      *
      * @return bool
      */
-    public function supports($resource);
+    public function supports(FileResource $resource);
 
     /**
-     * @param string $resource
+     * @param FileResource $resource
      *
      * @return LayoutUpdateInterface
      */
-    public function load($resource);
+    public function load(FileResource $resource);
 }

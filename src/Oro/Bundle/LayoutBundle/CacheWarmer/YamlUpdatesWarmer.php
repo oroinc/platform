@@ -29,7 +29,7 @@ class YamlUpdatesWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $iterator = new \RecursiveArrayIterator($this->resources);
+        /*$iterator = new \RecursiveArrayIterator($this->resources);
 
         foreach (new \RecursiveIteratorIterator($iterator) as $resource) {
             if (!$this->loader->supports($resource)) {
@@ -41,7 +41,7 @@ class YamlUpdatesWarmer implements CacheWarmerInterface
             } catch (\Exception $e) {
                 // problem during compilation, give up
             }
-        }
+        }*/
     }
 
     /**

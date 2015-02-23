@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
-use Oro\Component\Layout\CallbackLayoutUpdate;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator;
 
 /**
  * Evaluates given PHP file resource, context of the file will consist with variables
@@ -18,25 +18,29 @@ use Oro\Component\Layout\LayoutManipulatorInterface;
  *
  * @see src/Oro/Bundle/LayoutBundle/Tests/Unit/Stubs/Updates/layout_update.php
  */
-class PhpFileLoader implements FileLoaderInterface
+class PhpFileLoader extends AbstractGeneratorLoader
 {
     /**
      * {@inheritdoc}
      */
-    public function load($resource)
+    public function supports(FileResource $resource)
     {
-        return new CallbackLayoutUpdate(
-            function (LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item) use ($resource) {
-                include $resource;
-            }
-        );
+        return is_string($resource->getFilename()) && 'php' === pathinfo($resource->getFilename(), PATHINFO_EXTENSION);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function supports($resource)
+    protected function getGenerator()
     {
-        return is_string($resource) && 'php' === pathinfo($resource, PATHINFO_EXTENSION);
+        return new PhpLayoutUpdateGenerator();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function loadResourceGeneratorData(FileResource $resource)
+    {
+        return file_get_contents($resource->getFilename());
     }
 }

@@ -8,11 +8,15 @@ use Psr\Log\LoggerAwareInterface;
 
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Component\Layout\Extension\AbstractExtension;
-use Oro\Bundle\LayoutBundle\Layout\Loader\FileLoaderInterface;
+use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
+use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
+use Oro\Bundle\LayoutBundle\Layout\Loader\RouteFileResource;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    const ROUTE_CONTEXT_PARAM = 'routeName';
 
     /** @var array */
     protected $resources;
@@ -20,28 +24,20 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
     /** @var ThemeManager */
     protected $manager;
 
-    /** @var FileLoaderInterface[] */
-    protected $loaders = [];
+    /** @var LoaderInterface */
+    private $loader;
 
     /**
-     * @param array                 $resources
-     * @param ThemeManager          $manager
-     * @param FileLoaderInterface[] $loaders
+     * @param array           $resources
+     * @param ThemeManager    $manager
+     * @param LoaderInterface $loader
      */
-    public function __construct(array $resources, ThemeManager $manager, $loaders = [])
+    public function __construct(array $resources, ThemeManager $manager, LoaderInterface $loader)
     {
         $this->resources = $resources;
         $this->manager   = $manager;
-        $this->loaders   = $loaders;
+        $this->loader    = $loader;
         $this->setLogger(new NullLogger());
-    }
-
-    /**
-     * @param FileLoaderInterface $loader
-     */
-    public function addLoader(FileLoaderInterface $loader)
-    {
-        $this->loaders[] = $loader;
     }
 
     /**
@@ -49,23 +45,25 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
      */
     protected function loadLayoutUpdates()
     {
-        $updates = $skipped = [];
-        $theme   = $this->manager->getTheme();
+        $updates   = $skipped = [];
+        $theme     = $this->manager->getTheme();
+        $directory = $theme->getDirectory();
 
-        $resources = isset($this->resources[$theme->getDirectory()]) ? $this->resources[$theme->getDirectory()] : [];
-        while ($resource = array_pop($resources)) {
-            $found = false;
-            foreach ($this->loaders as $loader) {
-                if ($loader->supports($resource)) {
-                    $updates[] = $loader->load($resource);
+        $themeResources = isset($this->resources[$directory]) ? $this->resources[$directory] : [];
+        while ($resources = array_pop($themeResources)) {
+            // work with global resources in the same way as with route related
+            $resources = is_array($resources) ? $resources : [$resources];
 
-                    $found = true;
-                    break;
+            foreach ($resources as $routeName => $resource) {
+                $resource = is_string($routeName)
+                    ? new RouteFileResource($resource, $routeName)
+                    : new FileResource($resource);
+
+                if ($this->loader->supports($resource)) {
+                    $updates[] = $this->loader->load($resource);
+                } else {
+                    $skipped[] = $resource;
                 }
-            }
-
-            if (!$found) {
-                $skipped[] = $resource;
             }
         }
 
@@ -75,9 +73,9 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
     }
 
     /**
-     * @param string $resource
+     * @param FileResource $resource
      */
-    protected function logUnknownResource($resource)
+    protected function logUnknownResource(FileResource $resource)
     {
         $this->logger->notice(sprintf('Skipping resource "%s" because loader for it not found', $resource));
     }
