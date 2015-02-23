@@ -280,7 +280,8 @@ define([
                 parser.href = pathDesc.url;
                 pathname = parser.pathname;
                 query = parser.search.substr(1);
-                pathDesc.url = pathname + (query && ('?' + query));
+                // IE removes starting slash
+                pathDesc.url = (pathname[0] == '/' ? '' : '/') + pathname + (query && ('?' + query));
             }
             if (options.fullRedirect) {
                 query = utils.queryParams.parse(query);

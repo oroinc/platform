@@ -22,7 +22,7 @@ define(function (require) {
          * @param options {Object}
          */
         initialize: function (options) {
-            this.template = $('#emailtemplate-chooser-template').html();
+            this.template = _.template($('#emailtemplate-chooser-template').html());
             this.target = options.target;
 
             this.listenTo(this.collection, 'reset', this.render);
@@ -48,7 +48,7 @@ define(function (require) {
             $(this.target).val('').trigger('change');
             $(this.target).find('option[value!=""]').remove();
             if (this.collection.models.length > 0) {
-                $(this.target).append(_.template(this.template, {entities: this.collection.models}));
+                $(this.target).append(this.template({entities: this.collection.models}));
             }
         }
     });

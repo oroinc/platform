@@ -55,12 +55,12 @@ class Tags extends AbstractPageFilteredGrid
      */
     public function edit()
     {
-        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $action->click();
         $action->click();
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Edit']")->click();
+        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $tag = new Tag($this->test);
@@ -70,12 +70,12 @@ class Tags extends AbstractPageFilteredGrid
 
     public function delete()
     {
-        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $action->click();
         $action->click();
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Delete']")->click();
+        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
         $this->waitForAjax();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitPageToLoad();
@@ -87,8 +87,8 @@ class Tags extends AbstractPageFilteredGrid
     public function checkContextMenu($tagName, $contextName)
     {
         $this->filterBy('Tag', $tagName);
-        $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
         $this->waitForAjax();
-        $this->assertElementNotPresent("//td[@class='action-cell']//a[@title= '{$contextName}']");
+        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
     }
 }

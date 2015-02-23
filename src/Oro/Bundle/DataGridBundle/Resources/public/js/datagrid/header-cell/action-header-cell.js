@@ -34,7 +34,6 @@ define([
 
         initialize: function (options) {
             var datagrid;
-            Backgrid.requireOptions(options, ["column", "collection"]);
 
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {

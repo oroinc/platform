@@ -609,6 +609,7 @@ define(function (require) {
             if (widgetContent.length === 0) {
                 throw new Error("Invalid server response: " + content);
             }
+            this.disposePageComponents();
             this.setElement(widgetContent);
             this._show();
         },
