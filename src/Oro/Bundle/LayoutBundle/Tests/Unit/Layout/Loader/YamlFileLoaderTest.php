@@ -118,7 +118,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
                 function ($className, $data, ConditionCollection $collection) {
                     $this->assertNotEmpty($data);
                     $this->assertSame(
-                        ['oro_layout' => ['actions' => [['@add' => ['id' => 'root', 'parent' => null]]]]],
+                        ['actions' => [['@add' => ['id' => 'root', 'parent' => null]]]],
                         $data
                     );
 

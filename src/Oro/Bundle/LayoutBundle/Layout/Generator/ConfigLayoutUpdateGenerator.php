@@ -7,7 +7,7 @@ use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
-    const NODE_ACTIONS   = 'actions';
+    const NODE_ACTIONS = 'actions';
     const NODE_CONDITION = 'condition';
 
     /** @var \ReflectionClass */
@@ -19,16 +19,24 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     protected function doGenerateBody($data)
     {
         $body = [];
-        foreach ($data as $actionDefinition) {
-            $actionName = key($actionDefinition);
-            $actionName = substr($actionName, 1);
-            $parameters = is_array($actionDefinition[$actionName]) ? $actionDefinition[$actionName] : [];
+        foreach ($data[self::NODE_ACTIONS] as $actionDefinition) {
+            $call           = [];
+            $fullActionName = key($actionDefinition);
+            $actionName     = substr($fullActionName, 1);
+            $parameters     = isset($actionDefinition[$fullActionName]) && is_array($actionDefinition[$fullActionName])
+                ? $actionDefinition[$fullActionName] : [];
 
-            $body[] = sprintf('$%s->%s(', self::PARAM_LAYOUT_MANIPULATOR, $actionName);
-            foreach ($parameters as $value) {
-                $body[] = var_export($value, true) . ',';
-            }
-            $body[] = ');';
+            array_walk(
+                $parameters,
+                function (&$param) {
+                    $param = var_export($param, true);
+                }
+            );
+            $call[] = sprintf('$%s->%s(', self::PARAM_LAYOUT_MANIPULATOR, $actionName);
+            $call[] = implode(', ', $parameters);
+            $call[] = ');';
+
+            $body[] = implode(' ', $call);
         }
 
         return implode("\n", $body);

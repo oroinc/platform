@@ -37,7 +37,7 @@ class ConfigExpressionCondition implements ConditionInterface
             PhpParameter::create('assembler')
                 ->setType('\Oro\Component\ConfigExpression\ExpressionAssembler')
         );
-        $setAssemblerMethod->setBody($writer->write('$this->expressionAssembler = $assembler;'));
+        $setAssemblerMethod->setBody($writer->write('$this->expressionAssembler = $assembler;')->getContent());
         $class->setMethod($setAssemblerMethod);
         $writer->reset();
 
@@ -68,6 +68,7 @@ CONTENT;
                     $method->getBody()
                 )
             )
+            ->getContent()
         );
     }
 }

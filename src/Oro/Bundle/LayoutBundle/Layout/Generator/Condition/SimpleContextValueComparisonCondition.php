@@ -55,6 +55,7 @@ CONTENT;
                     $method->getBody()
                 )
             )
+                ->getContent()
         );
     }
 }

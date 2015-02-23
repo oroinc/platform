@@ -23,14 +23,14 @@ class SimpleContextValueComparisonConditionTest extends \PHPUnit_Framework_TestC
     public function testVisit($oldMethodBody, $value, $condition, $expectedMethodBody)
     {
         $condition = new SimpleContextValueComparisonCondition('valueToCompare', $condition, $value);
-        $visitor   = $this->setUpVisitor($oldMethodBody);
+        $visitor   = $this->setUpVisitContext($oldMethodBody);
 
         $condition->visit($visitor);
 
         /** @var PhpMethod[] $methods */
         $methods = $visitor->getClass()->getMethods();
         $method  = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
-        $this->assertSame($expectedMethodBody, $method->getBody()->getContent());
+        $this->assertSame($expectedMethodBody, $method->getBody());
     }
 
     /**
@@ -70,7 +70,7 @@ CONTENT
      *
      * @return VisitContext
      */
-    protected function setUpVisitor($body)
+    protected function setUpVisitContext($body)
     {
         $phpClass = PhpClass::create(uniqid('LayoutUpdateClass'));
 

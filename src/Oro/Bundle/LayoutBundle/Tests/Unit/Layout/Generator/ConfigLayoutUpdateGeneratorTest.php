@@ -57,6 +57,90 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                 ],
                 '$exception' => 'Invalid action at position: 0, name: @addSuperPuper'
             ],
+            'action name should start from @' => [
+                '$data'      => [
+                    'actions' => [
+                        ['add' => null]
+                    ]
+                ],
+                '$exception' => 'Invalid action at position: 0, name: add'
+            ],
+            'known action proceed' => [
+                '$data' => [
+                    'actions' => [
+                        ['@add' => null]
+                    ]
+                ],
+            ]
         ];
+    }
+
+    // @codingStandardsIgnoreStart
+    public function testGenerate()
+    {
+        $this->assertSame(
+<<<CLASS
+<?php
+
+class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
+{
+    public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
+    {
+        \$layoutManipulator->add( 'root', NULL, 'root' );
+        \$layoutManipulator->add( 'header', 'root', 'header' );
+        \$layoutManipulator->addAlias( 'header', 'header_alias' );
+    }
+}
+CLASS
+            ,
+            $this->generator->generate(
+                'testClassName',
+                [
+                    'actions' => [
+                        [
+                            '@add' => [
+                                'id'        => 'root',
+                                'parent'    => null,
+                                'blockType' => 'root'
+                            ]
+                        ],
+                        [
+                            '@add' => [
+                                'id'        => 'header',
+                                'parent'    => 'root',
+                                'blockType' => 'header'
+                            ]
+                        ],
+                        [
+                            '@addAlias' => [
+                                'alias' => 'header',
+                                'id'    => 'header_alias',
+                            ]
+                        ]
+                    ]
+                ],
+                new ConditionCollection()
+            )
+        );
+    }
+    // @codingStandardsIgnoreEnd
+
+    public function testShouldProcessCondition()
+    {
+        $collection = new ConditionCollection();
+        $this->generator->generate(
+            'testClassName',
+            [
+                'actions'   => [],
+                'condition' => [['@true' => null]]
+            ],
+            $collection
+        );
+
+        $this->assertNotEmpty($collection);
+        $this->assertContainsOnlyInstancesOf(
+            'Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition',
+            $collection
+        );
     }
 }

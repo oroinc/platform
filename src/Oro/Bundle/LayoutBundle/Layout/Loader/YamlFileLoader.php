@@ -19,6 +19,8 @@ class YamlFileLoader extends AbstractGeneratorLoader
      */
     protected function loadResourceGeneratorData(FileResource $resource)
     {
-        return Yaml::parse($resource->getFilename());
+        $data = Yaml::parse($resource->getFilename());
+
+        return isset($data['oro_layout']) ? $data['oro_layout'] : [];
     }
 }
