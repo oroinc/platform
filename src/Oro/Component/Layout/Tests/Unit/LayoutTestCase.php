@@ -71,7 +71,6 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
 
         if ($removeAuxiliaryVariables) {
             unset($result['vars']['translation_domain']);
-            unset($result['vars']['visible']);
             unset($result['vars']['label']);
             unset($result['vars']['block_type']);
             unset($result['vars']['unique_block_prefix']);

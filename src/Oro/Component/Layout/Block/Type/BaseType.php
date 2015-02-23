@@ -16,7 +16,7 @@ class BaseType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(['attr', 'label', 'label_attr', 'translation_domain', 'visible']);
+        $resolver->setOptional(['attr', 'label', 'label_attr', 'translation_domain']);
         $resolver->setAllowedTypes(
             [
                 'attr'       => 'array',
@@ -48,9 +48,6 @@ class BaseType extends AbstractType
 
         // add the translation domain
         $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
-
-        // add 'visible' option
-        $view->vars['visible'] = isset($options['visible']) ? $options['visible'] : true;
 
         // add core variables to the block view, like id, block type and variables required for rendering engine
         $id                                = $block->getId();

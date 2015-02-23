@@ -15,6 +15,9 @@ use Oro\Component\Layout\ContextInterface;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass;
 
+/**
+ * Allows to use expressions (see ConfigExpression component) in block type options and attributes.
+ */
 class ConfigExpressionExtension extends AbstractBlockTypeExtension implements ContextConfiguratorInterface
 {
     /** @var AssemblerInterface */

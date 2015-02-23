@@ -61,6 +61,11 @@ services:
         calls:
             - [addConfigurationPass, [@oro_layout.expression.pass.property_path]]
 
+    oro_layout.block_type_extension.visible:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\VisibleExtension
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
     oro_layout.block_type_extension.config_expression:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionExtension
         arguments:

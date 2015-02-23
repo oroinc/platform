@@ -112,7 +112,6 @@ class BlockFactoryTest extends LayoutTestCase
                     'id'                  => 'rootId',
                     'block_type'          => 'root',
                     'translation_domain'  => 'messages',
-                    'visible'             => true,
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
                         BaseType::NAME,
@@ -144,7 +143,6 @@ class BlockFactoryTest extends LayoutTestCase
                     'id'                  => 'rootId',
                     'block_type'          => 'root',
                     'translation_domain'  => 'messages',
-                    'visible'             => true,
                     'unique_block_prefix' => '_rootId',
                     'block_prefixes'      => [
                         BaseType::NAME,
@@ -160,7 +158,6 @@ class BlockFactoryTest extends LayoutTestCase
                             'id'                  => 'headerId',
                             'block_type'          => 'header',
                             'translation_domain'  => 'messages',
-                            'visible'             => true,
                             'unique_block_prefix' => '_headerId',
                             'block_prefixes'      => [
                                 BaseType::NAME,
@@ -176,7 +173,6 @@ class BlockFactoryTest extends LayoutTestCase
                                     'id'                  => 'logoId',
                                     'block_type'          => 'logo',
                                     'translation_domain'  => 'messages',
-                                    'visible'             => true,
                                     'unique_block_prefix' => '_logoId',
                                     'block_prefixes'      => [
                                         BaseType::NAME,
