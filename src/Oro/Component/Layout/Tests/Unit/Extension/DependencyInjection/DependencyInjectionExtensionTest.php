@@ -19,7 +19,8 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
             $this->container,
             ['test' => 'block_type_service'],
             ['test' => ['block_type_extension_service']],
-            ['test' => ['layout_update_service']]
+            ['test' => ['layout_update_service']],
+            ['context_configurator_service']
         );
     }
 
@@ -122,5 +123,38 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetUnknownBlockLayoutUpdates()
     {
         $this->assertSame([], $this->extension->getLayoutUpdates('unknown'));
+    }
+
+    public function testHasContextConfigurators()
+    {
+        $this->assertTrue($this->extension->hasContextConfigurators());
+    }
+
+    public function testGetContextConfigurators()
+    {
+        $configurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('context_configurator_service')
+            ->will($this->returnValue($configurator));
+
+        $result = $this->extension->getContextConfigurators();
+        $this->assertCount(1, $result);
+        $this->assertSame($configurator, $result[0]);
+    }
+
+    public function testHasContextConfiguratorsWhenNoAnyRegistered()
+    {
+        $extension = new DependencyInjectionExtension($this->container, [], [], [], []);
+
+        $this->assertFalse($extension->hasContextConfigurators());
+    }
+
+    public function testGetContextConfiguratorsWhenNoAnyRegistered()
+    {
+        $extension = new DependencyInjectionExtension($this->container, [], [], [], []);
+
+        $this->assertSame([], $extension->getContextConfigurators());
     }
 }

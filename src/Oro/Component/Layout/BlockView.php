@@ -10,6 +10,15 @@ use Symfony\Component\Form\FormView;
 class BlockView extends FormView
 {
     /**
+     * @param BlockView $parent
+     */
+    public function __construct(BlockView $parent = null)
+    {
+        parent::__construct($parent);
+        unset($this->vars['value']);
+    }
+
+    /**
      * Returns a child from any level of a hierarchy by id (implements \ArrayAccess)
      *
      * @param string $id The child id

@@ -48,6 +48,36 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
+    public function getTypeExtensions($name)
+    {
+        $extensions = [];
+        foreach ($this->getExtensions() as $extension) {
+            if ($extension->hasTypeExtensions($name)) {
+                $extensions = array_merge($extensions, $extension->getTypeExtensions($name));
+            }
+        }
+
+        return $extensions;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContextConfigurators()
+    {
+        $configurators = [];
+        foreach ($this->getExtensions() as $extension) {
+            if ($extension->hasContextConfigurators()) {
+                $configurators = array_merge($configurators, $extension->getContextConfigurators());
+            }
+        }
+
+        return $configurators;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions($name, OptionsResolverInterface $resolver)
     {
         foreach ($this->getExtensions() as $extension) {
@@ -115,6 +145,21 @@ class LayoutRegistry implements LayoutRegistryInterface
                 $layoutUpdates = $extension->getLayoutUpdates($id);
                 foreach ($layoutUpdates as $layoutUpdate) {
                     $layoutUpdate->updateLayout($layoutManipulator, $item);
+                }
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureContext(ContextInterface $context)
+    {
+        foreach ($this->getExtensions() as $extension) {
+            if ($extension->hasContextConfigurators()) {
+                $configurators = $extension->getContextConfigurators();
+                foreach ($configurators as $configurator) {
+                    $configurator->configureContext($context);
                 }
             }
         }

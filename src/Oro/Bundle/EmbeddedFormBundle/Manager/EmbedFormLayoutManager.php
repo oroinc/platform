@@ -56,6 +56,7 @@ class EmbedFormLayoutManager
         if ($typeInstance instanceof LayoutUpdateInterface) {
             $typeInstance->updateLayout($layoutBuilder);
         }
+        $layoutContext->getDataResolver()->setOptional(['embedded_form']);
         $layoutContext->set('embedded_form', $form);
 
         $layout = $layoutBuilder->getLayout($layoutContext);

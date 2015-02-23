@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Extension;
 
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
@@ -67,4 +68,18 @@ interface ExtensionInterface
      * @return bool true, if the given layout item has additional layout updates; otherwise, false
      */
     public function hasLayoutUpdates($id);
+
+    /**
+     * Returns layout context configurators.
+     *
+     * @return ContextConfiguratorInterface[]
+     */
+    public function getContextConfigurators();
+
+    /**
+     * Checks whether this extension provides layout context configurators.
+     *
+     * @return bool true, if this extension has layout context configurators; otherwise, false
+     */
+    public function hasContextConfigurators();
 }

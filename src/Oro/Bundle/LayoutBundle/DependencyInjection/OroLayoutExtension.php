@@ -35,6 +35,7 @@ class OroLayoutExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('block_types.yml');
+        $loader->load('config_expressions.yml');
 
         $container->setParameter(
             'oro_layout.templating.default',

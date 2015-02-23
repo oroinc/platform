@@ -68,13 +68,44 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $extension->getLayoutUpdates('unknown'));
     }
 
+    public function testHasContextConfigurators()
+    {
+        $extension = $this->getAbstractExtension();
+        $this->assertTrue($extension->hasContextConfigurators());
+    }
+
+    public function testGetContextConfigurators()
+    {
+        $extension     = $this->getAbstractExtension();
+        $configurators = $extension->getContextConfigurators();
+        $this->assertCount(1, $configurators);
+        $this->assertInstanceOf(
+            'Oro\Component\Layout\ContextConfiguratorInterface',
+            $configurators[0]
+        );
+    }
+
+    public function testHasContextConfiguratorsWhenNoAnyRegistered()
+    {
+        $extension = new AbstractExtensionStub([], [], [], []);
+
+        $this->assertFalse($extension->hasContextConfigurators());
+    }
+
+    public function testGetContextConfiguratorsWhenNoAnyRegistered()
+    {
+        $extension = new AbstractExtensionStub([], [], [], []);
+
+        $this->assertSame([], $extension->getContextConfigurators());
+    }
+
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\BlockTypeInterface", "integer" given.
      */
     public function testLoadInvalidBlockTypes()
     {
-        $extension = new AbstractExtensionStub([123], [], []);
+        $extension = new AbstractExtensionStub([123], [], [], []);
         $extension->hasType('test');
     }
 
@@ -86,7 +117,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testLoadInvalidBlockTypeExtensions()
     {
-        $extension = new AbstractExtensionStub([], [123], []);
+        $extension = new AbstractExtensionStub([], [123], [], []);
         $extension->hasTypeExtensions('test');
     }
 
@@ -98,7 +129,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testLoadInvalidLayoutUpdates()
     {
-        $extension = new AbstractExtensionStub([], [], ['test' => [123]]);
+        $extension = new AbstractExtensionStub([], [], ['test' => [123]], []);
         $extension->hasLayoutUpdates('test');
     }
 
@@ -113,7 +144,8 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [
                 [$this->getMock('Oro\Component\Layout\LayoutUpdateInterface')]
-            ]
+            ],
+            []
         );
         $extension->hasLayoutUpdates('test');
     }
@@ -131,9 +163,22 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [
                 'test' => $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
-            ]
+            ],
+            []
         );
         $extension->hasLayoutUpdates('test');
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\ContextConfiguratorInterface", "integer" given.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testLoadInvalidContextConfigurators()
+    {
+        $extension = new AbstractExtensionStub([], [], [], [123]);
+        $extension->hasContextConfigurators();
     }
 
     protected function getAbstractExtension()
@@ -155,7 +200,8 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
                 'test' => [
                     $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
                 ]
-            ]
+            ],
+            [$this->getMock('Oro\Component\Layout\ContextConfiguratorInterface')]
         );
     }
 }

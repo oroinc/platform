@@ -7,7 +7,8 @@
     "require": {
         "php": ">=5.4.9",
         "symfony/symfony": "2.3.*",
-        "oro/layout": "dev-master"
+        "oro/layout": "dev-master",
+        "oro/config-expression": "dev-master"
     },
     "autoload": {
         "psr-0": { "Oro\\Bundle\\LayoutBundle": "" }
