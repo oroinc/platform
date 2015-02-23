@@ -16,8 +16,6 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    const ROUTE_CONTEXT_PARAM = 'routeName';
-
     /** @var array */
     protected $resources;
 
@@ -49,6 +47,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
         $theme     = $this->manager->getTheme();
         $directory = $theme->getDirectory();
 
+        // TODO refactor copy/paste, possible solve with iterator
         $themeResources = isset($this->resources[$directory]) ? $this->resources[$directory] : [];
         foreach ($themeResources as $routeName => $resources) {
             // work with global resources in the same way as with route related
@@ -60,6 +59,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
                     : new FileResource($resource);
 
                 if ($this->loader->supports($resource)) {
+                    // TODO set assembler to update
                     $updates[] = $this->loader->load($resource);
                 } else {
                     $skipped[] = $resource;

@@ -5,10 +5,11 @@ namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Component\Layout\Layout;
-use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
+use Oro\Component\Layout\LayoutBuilderInterface;
 
+use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType;
 use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType;
@@ -21,14 +22,22 @@ class EmbedFormLayoutManager
     /** @var EmbeddedFormManager */
     protected $formManager;
 
+    /** @var ThemeManager */
+    protected $themeManager;
+
     /**
      * @param LayoutManager       $layoutManager
      * @param EmbeddedFormManager $formManager
+     * @param ThemeManager        $themeManager
      */
-    public function __construct(LayoutManager $layoutManager, EmbeddedFormManager $formManager)
-    {
+    public function __construct(
+        LayoutManager $layoutManager,
+        EmbeddedFormManager $formManager,
+        ThemeManager $themeManager
+    ) {
         $this->layoutManager = $layoutManager;
         $this->formManager   = $formManager;
+        $this->themeManager  = $themeManager;
     }
 
     /**
@@ -40,6 +49,8 @@ class EmbedFormLayoutManager
     public function getFormLayout(EmbeddedForm $formEntity, FormInterface $form)
     {
         $layoutContext = new LayoutContext();
+
+        // TODO discuss adding not registered blocks and passing not static options
         $layoutBuilder = $this->getLayoutBuilder($formEntity);
         $layoutBuilder->add(
             'form',
@@ -95,28 +106,12 @@ class EmbedFormLayoutManager
      */
     protected function getLayoutBuilder(EmbeddedForm $formEntity)
     {
-        $layoutBuilder = $this->layoutManager->getLayoutBuilder();
+        $this->themeManager->setActiveTheme('embedded_default');
 
-        $layoutBuilder
-            ->add('root', null, 'root')
-            ->add('head', 'root', 'head', ['title' => 'Form'])
-            ->add('meta_charset', 'head', 'meta', ['charset' => 'utf-8'])
-            ->add(
-                'meta_x_ua_compatible',
-                'head',
-                'meta',
-                ['http_equiv' => 'X-UA-Compatible', 'content' => 'IE=edge,chrome=1']
-            )
-            ->add(
-                'meta_viewport',
-                'head',
-                'meta',
-                ['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1.0']
-            )
-            ->add('base_css', 'head', 'style')
-            ->add('form_css', 'head', 'style', ['content' => $formEntity->getCss()])
-            ->add('content', 'root', 'body')
-            ->setBlockTheme('OroEmbeddedFormBundle:Layout:embed_form.html.twig');
+        $layoutBuilder = $this->layoutManager->getLayoutBuilder();
+        // TODO discuss adding root automatically
+        $layoutBuilder->add('root', null, 'root');
+        $layoutBuilder->setOption('form_css', 'content', $formEntity->getCss());
 
         return $layoutBuilder;
     }

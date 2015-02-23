@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator\Condition;
 
-use CG\Core\DefaultGeneratorStrategy;
 use CG\Generator\PhpClass;
 use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
+use CG\Core\DefaultGeneratorStrategy;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition;

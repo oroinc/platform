@@ -4,8 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Layout\Generator\Condition;
 
 use CG\Generator\PhpMethod;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
+use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
 class SimpleContextValueComparisonCondition implements ConditionInterface
 {
@@ -45,16 +45,18 @@ if ($%1\$s->getContext()->has('%2\$s') && $%1\$s->getContext()->get('%2\$s') %3\
 CONTENT;
 
         $method->setBody(
-            $visitContext->createWriter()->write(
-                sprintf(
-                    $bodyTemplate,
-                    LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
-                    $this->contextValueName,
-                    $this->condition,
-                    var_export($this->value, true),
-                    $method->getBody()
+            $visitContext
+                ->createWriter()
+                ->write(
+                    sprintf(
+                        $bodyTemplate,
+                        LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
+                        $this->contextValueName,
+                        $this->condition,
+                        var_export($this->value, true),
+                        $method->getBody()
+                    )
                 )
-            )
                 ->getContent()
         );
     }

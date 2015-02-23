@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition;
 
 abstract class AbstractGeneratorLoader implements LoaderInterface
@@ -47,6 +47,7 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
             return $this->loaded[$className];
         }
 
+        // TODO generate cache file in dev mode, but check mTime each request
         if (!class_exists($className, false)) {
             if (false === $cache = $this->getCacheFilename($name)) {
                 eval('?>' . $this->doGenerate($className, $resource));
@@ -75,7 +76,7 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
         if ($resource instanceof RouteFileResource) {
             $conditionCollection->append(
                 new SimpleContextValueComparisonCondition(
-                    ThemeExtension::ROUTE_CONTEXT_PARAM,
+                    RouteContextConfigurator::PARAM_NAME,
                     '===',
                     $resource->getRouteName()
                 )

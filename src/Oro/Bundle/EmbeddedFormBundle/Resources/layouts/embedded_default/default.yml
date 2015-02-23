@@ -1,0 +1,47 @@
+oro_layout:
+    actions:
+        #- @add:
+        #    id:        root
+        #    parent:    ~
+        #    blockType: root
+        - @add:
+            id:        head
+            parent:    root
+            blockType: head
+            options:
+                title: Form
+        - @add:
+            id:        meta_charset
+            parent:    head
+            blockType: meta
+            options:
+                charset: 'utf-8'
+        - @add:
+            id:        meta_x_ua_compatible
+            parent:    head
+            blockType: meta
+            options:
+                http_equiv: 'X-UA-Compatible'
+                content:    'IE=edge,chrome=1'
+        - @add:
+            id:        meta_viewport
+            parent:    head
+            blockType: meta
+            options:
+                name:    'viewport'
+                content: 'width=device-width, initial-scale=1.0'
+        - @add:
+            id:        base_css
+            parent:    head
+            blockType: style
+
+        - @add:
+            id:        form_css
+            parent:    head
+            blockType: style
+        - @add:
+            id:        content
+            parent:    root
+            blockType: body
+        - @setBlockTheme:
+            theme: 'OroEmbeddedFormBundle:Layout:embed_form.html.twig'

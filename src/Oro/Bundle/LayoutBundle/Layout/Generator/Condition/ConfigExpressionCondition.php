@@ -60,15 +60,16 @@ class ConfigExpressionCondition implements ConditionInterface
 CONTENT;
 
         $method->setBody(
-            $writer->write(
-                sprintf(
-                    $bodyTemplate,
-                    var_export($this->configuration, true),
-                    LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
-                    $method->getBody()
+            $writer
+                ->write(
+                    sprintf(
+                        $bodyTemplate,
+                        var_export($this->configuration, true),
+                        LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
+                        $method->getBody()
+                    )
                 )
-            )
-            ->getContent()
+                ->getContent()
         );
     }
 }
