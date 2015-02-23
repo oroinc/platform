@@ -20,7 +20,8 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
             ['test' => 'block_type_service'],
             ['test' => ['block_type_extension_service']],
             ['test' => ['layout_update_service']],
-            ['context_configurator_service']
+            ['context_configurator_service'],
+            ['test' => 'data_provider_service']
         );
     }
 
@@ -70,7 +71,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The block type "unknown" is not registered with the service container.
      */
-    public function testGetUnknownBlockType()
+    public function testGetUnknownType()
     {
         $this->extension->getType('unknown');
     }
@@ -146,15 +147,42 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testHasContextConfiguratorsWhenNoAnyRegistered()
     {
-        $extension = new DependencyInjectionExtension($this->container, [], [], [], []);
+        $extension = new DependencyInjectionExtension($this->container, [], [], [], [], []);
 
         $this->assertFalse($extension->hasContextConfigurators());
     }
 
     public function testGetContextConfiguratorsWhenNoAnyRegistered()
     {
-        $extension = new DependencyInjectionExtension($this->container, [], [], [], []);
+        $extension = new DependencyInjectionExtension($this->container, [], [], [], [], []);
 
         $this->assertSame([], $extension->getContextConfigurators());
+    }
+
+    public function testHasDataProvider()
+    {
+        $this->assertTrue($this->extension->hasDataProvider('test'));
+        $this->assertFalse($this->extension->hasDataProvider('unknown'));
+    }
+
+    public function testGetDataProvider()
+    {
+        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with('data_provider_service')
+            ->will($this->returnValue($dataProvider));
+
+        $this->assertSame($dataProvider, $this->extension->getDataProvider('test'));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The data provider "unknown" is not registered with the service container.
+     */
+    public function testGetUnknownDataProvider()
+    {
+        $this->extension->getDataProvider('unknown');
     }
 }

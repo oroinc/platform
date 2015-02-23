@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Extension;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
@@ -82,4 +83,24 @@ interface ExtensionInterface
      * @return bool true, if this extension has layout context configurators; otherwise, false
      */
     public function hasContextConfigurators();
+
+    /**
+     * Returns a data provider by name.
+     *
+     * @param string $name The name of the data provider
+     *
+     * @return DataProviderInterface
+     *
+     * @throws Exception\InvalidArgumentException if the given data provider is not supported by this extension
+     */
+    public function getDataProvider($name);
+
+    /**
+     * Checks whether the given data provider is supported.
+     *
+     * @param string $name The name of the data provider
+     *
+     * @return bool true, if the given data provider is supported by this extension; otherwise, false
+     */
+    public function hasDataProvider($name);
 }

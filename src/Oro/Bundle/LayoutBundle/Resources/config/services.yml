@@ -9,10 +9,11 @@ services:
         class: Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
             - @service_container
-            - {}
-            - {}
-            - {}
-            - {}
+            - {} # types
+            - {} # type extensions
+            - {} # layout updates
+            - {} # context configurators
+            - {} # data providers
 
     oro_layout.layout_factory_builder:
         public: false

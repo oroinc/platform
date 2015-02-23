@@ -51,7 +51,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($type));
 
         $this->assertSame($type, $this->registry->getType($name));
-        // check that the created block type is cached
+        // check that the loaded block type is cached
         $this->assertSame($type, $this->registry->getType($name));
     }
 
@@ -66,7 +66,7 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load block type "".
+     * @expectedExceptionMessage Could not load a block type "".
      */
     public function testGetTypeWithEmptyName()
     {
@@ -84,9 +84,9 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load block type "widget".
+     * @expectedExceptionMessage Could not load a block type "widget".
      */
-    public function testGetUndefinedBlockType()
+    public function testGetUndefinedType()
     {
         $this->extension->expects($this->once())
             ->method('hasType')
@@ -131,6 +131,60 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
         $result = $this->registry->getContextConfigurators();
         $this->assertCount(1, $result);
         $this->assertSame($configurator, $result[0]);
+    }
+
+    public function testFindDataProvider()
+    {
+        $name         = 'test';
+        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+
+        $this->extension->expects($this->once())
+            ->method('hasDataProvider')
+            ->with($name)
+            ->will($this->returnValue(true));
+        $this->extension->expects($this->once())
+            ->method('getDataProvider')
+            ->with($name)
+            ->will($this->returnValue($dataProvider));
+
+        $this->assertSame($dataProvider, $this->registry->findDataProvider($name));
+        // check that the loaded data provider is cached
+        $this->assertSame($dataProvider, $this->registry->findDataProvider($name));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "string", "NULL" given.
+     */
+    public function testFindDataProviderWithNullName()
+    {
+        $this->registry->findDataProvider(null);
+    }
+
+    public function testFindDataProviderWithEmptyName()
+    {
+        $this->assertNull($this->registry->findDataProvider(''));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "string", "integer" given.
+     */
+    public function testFindDataProviderWithNotStringName()
+    {
+        $this->registry->findDataProvider(1);
+    }
+
+    public function testFindUndefinedDataProvider()
+    {
+        $this->extension->expects($this->once())
+            ->method('hasDataProvider')
+            ->with('foo')
+            ->will($this->returnValue(false));
+        $this->extension->expects($this->never())
+            ->method('getDataProvider');
+
+        $this->assertNull($this->registry->findDataProvider('foo'));
     }
 
     public function testSetDefaultOptions()

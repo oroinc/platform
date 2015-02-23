@@ -17,6 +17,7 @@ class ConfigurationPass implements CompilerPassInterface
     const BLOCK_TYPE_EXTENSION_TAG_NAME = 'layout.block_type_extension';
     const LAYOUT_UPDATE_TAG_NAME = 'layout.layout_update';
     const CONTEXT_CONFIGURATOR_TAG_NAME = 'layout.context_configurator';
+    const DATA_PROVIDER_TAG_NAME = 'layout.data_provider';
 
     /**
      * {@inheritdoc}
@@ -46,6 +47,7 @@ class ConfigurationPass implements CompilerPassInterface
             $extensionDef->replaceArgument(2, $this->getBlockTypeExtensions($container));
             $extensionDef->replaceArgument(3, $this->getLayoutUpdates($container));
             $extensionDef->replaceArgument(4, $this->getContextConfigurators($container));
+            $extensionDef->replaceArgument(5, $this->getDataProviders($container));
         }
     }
 
@@ -140,5 +142,27 @@ class ConfigurationPass implements CompilerPassInterface
         }
 
         return $configurators;
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     *
+     * @return array
+     */
+    protected function getDataProviders(ContainerBuilder $container)
+    {
+        $dataProviders = [];
+        foreach ($container->findTaggedServiceIds(self::DATA_PROVIDER_TAG_NAME) as $serviceId => $tag) {
+            if (empty($tag[0]['alias'])) {
+                throw new InvalidConfigurationException(
+                    sprintf('Tag attribute "alias" is required for "%s" service.', $serviceId)
+                );
+            }
+
+            $alias                 = $tag[0]['alias'];
+            $dataProviders[$alias] = $serviceId;
+        }
+
+        return $dataProviders;
     }
 }
