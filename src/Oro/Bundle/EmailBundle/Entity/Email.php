@@ -187,15 +187,6 @@ class Email extends ExtendEmail
      */
     protected $xMessageId;
 
-//    /**
-//     * @var string
-//     *
-//     * @ORM\Column(name="thread_id_txt", type="string", length=255, nullable=true)
-//     * @Soap\ComplexType("string", nillable=true)
-//     * @JMS\Type("string")
-//     */
-//    protected $threadId;
-
     /**
      * @var EmailThread
      *
@@ -572,30 +563,6 @@ class Email extends ExtendEmail
 
         return $this;
     }
-
-//    /**
-//     * Get email thread id uses for group related messages
-//     *
-//     * @return string
-//     */
-//    public function getThreadId()
-//    {
-//        return $this->threadId;
-//    }
-//
-//    /**
-//     * Set email thread id uses for group related messages
-//     *
-//     * @param string $threadId
-//     *
-//     * @return Email
-//     */
-//    public function setThreadId($threadId)
-//    {
-//        $this->threadId = $threadId;
-//
-//        return $this;
-//    }
 
     /**
      * Get email thread id uses for group related messages
