@@ -29,11 +29,16 @@ services:
     oro_layout.loader.php_file_loader:
         class:  %oro_layout.loader.php_file_loader.class%
         public: false
+        arguments:
+            - @oro_layout.php_layout_update_generator
+            - %kernel.debug%
+            - %kernel.cache_dir%
 
     oro_layout.loader.yaml_file_loader:
         class:  %oro_layout.loader.yaml_file_loader.class%
         public: false
         arguments:
+            - @oro_layout.config_layout_update_generator
             - %kernel.debug%
             - %kernel.cache_dir%
 
@@ -57,5 +62,9 @@ services:
 
     oro_layout.config_layout_update_generator:
         class:  Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator
+        public: false
+
+    oro_layout.php_layout_update_generator:
+        class:  Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator
         public: false
 

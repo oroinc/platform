@@ -21,6 +21,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         $body = [];
         foreach ($data as $actionDefinition) {
             $actionName = key($actionDefinition);
+            $actionName = substr($actionName, 1);
             $parameters = is_array($actionDefinition[$actionName]) ? $actionDefinition[$actionName] : [];
 
             $body[] = sprintf('$%s->%s(', self::PARAM_LAYOUT_MANIPULATOR, $actionName);
@@ -40,19 +41,21 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      */
     protected function validate($data)
     {
-        if (!is_array($data) && isset($data[self::NODE_ACTIONS]) && is_array($data[self::NODE_ACTIONS])) {
+        if (!(is_array($data) && isset($data[self::NODE_ACTIONS]) && is_array($data[self::NODE_ACTIONS]))) {
             throw new \LogicException(sprintf('Invalid data given, expected array with key "%s"', self::NODE_ACTIONS));
         }
 
         foreach ($data[self::NODE_ACTIONS] as $k => $actionDefinition) {
-            if (!(is_array($actionDefinition) && $this->isKnownAction(key($actionDefinition)))) {
-                throw new \LogicException(sprintf('Invalid action definition at position: %d', $k));
+            $actionName = key($actionDefinition);
+
+            if (!(is_array($actionDefinition) && $this->isKnownAction($actionName))) {
+                throw new \LogicException(sprintf('Invalid action at position: %d, name: %s', $k, $actionName));
             }
         }
     }
 
     /**
-     * Appends given condition expression from "condition" node to condition collection
+     * Appends given condition expression from "condition" node to condition collection.
      *
      * {@inheritdoc}
      */
@@ -76,11 +79,11 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             return false;
         }
 
-        $actionName = substr($actionName, 1);
-
         if (null === $this->ref) {
             $this->ref = new \ReflectionClass('Oro\Component\Layout\LayoutManipulatorInterface');
         }
+
+        $actionName = substr($actionName, 1);
 
         return $this->ref->hasMethod($actionName);
     }

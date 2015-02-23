@@ -8,7 +8,7 @@ use CG\Generator\Writer;
 class VisitContext
 {
     /** @var PhpClass */
-    private $class;
+    protected $class;
 
     public function __construct(PhpClass $class)
     {

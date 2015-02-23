@@ -4,7 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
-use Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator;
 
 /**
  * Evaluates given PHP file resource, context of the file will consist with variables
@@ -26,14 +25,6 @@ class PhpFileLoader extends AbstractGeneratorLoader
     public function supports(FileResource $resource)
     {
         return is_string($resource->getFilename()) && 'php' === pathinfo($resource->getFilename(), PATHINFO_EXTENSION);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getGenerator()
-    {
-        return new PhpLayoutUpdateGenerator();
     }
 
     /**

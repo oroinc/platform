@@ -3,8 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
-use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
+use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
 
 use Symfony\Component\HttpKernel\Tests\Logger;
 
@@ -34,6 +35,9 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         ],
         'oro-gold'    => [
             'resource-gold.yml'
+        ],
+        'oro-black'   => [
+            'route_name' => ['resource1.yml']
         ]
     ];
 
@@ -42,15 +46,15 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->themeManager = $this->getMockBuilder('Oro\Bundle\LayoutBundle\Theme\ThemeManager')
             ->disableOriginalConstructor()->getMock();
 
-        $this->yamlLoader = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\FileLoaderInterface');
-        $this->phpLoader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\FileLoaderInterface');
+        $this->yamlLoader = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
+        $this->phpLoader  = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface');
 
         $this->logger = new Logger();
 
         $this->extension = new ThemeExtension(
             $this->resources,
             $this->themeManager,
-            [$this->yamlLoader, $this->phpLoader]
+            new ChainLoader([$this->yamlLoader, $this->phpLoader])
         );
         $this->extension->setLogger($this->logger);
     }
@@ -78,7 +82,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->yamlLoader->expects($this->any())->method('supports')
             ->willReturnCallback($callbackBuilder('yml'));
-        $this->phpLoader->expects($this->any())->method('supports')
+        $this->phpLoader->expects($this->never())->method('supports')
             ->willReturnCallback($callbackBuilder('php'));
 
         $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
@@ -115,6 +119,22 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $logs = $this->logger->getLogs('notice');
         $this->assertSame('Skipping resource "resource2.xml" because loader for it not found', reset($logs));
+    }
+
+    public function testShouldCreateRouteFileResourceForNestingFiles()
+    {
+        $this->setUpActiveTheme('oro-black');
+
+        $callbackBuilder = $this->getCallbackBuilder();
+
+        $this->yamlLoader->expects($this->any())->method('supports')
+            ->willReturnCallback($callbackBuilder('yml'));
+
+        $this->yamlLoader->expects($this->once())->method('load')
+            ->with($this->isInstanceOf('Oro\Bundle\LayoutBundle\Layout\Loader\RouteFileResource'))
+            ->willReturn($this->getMock('Oro\Component\Layout\LayoutUpdateInterface'));
+
+        $this->extension->getLayoutUpdates('root');
     }
 
     protected function getCallbackBuilder()

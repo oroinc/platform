@@ -8,6 +8,14 @@ class ChainLoader implements LoaderInterface
     protected $loaders = [];
 
     /**
+     * @param LoaderInterface[] $loaders
+     */
+    public function __construct(array $loaders = [])
+    {
+        array_walk($loaders, [$this, 'addLoader']);
+    }
+
+    /**
      * @param LoaderInterface $loader
      */
     public function addLoader(LoaderInterface $loader)

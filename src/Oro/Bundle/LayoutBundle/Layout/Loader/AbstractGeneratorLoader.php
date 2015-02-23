@@ -4,12 +4,15 @@ namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition;
 
 abstract class AbstractGeneratorLoader implements LoaderInterface
 {
     const CLASS_PREFIX = '__Oro_Layout_Update_';
+
+    /** @var LayoutUpdateGeneratorInterface */
+    private $generator;
 
     /** @var bool */
     private $debug;
@@ -21,13 +24,15 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
     protected $loaded = [];
 
     /**
-     * @param bool   $debug
-     * @param string $cache
+     * @param LayoutUpdateGeneratorInterface $generator
+     * @param bool                           $debug
+     * @param string                         $cache
      */
-    public function __construct($debug, $cache)
+    public function __construct(LayoutUpdateGeneratorInterface $generator, $debug, $cache)
     {
-        $this->debug = $debug;
-        $this->cache = $cache;
+        $this->generator = $generator;
+        $this->debug     = $debug;
+        $this->cache     = $cache;
     }
 
     /**
@@ -91,7 +96,10 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
     /**
      * @return LayoutUpdateGeneratorInterface
      */
-    abstract protected function getGenerator();
+    protected function getGenerator()
+    {
+        return $this->generator;
+    }
 
     /**
      * @return boolean
@@ -126,7 +134,7 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
      */
     protected function getCacheFilename($name)
     {
-        if ($this->isDebug()) {
+        if ($this->isDebug() || (!$this->getCache())) {
             return false;
         }
 

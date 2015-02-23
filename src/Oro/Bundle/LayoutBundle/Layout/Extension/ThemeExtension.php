@@ -50,11 +50,11 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface
         $directory = $theme->getDirectory();
 
         $themeResources = isset($this->resources[$directory]) ? $this->resources[$directory] : [];
-        while ($resources = array_pop($themeResources)) {
+        foreach ($themeResources as $routeName => $resources) {
             // work with global resources in the same way as with route related
             $resources = is_array($resources) ? $resources : [$resources];
 
-            foreach ($resources as $routeName => $resource) {
+            foreach ($resources as $resource) {
                 $resource = is_string($routeName)
                     ? new RouteFileResource($resource, $routeName)
                     : new FileResource($resource);

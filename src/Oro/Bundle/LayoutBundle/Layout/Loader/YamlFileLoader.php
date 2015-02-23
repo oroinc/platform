@@ -4,8 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
 use Symfony\Component\Yaml\Yaml;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator;
-
 class YamlFileLoader extends AbstractGeneratorLoader
 {
     /**
@@ -14,14 +12,6 @@ class YamlFileLoader extends AbstractGeneratorLoader
     public function supports(FileResource $resource)
     {
         return is_string($resource->getFilename()) && 'yml' === pathinfo($resource->getFilename(), PATHINFO_EXTENSION);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function getGenerator()
-    {
-        return new ConfigLayoutUpdateGenerator();
     }
 
     /**

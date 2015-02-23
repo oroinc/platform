@@ -35,7 +35,7 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
         $layoutItemParameter->setType('Oro\Component\Layout\LayoutItemInterface');
         $method->addParameter($layoutItemParameter);
 
-        $method->setBody($visitor->createWriter()->write($this->doGenerateBody($data))->getContent());
+        $method->setBody($visitor->createWriter()->write(trim($this->doGenerateBody($data)))->getContent());
         $class->setMethod($method);
 
         /** @var ConditionInterface $condition */
