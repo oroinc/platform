@@ -22,7 +22,3 @@
         }
     },
 }) }}
-{% set thread = record.getValue('thread') %}
-{% if thread is not null and thread.getLastUnseenEmail is not null %}
-    {{ thread.getLastUnseenEmail.getSubject() }}
-{% endif %}
