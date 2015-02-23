@@ -23,7 +23,6 @@ class Configuration implements ConfigurationInterface
                 'sorting_field'     => ['value' => 'updatedAt'],
                 'sorting_direction' => ['value' => 'DESC'],
                 'per_page'          => ['value' => 10],
-                'grouping'          => ['value' => true],
             ]
         );
 
