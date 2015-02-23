@@ -33,14 +33,6 @@ class EmailThreadProvider
             }
         }
 
-        // search among xThreadId
-        foreach ($emailReferences as $email) {
-            /** @var Email $email */
-            if ($email->getXThreadId() && $email->getThread()) {
-                return $email->getThread();
-            }
-        }
-
         // generate new thread if need
         if (count($emailReferences) > 0) {
             $thread = new EmailThread();
@@ -94,7 +86,7 @@ class EmailThreadProvider
             $unseenEmails = $emails->matching($criteria);
             if (count($unseenEmails)) {
                 $headEmail = $unseenEmails[0];
-            } else if (count($emails)) {
+            } elseif (count($emails)) {
                 $headEmail = $emails[0];
             }
         }
