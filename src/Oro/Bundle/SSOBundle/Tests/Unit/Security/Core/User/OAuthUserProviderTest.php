@@ -79,7 +79,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->any())
             ->method('get')
-            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->with($this->equalTo('oro_sso.enable_google_sso'))
             ->will($this->returnValue(false));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
@@ -92,7 +92,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->any())
             ->method('get')
-            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->with($this->equalTo('oro_sso.enable_google_sso'))
             ->will($this->returnValue(true));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
@@ -130,7 +130,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(0))
             ->method('get')
-            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->with($this->equalTo('oro_sso.enable_google_sso'))
             ->will($this->returnValue(true));
 
         $this->cm
@@ -180,7 +180,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(0))
             ->method('get')
-            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->with($this->equalTo('oro_sso.enable_google_sso'))
             ->will($this->returnValue(true));
 
         $this->cm
@@ -233,7 +233,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(0))
             ->method('get')
-            ->with($this->equalTo('oro_user.enable_google_sso'))
+            ->with($this->equalTo('oro_sso.enable_google_sso'))
             ->will($this->returnValue(true));
 
         $this->cm
