@@ -95,46 +95,6 @@ class FormType extends AbstractContainerType
      */
     public function buildBlock(BlockBuilderInterface $builder, array $options)
     {
-        $form = $this->getForm($builder, $options);
-        $this->formLayoutBuilder->build($form, $builder, $options);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function buildView(BlockView $view, BlockInterface $block, array $options)
-    {
-        /** @var FormAccessorInterface $formAccessor */
-        $formAccessor = $block->getContext()->get($options['form_name']);
-        if (!$formAccessor instanceof FormAccessorInterface) {
-            throw new UnexpectedTypeException(
-                $formAccessor,
-                'Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface',
-                sprintf('context[%s]', $options['form_name'])
-            );
-        }
-
-        $view->vars['form'] = $formAccessor->getView();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return self::NAME;
-    }
-
-    /**
-     * @param BlockBuilderInterface $builder
-     * @param array                 $options
-     *
-     * @return FormInterface
-     *
-     * @throws UnexpectedTypeException
-     */
-    protected function getForm(BlockBuilderInterface $builder, array $options)
-    {
         $form = $builder->getContext()->get($options['form_name']);
         if ($form instanceof FormInterface) {
             // replace the form with the form accessor because child blocks require the accessor
@@ -149,6 +109,24 @@ class FormType extends AbstractContainerType
             );
         }
 
-        return $form;
+        $this->formLayoutBuilder->build($form, $builder, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(BlockView $view, BlockInterface $block, array $options)
+    {
+        /** @var FormAccessorInterface $formAccessor */
+        $formAccessor       = $block->getContext()->get($options['form_name']);
+        $view->vars['form'] = $formAccessor->getView();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return self::NAME;
     }
 }
