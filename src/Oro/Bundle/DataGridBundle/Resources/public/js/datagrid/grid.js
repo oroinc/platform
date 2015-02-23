@@ -9,6 +9,7 @@ define(function (require) {
         Backgrid = require('backgrid'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
+        SimpleValueWatcher = require('oroui/js/tools/simple-value-watcher'),
         LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         GridHeader = require('./header'),
         GridBody = require('./body'),
@@ -202,8 +203,8 @@ define(function (require) {
                 return;
             }
 
-            this.setLayout('default');
             this.setFloatThead(false);
+            this.setLayout('default');
 
             _.each(this.columns.models, function (column) {
                 column.dispose();
@@ -560,7 +561,7 @@ define(function (require) {
          */
         getCssHeightCalcExpression: function () {
             var documentHeight = $(document).height(),
-                availableHeight = mediator.execute('layout:getAvailableHeight', this.$grid.parent());
+                availableHeight = mediator.execute('layout:getAvailableHeight', this.$grid.parents('.grid-scrollable-container:first'));
             return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
         },
 
@@ -586,8 +587,10 @@ define(function (require) {
                 this.floatThead = newValue;
                 if (newValue) {
                     this.addFloatThead();
+                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
                 } else {
                     self.removeFloatThead();
+                    clearInterval(this.heightFixIntervalId);
                 }
             }
         },
@@ -712,6 +715,7 @@ define(function (require) {
             var tableRect = this.$grid[0].getBoundingClientRect(),
                 visibleRect = this.getVisibleRect(this.$grid[0]),
                 mode = 'default';
+            this.lastClientRect = tableRect;
             if (visibleRect.top !== tableRect.top) {
                 mode = 'fixed';
                 if (this.$grid.find('thead:first .dropdown.open').length) {
@@ -736,6 +740,10 @@ define(function (require) {
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-fixed');
                         this.$el.addClass('floatThead-relative');
+                        if (!this.$grid.find('.thead-sizing-row').length) {
+                            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:'
+                                + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
+                        }
                     }
                     this.$grid.find('thead:first').css({
                         top: visibleRect.top - tableRect.top
@@ -750,6 +758,10 @@ define(function (require) {
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-relative');
                         this.$el.addClass('floatThead-fixed');
+                        if (!this.$grid.find('.thead-sizing-row').length) {
+                            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:'
+                                + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
+                        }
                     }
                     this.$grid.find('thead:first').css({
                         top: visibleRect.top,
@@ -762,6 +774,7 @@ define(function (require) {
                     break;
                 default:
                     if (this.currentFloatTheadMode !== mode) {
+                        this.$grid.find('.thead-sizing-row').remove();
                         this.$el.removeClass('floatThead-relative floatThead-fixed');
                         // remove extra styles
                         this.$grid.find('thead:first, thead:first tr:first'). attr('style', '');
@@ -775,8 +788,6 @@ define(function (require) {
         addFloatThead: function () {
             this.rescrollCb = this.rescroll();
             this.headerHeight = this.$grid.find('thead tr:first').height();
-            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:'
-                + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
             this.fixHeaderCellWidth();
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
                 setTimeout(_.bind(this.reposition, this), 0);
@@ -798,13 +809,19 @@ define(function (require) {
                 scrollContainer = this.$('.grid-scrollable-container'),
                 otherScroll = this.$('.other-scroll'),
                 otherScrollInner = this.$('.other-scroll > div'),
-                scrollBarWidth = mediator.execute('layout:scrollbarWidth');
+                scrollBarWidth = mediator.execute('layout:scrollbarWidth'),
+                scrollVisibleWatcher;
+
+            scrollVisibleWatcher = new SimpleValueWatcher(false, this, function () {
+                scrollContainer.css({
+                    width: 'calc(100% + ' + (self.scrollVisible ? scrollBarWidth : 0) + 'px)'
+                });
+                this.reflow();
+            });
             function setup() {
                 var heightDec = self.headerHeight + 1; // compensate border
                 self.scrollVisible = scrollContainer[0].clientHeight !== scrollContainer[0].scrollHeight;
-                scrollContainer.css({
-                    width: 'calc(100% + ' + scrollBarWidth + 'px)'
-                });
+                scrollVisibleWatcher.test(self.scrollVisible);
                 otherScroll.css({
                     height: scrollContainer[0].clientHeight - heightDec,
                     width: scrollBarWidth,
@@ -824,11 +841,24 @@ define(function (require) {
         },
 
         fixHeightInFloatTheadMode: function () {
-            var currentTop = this.$grid.parent()[0].getBoundingClientRect().top;
-            if (this.lastTableParentTop !== currentTop) {
-                this.lastTableParentTop = currentTop;
-                this.reflow();
+            var currentClientRect = this.$grid[0].getBoundingClientRect();
+            if (this.lastClientRect.top !== currentClientRect.top
+                  || this.lastClientRect.left !== currentClientRect.left
+                  || this.lastClientRect.right !== currentClientRect.right) {
+                if( this.layout === 'fullscreen') {
+                    // ajust max height
+                    this.$grid.parents('.grid-scrollable-container').css({
+                        maxHeight: this.getCssHeightCalcExpression()
+                    });
+                }
+                if (this.lastClientRect.left !== currentClientRect.left
+                    || this.lastClientRect.right !== currentClientRect.right) {
+                    this.reflow();
+                } else {
+                    this.reposition();
+                }
             }
+            this.lastClientRect = currentClientRect;
         },
 
         /**
@@ -995,7 +1025,12 @@ define(function (require) {
          */
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
-                this.reflow();
+                if (newLayout === 'fullscreen') {
+                    this.$grid.parents('.grid-scrollable-container').css({
+                        maxHeight: this.getCssHeightCalcExpression()
+                    });
+                    this.reflow();
+                }
                 return;
             }
             this.layout = newLayout;
