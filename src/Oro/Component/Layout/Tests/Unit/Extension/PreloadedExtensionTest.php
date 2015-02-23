@@ -77,6 +77,32 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $extension->getLayoutUpdates('unknown'));
     }
 
+    public function testContextConfigurators()
+    {
+        $configurator = $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface');
+
+        $extension = new PreloadedExtension(
+            [],
+            [],
+            [],
+            [$configurator]
+        );
+
+        $this->assertTrue($extension->hasContextConfigurators());
+
+        $result = $extension->getContextConfigurators();
+        $this->assertCount(1, $result);
+        $this->assertSame($configurator, $result[0]);
+    }
+
+    public function testContextConfiguratorsWheNoAnyRegistered()
+    {
+        $extension = new PreloadedExtension([]);
+
+        $this->assertFalse($extension->hasContextConfigurators());
+        $this->assertSame([], $extension->getContextConfigurators());
+    }
+
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage Keys of $types array must be strings.
@@ -192,6 +218,23 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             [
                 'test' => $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
+            ]
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Each item of $contextConfigurators array must be ContextConfiguratorInterface.
+     */
+    public function testConstructWithInvalidContextConfiguratorType()
+    {
+        new PreloadedExtension(
+            [],
+            [],
+            [],
+            [
+                $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface'),
+                new \stdClass()
             ]
         );
     }

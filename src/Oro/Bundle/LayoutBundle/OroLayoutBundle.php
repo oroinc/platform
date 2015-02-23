@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigurationPass;
+use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass;
 
 class OroLayoutBundle extends Bundle
 {
@@ -17,5 +18,6 @@ class OroLayoutBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new ConfigurationPass());
+        $container->addCompilerPass(new ConfigExpressionCompilerPass());
     }
 }

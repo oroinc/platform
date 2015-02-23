@@ -22,4 +22,12 @@ class LayoutManager
     {
         return $this->layoutFactoryBuilder->getLayoutFactory()->createLayoutBuilder();
     }
+
+    /**
+     * @return LayoutFactoryInterface
+     */
+    public function getLayoutFactory()
+    {
+        return $this->layoutFactoryBuilder->getLayoutFactory();
+    }
 }

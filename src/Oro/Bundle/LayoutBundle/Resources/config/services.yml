@@ -12,6 +12,7 @@ services:
             - {}
             - {}
             - {}
+            - {}
 
     oro_layout.layout_factory_builder:
         public: false
@@ -29,3 +30,53 @@ services:
         class: %oro_layout.form_layout_builder.class%
         calls:
             - [addSimpleFormTypes, [['choice', 'datetime', 'date', 'time']]]
+
+    oro_layout.expression.extension:
+        public: false
+        class: Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension
+        arguments:
+            - @service_container
+            - {}
+
+    oro_layout.expression.context_accessor:
+        public: false
+        class: Oro\Component\ConfigExpression\ContextAccessor
+
+    oro_layout.expression.pass.property_path:
+        public: false
+        class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
+
+    oro_layout.expression.factory:
+        public: false
+        class: Oro\Component\ConfigExpression\ExpressionFactory
+        arguments:
+            - @oro_layout.expression.context_accessor
+        calls:
+            - [addExtension, [@oro_layout.expression.extension]]
+
+    oro_layout.expression.assembler:
+        class: Oro\Component\ConfigExpression\ExpressionAssembler
+        arguments:
+            - @oro_layout.expression.factory
+        calls:
+            - [addConfigurationPass, [@oro_layout.expression.pass.property_path]]
+
+    oro_layout.block_type_extension.visible:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\VisibleExtension
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+
+    oro_layout.block_type_extension.config_expression:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\ConfigExpressionExtension
+        arguments:
+            - @oro_layout.expression.assembler
+            - @service_container
+            - {}
+        tags:
+            - { name: layout.block_type_extension, alias: block }
+            - { name: layout.context_configurator }
+
+    oro_layout.expression.json_encoder:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\JsonConfigExpressionEncoder
+        tags:
+            - { name: oro_layout.expression.encoder, format: json }

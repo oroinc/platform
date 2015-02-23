@@ -11,7 +11,7 @@
         "symfony/templating": "~2.3"
     },
     "require-dev": {
-        "symfony/dependency-injection": "~2.3",
+        "symfony/dependency-injection": "~2.3"
     },
     "autoload": {
         "psr-0": { "Oro\\Component\\Layout": "" }

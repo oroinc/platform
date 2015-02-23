@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Extension;
 
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
@@ -47,6 +48,13 @@ abstract class AbstractExtension implements ExtensionInterface
      *  ]
      */
     private $layoutUpdates;
+
+    /**
+     * The layout context configurators provided by this extension
+     *
+     * @var ContextConfiguratorInterface[]
+     */
+    private $contextConfigurators;
 
     /**
      * {@inheritdoc}
@@ -131,6 +139,30 @@ abstract class AbstractExtension implements ExtensionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getContextConfigurators()
+    {
+        if (null === $this->contextConfigurators) {
+            $this->initContextConfigurators();
+        }
+
+        return $this->contextConfigurators;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasContextConfigurators()
+    {
+        if (null === $this->contextConfigurators) {
+            $this->initContextConfigurators();
+        }
+
+        return !empty($this->contextConfigurators);
+    }
+
+    /**
      * Registers block types.
      *
      * @return BlockTypeInterface[]
@@ -162,6 +194,16 @@ abstract class AbstractExtension implements ExtensionInterface
      * @return array of array of LayoutUpdateInterface
      */
     protected function loadLayoutUpdates()
+    {
+        return [];
+    }
+
+    /**
+     * Registers layout context configurators.
+     *
+     * @return ContextConfiguratorInterface[]
+     */
+    protected function loadContextConfigurators()
     {
         return [];
     }
@@ -247,5 +289,27 @@ abstract class AbstractExtension implements ExtensionInterface
             }
         }
         $this->layoutUpdates = $loadedLayoutUpdates;
+    }
+
+    /**
+     * Initializes layout context configurators.
+     *
+     * @throws Exception\UnexpectedTypeException if any registered context configurators is not
+     *                                           an instance of ContextConfiguratorInterface
+     */
+    private function initContextConfigurators()
+    {
+        $this->contextConfigurators = [];
+
+        foreach ($this->loadContextConfigurators() as $configurator) {
+            if (!$configurator instanceof ContextConfiguratorInterface) {
+                throw new Exception\UnexpectedTypeException(
+                    $configurator,
+                    'Oro\Component\Layout\ContextConfiguratorInterface'
+                );
+            }
+
+            $this->contextConfigurators[] = $configurator;
+        }
     }
 }

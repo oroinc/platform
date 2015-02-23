@@ -39,7 +39,6 @@ class BlockOptionsResolver
         return $resolver->resolve($options);
     }
 
-
     /**
      * @param string|BlockTypeInterface $blockType
      *

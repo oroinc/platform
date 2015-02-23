@@ -42,9 +42,6 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         if (!isset($view['vars']['attr'])) {
             $view['vars']['attr'] = [];
         }
-        if (!isset($view['vars']['value'])) {
-            $view['vars']['value'] = null;
-        }
         if (!isset($view['children'])) {
             $view['children'] = [];
         }

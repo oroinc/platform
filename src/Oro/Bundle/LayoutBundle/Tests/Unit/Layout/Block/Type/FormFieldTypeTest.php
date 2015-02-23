@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
+use Symfony\Component\Form\FormView;
+
 use Oro\Component\Layout\Block\Type\BaseType;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-use Symfony\Component\Form\FormView;
 
 class FormFieldTypeTest extends BlockTypeTestCase
 {
@@ -22,6 +23,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ->with($formPath)
             ->will($this->returnValue($fieldView));
 
+        $this->context->getDataResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
         $view = $this->getBlockView(
             FormFieldType::NAME,
@@ -53,6 +55,7 @@ class FormFieldTypeTest extends BlockTypeTestCase
     {
         $formName = 'test_form';
 
+        $this->context->getDataResolver()->setOptional([$formName]);
         $this->context->set($formName, 123);
         $this->getBlockView(
             FormFieldType::NAME,
