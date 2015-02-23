@@ -199,7 +199,7 @@ class TagsAcl extends Selenium2TestCase
         $login = $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
-            ->setEntity('Tag', ['view'], 'None')
+            ->setCapability(array('Unassign all tags from entities'), 'None')
             ->save();
         /** @var Users $login*/
         $login = $login->openUsers('Oro\Bundle\UserBundle')
