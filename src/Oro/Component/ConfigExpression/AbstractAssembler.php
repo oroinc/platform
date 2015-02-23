@@ -82,7 +82,7 @@ abstract class AbstractAssembler implements AssemblerInterface
      *
      * @param string $entityType
      *
-     * @return bool
+     * @return string
      */
     protected function getExpressionType($entityType)
     {

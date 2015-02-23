@@ -47,5 +47,4 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->extension->getExpression('unknown');
     }
-
 }
