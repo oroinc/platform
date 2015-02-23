@@ -28,6 +28,10 @@ oro:
         updated_by.label:    Updated By
         organization.label:  Organization
 
+        action:
+            assign_unassign: "Tag assign/unassign"
+            unassign_global: "Unassign all tags from entities"
+
         tagging:
             alias.label:         Alias
             entity_description:  Represent tagging

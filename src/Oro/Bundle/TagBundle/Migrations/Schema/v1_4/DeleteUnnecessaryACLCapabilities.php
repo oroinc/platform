@@ -31,8 +31,6 @@ class DeleteUnnecessaryACLCapabilities implements Migration, ContainerAwareInter
         $aclManager = $this->container->get('oro_security.acl.manager');
         $aclProvider = $this->container->get('security.acl.dbal.provider');
         $aclObjects = [
-            'Action:oro_tag_assign_unassign',
-            'Action:oro_tag_unassign_global',
             'Action:oro_tag_view_tag_cloud'
         ];
 

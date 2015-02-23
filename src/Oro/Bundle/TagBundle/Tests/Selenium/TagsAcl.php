@@ -22,6 +22,12 @@ class TagsAcl extends Selenium2TestCase
             ->setEntity('Group', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setEntity('Role', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setEntity('Tag', ['view'], 'System')
+            ->setCapability(
+                array(
+                    'Tag assign/unassign',
+                    'Unassign all tags from entities'),
+                'System'
+            )
             ->save()
             ->assertMessage('Role saved')
             ->close();
@@ -230,7 +236,7 @@ class TagsAcl extends Selenium2TestCase
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $role)
             ->open(array($role))
-            ->setEntity('Tag', ['view'], 'None')
+            ->setCapability(array('Tag assign/unassign'), 'None')
             ->save()
             ->logout()
             ->setUsername($username)

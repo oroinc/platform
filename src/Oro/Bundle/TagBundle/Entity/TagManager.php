@@ -17,9 +17,9 @@ use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
 
 class TagManager
 {
-    const ACL_RESOURCE_REMOVE_ID_KEY = 'oro_tag_view';
+    const ACL_RESOURCE_REMOVE_ID_KEY = 'oro_tag_unassign_global';
     const ACL_RESOURCE_CREATE_ID_KEY = 'oro_tag_create';
-    const ACL_RESOURCE_ASSIGN_ID_KEY = 'oro_tag_view';
+    const ACL_RESOURCE_ASSIGN_ID_KEY = 'oro_tag_assign_unassign';
     /**
      * @var EntityManager
      */
