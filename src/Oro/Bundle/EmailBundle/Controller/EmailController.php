@@ -160,6 +160,17 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("/forward/{id}", name="oro_email_email_forward", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_create")
+     * @Template("OroEmailBundle:Email:update.html.twig")
+     */
+    public function forwardAction(Email $email)
+    {
+        // todo split reply and forward logic
+        return $this->createEmail(new EmailModel(), $email);
+    }
+
+    /**
      * Get the given email body content
      *
      * @Route("/body/{id}", name="oro_email_body", requirements={"id"="\d+"})
