@@ -20,10 +20,8 @@
 {%- endblock %}
 
 {% block container_widget -%}
-    {% for child in block -%}
-        {% if child.vars.visible -%}
-            {{ block_widget(child) }}
-        {%- endif %}
+    {% for child in block if child.vars.visible -%}
+        {{ block_widget(child) }}
     {%- endfor %}
 {%- endblock %}
 
