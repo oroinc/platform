@@ -8,6 +8,8 @@ parameters:
     oro_layout.loader.php_file_loader.class:        Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader
     oro_layout.loader.yaml_file_loader.class:       Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader
 
+    oro_layout.updates_generator.class:             Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGenerator
+
     oro_layout.theme_updates_resources: []
 
 services:
@@ -43,6 +45,11 @@ services:
         class: %oro_layout.yaml_updates_warmer.class%
         arguments:
             - %oro_layout.theme_updates_resources%
-            - @oro_layout.loader.yml_file_loader
+            - @oro_layout.loader.yaml_file_loader
         tags:
             - { name: kernel.cache_warmer }
+
+    oro_layout.updates_generator:
+        class: %oro_layout.updates_generator.class%
+        arguments:
+            - %kernel.cache_dir%
