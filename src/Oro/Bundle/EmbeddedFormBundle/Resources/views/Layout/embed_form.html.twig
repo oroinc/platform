@@ -21,12 +21,12 @@
 {% endblock %}
 
 {% block _base_css_widget %}
-    {% set base_content %}
+    {% set content %}
     body {
         min-width: 0;
     }
     {% endset %}
-    {{ block_widget(block, {'content': content ~ base_content }) }}
+    {{ block_widget(block, {'content': content }) }}
 {% endblock %}
 
 {% block _form_css_widget %}

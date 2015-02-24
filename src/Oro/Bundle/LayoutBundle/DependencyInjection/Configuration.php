@@ -56,9 +56,11 @@ class Configuration implements ConfigurationInterface
                                         return !in_array(self::DEFAULT_LAYOUT_PHP_RESOURCE, $v);
                                     }
                                 )
-                                ->then(function ($v) {
-                                    return array_merge([self::DEFAULT_LAYOUT_PHP_RESOURCE], $v);
-                                })
+                                ->then(
+                                    function ($v) {
+                                        return array_merge([self::DEFAULT_LAYOUT_PHP_RESOURCE], $v);
+                                    }
+                                )
                             ->end()
                         ->end()
                     ->end()
@@ -77,15 +79,16 @@ class Configuration implements ConfigurationInterface
                                         return !in_array(self::DEFAULT_LAYOUT_TWIG_RESOURCE, $v);
                                     }
                                 )
-                                ->then(function ($v) {
-                                    return array_merge([self::DEFAULT_LAYOUT_TWIG_RESOURCE], $v);
-                                })
+                                ->then(
+                                    function ($v) {
+                                        return array_merge([self::DEFAULT_LAYOUT_TWIG_RESOURCE], $v);
+                                    }
+                                )
                             ->end()
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
 
         $parentNode->append($node);
     }
@@ -131,8 +134,7 @@ class Configuration implements ConfigurationInterface
                         ->cannotBeEmpty()
                     ->end()
                 ->end()
-            ->end()
-        ;
+            ->end();
 
         $parentNode
             ->append($node)
@@ -144,7 +146,7 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->validate()
                 ->always(
-                    function($v) {
+                    function ($v) {
                         $v['themes'] = isset($v['themes']) ? $v['themes'] : [];
 
                         if (empty($v['themes'][self::BASE_THEME_IDENTIFIER])) {
@@ -158,7 +160,6 @@ class Configuration implements ConfigurationInterface
                         return $v;
                     }
                 )
-            ->end()
-        ;
+            ->end();
     }
 }

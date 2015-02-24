@@ -87,6 +87,7 @@ class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
 {
     public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
     {
+        // filename: testfilename.yml
         \$layoutManipulator->add( 'root', NULL, 'root' );
         \$layoutManipulator->add( 'header', 'root', 'header' );
         \$layoutManipulator->addAlias( 'header', 'header_alias' );
@@ -120,7 +121,8 @@ CLASS
                                 ]
                             ]
                         ]
-                    ]
+                    ],
+                    'testfilename.yml'
                 ),
                 new ConditionCollection()
             )

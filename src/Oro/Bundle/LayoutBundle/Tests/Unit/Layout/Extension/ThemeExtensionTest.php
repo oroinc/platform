@@ -151,7 +151,22 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldPassDependenciesToUpdateInstance()
     {
-        
+        $assembler = $this->getMockBuilder('\Oro\Component\ConfigExpression\ExpressionAssembler')
+            ->disableOriginalConstructor()->getMock();
+        $update = $this->getMock('Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionAssemblerLayoutUpdateInterface');
+
+        $this->extension->setAssembler($assembler);
+        $this->setUpActiveTheme('oro-black');
+
+        $callbackBuilder = $this->getCallbackBuilder();
+        $this->yamlLoader->expects($this->any())->method('supports')
+            ->willReturnCallback($callbackBuilder('yml'));
+        $this->yamlLoader->expects($this->once())->method('load')
+            ->willReturn($update);
+
+        $update->expects($this->once())->method('setAssembler')->with($assembler);
+
+        $this->extension->getLayoutUpdates('root');
     }
 
     protected function getCallbackBuilder()
