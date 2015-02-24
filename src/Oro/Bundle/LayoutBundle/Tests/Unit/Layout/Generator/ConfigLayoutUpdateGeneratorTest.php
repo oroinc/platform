@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +33,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
             $this->setExpectedException('\LogicException', $exception);
         }
 
-        $this->generator->generate('testClassName', $data, new ConditionCollection());
+        $this->generator->generate('testClassName', new GeneratorData($data), new ConditionCollection());
     }
 
     /**
@@ -41,15 +42,15 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
     public function resourceDataProvider()
     {
         return [
-            'invalid data'                  => [
+            'invalid data'                    => [
                 '$data'      => new \stdClass(),
                 '$exception' => 'Invalid data given, expected array with key "actions"'
             ],
-            'should contains actions'       => [
+            'should contains actions'         => [
                 '$data'      => [],
                 '$exception' => 'Invalid data given, expected array with key "actions"'
             ],
-            'should contains known actions' => [
+            'should contains known actions'   => [
                 '$data'      => [
                     'actions' => [
                         ['@addSuperPuper' => null]
@@ -65,7 +66,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                 ],
                 '$exception' => 'Invalid action at position: 0, name: add'
             ],
-            'known action proceed' => [
+            'known action proceed'            => [
                 '$data' => [
                     'actions' => [
                         ['@add' => null]
@@ -95,34 +96,37 @@ CLASS
             ,
             $this->generator->generate(
                 'testClassName',
-                [
-                    'actions' => [
-                        [
-                            '@add' => [
-                                'id'        => 'root',
-                                'parent'    => null,
-                                'blockType' => 'root'
-                            ]
-                        ],
-                        [
-                            '@add' => [
-                                'id'        => 'header',
-                                'parent'    => 'root',
-                                'blockType' => 'header'
-                            ]
-                        ],
-                        [
-                            '@addAlias' => [
-                                'alias' => 'header',
-                                'id'    => 'header_alias',
+                new GeneratorData(
+                    [
+                        'actions' => [
+                            [
+                                '@add' => [
+                                    'id'        => 'root',
+                                    'parent'    => null,
+                                    'blockType' => 'root'
+                                ]
+                            ],
+                            [
+                                '@add' => [
+                                    'id'        => 'header',
+                                    'parent'    => 'root',
+                                    'blockType' => 'header'
+                                ]
+                            ],
+                            [
+                                '@addAlias' => [
+                                    'alias' => 'header',
+                                    'id'    => 'header_alias',
+                                ]
                             ]
                         ]
                     ]
-                ],
+                ),
                 new ConditionCollection()
             )
         );
     }
+
     // @codingStandardsIgnoreEnd
 
     public function testShouldProcessCondition()
@@ -130,10 +134,12 @@ CLASS
         $collection = new ConditionCollection();
         $this->generator->generate(
             'testClassName',
-            [
-                'actions'   => [],
-                'condition' => [['@true' => null]]
-            ],
+            new GeneratorData(
+                [
+                    'actions'   => [],
+                    'condition' => [['@true' => null]]
+                ]
+            ),
             $collection
         );
 

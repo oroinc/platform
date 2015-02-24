@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
 
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
@@ -114,20 +115,23 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $generator = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
+        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.yml';
+        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
         $generator->expects($this->once())->method('generate')
             ->willReturnCallback(
-                function ($className, $data, ConditionCollection $collection) {
+                function ($className, GeneratorData $data, ConditionCollection $collection) use ($path) {
                     $this->assertNotEmpty($data);
                     $this->assertSame(
                         ['actions' => [['@add' => ['id' => 'root', 'parent' => null]]]],
-                        $data
+                        $data->getSource()
                     );
+                    $this->assertSame($path, $data->getFilename());
 
                     return $this->buildClass($className);
                 }
             );
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.yml';
-        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
 
         $loader->load(new RouteFileResource($path, uniqid('route')));
     }

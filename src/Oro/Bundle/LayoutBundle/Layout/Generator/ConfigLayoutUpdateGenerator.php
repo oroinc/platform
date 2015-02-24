@@ -7,7 +7,7 @@ use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition
 
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
-    const NODE_ACTIONS = 'actions';
+    const NODE_ACTIONS   = 'actions';
     const NODE_CONDITION = 'condition';
 
     /** @var \ReflectionClass */
@@ -16,10 +16,16 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     /**
      * {@inheritdoc}
      */
-    protected function doGenerateBody($data)
+    protected function doGenerateBody(GeneratorData $data)
     {
-        $body = [];
-        foreach ($data[self::NODE_ACTIONS] as $actionDefinition) {
+        $body   = [];
+        $source = $data->getSource();
+
+        if ($data->getFilename()) {
+            $body[] = '// filename: ' . $data->getFilename();
+        }
+
+        foreach ($source[self::NODE_ACTIONS] as $actionDefinition) {
             $call           = [];
             $fullActionName = key($actionDefinition);
             $actionName     = substr($fullActionName, 1);
@@ -47,13 +53,15 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      *
      * {@inheritdoc}
      */
-    protected function validate($data)
+    protected function validate(GeneratorData $data)
     {
-        if (!(is_array($data) && isset($data[self::NODE_ACTIONS]) && is_array($data[self::NODE_ACTIONS]))) {
+        $source = $data->getSource();
+
+        if (!(is_array($source) && isset($source[self::NODE_ACTIONS]) && is_array($source[self::NODE_ACTIONS]))) {
             throw new \LogicException(sprintf('Invalid data given, expected array with key "%s"', self::NODE_ACTIONS));
         }
 
-        foreach ($data[self::NODE_ACTIONS] as $k => $actionDefinition) {
+        foreach ($source[self::NODE_ACTIONS] as $k => $actionDefinition) {
             $actionName = key($actionDefinition);
 
             if (!(is_array($actionDefinition) && $this->isKnownAction($actionName))) {
@@ -67,10 +75,12 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      *
      * {@inheritdoc}
      */
-    protected function prepareConditionCollection($data, ConditionCollection $conditionCollection)
+    protected function prepareConditionCollection(GeneratorData $data, ConditionCollection $conditionCollection)
     {
-        if (isset($data[self::NODE_CONDITION])) {
-            $conditionCollection->append(new ConfigExpressionCondition($data[self::NODE_CONDITION]));
+        $source = $data->getSource();
+
+        if (isset($source[self::NODE_CONDITION])) {
+            $conditionCollection->append(new ConfigExpressionCondition($source[self::NODE_CONDITION]));
         }
     }
 

@@ -15,11 +15,11 @@ interface LayoutUpdateGeneratorInterface
      * Generates valid PHP class that is instance of "Oro\Component\Layout\LayoutUpdateInterface" based on given data.
      *
      * @param string              $className           Class name for newly generated PHP source
-     * @param array|string        $data                Data consist actions which should be generated as PHP code
+     * @param GeneratorData       $data                Data consist actions which should be generated as PHP code
      * @param ConditionCollection $conditionCollection Collection of conditions that are should be allowed for
      *                                                 the actions to be performed
      *
      * @return string
      */
-    public function generate($className, $data, ConditionCollection $conditionCollection);
+    public function generate($className, GeneratorData $data, ConditionCollection $conditionCollection);
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Symfony\Component\Yaml\Yaml;
 
 class YamlFileLoader extends AbstractGeneratorLoader
@@ -19,9 +20,10 @@ class YamlFileLoader extends AbstractGeneratorLoader
      */
     protected function loadResourceGeneratorData(FileResource $resource)
     {
-        // TODO add lines and filename to generated file
-        $data = Yaml::parse($resource->getFilename());
+        $filename = $resource->getFilename();
+        $data     = Yaml::parse($filename);
+        $data     = isset($data['oro_layout']) ? $data['oro_layout'] : [];
 
-        return isset($data['oro_layout']) ? $data['oro_layout'] : [];
+        return new GeneratorData($data, $filename);
     }
 }

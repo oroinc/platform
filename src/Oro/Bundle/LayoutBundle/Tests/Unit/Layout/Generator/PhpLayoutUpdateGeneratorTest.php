@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
 
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 
@@ -30,6 +31,8 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
      */
     public function testGenerate($code)
     {
+        $data = new GeneratorData($code);
+
         $this->assertSame(
 <<<CLASS
 <?php
@@ -43,7 +46,7 @@ class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
 }
 CLASS
             ,
-            $this->generator->generate('testClassName', $code, new ConditionCollection())
+            $this->generator->generate('testClassName', $data, new ConditionCollection())
         );
     }
     // @codingStandardsIgnoreEnd
@@ -78,7 +81,7 @@ CLASS
             ,
             $this->generator->generate(
                 'testClassName',
-                'echo 123;',
+                new GeneratorData('echo 123;'),
                 new ConditionCollection([new StubCondition()])
             )
         );

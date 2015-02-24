@@ -6,6 +6,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader;
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Loader\RouteFileResource;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
@@ -110,14 +111,14 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $className
-     * @param string $data
+     * @param string        $className
+     * @param GeneratorData $data
      *
      * @return string
      */
-    public function buildClass($className, $data)
+    public function buildClass($className, GeneratorData $data)
     {
-        $data = str_replace(['<?php', '<?', '?>'], '', $data);
+        $data = str_replace(['<?php', '<?', '?>'], '', $data->getSource());
 
         return <<<CLASS
 <?php

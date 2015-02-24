@@ -15,7 +15,7 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
     /**
      * {@inheritdoc}
      */
-    public function generate($className, $data, ConditionCollection $conditionCollection)
+    public function generate($className, GeneratorData $data, ConditionCollection $conditionCollection)
     {
         $this->validate($data);
         $this->prepareConditionCollection($data, $conditionCollection);
@@ -51,21 +51,21 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
     /**
      * Performs code generation itself based on data given
      *
-     * @param array|string $data
+     * @param GeneratorData $data
      *
      * @return string
      */
-    abstract protected function doGenerateBody($data);
+    abstract protected function doGenerateBody(GeneratorData $data);
 
     /**
      * Validates given resource data. Should throw exception if error found.
      * Empty implementation, could be overridden in descendants.
      *
-     * @param array|string $data
+     * @param GeneratorData $source
      *
      * @return void
      */
-    protected function validate($data)
+    protected function validate(GeneratorData $source)
     {
     }
 
@@ -73,12 +73,12 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
      * Do preparation of condition collection based on resource data.
      * Empty implementation, could be overridden in descendants.
      *
-     * @param array|string        $data
+     * @param GeneratorData       $data
      * @param ConditionCollection $conditionCollection
      *
      * @return void
      */
-    protected function prepareConditionCollection($data, ConditionCollection $conditionCollection)
+    protected function prepareConditionCollection(GeneratorData $data, ConditionCollection $conditionCollection)
     {
     }
 }

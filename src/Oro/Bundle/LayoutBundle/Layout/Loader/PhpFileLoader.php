@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
 
@@ -32,6 +33,8 @@ class PhpFileLoader extends AbstractGeneratorLoader
      */
     protected function loadResourceGeneratorData(FileResource $resource)
     {
-        return file_get_contents($resource->getFilename());
+        $filename = $resource->getFilename();
+
+        return new GeneratorData(file_get_contents($filename), $filename);
     }
 }
