@@ -14,6 +14,10 @@ oro:
 
         system_configuration:
             email_configuration: Email Configuration
+            email_threads:
+                label: Email Threads
+                use_threads_in_emails.label: Use email threads in My Emails
+
 
         emailtemplate:
             entity_label:        Template

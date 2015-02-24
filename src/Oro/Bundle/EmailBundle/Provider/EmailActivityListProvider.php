@@ -196,6 +196,14 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
+    public function getGroupedTemplate()
+    {
+        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.js.twig';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
