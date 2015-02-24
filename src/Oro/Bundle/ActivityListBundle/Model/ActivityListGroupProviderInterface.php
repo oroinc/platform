@@ -20,4 +20,11 @@ interface ActivityListGroupProviderInterface
      * @return array
      */
     public function getGroupedEntities($entity);
+
+    /**
+     * Get Grouped Template
+     *
+     * @return string
+     */
+    public function getGroupedTemplate();
 }

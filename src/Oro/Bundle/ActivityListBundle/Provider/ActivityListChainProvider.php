@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -162,9 +163,11 @@ class ActivityListChainProvider
     }
 
     /**
+     * @param Config $config
+     *
      * @return array
      */
-    public function getActivityListOption()
+    public function getActivityListOption(Config $config)
     {
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $templates            = [];
@@ -175,12 +178,17 @@ class ActivityListChainProvider
             if ($provider instanceof CommentProviderInterface) {
                 $hasComment = $provider->hasComments($this->configManager, $provider->getActivityClass());
             }
+            $template = $provider->getTemplate();
+            if ($provider instanceof ActivityListGroupProviderInterface &&
+                $config->get('oro_activity_list.grouping')) {
+                $template = $provider->getGroupedTemplate();
+            }
 
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
-                'template'     => $provider->getTemplate(),
+                'template'     => $template,
                 'routes'       => $provider->getRoutes(),
                 'has_comments' => $hasComment,
             ];
