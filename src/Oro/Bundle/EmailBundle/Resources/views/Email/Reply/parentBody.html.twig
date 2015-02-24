@@ -8,7 +8,9 @@
             }) }}
         </p>
         <div class="email-prev-body">
-            {{ email.emailBody.bodyContent|raw }}
+            {% if email.emailBody %}
+                {{ email.emailBody.bodyContent|raw }}
+            {% endif %}
         </div>
     </div>
 </body>
