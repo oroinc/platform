@@ -3,3 +3,28 @@ oro_system_configuration:
         email_configuration:
             icon:  icon-envelope
             title: oro.email.system_configuration.email_configuration
+        email_threads:
+            title: oro.email.system_configuration.email_threads.label
+
+    fields:
+        oro_email.use_threads_in_emails:
+            data_type: boolean
+            type: oro_config_checkbox
+            options:
+                label: oro.email.system_configuration.email_threads.use_threads_in_emails.label
+
+    tree:
+        system_configuration:
+            platform:
+                children:
+                    general_setup:
+                        children:
+                            email_configuration:
+                                children:
+                                    email_threads:
+                                        children:
+                                            - oro_email.use_threads_in_emails
+
+    api_tree:
+        email_threads:
+            oro_email.use_threads_in_emails: ~

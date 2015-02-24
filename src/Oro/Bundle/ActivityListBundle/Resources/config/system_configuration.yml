@@ -40,9 +40,7 @@ oro_system_configuration:
             data_type: boolean
             type: oro_config_checkbox
             options:
-                label: oro.activitylist.system_configuration.fields.grouping.label
-                tooltip: oro.activitylist.system_configuration.fields.grouping.tooltip
-                required: true
+                label: oro.activitylist.system_configuration.email_threads.use_threads_in_activities.label
 
     tree:
         system_configuration:
@@ -57,6 +55,10 @@ oro_system_configuration:
                                             - oro_activity_list.sorting_field
                                             - oro_activity_list.sorting_direction
                                             - oro_activity_list.per_page
+                            email_configuration:
+                                children:
+                                    email_threads:
+                                        children:
                                             - oro_activity_list.grouping
 
     api_tree:
@@ -64,3 +66,5 @@ oro_system_configuration:
             oro_activity_list.sorting_field: ~
             oro_activity_list.sorting_direction: ~
             oro_activity_list.per_page: ~
+        email_threads:
+            oro_activity_list.grouping: ~

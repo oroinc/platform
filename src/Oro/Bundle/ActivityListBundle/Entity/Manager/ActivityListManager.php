@@ -268,7 +268,7 @@ class ActivityListManager
                     'canCreate'    => true,
                 ],
                 'activityListOptions' => [
-                    'configuration'            => $this->chainProvider->getActivityListOption(),
+                    'configuration'            => $this->chainProvider->getActivityListOption($this->config),
                     'template'                 => '#template-activity-list',
                     'itemTemplate'             => '#template-activity-item',
                     'urls'                     => [],
