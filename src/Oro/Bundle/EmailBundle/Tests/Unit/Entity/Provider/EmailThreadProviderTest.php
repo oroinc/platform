@@ -123,9 +123,6 @@ class EmailThreadProviderTest extends \PHPUnit_Framework_TestCase
             ->getMockForAbstractClass();
 
         $emailFromTread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
-        $emailFromTread->expects($this->exactly(1))
-            ->method('getXThreadId')
-            ->will($this->returnValue(null));
 
         $query->expects($this->exactly(1))
             ->method('getResult')
