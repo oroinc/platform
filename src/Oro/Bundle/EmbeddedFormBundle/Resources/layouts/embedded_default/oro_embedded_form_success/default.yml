@@ -1,0 +1,9 @@
+oro_layout:
+    actions:
+        - @add:
+            id:        success_message
+            parent:    content
+            blockType: embed_form_success
+            options:
+                message: { @value: $context.embedded_form_entity.successMessage }
+                form_id: { @value: $context.embedded_form_entity.id }

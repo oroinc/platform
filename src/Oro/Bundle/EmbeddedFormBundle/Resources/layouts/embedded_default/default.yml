@@ -34,6 +34,8 @@ oro_layout:
             id:        form_css
             parent:    head
             blockType: style
+            options:
+                content: { @value: $context.embedded_form_entity.css }
         - @add:
             id:        content
             parent:    root

@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\EmbeddedFormBundle\Controller;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
-use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
-
-use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
-use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
+use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbeddedFormManager;
 use Oro\Bundle\EmbeddedFormBundle\Manager\EmbedFormLayoutManager;
+use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitAfterEvent;
+use Oro\Bundle\EmbeddedFormBundle\Event\EmbeddedFormSubmitBeforeEvent;
 
 class EmbedFormController extends Controller
 {
@@ -101,12 +100,9 @@ class EmbedFormController extends Controller
      */
     public function formSuccessAction(EmbeddedForm $formEntity)
     {
-        $response = new Response();
-
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
-        $response->setContent($layoutManager->getLayout($formEntity)->render());
 
-        return $response;
+        return new Response($layoutManager->getLayout($formEntity)->render());
     }
 }

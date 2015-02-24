@@ -9,6 +9,7 @@ use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
 
 class EmbedFormLayoutManager
@@ -61,7 +62,7 @@ class EmbedFormLayoutManager
         $formTypeName = $formEntity->getFormType();
         $customLayout = $this->formManager->getCustomFormLayoutByFormType($formTypeName);
 
-        $layoutContext->set('embedded_form', $form);
+        $layoutContext->set('embedded_form', null === $form ? null : new FormAccessor($form));
         $layoutContext->set('embedded_form_entity', $formEntity);
         $layoutContext->set('embedded_form_type', $formTypeName);
         $layoutContext->set('embedded_form_custom_layout', $customLayout);
