@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\Config\Loader\FolderContentsCummulativeLoader;
+use Oro\Component\Config\Loader\FolderContentCummulativeLoader;
 
 class OroLayoutExtension extends Extension
 {
@@ -64,7 +64,7 @@ class OroLayoutExtension extends Extension
         $foundThemeLayoutUpdates = [];
         $updatesLoader           = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            [new FolderContentsCummulativeLoader('Resources/layouts/', 3, false)]
+            [new FolderContentCummulativeLoader('Resources/layouts/', -1, false)]
         );
 
         $resources = $updatesLoader->load($container);

@@ -30,14 +30,16 @@ class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionAss
 
     public function updateLayout(\$layoutManipulator, \$item)
     {
-            if (\$this->expressionAssembler) {
-                \$expr = \$this->expressionAssembler->assemble(array (
+            if (null === \$this->expressionAssembler) {
+                throw new \RuntimeException('Missing expression assembler for layout update');
+            }
+
+            \$expr = \$this->expressionAssembler->assemble(array (
           '@true' => NULL,
         ));
-                \$context = ['context' => \$item->getContext()];
-                if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
-                    echo 123;
-                }
+            \$context = ['context' => \$item->getContext()];
+            if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
+                echo 123;
             }
     }
 

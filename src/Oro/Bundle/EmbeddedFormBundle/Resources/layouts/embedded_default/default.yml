@@ -34,7 +34,6 @@ oro_layout:
             id:        base_css
             parent:    head
             blockType: style
-
         - @add:
             id:        form_css
             parent:    head

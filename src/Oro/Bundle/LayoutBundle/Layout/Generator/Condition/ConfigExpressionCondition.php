@@ -50,12 +50,14 @@ class ConfigExpressionCondition implements ConditionInterface
         $method = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
 
         $bodyTemplate = <<<CONTENT
-    if (\$this->expressionAssembler) {
-        \$expr = \$this->expressionAssembler->assemble(%s);
-        \$context = ['context' => $%s->getContext()];
-        if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
-            %s
-        }
+    if (null === \$this->expressionAssembler) {
+        throw new \\RuntimeException('Missing expression assembler for layout update');
+    }
+
+    \$expr = \$this->expressionAssembler->assemble(%s);
+    \$context = ['context' => $%s->getContext()];
+    if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
+        %s
     }
 CONTENT;
 

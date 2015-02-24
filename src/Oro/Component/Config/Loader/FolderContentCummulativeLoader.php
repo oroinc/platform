@@ -8,7 +8,46 @@ use Oro\Component\Config\CumulativeResourceInfo;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class FolderContentsCummulativeLoader implements CumulativeResourceLoader
+/**
+ * Loader that returns folder content as a list of found files, works recursively as deep
+ * as it's configured by $maxNestingLevel param. There are two possible scenarios
+ * how it organizes data loaded: plain and nested, this configured by $plainResultStructure param.
+ *
+ * Examples:
+ *   Plain mode
+ *      Directory structure:
+ *          relative path folder/
+ *               file1.yml
+ *               foo/
+ *                  file2.yml
+ *                  bar/
+ *                      file3.yml
+ *      Loaded result:
+ *          [
+ *              'relative path folder/file1.yml'
+ *              'relative path folder/foo/file2.yml'
+ *              'relative path folder/foo/bar/file2.yml'
+ *          ]
+ *  Nested mode
+ *      Directory structure:
+ *          relative path folder/
+ *               file1.yml
+ *               foo/
+ *                  file2.yml
+ *                  bar/
+ *                      file3.yml
+ *      Loaded result:
+ *          [
+ *              0     => 'relative path folder/file1.yml',
+ *              'foo' => [
+ *                   0     => 'relative path folder/foo/file2.yml',
+ *                   'bar' => [
+ *                      'relative path folder/foo/bar/file2.yml'
+ *                   ]
+ *              ]
+ *          ]
+ */
+class FolderContentCummulativeLoader implements CumulativeResourceLoader
 {
     /** @var string */
     protected $relativeFolderPath;
