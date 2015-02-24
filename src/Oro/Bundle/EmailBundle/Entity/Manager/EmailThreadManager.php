@@ -7,6 +7,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 
 class EmailThreadManager
@@ -68,7 +69,14 @@ class EmailThreadManager
     {
         foreach ($newEntities as $entity) {
             if ($entity instanceof Email) {
-                $entity->setThreadId($this->emailThreadProvider->getEmailThreadId($entityManager, $entity));
+                $thread = $this->emailThreadProvider->getEmailThread($entityManager, $entity);
+                if ($thread) {
+                    $entityManager->persist($thread);
+                    $uow = $entityManager->getUnitOfWork();
+                    $metaData = $entityManager->getClassMetadata(EmailThread::ENTITY_CLASS);
+                    $uow->computeChangeSet($metaData, $thread);
+                    $entity->setThread($thread);
+                }
                 $this->updateRefs($entityManager, $entity);
                 $this->addEmailToQueue($entity);
             }
@@ -76,7 +84,7 @@ class EmailThreadManager
     }
 
     /**
-     * Handles email queue
+     * Set heads of queued emails
      *
      * @param EntityManager $entityManager
      */
@@ -97,10 +105,10 @@ class EmailThreadManager
      */
     protected function updateRefs(EntityManager $entityManager, Email $entity)
     {
-        if ($entity->getThreadId()) {
+        if ($entity->getThread()) {
             /** @var Email $email */
             foreach ($this->emailThreadProvider->getEmailReferences($entityManager, $entity) as $email) {
-                $email->setThreadId($entity->getThreadId());
+                $email->setThread($entity->getThread());
                 $entityManager->persist($email);
                 $this->addEmailToQueue($email);
             }
@@ -115,7 +123,7 @@ class EmailThreadManager
      */
     protected function updateThreadHead(EntityManager $entityManager, Email $entity)
     {
-        if ($entity->getThreadId() && $entity->getId()) {
+        if ($entity->getThread() && $entity->getId()) {
             $threadEmails = $this->emailThreadProvider->getThreadEmails($entityManager, $entity);
             $this->resetHead($entityManager, $threadEmails);
             $this->setHeadLastEmail($entityManager, $threadEmails);
