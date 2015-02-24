@@ -35,16 +35,15 @@ define([
          * @param {Array.<Object>} promises collection
          */
         onPageUpdate: function (pageData, actionArgs, jqXHR, promises) {
-            // starts deferred initialization
-            this._deferredRender();
-            // collects initialization promises
-            promises.push(this.deferredRender.promise(this));
-
             this.data = _.pick(pageData, this.pageItems);
             this.actionArgs = actionArgs;
             this.render();
             this.data = null;
             this.actionArgs = null;
+            if (this.deferredRender) {
+                // collects initialization promises
+                promises.push(this.deferredRender.promise(this));
+            }
         },
 
         /**
@@ -70,6 +69,8 @@ define([
                 PageRegionView.__super__.render.call(this);
             }
 
+            // starts deferred initialization
+            this._deferredRender();
             // initialize components in view's markup
             mediator.execute('layout:init', this.$el, this)
                 .done(_.bind(this._resolveDeferredRender, this));
@@ -104,6 +105,7 @@ define([
         _resolveDeferredRender: function () {
             if (this.deferredRender) {
                 this.deferredRender.resolve(this);
+                delete this.deferredRender;
             }
         }
     });

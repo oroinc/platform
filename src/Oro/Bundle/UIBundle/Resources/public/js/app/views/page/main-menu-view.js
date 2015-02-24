@@ -44,7 +44,6 @@ define([
             mediator.trigger('mainMenuUpdated', this);
             this.$el.trigger('mainMenuUpdated');
 
-            this._resolveDeferredRender();
             return this;
         },
 

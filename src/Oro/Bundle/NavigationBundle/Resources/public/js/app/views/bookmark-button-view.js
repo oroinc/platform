@@ -65,7 +65,6 @@ define([
                 this.$el.hide();
             }
 
-            this._resolveDeferredRender();
             return this;
         },
 

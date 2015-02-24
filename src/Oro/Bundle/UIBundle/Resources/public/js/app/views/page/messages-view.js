@@ -29,7 +29,6 @@ define([
                 this._addMessages(this.data.flashMessages);
             }
 
-            this._resolveDeferredRender();
             return this;
         },
 

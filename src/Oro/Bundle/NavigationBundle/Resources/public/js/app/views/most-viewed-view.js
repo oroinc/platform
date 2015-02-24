@@ -14,14 +14,12 @@ define([
         pageItems: ['mostviewed'],
 
         render: function () {
-            // update the view if data is not from cache
-            if (this.actionArgs && this.actionArgs.options.fromCache !== true) {
-                MostViewedView.__super__.render.call(this);
-            } else {
-                this._resolveDeferredRender();
+            // does not update view is data is from cache
+            if (!this.actionArgs || this.actionArgs.options.fromCache === true) {
+                return this;
             }
 
-            return this;
+            return MostViewedView.__super__.render.call(this);
         }
     });
 

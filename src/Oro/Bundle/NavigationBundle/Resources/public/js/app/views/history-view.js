@@ -14,14 +14,12 @@ define([
         pageItems: ['history'],
 
         render: function () {
-            // update the view if data is not from cache
-            if (this.actionArgs && this.actionArgs.options.fromCache !== true) {
-                HistoryView.__super__.render.call(this);
-            } else {
-                this._resolveDeferredRender();
+            // does not update view if data is from cache
+            if (!this.actionArgs || this.actionArgs.options.fromCache === true) {
+                return this;
             }
 
-            return this;
+            return HistoryView.__super__.render.call(this);
         }
     });
 
