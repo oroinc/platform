@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
@@ -146,7 +147,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['internalDate', new \DateTime('now', new \DateTimeZone('UTC'))],
             ['messageId', 'testMessageId'],
             ['xMessageId', 'testXMessageId'],
-            ['threadId', ['testThreadId']],
+            ['thread', new EmailThread()],
             ['xThreadId', 'testxXThreadId'],
             ['refs', 'testRefs'],
             ['seen', true],
