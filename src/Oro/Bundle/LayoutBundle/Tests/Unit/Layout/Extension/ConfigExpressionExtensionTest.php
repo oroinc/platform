@@ -3,6 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Func;
+use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
@@ -71,17 +74,17 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewEvaluatesAllExpressions()
     {
         $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
-        $expr->expects($this->once())
-            ->method('evaluate')
-            ->with(['context' => $context])
-            ->will($this->returnValue(true));
 
         $view->vars['expr_object']           = $expr;
         $view->vars['expr_array']            = ['@true' => null];
@@ -89,8 +92,15 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $view->vars['scalar']                = 123;
         $view->vars['attr']['enabled']       = ['@true' => null];
         $view->vars['label_attr']['enabled'] = ['@true' => null];
+        $view->vars['data-scalar']           = 'foo';
+        $view->vars['data-expr']             = ['@true' => null];
 
-        $this->expressionAssembler->expects($this->exactly(3))
+        $expr->expects($this->once())
+            ->method('evaluate')
+            ->with(['context' => $context, 'data' => $data, 'scalar' => 'foo', 'expr' => true])
+            ->will($this->returnValue(true));
+
+        $this->expressionAssembler->expects($this->exactly(4))
             ->method('assemble')
             ->with(['@true' => null])
             ->will($this->returnValue(new Condition\True()));
@@ -128,6 +138,94 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             $view->vars['label_attr']['enabled'],
             'Failed asserting that an expression in "label_attr" is assembled and evaluated'
         );
+        $this->assertSame(
+            'foo',
+            $view->vars['data-scalar'],
+            'Failed asserting that "data-scalar" exists'
+        );
+        $this->assertSame(
+            'foo',
+            $view->vars['data-scalar'],
+            'Failed asserting that "data-expr" is assembled and evaluated'
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedExceptionMessage The key "$expr" does exist in an array.
+     */
+    public function testFinishViewEvaluatesExpressionCycledToItself()
+    {
+        $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block->expects($this->once())
+            ->method('getContext')
+            ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
+        $view = new BlockView();
+
+        $view->vars['data-expr'] = ['@trim' => '$expr'];
+
+        $expr = new Func\Trim();
+        $expr->initialize([new PropertyPath('$expr')]);
+        $expr->setContextAccessor(new ContextAccessor());
+
+        $this->expressionAssembler->expects($this->once())
+            ->method('assemble')
+            ->with(['@trim' => '$expr'])
+            ->will($this->returnValue($expr));
+
+        $context['expressions.evaluate'] = true;
+        $this->extension->finishView($view, $block, []);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Circular reference in an expression for variable "data-expr2" of block "test_block". Max nesting level is 5.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testFinishViewEvaluatesCycledExpressions()
+    {
+        $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block->expects($this->once())
+            ->method('getContext')
+            ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
+        $view             = new BlockView();
+        $view->vars['id'] = 'test_block';
+
+        $view->vars['data-expr1'] = ['@trim' => '$expr2'];
+        $view->vars['data-expr2'] = ['@trim' => '$expr1'];
+
+        $expr1 = new Func\Trim();
+        $expr1->initialize([new PropertyPath('$expr2')]);
+        $expr1->setContextAccessor(new ContextAccessor());
+
+        $expr2 = new Func\Trim();
+        $expr2->initialize([new PropertyPath('$expr1')]);
+        $expr2->setContextAccessor(new ContextAccessor());
+
+        $this->expressionAssembler->expects($this->exactly(2))
+            ->method('assemble')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [['@trim' => '$expr2'], $expr1],
+                        [['@trim' => '$expr1'], $expr2]
+                    ]
+                )
+            );
+
+        $context['expressions.evaluate'] = true;
+        $this->extension->finishView($view, $block, []);
     }
 
     public function testFinishViewDoNothingIfEvaluationIfExpressionsDisabledAndEncodingIsNotSet()
@@ -137,6 +235,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->never())
+            ->method('getData');
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
@@ -166,10 +266,14 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewEncodesAllExpressions()
     {
         $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
@@ -234,10 +338,14 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewThrowsExceptionIfEncoderDoesNotExist()
     {
         $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
