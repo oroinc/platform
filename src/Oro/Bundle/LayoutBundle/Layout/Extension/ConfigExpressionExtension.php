@@ -21,6 +21,9 @@ use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompile
  */
 class ConfigExpressionExtension extends AbstractBlockTypeExtension implements ContextConfiguratorInterface
 {
+    const PARAM_EVALUATE = 'expressions_evaluate';
+    const PARAM_ENCODING = 'expressions_encoding';
+
     const SCOPE_VARS = 1;
     const SCOPE_ATTR = 2;
     const SCOPE_OTHER = 3;
@@ -56,8 +59,8 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     public function configureContext(ContextInterface $context)
     {
         $context->getDataResolver()
-            ->setDefaults(['expressions.evaluate' => true])
-            ->setOptional(['expressions.encoding']);
+            ->setDefaults([self::PARAM_EVALUATE => true])
+            ->setOptional([self::PARAM_ENCODING]);
     }
 
     /**
@@ -66,8 +69,8 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
         $context  = $block->getContext();
-        $evaluate = $context->get('expressions.evaluate');
-        $encoding = $context->getOr('expressions.encoding');
+        $evaluate = $context->get(self::PARAM_EVALUATE);
+        $encoding = $context->getOr(self::PARAM_ENCODING);
         if ($evaluate || $encoding !== null) {
             $view->vars = $this->processExpressions(
                 $view->vars,

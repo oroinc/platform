@@ -53,22 +53,22 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->configureContext($context);
         $context->resolve();
 
-        $this->assertTrue($context['expressions.evaluate']);
-        $this->assertFalse(isset($context['expressions.encoding']));
+        $this->assertTrue($context[ConfigExpressionExtension::PARAM_EVALUATE]);
+        $this->assertFalse(isset($context[ConfigExpressionExtension::PARAM_ENCODING]));
     }
 
     public function testConfigureContext()
     {
         $context = new LayoutContext();
 
-        $context['expressions.evaluate'] = false;
-        $context['expressions.encoding'] = 'json';
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
+        $context[ConfigExpressionExtension::PARAM_ENCODING] = 'json';
 
         $this->extension->configureContext($context);
         $context->resolve();
 
-        $this->assertFalse($context['expressions.evaluate']);
-        $this->assertEquals('json', $context['expressions.encoding']);
+        $this->assertFalse($context[ConfigExpressionExtension::PARAM_EVALUATE]);
+        $this->assertEquals('json', $context[ConfigExpressionExtension::PARAM_ENCODING]);
     }
 
     public function testFinishViewEvaluatesAllExpressions()
@@ -105,7 +105,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(['@true' => null])
             ->will($this->returnValue(new Condition\True()));
 
-        $context['expressions.evaluate'] = true;
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = true;
         $this->extension->finishView($view, $block, []);
 
         $this->assertSame(
@@ -178,7 +178,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(['@trim' => '$expr'])
             ->will($this->returnValue($expr));
 
-        $context['expressions.evaluate'] = true;
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = true;
         $this->extension->finishView($view, $block, []);
     }
 
@@ -224,7 +224,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $context['expressions.evaluate'] = true;
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = true;
         $this->extension->finishView($view, $block, []);
     }
 
@@ -257,7 +257,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $initialVars = $view->vars;
 
-        $context['expressions.evaluate'] = false;
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
         $this->extension->finishView($view, $block, []);
 
         $this->assertSame($initialVars, $view->vars);
@@ -293,8 +293,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(['@true' => null])
             ->will($this->returnValue(new Condition\True()));
 
-        $context['expressions.evaluate'] = false;
-        $context['expressions.encoding'] = 'json';
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
+        $context[ConfigExpressionExtension::PARAM_ENCODING] = 'json';
         $this->extension->finishView($view, $block, []);
 
         $this->assertSame(
@@ -354,8 +354,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $view->vars['expr_object'] = $expr;
 
-        $context['expressions.evaluate'] = false;
-        $context['expressions.encoding'] = 'unknown';
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
+        $context[ConfigExpressionExtension::PARAM_ENCODING] = 'unknown';
         $this->extension->finishView($view, $block, []);
     }
 }
