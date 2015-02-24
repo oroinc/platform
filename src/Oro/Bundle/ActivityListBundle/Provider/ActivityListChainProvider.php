@@ -180,7 +180,7 @@ class ActivityListChainProvider
             }
             $template = $provider->getTemplate();
             if ($provider instanceof ActivityListGroupProviderInterface &&
-                $config->get('oro_activity_list.use_threads_in_activities')) {
+                $config->get('oro_activity_list.grouping')) {
                 $template = $provider->getGroupedTemplate();
             }
 

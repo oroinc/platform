@@ -36,7 +36,7 @@ oro_system_configuration:
                     100:    100
                 constraints:
                     - NotBlank: ~
-        oro_activity_list.use_threads_in_activities:
+        oro_activity_list.grouping:
             data_type: boolean
             type: oro_config_checkbox
             options:
@@ -59,7 +59,7 @@ oro_system_configuration:
                                 children:
                                     email_threads:
                                         children:
-                                            - oro_activity_list.use_threads_in_activities
+                                            - oro_activity_list.grouping
 
     api_tree:
         activity_list:
@@ -67,4 +67,4 @@ oro_system_configuration:
             oro_activity_list.sorting_direction: ~
             oro_activity_list.per_page: ~
         email_threads:
-            oro_activity_list.use_threads_in_activities: ~
+            oro_activity_list.grouping: ~

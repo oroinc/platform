@@ -20,10 +20,10 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'sorting_field'             => ['value' => 'updatedAt'],
-                'sorting_direction'         => ['value' => 'DESC'],
-                'per_page'                  => ['value' => 10],
-                'use_threads_in_activities' => ['value' => true],
+                'sorting_field'     => ['value' => 'updatedAt'],
+                'sorting_direction' => ['value' => 'DESC'],
+                'per_page'          => ['value' => 10],
+                'grouping'          => ['value' => true],
             ]
         );
 

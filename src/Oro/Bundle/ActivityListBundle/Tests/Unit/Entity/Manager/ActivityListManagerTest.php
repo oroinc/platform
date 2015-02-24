@@ -111,7 +111,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                     if ($configKey === 'oro_activity_list.sorting_field') {
                         return 'createdBy';
                     }
-                    if ($configKey === 'oro_activity_list.use_threads_in_activities') {
+                    if ($configKey === 'oro_activity_list.grouping') {
                         return false;
                     }
                     return 'ASC';
@@ -151,7 +151,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                     if ($configKey === 'oro_activity_list.sorting_field') {
                         return 'createdBy';
                     }
-                    if ($configKey === 'oro_activity_list.use_threads_in_activities') {
+                    if ($configKey === 'oro_activity_list.grouping') {
                         return true;
                     }
                     return 'DESC';
