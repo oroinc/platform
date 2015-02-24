@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EmailModelBuilder|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailModelBuilder
      */
     protected $emailModelBuilder;
 
@@ -44,49 +44,126 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->emailModelBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailModelBuilder')
-            ->setConstructorArgs([$this->helper, $this->request, $this->entityManager])
-            ->setMethods(['applyRequest'])
-            ->getMock();
+        $this->emailModelBuilder = new EmailModelBuilder(
+            $this->helper,
+            $this->request,
+            $this->entityManager
+        );
     }
 
     /**
-     * @param string $method
-     * @param int    $applyRequestCalls
+     * @param $entityClass
+     * @param $entityId
+     * @param $from
+     * @param $subject
+     * @param $parentEmailId
+     * @param $helperDecodeClassNameCalls
+     * @param $emGetRepositoryCalls
+     * @param $helperPreciseFullEmailAddressCalls
+     * @param $helperGetUserCalls
+     * @param $helperBuildFullEmailAddress
      *
-     * @dataProvider createEmailMethodCallProvider
+     * @dataProvider createEmailModelProvider
+     *
+     * @SuppressWarnings(PHPMD)
      */
-    public function testCreateEmailModel($method, $applyRequestCalls)
-    {
+    public function testCreateEmailModel(
+        $entityClass,
+        $entityId,
+        $from,
+        $subject,
+        $parentEmailId,
+        $helperDecodeClassNameCalls,
+        $emGetRepositoryCalls,
+        $helperPreciseFullEmailAddressCalls,
+        $helperGetUserCalls,
+        $helperBuildFullEmailAddress
+    ) {
         $emailModel = new EmailModel();
+        $emailModel->setParentEmailId($parentEmailId);
 
-        $this->request->setMethod($method);
+        $this->request = new Request();
+        $this->request->setMethod('GET');
 
-        $this->emailModelBuilder->expects($this->exactly($applyRequestCalls))
-            ->method('applyRequest');
+        if ($entityClass) {
+            $this->request->query->set('entityClass', $entityClass);
+        }
+        if ($entityId) {
+            $this->request->query->set('entityId', $entityId);
+        }
+        if ($from) {
+            $this->request->query->set('from', $from);
+        }
+        if ($subject) {
+            $this->request->query->set('subject', $subject);
+        }
+
+        $this->emailModelBuilder = new EmailModelBuilder(
+            $this->helper,
+            $this->request,
+            $this->entityManager
+        );
+
+        $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
+            ->method('decodeClassName')
+            ->willReturn($entityClass);
+
+        $repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->entityManager->expects($this->exactly($emGetRepositoryCalls))
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        $this->helper->expects($this->exactly($helperPreciseFullEmailAddressCalls))
+            ->method('preciseFullEmailAddress');
+
+        $this->helper->expects($this->exactly($helperGetUserCalls))
+            ->method('getUser')
+            ->willReturn($this->getMock('Oro\Bundle\UserBundle\Entity\User'));
+
+        $this->helper->expects($this->exactly($helperBuildFullEmailAddress))
+            ->method('buildFullEmailAddress');
 
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
         $this->assertEquals($emailModel, $result);
     }
 
-    public function createEmailMethodCallProvider()
+    public function createEmailModelProvider()
     {
         return [
-            ['GET', 1],
-            ['POST', 0],
+            [
+                'entityClass' => 'Oro\Bundle\UserBundle\Entity\User',
+                'entityId' => 1,
+                'from' => 'from@example.com',
+                'subject' => 'Subject',
+                'parentEmailId' => 1,
+                'helperDecodeClassNameCalls' => 1,
+                'emGetRepositoryCalls' => 0,
+                'helperPreciseFullEmailAddressCalls' => 2,
+                'helperGetUserCalls' => 0,
+                'helperBuildFullEmailAddress' => 0,
+            ],
+            [
+                'entityClass' => null,
+                'entityId' => null,
+                'from' => null,
+                'subject' => null,
+                'parentEmailId' => null,
+                'helperDecodeClassNameCalls' => 0,
+                'emGetRepositoryCalls' => 0,
+                'helperPreciseFullEmailAddressCalls' => 0,
+                'helperGetUserCalls' => 2,
+                'helperBuildFullEmailAddress' => 2,
+            ],
         ];
     }
 
-    public function testCreateEmailModelFromScratch()
-    {
-        $result = $this->emailModelBuilder->createEmailModel();
-        $this->assertInstanceOf('Oro\Bundle\EmailBundle\Form\Model\Email', $result);
-    }
-
     /**
-     * @param boolean $getOwnerResult
-     * @param boolean $getUserResult
-     * @param $getToCalls
+     * @param object $getOwnerResult
+     * @param object $getUserResult
+     * @param int    $getToCalls
      *
      * @dataProvider createReplyEmailModelProvider
      */
@@ -98,7 +175,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getOwner')
             ->willReturn($getOwnerResult);
 
-        $this->helper->expects($this->once())
+        $this->helper->expects($this->any())
             ->method('getUser')
             ->willReturn($getUserResult);
 
@@ -145,11 +222,14 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function createReplyEmailModelProvider()
     {
+        $entityOne = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+        $entityTwo = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
         return [
-            [true, false, 0],
-            [false, true, 0],
-            [false, false, 1],
-            [true, true, 1],
+            [$entityOne, $entityTwo, 0],
+            [$entityTwo, $entityOne, 0],
+            [$entityOne, $entityOne, 1],
+            [$entityTwo, $entityTwo, 1],
         ];
     }
 
