@@ -82,6 +82,7 @@ class RendererTest extends LayoutTestCase
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }'])
             ->add('script', 'head', 'script', ['content' => 'alert(\'test\');'])
             ->add('content', 'root', 'body')
+            ->add('title', 'content', 'text', ['text' => 'Hi %val%!', 'text_parameters' => ['%val%' => 'World']])
             ->add(
                 'form',
                 'content',
@@ -189,7 +190,7 @@ HTML;
     protected function getTwigFormLayoutResult()
     {
         $expected = <<<HTML
-<fieldset>
+Hi World!    <fieldset>
     <legend>Additional Info</legend>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
@@ -246,7 +247,7 @@ HTML;
     protected function getPhpFormLayoutResult()
     {
         $expected = <<<HTML
-<fieldset>
+Hi World!                <fieldset>
     <legend>Additional Info</legend>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
