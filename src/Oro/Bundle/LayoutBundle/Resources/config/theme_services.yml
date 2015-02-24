@@ -1,10 +1,12 @@
 parameters:
-    oro_layout.theme_factory.class:                 Oro\Bundle\LayoutBundle\Theme\ThemeFactory
-    oro_layout.theme_manager.class:                 Oro\Bundle\LayoutBundle\Theme\ThemeManager
-    oro_layout.theme_extension.class:               Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension
+    oro_layout.theme_factory.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeFactory
+    oro_layout.theme_manager.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeManager
+    oro_layout.theme_extension.class:                  Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension
 
-    oro_layout.loader.php_file_loader.class:        Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader
-    oro_layout.loader.yaml_file_loader.class:       Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader
+    oro_layout.loader.default_resource_factory.class:  Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory
+
+    oro_layout.loader.php_file_loader.class:           Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader
+    oro_layout.loader.yaml_file_loader.class:          Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader
 
     oro_layout.theme_updates_resources: []
     oro_layout.updates_cache_dir:       %kernel.cache_dir%/layouts
@@ -19,6 +21,10 @@ services:
         arguments:
             - @oro_layout.theme_factory
             - []
+
+    oro_layout.loader.default_resource_factory:
+        class:  %oro_layout.loader.default_resource_factory.class%
+        public: false
 
     oro_layout.loader.chain_loader:
         class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader
@@ -49,7 +55,10 @@ services:
         arguments:
             - %oro_layout.theme_updates_resources%
             - @oro_layout.theme_manager
+            - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader.chain_loader
+        calls:
+            - [setAssembler, [@oro_layout.expression.assembler]]
         tags:
             - { name: monolog.logger, channel: main }
 
@@ -65,6 +74,7 @@ services:
         public: false
         arguments:
             - %oro_layout.theme_updates_resources%
+            - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader.chain_loader
         tags:
             - { name: kernel.cache_warmer }

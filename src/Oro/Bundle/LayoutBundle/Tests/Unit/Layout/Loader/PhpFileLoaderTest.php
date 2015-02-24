@@ -34,10 +34,6 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
                 '$resource'       => new FileResource('test.php'),
                 '$expectedResult' => true
             ],
-            'should support php route file resource' => [
-                '$resource'       => new RouteFileResource('test.php', uniqid('test_route')),
-                '$expectedResult' => true
-            ],
             'should not support yml resource'        => [
                 '$resource'       => new FileResource('test.yml'),
                 '$expectedResult' => false
@@ -61,8 +57,6 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $update = $loader->load(new FileResource($path));
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
-
-        $this->assertSame($update, $loader->load(new FileResource($path)), 'Should evaluate and instantiate once');
     }
 
     public function testLoadInProductionMode()
@@ -80,34 +74,30 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
 
         $update = $loader->load(new FileResource($path));
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
-
-        $this->assertSame($update, $loader->load(new FileResource($path)), 'Should evaluate and instantiate once');
         $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($dir)));
 
         $fs->remove($dir);
     }
 
-    public function testTakesIntoAccountRoute()
+    public function testPassesConditionCollection()
     {
         $generator = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface');
         $loader    = $this->getLoader($generator);
 
+        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update3.php';
+        $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
+        $resource = new FileResource($path);
+
         $generator->expects($this->once())->method('generate')
             ->willReturnCallback(
-                function ($className, $data, ConditionCollection $collection) {
-                    $this->assertNotEmpty($collection);
-                    $this->assertContainsOnlyInstancesOf(
-                        '\Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition',
-                        $collection
-                    );
+                function ($className, $data, ConditionCollection $collection) use ($resource) {
+                    $this->assertSame($resource->getConditions(), $collection);
 
                     return $this->buildClass($className, $data);
                 }
             );
-        $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update3.php';
-        $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
 
-        $loader->load(new RouteFileResource($path, uniqid('route')));
+        $loader->load($resource);
     }
 
     /**

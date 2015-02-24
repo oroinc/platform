@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
-use Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator;
-use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition;
 
-abstract class AbstractGeneratorLoader implements LoaderInterface
+abstract class AbstractLoader implements LoaderInterface
 {
     const CLASS_PREFIX = '__Oro_Layout_Update_';
 
@@ -19,9 +17,6 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
 
     /** @var string */
     private $cache;
-
-    /** @var array */
-    protected $loaded = [];
 
     /**
      * @param LayoutUpdateGeneratorInterface $generator
@@ -43,10 +38,6 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
         $name      = $resource->getFilename();
         $className = $this->generateClassName($name);
 
-        if (isset($this->loaded[$className])) {
-            return $this->loaded[$className];
-        }
-
         if (!class_exists($className, false)) {
             if (false === $cache = $this->getCacheFilename($name)) {
                 eval('?>' . $this->doGenerate($className, $resource));
@@ -60,7 +51,7 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
             }
         }
 
-        return $this->loaded[$className] = new $className($this);
+        return new $className($this);
     }
 
     /**
@@ -71,27 +62,18 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
      */
     protected function doGenerate($className, FileResource $resource)
     {
-        $conditionCollection = new ConditionCollection();
-
-        if ($resource instanceof RouteFileResource) {
-            $conditionCollection->append(
-                new SimpleContextValueComparisonCondition(
-                    RouteContextConfigurator::PARAM_NAME,
-                    '===',
-                    $resource->getRouteName()
-                )
-            );
-        }
-
         $resourceDataForGenerator = $this->loadResourceGeneratorData($resource);
+        $resourceDataForGenerator->setFilename($resource->getFilename());
 
-        return $this->getGenerator()->generate($className, $resourceDataForGenerator, $conditionCollection);
+        return $this->getGenerator()->generate($className, $resourceDataForGenerator, $resource->getConditions());
     }
 
     /**
+     * Loads file resource content and prepares generator data.
+     *
      * @param FileResource $resource
      *
-     * @return array|string
+     * @return GeneratorData
      */
     abstract protected function loadResourceGeneratorData(FileResource $resource);
 

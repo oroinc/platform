@@ -1,9 +1,5 @@
 oro_layout:
     actions:
-        #- @add:
-        #    id:        root
-        #    parent:    ~
-        #    blockType: root
         - @add:
             id:        head
             parent:    root

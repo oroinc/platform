@@ -9,6 +9,7 @@ use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 /**
  * Evaluates given PHP file resource, context of the file will consist with variables
  * LayoutManipulatorInterface $layoutManipulator and LayoutItemInterface $item
+ *
  * Example:
  *     <?php
  *         // @var LayoutManipulatorInterface $layoutManipulator
@@ -18,7 +19,7 @@ use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
  *
  * @see src/Oro/Bundle/LayoutBundle/Tests/Unit/Stubs/Updates/layout_update.php
  */
-class PhpFileLoader extends AbstractGeneratorLoader
+class PhpFileLoader extends AbstractLoader
 {
     /**
      * {@inheritdoc}
@@ -33,8 +34,6 @@ class PhpFileLoader extends AbstractGeneratorLoader
      */
     protected function loadResourceGeneratorData(FileResource $resource)
     {
-        $filename = $resource->getFilename();
-
-        return new GeneratorData(file_get_contents($filename), $filename);
+        return new GeneratorData(file_get_contents($resource->getFilename()));
     }
 }

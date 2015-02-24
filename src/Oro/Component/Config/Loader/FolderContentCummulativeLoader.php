@@ -13,7 +13,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  * as it's configured by $maxNestingLevel param. There are two possible scenarios
  * how it organizes data loaded: plain and nested, this configured by $plainResultStructure param.
  * It should be used when need to trace directory structure/content updates
- * (including adding new file or removing previosly found), but skip file modification.
+ * (including adding new file or removing previously found), but skip file modification.
  *
  * Examples:
  *   Plain mode

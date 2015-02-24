@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
+use Symfony\Component\HttpKernel\Tests\Logger;
+
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
+use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
+use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
-
-use Symfony\Component\HttpKernel\Tests\Logger;
 
 class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,6 +56,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension = new ThemeExtension(
             $this->resources,
             $this->themeManager,
+            new ResourceFactory(),
             new ChainLoader([$this->yamlLoader, $this->phpLoader])
         );
         $this->extension->setLogger($this->logger);
@@ -131,10 +134,24 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturnCallback($callbackBuilder('yml'));
 
         $this->yamlLoader->expects($this->once())->method('load')
-            ->with($this->isInstanceOf('Oro\Bundle\LayoutBundle\Layout\Loader\RouteFileResource'))
-            ->willReturn($this->getMock('Oro\Component\Layout\LayoutUpdateInterface'));
+            ->willReturnCallback(
+                function (FileResource $resource) {
+                    $this->assertNotEmpty($resource->getConditions());
+                    $this->assertContainsOnlyInstancesOf(
+                        'Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition',
+                        $resource->getConditions()
+                    );
+
+                    return $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+                }
+            );
 
         $this->extension->getLayoutUpdates('root');
+    }
+
+    public function testShouldPassDependenciesToUpdateInstance()
+    {
+        
     }
 
     protected function getCallbackBuilder()

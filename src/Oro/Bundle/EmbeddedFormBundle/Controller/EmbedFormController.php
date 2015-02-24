@@ -91,8 +91,7 @@ class EmbedFormController extends Controller
 
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
-        $layout        = $layoutManager->getFormLayout($formEntity, $form);
-        $response->setContent($layout->render());
+        $response->setContent($layoutManager->getLayout($formEntity, $form)->render());
 
         return $response;
     }
@@ -106,8 +105,7 @@ class EmbedFormController extends Controller
 
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
-        $layout        = $layoutManager->getFormSuccessLayout($formEntity);
-        $response->setContent($layout->render());
+        $response->setContent($layoutManager->getLayout($formEntity)->render());
 
         return $response;
     }

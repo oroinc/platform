@@ -35,4 +35,12 @@ class GeneratorData
     {
         return $this->filename;
     }
+
+    /**
+     * @param string $filename
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+    }
 }

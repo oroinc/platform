@@ -9,7 +9,7 @@ use Oro\Component\Layout\ContextConfiguratorInterface;
 
 class RouteContextConfigurator implements ContextConfiguratorInterface
 {
-    const PARAM_NAME = 'routeName';
+    const PARAM_ROUTE_NAME = 'route_name';
 
     /** @var Request|null */
     protected $request;
@@ -31,7 +31,7 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()->setOptional([self::PARAM_NAME]);
-        $context->set(self::PARAM_NAME, $this->request ? $this->request->get('_route') : null);
+        $context->getDataResolver()->setOptional([self::PARAM_ROUTE_NAME]);
+        $context->set(self::PARAM_ROUTE_NAME, $this->request ? $this->request->get('_route') : null);
     }
 }

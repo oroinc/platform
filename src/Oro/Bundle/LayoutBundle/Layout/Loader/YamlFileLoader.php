@@ -6,7 +6,22 @@ use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 
-class YamlFileLoader extends AbstractGeneratorLoader
+/**
+ * Generates layout update object and instantiate it based on yml configuration file content.
+ * Config should contain 'oro_layout' root node that should consist with array of actions in 'actions' node.
+ * Extra keys are allowed and will be processed(or skipped) depends on generator.
+ *
+ * Example:
+ *    oro_layout:
+ *        actions:
+ *            - @add:
+ *              id:        test
+ *              parent:    root
+ *              blockType: block
+ *
+ * @see src/Oro/Bundle/LayoutBundle/Tests/Unit/Stubs/Updates/layout_update4.yml
+ */
+class YamlFileLoader extends AbstractLoader
 {
     /**
      * {@inheritdoc}
@@ -21,10 +36,9 @@ class YamlFileLoader extends AbstractGeneratorLoader
      */
     protected function loadResourceGeneratorData(FileResource $resource)
     {
-        $filename = $resource->getFilename();
-        $data     = Yaml::parse($filename);
+        $data     = Yaml::parse($resource->getFilename());
         $data     = isset($data['oro_layout']) ? $data['oro_layout'] : [];
 
-        return new GeneratorData($data, $filename);
+        return new GeneratorData($data);
     }
 }
