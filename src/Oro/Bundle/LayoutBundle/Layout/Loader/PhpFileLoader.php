@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutManipulatorInterface;
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 
 /**
  * Evaluates given PHP file resource, context of the file will consist with variables

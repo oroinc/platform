@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
-use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Symfony\Component\Yaml\Yaml;
+
+use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 
 class YamlFileLoader extends AbstractGeneratorLoader
 {

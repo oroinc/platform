@@ -9,7 +9,7 @@ class PhpLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      */
     protected function doGenerateBody(GeneratorData $data)
     {
-        $result =  str_replace(['<?php', '<?', '?>'], '', $data->getSource());
+        $result = str_replace(['<?php', '<?', '?>'], '', $data->getSource());
 
         if ($data->getFilename()) {
             $result = '// filename: ' . $data->getFilename() . "\n" . $result;
