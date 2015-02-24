@@ -11,6 +11,7 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -188,9 +189,9 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getTemplate()
+    public function getTemplate(Config $config)
     {
-        if ($this->configManager->get('oro_email.enable_threads')) {
+        if ($config->get('oro_email.use_threads_at_activities')) {
             return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.js.twig';
         } else {
             return 'OroEmailBundle:Email:js/activityItemTemplate.js.twig';

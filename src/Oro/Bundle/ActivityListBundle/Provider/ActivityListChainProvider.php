@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -162,9 +163,11 @@ class ActivityListChainProvider
     }
 
     /**
+     * @param Config $config
+     *
      * @return array
      */
-    public function getActivityListOption()
+    public function getActivityListOption(Config $config)
     {
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $templates            = [];
@@ -180,7 +183,7 @@ class ActivityListChainProvider
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
-                'template'     => $provider->getTemplate(),
+                'template'     => $provider->getTemplate($config),
                 'routes'       => $provider->getRoutes(),
                 'has_comments' => $hasComment,
             ];
