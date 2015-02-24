@@ -30,37 +30,45 @@ class IifTest extends \PHPUnit_Framework_TestCase
     public function evaluateDataProvider()
     {
         return [
-            'true_expr'  => [
+            'true_expr'        => [
                 'options'        => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'context'        => ['foo' => 'true', 'bar' => 'false'],
                 'expectedResult' => 'true'
             ],
-            'false_expr' => [
+            'false_expr'       => [
                 'options'        => [new Condition\False(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'context'        => ['foo' => 'true', 'bar' => 'false'],
                 'expectedResult' => 'false'
+            ],
+            'short_true_expr'  => [
+                'options'        => [new PropertyPath('foo'), new PropertyPath('bar')],
+                'context'        => ['foo' => 'fooValue', 'bar' => 'barValue'],
+                'expectedResult' => 'fooValue'
+            ],
+            'short_false_expr' => [
+                'options'        => [new PropertyPath('foo'), new PropertyPath('bar')],
+                'context'        => ['foo' => null, 'bar' => 'barValue'],
+                'expectedResult' => 'barValue'
             ]
         ];
     }
 
     /**
      * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 3 elements, but 0 given.
+     * @expectedExceptionMessage Options must have 2 or 3 elements, but 0 given.
      */
     public function testInitializeFailsWhenEmptyOptions()
     {
         $this->function->initialize([]);
     }
 
-    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Invalid expression type. Expected "Oro\Component\ConfigExpression\ExpressionInterface", "integer" given.
+     * @expectedExceptionMessage Options must have 2 or 3 elements, but 4 given.
      */
-    // @codingStandardsIgnoreEnd
-    public function testInitializeFailsWhenFirstArgIsNotExpression()
+    public function testInitializeFailsWhenTooManyOptions()
     {
-        $this->function->initialize([1, 2, 3]);
+        $this->function->initialize([1, 2, 3, 4]);
     }
 
     /**

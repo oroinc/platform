@@ -7,6 +7,8 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 
 /**
  * Implements the ternary operator '?:'.
+ * This class supports both syntax the full (expr ? true_value : false_value)
+ * and the short (expr ?: false_value).
  */
 class Iif extends AbstractFunction
 {
@@ -18,6 +20,9 @@ class Iif extends AbstractFunction
 
     /** @var mixed */
     protected $falseValue;
+
+    /** @var boolean */
+    protected $isShort;
 
     /**
      * {@inheritdoc}
@@ -40,25 +45,26 @@ class Iif extends AbstractFunction
      */
     public function initialize(array $options)
     {
-        if (count($options) !== 3) {
+        $count = count($options);
+        if ($count < 2 || $count > 3) {
             throw new Exception\InvalidArgumentException(
-                sprintf('Options must have 3 elements, but %d given.', count($options))
+                sprintf('Options must have 2 or 3 elements, but %d given.', count($options))
             );
         }
 
         $this->expression = reset($options);
-        if (!$this->expression instanceof ExpressionInterface) {
-            throw new Exception\UnexpectedTypeException(
-                $this->expression,
-                'Oro\Component\ConfigExpression\ExpressionInterface',
-                'Invalid expression type.'
-            );
+        next($options);
+        if ($count === 2) {
+            // short syntax
+            $this->isShort    = true;
+            $this->falseValue = current($options);
+        } else {
+            // full syntax
+            $this->isShort   = false;
+            $this->trueValue = current($options);
+            next($options);
+            $this->falseValue = current($options);
         }
-
-        next($options);
-        $this->trueValue = current($options);
-        next($options);
-        $this->falseValue = current($options);
 
         return $this;
     }
@@ -68,8 +74,13 @@ class Iif extends AbstractFunction
      */
     protected function doEvaluate($context)
     {
-        return $this->expression->evaluate($context, $this->errors)
-            ? $this->resolveValue($context, $this->trueValue)
-            : $this->resolveValue($context, $this->falseValue);
+        $expression = $this->resolveValue($context, $this->expression);
+        if ($this->isShort) {
+            return $expression ?: $this->resolveValue($context, $this->falseValue);
+        } else {
+            return $expression
+                ? $this->resolveValue($context, $this->trueValue)
+                : $this->resolveValue($context, $this->falseValue);
+        }
     }
 }
