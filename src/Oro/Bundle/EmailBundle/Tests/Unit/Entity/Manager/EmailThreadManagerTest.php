@@ -23,50 +23,58 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testHandleOnFlush()
     {
-        $threadId = 'testThreadId';
+        $metaClass = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
         $emailFromThread = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromThread->expects($this->once())
-            ->method('setThreadId')
-            ->with($threadId);
+            ->method('setThread')
+            ->with($thread);
         $this->emailThreadProvider->expects($this->once())
-            ->method('getEmailThreadId')
-            ->will($this->returnValue($threadId));
+            ->method('getEmailThread')
+            ->will($this->returnValue($thread));
         $this->emailThreadProvider->expects($this->once())
             ->method('getEmailReferences')
             ->will($this->returnValue([$emailFromThread]));
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->once())
-            ->method('setThreadId')
-            ->with($threadId);
+            ->method('setThread')
+            ->with($thread);
         $email->expects($this->exactly(2))
-            ->method('getThreadId')
-            ->will($this->returnValue($threadId));
+            ->method('getThread')
+            ->will($this->returnValue($thread));
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
         $uow = $this->getMockBuilder('\Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()
             ->getMock();
-        $entityManager->expects($this->once())
+        $entityManager->expects($this->exactly(2))
             ->method('getUnitOfWork')
             ->will($this->returnValue($uow));
-        $entityManager->expects($this->exactly(1))
+        $entityManager->expects($this->exactly(2))
             ->method('persist');
+        $entityManager->expects($this->exactly(1))
+            ->method('getClassMetadata')
+            ->will($this->returnValue($metaClass));
 
         $uow->expects($this->once())
             ->method('getScheduledEntityInsertions')
             ->will($this->returnValue([$email, new \stdClass()]));
+        $uow->expects($this->once())
+            ->method('computeChangeSet');
 
         $this->manager->handleOnFlush(new OnFlushEventArgs($entityManager));
     }
 
     public function testHandlePostFlush()
     {
-        $threadId = 'id';
+        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
-            ->method('getThreadId')
-            ->will($this->returnValue($threadId));
+            ->method('getThread')
+            ->will($this->returnValue($thread));
         $email->expects($this->exactly(1))
             ->method('getId')
             ->will($this->returnValue(1));
@@ -117,6 +125,11 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
         $calls)
     {
         $threadId = 'testThreadId';
+        $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
+        $thread->expects($this->any())
+            ->method('getId')
+            ->will($this->returnValue(1));
+
         $emailFromThread1 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromThread2 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $emailFromThread3 = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
@@ -166,16 +179,15 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
 
         $email = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
         $email->expects($this->exactly(1))
-            ->method('getThreadId')
-            ->will($this->returnValue($threadId));
-        $email->expects($this->exactly(1))
+            ->method('getThread')
+            ->will($this->returnValue($thread));
+        $email->expects($this->any())
             ->method('getId')
             ->will($this->returnValue(1));
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-
         $entityManager->expects($this->exactly(4))
             ->method('persist');
 

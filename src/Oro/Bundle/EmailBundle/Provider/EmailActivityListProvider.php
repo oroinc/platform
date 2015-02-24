@@ -154,7 +154,7 @@ class EmailActivityListProvider implements
         $email = $headEmail = $this->doctrineRegistryLink->getService()
             ->getRepository($activityListEntity->getRelatedActivityClass())
             ->find($activityListEntity->getRelatedActivityId());
-        if ($email->isHead() && $email->getThreadId()) {
+        if ($email->isHead() && $email->getThread()) {
             $headEmail = $this->emailThreadProvider->getHeadEmail(
                 $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),
                 $email
@@ -168,7 +168,7 @@ class EmailActivityListProvider implements
             'headOwnerName' => $headEmail->getFromName(),
             'headSubject'   => $headEmail->getSubject(),
             'headSentAt'    => $headEmail->getSentAt()->format('c'),
-            'isHead'        => $email->isHead() && $email->getThreadId()
+            'isHead'        => $email->isHead() && $email->getThread()
         ];
 
         if ($email->getFromEmailAddress()->hasOwner()) {
@@ -249,8 +249,8 @@ class EmailActivityListProvider implements
             'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
         )
             ->setParameter('class', self::ACTIVITY_CLASS)
-            ->andWhere('e.threadId = :threadId')
-            ->setParameter('threadId', $email->getThreadId());
+            ->andWhere('e.thread = :thread')
+            ->setParameter('thread', $email->getThread());
 
         return $queryBuilder->getQuery()->getResult();
     }
