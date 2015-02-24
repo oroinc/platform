@@ -91,9 +91,9 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $view->vars['not_expr_array']        = ['\@true' => null];
         $view->vars['scalar']                = 123;
         $view->vars['attr']['enabled']       = ['@true' => null];
+        $view->vars['attr']['data-scalar']   = 'foo';
+        $view->vars['attr']['data-expr']     = ['@true' => null];
         $view->vars['label_attr']['enabled'] = ['@true' => null];
-        $view->vars['data-scalar']           = 'foo';
-        $view->vars['data-expr']             = ['@true' => null];
 
         $expr->expects($this->once())
             ->method('evaluate')
@@ -134,19 +134,19 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             'Failed asserting that an expression in "attr" is assembled and evaluated'
         );
         $this->assertSame(
+            'foo',
+            $view->vars['attr']['data-scalar'],
+            'Failed asserting that "attr.data-scalar" exists'
+        );
+        $this->assertSame(
+            'foo',
+            $view->vars['attr']['data-scalar'],
+            'Failed asserting that "attr.data-expr" is assembled and evaluated'
+        );
+        $this->assertSame(
             true,
             $view->vars['label_attr']['enabled'],
             'Failed asserting that an expression in "label_attr" is assembled and evaluated'
-        );
-        $this->assertSame(
-            'foo',
-            $view->vars['data-scalar'],
-            'Failed asserting that "data-scalar" exists'
-        );
-        $this->assertSame(
-            'foo',
-            $view->vars['data-scalar'],
-            'Failed asserting that "data-expr" is assembled and evaluated'
         );
     }
 
@@ -167,7 +167,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($data));
         $view = new BlockView();
 
-        $view->vars['data-expr'] = ['@trim' => '$expr'];
+        $view->vars['attr']['data-expr'] = ['@trim' => '$expr'];
 
         $expr = new Func\Trim();
         $expr->initialize([new PropertyPath('$expr')]);
@@ -202,8 +202,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $view             = new BlockView();
         $view->vars['id'] = 'test_block';
 
-        $view->vars['data-expr1'] = ['@trim' => '$expr2'];
-        $view->vars['data-expr2'] = ['@trim' => '$expr1'];
+        $view->vars['attr']['data-expr1'] = ['@trim' => '$expr2'];
+        $view->vars['attr']['data-expr2'] = ['@trim' => '$expr1'];
 
         $expr1 = new Func\Trim();
         $expr1->initialize([new PropertyPath('$expr2')]);

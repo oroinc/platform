@@ -21,6 +21,9 @@ use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompile
  */
 class ConfigExpressionExtension extends AbstractBlockTypeExtension implements ContextConfiguratorInterface
 {
+    const SCOPE_VARS = 1;
+    const SCOPE_ATTR = 2;
+    const SCOPE_OTHER = 3;
     const MAX_EXPRESSION_NESTING_LEVEL = 5;
 
     /** @var AssemblerInterface */
@@ -73,7 +76,7 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
                 $block->getData(),
                 $evaluate,
                 $encoding,
-                true
+                self::SCOPE_VARS
             );
         }
     }
@@ -93,11 +96,12 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
      * @param DataProviderRegistryInterface $data
      * @param bool                          $evaluate
      * @param string                        $encoding
-     * @param bool                          $isVars
+     * @param int                           $scope
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function processExpressions(
         array &$values,
@@ -106,21 +110,22 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
         DataProviderRegistryInterface $data,
         $evaluate,
         $encoding,
-        $isVars = false
+        $scope
     ) {
         $removeBackslashKeys = [];
         foreach ($values as $key => $value) {
             if (is_array($value)) {
-                if ($isVars && ($key === 'attr' || $key === 'label_attr')) {
+                if ($scope === self::SCOPE_VARS && ($key === 'attr' || $key === 'label_attr')) {
                     // process block and block label attributes
                     if (!empty($value)) {
                         $values[$key] = $this->processExpressions(
-                            $value,
+                            $values[$key],
                             $view,
                             $context,
                             $data,
                             $evaluate,
-                            $encoding
+                            $encoding,
+                            $key === 'attr' ? self::SCOPE_ATTR : self::SCOPE_OTHER
                         );
                     }
                     continue;
@@ -142,10 +147,15 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
                     }
                 }
             }
-            if ($value instanceof ExpressionInterface && $values[$key] instanceof ExpressionInterface) {
+            if ($value instanceof ExpressionInterface) {
                 if ($evaluate) {
                     $values[$key] = $value->evaluate(
-                        $this->getEvaluateExpressionContext($view, $context, $data, $isVars ? $key : null)
+                        $this->getEvaluateExpressionContext(
+                            $view,
+                            $context,
+                            $data,
+                            $scope === self::SCOPE_ATTR ? $key : null
+                        )
                     );
                 } else {
                     $values[$key] = $this->encodeExpression($value, $encoding);
@@ -179,7 +189,7 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
         $nestingLevel = 0
     ) {
         $result = ['context' => $context, 'data' => $data];
-        foreach ($view->vars as $key => $value) {
+        foreach ($view->vars['attr'] as $key => $value) {
             if (strpos($key, 'data-') === 0) {
                 if ($excludeKey !== null && $excludeKey === $key) {
                     // skip a variable for which an expression is calculated
@@ -191,8 +201,8 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
                     $k = key($value);
                     if (is_string($k) && strpos($k, '@') === 0) {
                         // do an expression assembling
-                        $value            = $this->expressionAssembler->assemble($value);
-                        $view->vars[$key] = $value;
+                        $value                    = $this->expressionAssembler->assemble($value);
+                        $view->vars['attr'][$key] = $value;
                     }
                 }
                 if ($value instanceof ExpressionInterface) {
@@ -208,10 +218,10 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
                             )
                         );
                     }
-                    $value            = $value->evaluate(
+                    $value                    = $value->evaluate(
                         $this->getEvaluateExpressionContext($view, $context, $data, $key, $nestingLevel + 1)
                     );
-                    $view->vars[$key] = $value;
+                    $view->vars['attr'][$key] = $value;
                 }
                 $result[substr($key, 5)] = $value;
             }
