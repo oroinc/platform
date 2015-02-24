@@ -65,8 +65,8 @@ define(function (require) {
             delete dialogs[data.id];
             scrollUpdate();
         });
-        mediator.on('widget_dialog:stateChange', function (dara) {
-            dialogs[dara.id] = dara.state !== 'minimized';
+        mediator.on('widget_dialog:stateChange', function (data) {
+            dialogs[data.id] = data.state !== 'minimized';
             scrollUpdate();
         });
     }
