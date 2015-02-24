@@ -189,13 +189,17 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getTemplate(Config $config)
+    public function getTemplate()
     {
-        if ($config->get('oro_activity_list.use_threads_in_activities')) {
-            return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.js.twig';
-        } else {
-            return 'OroEmailBundle:Email:js/activityItemTemplate.js.twig';
-        }
+        return 'OroEmailBundle:Email:js/activityItemTemplate.js.twig';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupedTemplate()
+    {
+        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.js.twig';
     }
 
     /**

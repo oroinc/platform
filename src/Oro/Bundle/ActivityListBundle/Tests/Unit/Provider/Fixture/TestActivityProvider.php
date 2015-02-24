@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
@@ -38,7 +37,7 @@ class TestActivityProvider implements ActivityListProviderInterface, CommentProv
     /**
      * {@inheritdoc}
      */
-    public function getTemplate(Config $config)
+    public function getTemplate()
     {
         return 'test_template.js.twig';
     }

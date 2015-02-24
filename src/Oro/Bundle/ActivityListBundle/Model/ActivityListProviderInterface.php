@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Model;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
@@ -41,10 +40,9 @@ interface ActivityListProviderInterface
     public function getOrganization($activityEntity);
 
     /**
-     * @param Config $config
      * @return string
      */
-    public function getTemplate(Config $config);
+    public function getTemplate();
 
     /**
      * Should return array of route names as key => value

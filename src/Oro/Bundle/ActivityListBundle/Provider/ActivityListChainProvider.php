@@ -178,12 +178,17 @@ class ActivityListChainProvider
             if ($provider instanceof CommentProviderInterface) {
                 $hasComment = $provider->hasComments($this->configManager, $provider->getActivityClass());
             }
+            $template = $provider->getTemplate();
+            if ($provider instanceof ActivityListGroupProviderInterface &&
+                $config->get('oro_activity_list.use_threads_in_activities')) {
+                $template = $provider->getGroupedTemplate();
+            }
 
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
-                'template'     => $provider->getTemplate($config),
+                'template'     => $template,
                 'routes'       => $provider->getRoutes(),
                 'has_comments' => $hasComment,
             ];
