@@ -26,7 +26,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The block type "unknown" can not be loaded by this extension.
      */
-    public function testGetUnknownBlockType()
+    public function testGetUnknownType()
     {
         $extension = $this->getAbstractExtension();
         $extension->getType('unknown');
@@ -87,26 +87,54 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testHasContextConfiguratorsWhenNoAnyRegistered()
     {
-        $extension = new AbstractExtensionStub([], [], [], []);
+        $extension = new AbstractExtensionStub([], [], [], [], []);
 
         $this->assertFalse($extension->hasContextConfigurators());
     }
 
     public function testGetContextConfiguratorsWhenNoAnyRegistered()
     {
-        $extension = new AbstractExtensionStub([], [], [], []);
+        $extension = new AbstractExtensionStub([], [], [], [], []);
 
         $this->assertSame([], $extension->getContextConfigurators());
     }
 
+    public function testHasDataProvider()
+    {
+        $extension = $this->getAbstractExtension();
+        $this->assertTrue($extension->hasDataProvider('test'));
+        $this->assertFalse($extension->hasDataProvider('unknown'));
+    }
+
+    public function testGetDataProvider()
+    {
+        $extension = $this->getAbstractExtension();
+        $this->assertInstanceOf(
+            'Oro\Component\Layout\DataProviderInterface',
+            $extension->getDataProvider('test')
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The data provider "unknown" can not be loaded by this extension.
+     */
+    public function testGetUnknownDataProvider()
+    {
+        $extension = $this->getAbstractExtension();
+        $extension->getDataProvider('unknown');
+    }
+
+    // @codingStandardsIgnoreStart
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
-     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\BlockTypeInterface", "integer" given.
+     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\DataProviderInterface", "integer" given.
      */
-    public function testLoadInvalidBlockTypes()
+    // @codingStandardsIgnoreEnd
+    public function testLoadInvalidDataProviders()
     {
-        $extension = new AbstractExtensionStub([123], [], [], []);
-        $extension->hasType('test');
+        $extension = new AbstractExtensionStub([], [], [], [], [123]);
+        $extension->hasDataProvider('test');
     }
 
     // @codingStandardsIgnoreStart
@@ -117,7 +145,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testLoadInvalidBlockTypeExtensions()
     {
-        $extension = new AbstractExtensionStub([], [123], [], []);
+        $extension = new AbstractExtensionStub([], [123], [], [], []);
         $extension->hasTypeExtensions('test');
     }
 
@@ -129,7 +157,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testLoadInvalidLayoutUpdates()
     {
-        $extension = new AbstractExtensionStub([], [], ['test' => [123]], []);
+        $extension = new AbstractExtensionStub([], [], ['test' => [123]], [], []);
         $extension->hasLayoutUpdates('test');
     }
 
@@ -145,6 +173,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 [$this->getMock('Oro\Component\Layout\LayoutUpdateInterface')]
             ],
+            [],
             []
         );
         $extension->hasLayoutUpdates('test');
@@ -164,6 +193,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'test' => $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
             ],
+            [],
             []
         );
         $extension->hasLayoutUpdates('test');
@@ -177,8 +207,18 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreEnd
     public function testLoadInvalidContextConfigurators()
     {
-        $extension = new AbstractExtensionStub([], [], [], [123]);
+        $extension = new AbstractExtensionStub([], [], [], [123], []);
         $extension->hasContextConfigurators();
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
+     * @expectedExceptionMessage Expected argument of type "Oro\Component\Layout\BlockTypeInterface", "integer" given.
+     */
+    public function testLoadInvalidBlockTypes()
+    {
+        $extension = new AbstractExtensionStub([123], [], [], [], []);
+        $extension->hasType('test');
     }
 
     protected function getAbstractExtension()
@@ -201,7 +241,8 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
                     $this->getMock('Oro\Component\Layout\LayoutUpdateInterface')
                 ]
             ],
-            [$this->getMock('Oro\Component\Layout\ContextConfiguratorInterface')]
+            [$this->getMock('Oro\Component\Layout\ContextConfiguratorInterface')],
+            ['test' => $this->getMock('Oro\Component\Layout\DataProviderInterface')]
         );
     }
 }

@@ -3,6 +3,9 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Component\ConfigExpression\Condition;
+use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\ConfigExpression\Func;
+use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
@@ -50,52 +53,59 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->configureContext($context);
         $context->resolve();
 
-        $this->assertTrue($context['expressions.evaluate']);
-        $this->assertFalse(isset($context['expressions.encoding']));
+        $this->assertTrue($context[ConfigExpressionExtension::PARAM_EVALUATE]);
+        $this->assertFalse(isset($context[ConfigExpressionExtension::PARAM_ENCODING]));
     }
 
     public function testConfigureContext()
     {
         $context = new LayoutContext();
 
-        $context['expressions.evaluate'] = false;
-        $context['expressions.encoding'] = 'json';
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
+        $context[ConfigExpressionExtension::PARAM_ENCODING] = 'json';
 
         $this->extension->configureContext($context);
         $context->resolve();
 
-        $this->assertFalse($context['expressions.evaluate']);
-        $this->assertEquals('json', $context['expressions.encoding']);
+        $this->assertFalse($context[ConfigExpressionExtension::PARAM_EVALUATE]);
+        $this->assertEquals('json', $context[ConfigExpressionExtension::PARAM_ENCODING]);
     }
 
     public function testFinishViewEvaluatesAllExpressions()
     {
         $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
-        $expr->expects($this->once())
-            ->method('evaluate')
-            ->with(['context' => $context])
-            ->will($this->returnValue(true));
 
         $view->vars['expr_object']           = $expr;
         $view->vars['expr_array']            = ['@true' => null];
         $view->vars['not_expr_array']        = ['\@true' => null];
         $view->vars['scalar']                = 123;
         $view->vars['attr']['enabled']       = ['@true' => null];
+        $view->vars['attr']['data-scalar']   = 'foo';
+        $view->vars['attr']['data-expr']     = ['@true' => null];
         $view->vars['label_attr']['enabled'] = ['@true' => null];
 
-        $this->expressionAssembler->expects($this->exactly(3))
+        $expr->expects($this->once())
+            ->method('evaluate')
+            ->with(['context' => $context, 'data' => $data, 'scalar' => 'foo', 'expr' => true])
+            ->will($this->returnValue(true));
+
+        $this->expressionAssembler->expects($this->exactly(4))
             ->method('assemble')
             ->with(['@true' => null])
             ->will($this->returnValue(new Condition\True()));
 
-        $context['expressions.evaluate'] = true;
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = true;
         $this->extension->finishView($view, $block, []);
 
         $this->assertSame(
@@ -124,10 +134,98 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             'Failed asserting that an expression in "attr" is assembled and evaluated'
         );
         $this->assertSame(
+            'foo',
+            $view->vars['attr']['data-scalar'],
+            'Failed asserting that "attr.data-scalar" exists'
+        );
+        $this->assertSame(
+            'foo',
+            $view->vars['attr']['data-scalar'],
+            'Failed asserting that "attr.data-expr" is assembled and evaluated'
+        );
+        $this->assertSame(
             true,
             $view->vars['label_attr']['enabled'],
             'Failed asserting that an expression in "label_attr" is assembled and evaluated'
         );
+    }
+
+    /**
+     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedExceptionMessage The key "$expr" does exist in an array.
+     */
+    public function testFinishViewEvaluatesExpressionCycledToItself()
+    {
+        $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block->expects($this->once())
+            ->method('getContext')
+            ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
+        $view = new BlockView();
+
+        $view->vars['attr']['data-expr'] = ['@trim' => '$expr'];
+
+        $expr = new Func\Trim();
+        $expr->initialize([new PropertyPath('$expr')]);
+        $expr->setContextAccessor(new ContextAccessor());
+
+        $this->expressionAssembler->expects($this->once())
+            ->method('assemble')
+            ->with(['@trim' => '$expr'])
+            ->will($this->returnValue($expr));
+
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = true;
+        $this->extension->finishView($view, $block, []);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Circular reference in an expression for variable "data-expr2" of block "test_block". Max nesting level is 5.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testFinishViewEvaluatesCycledExpressions()
+    {
+        $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
+        $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block->expects($this->once())
+            ->method('getContext')
+            ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
+        $view             = new BlockView();
+        $view->vars['id'] = 'test_block';
+
+        $view->vars['attr']['data-expr1'] = ['@trim' => '$expr2'];
+        $view->vars['attr']['data-expr2'] = ['@trim' => '$expr1'];
+
+        $expr1 = new Func\Trim();
+        $expr1->initialize([new PropertyPath('$expr2')]);
+        $expr1->setContextAccessor(new ContextAccessor());
+
+        $expr2 = new Func\Trim();
+        $expr2->initialize([new PropertyPath('$expr1')]);
+        $expr2->setContextAccessor(new ContextAccessor());
+
+        $this->expressionAssembler->expects($this->exactly(2))
+            ->method('assemble')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [['@trim' => '$expr2'], $expr1],
+                        [['@trim' => '$expr1'], $expr2]
+                    ]
+                )
+            );
+
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = true;
+        $this->extension->finishView($view, $block, []);
     }
 
     public function testFinishViewDoNothingIfEvaluationIfExpressionsDisabledAndEncodingIsNotSet()
@@ -137,6 +235,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->never())
+            ->method('getData');
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
@@ -157,7 +257,7 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $initialVars = $view->vars;
 
-        $context['expressions.evaluate'] = false;
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
         $this->extension->finishView($view, $block, []);
 
         $this->assertSame($initialVars, $view->vars);
@@ -166,10 +266,14 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewEncodesAllExpressions()
     {
         $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
@@ -189,8 +293,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(['@true' => null])
             ->will($this->returnValue(new Condition\True()));
 
-        $context['expressions.evaluate'] = false;
-        $context['expressions.encoding'] = 'json';
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
+        $context[ConfigExpressionExtension::PARAM_ENCODING] = 'json';
         $this->extension->finishView($view, $block, []);
 
         $this->assertSame(
@@ -234,10 +338,14 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testFinishViewThrowsExceptionIfEncoderDoesNotExist()
     {
         $context = new LayoutContext();
+        $data    = $this->getMock('Oro\Component\Layout\DataProviderRegistryInterface');
         $block   = $this->getMock('Oro\Component\Layout\BlockInterface');
         $block->expects($this->once())
             ->method('getContext')
             ->will($this->returnValue($context));
+        $block->expects($this->once())
+            ->method('getData')
+            ->will($this->returnValue($data));
         $view = new BlockView();
 
         $expr = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
@@ -246,8 +354,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
 
         $view->vars['expr_object'] = $expr;
 
-        $context['expressions.evaluate'] = false;
-        $context['expressions.encoding'] = 'unknown';
+        $context[ConfigExpressionExtension::PARAM_EVALUATE] = false;
+        $context[ConfigExpressionExtension::PARAM_ENCODING] = 'unknown';
         $this->extension->finishView($view, $block, []);
     }
 }

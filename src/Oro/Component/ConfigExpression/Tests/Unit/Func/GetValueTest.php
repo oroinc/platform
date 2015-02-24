@@ -7,14 +7,14 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Func;
 use Oro\Component\ConfigExpression\PropertyAccess\PropertyPath;
 
-class IifTest extends \PHPUnit_Framework_TestCase
+class GetValueTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Func\Iif */
+    /** @var Func\GetValue */
     protected $function;
 
     protected function setUp()
     {
-        $this->function = new Func\Iif();
+        $this->function = new Func\GetValue();
         $this->function->setContextAccessor(new ContextAccessor());
     }
 
@@ -30,32 +30,27 @@ class IifTest extends \PHPUnit_Framework_TestCase
     public function evaluateDataProvider()
     {
         return [
-            'true_expr'        => [
-                'options'        => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
-                'context'        => ['foo' => 'true', 'bar' => 'false'],
-                'expectedResult' => 'true'
+            'get'           => [
+                'options'        => [new PropertyPath('foo')],
+                'context'        => ['foo' => 'bar'],
+                'expectedResult' => 'bar'
             ],
-            'false_expr'       => [
-                'options'        => [new Condition\False(), new PropertyPath('foo'), new PropertyPath('bar')],
-                'context'        => ['foo' => 'true', 'bar' => 'false'],
-                'expectedResult' => 'false'
+            'get_with_expr' => [
+                'options'        => [new Condition\True()],
+                'context'        => [],
+                'expectedResult' => true
             ],
-            'short_true_expr'  => [
-                'options'        => [new PropertyPath('foo'), new PropertyPath('bar')],
-                'context'        => ['foo' => 'fooValue', 'bar' => 'barValue'],
-                'expectedResult' => 'fooValue'
-            ],
-            'short_false_expr' => [
-                'options'        => [new PropertyPath('foo'), new PropertyPath('bar')],
-                'context'        => ['foo' => null, 'bar' => 'barValue'],
-                'expectedResult' => 'barValue'
+            'get_constant'  => [
+                'options'        => ['foo'],
+                'context'        => [],
+                'expectedResult' => 'foo'
             ]
         ];
     }
 
     /**
      * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 or 3 elements, but 0 given.
+     * @expectedExceptionMessage Options must have 1 element, but 0 given.
      */
     public function testInitializeFailsWhenEmptyOptions()
     {
@@ -64,11 +59,11 @@ class IifTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Options must have 2 or 3 elements, but 4 given.
+     * @expectedExceptionMessage Options must have 1 element, but 2 given.
      */
     public function testInitializeFailsWhenTooManyOptions()
     {
-        $this->function->initialize([1, 2, 3, 4]);
+        $this->function->initialize([1, 2]);
     }
 
     /**
@@ -88,28 +83,24 @@ class IifTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new PropertyPath('foo')],
                 'message'  => null,
                 'expected' => [
-                    '@iif' => [
+                    '@value' => [
                         'parameters' => [
-                            ['@true' => null],
-                            '$foo',
-                            '$bar'
+                            '$foo'
                         ]
                     ]
                 ]
             ],
             [
-                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new PropertyPath('foo')],
                 'message'  => 'Test',
                 'expected' => [
-                    '@iif' => [
+                    '@value' => [
                         'message'    => 'Test',
                         'parameters' => [
-                            ['@true' => null],
-                            '$foo',
-                            '$bar'
+                            '$foo'
                         ]
                     ]
                 ]

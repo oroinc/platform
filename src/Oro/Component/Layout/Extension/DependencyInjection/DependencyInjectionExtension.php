@@ -59,24 +59,34 @@ class DependencyInjectionExtension implements ExtensionInterface
     private $contextConfiguratorServiceIds;
 
     /**
+     * The data provider services registered in DI container
+     *
+     * @var string[]
+     */
+    private $dataProviderServiceIds;
+
+    /**
      * @param ContainerInterface $container
      * @param string[]           $typeServiceIds
      * @param array              $typeExtensionServiceIds array of string[]
      * @param array              $layoutUpdateServiceIds  array of string[]
      * @param string[]           $contextConfiguratorServiceIds
+     * @param string[]           $dataProviderServiceIds
      */
     public function __construct(
         ContainerInterface $container,
         array $typeServiceIds,
         array $typeExtensionServiceIds,
         array $layoutUpdateServiceIds,
-        array $contextConfiguratorServiceIds
+        array $contextConfiguratorServiceIds,
+        array $dataProviderServiceIds
     ) {
         $this->container                     = $container;
         $this->typeServiceIds                = $typeServiceIds;
         $this->typeExtensionServiceIds       = $typeExtensionServiceIds;
         $this->layoutUpdateServiceIds        = $layoutUpdateServiceIds;
         $this->contextConfiguratorServiceIds = $contextConfiguratorServiceIds;
+        $this->dataProviderServiceIds        = $dataProviderServiceIds;
     }
 
     /**
@@ -183,5 +193,27 @@ class DependencyInjectionExtension implements ExtensionInterface
     public function hasContextConfigurators()
     {
         return !empty($this->contextConfiguratorServiceIds);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataProvider($name)
+    {
+        if (!isset($this->dataProviderServiceIds[$name])) {
+            throw new Exception\InvalidArgumentException(
+                sprintf('The data provider "%s" is not registered with the service container.', $name)
+            );
+        }
+
+        return $this->container->get($this->dataProviderServiceIds[$name]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasDataProvider($name)
+    {
+        return isset($this->dataProviderServiceIds[$name]);
     }
 }

@@ -12,6 +12,7 @@ use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\DataProviderRegistryInterface;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompilerPass;
 
@@ -20,6 +21,14 @@ use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ConfigExpressionCompile
  */
 class ConfigExpressionExtension extends AbstractBlockTypeExtension implements ContextConfiguratorInterface
 {
+    const PARAM_EVALUATE = 'expressions_evaluate';
+    const PARAM_ENCODING = 'expressions_encoding';
+
+    const SCOPE_VARS = 1;
+    const SCOPE_ATTR = 2;
+    const SCOPE_OTHER = 3;
+    const MAX_EXPRESSION_NESTING_LEVEL = 5;
+
     /** @var AssemblerInterface */
     protected $expressionAssembler;
 
@@ -50,8 +59,8 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     public function configureContext(ContextInterface $context)
     {
         $context->getDataResolver()
-            ->setDefaults(['expressions.evaluate' => true])
-            ->setOptional(['expressions.encoding']);
+            ->setDefaults([self::PARAM_EVALUATE => true])
+            ->setOptional([self::PARAM_ENCODING]);
     }
 
     /**
@@ -60,10 +69,18 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
         $context  = $block->getContext();
-        $evaluate = $context->get('expressions.evaluate');
-        $encoding = $context->getOr('expressions.encoding');
+        $evaluate = $context->get(self::PARAM_EVALUATE);
+        $encoding = $context->getOr(self::PARAM_ENCODING);
         if ($evaluate || $encoding !== null) {
-            $view->vars = $this->processExpressions($view->vars, $context, $evaluate, $encoding, true);
+            $view->vars = $this->processExpressions(
+                $view->vars,
+                $view,
+                $context,
+                $block->getData(),
+                $evaluate,
+                $encoding,
+                self::SCOPE_VARS
+            );
         }
     }
 
@@ -76,56 +93,144 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     }
 
     /**
-     * @param array            $values
-     * @param ContextInterface $context
-     * @param bool             $evaluate
-     * @param string           $encoding
-     * @param bool             $isVars
+     * @param array                         $values
+     * @param BlockView                     $view
+     * @param ContextInterface              $context
+     * @param DataProviderRegistryInterface $data
+     * @param bool                          $evaluate
+     * @param string                        $encoding
+     * @param int                           $scope
      *
      * @return array
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function processExpressions(
-        array $values,
+        array &$values,
+        BlockView $view,
         ContextInterface $context,
+        DataProviderRegistryInterface $data,
         $evaluate,
         $encoding,
-        $isVars = false
+        $scope
     ) {
+        $removeBackslashKeys = [];
         foreach ($values as $key => $value) {
             if (is_array($value)) {
-                if ($isVars && ($key === 'attr' || $key === 'label_attr')) {
+                if ($scope === self::SCOPE_VARS && ($key === 'attr' || $key === 'label_attr')) {
                     // process block and block label attributes
                     if (!empty($value)) {
-                        $values[$key] = $this->processExpressions($value, $context, $evaluate, $encoding);
+                        $values[$key] = $this->processExpressions(
+                            $values[$key],
+                            $view,
+                            $context,
+                            $data,
+                            $evaluate,
+                            $encoding,
+                            $key === 'attr' ? self::SCOPE_ATTR : self::SCOPE_OTHER
+                        );
                     }
                     continue;
                 } elseif (count($value) === 1) {
                     // try to assemble an expression
-                    $v = reset($value);
+                    reset($value);
                     $k = key($value);
                     if (is_string($k)) {
                         $pos = strpos($k, '@');
                         if ($pos === 0) {
                             // do an expression assembling
-                            $value = $this->expressionAssembler->assemble($value);
+                            $value        = $this->expressionAssembler->assemble($value);
+                            $values[$key] = $value;
                         } elseif ($pos === 1 && $k[0] === '\\') {
-                            // remove the backslash (\) at the begin of the array key
-                            $values[$key] = [substr($k, 1) => $v];
+                            // the backslash (\) at the begin of the array key should be removed
+                            $removeBackslashKeys[] = $key;
                             continue;
                         }
                     }
                 }
             }
             if ($value instanceof ExpressionInterface) {
-                $values[$key] = $evaluate
-                    ? $value->evaluate(['context' => $context])
-                    : $this->encodeExpression($value, $encoding);
+                if ($evaluate) {
+                    $values[$key] = $value->evaluate(
+                        $this->getEvaluateExpressionContext(
+                            $view,
+                            $context,
+                            $data,
+                            $scope === self::SCOPE_ATTR ? $key : null
+                        )
+                    );
+                } else {
+                    $values[$key] = $this->encodeExpression($value, $encoding);
+                }
             }
+        }
+        // remove the backslash (\) at the begin of the array key
+        foreach ($removeBackslashKeys as $key) {
+            $value        = $values[$key];
+            $v            = reset($value);
+            $values[$key] = [substr(key($value), 1) => $v];
         }
 
         return $values;
+    }
+
+    /**
+     * @param BlockView                     $view
+     * @param ContextInterface              $context
+     * @param DataProviderRegistryInterface $data
+     * @param string                        $excludeKey
+     * @param int                           $nestingLevel
+     *
+     * @return array
+     */
+    protected function getEvaluateExpressionContext(
+        BlockView $view,
+        ContextInterface $context,
+        DataProviderRegistryInterface $data,
+        $excludeKey = null,
+        $nestingLevel = 0
+    ) {
+        $result = ['context' => $context, 'data' => $data];
+        foreach ($view->vars['attr'] as $key => $value) {
+            if (strpos($key, 'data-') === 0) {
+                if ($excludeKey !== null && $excludeKey === $key) {
+                    // skip a variable for which an expression is calculated
+                    continue;
+                }
+                // check if a data value is an expression which is not evaluated yet
+                if (is_array($value) && count($value) === 1) {
+                    reset($value);
+                    $k = key($value);
+                    if (is_string($k) && strpos($k, '@') === 0) {
+                        // do an expression assembling
+                        $value                    = $this->expressionAssembler->assemble($value);
+                        $view->vars['attr'][$key] = $value;
+                    }
+                }
+                if ($value instanceof ExpressionInterface) {
+                    // do simplified check for circular references
+                    if ($nestingLevel > static::MAX_EXPRESSION_NESTING_LEVEL) {
+                        throw new \RuntimeException(
+                            sprintf(
+                                'Circular reference in an expression for variable "%s" of block "%s". '
+                                . 'Max nesting level is %s.',
+                                $key,
+                                $view->vars['id'],
+                                static::MAX_EXPRESSION_NESTING_LEVEL
+                            )
+                        );
+                    }
+                    $value                    = $value->evaluate(
+                        $this->getEvaluateExpressionContext($view, $context, $data, $key, $nestingLevel + 1)
+                    );
+                    $view->vars['attr'][$key] = $value;
+                }
+                $result[substr($key, 5)] = $value;
+            }
+        }
+
+        return $result;
     }
 
     /**

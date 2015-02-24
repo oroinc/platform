@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Extension;
 use Oro\Component\Layout\BlockTypeExtensionInterface;
 use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
+use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
@@ -60,12 +61,26 @@ class PreloadedExtension implements ExtensionInterface
     private $contextConfigurators;
 
     /**
+     * The data providers provided by this extension
+     *
+     * @var DataProviderInterface[]
+     *
+     * Example:
+     *  [
+     *      'data_provider_1' => DataProviderInterface,
+     *      'data_provider_2' => DataProviderInterface
+     *  ]
+     */
+    private $dataProviders;
+
+    /**
      * Creates a new preloaded extension.
      *
      * @param array $types                BlockTypeInterface[]
      * @param array $typeExtensions       array of BlockTypeExtensionInterface[]
      * @param array $layoutUpdates        array of LayoutUpdateInterface[]
      * @param array $contextConfigurators ContextConfiguratorInterface[]
+     * @param array $dataProviders        DataProviderInterface[]
      *
      * @throws Exception\InvalidArgumentException
      */
@@ -73,17 +88,20 @@ class PreloadedExtension implements ExtensionInterface
         array $types,
         array $typeExtensions = [],
         array $layoutUpdates = [],
-        array $contextConfigurators = []
+        array $contextConfigurators = [],
+        array $dataProviders = []
     ) {
         $this->validateTypes($types);
         $this->validateTypeExtensions($typeExtensions);
         $this->validateLayoutUpdates($layoutUpdates);
         $this->validateContextConfigurators($contextConfigurators);
+        $this->validateDataProviders($dataProviders);
 
-        $this->types          = $types;
-        $this->typeExtensions = $typeExtensions;
-        $this->layoutUpdates  = $layoutUpdates;
-        $this->contextConfigurators  = $contextConfigurators;
+        $this->types                = $types;
+        $this->typeExtensions       = $typeExtensions;
+        $this->layoutUpdates        = $layoutUpdates;
+        $this->contextConfigurators = $contextConfigurators;
+        $this->dataProviders        = $dataProviders;
     }
 
     /**
@@ -158,6 +176,28 @@ class PreloadedExtension implements ExtensionInterface
     public function hasContextConfigurators()
     {
         return !empty($this->contextConfigurators);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataProvider($name)
+    {
+        if (!isset($this->dataProviders[$name])) {
+            throw new Exception\InvalidArgumentException(
+                sprintf('The data provider "%s" can not be loaded by this extension.', $name)
+            );
+        }
+
+        return $this->dataProviders[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasDataProvider($name)
+    {
+        return isset($this->dataProviders[$name]);
     }
 
     /**
@@ -248,6 +288,27 @@ class PreloadedExtension implements ExtensionInterface
             if (!$val instanceof ContextConfiguratorInterface) {
                 throw new Exception\InvalidArgumentException(
                     'Each item of $contextConfigurators array must be ContextConfiguratorInterface.'
+                );
+            }
+        }
+    }
+
+    /**
+     * @param array $dataProviders
+     *
+     * @throws Exception\InvalidArgumentException
+     */
+    protected function validateDataProviders(array $dataProviders)
+    {
+        foreach ($dataProviders as $key => $val) {
+            if (!is_string($key)) {
+                throw new Exception\InvalidArgumentException(
+                    'Keys of $dataProviders array must be strings.'
+                );
+            }
+            if (!$val instanceof DataProviderInterface) {
+                throw new Exception\InvalidArgumentException(
+                    'Each item of $dataProviders array must be DataProviderInterface.'
                 );
             }
         }
