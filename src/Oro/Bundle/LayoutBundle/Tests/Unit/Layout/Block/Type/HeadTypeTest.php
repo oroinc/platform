@@ -14,24 +14,28 @@ class HeadTypeTest extends BlockTypeTestCase
     public function testSetDefaultOptions()
     {
         $this->assertEquals(
-            ['title' => ''],
+            ['title' => '', 'title_parameters' => []],
             $this->resolveOptions(HeadType::NAME, [])
         );
         $this->assertEquals(
-            ['title' => 'test'],
-            $this->resolveOptions(HeadType::NAME, ['title' => 'test'])
+            ['title' => 'test', 'title_parameters' => ['{{ foo }}' => 'bar']],
+            $this->resolveOptions(HeadType::NAME, ['title' => 'test', 'title_parameters' => ['{{ foo }}' => 'bar']])
         );
     }
 
     public function testBuildView()
     {
-        $view = $this->getBlockBuilder(HeadType::NAME, ['title' => 'test'])
+        $view = $this->getBlockBuilder(
+            HeadType::NAME,
+            ['title' => 'test', 'title_parameters' => ['{{ foo }}' => 'bar']]
+        )
             ->add(MetaType::NAME, ['charset' => 'UTF-8'])
             ->add(ScriptType::NAME, [])
             ->add(MetaType::NAME, ['http_equiv' => 'refresh', 'content' => '30'])
             ->getBlockView();
 
         $this->assertEquals('test', $view->vars['title']);
+        $this->assertEquals(['{{ foo }}' => 'bar'], $view->vars['title_parameters']);
 
         // check that children are in the right order
         $this->assertEquals(

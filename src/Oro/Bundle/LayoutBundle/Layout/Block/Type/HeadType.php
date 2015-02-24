@@ -21,7 +21,8 @@ class HeadType extends AbstractContainerType
     {
         $resolver->setDefaults(
             [
-                'title' => ''
+                'title'            => '',
+                'title_parameters' => []
             ]
         );
     }
@@ -31,7 +32,8 @@ class HeadType extends AbstractContainerType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $view->vars['title'] = $options['title'];
+        $view->vars['title']            = $options['title'];
+        $view->vars['title_parameters'] = $options['title_parameters'];
     }
 
     /**

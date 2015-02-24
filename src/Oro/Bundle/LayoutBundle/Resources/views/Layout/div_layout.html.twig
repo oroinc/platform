@@ -34,7 +34,7 @@
 
 {% block head_widget %}
     <head{{ block('block_attributes') }}>
-        <title>{{ title|trans({}, translation_domain) }}</title>
+        <title>{{ title|trans(title_parameters, translation_domain) }}</title>
         {{ block_widget(block) }}
     </head>
 {% endblock %}
@@ -79,7 +79,7 @@
 
 {% block fieldset_widget %}
     <fieldset{{ block('block_attributes') }}>
-        <legend>{{ title|trans({}, translation_domain) }}</legend>
+        <legend>{{ title|trans(title_parameters, translation_domain) }}</legend>
         {{ block_widget(block) }}
     </fieldset>
 {% endblock %}
