@@ -25,6 +25,7 @@ parameters:
     oro_navigation.menu.matcher.voter.routepattern:            Oro\Bundle\NavigationBundle\Menu\Matcher\Voter\RoutePatternVoter
 
     oro_navigation.title_service.class:                        Oro\Bundle\NavigationBundle\Provider\TitleService
+    oro_navigation.title_provider.class:                       Oro\Bundle\NavigationBundle\Provider\TitleProvider
     oro_navigation.title_service.twig.extension.class:         Oro\Bundle\NavigationBundle\Twig\TitleExtension
     oro_navigation.title_service.annotations_reader.class:     Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader
     oro_navigation.title_service.config_reader.class:          Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader
@@ -241,6 +242,12 @@ services:
           - @serializer
           - @oro_config.user
           - @oro_navigation.breadcrumb_manager
+          - @oro_navigation.title_provider
+
+    oro_navigation.title_provider:
+        class: %oro_navigation.title_provider.class%
+        arguments:
+          - @oro_entity.doctrine_helper
 
     oro_navigation.title_annotations_reader:
         class:                        %oro_navigation.title_service.annotations_reader.class%
@@ -340,3 +347,10 @@ services:
             - @oro_navigation.content.tag_generator_chain
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: buildAfter }
+
+    oro_navigation.layout_context_configurator.title:
+        class: Oro\Bundle\NavigationBundle\Layout\TitleContextConfigurator
+        arguments:
+            - @oro_navigation.title_provider
+        tags:
+            - { name: layout.context_configurator }

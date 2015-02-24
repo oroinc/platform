@@ -46,6 +46,11 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
     protected $userConfigManager;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $titleProvider;
+
+    /**
      * @var TitleService
      */
     private $titleService;
@@ -89,6 +94,10 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->method('getTranslations')
             ->will($this->returnValue(['messages' => []]));
 
+        $this->titleProvider = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\TitleProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->titleService = new TitleService(
             $this->annotationsReader,
             $this->configReader,
@@ -96,7 +105,8 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             $this->em,
             $this->serializer,
             $this->userConfigManager,
-            $this->breadcrumbManager
+            $this->breadcrumbManager,
+            $this->titleProvider
         );
     }
 
@@ -183,74 +193,21 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($dataArray['params'], $this->titleService->getParams());
     }
 
-    /**
-     * Tests case with exists item
-     */
-    public function testLoadByRouteExistInDB()
+    public function testLoadByRoute()
     {
-        $route = 'test_route';
+        $route          = 'test_route';
+        $testTitle      = 'Test title';
+        $testShortTitle = 'Test short title';
 
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($this->repository));
-
-        $entityMock = $this->getMock('Oro\Bundle\NavigationBundle\Entity\Title');
-
-        $this->repository->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(array('route' => $route)))
-            ->will($this->returnValue($entityMock));
-
-        $testTitle = 'Test title';
-        $entityMock->expects($this->once())
-            ->method('getTitle')
-            ->will($this->returnValue($testTitle));
+        $this->titleProvider->expects($this->once())
+            ->method('getTitleTemplates')
+            ->with($route)
+            ->will($this->returnValue(['title' => $testTitle, 'short_title' => $testShortTitle]));
 
         $this->titleService->loadByRoute($route);
 
         $this->assertEquals($testTitle, $this->titleService->getTemplate());
-    }
-
-    /**
-     * Tests case with doesn't exists item
-     */
-    public function testLoadByRouteDoesntExistInDB()
-    {
-        $route = 'test_route';
-
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($this->repository));
-
-        $this->repository->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(array('route' => $route)))
-            ->will($this->returnValue(false));
-
-        $this->titleService->loadByRoute($route);
-    }
-
-    /**
-     * Tests case with fallback to config value
-     */
-    public function testLoadByRouteFallbackToConfig()
-    {
-        $route = 'test_route';
-
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->will($this->returnValue($this->repository));
-
-        $this->repository->expects($this->once())
-            ->method('findOneBy')
-            ->with($this->equalTo(array('route' => $route)))
-            ->will($this->returnValue(false));
-
-        $titles = array($route => 'Test title template %placeholder%');
-        $this->titleService->setTitles($titles);
-        $this->titleService->loadByRoute($route);
-
-        $this->assertEquals($titles[$route], $this->titleService->getTemplate());
+        $this->assertEquals($testShortTitle, $this->titleService->getShortTemplate());
     }
 
     /**

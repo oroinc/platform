@@ -2,26 +2,29 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use JMS\Serializer\Exception\RuntimeException;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Routing\Route;
+
+use JMS\Serializer\Exception\RuntimeException;
 use JMS\Serializer\Serializer;
+
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\NavigationBundle\Entity\Title;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Title\StoredTitle;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
-use Oro\Bundle\ConfigBundle\Config\UserConfigManager;
-
-use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TitleService implements TitleServiceInterface
 {
+    /** @var TitleProvider */
+    private $titleProvider;
+
     /**
      * Title template
      *
@@ -79,16 +82,13 @@ class TitleService implements TitleServiceInterface
      */
     protected $serializer = null;
 
-    /** @var array */
-    protected $titles = null;
-
     /**
      * @var BreadcrumbManager
      */
     protected $breadcrumbManager;
 
     /**
-     * @var UserConfigManager
+     * @var ConfigManager
      */
     protected $userConfigManager;
 
@@ -99,7 +99,8 @@ class TitleService implements TitleServiceInterface
         ObjectManager $em,
         Serializer $serializer,
         $userConfigManager,
-        BreadcrumbManager $breadcrumbManager
+        BreadcrumbManager $breadcrumbManager,
+        TitleProvider $titleProvider
     ) {
         $this->readers = array($reader, $configReader);
         $this->translator = $translator;
@@ -107,6 +108,7 @@ class TitleService implements TitleServiceInterface
         $this->serializer = $serializer;
         $this->userConfigManager = $userConfigManager;
         $this->breadcrumbManager = $breadcrumbManager;
+        $this->titleProvider = $titleProvider;
     }
 
     /**
@@ -329,18 +331,9 @@ class TitleService implements TitleServiceInterface
      */
     public function loadByRoute($route)
     {
-        /** @var $bdData Title */
-        $bdData = $this->getStoredTitlesRepository()->findOneBy(
-            array('route' => $route)
-        );
-
-        if ($bdData) {
-            $this->setTemplate($bdData->getTitle());
-            $this->setShortTemplate($bdData->getShortTitle());
-        } elseif (isset($this->titles[$route])) {
-            $this->setTemplate($this->titles[$route]);
-            $this->setShortTemplate($this->titles[$route]);
-        }
+        $templates = $this->titleProvider->getTitleTemplates($route);
+        $this->setTemplate($templates['title']);
+        $this->setShortTemplate($templates['short_title']);
     }
 
     /**
@@ -485,15 +478,5 @@ class TitleService implements TitleServiceInterface
             ->setSuffix($this->suffix);
 
         return $this->serializer->serialize($storedTitle, 'json');
-    }
-
-    /**
-     * Inject titles from config
-     *
-     * @param $titles
-     */
-    public function setTitles($titles)
-    {
-        $this->titles = $titles;
     }
 }

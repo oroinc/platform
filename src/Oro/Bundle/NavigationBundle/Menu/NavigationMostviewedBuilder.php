@@ -8,7 +8,7 @@ use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 class NavigationMostviewedBuilder extends NavigationItemBuilder
 {
     /**
-     * @var \Oro\Bundle\ConfigBundle\Config\UserConfigManager
+     * @var \Oro\Bundle\ConfigBundle\Config\ConfigManager
      */
     private $configOptions = null;
 
