@@ -37,8 +37,7 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
-                'enable_threads'            => ['value' => true],
-                'use_threads_at_activities' => ['value' => true]
+                'use_threads_in_emails' => ['value' => true],
             ]
         );
 

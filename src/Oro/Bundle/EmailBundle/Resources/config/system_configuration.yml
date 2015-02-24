@@ -3,20 +3,15 @@ oro_system_configuration:
         email_configuration:
             icon:  icon-envelope
             title: oro.email.system_configuration.email_configuration
-        email_thread_configuration:
-            title: oro.email.system_configuration.email_thread_configuration.label
+        email_threads:
+            title: oro.email.system_configuration.email_threads.label
 
     fields:
-        oro_email.enable_threads:
+        oro_email.use_threads_in_emails:
             data_type: boolean
             type: oro_config_checkbox
             options:
-                label: oro.email.system_configuration.email_thread_configuration.enable_threads.label
-        oro_email.use_threads_at_activities:
-            data_type: boolean
-            type: oro_config_checkbox
-            options:
-                label: oro.email.system_configuration.use_threads_at_activities.label
+                label: oro.email.system_configuration.email_threads.use_threads_in_emails.label
 
     tree:
         system_configuration:
@@ -26,17 +21,10 @@ oro_system_configuration:
                         children:
                             email_configuration:
                                 children:
-                                    email_thread_configuration:
+                                    email_threads:
                                         children:
-                                            - oro_email.enable_threads
-                            look_and_feel:
-                                children:
-                                    activity_list_settings:
-                                        children:
-                                            - oro_email.use_threads_at_activities
+                                            - oro_email.use_threads_in_emails
 
     api_tree:
-        email_thread_configuration:
-            oro_email.enable_threads: ~
-        activity_list:
-            oro_email.use_threads_at_activities: ~
+        email_threads:
+            oro_email.use_threads_in_emails: ~

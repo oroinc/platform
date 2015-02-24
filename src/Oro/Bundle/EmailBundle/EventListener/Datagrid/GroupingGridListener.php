@@ -27,7 +27,7 @@ class GroupingGridListener
      */
     public function onBuildBefore(BuildBefore $event)
     {
-        if ($this->config->get('oro_email.enable_threads')) {
+        if ($this->config->get('oro_email.use_threads_in_emails')) {
             $config = $event->getConfig();
 
             $config->offsetAddToArray('actions', [
@@ -51,7 +51,7 @@ class GroupingGridListener
         $ormDataSource = $dataGrid->getDatasource();
         $queryBuilder = $ormDataSource->getQueryBuilder();
 
-        if ($this->config->get('oro_email.enable_threads')) {
+        if ($this->config->get('oro_email.use_threads_in_emails')) {
             $queryBuilder->andWhere('e.head = 1');
         }
     }

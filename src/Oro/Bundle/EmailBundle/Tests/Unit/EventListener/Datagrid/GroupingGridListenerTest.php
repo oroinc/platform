@@ -87,7 +87,7 @@ class GroupingGridListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with('oro_email.enable_threads')
+            ->with('oro_email.use_threads_in_emails')
             ->willReturn($enabled);
 
         $this->config->expects($this->exactly($arrayModify))
@@ -121,7 +121,7 @@ class GroupingGridListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configManager->expects($this->once())
             ->method('get')
-            ->with('oro_email.enable_threads')
+            ->with('oro_email.use_threads_in_emails')
             ->willReturn($enabled);
 
         $this->queryBuilder->expects($this->exactly($andWhereCalls))

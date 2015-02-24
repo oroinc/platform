@@ -235,7 +235,7 @@ class ActivityListManager
             $entityId,
             $this->config->get('oro_activity_list.sorting_field'),
             $this->config->get('oro_activity_list.sorting_direction'),
-            $this->config->get('oro_email.use_threads_at_activities')
+            $this->config->get('oro_activity_list.use_threads_in_activities')
         );
     }
 
