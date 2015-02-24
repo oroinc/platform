@@ -58,6 +58,7 @@ parameters:
 
     #Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
+    oro_email.workflow.action.send_email_template.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate
 
     oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
 
@@ -313,6 +314,18 @@ services:
             - @oro_locale.formatter.name
         tags:
             - { name: oro_workflow.action, alias: send_email }
+
+    oro_email.workflow.action.send_email_template:
+        class: %oro_email.workflow.action.send_email_template.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_email.email_renderer
+            - @oro_email.mailer.processor
+            - @doctrine.orm.entity_manager
+            - @oro_email.email.address.helper
+            - @oro_locale.formatter.name
+        tags:
+            - { name: oro_workflow.action, alias: send_email_template }
 
     oro_email.helper.datagrid.emails:
         class: %oro_email.helper.datagrid.emails.class%
