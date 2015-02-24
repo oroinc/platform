@@ -153,7 +153,7 @@ class EmailModelBuilder
         if ($this->request->query->has('from')) {
             $from = $this->request->query->get('from');
             if (!empty($from)) {
-                $from = $this->helper->preciseFullEmailAddress($from);
+                $this->helper->preciseFullEmailAddress($from);
             }
             $emailModel->setFrom($from);
         } else {
@@ -186,7 +186,7 @@ class EmailModelBuilder
         if ($this->request->query->has($type)) {
             $address = trim($this->request->query->get($type));
             if (!empty($address)) {
-                $address = $this->helper->preciseFullEmailAddress(
+                $this->helper->preciseFullEmailAddress(
                     $address,
                     $emailModel->getEntityClass(),
                     $emailModel->getEntityId()

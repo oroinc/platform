@@ -11,6 +11,7 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Templating\EngineInterface;
 
 use Symfony\Component\Security\Core\SecurityContext;
@@ -18,7 +19,7 @@ use Symfony\Component\Security\Core\SecurityContext;
 class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var EmailModelBuilderHelper|\PHPUnit_Framework_MockObject_MockObject
+     * @var EmailModelBuilderHelper
      */
     protected $helper;
 
@@ -94,86 +95,165 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->templating = $this->getMock('Symfony\Component\Templating\EngineInterface');
 
-        $this->helper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper')
-            ->setConstructorArgs([
-                $this->entityRoutingHelper,
-                $this->emailAddressHelper,
-                $this->nameFormatter,
-                $this->securityContext,
-                $this->emailAddressManager,
-                $this->entityManager,
-                $this->emailCacheManager,
-                $this->templating,
-            ])
-            ->setMethods([
-                'isFullQualifiedUser',
-                'preciseViaRoutingHelper',
-                'preciseViaAddressManager',
-            ])
-            ->getMock();
+        $this->helper = new EmailModelBuilderHelper(
+            $this->entityRoutingHelper,
+            $this->emailAddressHelper,
+            $this->nameFormatter,
+            $this->securityContext,
+            $this->emailAddressManager,
+            $this->entityManager,
+            $this->emailCacheManager,
+            $this->templating
+        );
     }
 
-    /**
-     * @param boolean     $isFullEmailAddress
-     * @param string|null $ownerClass
-     * @param int|null    $ownerId
-     * @param int         $preciseViaRoutingHelperCalls
-     * @param int         $preciseViaAddressManagerCalls
-     *
-     * @dataProvider preciseFullEmailAddressProvider
-     */
-    public function testPreciseFullEmailAddress(
-        $isFullEmailAddress,
-        $ownerClass,
-        $ownerId,
-        $preciseViaRoutingHelperCalls,
-        $preciseViaAddressManagerCalls
-    ) {
+    public function testPreciseFullEmailAddressIsFullQualifiedName()
+    {
+        $emailAddress = 'someaddress@example.com';
+
         $this->emailAddressHelper->expects($this->once())
             ->method('isFullEmailAddress')
-            ->willReturn($isFullEmailAddress);
+            ->with($emailAddress)
+            ->willReturn(true);
 
-        $this->helper->expects($this->exactly($preciseViaRoutingHelperCalls))
-            ->method('preciseViaRoutingHelper');
+        $this->entityRoutingHelper->expects($this->never())
+            ->method('getEntity');
 
-        $this->helper->expects($this->exactly($preciseViaAddressManagerCalls))
-            ->method('preciseViaAddressManager');
+        $this->nameFormatter->expects($this->never())
+            ->method('format');
 
-        $this->helper->preciseFullEmailAddress('someaddress@example.com', $ownerClass, $ownerId);
+        $this->emailAddressHelper->expects($this->never())
+            ->method('buildFullEmailAddress');
+
+        $this->emailAddressManager->expects($this->never())
+            ->method('getEmailAddressRepository');
+
+        $this->helper->preciseFullEmailAddress($emailAddress, null, null);
     }
 
-    public function preciseFullEmailAddressProvider()
+    public function testPreciseFullEmailAddressViaRoutingHelper()
     {
-        return [
-            [
-                'isFullEmailAddress'            => true,
-                'ownerClass'                    => 'Class',
-                'ownerId'                       => 1,
-                'preciseViaRoutingHelperCalls'  => 0,
-                'preciseViaAddressManagerCalls' => 0,
-            ],
-            [
-                'isFullEmailAddress'            => false,
-                'ownerClass'                    => 'Class',
-                'ownerId'                       => 1,
-                'preciseViaRoutingHelperCalls'  => 1,
-                'preciseViaAddressManagerCalls' => 1,
-            ],
-            [
-                'isFullEmailAddress'            => false,
-                'ownerClass'                    => null,
-                'ownerId'                       => 1,
-                'preciseViaRoutingHelperCalls'  => 0,
-                'preciseViaAddressManagerCalls' => 1,
-            ],
-            [
-                'isFullEmailAddress'            => false,
-                'ownerClass'                    => 'Class',
-                'ownerId'                       => null,
-                'preciseViaRoutingHelperCalls'  => 0,
-                'preciseViaAddressManagerCalls' => 1,
-            ],
-        ];
+        $emailAddress = 'someaddress@example.com';
+        $expected     = 'Admin <someaddress@example.com>';
+
+        $this->emailAddressHelper->expects($this->once())
+            ->method('isFullEmailAddress')
+            ->with($emailAddress)
+            ->willReturn(false);
+
+        $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $ownerId    = 1;
+        $owner      = $this->getMock($ownerClass);
+        $ownerName  = 'admin';
+
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('getEntity')
+            ->with($ownerClass, $ownerId)
+            ->willReturn($owner);
+
+        $this->nameFormatter->expects($this->once())
+            ->method('format')
+            ->with($owner)
+            ->willReturn($ownerName);
+
+        $this->emailAddressHelper->expects($this->once())
+            ->method('buildFullEmailAddress')
+            ->with($emailAddress, $ownerName)
+            ->willReturn($expected);
+
+        $this->emailAddressManager->expects($this->never())
+            ->method('getEmailAddressRepository');
+
+        $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
+        $this->assertEquals($expected, $emailAddress);
+    }
+
+    public function testPreciseFullEmailAddressViaAddressManager()
+    {
+        $emailAddress = 'someaddress@example.com';
+        $expected     = 'Admin <someaddress@example.com>';
+
+        $this->emailAddressHelper->expects($this->once())
+            ->method('isFullEmailAddress')
+            ->with($emailAddress)
+            ->willReturn(false);
+
+        $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $ownerId    = null;
+        $ownerName  = 'admin';
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $otherOwner = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
+
+        $emailAddressObj = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailAddress');
+        $emailAddressObj->expects($this->any())
+            ->method('getOwner')
+            ->willReturn($otherOwner);
+
+        $repo->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn($emailAddressObj);
+
+        $this->emailAddressManager->expects($this->once())
+            ->method('getEmailAddressRepository')
+            ->with($this->entityManager)
+            ->willReturn($repo);
+
+        $this->nameFormatter->expects($this->once())
+            ->method('format')
+            ->with($otherOwner)
+            ->willReturn($ownerName);
+
+        $this->emailAddressHelper->expects($this->once())
+            ->method('buildFullEmailAddress')
+            ->with($emailAddress, $ownerName)
+            ->willReturn($expected);
+
+        $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
+        $this->assertEquals($expected, $emailAddress);
+    }
+
+    public function testPreciseFulEmailAddressNoResult()
+    {
+        $emailAddress = $expected = 'someaddress@example.com';
+
+        $this->emailAddressHelper->expects($this->once())
+            ->method('isFullEmailAddress')
+            ->with($emailAddress)
+            ->willReturn(false);
+
+        $ownerClass = 'Oro\Bundle\UserBundle\Entity\User';
+        $ownerId    = 2;
+
+        $this->entityRoutingHelper->expects($this->once())
+            ->method('getEntity')
+            ->with($ownerClass, $ownerId)
+            ->willReturn(null);
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $repo->expects($this->once())
+            ->method('findOneBy')
+            ->willReturn(null);
+
+        $this->emailAddressManager->expects($this->once())
+            ->method('getEmailAddressRepository')
+            ->with($this->entityManager)
+            ->willReturn($repo);
+
+        $this->nameFormatter->expects($this->never())
+            ->method('format');
+
+        $this->emailAddressHelper->expects($this->never())
+            ->method('buildFullEmailAddress');
+
+        $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId);
+        $this->assertEquals($emailAddress, $expected);
     }
 
     public function testGetUserTokenIsNull()
@@ -187,11 +267,12 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param boolean $isFullQualifiedUser
+     * @param object $user
+     * @param mixed  $expected
      *
      * @dataProvider getUserProvider
      */
-    public function testGetUserTokenIsNotNull($isFullQualifiedUser)
+    public function testGetUserTokenIsNotNull($user, $expected)
     {
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
@@ -199,29 +280,33 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->method('getToken')
             ->willReturn($token);
 
-        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
-
         $token->expects($this->once())
             ->method('getUser')
             ->willReturn($user);
 
-        $this->helper->expects($this->once())
-            ->method('isFullQualifiedUser')
-            ->willReturn($isFullQualifiedUser);
-
         $result = $this->helper->getUser();
-        if ($isFullQualifiedUser) {
-            $this->assertEquals($user, $result);
-        } else {
-            $this->assertNull($result);
-        }
+        $this->assertEquals($expected, $result);
     }
 
     public function getUserProvider()
     {
+        $user = $result = new User();
+        $positive = [
+            $user,
+            $result,
+        ];
+
+        $user = new \stdClass();
+        $result = null;
+
+        $negative = [
+            $user,
+            $result,
+        ];
+
         return [
-            ['isFullQualifiedUser' => false,],
-            ['isFullQualifiedUser' => true,]
+            $positive,
+            $negative,
         ];
     }
 

@@ -102,21 +102,33 @@ class EmailModelBuilderHelper
      * @param string      $emailAddress
      * @param string|null $ownerClass
      * @param mixed|null  $ownerId
-     *
-     * @return string
      */
-    public function preciseFullEmailAddress($emailAddress, $ownerClass = null, $ownerId = null)
+    public function preciseFullEmailAddress(&$emailAddress, $ownerClass = null, $ownerId = null)
     {
-        $address = $emailAddress;
-
         if (!$this->emailAddressHelper->isFullEmailAddress($emailAddress)) {
             if (!empty($ownerClass) && !empty($ownerId)) {
-                $address = $this->preciseViaRoutingHelper($address, $ownerClass, $ownerId);
-            }
-            $address = $this->preciseViaAddressManager($address);
-        }
+                $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
+                if ($owner) {
+                    $ownerName = $this->nameFormatter->format($owner);
+                    if (!empty($ownerName)) {
+                        $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
 
-        return $address;
+                        return;
+                    }
+                }
+            }
+            $repo            = $this->emailAddressManager->getEmailAddressRepository($this->entityManager);
+            $emailAddressObj = $repo->findOneBy(array('email' => $emailAddress));
+            if ($emailAddressObj) {
+                $owner = $emailAddressObj->getOwner();
+                if ($owner) {
+                    $ownerName = $this->nameFormatter->format($owner);
+                    if (!empty($ownerName)) {
+                        $emailAddress = $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -202,47 +214,5 @@ class EmailModelBuilderHelper
         return $entity instanceof UserInterface
         && $entity instanceof EmailHolderInterface
         && $entity instanceof EmailOwnerInterface;
-    }
-
-    /**
-     * @param $emailAddress
-     * @param $ownerClass
-     * @param $ownerId
-     *
-     * @return string
-     */
-    protected function preciseViaRoutingHelper($emailAddress, $ownerClass, $ownerId)
-    {
-        $owner = $this->entityRoutingHelper->getEntity($ownerClass, $ownerId);
-        if ($owner && $this->isFullQualifiedUser($owner)) {
-            $ownerName = $this->nameFormatter->format($owner);
-            if (!empty($ownerName)) {
-                return $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
-            }
-        }
-
-        return $emailAddress;
-    }
-
-    /**
-     * @param $emailAddress
-     *
-     * @return string
-     */
-    protected function preciseViaAddressManager($emailAddress)
-    {
-        $repo = $this->emailAddressManager->getEmailAddressRepository($this->entityManager);
-        $emailAddressObj = $repo->findOneBy(['email' => $emailAddress]);
-        if ($emailAddressObj) {
-            $owner = $emailAddressObj->getOwner();
-            if ($owner) {
-                $ownerName = $this->nameFormatter->format($owner);
-                if (!empty($ownerName)) {
-                    return $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $ownerName);
-                }
-            }
-        }
-
-        return $emailAddress;
     }
 }
