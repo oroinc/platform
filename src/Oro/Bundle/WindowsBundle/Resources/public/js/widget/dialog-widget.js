@@ -273,7 +273,7 @@ define(function (require) {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
                 }
                 this.widget = $('<div/>');
-                this._transmitDialogEvents(this.widget);
+                this._transmitDialogEvents();
                 this.widget.html(this.$el).dialog(dialogOptions);
                 this.widget.attr('data-layout', 'separate');
             } else {
@@ -379,29 +379,30 @@ define(function (require) {
         /**
          * Transmits dialog window state events over system message bus
          *
-         * @param {jQuery} $dialog
          * @protected
          */
-        _transmitDialogEvents: function ($dialog) {
-            var id = this.cid;
-            function transmit(action, state) {
-                mediator.trigger('widget_dialog:' + action, {
-                    id: id,
-                    state: state
-                });
-            }
-            $dialog.on('dialogbeforeclose', function () {
-                transmit('close', $dialog.dialog('state'));
+        _transmitDialogEvents: function () {
+            var self = this;
+            this.widget.on('dialogbeforeclose', function () {
+                mediator.trigger('widget_dialog:close', self);
             });
-            $dialog.on('dialogopen', function () {
-                transmit('open', $dialog.dialog('state'));
+            this.widget.on('dialogopen', function () {
+                mediator.trigger('widget_dialog:open', self);
             });
-            $dialog.on('dialogstatechange', function (event, data) {
-                if (data.state === data.oldState) {
-                    return;
+            this.widget.on('dialogstatechange', function (event, data) {
+                if (data.state !== data.oldState) {
+                    mediator.trigger('widget_dialog:stateChange', self);
                 }
-                transmit('stateChange', data.state);
             });
+        },
+
+        /**
+         * Returns state of the dialog
+         *
+         * @returns {string}
+         */
+        getState: function () {
+            return this.widget.dialog('state');
         }
     });
 

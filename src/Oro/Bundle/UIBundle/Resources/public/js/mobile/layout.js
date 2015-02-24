@@ -57,16 +57,16 @@ define(function (require) {
             }
         }
 
-        mediator.on('widget_dialog:open', function (data) {
-            dialogs[data.id] = data.state !== 'minimized';
+        mediator.on('widget_dialog:open', function (dialog) {
+            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
             scrollUpdate();
         });
-        mediator.on('widget_dialog:close', function (data) {
-            delete dialogs[data.id];
+        mediator.on('widget_dialog:close', function (dialog) {
+            delete dialogs[dialog.cid];
             scrollUpdate();
         });
-        mediator.on('widget_dialog:stateChange', function (data) {
-            dialogs[data.id] = data.state !== 'minimized';
+        mediator.on('widget_dialog:stateChange', function (dialog) {
+            dialogs[dialog.cid] = dialog.getState() !== 'minimized';
             scrollUpdate();
         });
     }
