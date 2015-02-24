@@ -9,7 +9,6 @@ define(function (require) {
         Backgrid = require('backgrid'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
-        SimpleValueWatcher = require('oroui/js/tools/simple-value-watcher'),
         LoadingMaskView = require('oroui/js/app/views/loading-mask-view'),
         GridHeader = require('./header'),
         GridBody = require('./body'),
@@ -20,7 +19,8 @@ define(function (require) {
         SelectAllHeaderCell = require('./header-cell/select-all-header-cell'),
         RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action'),
         ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
-        ExportAction = require('oro/datagrid/action/export-action');
+        ExportAction = require('oro/datagrid/action/export-action'),
+        tools = require('oroui/js/tools');
 
     /**
      * Basic grid class.
@@ -587,7 +587,7 @@ define(function (require) {
                 this.floatThead = newValue;
                 if (newValue) {
                     this.addFloatThead();
-                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
+                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 400);
                 } else {
                     self.removeFloatThead();
                     clearInterval(this.heightFixIntervalId);
@@ -688,9 +688,14 @@ define(function (require) {
                     right: midRect.right
                 };
             current = current.parentNode;
-            while (current !== document) {
+            while (current !== null) {
                 midRect = current.getBoundingClientRect();
                 borders = this.getBorders(current);
+
+                if (current.id === 'top-page' && tools.isMobile()) {
+                    // override top border
+                    borders.top = 55;
+                }
 
                 if (resultRect.top < midRect.top + borders.top) {
                     resultRect.top = midRect.top + borders.top;
@@ -704,19 +709,18 @@ define(function (require) {
                 if (resultRect.right > midRect.right - borders.right) {
                     resultRect.right = midRect.right - borders.right;
                 }
-                current = current.parentNode;
+                current = current.offsetParent;
             }
             return resultRect;
         },
 
         reposition: function () {
-            this.rescrollCb();
+            this.rescrollCb && this.rescrollCb();
             // get gridRect
             var tableRect = this.$grid[0].getBoundingClientRect(),
                 visibleRect = this.getVisibleRect(this.$grid[0]),
                 mode = 'default';
-            this.lastClientRect = tableRect;
-            if (visibleRect.top !== tableRect.top) {
+            if (visibleRect.top !== tableRect.top || this.layout === 'fullscreen') {
                 mode = 'fixed';
                 if (this.$grid.find('thead:first .dropdown.open').length) {
                     mode = 'relative';
@@ -792,7 +796,7 @@ define(function (require) {
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
                 setTimeout(_.bind(this.reposition, this), 0);
             }, this));
-            this.$grid.parents().on('scroll', this.reposition);
+            this.$grid.parents('.other-scroll-container').parents().on('scroll', this.reposition);
         },
 
         removeFloatThead: function () {
@@ -810,49 +814,74 @@ define(function (require) {
                 otherScroll = this.$('.other-scroll'),
                 otherScrollInner = this.$('.other-scroll > div'),
                 scrollBarWidth = mediator.execute('layout:scrollbarWidth'),
-                scrollVisibleWatcher;
+                scrollStateModel = new Backbone.Model(),
+                heightDec;
 
-            scrollVisibleWatcher = new SimpleValueWatcher(false, this, function () {
+            scrollStateModel.on('change:headerHeight', function () {
+                heightDec = self.headerHeight + 1; // compensate border
+                otherScroll.css({
+                    width: scrollBarWidth,
+                    top: heightDec
+                });
+            }, this);
+            scrollStateModel.on('change:scrollVisible', function () {
                 scrollContainer.css({
                     width: 'calc(100% + ' + (self.scrollVisible ? scrollBarWidth : 0) + 'px)'
                 });
-                this.reflow();
-            });
-            function setup() {
-                var heightDec = self.headerHeight + 1; // compensate border
-                self.scrollVisible = scrollContainer[0].clientHeight !== scrollContainer[0].scrollHeight;
-                scrollVisibleWatcher.test(self.scrollVisible);
                 otherScroll.css({
-                    height: scrollContainer[0].clientHeight - heightDec,
-                    width: scrollBarWidth,
-                    top: heightDec,
                     display: self.scrollVisible ? 'block' : 'none'
-                }).scrollTop(scrollContainer[0].scrollTop);
+                });
+                this.reflow();
+            }, this);
+            scrollStateModel.on('change:clientHeight', function () {
+                otherScroll.css({
+                    height: scrollContainer[0].clientHeight - heightDec
+                });
+            }, this);
+            scrollStateModel.on('change:scrollHeight', function () {
                 otherScrollInner.css({
                     height: scrollContainer[0].scrollHeight - heightDec
                 });
+            });
+            scrollStateModel.on('change:scrollTop', function () {
+                otherScroll.scrollTop(scrollContainer[0].scrollTop);
+            }, this);
+            function setup() {
+                scrollStateModel.set({
+                    headerHeight: self.headerHeight
+                });
+                self.scrollVisible = scrollContainer[0].clientHeight !== scrollContainer[0].scrollHeight;
+                scrollStateModel.set({
+                    scrollVisible:self.scrollVisible,
+                    scrollHeight: scrollContainer[0].scrollHeight,
+                    clientHeight: scrollContainer[0].clientHeight,
+                    scrollTop: scrollContainer[0].scrollTop
+                });
             }
+            scrollContainer.on('scroll', setup);
             otherScroll.on('scroll', function () {
                 scrollContainer.scrollTop(otherScroll.scrollTop());
-                self.reposition();
+                if (self.currentFloatTheadMode === 'default') {
+                    self.reposition();
+                }
             });
             setup();
             return setup;
         },
 
         fixHeightInFloatTheadMode: function () {
-            var currentClientRect = this.$grid[0].getBoundingClientRect();
-            if (this.lastClientRect.top !== currentClientRect.top
+            var currentClientRect = this.$grid.parents('.other-scroll-container')[0].getBoundingClientRect();
+            if (!this.lastClientRect || (this.lastClientRect.top !== currentClientRect.top
                   || this.lastClientRect.left !== currentClientRect.left
-                  || this.lastClientRect.right !== currentClientRect.right) {
+                  || this.lastClientRect.right !== currentClientRect.right)) {
                 if( this.layout === 'fullscreen') {
                     // ajust max height
                     this.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: this.getCssHeightCalcExpression()
                     });
                 }
-                if (this.lastClientRect.left !== currentClientRect.left
-                    || this.lastClientRect.right !== currentClientRect.right) {
+                if (!this.lastClientRect || (this.lastClientRect.left !== currentClientRect.left
+                    || this.lastClientRect.right !== currentClientRect.right)) {
                     this.reflow();
                 } else {
                     this.reposition();

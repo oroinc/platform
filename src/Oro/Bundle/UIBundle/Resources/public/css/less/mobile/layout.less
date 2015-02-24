@@ -10,6 +10,9 @@
 &, #page, #top-page {
   overflow: hidden;
   height: 100%;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: auto;
+  overflow-scrolling: auto;
 }
 #top-page {
   position: relative;
@@ -33,8 +36,8 @@
   height: 100%;
   #container {
     overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    overflow-scrolling: touch;
+    -webkit-overflow-scrolling: auto;
+    overflow-scrolling: auto;
     height: 100%;
   }
 }

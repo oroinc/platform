@@ -339,7 +339,7 @@ define(function (require) {
          * @returns {string}
          */
         getPreferredLayout: function ($mainEl) {
-            if (!this.hasHorizontalScroll()
+            if (!this.hasHorizontalScroll() && !tools.isMobile()
                 && this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
                 return 'fullscreen';
             } else {
