@@ -37,6 +37,13 @@ define(function (require) {
         defaultPos: 'center center',
         openedWindows: 0,
         contentTop: null,
+        /**
+         * Flag if the widget is embedded to the page
+         * (dialog has own life cycle)
+         *
+         * @type {boolean}
+         */
+        _isEmbedded: false,
 
         listen: {
             'adoptedFormResetClick': 'remove',
@@ -140,6 +147,16 @@ define(function (require) {
             }
 
             DialogWidget.__super__.dispose.call(this);
+        },
+
+        /**
+         * Returns flag if the widget is embedded to the parent content
+         *
+         * @returns {boolean}
+         */
+        isEmbedded: function () {
+            // modal dialogs has same life cycle as embedded widgets
+            return this._isEmbedded || this.options.dialogOptions.modal;
         },
 
         /**

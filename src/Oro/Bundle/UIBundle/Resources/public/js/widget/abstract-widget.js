@@ -39,6 +39,13 @@ define(function (require) {
         loadingElement: null,
         loadingMask: null,
         loading: false,
+        /**
+         * Flag if the widget is embedded to the page
+         * (defines life cycle of the widget)
+         *
+         * @type {boolean}
+         */
+        _isEmbedded: true,
 
         listen: {
             renderComplete: '_initSectionActions'
@@ -98,6 +105,15 @@ define(function (require) {
             this.trigger('widgetRemoved');
 
             AbstractWidget.__super__.dispose.call(this);
+        },
+
+        /**
+         * Returns flag if the widget is embedded to the parent content
+         *
+         * @returns {boolean}
+         */
+        isEmbedded: function () {
+            return this._isEmbedded;
         },
 
         /**

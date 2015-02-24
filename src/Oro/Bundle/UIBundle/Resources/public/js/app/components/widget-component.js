@@ -129,11 +129,9 @@ define(function (require) {
 
             widget.render();
 
-            if (this.options.type !== 'dialog') {
+            if (widget.isEmbedded()) {
                 /**
-                 * dialog has independent lifecycle,
-                 * and should not to be disposed with page content
-                 * (dialog have its own implementation of tracking pageChange event)
+                 * if the widget is embedded, bind its life cycle with the component
                  */
                 widget.listenTo(this, 'dispose', widget.dispose);
             }
