@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityNotFoundException;
 
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
@@ -10,7 +11,6 @@ use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 /**
@@ -20,7 +20,7 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class SendEmailTemplate extends AbstractAction
+class SendEmailTemplate extends AbstractSendEmail
 {
     /** @var array */
     protected $options;
@@ -30,12 +30,6 @@ class SendEmailTemplate extends AbstractAction
 
     /** @var EmailRenderer */
     protected $renderer;
-
-    /** @var EmailAddressHelper */
-    protected $emailAddressHelper;
-
-    /** @var NameFormatter */
-    protected $nameFormatter;
 
     /** @var ObjectManager */
     protected $objectManager;
@@ -56,12 +50,10 @@ class SendEmailTemplate extends AbstractAction
         EmailAddressHelper $emailAddressHelper,
         NameFormatter $nameFormatter
     ) {
-        parent::__construct($contextAccessor);
+        parent::__construct($contextAccessor, $emailAddressHelper, $nameFormatter);
 
         $this->renderer = $renderer;
         $this->emailProcessor = $emailProcessor;
-        $this->emailAddressHelper = $emailAddressHelper;
-        $this->nameFormatter = $nameFormatter;
         $this->objectManager = $objectManager;
     }
 
@@ -88,8 +80,7 @@ class SendEmailTemplate extends AbstractAction
             $this->assertEmailAddressOption($to);
         }
 
-        if (empty($options['template'])
-        ) {
+        if (empty($options['template'])) {
             throw new InvalidParameterException('Template parameter is required');
         }
 
@@ -102,13 +93,6 @@ class SendEmailTemplate extends AbstractAction
         return $this;
     }
 
-    protected function assertEmailAddressOption($option)
-    {
-        if (is_array($option) && array_key_exists('name', $option) && !array_key_exists('email', $option)) {
-            throw new InvalidParameterException('Email parameter is required');
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -116,7 +100,7 @@ class SendEmailTemplate extends AbstractAction
     {
         $emailModel = new Email();
         $emailModel->setFrom($this->getEmailAddress($context, $this->options['from']));
-        $to = array();
+        $to = [];
         foreach ($this->options['to'] as $email) {
             if ($email) {
                 $to[] = $this->getEmailAddress($context, $email);
@@ -128,15 +112,10 @@ class SendEmailTemplate extends AbstractAction
 
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
             ->findByName($template);
-
         if (!$emailTemplate) {
-            throw new InvalidParameterException('Template not found');
+            throw new EntityNotFoundException('Template not found');
         }
-
-        $templateData = $this->renderer->compileMessage(
-            $emailTemplate,
-            ['entity' => $entity]
-        );
+        $templateData = $this->renderer->compileMessage($emailTemplate, ['entity' => $entity]);
 
         $type = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
         list ($subjectRendered, $templateRendered) = $templateData;
@@ -150,34 +129,5 @@ class SendEmailTemplate extends AbstractAction
         if (array_key_exists('attribute', $this->options)) {
             $this->contextAccessor->setValue($context, $this->options['attribute'], $email);
         }
-    }
-
-    /**
-     * Get email address prepared for sending.
-     *
-     * @param mixed $context
-     * @param string|array $data
-     * @return string
-     */
-    protected function getEmailAddress($context, $data)
-    {
-        $name = null;
-        $emailAddress = $this->contextAccessor->getValue($context, $data);
-
-        if (is_array($data)) {
-            $emailAddress = $this->contextAccessor->getValue($context, $data['email']);
-
-            if (array_key_exists('name', $data)) {
-                $data['name'] = $this->contextAccessor->getValue($context, $data['name']);
-
-                if (is_object($data['name'])) {
-                    $name = $this->nameFormatter->format($data['name']);
-                } else {
-                    $name = $data['name'];
-                }
-            }
-        }
-
-        return $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $name);
     }
 }
