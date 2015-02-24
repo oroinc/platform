@@ -114,7 +114,6 @@ class SendEmailTemplate extends AbstractAction
      */
     protected function executeAction($context)
     {
-        xdebug_break();
         $emailModel = new Email();
         $emailModel->setFrom($this->getEmailAddress($context, $this->options['from']));
         $to = array();
