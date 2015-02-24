@@ -58,6 +58,14 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 ['class' => 'Test\ContextConfigurator2']
             ]
         ];
+        $dataProviderServiceIds        = [
+            'dataProvider1' => [
+                ['class' => 'Test\DataProvider1', 'alias' => 'test_data_provider_name1']
+            ],
+            'dataProvider2' => [
+                ['class' => 'Test\DataProvider2', 'alias' => 'test_data_provider_name2']
+            ]
+        ];
 
         $container->expects($this->exactly(4))
             ->method('hasDefinition')
@@ -95,7 +103,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 ['twig', new Reference(ConfigurationPass::TWIG_RENDERER_SERVICE)]
             );
 
-        $container->expects($this->exactly(4))
+        $container->expects($this->exactly(5))
             ->method('findTaggedServiceIds')
             ->will(
                 $this->returnValueMap(
@@ -103,7 +111,8 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                         [ConfigurationPass::BLOCK_TYPE_TAG_NAME, $blockTypeServiceIds],
                         [ConfigurationPass::BLOCK_TYPE_EXTENSION_TAG_NAME, $blockTypeExtensionServiceIds],
                         [ConfigurationPass::LAYOUT_UPDATE_TAG_NAME, $layoutUpdateServiceIds],
-                        [ConfigurationPass::CONTEXT_CONFIGURATOR_TAG_NAME, $contextConfiguratorServiceIds]
+                        [ConfigurationPass::CONTEXT_CONFIGURATOR_TAG_NAME, $contextConfiguratorServiceIds],
+                        [ConfigurationPass::DATA_PROVIDER_TAG_NAME, $dataProviderServiceIds]
                     ]
                 )
             );
@@ -142,6 +151,15 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 [
                     'contextConfigurator1',
                     'contextConfigurator2'
+                ]
+            );
+        $extensionDef->expects($this->at(4))
+            ->method('replaceArgument')
+            ->with(
+                5,
+                [
+                    'test_data_provider_name1' => 'dataProvider1',
+                    'test_data_provider_name2' => 'dataProvider2'
                 ]
             );
 
@@ -271,6 +289,54 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                         [ConfigurationPass::BLOCK_TYPE_TAG_NAME, []],
                         [ConfigurationPass::BLOCK_TYPE_EXTENSION_TAG_NAME, []],
                         [ConfigurationPass::LAYOUT_UPDATE_TAG_NAME, $serviceIds]
+                    ]
+                )
+            );
+
+        $compilerPass = new ConfigurationPass();
+        $compilerPass->process($container);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @expectedExceptionMessage Tag attribute "alias" is required for "dataProvider1" service.
+     */
+    public function testDataProviderWithoutAlias()
+    {
+        $container    = $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
+            ->getMock();
+        $extensionDef = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->getMock();
+
+        $serviceIds = [
+            'dataProvider1' => [['class' => 'Test\DataProvider1']]
+        ];
+
+        $container->expects($this->exactly(2))
+            ->method('hasDefinition')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [ConfigurationPass::LAYOUT_FACTORY_BUILDER_SERVICE, false],
+                        [ConfigurationPass::LAYOUT_EXTENSION_SERVICE, true]
+                    ]
+                )
+            );
+        $container->expects($this->once())
+            ->method('getDefinition')
+            ->with(ConfigurationPass::LAYOUT_EXTENSION_SERVICE)
+            ->will($this->returnValue($extensionDef));
+
+        $container->expects($this->exactly(5))
+            ->method('findTaggedServiceIds')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [ConfigurationPass::BLOCK_TYPE_TAG_NAME, []],
+                        [ConfigurationPass::BLOCK_TYPE_EXTENSION_TAG_NAME, []],
+                        [ConfigurationPass::LAYOUT_UPDATE_TAG_NAME, []],
+                        [ConfigurationPass::CONTEXT_CONFIGURATOR_TAG_NAME, []],
+                        [ConfigurationPass::DATA_PROVIDER_TAG_NAME, $serviceIds]
                     ]
                 )
             );

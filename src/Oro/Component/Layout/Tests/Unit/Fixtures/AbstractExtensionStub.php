@@ -18,16 +18,21 @@ class AbstractExtensionStub extends AbstractExtension
     /** @var array */
     protected $loadedContextConfigurators;
 
+    /** @var array */
+    protected $loadedDataProviders;
+
     public function __construct(
         $loadedTypes,
         $loadedTypeExtensions,
         $loadedLayoutUpdates,
-        $loadedContextConfigurators
+        $loadedContextConfigurators,
+        $loadedDataProviders
     ) {
         $this->loadedTypes                = $loadedTypes;
         $this->loadedTypeExtensions       = $loadedTypeExtensions;
         $this->loadedLayoutUpdates        = $loadedLayoutUpdates;
         $this->loadedContextConfigurators = $loadedContextConfigurators;
+        $this->loadedDataProviders        = $loadedDataProviders;
     }
 
     protected function loadTypes()
@@ -48,5 +53,10 @@ class AbstractExtensionStub extends AbstractExtension
     protected function loadContextConfigurators()
     {
         return $this->loadedContextConfigurators;
+    }
+
+    protected function loadDataProviders()
+    {
+        return $this->loadedDataProviders;
     }
 }

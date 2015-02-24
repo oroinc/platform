@@ -7,6 +7,9 @@ final class Block implements BlockInterface
     /** @var ContextInterface */
     private $context;
 
+    /** @var DataProviderRegistryInterface */
+    private $data;
+
     /** @var RawLayout */
     private $rawLayout;
 
@@ -20,18 +23,21 @@ final class Block implements BlockInterface
     private $parent = false;
 
     /**
-     * @param RawLayout                $rawLayout
-     * @param BlockTypeHelperInterface $typeHelper
-     * @param ContextInterface         $context
+     * @param RawLayout                     $rawLayout
+     * @param BlockTypeHelperInterface      $typeHelper
+     * @param ContextInterface              $context
+     * @param DataProviderRegistryInterface $data
      */
     public function __construct(
         RawLayout $rawLayout,
         BlockTypeHelperInterface $typeHelper,
-        ContextInterface $context
+        ContextInterface $context,
+        DataProviderRegistryInterface $data
     ) {
         $this->rawLayout  = $rawLayout;
         $this->typeHelper = $typeHelper;
         $this->context    = $context;
+        $this->data       = $data;
     }
 
     /**
@@ -81,7 +87,7 @@ final class Block implements BlockInterface
         if ($this->parent === false) {
             $parentId = $this->rawLayout->getParentId($this->id);
             if ($parentId) {
-                $this->parent = new self($this->rawLayout, $this->typeHelper, $this->context);
+                $this->parent = new self($this->rawLayout, $this->typeHelper, $this->context, $this->data);
                 $this->parent->initialize($parentId);
             } else {
                 $this->parent = null;
@@ -113,5 +119,13 @@ final class Block implements BlockInterface
     public function getContext()
     {
         return $this->context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getData()
+    {
+        return $this->data;
     }
 }

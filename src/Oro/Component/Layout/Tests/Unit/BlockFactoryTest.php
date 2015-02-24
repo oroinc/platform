@@ -287,6 +287,7 @@ class BlockFactoryTest extends LayoutTestCase
                 [
                     'header' => [$headerLayoutUpdate]
                 ],
+                [],
                 []
             )
         );

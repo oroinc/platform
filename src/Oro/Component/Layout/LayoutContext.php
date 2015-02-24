@@ -119,32 +119,36 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($name)
     {
-        return $this->has($offset);
+        return isset($this->data[$name]) || array_key_exists($name, $this->data);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($name)
     {
-        return $this->get($offset);
+        if (!isset($this->data[$name]) && !array_key_exists($name, $this->data)) {
+            throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $name));
+        };
+
+        return $this->data[$name];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($name, $value)
     {
-        $this->set($offset, $value);
+        $this->set($name, $value);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($name)
     {
-        $this->remove($offset);
+        $this->remove($name);
     }
 }

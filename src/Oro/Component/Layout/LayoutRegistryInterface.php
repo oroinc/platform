@@ -38,6 +38,17 @@ interface LayoutRegistryInterface
     public function getContextConfigurators();
 
     /**
+     * Returns a data provider by name or NULL if a data provider does not exist.
+     *
+     * @param string $name The name of the data provider
+     *
+     * @return DataProviderInterface|null
+     *
+     * @throws Exception\UnexpectedTypeException if the passed name is not a string
+     */
+    public function findDataProvider($name);
+
+    /**
      * Sets the default options for a block type.
      *
      * @param string                   $name     The block type name

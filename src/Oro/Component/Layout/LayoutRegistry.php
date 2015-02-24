@@ -17,6 +17,9 @@ class LayoutRegistry implements LayoutRegistryInterface
     /** @var BlockTypeInterface[] */
     private $types = [];
 
+    /** @var DataProviderInterface[] */
+    private $dataProviders = [];
+
     /**
      * {@inheritdoc}
      */
@@ -38,7 +41,7 @@ class LayoutRegistry implements LayoutRegistryInterface
             }
         }
         if (!$type) {
-            throw new Exception\InvalidArgumentException(sprintf('Could not load block type "%s".', $name));
+            throw new Exception\InvalidArgumentException(sprintf('Could not load a block type "%s".', $name));
         }
         $this->types[$name] = $type;
 
@@ -73,6 +76,31 @@ class LayoutRegistry implements LayoutRegistryInterface
         }
 
         return $configurators;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function findDataProvider($name)
+    {
+        if (!is_string($name)) {
+            throw new Exception\UnexpectedTypeException($name, 'string');
+        }
+
+        if (isset($this->dataProviders[$name])) {
+            return $this->dataProviders[$name];
+        }
+
+        $dataProvider = null;
+        foreach ($this->getExtensions() as $extension) {
+            if ($extension->hasDataProvider($name)) {
+                $dataProvider = $extension->getDataProvider($name);
+                break;
+            }
+        }
+        $this->dataProviders[$name] = $dataProvider;
+
+        return $dataProvider;
     }
 
     /**

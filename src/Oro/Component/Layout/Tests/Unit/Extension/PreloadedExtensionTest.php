@@ -6,7 +6,7 @@ use Oro\Component\Layout\Extension\PreloadedExtension;
 
 class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testBlockTypes()
+    public function testTypes()
     {
         $name = 'test';
         $type = $this->getMock('Oro\Component\Layout\BlockTypeInterface');
@@ -27,7 +27,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
      * @expectedExceptionMessage The type "unknown" can not be loaded by this extension.
      */
-    public function testGetBlockUnknownType()
+    public function testGetUnknownType()
     {
         $extension = new PreloadedExtension([]);
 
@@ -101,6 +101,38 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($extension->hasContextConfigurators());
         $this->assertSame([], $extension->getContextConfigurators());
+    }
+
+    public function testDataProviders()
+    {
+        $name         = 'test';
+        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+
+        $extension = new PreloadedExtension(
+            [],
+            [],
+            [],
+            [],
+            [
+                $name => $dataProvider
+            ]
+        );
+
+        $this->assertTrue($extension->hasDataProvider($name));
+        $this->assertFalse($extension->hasDataProvider('unknown'));
+
+        $this->assertSame($dataProvider, $extension->getDataProvider($name));
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The data provider "unknown" can not be loaded by this extension.
+     */
+    public function testGetUnknownDataProvider()
+    {
+        $extension = new PreloadedExtension([], [], [], [], []);
+
+        $extension->getDataProvider('unknown');
     }
 
     /**
@@ -235,6 +267,42 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 $this->getMock('Oro\Component\Layout\ContextConfiguratorInterface'),
                 new \stdClass()
+            ]
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Each item of $dataProviders array must be DataProviderInterface.
+     */
+    public function testConstructWithInvalidDataProviders()
+    {
+        new PreloadedExtension(
+            [],
+            [],
+            [],
+            [],
+            [
+                'test1' => $this->getMock('Oro\Component\Layout\DataProviderInterface'),
+                'test2' => new \stdClass()
+            ]
+        );
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Keys of $dataProviders array must be strings.
+     */
+    public function testConstructWithInvalidKeysForDataProviders()
+    {
+        new PreloadedExtension(
+            [],
+            [],
+            [],
+            [],
+            [
+                'test' => $this->getMock('Oro\Component\Layout\DataProviderInterface'),
+                $this->getMock('Oro\Component\Layout\DataProviderInterface')
             ]
         );
     }
