@@ -3,10 +3,10 @@
 namespace Oro\Component\Layout;
 
 /**
- * The data provider registry that fallback to the layout context if a data provider
+ * The data provider registry that falls back to the layout context if a data provider
  * is not registered in the layout registry.
- * This means that at first a data provider is searching in the layout registry and
- * if it does not registered there a context variable with appropriate name is used
+ * This means that at first a data provider is searched in the layout registry and
+ * if it is not registered there a context variable with appropriate name is used
  * as data.
  */
 class DataProviderRegistry implements DataProviderRegistryInterface
