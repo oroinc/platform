@@ -217,7 +217,7 @@ class EmailModelBuilder
         $entities = $emailEntity->getActivityTargetEntities();
         foreach ($entities as $entity) {
             if ($entity != $this->helper->getUser()) {
-                $emailModel->setEntityClass(ClassUtils::getRealClass($entity));
+                $emailModel->setEntityClass(ClassUtils::getClass($entity));
                 $emailModel->setEntityId($entity->getId());
 
                 return;
