@@ -47,12 +47,12 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
             return $this->loaded[$className];
         }
 
-        // TODO generate cache file in dev mode, but check mTime each request
         if (!class_exists($className, false)) {
             if (false === $cache = $this->getCacheFilename($name)) {
                 eval('?>' . $this->doGenerate($className, $resource));
             } else {
-                if (!is_file($cache)) {
+                // write cache to file, refresh cache if source file fresher then cached one in debug mode
+                if (!is_file($cache) || ($this->isDebug() && filemtime($name) > filemtime($cache))) {
                     $this->writeCacheFile($cache, $this->doGenerate($className, $resource));
                 }
 
@@ -83,8 +83,9 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
             );
         }
 
-        return $this->getGenerator()
-            ->generate($className, $this->loadResourceGeneratorData($resource), $conditionCollection);
+        $resourceDataForGenerator = $this->loadResourceGeneratorData($resource);
+
+        return $this->getGenerator()->generate($className, $resourceDataForGenerator, $conditionCollection);
     }
 
     /**
@@ -119,6 +120,8 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
     }
 
     /**
+     * Generates PHP class name based on given resource name
+     *
      * @param string $name
      *
      * @return string
@@ -129,13 +132,15 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
     }
 
     /**
-     * @param string $name
+     * Generates PHP filename based on given resource name
      *
-     * @return bool|string
+     * @param string $name Resource filename
+     *
+     * @return bool|string Returns FALSE if cache dir isn't configured or generated PHP absolute filename otherwise
      */
     protected function getCacheFilename($name)
     {
-        if ($this->isDebug() || (!$this->getCache())) {
+        if (!$this->getCache()) {
             return false;
         }
 
@@ -155,6 +160,8 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
     }
 
     /**
+     * Write content to file, creates directories recursively. Throws excretion if cache directory is not writable
+     *
      * @param string $file
      * @param string $content
      */
@@ -183,6 +190,8 @@ abstract class AbstractGeneratorLoader implements LoaderInterface
     }
 
     /**
+     * Remove special characters from filename.
+     *
      * @param string $name
      *
      * @return string

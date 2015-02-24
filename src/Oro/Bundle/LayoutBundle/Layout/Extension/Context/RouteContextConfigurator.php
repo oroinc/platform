@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 
-// TODO cover by test
 class RouteContextConfigurator implements ContextConfiguratorInterface
 {
     const PARAM_NAME = 'routeName';
