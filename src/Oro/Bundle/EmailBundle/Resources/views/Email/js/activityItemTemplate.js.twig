@@ -44,9 +44,9 @@
                     <div class="dropdown"><a data-toggle="dropdown" class="dropdown-toggle activity-item" href="javascript:void(0);">...</a>
                         <ul class="dropdown-menu activity-item pull-right launchers-dropdown-menu">
                             <li>
-                                <ul title="{{ 'oro.email.reply'|trans }}" class="nav nav-pills icons-holder launchers-list">
+                                <ul class="nav nav-pills icons-holder launchers-list">
                                     <li class="launcher-item">
-                                        <a data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>" {{ UI.renderWidgetDataAttributes({
+                                        <a title="{{ 'oro.email.reply'|trans }}" data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>" {{ UI.renderWidgetDataAttributes({
                                             'type': 'dialog',
                                             'multiple': true,
                                             'refresh-widget-alias': 'activity-list-widget',
