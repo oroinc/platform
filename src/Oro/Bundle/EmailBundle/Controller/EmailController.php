@@ -72,12 +72,17 @@ class EmailController extends Controller
      */
     public function threadWidgetAction(Email $entity)
     {
-        $thread = $this->get('oro_email.email.thread.provider')->getThreadEmails(
-            $this->get('doctrine')->getManager(),
-            $entity
-        );
+        $config = $this->get('oro_config.global');
+        if ($config->get('oro_email.use_threads_in_emails')) {
+            $emails = $this->get('oro_email.email.thread.provider')->getThreadEmails(
+                $this->get('doctrine')->getManager(),
+                $entity
+            );
+        } else {
+            $emails = [$entity];
+        }
 
-        foreach ($thread as $email) {
+        foreach ($emails as $email) {
             try {
                 $this->getEmailCacheManager()->ensureEmailBodyCached($email);
             } catch (LoadEmailBodyException $e) {
@@ -87,7 +92,7 @@ class EmailController extends Controller
 
         return [
             'entity' => $entity,
-            'thread' => $thread,
+            'thread' => $emails,
         ];
     }
 
