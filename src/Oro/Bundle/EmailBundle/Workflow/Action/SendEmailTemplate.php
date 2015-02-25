@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
-use Oro\Bundle\EmailBundle\Validator\EmailAddressValidator;
 use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
