@@ -107,6 +107,20 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getDoNotCleanableEntityClasses()
+    {
+        return array_merge(
+            parent::getDoNotCleanableEntityClasses(),
+            [
+                'Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin',
+                'Oro\Bundle\ImapBundle\Entity\ImapEmailFolder'
+            ]
+        );
+    }
+
+    /**
      * Deletes all empty outdated folders
      *
      * @param EmailOrigin $origin
@@ -341,7 +355,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             if ($count === self::DB_BATCH_SIZE) {
                 $this->saveEmails($batch, $imapFolder);
                 $count = 0;
-                $batch = array();
+                $batch = [];
             }
         }
         if ($count > 0) {

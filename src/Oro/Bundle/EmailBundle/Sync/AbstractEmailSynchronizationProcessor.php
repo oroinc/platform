@@ -32,14 +32,14 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
-    /** @var array */
-    private $emailOriginUsers = [];
-
     /** @var int Number of seconds passed to store last emails batch */
     protected $dbBatchSaveTime = -1;
 
     /** @var int Timestamp when last batch was saved. */
     protected $dbBatchSaveTimestamp = 0;
+
+    /** @var array */
+    private $emailOriginUsers = [];
 
     /**
      * Constructor
@@ -275,8 +275,24 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     }
 
     /**
+     * Returns entity classes which should NOT be cleared from entity manager.
+     * Used by cleanUp method.
+     *
+     * @return array
+     */
+    protected function getDoNotCleanableEntityClasses()
+    {
+        return [
+            'Oro\Bundle\ConfigBundle\Entity\Config',
+            'Oro\Bundle\ConfigBundle\Entity\ConfigValue',
+            'Oro\Bundle\EmailBundle\Entity\EmailOrigin',
+            'Oro\Bundle\EmailBundle\Entity\EmailFolder'
+        ];
+    }
+
+    /**
      * Cleans doctrine's UOF to prevent:
-     *  - "eating" too mach memory
+     *  - "eating" too much memory
      *  - storing too many object which cause slowness of sync process
      * Tracks time when last batch was saved.
      * Calculates time between batch saves.
@@ -289,14 +305,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         /**
          * Entities which should NOT be cleared.
          */
-        $doNotClear = [
-            'Oro\Bundle\EmailBundle\Entity\EmailFolder',
-            'Oro\Bundle\EmailBundle\Entity\EmailOrigin',
-            'Oro\Bundle\ImapBundle\Entity\ImapEmailFolder',
-            'Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin',
-            'Oro\Bundle\ConfigBundle\Entity\Config',
-            'Oro\Bundle\ConfigBundle\Entity\ConfigValue'
-        ];
+        $doNotClear = $this->getDoNotCleanableEntityClasses();
 
         /**
          * Clear entity manager.
@@ -309,17 +318,17 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         }
 
         /**
-         * If folder sync completed and batch save time exceeded limit - throws exception.
+         * In case folder sync completed and batch save time exceeded limit - throws exception.
          */
         if ($isFolderSyncComplete
             && $folder != null
             && $this->dbBatchSaveTime > 0
             && $this->dbBatchSaveTime > self::DB_BATCH_TIME
         ) {
-            throw new SyncFolderTimeoutException($folder);
+            throw new SyncFolderTimeoutException($folder->getOrigin()->getId(), $folder->getFullName());
         } elseif ($isFolderSyncComplete) {
             /**
-             * If folder sync completed without batch save time exceed - reset dbBatchSaveTime.
+             * In case folder sync completed without batch save time exceed - reset dbBatchSaveTime.
              */
             $this->dbBatchSaveTime = -1;
         } else {

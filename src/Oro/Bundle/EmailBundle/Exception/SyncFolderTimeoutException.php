@@ -2,20 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Exception;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-
 class SyncFolderTimeoutException extends \RuntimeException
 {
     /**
-     * @param EmailFolder $folder
+     * @param int    $originId   Email origin id
+     * @param string $folderName Email folder full name
      */
-    public function __construct(EmailFolder $folder)
+    public function __construct($originId, $folderName)
     {
         parent::__construct(
             sprintf(
                 'Exit because of origin\'s "%d" folder "%s" sync exceeded max save time per batch.',
-                $folder->getOrigin()->getId(),
-                $folder->getFullName()
+                $originId,
+                $folderName
             )
         );
     }
