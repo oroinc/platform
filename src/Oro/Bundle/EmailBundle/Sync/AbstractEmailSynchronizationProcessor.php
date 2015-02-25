@@ -36,7 +36,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
     private $emailOriginUsers = [];
 
     /** @var int Number of seconds passed to store last emails batch */
-    protected $dbBatchSaveTime = 0;
+    protected $dbBatchSaveTime = -1;
 
     /** @var int Timestamp when last batch was saved. */
     protected $dbBatchSaveTimestamp = 0;
@@ -321,7 +321,7 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
             /**
              * If folder sync completed without batch save time exceed - reset dbBatchSaveTime.
              */
-            $this->dbBatchSaveTime = 0;
+            $this->dbBatchSaveTime = -1;
         } else {
             /**
              * After batch save - calculate time difference between batches
