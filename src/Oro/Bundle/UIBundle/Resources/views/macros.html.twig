@@ -223,7 +223,7 @@
         <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
             {% if parameters.elements is defined and parameters.elements is not empty %}
                 {% for item in parameters.elements %}
-                    {{ _self.dropdownItem(parameters) }}
+                    {{ _self.dropdownItem(item) }}
                 {% endfor %}
             {% endif %}
             {% if parameters.html is defined and parameters.html is not empty %}
