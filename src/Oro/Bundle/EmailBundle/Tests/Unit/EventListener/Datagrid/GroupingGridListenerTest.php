@@ -79,40 +79,6 @@ class GroupingGridListenerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $enabled
-     * @param $arrayModify
-     *
-     * @dataProvider buildBeforeProvider
-     */
-    public function testOnBuildBefore($enabled, $arrayModify)
-    {
-        $this->configManager->expects($this->once())
-            ->method('get')
-            ->with('oro_email.use_threads_in_emails')
-            ->willReturn($enabled);
-
-        $this->config->expects($this->exactly($arrayModify))
-            ->method('offsetAddToArray');
-
-        $buildBeforeEvent = new BuildBefore($this->datagrid, $this->config);
-        $this->groupingGridListener->onBuildBefore($buildBeforeEvent);
-    }
-
-    public function buildBeforeProvider()
-    {
-        return [
-            'configEnabled' => [
-                'enabled' => true,
-                'arrayModify' => 1,
-            ],
-            'configDisabled' => [
-                'enabled' => false,
-                'arrayModify' => 0,
-            ],
-        ];
-    }
-
-    /**
-     * @param $enabled
      * @param $andWhereCalls
      *
      * @dataProvider buildAfterProvider

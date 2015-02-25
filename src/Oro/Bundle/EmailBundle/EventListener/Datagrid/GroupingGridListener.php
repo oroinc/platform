@@ -25,25 +25,6 @@ class GroupingGridListener
     /**
      * {@inheritDoc}
      */
-    public function onBuildBefore(BuildBefore $event)
-    {
-        if ($this->config->get('oro_email.use_threads_in_emails')) {
-            $config = $event->getConfig();
-
-            $config->offsetAddToArray('actions', [
-                'test' => [
-                    'type'  => 'navigate',
-                    'label' => 'oro.grid.action.view',
-                    'link'  => 'view_thread_link',
-                    'icon'  => 'eye-open',
-                ]
-            ]);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     public function onBuildAfter(BuildAfter $event)
     {
         $dataGrid = $event->getDatagrid();
