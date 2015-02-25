@@ -91,7 +91,12 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
     protected function getBlockView($blockType, array $options = [])
     {
         $layoutBuilder = $this->layoutFactory->createLayoutBuilder();
-        $layoutBuilder->add($blockType . '_id', null, $blockType, $options);
+        $layoutBuilder->add(
+            ($blockType instanceof BlockTypeInterface ? $blockType->getName() : $blockType) . '_id',
+            null,
+            $blockType,
+            $options
+        );
         $layout = $layoutBuilder->getLayout($this->context);
 
         return $layout->getView();
