@@ -1,6 +1,10 @@
 /*global define*/
 define(['jquery'], function ($) {
     'use strict';
+
+    function isMobile() {
+        return $('body').hasClass('mobile-version');
+    }
     $.ajaxSetup({
         headers: {
             'X-CSRF-Header': 1
@@ -65,7 +69,38 @@ define(['jquery'], function ($) {
                     return orig.apply(this, arguments);
                 }
             };
-        })($.fn.focus)
+        })($.fn.focus),
+
+        /**
+         * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
+         */
+        getBorders: function (el) {
+            var computed = window.getComputedStyle(el || this[0], null);
+            function convertBorderToPx(cssValue) {
+                switch (cssValue) {
+                    case 'thin':
+                        return 1;
+                    case 'medium':
+                        return 2;
+                    case 'thick':
+                        return 5;
+                    default:
+                        return Math.round(parseFloat(cssValue));
+                }
+            }
+
+            return {
+                top: convertBorderToPx(computed.getPropertyValue('borderTopWidth') ||
+                    computed.borderTopWidth),
+                bottom: convertBorderToPx(computed.getPropertyValue('borderBottomWidth') ||
+                    computed.borderBottomWidth),
+                left: convertBorderToPx(computed.getPropertyValue('borderLeftWidth') ||
+                    computed.borderLeftWidth),
+                right: convertBorderToPx(computed.getPropertyValue('borderRightWidth') ||
+                    computed.borderRightWidth)
+            };
+        }
+
     });
 
     return $;

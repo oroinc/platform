@@ -606,10 +606,10 @@ define(function (require) {
         },
 
         fixHeaderCellWidth: function () {
-            var headerCell, i, cellWidth,
-                headerCells = this.getHeaderCells(),
+            var headerCells = this.getHeaderCells(),
                 firstRowCells = this.getFirstRowCells(),
                 totalWidth = 0,
+                self = this,
                 scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             // remove style
             headerCells.attr('style', '');
@@ -620,10 +620,11 @@ define(function (require) {
                 this.$grid.css({borderRight: scrollBarWidth + 'px solid darkblue'});
             }
             this.$el.removeClass('floatThead');
-            for (i = 0; i < headerCells.length; i++) {
-                headerCell = headerCells[i];
-                cellWidth = headerCell.offsetWidth;
-                if (this.scrollVisible && i === headerCells.length - 1) {
+
+            // copy widths
+            headerCells.each(function (i, headerCell) {
+                var cellWidth = headerCell.offsetWidth;
+                if (self.scrollVisible && i === headerCells.length - 1) {
                     cellWidth += scrollBarWidth;
                 }
                 totalWidth += cellWidth;
@@ -633,7 +634,7 @@ define(function (require) {
                     firstRowCells[i].style.minWidth = firstRowCells[i].style.width = cellWidth + 'px';
                     firstRowCells[i].style.boxSizing = 'border-box';
                 }
-            }
+            });
 
             this.$grid.css({borderRight: 'none'});
             this.$el.addClass('floatThead');
@@ -647,81 +648,10 @@ define(function (require) {
             this.reposition();
         },
 
-        /**
-         * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
-         */
-        getBorders: function (elem) {
-            var computed = window.getComputedStyle(elem, null);
-            function convertBorderToPx(cssValue) {
-                switch (cssValue) {
-                    case 'thin':
-                        return 1;
-                    case 'medium':
-                        return 2;
-                    case 'thick':
-                        return 5;
-                    default:
-                        return Math.round(parseFloat(cssValue));
-                }
-            }
-
-            return {
-                top: convertBorderToPx(computed.getPropertyValue('borderTopWidth') ||
-                    computed.borderTopWidth),
-                bottom: convertBorderToPx(computed.getPropertyValue('borderBottomWidth') ||
-                    computed.borderBottomWidth),
-                left: convertBorderToPx(computed.getPropertyValue('borderLeftWidth') ||
-                    computed.borderLeftWidth),
-                right: convertBorderToPx(computed.getPropertyValue('borderRightWidth') ||
-                    computed.borderRightWidth)
-            };
-        },
-
-        getVisibleRect: function (el) {
-            var current = el,
-                tableRect = current.getBoundingClientRect(),
-                midRect = tableRect,
-                borders,
-                resultRect = {
-                    top: midRect.top - this.headerHeight,
-                    left: midRect.left,
-                    bottom: midRect.bottom,
-                    right: midRect.right
-                };
-            current = current.parentNode;
-            while (current.getBoundingClientRect) {
-                midRect = current.getBoundingClientRect();
-                borders = this.getBorders(current);
-
-                if (current.id === 'top-page' && tools.isMobile()) {
-                    /**
-                     * Equals header height. Cannot calculate dynamically due to issues on ipad
-                     */
-                    if (resultRect.top < 54) {
-                        resultRect.top = 54;
-                    }
-                }
-
-                if (resultRect.top < midRect.top + borders.top) {
-                    resultRect.top = midRect.top + borders.top;
-                }
-                if (resultRect.bottom > midRect.bottom - borders.bottom) {
-                    resultRect.bottom = midRect.bottom - borders.bottom;
-                }
-                if (resultRect.left < midRect.left + borders.left) {
-                    resultRect.left = midRect.left + borders.left;
-                }
-                if (resultRect.right > midRect.right - borders.right) {
-                    resultRect.right = midRect.right - borders.right;
-                }
-                current = current.parentNode;
-            }
-
-            return resultRect;
-        },
-
         reposition: function () {
-            this.rescrollCb && this.rescrollCb();
+            if (this.rescrollCb) {
+                this.rescrollCb();
+            }
             // get gridRect
             var tableRect = this.$grid[0].getBoundingClientRect(),
                 visibleRect = this.getVisibleRect(this.$grid[0]),
@@ -909,6 +839,54 @@ define(function (require) {
                 }
             }
             this.lastClientRect = currentClientRect;
+        },
+
+        /**
+         *
+         * @param el
+         * @returns {{top: number, left: Number, bottom: Number, right: Number}}
+         */
+        getVisibleRect: function (el) {
+            var current = el,
+                tableRect = current.getBoundingClientRect(),
+                midRect = tableRect,
+                borders,
+                resultRect = {
+                    top: midRect.top - this.headerHeight,
+                    left: midRect.left,
+                    bottom: midRect.bottom,
+                    right: midRect.right
+                };
+            current = current.parentNode;
+            while (current.getBoundingClientRect) {
+                midRect = current.getBoundingClientRect();
+                borders = $.fn.getBorders(current);
+
+                if (current.id === 'top-page' && tools.isMobile()) {
+                    /**
+                     * Equals header height. Cannot calculate dynamically due to issues on ipad
+                     */
+                    if (resultRect.top < 54) {
+                        resultRect.top = 54;
+                    }
+                }
+
+                if (resultRect.top < midRect.top + borders.top) {
+                    resultRect.top = midRect.top + borders.top;
+                }
+                if (resultRect.bottom > midRect.bottom - borders.bottom) {
+                    resultRect.bottom = midRect.bottom - borders.bottom;
+                }
+                if (resultRect.left < midRect.left + borders.left) {
+                    resultRect.left = midRect.left + borders.left;
+                }
+                if (resultRect.right > midRect.right - borders.right) {
+                    resultRect.right = midRect.right - borders.right;
+                }
+                current = current.parentNode;
+            }
+
+            return resultRect;
         },
 
         /**
