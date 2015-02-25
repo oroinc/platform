@@ -23,7 +23,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    private $translator;
+    protected $titleTranslator;
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -70,7 +70,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\Translator')
+        $this->titleTranslator = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\TitleTranslator')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -90,10 +90,6 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->translator->expects($this->any())
-            ->method('getTranslations')
-            ->will($this->returnValue(['messages' => []]));
-
         $this->titleProvider = $this->getMockBuilder('Oro\Bundle\NavigationBundle\Provider\TitleProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -101,7 +97,7 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->titleService = new TitleService(
             $this->annotationsReader,
             $this->configReader,
-            $this->translator,
+            $this->titleTranslator,
             $this->em,
             $this->serializer,
             $this->userConfigManager,
@@ -112,8 +108,10 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
 
     public function testRender()
     {
-        $this->translator->expects($this->once())
-            ->method('trans');
+        $this->titleTranslator->expects($this->once())
+            ->method('trans')
+            ->with('PrefixSuffix', [])
+            ->will($this->returnValue('PrefixSuffix'));
 
         $result = $this->titleService->render(array(), null, 'Prefix', 'Suffix');
 
@@ -144,6 +142,11 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $storedTitleMock->expects($this->once())
             ->method('getSuffix');
 
+        $this->titleTranslator->expects($this->once())
+            ->method('trans')
+            ->with('string', [])
+            ->will($this->returnValue('string'));
+
         $result = $this->titleService->render(array(), $data, null, null, true);
 
         $this->assertTrue(is_string($result));
@@ -152,9 +155,9 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
     public function testRenderShort()
     {
         $shortTitle = 'short title';
-        $this->translator->expects($this->once())
+        $this->titleTranslator->expects($this->once())
             ->method('trans')
-            ->with($this->equalTo($shortTitle))
+            ->with($shortTitle, [])
             ->will($this->returnValue($shortTitle));
         $this->titleService->setShortTemplate($shortTitle);
         $result = $this->titleService->render(array(), null, 'Prefix', 'Suffix', true, true);

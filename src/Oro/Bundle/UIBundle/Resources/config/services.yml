@@ -90,3 +90,11 @@ services:
         class: %oro_ui.provider.widget_context.class%
         calls:
             - [setRequest, ["@?request="]]
+
+    oro_ui.block_type_extension.head:
+        class: Oro\Bundle\UIBundle\Layout\Extension\HeadBlockTypeExtension
+        arguments:
+            - @oro_navigation.title_provider
+            - @oro_navigation.title_translator
+        tags:
+            - { name: layout.block_type_extension, alias: head }

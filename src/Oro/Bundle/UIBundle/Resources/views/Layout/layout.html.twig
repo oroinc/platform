@@ -1,0 +1,7 @@
+{% block head_widget %}
+    <head{{ block('block_attributes') }}>
+        <title>{% trans %}Loading...{% endtrans %}</title>
+        <script id="page-title" type="text/html">{{ title|replace(title_parameters) }}</script>
+        {{ block_widget(block) }}
+    </head>
+{% endblock %}

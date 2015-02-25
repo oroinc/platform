@@ -15,16 +15,12 @@ use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Title\StoredTitle;
 use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class TitleService implements TitleServiceInterface
 {
-    /** @var TitleProvider */
-    private $titleProvider;
-
     /**
      * Title template
      *
@@ -68,9 +64,14 @@ class TitleService implements TitleServiceInterface
     private $prefix = null;
 
     /**
-     * @var Translator
+     * @var TitleProvider
      */
-    private $translator;
+    private $titleProvider;
+
+    /**
+     * @var TitleTranslator
+     */
+    private $titleTranslator;
 
     /**
      * @var ObjectManager
@@ -95,7 +96,7 @@ class TitleService implements TitleServiceInterface
     public function __construct(
         AnnotationsReader $reader,
         ConfigReader $configReader,
-        Translator $translator,
+        TitleTranslator $titleTranslator,
         ObjectManager $em,
         Serializer $serializer,
         $userConfigManager,
@@ -103,7 +104,7 @@ class TitleService implements TitleServiceInterface
         TitleProvider $titleProvider
     ) {
         $this->readers = array($reader, $configReader);
-        $this->translator = $translator;
+        $this->titleTranslator = $titleTranslator;
         $this->em = $em;
         $this->serializer = $serializer;
         $this->userConfigManager = $userConfigManager;
@@ -175,28 +176,9 @@ class TitleService implements TitleServiceInterface
             $title = $prefix . $title . $suffix;
         }
 
-        $this->translateTitleParts($title, $params);
+        $title = $this->titleTranslator->trans($title, $params);
 
         return $title;
-    }
-
-    /**
-     * Checks if the given template contains several parts and if so translate each part individually
-     *
-     * @param string $translatedTemplate
-     * @param array  $params
-     */
-    protected function translateTitleParts(&$translatedTemplate, array $params)
-    {
-        if ($translatedTemplate) {
-            $delimiter = ' ' . $this->userConfigManager->get('oro_navigation.title_delimiter') . ' ';
-            $transItems = explode($delimiter, $translatedTemplate);
-            foreach ($transItems as $key => $transItem) {
-                $transItems[$key] = $this->translator->trans($transItem, $params);
-            }
-
-            $translatedTemplate = implode($delimiter, $transItems);
-        }
     }
 
     /**
