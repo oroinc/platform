@@ -5,3 +5,11 @@
         {{ block_widget(block) }}
     </head>
 {% endblock %}
+
+{% block _page_title_widget %}
+    <div class="pull-left pull-left-extra">
+        <div class="pull-left">
+            <h1 class="oro-subtitle">{{ block_widget(block) }}</h1>
+        </div>
+    </div>
+{% endblock %}
