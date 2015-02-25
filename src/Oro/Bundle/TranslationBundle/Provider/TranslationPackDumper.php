@@ -220,11 +220,13 @@ class TranslationPackDumper implements LoggerAwareInterface
         // dotted key that finish with dot, e.g. segment.type. meaning that suffix can be added dynamically
         $isDotAtTheEnd = $isKeyValueEqual && $isDottedKey && '.' == $key[strlen($key) - 1];
         // dotted key that finish with %s, e.g. segment.type.%s meaning that suffix can be added dynamically
-        $isPlaceholder = $isKeyValueEqual && $isDottedKey && '%s' == substr($key, -2);
+        $isFinishPlaceholder = $isKeyValueEqual && $isDottedKey && '%s' == substr($key, -2);
+        // dotted key that contains %s, e.g. segment.type.%s.label meaning that placeholder will be changed dynamically
+        $isMiddlePlaceholder = $isKeyValueEqual && $isDottedKey && false !== strpos($key, '.%s.');
         // key is something like %segment.name%, so called parameter
         $isParameter   = preg_match('#^%[^%\s]+%$#', $key);
 
-        if ($isParameter | $isDotAtTheEnd | $isPlaceholder) {
+        if ($isParameter | $isDotAtTheEnd | $isFinishPlaceholder | $isMiddlePlaceholder) {
             return false;
         }
 
