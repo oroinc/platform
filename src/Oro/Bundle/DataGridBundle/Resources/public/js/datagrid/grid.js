@@ -3,11 +3,10 @@
 define(function (require) {
     'use strict';
 
-    var testing = true;
-
     var Grid,
         $ = require('jquery'),
         _ = require('underscore'),
+        Backbone = require('backbone'),
         Backgrid = require('backgrid'),
         __ = require('orotranslation/js/translator'),
         mediator = require('oroui/js/mediator'),
@@ -543,7 +542,7 @@ define(function (require) {
              * Backbone event. Fired when the grid has been successfully rendered.
              * @event rendered
              */
-            this.trigger("rendered");
+            this.trigger('rendered');
 
             /**
              * Backbone event. Fired when data for grid has been successfully rendered.
@@ -563,7 +562,8 @@ define(function (require) {
          */
         getCssHeightCalcExpression: function () {
             var documentHeight = $(document).height(),
-                availableHeight = mediator.execute('layout:getAvailableHeight', this.$grid.parents('.grid-scrollable-container:first'));
+                availableHeight = mediator.execute('layout:getAvailableHeight',
+                    this.$grid.parents('.grid-scrollable-container:first'));
             return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
         },
 
@@ -609,7 +609,6 @@ define(function (require) {
             var headerCell, i, cellWidth,
                 headerCells = this.getHeaderCells(),
                 firstRowCells = this.getFirstRowCells(),
-                thead = this.$grid.find('thead:first'),
                 totalWidth = 0,
                 scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             // remove style
@@ -655,11 +654,11 @@ define(function (require) {
             var computed = window.getComputedStyle(elem, null);
             function convertBorderToPx(cssValue) {
                 switch (cssValue) {
-                    case "thin":
+                    case 'thin':
                         return 1;
-                    case "medium":
+                    case 'medium':
                         return 2;
-                    case "thick":
+                    case 'thick':
                         return 5;
                     default:
                         return Math.round(parseFloat(cssValue));
@@ -667,14 +666,14 @@ define(function (require) {
             }
 
             return {
-                top: convertBorderToPx(computed.getPropertyValue( "borderTopWidth" )
-                    || computed[ "borderTopWidth" ]),
-                bottom: convertBorderToPx(computed.getPropertyValue( "borderBottomWidth" )
-                    || computed[ "borderBottomWidth" ]),
-                left: convertBorderToPx(computed.getPropertyValue( "borderLeftWidth" )
-                    || computed[ "borderLeftWidth" ]),
-                right: convertBorderToPx(computed.getPropertyValue( "borderRightWidth" )
-                    || computed[ "borderRightWidth" ])
+                top: convertBorderToPx(computed.getPropertyValue('borderTopWidth') ||
+                    computed.borderTopWidth),
+                bottom: convertBorderToPx(computed.getPropertyValue('borderBottomWidth') ||
+                    computed.borderBottomWidth),
+                left: convertBorderToPx(computed.getPropertyValue('borderLeftWidth') ||
+                    computed.borderLeftWidth),
+                right: convertBorderToPx(computed.getPropertyValue('borderRightWidth') ||
+                    computed.borderRightWidth)
             };
         },
 
@@ -736,7 +735,7 @@ define(function (require) {
         },
 
         setFloatTheadMode: function (mode, visibleRect, tableRect) {
-            var theadRect;
+            var theadRect, sizingThead;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
                 visibleRect = this.getVisibleRect(this.$grid[0]);
@@ -751,7 +750,7 @@ define(function (require) {
                         this.$el.removeClass('floatThead-fixed');
                         this.$el.addClass('floatThead-relative');
                         if (!this.$grid.find('.thead-sizing').length) {
-                            var sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
                             this.$grid.prepend(sizingThead);
                         }
                     }
@@ -770,7 +769,7 @@ define(function (require) {
                         this.$el.addClass('floatThead-fixed');
                         this.$grid.find('thead:first .dropdown.open').removeClass('open');
                         if (!this.$grid.find('.thead-sizing').length) {
-                            var sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
                             sizingThead.insertAfter(this.$grid.find('thead'));
                         }
                     }
@@ -788,7 +787,7 @@ define(function (require) {
                         this.$grid.find('.thead-sizing').remove();
                         this.$el.removeClass('floatThead-relative floatThead-fixed');
                         // remove extra styles
-                        this.$grid.find('thead:first, thead:first tr:first'). attr('style', '');
+                        this.$grid.find('thead:first, thead:first tr:first').attr('style', '');
                         // cleanup
                     }
                     break;
@@ -893,17 +892,17 @@ define(function (require) {
 
         fixHeightInFloatTheadMode: function () {
             var currentClientRect = this.$grid.parents('.other-scroll-container')[0].getBoundingClientRect();
-            if (!this.lastClientRect || (this.lastClientRect.top !== currentClientRect.top
-                  || this.lastClientRect.left !== currentClientRect.left
-                  || this.lastClientRect.right !== currentClientRect.right)) {
-                if( this.layout === 'fullscreen') {
+            if (!this.lastClientRect || (this.lastClientRect.top !== currentClientRect.top ||
+                this.lastClientRect.left !== currentClientRect.left ||
+                this.lastClientRect.right !== currentClientRect.right)) {
+                if (this.layout === 'fullscreen') {
                     // adjust max height
                     this.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: this.getCssHeightCalcExpression()
                     });
                 }
-                if (!this.lastClientRect || (this.lastClientRect.left !== currentClientRect.left
-                    || this.lastClientRect.right !== currentClientRect.right)) {
+                if (!this.lastClientRect || (this.lastClientRect.left !== currentClientRect.left ||
+                    this.lastClientRect.right !== currentClientRect.right)) {
                     this.reflow();
                 } else {
                     this.reposition();
@@ -922,7 +921,7 @@ define(function (require) {
             }
             this.$grid.append(this.body.render().$el);
 
-            mediator.trigger("grid_load:complete", this.collection, this.$grid);
+            mediator.trigger('grid_load:complete', this.collection, this.$grid);
         },
 
         /**
@@ -981,7 +980,7 @@ define(function (require) {
                  * Backbone event. Fired when data for grid has been successfully rendered.
                  * @event grid_load:complete
                  */
-                mediator.trigger("grid_load:complete", this.collection, this.$el);
+                mediator.trigger('grid_load:complete', this.collection, this.$el);
                 mediator.execute('layout:init', this.$el, this);
                 this.reflow();
             }
@@ -1059,7 +1058,7 @@ define(function (require) {
          * Chooses layout on resize or during creation
          */
         updateLayout: function () {
-            if(!this.$grid.parents('body').length) {
+            if (!this.$grid.parents('body').length) {
                 // not ready to apply layout
                 return;
             }
