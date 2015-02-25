@@ -3,8 +3,8 @@ Transition Actions
 
 Table of Contents
 -----------------
- - [Send Email Action](#send-email)
- - [Send Email Template Action](#send-email-template)
+ - [Send Email Action](#send-email-action)
+ - [Send Email Template Action](#send-email-template-action)
 
 
 Send Email Action
