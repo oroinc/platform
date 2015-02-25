@@ -144,15 +144,6 @@ define(function (require) {
          * @throws {TypeError} If mandatory options are undefined
          */
         initialize: function (options) {
-            if (testing) {
-                this.i = 0;
-                /*
-                $('#page').prepend('<div class="logging-div" style="position: absolute;background: white;color: black;height: 350px;min-width: 200px;z-index: 1000000; overflow: scroll"></div>');
-                var loggingDiv = $('.logging-div');
-                this.log = function log(value) {
-                    loggingDiv.prepend('<div>' + value + '</div>');
-                } //*/
-            }
             var opts = options || {};
             this.subviews = [];
 
@@ -753,7 +744,6 @@ define(function (require) {
             if (!tableRect) {
                 tableRect = this.$grid[0].getBoundingClientRect();
             }
-            if (testing) console.log(this.i++, mode, tableRect);
             switch (mode) {
                 case 'relative':
                     // works well with dropdowns, but causes jumps while scrolling
