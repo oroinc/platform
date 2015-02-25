@@ -5,13 +5,12 @@ namespace Oro\Bundle\EmbeddedFormBundle\Manager;
 use Symfony\Component\Form\FormInterface;
 
 use Oro\Component\Layout\Layout;
-use Oro\Component\Layout\LayoutBuilderInterface;
 use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\LayoutManager;
 
+use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm;
-use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType;
-use Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType;
 
 class EmbedFormLayoutManager
 {
@@ -21,14 +20,22 @@ class EmbedFormLayoutManager
     /** @var EmbeddedFormManager */
     protected $formManager;
 
+    /** @var ThemeManager */
+    protected $themeManager;
+
     /**
      * @param LayoutManager       $layoutManager
      * @param EmbeddedFormManager $formManager
+     * @param ThemeManager        $themeManager
      */
-    public function __construct(LayoutManager $layoutManager, EmbeddedFormManager $formManager)
-    {
+    public function __construct(
+        LayoutManager $layoutManager,
+        EmbeddedFormManager $formManager,
+        ThemeManager $themeManager
+    ) {
         $this->layoutManager = $layoutManager;
         $this->formManager   = $formManager;
+        $this->themeManager  = $themeManager;
     }
 
     /**
@@ -37,87 +44,29 @@ class EmbedFormLayoutManager
      *
      * @return Layout
      */
-    public function getFormLayout(EmbeddedForm $formEntity, FormInterface $form)
+    public function getLayout(EmbeddedForm $formEntity, FormInterface $form = null)
     {
         $layoutContext = new LayoutContext();
-        $layoutBuilder = $this->getLayoutBuilder($formEntity);
-        $layoutBuilder->add(
-            'form',
-            'content',
-            new EmbedFormType(),
-            [
-                'form'        => $form->createView(),
-                // @deprecated since 1.7. Kept for backward compatibility
-                'form_layout' => $this->formManager->getCustomFormLayoutByFormType($formEntity->getFormType())
-            ]
-        );
 
-        $typeInstance = $this->formManager->getTypeInstance($formEntity->getFormType());
-        if ($typeInstance instanceof LayoutUpdateInterface) {
-            $typeInstance->updateLayout($layoutBuilder);
-        }
-        $layoutContext->getDataResolver()->setOptional(['embedded_form']);
-        $layoutContext->set('embedded_form', $form);
+        // TODO discuss active theme as context param
+        $this->themeManager->setActiveTheme('embedded_default');
 
-        $layout = $layoutBuilder->getLayout($layoutContext);
-
-        return $layout;
-    }
-
-    /**
-     * @param EmbeddedForm $formEntity
-     *
-     * @return Layout
-     */
-    public function getFormSuccessLayout(EmbeddedForm $formEntity)
-    {
-        $layoutContext = new LayoutContext();
-        $layoutBuilder = $this->getLayoutBuilder($formEntity);
-        $layoutBuilder->add(
-            'success_message',
-            'content',
-            new EmbedFormSuccessType(),
-            [
-                'message' => $formEntity->getSuccessMessage(),
-                'form_id' => $formEntity->getId()
-            ]
-        );
-
-        $layout = $layoutBuilder->getLayout($layoutContext);
-
-        return $layout;
-    }
-
-    /**
-     * @param EmbeddedForm $formEntity
-     *
-     * @return LayoutBuilderInterface
-     */
-    protected function getLayoutBuilder(EmbeddedForm $formEntity)
-    {
         $layoutBuilder = $this->layoutManager->getLayoutBuilder();
+        // TODO discuss adding root automatically
+        $layoutBuilder->add('root', null, 'root');
 
-        $layoutBuilder
-            ->add('root', null, 'root')
-            ->add('head', 'root', 'head', ['title' => 'Form'])
-            ->add('meta_charset', 'head', 'meta', ['charset' => 'utf-8'])
-            ->add(
-                'meta_x_ua_compatible',
-                'head',
-                'meta',
-                ['http_equiv' => 'X-UA-Compatible', 'content' => 'IE=edge,chrome=1']
-            )
-            ->add(
-                'meta_viewport',
-                'head',
-                'meta',
-                ['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1.0']
-            )
-            ->add('base_css', 'head', 'style')
-            ->add('form_css', 'head', 'style', ['content' => $formEntity->getCss()])
-            ->add('content', 'root', 'body')
-            ->setBlockTheme('OroEmbeddedFormBundle:Layout:embed_form.html.twig');
+        $layoutContext->getDataResolver()
+            ->setRequired(['embedded_form_entity', 'embedded_form_type'])
+            ->setOptional(['embedded_form', 'embedded_form_custom_layout']);
 
-        return $layoutBuilder;
+        $formTypeName = $formEntity->getFormType();
+        $customLayout = $this->formManager->getCustomFormLayoutByFormType($formTypeName);
+
+        $layoutContext->set('embedded_form', null === $form ? null : new FormAccessor($form));
+        $layoutContext->set('embedded_form_entity', $formEntity);
+        $layoutContext->set('embedded_form_type', $formTypeName);
+        $layoutContext->set('embedded_form_custom_layout', $customLayout);
+
+        return $layoutBuilder->getLayout($layoutContext);
     }
 }
