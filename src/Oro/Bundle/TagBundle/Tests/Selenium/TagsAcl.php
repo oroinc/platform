@@ -21,7 +21,6 @@ class TagsAcl extends Selenium2TestCase
             ->setEntity('User', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setEntity('Group', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
             ->setEntity('Role', array('Create', 'Edit', 'Delete', 'View', 'Assign'), 'Organization')
-            ->setEntity('Tag', ['view'], 'System')
             ->setCapability(
                 array(
                     'Tag assign/unassign',
