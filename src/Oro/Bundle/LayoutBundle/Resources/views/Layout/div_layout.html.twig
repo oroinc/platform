@@ -83,3 +83,7 @@
         {{ block_widget(block) }}
     </fieldset>
 {% endblock %}
+
+{% block text_widget -%}
+    {{ text|trans(text_parameters, translation_domain) }}
+{%- endblock %}

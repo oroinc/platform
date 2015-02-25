@@ -124,6 +124,8 @@ class DebugCommand extends ContainerAwareCommand
                 $formatted = 'true';
             } elseif ($value === false) {
                 $formatted = 'false';
+            } elseif (is_string($value)) {
+                $formatted = sprintf('"%s"', $value);
             } else {
                 $formatted = $value;
             }
