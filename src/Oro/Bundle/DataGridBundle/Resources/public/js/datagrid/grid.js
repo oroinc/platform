@@ -151,7 +151,7 @@ define(function (require) {
                 var loggingDiv = $('.logging-div');
                 this.log = function log(value) {
                     loggingDiv.prepend('<div>' + value + '</div>');
-                }*/
+                } //*/
             }
             var opts = options || {};
             this.subviews = [];
@@ -705,7 +705,7 @@ define(function (require) {
 
                 if (current.id === 'top-page' && tools.isMobile()) {
                     /**
-                     * This value
+                     * Equals header height. Cannot calculate dynamically due to issues on ipad
                      */
                     if (resultRect.top < 54) {
                         resultRect.top = 54;
@@ -760,9 +760,9 @@ define(function (require) {
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-fixed');
                         this.$el.addClass('floatThead-relative');
-                        if (!this.$grid.find('.thead-sizing-row').length) {
-                            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:'
-                                + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
+                        if (!this.$grid.find('.thead-sizing').length) {
+                            var sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            this.$grid.prepend(sizingThead);
                         }
                     }
                     this.$grid.find('thead:first').css({
@@ -779,9 +779,9 @@ define(function (require) {
                         this.$el.removeClass('floatThead-relative');
                         this.$el.addClass('floatThead-fixed');
                         this.$grid.find('thead:first .dropdown.open').removeClass('open');
-                        if (!this.$grid.find('.thead-sizing-row').length) {
-                            this.$grid.find('tbody').prepend('<tr class="thead-sizing-row"><td style="height:'
-                                + (this.headerHeight - 1/* BORDER_WIDTH */) + 'px"></td></tr>');
+                        if (!this.$grid.find('.thead-sizing').length) {
+                            var sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            sizingThead.insertAfter(this.$grid.find('thead'));
                         }
                     }
                     this.$grid.find('thead:first').css({
@@ -795,7 +795,7 @@ define(function (require) {
                     break;
                 default:
                     if (this.currentFloatTheadMode !== mode) {
-                        this.$grid.find('.thead-sizing-row').remove();
+                        this.$grid.find('.thead-sizing').remove();
                         this.$el.removeClass('floatThead-relative floatThead-fixed');
                         // remove extra styles
                         this.$grid.find('thead:first, thead:first tr:first'). attr('style', '');
@@ -813,12 +813,12 @@ define(function (require) {
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
                 this.setFloatTheadMode('relative');
             }, this));
-            this.$grid.parents('.grid-container').parents().on('scroll', this.reposition);
+            this.$grid.parents('.grid-container').parents().add(document).on('scroll', this.reposition);
         },
 
         removeFloatThead: function () {
             this.$grid.find('tbody .thead-sizing-row').remove();
-            this.$grid.parents().off('scroll', this.reposition);
+            this.$grid.parents().add(document).off('scroll', this.reposition);
             // remove css
             this.$grid.find('thead:first, thead:first tr:first').parent().attr('style', '');
             this.getHeaderCells().attr('style', '');

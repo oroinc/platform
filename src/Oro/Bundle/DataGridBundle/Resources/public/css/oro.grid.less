@@ -142,15 +142,15 @@ table.grid {
   }
   thead {
     z-index: 1;
+    &.thead-sizing th {
+      border-top: none;
+    }
   }
   &.floatThead-relative{
-    .thead-sizing-row {
-      display: block;
-    }
     .grid-scrollable-container {
       position: relative;
     }
-    thead {
+    thead:first-child {
       position: absolute;
       width: auto;
       display: block;
@@ -161,10 +161,7 @@ table.grid {
     }
   }
   &.floatThead-fixed{
-    .thead-sizing-row {
-      display: block;
-    }
-    thead {
+    thead:first-child {
       position: fixed;
       display: block;
       overflow: hidden;
