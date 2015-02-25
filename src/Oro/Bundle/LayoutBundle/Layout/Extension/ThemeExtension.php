@@ -6,15 +6,16 @@ use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
-use Oro\Component\Layout\LayoutUpdateInterface;
-use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
-use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\ConfigExpression\ExpressionAssembler;
+use Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface;
+use Oro\Component\Layout\LayoutUpdateInterface;
+use Oro\Component\Layout\Extension\AbstractExtension;
+
+use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ThemeResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
-use Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ExpressionAssemblerAwareInterface
 {

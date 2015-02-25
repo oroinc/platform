@@ -139,8 +139,8 @@ class ConfigExpressionExtensionTest extends \PHPUnit_Framework_TestCase
             'Failed asserting that "attr.data-scalar" exists'
         );
         $this->assertSame(
-            'foo',
-            $view->vars['attr']['data-scalar'],
+            true,
+            $view->vars['attr']['data-expr'],
             'Failed asserting that "attr.data-expr" is assembled and evaluated'
         );
         $this->assertSame(
