@@ -317,6 +317,8 @@ services:
             - @oro_email.mailer.processor
             - @oro_email.email.address.helper
             - @oro_locale.formatter.name
+        calls:
+            - [setLogger, [@logger]]
         tags:
             - { name: oro_workflow.action, alias: send_email }
 
@@ -330,6 +332,8 @@ services:
             - @oro_email.email.address.helper
             - @oro_locale.formatter.name
             - @validator
+        calls:
+            - [setLogger, [@logger]]
         tags:
             - { name: oro_workflow.action, alias: send_email_template }
 

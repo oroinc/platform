@@ -2,14 +2,19 @@
 
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
-abstract class AbstractSendEmail extends AbstractAction
+abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     /**
      * @var EmailAddressHelper
      */

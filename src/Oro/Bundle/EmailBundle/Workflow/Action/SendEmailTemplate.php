@@ -128,7 +128,9 @@ class SendEmailTemplate extends AbstractSendEmail
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
             ->findByName($template);
         if (!$emailTemplate) {
-            throw new EntityNotFoundException('Template not found');
+            $errorMessage = sprintf('Template "%s" not found.', $template);
+            $this->logger->error('Workflow send email action.' . $errorMessage);
+            throw new EntityNotFoundException($errorMessage);
         }
         $templateData = $this->renderer->compileMessage($emailTemplate, ['entity' => $entity]);
 
