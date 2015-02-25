@@ -17,3 +17,10 @@
 {% block placeholder_widget %}
     {{ placeholder(placeholder_name, placeholder_parameters) }}
 {% endblock %}
+
+{% block require_js_widget %}
+    {% include 'OroRequireJSBundle::scripts.html.twig' with {
+        compressed: compressed,
+        config_extend: placeholder('requirejs_config_extend')
+    } %}
+{% endblock %}
