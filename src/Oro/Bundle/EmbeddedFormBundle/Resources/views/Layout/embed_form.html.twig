@@ -26,7 +26,7 @@
         min-width: 0;
     }
     {% endset %}
-    {{ block_widget(block, {'content': content}) }}
+    {{ block_widget(block, {'content': content }) }}
 {% endblock %}
 
 {% block _form_css_widget %}
@@ -34,7 +34,7 @@
     {{ block_widget(block, {'content': content}) }}
 {% endblock %}
 
-{% block embed_form_widget %}
+{% block embed_form_legacy_form_widget %}
     {% if form_layout is not empty %}
         {% include form_layout with {'form': form} %}
     {% else %}

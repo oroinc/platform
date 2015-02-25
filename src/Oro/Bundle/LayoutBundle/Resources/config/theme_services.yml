@@ -1,13 +1,88 @@
 parameters:
-    oro_layout.theme_factory.class:      Oro\Bundle\LayoutBundle\Theme\ThemeFactory
-    oro_layout.theme_manager.class:      Oro\Bundle\LayoutBundle\Theme\ThemeManager
+    oro_layout.theme_factory.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeFactory
+    oro_layout.theme_manager.class:                    Oro\Bundle\LayoutBundle\Theme\ThemeManager
+    oro_layout.theme_extension.class:                  Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension
+
+    oro_layout.loader.default_resource_factory.class:  Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory
+
+    oro_layout.loader.php_file_loader.class:           Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader
+    oro_layout.loader.yaml_file_loader.class:          Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader
+
+    oro_layout.theme_updates_resources: []
+    oro_layout.updates_cache_dir:       %kernel.cache_dir%/layouts
 
 services:
     oro_layout.theme_factory:
         class: %oro_layout.theme_factory.class%
+        public: false
 
     oro_layout.theme_manager:
         class: %oro_layout.theme_manager.class%
         arguments:
             - @oro_layout.theme_factory
             - []
+
+    oro_layout.loader.default_resource_factory:
+        class:  %oro_layout.loader.default_resource_factory.class%
+        public: false
+
+    oro_layout.loader.chain_loader:
+        class:  Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader
+        public: false
+        calls:
+            - [addLoader, [@oro_layout.loader.yaml_file_loader]]
+            - [addLoader, [@oro_layout.loader.php_file_loader]]
+
+    oro_layout.loader.php_file_loader:
+        class:  %oro_layout.loader.php_file_loader.class%
+        public: false
+        arguments:
+            - @oro_layout.php_layout_update_generator
+            - %kernel.debug%
+            - %oro_layout.updates_cache_dir%
+
+    oro_layout.loader.yaml_file_loader:
+        class:  %oro_layout.loader.yaml_file_loader.class%
+        public: false
+        arguments:
+            - @oro_layout.config_layout_update_generator
+            - %kernel.debug%
+            - %oro_layout.updates_cache_dir%
+
+    oro_layout.theme_extension:
+        class:  %oro_layout.theme_extension.class%
+        public: false
+        arguments:
+            - %oro_layout.theme_updates_resources%
+            - @oro_layout.theme_manager
+            - @oro_layout.loader.default_resource_factory
+            - @oro_layout.loader.chain_loader
+        calls:
+            - [setAssembler, [@oro_layout.expression.assembler]]
+        tags:
+            - { name: monolog.logger, channel: main }
+
+    oro_layout.extension.route_context_configurator:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_layout.yaml_updates_warmer:
+        class: Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer
+        public: false
+        arguments:
+            - %oro_layout.theme_updates_resources%
+            - @oro_layout.loader.default_resource_factory
+            - @oro_layout.loader.chain_loader
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_layout.config_layout_update_generator:
+        class:  Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator
+        public: false
+
+    oro_layout.php_layout_update_generator:
+        class:  Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator
+        public: false

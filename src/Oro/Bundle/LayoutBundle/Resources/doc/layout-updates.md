@@ -13,6 +13,7 @@ Configuration will be loaded from `Resources/config/oro/layout.yml`  files. For 
 | `screenshot` | Screenshot for preview. This will be displayed in theme management UI. | no |
 | `directory` | Directory name where to do look up for layout updates. By default equals to theme identifier | no |
 | `parent` | Parent theme identifier. By default all theme is descendant of `base` theme | no |
+| `groups` | Group names for which it's applicable. By default theme is available in `main` group as applicable to platform  | no |
 
 **Example:**
 

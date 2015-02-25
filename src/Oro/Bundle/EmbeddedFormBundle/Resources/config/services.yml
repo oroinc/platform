@@ -37,3 +37,14 @@ services:
         arguments:
             - @oro_layout.layout_manager
             - @oro_embedded_form.manager
+            - @oro_layout.theme_manager
+
+    oro_embedded_form.layout.block_type.success_message:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType
+        tags:
+             - { name: layout.block_type, alias: embed_form_success }
+
+    oro_embedded_form.layout.block_type.default_form:
+        class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormType
+        tags:
+             - { name: layout.block_type, alias: embed_form_legacy_form }

@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\FolderContentCummulativeLoader;
 
 class OroLayoutExtension extends Extension
 {
@@ -19,11 +20,11 @@ class OroLayoutExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configLoader     = new CumulativeConfigLoader(
+        $configLoader = new CumulativeConfigLoader(
             'oro_layout',
             new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
         );
-        $resources        = $configLoader->load($container);
+        $resources    = $configLoader->load($container);
         foreach ($resources as $resource) {
             $configs[] = $resource->data['oro_layout'];
         }
@@ -59,5 +60,27 @@ class OroLayoutExtension extends Extension
         $managerDefinition = $container->getDefinition(self::THEME_MANAGER_SERVICE_ID);
         $managerDefinition->addMethodCall('setActiveTheme', array($config['active_theme']));
         $managerDefinition->replaceArgument(1, $config['themes']);
+
+        $foundThemeLayoutUpdates = [];
+        $updatesLoader           = new CumulativeConfigLoader(
+            'oro_layout_updates_list',
+            [new FolderContentCummulativeLoader('Resources/layouts/', -1, false)]
+        );
+
+        $resources = $updatesLoader->load($container);
+        foreach ($resources as $resource) {
+            /**
+             * $resource->data contains data in following format
+             * [
+             *    'directory-where-updates-found' => [
+             *       'found update absolute filename',
+             *       ...
+             *    ]
+             * ]
+             */
+            $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resource->data);
+        }
+
+        $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
     }
 }
