@@ -151,7 +151,7 @@ class SendEmailTemplate extends AbstractSendEmail
     /**
      * @param string $email
      *
-     * @return array
+     * @throws \Symfony\Component\Validator\Exception\ValidatorException
      */
     protected function validateAddress($email)
     {
