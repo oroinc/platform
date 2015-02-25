@@ -14,6 +14,9 @@ oro:
 
         system_configuration:
             email_configuration: Email Configuration
+            signature_configuration:
+              label: Signature
+              signature.label: Signature Content
 
         emailtemplate:
             entity_label:        Template
