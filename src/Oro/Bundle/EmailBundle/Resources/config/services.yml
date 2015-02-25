@@ -9,7 +9,9 @@ parameters:
     oro_email.email.owner.provider.class:         Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider
     oro_email.email.owner.provider.storage.class: Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage
     oro_email.email.owner.manager.class:          Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager
+    oro_email.email.model.builder.helper.class:   Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper
     oro_email.email.entity.builder.class:         Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder
+    oro_email.email.model.builder.class:          Oro\Bundle\EmailBundle\Builder\EmailModelBuilder
     oro_email.email.entity.batch_processor.class: Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor
     oro_email.email_body_loader_selector.class:   Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector
     oro_email.listener.entity_listener.class:     Oro\Bundle\EmailBundle\EventListener\EntityListener
@@ -128,6 +130,18 @@ services:
             - @oro_email.email.owner.provider.storage
             - @oro_email.email.address.manager
 
+    oro_email.email.model.builder.helper:
+        class: %oro_email.email.model.builder.helper.class%
+        arguments:
+            - @oro_entity.routing_helper
+            - @oro_email.email.address.helper
+            - @oro_locale.formatter.name
+            - @security.context
+            - @oro_email.email.address.manager
+            - @doctrine.orm.entity_manager
+            - @oro_email.email.cache.manager
+            - @templating
+
     oro_email.email.entity.builder:
         class: %oro_email.email.entity.builder.class%
         scope: prototype
@@ -135,6 +149,14 @@ services:
             - @oro_email.email.entity.batch_processor
             - @oro_email.email.address.manager
             - @oro_email.email.address.helper
+
+    oro_email.email.model.builder:
+      class: %oro_email.email.model.builder.class%
+      scope: request
+      arguments:
+          - @oro_email.email.model.builder.helper
+          - @request
+          - @doctrine.orm.entity_manager
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%

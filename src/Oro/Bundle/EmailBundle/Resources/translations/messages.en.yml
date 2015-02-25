@@ -129,6 +129,7 @@ oro:
 
         reply:                    Reply
         forward:                  Forward
+        forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
 
 "%subject% - Email": "%subject% - Email"
