@@ -12,6 +12,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -113,6 +114,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             $processedOrigins[$origin->getId()] = true;
             try {
                 $this->doSyncOrigin($origin);
+            } catch (SyncFolderTimeoutException $ex) {
+                break;
             } catch (\Exception $ex) {
                 $failedOriginIds[] = $origin->getId();
             }
@@ -149,12 +152,14 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             $this->logger->notice('Exit because synchronization was not configured.');
         }
 
-        $failedOriginIds = array();
+        $failedOriginIds = [];
         foreach ($originIds as $originId) {
             $origin = $this->findOrigin($originId);
             if ($origin !== null) {
                 try {
                     $this->doSyncOrigin($origin);
+                } catch (SyncFolderTimeoutException $ex) {
+                    break;
                 } catch (\Exception $ex) {
                     $failedOriginIds[] = $origin->getId();
                 }
@@ -202,6 +207,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             } else {
                 $this->logger->notice('Skip because it is already in process.');
             }
+        } catch (SyncFolderTimeoutException $ex) {
+            $this->logger->notice($ex->getMessage());
+            $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS);
+
+            throw $ex;
         } catch (\Exception $ex) {
             try {
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
@@ -209,13 +219,13 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
                 // ignore any exception here
                 $this->logger->error(
                     sprintf('Cannot set the fail state. Error: %s.', $innerEx->getMessage()),
-                    array('exception' => $innerEx)
+                    ['exception' => $innerEx]
                 );
             }
 
             $this->logger->error(
                 sprintf('The synchronization failed. Error: %s.', $ex->getMessage()),
-                array('exception' => $ex)
+                ['exception' => $ex]
             );
 
             throw $ex;

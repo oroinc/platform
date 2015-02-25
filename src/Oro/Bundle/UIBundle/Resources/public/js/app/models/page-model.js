@@ -11,12 +11,7 @@ define([
 
     PageModel = BaseModel.extend({
         defaults: {
-            content: '',
-            scripts: '',
             currentRoute: '',
-
-            history: '',
-            mostviewed: '',
 
             title: '',
             titleSerialized: '',
