@@ -649,9 +649,6 @@ define(function (require) {
         },
 
         reposition: function () {
-            if (this.rescrollCb) {
-                this.rescrollCb();
-            }
             // get gridRect
             var tableRect = this.$grid[0].getBoundingClientRect(),
                 visibleRect = this.getVisibleRect(this.$grid[0]),
@@ -662,6 +659,9 @@ define(function (require) {
             this.setFloatTheadMode(mode, visibleRect, tableRect);
             // update lastClientRect to prevent calling this function again
             this.lastClientRect = this.$grid.parents('.other-scroll-container')[0].getBoundingClientRect();
+            if (this.rescrollCb) {
+                this.rescrollCb();
+            }
         },
 
         setFloatTheadMode: function (mode, visibleRect, tableRect) {
@@ -681,6 +681,7 @@ define(function (require) {
                         this.$el.addClass('floatThead-relative');
                         if (!this.$grid.find('.thead-sizing').length) {
                             sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            sizingThead.find('th').attr('style', '');
                             this.$grid.prepend(sizingThead);
                         }
                     }
@@ -700,6 +701,7 @@ define(function (require) {
                         this.$grid.find('thead:first .dropdown.open').removeClass('open');
                         if (!this.$grid.find('.thead-sizing').length) {
                             sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            sizingThead.find('th').attr('style', '');
                             sizingThead.insertAfter(this.$grid.find('thead'));
                         }
                     }
@@ -758,39 +760,41 @@ define(function (require) {
                 return _.noop;
             }
 
-            scrollStateModel.on('change:headerHeight', function () {
-                heightDec = self.headerHeight + 1; // compensate border
+            scrollStateModel.on('change:headerHeight', function (model, val) {
+                heightDec = val + 1; // compensate border
                 otherScroll.css({
                     width: scrollBarWidth,
                     marginTop: heightDec
                 });
+                scrollStateModel.trigger('change:scrollHeight', scrollStateModel, scrollContainer[0].scrollHeight);
+                scrollStateModel.trigger('change:clientHeight', scrollStateModel, scrollContainer[0].clientHeight);
             }, this);
-            scrollStateModel.on('change:scrollVisible', function () {
+            scrollStateModel.on('change:scrollVisible', function (model, val) {
                 scrollContainer.css({
-                    width: 'calc(100% + ' + (self.scrollVisible ? scrollBarWidth : 0) + 'px)'
+                    width: 'calc(100% + ' + (val ? scrollBarWidth : 0) + 'px)'
                 });
                 otherScroll.css({
-                    display: self.scrollVisible ? 'block' : 'none'
+                    display: val ? 'block' : 'none'
                 });
                 this.reflow();
             }, this);
-            scrollStateModel.on('change:clientHeight', function () {
+            scrollStateModel.on('change:clientHeight', function (model, val) {
                 otherScroll.css({
-                    height: scrollContainer[0].clientHeight - heightDec
+                    height: val - heightDec
                 });
             }, this);
-            scrollStateModel.on('change:clientHeight', function () {
+            scrollStateModel.on('change:clientWidth', function (model, val) {
                 otherScroll.css({
-                    marginLeft: scrollContainer[0].clientWidth - scrollBarWidth
+                    marginLeft: val - scrollBarWidth
                 });
             }, this);
-            scrollStateModel.on('change:scrollHeight', function () {
+            scrollStateModel.on('change:scrollHeight', function (model, val) {
                 otherScrollInner.css({
-                    height: scrollContainer[0].scrollHeight - heightDec
+                    height: val - heightDec
                 });
             });
-            scrollStateModel.on('change:scrollTop', function () {
-                otherScroll.scrollTop(scrollContainer[0].scrollTop);
+            scrollStateModel.on('change:scrollTop', function (model, val) {
+                otherScroll.scrollTop(val);
             }, this);
             function setup() {
                 scrollStateModel.set({
