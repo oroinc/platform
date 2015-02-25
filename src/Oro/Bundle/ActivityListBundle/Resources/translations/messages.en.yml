@@ -36,7 +36,11 @@ oro:
                         ASC:  Ascending
                 per_page.label: Items Per Page By Default
             email_threads:
-                use_threads_in_activities.label: Use email threads in Activities
+                use_threads_in_activities:
+                    label: Display Emails in Activities as
+                    choices:
+                        non_threaded.label: Non-Threaded
+                        threaded.label: Threaded
 
         pagination:
             page: Page:

@@ -38,9 +38,12 @@ oro_system_configuration:
                     - NotBlank: ~
         oro_activity_list.grouping:
             data_type: boolean
-            type: oro_config_checkbox
+            type: choice
             options:
                 label: oro.activitylist.system_configuration.email_threads.use_threads_in_activities.label
+                choices:
+                    - oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.non_threaded.label
+                    - oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.threaded.label
 
     tree:
         system_configuration:
