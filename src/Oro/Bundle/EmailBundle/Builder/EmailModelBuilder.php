@@ -56,7 +56,9 @@ class EmailModelBuilder
      */
     public function createEmailModel(EmailModel $emailModel = null)
     {
-        $emailModel = $emailModel ?: new EmailModel();
+        if (!$emailModel) {
+            $emailModel = new EmailModel();
+        }
 
         if ($this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
