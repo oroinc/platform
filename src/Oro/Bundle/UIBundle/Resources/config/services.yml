@@ -98,3 +98,15 @@ services:
             - @oro_navigation.title_translator
         tags:
             - { name: layout.block_type_extension, alias: head }
+
+    oro_ui.block_type.placeholder:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\PlaceholderType
+        tags:
+             - { name: layout.block_type, alias: placeholder }
+
+    oro_ui.block_type.require_js:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\RequireJsType
+        arguments:
+            - %kernel.debug%
+        tags:
+             - { name: layout.block_type, alias: require_js }
