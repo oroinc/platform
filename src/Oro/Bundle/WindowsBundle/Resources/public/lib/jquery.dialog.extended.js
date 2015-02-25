@@ -635,6 +635,7 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
         },
 
         _setState: function (state) {
+            var oldState = this.options.state;
             this.options.state = state;
             // toggle data state
             this.widget()
@@ -647,7 +648,11 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
                 if (!snapshot && this.state() == 'normal') {
                     snapshot = this.snapshot();
                 }
-                this._trigger("stateChange", null, {state: this.state(), snapshot: snapshot});
+                this._trigger("stateChange", null, {
+                    state: this.state(),
+                    oldState: oldState,
+                    snapshot: snapshot
+                });
             }
 
             return this;

@@ -22,6 +22,12 @@ define([
         hide: function () {
             PageLoadingMaskView.__super__.hide.call(this);
             $.isActive(false);
+        },
+
+        attach: function () {
+            PageLoadingMaskView.__super__.attach.apply(this, arguments);
+            // shows loader once it is attached to the page
+            this.show();
         }
     });
 

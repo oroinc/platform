@@ -20,8 +20,8 @@ define(['underscore', 'oroui/js/app/components/base/component', 'oroui/js/tools'
                         { el: options._sourceElement }
                     );
                 this.view = new viewConstructor(viewOptions);
-                if (this.view.renderDeffered) {
-                    this.view.renderDeffered
+                if (this.view.renderDeferred) {
+                    this.view.renderDeferred
                         .done(_.bind(this._resolveDeferredInit, this))
                         .fail(function () {
                             throw new Error("View rendering failed");
