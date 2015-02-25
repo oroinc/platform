@@ -128,6 +128,11 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
         $this->assertEquals($emailModel, $result);
+
+        $this->assertEquals($entityClass ?: null, $result->getEntityClass());
+        $this->assertEquals($entityId ?: null, $result->getEntityId());
+        $this->assertEquals($subject ?: null, $result->getSubject());
+        $this->assertEquals($from ?: null, $result->getFrom());
     }
 
     public function createEmailModelProvider()
