@@ -14,28 +14,32 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Model\EmailHeader;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 
 abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
     /** Determines how many emails can be stored in a database at once */
-    const DB_BATCH_SIZE = 30;
+    const DB_BATCH_SIZE = 100;
 
-    /**
-     * @var EntityManager
-     */
+    /** Max time in seconds between saved DB batches */
+    const DB_BATCH_TIME = 30;
+
+    /** @var EntityManager */
     protected $em;
 
-    /**
-     * @var EmailEntityBuilder
-     */
+    /** @var EmailEntityBuilder */
     protected $emailEntityBuilder;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $emailOriginUsers = [];
+
+    /** @var int Number of seconds passed to store last emails batch */
+    protected $dbBatchSaveTime = 0;
+
+    /** @var int Timestamp when last batch was saved. */
+    protected $dbBatchSaveTimestamp = 0;
 
     /**
      * Constructor
@@ -268,5 +272,66 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
         }
 
         return ($folderType1 === $folderType2);
+    }
+
+    /**
+     * Cleans doctrine's UOF to prevent:
+     *  - "eating" too mach memory
+     *  - storing too many object which cause slowness of sync process
+     * Tracks time when last batch was saved.
+     * Calculates time between batch saves.
+     *
+     * @param bool             $isFolderSyncComplete
+     * @param null|EmailFolder $folder
+     */
+    protected function cleanUp($isFolderSyncComplete = false, $folder = null)
+    {
+        /**
+         * Entities which should NOT be cleared.
+         */
+        $doNotClear = [
+            'Oro\Bundle\EmailBundle\Entity\EmailFolder',
+            'Oro\Bundle\EmailBundle\Entity\EmailOrigin',
+            'Oro\Bundle\ImapBundle\Entity\ImapEmailFolder',
+            'Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin',
+            'Oro\Bundle\ConfigBundle\Entity\Config',
+            'Oro\Bundle\ConfigBundle\Entity\ConfigValue'
+        ];
+
+        /**
+         * Clear entity manager.
+         */
+        $map = array_keys($this->em->getUnitOfWork()->getIdentityMap());
+        foreach ($map as $entityClass) {
+            if (!in_array($entityClass, $doNotClear)) {
+                $this->em->clear($entityClass);
+            }
+        }
+
+        /**
+         * If folder sync completed and batch save time exceeded limit - throws exception.
+         */
+        if ($isFolderSyncComplete
+            && $folder != null
+            && $this->dbBatchSaveTime > 0
+            && $this->dbBatchSaveTime > self::DB_BATCH_TIME
+        ) {
+            throw new SyncFolderTimeoutException($folder);
+        } elseif ($isFolderSyncComplete) {
+            /**
+             * If folder sync completed without batch save time exceed - reset dbBatchSaveTime.
+             */
+            $this->dbBatchSaveTime = 0;
+        } else {
+            /**
+             * After batch save - calculate time difference between batches
+             */
+            if ($this->dbBatchSaveTimestamp !== 0) {
+                $this->dbBatchSaveTime = time() - $this->dbBatchSaveTimestamp;
+            }
+        }
+        $this->dbBatchSaveTimestamp = time();
+
+        $this->logger->notice(sprintf('"save time -> %s"', $this->dbBatchSaveTime));
     }
 }

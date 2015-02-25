@@ -94,7 +94,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
             // update synchronization date for the current folder
             $folder->setSynchronizedAt($lastSynchronizedAt > $syncStartTime ? $lastSynchronizedAt : $syncStartTime);
+
             $this->em->flush($folder);
+
+            $this->cleanUp(true, $imapFolder->getFolder());
         }
 
         // run removing of empty outdated folders every N synchronizations
@@ -449,6 +452,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         }
 
         $this->em->flush();
+
+        $this->cleanUp();
     }
 
     /**
