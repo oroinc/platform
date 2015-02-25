@@ -9,7 +9,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EmailBundle\EventListener\Datagrid\GroupingGridListener;
 
 class GroupingGridListenerTest extends \PHPUnit_Framework_TestCase

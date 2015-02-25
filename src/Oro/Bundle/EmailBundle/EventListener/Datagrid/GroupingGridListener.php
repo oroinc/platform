@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 
 class GroupingGridListener
 {
