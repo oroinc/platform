@@ -56,6 +56,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      * Validates given resource data, checks that "actions" node exists and consist valid actions.
      *
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function validate(GeneratorData $data)
     {
