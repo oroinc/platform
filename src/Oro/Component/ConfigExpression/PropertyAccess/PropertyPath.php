@@ -14,17 +14,57 @@ class PropertyPath implements PropertyPathInterface
 
     /**
      * @param string $path
+     *
+     * @throws Exception\InvalidPropertyPathException if a property path is invalid
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function __construct($path)
     {
         if (!is_string($path)) {
-            throw new Exception\UnexpectedTypeException($path, 'string');
+            throw new Exception\InvalidPropertyPathException(
+                sprintf(
+                    'Expected argument of type "string", "%s" given.',
+                    is_object($path) ? get_class($path) : gettype($path)
+                )
+            );
         }
         if ($path === '') {
-            throw new Exception\InvalidArgumentException('The property path must not be empty.');
+            throw new Exception\InvalidPropertyPathException('The property path must not be empty.');
         }
 
-        $this->path = $path;
+        $this->path     = $path;
+        $this->elements = [];
+
+        $remaining = $this->path;
+        $pos       = 0;
+
+        // first element is evaluated differently - no leading dot for properties
+        if (preg_match('/^(([^\.\[]+)|\[([^\]]+)\])(.*)/', $remaining, $matches)) {
+            $this->elements[] = $matches[2] === '' ? $matches[3] : $matches[2];
+
+            $pos       = strlen($matches[1]);
+            $remaining = $matches[4];
+            $pattern   = '/^(\.([^\.|\[]+)|\[([^\]]+)\])(.*)/';
+            while (preg_match($pattern, $remaining, $matches)) {
+                $this->elements[] = $matches[2] === '' ? $matches[3] : $matches[2];
+
+                $pos += strlen($matches[1]);
+                $remaining = $matches[4];
+            }
+        }
+
+        if ($remaining !== '') {
+            $this->elements = null;
+            throw new Exception\InvalidPropertyPathException(
+                sprintf(
+                    'Could not parse property path "%s". Unexpected token "%s" at position %d.',
+                    $this->path,
+                    $remaining[0],
+                    $pos
+                )
+            );
+        }
     }
 
     /**
@@ -40,10 +80,6 @@ class PropertyPath implements PropertyPathInterface
      */
     public function getElements()
     {
-        if ($this->elements === null) {
-            $this->elements = explode('.', $this->path);
-        }
-
         return $this->elements;
     }
 }

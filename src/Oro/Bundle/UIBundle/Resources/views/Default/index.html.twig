@@ -1,53 +1,7 @@
 {% if not oro_is_hash_navigation() %}
     <!DOCTYPE html>
     <html>
-    <head>
-        {% block head %}
-            <title>{% trans %}Loading...{% endtrans %}</title>
-            <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
-            <meta http-equiv="cache-control" content="max-age=0" />
-            <meta http-equiv="cache-control" content="no-cache" />
-            <meta http-equiv="expires" content="0" />
-            <meta http-equiv="pragma" content="no-cache" />
-            {% block head_style %}
-                {% if oro_theme_icon() %}
-                    <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
-                {% endif %}
-               {% placeholder head_style %}
-            {% endblock %}
-
-            {% block script %}
-                {% block scripts_before %}
-                    {% placeholder scripts_before %}
-                {% endblock %}
-                {% set requirejs_config_extend %}
-                    {%- placeholder requirejs_config_extend -%}
-                {% endset %}
-                {% include 'OroRequireJSBundle::scripts.html.twig' with {
-                    compressed: not app.debug,
-                    config_extend: requirejs_config_extend
-                } %}
-                {% block application %}
-                <script type="text/javascript">
-                    require(['oroui/js/app']);
-                </script>
-                {% endblock %}
-                <script type="text/javascript">
-                    require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
-                {% if isMobileVersion() %}
-                    require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
-                {% endif %}
-                {% if app.debug %}
-                    require(['oroui/js/tools'], function (tools) {tools.debug = true;});
-                {% endif %}
-                </script>
-                {% placeholder scripts_after %}
-                {% block head_script %}
-                {% endblock %}
-            {% endblock %}
-        {% endblock %}
-    </head>
+    {% !!! head_widget %}
     <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% if app.debug %}dev-mode {% endif %}{% block bodyClass %}{% endblock %}">
     {% placeholder after_body_start %}
     <div id="progressbar">
@@ -58,6 +12,14 @@
     </div>
     <div id="page" style="display:none;">
         <div id="top-page">
+            {% !!! _header_widget %}
+                {% placeholder before_navigation %}
+                {% !!! _navbar_widget %}
+                    {% placeholder header_logo %}
+                    {% placeholder dots_menu %}
+                    {% placeholder pin_tabs_list %}
+                {% !!! end _navbar_widget %}
+            {% !!! end _header_widget %}
             {% block header %}
                 <header class="navbar" id="oroplatform-header">
                     {% placeholder before_navigation %}
@@ -98,85 +60,13 @@
                         <div id="before-content-addition">
                             {% block before_content_addition %}{% endblock before_content_addition %}
                         </div>
-                        <div id="flash-messages">
-                            {% block messages %}
-                                <div class="flash-messages-frame">
-                                    <div class="flash-messages-holder"></div>
-                                </div>
-                                <script type="text/template" id="message-item-template">
-                                    <div class="alert <% if (type) {  %><%= 'alert-' + type %><% } %> fade in top-messages ">
-                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
-                                        <div class="message"><%= message %></div>
-                                    </div>
-                                </script>
-                                <script type="text/javascript">
-                                    require(['jquery', 'oroui/js/messenger'],
-                                            function($, messenger) {
-                                                messenger.setup({
-                                                    container: '#flash-messages .flash-messages-holder',
-                                                    template: _.template($.trim($('#message-item-template').html()))
-                                                });
-                                                {% if app.session.flashbag.peekAll|length > 0 %}
-                                                $(function() {
-                                                    {% for type, messages in app.session.flashbag.all %}
-                                                    {% for message in messages %}
-                                                    messenger.notificationFlashMessage({{ type|json_encode|raw }}, {{ message|trans|json_encode|raw }});
-                                                    {% endfor %}
-                                                    {% endfor %}
-                                                });
-                                                {% endif %}
-                                            });
-                                </script>
-                            {% endblock messages %}
-                        </div>
-
+                        {% !!! _flash_messages_widget %}
                     </div>
                     {% endblock before_content %}
                     <div id="container" class="scrollable-container">
                         {% block page_container %}
                             {% placeholder content_before %}
                             {% block content %}
-                                <div class="container" style="background: #fff">
-                                    <div class="row">
-                                        <div class="span4">
-                                            <hr />
-                                            <h3>Layout pages</h3>
-                                            <ul>
-                                                <li><a href="{{ path('oro_ui_1column') }}">1 column </a></li>
-                                                <li><a href="{{ path('oro_ui_1column_toolbar') }}">1 column with toolbar</a></li>
-                                                <li><a href="{{ path('oro_ui_1column_menu') }}">1 column with menu</a></li>
-                                                <li><a href="{{ path('oro_ui_grid_page') }}">grid page</a></li>
-                                                <li><a href="{{ path('oro_ui_grid_without_bar_page') }}">grid page without bar</a></li>
-                                                <li><a href="{{ path('oro_ui_2columns_left') }}">2 columns - left</a></li>
-                                                <li><a href="{{ path('oro_ui_2columns_right') }}">2 columns - right</a></li>
-                                                <li><a href="{{ path('oro_ui_3columns') }}">3 columns</a></li>
-                                            </ul>
-                                            <h3>Static pages</h3>
-                                            <ul>
-                                                <li><a href="{{ path('oro_ui_forgot_password') }}">Forgot password</a></li>
-                                                <li><a href="{{ path('oro_ui_login') }}">Login page</a></li>
-                                                <li><a href="{{ path('oro_ui_registration') }}">Registration page</a></li>
-                                                <li><a href="{{ path('oro_ui_404') }}">404</a></li>
-                                                <li><a href="{{ path('oro_ui_503') }}">503</a></li>
-                                            </ul>
-                                            <h3>Example pages</h3>
-                                            <ul>
-                                                <li><a href="{{ path('oro_ui_form_elements') }}">Form elements</a></li>
-                                                <li><a href="{{ path('oro_ui_form_horizontal') }}">Form Horizontal</a></li>
-                                                <li><a href="{{ path('oro_ui_messages') }}">System messages</a></li>
-                                                <li><a href="{{ path('oro_ui_title_bar') }}">Entity Title Bar</a></li>
-                                                <li><a href="{{ path('oro_ui_buttons') }}">Buttons</a></li>
-                                                <li><a href="#">Print page</a></li>
-                                                <li><a href="{{ path('oro_ui_tables') }}">Tables</a></li>
-                                                <li><a href="{{ path('oro_ui_general_elements') }}">General elements</a></li>
-                                            </ul>
-                                            <h3>Js use page</h3>
-                                            <ul>
-                                                <li><a href="{{ path('oro_ui_dialog_styled') }}">jQuery Dialog styled</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
                             {% endblock content %}
                             {% placeholder content_after %}
                         {% endblock page_container %}
