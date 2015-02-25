@@ -12,8 +12,8 @@
 
 {% block require_js_widget %}
     {% include 'OroRequireJSBundle::scripts.html.twig' with {
-    compressed: compressed,
-    config_extend: placeholder('requirejs_config_extend')
+        compressed: compressed,
+        config_extend: placeholder('requirejs_config_extend')
     } %}
 {% endblock %}
 
@@ -33,19 +33,15 @@
 {% endblock %}
 
 {% block _left_panel_widget %}
-    {% if isDesktopVersion() %}
-        <div id="left-panel">
-            {{ block_widget(block) }}
-        </div>
-    {% endif %}
+    <div id="left-panel">
+        {{ block_widget(block) }}
+    </div>
 {% endblock %}
 
 {% block _right_panel_widget %}
-    {% if isDesktopVersion() %}
-        <div id="right-panel">
-            {{ block_widget(block) }}
-        </div>
-    {% endif %}
+    <div id="right-panel">
+        {{ block_widget(block) }}
+    </div>
 {% endblock %}
 
 {% block _footer_widget %}

@@ -6,6 +6,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\UIBundle\Provider\UserAgent;
 
+/**
+ * IMPORTANT: it is not recommended to use this extension in Layout related TWIG templates,
+ *            there you should use context depended layout updates.
+ *            See details in the documentation for LayoutBundle.
+ */
 class MobileExtension extends \Twig_Extension
 {
     /** @var ContainerInterface */
@@ -48,6 +53,10 @@ class MobileExtension extends \Twig_Extension
     /**
      * Check by user-agent if request was from mobile device
      *
+     * IMPORTANT: it is not recommended to use this function in Layout related TWIG templates,
+     *            there you should use context depended layout updates.
+     *            See details in the documentation for LayoutBundle.
+     *
      * @return bool
      */
     public function isMobile()
@@ -69,6 +78,10 @@ class MobileExtension extends \Twig_Extension
 
     /**
      * Check by user-agent if request was not from mobile device
+     *
+     * IMPORTANT: it is not recommended to use this function in Layout related TWIG templates,
+     *            there you should use context depended layout updates.
+     *            See details in the documentation for LayoutBundle.
      *
      * @return bool
      */
