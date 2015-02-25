@@ -2,10 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
+use Doctrine\Common\Persistence\ObjectManager;
+
+use Symfony\Component\Validator\Validator;
+
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmail;
 use Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate;
+use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
+use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 
 class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,6 +57,11 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
     protected $emailTemplate;
 
     /**
+     * @var Validator|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $validator;
+
+    /**
      * @var SendEmail
      */
     protected $action;
@@ -74,6 +86,9 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->renderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -95,7 +110,8 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             $this->emailProcessor,
             $this->objectManager,
             new EmailAddressHelper(),
-            $this->nameFormatter
+            $this->nameFormatter,
+            $this->validator
         );
 
         $this->action->setDispatcher($this->dispatcher);
@@ -273,7 +289,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testExecuteWithoutTemplaitEntity()
+    public function testExecuteWithoutTemplateEntity()
     {
         $this->setExpectedException('\Doctrine\ORM\EntityNotFoundException', 'Entity was not found.');
         $options = [
@@ -302,6 +318,77 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->method('findByName')
             ->with($options['template'])
             ->willReturn(null);
+
+        $this->emailTemplate->expects($this->never())
+            ->method('getType')
+            ->willReturn('txt');
+        $this->renderer->expects($this->never())
+            ->method('compileMessage')
+            ->willReturn([$options['subject'], $options['body']]);
+
+        $emailEntity = $this->getMockBuilder('\Oro\Bundle\EmailBundle\Entity\Email')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->emailProcessor->expects($this->never())
+            ->method('process');
+        if (array_key_exists('attribute', $options)) {
+            $this->contextAccessor->expects($this->once())
+                ->method('setValue')
+                ->with($context, $options['attribute'], $emailEntity);
+        }
+        $this->action->initialize($options);
+        $this->action->execute($context);
+    }
+
+    public function testExecuteWithInvalidEmail()
+    {
+        $this->setExpectedException('\Symfony\Component\Validator\Exception\ValidatorException', 'test');
+        $options = [
+            'from' => 'invalidemailaddress',
+            'to' => 'test@test.com',
+            'template' => 'test',
+            'subject' => 'subject',
+            'body' => 'body',
+            'entity' => new \stdClass(),
+        ];
+        $context = [];
+        $this->contextAccessor->expects($this->any())
+            ->method('getValue')
+            ->will($this->returnArgument(1));
+        $this->nameFormatter->expects($this->any())
+            ->method('format')
+            ->will(
+                $this->returnCallback(
+                    function () {
+                        return '_Formatted';
+                    }
+                )
+            );
+
+        $violationList = $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationList')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $violationList->expects($this->once())
+            ->method('count')
+            ->willReturn(1);
+        $violationListInterface =
+            $this->getMockBuilder('Symfony\Component\Validator\ConstraintViolationInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $violationListInterface->expects($this->once())
+            ->method('getMessage')
+            ->willReturn('test');
+        $violationList->expects($this->once())
+            ->method('get')
+            ->willReturn($violationListInterface);
+        $this->validator->expects($this->once())
+            ->method('validateValue')
+            ->willReturn($violationList);
+
+        $this->objectRepository->expects($this->never())
+            ->method('findByName')
+            ->with($options['template'])
+            ->willReturn($this->emailTemplate);
 
         $this->emailTemplate->expects($this->never())
             ->method('getType')
