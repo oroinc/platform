@@ -30,7 +30,7 @@ class TitleProvider
      * @param string $routeName
      *
      * @return array ['title' => title template, 'short_title' => short title template]
-     *               also empty array may be returned id a route has no configured title
+     *               also empty array may be returned if a route has no configured title
      *
      * @throws \RuntimeException if the given route has no title templates
      */
