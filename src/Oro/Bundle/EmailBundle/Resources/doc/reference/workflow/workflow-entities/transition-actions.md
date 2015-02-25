@@ -14,7 +14,7 @@ Send Email Action
 
 **Alias:** send_email
 
-**Description:** Sets value of attribute from source
+**Description:** Send email to recipient with defined subject and body
 
 **Parameters:**
   - class - class name of created object;
@@ -42,7 +42,7 @@ Send Email Template Action
 
 **Alias:** send_email_template
 
-**Description:** Sets value of attribute from source
+**Description:** Send email to choose recipient with defined template
 
 **Parameters:**
   - class - class name of created object;
