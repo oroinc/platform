@@ -44,11 +44,11 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
         return [
             'invalid data'                    => [
                 '$data'      => new \stdClass(),
-                '$exception' => 'Invalid data given, expected array with key "actions"'
+                '$exception' => 'Syntax error: expected array with "actions" node at "."'
             ],
             'should contains actions'         => [
                 '$data'      => [],
-                '$exception' => 'Invalid data given, expected array with key "actions"'
+                '$exception' => 'Syntax error: expected array with "actions" node at "."'
             ],
             'should contains known actions'   => [
                 '$data'      => [
@@ -56,7 +56,8 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                         ['@addSuperPuper' => null]
                     ]
                 ],
-                '$exception' => 'Invalid action at position: 0, name: @addSuperPuper'
+                '$exception' => 'Syntax error: unknown action "addSuperPuper", '
+                    . 'should be one of LayoutManipulatorInterface\'s methods at "actions.0"'
             ],
             'action name should start from @' => [
                 '$data'      => [
@@ -64,14 +65,16 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                         ['add' => null]
                     ]
                 ],
-                '$exception' => 'Invalid action at position: 0, name: add'
+                '$exception' => 'Syntax error: action name should start with "@" symbol,'
+                    . ' current name "add" at "actions.0"'
             ],
             'known action proceed'            => [
-                '$data' => [
+                '$data'      => [
                     'actions' => [
                         ['@add' => null]
                     ]
                 ],
+                '$exception' => '"add" action requires at least 3 argument(s) to be passed, 1 given at "actions.0"'
             ]
         ];
     }
@@ -103,14 +106,14 @@ CLASS
                             [
                                 '@add' => [
                                     'id'        => 'root',
-                                    'parent'    => null,
+                                    'parentId'  => null,
                                     'blockType' => 'root'
                                 ]
                             ],
                             [
                                 '@add' => [
                                     'id'        => 'header',
-                                    'parent'    => 'root',
+                                    'parentId'  => 'root',
                                     'blockType' => 'header'
                                 ]
                             ],
