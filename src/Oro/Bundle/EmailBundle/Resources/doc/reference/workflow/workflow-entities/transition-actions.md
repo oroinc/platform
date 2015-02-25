@@ -23,8 +23,6 @@ Send Email Action
   - to - email address in To field (required);
   - subject - email template name (required);
   - body - entity parameter (required);
-  - template - email template name (required);
-  - entity - entity parameter (required);
 
 **Configuration Example**
 ```
@@ -42,7 +40,7 @@ Send Email Template Action
 
 **Class:** Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate
 
-**Alias:** send_email
+**Alias:** send_email_template
 
 **Description:** Sets value of attribute from source
 
