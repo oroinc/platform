@@ -328,10 +328,10 @@ abstract class AbstractEmailSynchronizationProcessor implements LoggerAwareInter
              */
             if ($this->dbBatchSaveTimestamp !== 0) {
                 $this->dbBatchSaveTime = time() - $this->dbBatchSaveTimestamp;
+
+                $this->logger->info(sprintf('Batch save time: "%d" seconds.', $this->dbBatchSaveTime));
             }
         }
         $this->dbBatchSaveTimestamp = time();
-
-        $this->logger->info(sprintf('Batch save time: "%s" seconds.', $this->dbBatchSaveTime));
     }
 }
