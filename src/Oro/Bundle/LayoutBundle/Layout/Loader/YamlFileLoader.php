@@ -52,6 +52,7 @@ class YamlFileLoader extends AbstractLoader
             return parent::doGenerate($className, $resource);
         } catch (SyntaxException $e) {
             $message = $e->getMessage() . PHP_EOL . Yaml::dump($e->getSource());
+            $message .= str_repeat(PHP_EOL, 2) . 'Filename: ' . $resource->getFilename();
 
             throw new \RuntimeException($message, 0, $e);
         }

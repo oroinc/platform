@@ -128,7 +128,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     }
 
     /**
-     * Removes "@" sign from begging of action name
+     * Removes "@" sign from beginning of action name
      *
      * @param string $actionName
      */

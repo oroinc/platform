@@ -42,11 +42,7 @@ class LayoutUpdatesWarmer implements CacheWarmerInterface
                     continue;
                 }
 
-                try {
-                    $this->loader->load($resource);
-                } catch (\Exception $e) {
-                    // problem during compilation, give up
-                }
+                $this->loader->load($resource);
             }
         }
     }
