@@ -146,6 +146,12 @@ define(function (require) {
         initialize: function (options) {
             if (testing) {
                 this.i = 0;
+                /*
+                $('#page').prepend('<div class="logging-div" style="position: absolute;background: white;color: black;height: 350px;min-width: 200px;z-index: 1000000; overflow: scroll"></div>');
+                var loggingDiv = $('.logging-div');
+                this.log = function log(value) {
+                    loggingDiv.prepend('<div>' + value + '</div>');
+                }*/
             }
             var opts = options || {};
             this.subviews = [];
@@ -697,6 +703,15 @@ define(function (require) {
                 midRect = current.getBoundingClientRect();
                 borders = this.getBorders(current);
 
+                if (current.id === 'top-page' && tools.isMobile()) {
+                    /**
+                     * This value
+                     */
+                    if (resultRect.top < 54) {
+                        resultRect.top = 54;
+                    }
+                }
+
                 if (resultRect.top < midRect.top + borders.top) {
                     resultRect.top = midRect.top + borders.top;
                 }
@@ -710,13 +725,6 @@ define(function (require) {
                     resultRect.right = midRect.right - borders.right;
                 }
                 current = current.parentNode;
-            }
-
-            if (tools.isMobile()) {
-                midRect = document.getElementById('oroplatform-header').getBoundingClientRect();
-                if (resultRect.top < midRect.bottom) {
-                    resultRect.top = midRect.bottom;
-                }
             }
 
             return resultRect;

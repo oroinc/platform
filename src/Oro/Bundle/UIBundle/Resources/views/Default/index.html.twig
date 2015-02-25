@@ -132,7 +132,7 @@
 
                     </div>
                     {% endblock before_content %}
-                    <div id="container" class="scrollable-container">
+                    <div id="container" class="{% if isDesktopVersion() %}scrollable-container{% endif %}">
                         {% block page_container %}
                             {% placeholder content_before %}
                             {% block content %}
