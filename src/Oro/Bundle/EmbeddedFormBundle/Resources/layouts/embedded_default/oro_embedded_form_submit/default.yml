@@ -2,7 +2,7 @@ oro_layout:
     actions:
         - @add:
             id:        form
-            parent:    content
+            parentId:  content
             blockType: embed_form_legacy_form
             options:
                 form:        { @value: $context.embedded_form.view }

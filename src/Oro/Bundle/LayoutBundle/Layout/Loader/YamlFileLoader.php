@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 
 /**
@@ -36,9 +37,24 @@ class YamlFileLoader extends AbstractLoader
      */
     protected function loadResourceGeneratorData(FileResource $resource)
     {
-        $data     = Yaml::parse($resource->getFilename());
-        $data     = isset($data['oro_layout']) ? $data['oro_layout'] : [];
+        $data = Yaml::parse($resource->getFilename());
+        $data = isset($data['oro_layout']) ? $data['oro_layout'] : [];
 
         return new GeneratorData($data);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doGenerate($className, FileResource $resource)
+    {
+        try {
+            return parent::doGenerate($className, $resource);
+        } catch (SyntaxException $e) {
+            $message = $e->getMessage() . PHP_EOL . Yaml::dump($e->getSource());
+            $message .= str_repeat(PHP_EOL, 2) . 'Filename: ' . $resource->getFilename();
+
+            throw new \RuntimeException($message, 0, $e);
+        }
     }
 }
