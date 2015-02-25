@@ -732,6 +732,7 @@ define(function (require) {
                 mode = 'fixed';
             }
             this.setFloatTheadMode(mode, visibleRect, tableRect);
+            // update lastClientRect to prevent calling this function again
             this.lastClientRect = this.$grid.parents('.other-scroll-container')[0].getBoundingClientRect();
         },
 
