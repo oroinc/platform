@@ -332,8 +332,10 @@ class TitleService implements TitleServiceInterface
     public function loadByRoute($route)
     {
         $templates = $this->titleProvider->getTitleTemplates($route);
-        $this->setTemplate($templates['title']);
-        $this->setShortTemplate($templates['short_title']);
+        if (!empty($templates)) {
+            $this->setTemplate($templates['title']);
+            $this->setShortTemplate($templates['short_title']);
+        }
     }
 
     /**

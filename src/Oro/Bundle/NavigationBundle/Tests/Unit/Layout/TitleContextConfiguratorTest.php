@@ -44,6 +44,25 @@ class TitleContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($titleTemplate, $context['title_template']);
     }
 
+    public function testConfigureContextWhenTitleDoesNotExist()
+    {
+        $routeName          = 'test_route';
+
+        $context = new LayoutContext();
+        $context->getDataResolver()->setOptional(['route_name']);
+        $context['route_name'] = $routeName;
+
+        $this->titleProvider->expects($this->once())
+            ->method('getTitleTemplates')
+            ->with($routeName)
+            ->will($this->returnValue([]));
+
+        $this->contextConfigurator->configureContext($context);
+        $context->resolve();
+
+        $this->assertSame('', $context['title_template']);
+    }
+
     public function testConfigureContextWithoutRoute()
     {
         $context = new LayoutContext();

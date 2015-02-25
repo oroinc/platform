@@ -33,8 +33,10 @@ class TitleContextConfigurator implements ContextConfiguratorInterface
                 [
                     'title_template' => function (Options $options, $titleTemplate) {
                         if (!$titleTemplate && isset($options['route_name'])) {
-                            $templates     = $this->titleProvider->getTitleTemplates($options['route_name']);
-                            $titleTemplate = $templates['title'];
+                            $templates = $this->titleProvider->getTitleTemplates($options['route_name']);
+                            if (isset($templates['title'])) {
+                                $titleTemplate = $templates['title'];
+                            }
                         }
 
                         return $titleTemplate;

@@ -210,6 +210,21 @@ class TitleServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($testShortTitle, $this->titleService->getShortTemplate());
     }
 
+    public function testLoadByRouteWhenTitleDoesNotExist()
+    {
+        $route = 'test_route';
+
+        $this->titleProvider->expects($this->once())
+            ->method('getTitleTemplates')
+            ->with($route)
+            ->will($this->returnValue([]));
+
+        $this->titleService->loadByRoute($route);
+
+        $this->assertNull($this->titleService->getTemplate());
+        $this->assertNull($this->titleService->getShortTemplate());
+    }
+
     /**
      * Prepare readers for update test
      */

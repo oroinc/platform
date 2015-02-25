@@ -82,11 +82,7 @@ class TitleProviderTest extends \PHPUnit_Framework_TestCase
         $this->titleProvider->getTitleTemplates($routeName);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The route "test_route" has not configured title.
-     */
-    public function testGetTitleTemplatesThrowsExceptionIfTemplatesDoNotExist()
+    public function testGetTitleTemplatesShouldReturnEmptyArrayIfTemplatesDoNotExist()
     {
         $routeName = 'test_route';
 
@@ -102,6 +98,13 @@ class TitleProviderTest extends \PHPUnit_Framework_TestCase
             ->with(['route' => $routeName])
             ->will($this->returnValue(null));
 
+        $result = $this->titleProvider->getTitleTemplates($routeName);
+        $this->assertEquals(
+            [],
+            $result
+        );
+
+        // test that loaded titles are cached
         $this->titleProvider->getTitleTemplates($routeName);
     }
 }
