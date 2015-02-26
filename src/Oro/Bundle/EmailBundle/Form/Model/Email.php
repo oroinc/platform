@@ -15,6 +15,12 @@ class Email
     /** @var mixed */
     protected $entityId;
 
+    /** @var int */
+    protected $parentEmailId;
+
+    /** @var int */
+    protected $direction;
+
     /** @var string */
     protected $from;
 
@@ -38,6 +44,9 @@ class Email
 
     /** @var string */
     protected $body;
+
+    /** @var string */
+    protected $bodyFooter;
 
     /**
      * Get id of emails datagrid
@@ -107,6 +116,54 @@ class Email
     public function setEntityId($entityId)
     {
         $this->entityId = $entityId;
+
+        return $this;
+    }
+
+    /**
+     * Get parent email id
+     *
+     * @return int
+     */
+    public function getParentEmailId()
+    {
+        return $this->parentEmailId;
+    }
+
+    /**
+     * Set parent email id
+     *
+     * @param $parentEmailId
+     *
+     * @return $this
+     */
+    public function setParentEmailId($parentEmailId)
+    {
+        $this->parentEmailId = $parentEmailId;
+
+        return $this;
+    }
+
+    /**
+     * Set email direction
+     *
+     * @return int
+     */
+    public function getDirection()
+    {
+        return $this->direction;
+    }
+
+    /**
+     * Get email direction
+     *
+     * @param $direction
+     *
+     * @return $this
+     */
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
 
         return $this;
     }
@@ -301,6 +358,30 @@ class Email
     public function setBody($body)
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    /**
+     * Get email body footer
+     *
+     * @return string
+     */
+    public function getBodyFooter()
+    {
+        return $this->bodyFooter;
+    }
+
+    /**
+     * Set email body footer
+     *
+     * @param string $bodyFooter
+     *
+     * @return Email
+     */
+    public function setBodyFooter($bodyFooter)
+    {
+        $this->bodyFooter = $bodyFooter;
 
         return $this;
     }

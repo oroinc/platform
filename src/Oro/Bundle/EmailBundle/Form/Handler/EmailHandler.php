@@ -11,19 +11,20 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\Translation\Translator;
 
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
-
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class EmailHandler
@@ -171,14 +172,7 @@ class EmailHandler
         if ($this->request->query->has('gridName')) {
             $model->setGridName($this->request->query->get('gridName'));
         }
-        if ($this->request->query->has('entityClass')) {
-            $model->setEntityClass(
-                $this->entityRoutingHelper->decodeClassName($this->request->query->get('entityClass'))
-            );
-        }
-        if ($this->request->query->has('entityId')) {
-            $model->setEntityId($this->request->query->get('entityId'));
-        }
+        $this->initEntityData($model);
         $this->initFrom($model);
         $this->initRecipients($model);
         $this->initSubject($model);
@@ -189,9 +183,9 @@ class EmailHandler
      */
     protected function initRecipients(Email $model)
     {
-        $model->setTo($this->getRecipients($model, EmailRecipient::TO));
-        $model->setCc($this->getRecipients($model, EmailRecipient::CC));
-        $model->setBcc($this->getRecipients($model, EmailRecipient::BCC));
+        $model->setTo(array_merge($model->getTo(), $this->getRecipients($model, EmailRecipient::TO)));
+        $model->setCc(array_merge($model->getCc(), $this->getRecipients($model, EmailRecipient::CC)));
+        $model->setBcc(array_merge($model->getBcc(), $this->getRecipients($model, EmailRecipient::BCC)));
     }
 
     /**
@@ -244,6 +238,50 @@ class EmailHandler
                         $this->nameFormatter->format($user)
                     )
                 );
+            }
+        }
+    }
+
+    /**
+     * Init entityClass and entityId fields
+     *
+     * @param Email $model
+     */
+    protected function initEntityData(Email $model)
+    {
+        if ($this->request->query->has('entityClass')) {
+            $model->setEntityClass(
+                $this->entityRoutingHelper->decodeClassName($this->request->query->get('entityClass'))
+            );
+        }
+        if ($this->request->query->has('entityId')) {
+            $model->setEntityId($this->request->query->get('entityId'));
+        }
+        if (!$model->getEntityClass() || !$model->getEntityId()) {
+            if ($model->getParentEmailId()) {
+                $parentEmail = $this->em->getRepository('OroEmailBundle:Email')->find($model->getParentEmailId());
+                $this->initEntityDataFromEmail($model, $parentEmail);
+            }
+        }
+    }
+
+    /**
+     * Init entityClass and entityId fields using email entity
+     *
+     * @param Email       $model
+     * @param EmailEntity $email
+     */
+    protected function initEntityDataFromEmail(Email $model, EmailEntity $email)
+    {
+        $entities = $email->getActivityTargetEntities();
+        foreach ($entities as $entity) {
+            if ($entity->getId() != $this->securityContext->getToken()->getUser()->getId()
+                && !($entity instanceof User)
+            ) {
+                $model->setEntityClass(ClassUtils::getRealClass($entity));
+                $model->setEntityId($entity->getId());
+
+                return;
             }
         }
     }

@@ -93,6 +93,9 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $msg->expects($this->once())
             ->method('getHeaders')
             ->will($this->returnValue($headers));
+        $msg->expects($this->exactly(2))
+            ->method('getFlags')
+            ->will($this->returnValue(['test1', 'test2']));
         $headers->expects($this->any())
             ->method('get')
             ->will(
@@ -112,6 +115,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                         ['To', $toAddressList],
                         ['Cc', $ccAddressList],
                         ['Bcc', $bccAddressList],
+                        ['References', $this->getHeader('References')],
                     ]
                 )
             );
@@ -156,6 +160,9 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(0, $email->getImportance());
         $this->assertEquals('MessageId', $email->getMessageId());
+        $this->assertEquals('References', $email->getRefs());
+        $this->assertEquals(false, $email->hasFlag('test'));
+        $this->assertEquals(true, $email->hasFlag('test1'));
         $this->assertEquals('XMsgId', $email->getXMessageId());
         $this->assertEquals('XThrId', $email->getXThreadId());
         $toRecipients = $email->getToRecipients();
@@ -196,6 +203,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                         ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
                         ['Importance', false],
                         ['Message-ID', $this->getHeader('MessageId')],
+                        ['References', $this->getHeader('References')],
                         ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
                         ['X-GM-THR-ID', $this->getMultiValueHeader(['XThrId1', 'XThrId2'])],
                         ['X-GM-LABELS', false],
