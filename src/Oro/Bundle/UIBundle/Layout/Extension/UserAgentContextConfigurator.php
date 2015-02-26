@@ -32,7 +32,7 @@ class UserAgentContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getDataResolver()
             ->setDefaults(['user_agent' => null])
-            ->setAllowedTypes(['user_agent' => ['Oro\Bundle\UIBundle\Provider\UserAgentInterface']])
+            ->setAllowedTypes(['user_agent' => 'Oro\Bundle\UIBundle\Provider\UserAgentInterface'])
             ->setNormalizers(
                 [
                     'user_agent' => function (Options $options, $userAgent) {
