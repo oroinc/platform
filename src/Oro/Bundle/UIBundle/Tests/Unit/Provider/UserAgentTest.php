@@ -8,8 +8,9 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
 {
     public function testWithoutUserAgentString()
     {
-        $agent = new UserAgent();
+        $agent = new UserAgent(null);
 
+        $this->assertSame('', $agent->getUserAgent());
         $this->assertTrue($agent->isDesktop());
         $this->assertFalse($agent->isMobile());
     }
@@ -18,45 +19,62 @@ class UserAgentTest extends \PHPUnit_Framework_TestCase
     {
         $agent = new UserAgent('');
 
+        $this->assertSame('', $agent->getUserAgent());
         $this->assertTrue($agent->isDesktop());
         $this->assertFalse($agent->isMobile());
     }
 
-    public function testDependedPropertiesUnset()
+    public function testMobileAgent()
     {
-        $agent = new UserAgent(
-            'Mozilla/5.0 (Linux; U; Android 2.3; en-us) AppleWebKit/999+ (KHTML, like Gecko) Safari/999.9'
-        );
+        $userAgent = 'Mozilla/5.0 (Linux; U; Android 2.3; en-us) AppleWebKit/999+ (KHTML, like Gecko) Safari/999.9';
+        $agent = new UserAgent($userAgent);
 
-        $this->assertFalse($agent->isDesktop());
+        $this->assertTrue(isset($agent[UserAgent::USER_AGENT]));
+        $this->assertTrue(isset($agent[UserAgent::MOBILE]));
+        $this->assertTrue(isset($agent[UserAgent::DESKTOP]));
+
+        $this->assertEquals($userAgent, $agent->getUserAgent());
+        $this->assertEquals($userAgent, $agent[UserAgent::USER_AGENT]);
         $this->assertTrue($agent->isMobile());
+        $this->assertTrue($agent[UserAgent::MOBILE]);
+        $this->assertFalse($agent->isDesktop());
+        $this->assertFalse($agent[UserAgent::DESKTOP]);
+    }
 
+    public function testDesktopAgent()
+    {
+        $userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; DigExt)';
+        $agent = new UserAgent($userAgent);
+
+        $this->assertTrue(isset($agent[UserAgent::USER_AGENT]));
+        $this->assertTrue(isset($agent[UserAgent::MOBILE]));
+        $this->assertTrue(isset($agent[UserAgent::DESKTOP]));
+
+        $this->assertEquals($userAgent, $agent->getUserAgent());
+        $this->assertEquals($userAgent, $agent[UserAgent::USER_AGENT]);
+        $this->assertFalse($agent->isMobile());
+        $this->assertFalse($agent[UserAgent::MOBILE]);
+        $this->assertTrue($agent->isDesktop());
+        $this->assertTrue($agent[UserAgent::DESKTOP]);
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Not supported
+     */
+    public function testArrayAccessSetThrowsException()
+    {
+        $agent = new UserAgent('');
+        $agent[UserAgent::USER_AGENT] = 'val';
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Not supported
+     */
+    public function testArrayAccessUnsetThrowsException()
+    {
+        $agent = new UserAgent('');
         unset($agent[UserAgent::USER_AGENT]);
-        $this->assertFalse(isset($agent[UserAgent::USER_AGENT]));
-        $this->assertFalse(isset($agent[UserAgent::MOBILE]));
-        $this->assertFalse(isset($agent[UserAgent::DESKTOP]));
-        $this->assertNull($agent[UserAgent::USER_AGENT]);
-        $this->assertTrue($agent->isDesktop());
-        $this->assertFalse($agent->isMobile());
-    }
-
-    public function testChangeUserAgentString()
-    {
-        $agent = new UserAgent(
-            'Mozilla/5.0 (Linux; U; Android 2.3; en-us) AppleWebKit/999+ (KHTML, like Gecko) Safari/999.9'
-        );
-
-        $this->assertFalse($agent->isDesktop());
-        $this->assertTrue($agent->isMobile());
-
-        $agent[UserAgent::USER_AGENT] = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; DigExt)';
-        $this->assertFalse(isset($agent[UserAgent::MOBILE]));
-        $this->assertFalse(isset($agent[UserAgent::DESKTOP]));
-        $this->assertEquals(
-            'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; DigExt)',
-            $agent[UserAgent::USER_AGENT]
-        );
-        $this->assertTrue($agent->isDesktop());
-        $this->assertFalse($agent->isMobile());
     }
 }
