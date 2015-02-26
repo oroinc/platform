@@ -24,7 +24,7 @@ class PlaceholderType extends AbstractType
     {
         $resolver
             ->setRequired(['placeholder_name'])
-            ->setOptional(['placeholder_parameters']);
+            ->setDefaults(['placeholder_parameters' => []]);
     }
 
     /**
