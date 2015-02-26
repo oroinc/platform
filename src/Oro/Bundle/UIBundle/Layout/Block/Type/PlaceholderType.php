@@ -24,7 +24,7 @@ class PlaceholderType extends AbstractType
     {
         $resolver
             ->setRequired(['placeholder_name'])
-            ->setOptional(['placeholder_parameters']);
+            ->setDefaults(['placeholder_parameters' => []]);
     }
 
     /**
@@ -33,9 +33,7 @@ class PlaceholderType extends AbstractType
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         $view->vars['placeholder_name']       = $options['placeholder_name'];
-        if (!empty($options['placeholder_parameters'])) {
-            $view->vars['placeholder_parameters'] = $options['placeholder_parameters'];
-        }        
+        $view->vars['placeholder_parameters'] = $options['placeholder_parameters'];
     }
 
     /**
