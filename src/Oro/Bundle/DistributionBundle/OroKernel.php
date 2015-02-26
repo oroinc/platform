@@ -121,7 +121,7 @@ abstract class OroKernel extends Kernel
     /**
      * @return array
      */
-    protected function collectBundles()
+    public function collectBundles()
     {
         $files = $this->findBundles(
             array(
