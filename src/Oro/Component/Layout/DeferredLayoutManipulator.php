@@ -217,8 +217,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
                 if ($finalize) {
                     $this->removeNotImportantRemainingActions();
                     // check that all scheduled actions have been performed
-                    $applied = $total - $this->calculateActionCount();
-                    if ($applied === 0 && $applied !== $total) {
+                    if ($this->calculateActionCount()) {
                         throw $this->createFailureException();
                     }
                 }

@@ -64,7 +64,7 @@ class ReflectionUtils
 
         $argumentsCount = count($arguments);
         $argumentsKeys  = array_keys($arguments);
-        $isAssoc        = !(count(array_filter($argumentsKeys, 'is_numeric')) === $argumentsCount);
+        $isAssoc        = ArrayUtils::isAssoc($arguments);
         $diff           = array_diff($argumentsKeys, $paramNames);
 
         if ($isAssoc && $diff) {

@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Generator;
 
 class GeneratorData
 {
-    /** @var string */
+    /** @var array|string */
     protected $source;
 
     /** @var string */
@@ -12,7 +12,7 @@ class GeneratorData
 
     /**
      * @param array|string $source
-     * @param string $filename
+     * @param string       $filename
      */
     public function __construct($source, $filename = null)
     {
@@ -21,11 +21,19 @@ class GeneratorData
     }
 
     /**
-     * @return string
+     * @return array|string
      */
     public function getSource()
     {
         return $this->source;
+    }
+
+    /**
+     * @param array|string $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
     }
 
     /**

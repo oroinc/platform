@@ -131,7 +131,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $loader    = $this->getLoader($generator);
 
         $exception = new SyntaxException(
-            'Syntax error: action name should start with "@" symbol, current name "add"',
+            'action name should start with "@" symbol, current name "add"',
             ['add' => ['id' => 'myId', 'parentId' => 'myParentId']],
             'actions.0'
         );
@@ -140,7 +140,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException(
             '\RuntimeException',
             <<<MESSAGE
-Syntax error: Syntax error: action name should start with "@" symbol, current name "add" at "actions.0"
+Syntax error: action name should start with "@" symbol, current name "add" at "actions.0"
 add:
     id: myId
     parentId: myParentId

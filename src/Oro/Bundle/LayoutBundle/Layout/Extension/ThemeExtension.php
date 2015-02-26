@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
-use Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
@@ -16,6 +15,7 @@ use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
+use Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ContextConfiguratorInterface
 {
