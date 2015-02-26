@@ -97,7 +97,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         )
             ->disableOriginalConstructor()
             ->getMock();
-
+        $logger = $this->getMock('Psr\Log\LoggerInterface');
         $this->objectManager->expects($this->any())
             ->method('getRepository')
             ->willReturn($this->objectRepository);
@@ -106,13 +106,14 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
 
         $this->action = new SendEmailTemplate(
             $this->contextAccessor,
-            $this->renderer,
             $this->emailProcessor,
-            $this->objectManager,
             new EmailAddressHelper(),
             $this->nameFormatter,
+            $this->renderer,
+            $this->objectManager,
             $this->validator
         );
+        $this->action->setLogger($logger);
 
         $this->action->setDispatcher($this->dispatcher);
     }
