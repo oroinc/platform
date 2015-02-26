@@ -52,8 +52,10 @@ define(function (require) {
             var $mainEl = $('#container').find('>:first-child');
             if (_.some(dialogs)) {
                 mediator.execute('layout:disablePageScroll', $mainEl);
+                $('#page').css('display', 'none');
             } else {
                 mediator.execute('layout:enablePageScroll', $mainEl);
+                $('#page').css('display', '');
             }
         }
 
