@@ -706,11 +706,18 @@ define(function (require) {
                         }
                     }
                     this.$grid.find('thead:first').css({
+                        // show only visible part
                         top: visibleRect.top,
-                        width: visibleRect.right - visibleRect.left
+                        width: visibleRect.right - visibleRect.left,
+
+                        // left side should be also tracked
+                        // gives incorrect rendering when "document" scrolled horizontally
+                        // left:
                     });
                     theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
                     this.$grid.find('thead:first tr:first').css({
+                        // possible solution set scrollLeft instead
+                        // could be more fast for rendering
                         marginLeft: tableRect.left - theadRect.left
                     });
                     break;
