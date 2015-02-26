@@ -36,3 +36,4 @@ oro_titles:
     oro_email_emailtemplate_create: "Create Email Template"
     oro_email_emailtemplate_clone: "Clone Email Template"
     oro_email_user_emails: "My Emails - %%username%%"
+    oro_email_thread_view: "My Emails - Thread view"

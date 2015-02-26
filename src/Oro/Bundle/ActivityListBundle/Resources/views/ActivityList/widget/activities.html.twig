@@ -51,6 +51,7 @@
         {% block items_container %}
             {% set options = {
                 widgetId: app.request.get('_wid'),
+                ignoreHead: oro_config_value('oro_activity_list.grouping') == false,
                 activityListData: render(path(
                     'oro_activity_list_api_get_list',
                     {
