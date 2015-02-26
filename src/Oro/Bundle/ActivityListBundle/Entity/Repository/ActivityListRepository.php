@@ -75,7 +75,7 @@ class ActivityListRepository extends EntityRepository
             ->orderBy('activity.' . $orderField, $orderDirection);
 
         if ($grouping) {
-            $queryBuilder->andWhere('activity.head = 1');
+            $queryBuilder->andWhere('activity.head = true');
         }
 
         return $queryBuilder;
