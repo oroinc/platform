@@ -210,7 +210,7 @@ class Email extends ExtendEmail
      * @var string
      *
      * @ORM\Column(name="refs", type="text", nullable=true)
-     * @Soap\ComplexType("integer", nillable=true)
+     * @Soap\ComplexType("string", nillable=true)
      * @JMS\Type("string")
      */
     protected $refs;

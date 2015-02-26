@@ -47,7 +47,6 @@ class EmailThread
      *
      * @ORM\ManyToOne(targetEntity="Email")
      * @ORM\JoinColumn(name="last_unseen_email_id", referencedColumnName="id", nullable=true)
-     * @Soap\ComplexType("string", nillable=true)
      * @JMS\Exclude
      */
     protected $lastUnseenEmail;
