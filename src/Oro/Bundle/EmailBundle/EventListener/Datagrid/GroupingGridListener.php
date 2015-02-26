@@ -32,7 +32,7 @@ class GroupingGridListener
         $queryBuilder = $ormDataSource->getQueryBuilder();
 
         if ($this->config->get('oro_email.use_threads_in_emails')) {
-            $queryBuilder->andWhere('e.head = 1');
+            $queryBuilder->andWhere('e.head = true');
         }
     }
 }
