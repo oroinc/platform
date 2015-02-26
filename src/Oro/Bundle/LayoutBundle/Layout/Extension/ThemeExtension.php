@@ -6,10 +6,9 @@ use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
-use Oro\Component\ConfigExpression\ExpressionAssembler;
-use Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface;
-use Oro\Component\Layout\LayoutUpdateInterface;
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
+use Oro\Component\Layout\ContextConfiguratorInterface;
 
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
@@ -17,9 +16,11 @@ use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ThemeResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
 
-class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ExpressionAssemblerAwareInterface
+class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ContextConfiguratorInterface
 {
     use LoggerAwareTrait;
+
+    const PARAM_THEME = 'theme';
 
     /** @var array */
     protected $resources;
@@ -33,35 +34,38 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
     /** @var LoaderInterface */
     protected $loader;
 
-    /** @var ExpressionAssembler */
-    protected $expressionAssembler;
+    /** @var DependencyInitializer */
+    protected $dependencyInitializer;
 
     /**
      * @param array                    $resources
      * @param ThemeManager             $manager
      * @param ResourceFactoryInterface $factory
      * @param LoaderInterface          $loader
+     * @param DependencyInitializer    $dependencyInitializer
      */
     public function __construct(
         array $resources,
         ThemeManager $manager,
         ResourceFactoryInterface $factory,
-        LoaderInterface $loader
+        LoaderInterface $loader,
+        DependencyInitializer $dependencyInitializer
     ) {
-        $this->resources = $resources;
-        $this->manager   = $manager;
-        $this->loader    = $loader;
-        $this->factory   = $factory;
+        $this->resources             = $resources;
+        $this->manager               = $manager;
+        $this->loader                = $loader;
+        $this->factory               = $factory;
+        $this->dependencyInitializer = $dependencyInitializer;
         $this->setLogger(new NullLogger());
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function loadLayoutUpdates()
+    protected function loadLayoutUpdates(ContextInterface $context)
     {
         $updates   = $skipped = [];
-        $theme     = $this->manager->getTheme();
+        $theme     = $this->manager->getTheme($context->getOr(self::PARAM_THEME));
         $directory = $theme->getDirectory();
 
         $themeResources = isset($this->resources[$directory]) ? $this->resources[$directory] : [];
@@ -74,7 +78,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
         }
 
         array_walk($skipped, [$this, 'logUnknownResource']);
-        array_walk($updates, [$this, 'ensureDependenciesInitialized']);
+        array_walk($updates, [$this->dependencyInitializer, 'initialize']);
 
         return ['root' => $updates];
     }
@@ -82,22 +86,9 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
     /**
      * {@inheritdoc}
      */
-    public function setAssembler(ExpressionAssembler $assembler)
+    public function configureContext(ContextInterface $context)
     {
-        $this->expressionAssembler = $assembler;
-    }
-
-    /**
-     * Initializes layout update object dependencies
-     *
-     * @param LayoutUpdateInterface $layoutUpdate
-     */
-    protected function ensureDependenciesInitialized(LayoutUpdateInterface $layoutUpdate)
-    {
-        // TODO find generic solution for dependency initialization
-        if ($layoutUpdate instanceof ExpressionAssemblerAwareInterface) {
-            $layoutUpdate->setAssembler($this->expressionAssembler);
-        }
+        $context->getDataResolver()->setOptional([self::PARAM_THEME]);
     }
 
     /**

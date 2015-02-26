@@ -9,7 +9,9 @@ use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
+use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
+use Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer;
 
 class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,6 +29,9 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
     /** @var Logger */
     protected $logger;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DependencyInitializer */
+    protected $dependencyInitializer;
 
     /** @var array */
     protected $resources = [
@@ -53,18 +58,30 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->logger = new Logger();
 
+        $this->dependencyInitializer = $this
+            ->getMockBuilder('\Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer')
+            ->disableOriginalConstructor()->getMock();
+
         $this->extension = new ThemeExtension(
             $this->resources,
             $this->themeManager,
             new ResourceFactory(),
-            new ChainLoader([$this->yamlLoader, $this->phpLoader])
+            new ChainLoader([$this->yamlLoader, $this->phpLoader]),
+            $this->dependencyInitializer
         );
         $this->extension->setLogger($this->logger);
     }
 
     protected function tearDown()
     {
-        unset($this->extension, $this->themeManager, $this->yamlLoader, $this->phpLoader, $this->logger);
+        unset(
+            $this->extension,
+            $this->themeManager,
+            $this->yamlLoader,
+            $this->phpLoader,
+            $this->logger,
+            $this->dependencyInitializer
+        );
     }
 
     public function testThemeWithoutUpdatesTheme()
@@ -74,7 +91,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->yamlLoader->expects($this->never())->method('supports');
         $this->phpLoader->expects($this->never())->method('supports');
 
-        $this->extension->getLayoutUpdates('root');
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
     }
 
     public function testThemeYamlUpdateFound()
@@ -93,7 +110,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->yamlLoader->expects($this->once())->method('load')->with('resource-gold.yml')
             ->willReturn($updateMock);
 
-        $result = $this->extension->getLayoutUpdates('root');
+        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
         $this->assertContains($updateMock, $result);
     }
 
@@ -108,7 +125,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->phpLoader->expects($this->any())->method('supports')
             ->willReturnCallback($callbackBuilder('php'));
 
-        $updateMock  = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $update2Mock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->yamlLoader->expects($this->once())->method('load')->with('resource1.yml')
@@ -116,7 +133,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->phpLoader->expects($this->once())->method('load')->with('resource3.php')
             ->willReturn($update2Mock);
 
-        $result = $this->extension->getLayoutUpdates('root');
+        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
         $this->assertContains($updateMock, $result);
         $this->assertContains($update2Mock, $result);
 
@@ -146,27 +163,32 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->extension->getLayoutUpdates('root');
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
     }
 
     public function testShouldPassDependenciesToUpdateInstance()
     {
-        $assembler = $this->getMockBuilder('\Oro\Component\ConfigExpression\ExpressionAssembler')
-            ->disableOriginalConstructor()->getMock();
-        $update = $this->getMock('Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionAssemblerLayoutUpdateInterface');
-
-        $this->extension->setAssembler($assembler);
+        $update = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $this->setUpActiveTheme('oro-black');
 
         $callbackBuilder = $this->getCallbackBuilder();
-        $this->yamlLoader->expects($this->any())->method('supports')
-            ->willReturnCallback($callbackBuilder('yml'));
-        $this->yamlLoader->expects($this->once())->method('load')
-            ->willReturn($update);
+        $this->yamlLoader->expects($this->any())->method('supports')->willReturnCallback($callbackBuilder('yml'));
+        $this->yamlLoader->expects($this->once())->method('load')->willReturn($update);
 
-        $update->expects($this->once())->method('setAssembler')->with($assembler);
+        $this->dependencyInitializer->expects($this->once())->method('initialize')->with($this->identicalTo($update));
 
-        $this->extension->getLayoutUpdates('root');
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
+    }
+
+    public function testConfigureContextSetOptionalActiveThemeOption()
+    {
+        $context = new DebugLayoutContext();
+        $this->extension->configureContext($context);
+
+        $this->assertContains('theme', $context->getDataResolver()->getKnownOptions());
+        $context->resolve();
+
+        $this->assertNull($context->getOr('theme'));
     }
 
     protected function getCallbackBuilder()
@@ -190,5 +212,20 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $themeMock->expects($this->any())->method('getDirectory')
             ->willReturn($dir);
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLayoutItem($id)
+    {
+        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
+        $layoutItem->expects($this->any())->method('getContext')
+            ->willReturn($this->getMock('Oro\Component\Layout\ContextInterface'));
+
+        return $layoutItem;
     }
 }

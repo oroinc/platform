@@ -53,19 +53,24 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testHasLayoutUpdates()
     {
         $extension = $this->getAbstractExtension();
-        $this->assertTrue($extension->hasLayoutUpdates('test'));
-        $this->assertFalse($extension->hasLayoutUpdates('unknown'));
+        $this->assertTrue($extension->hasLayoutUpdates($this->getLayoutItem('test')));
+        $this->assertFalse($extension->hasLayoutUpdates($this->getLayoutItem('unknown')));
     }
 
     public function testGetLayoutUpdates()
     {
+        $layoutItem = $this->getLayoutItem('test');
+
         $extension = $this->getAbstractExtension();
-        $this->assertCount(1, $extension->getLayoutUpdates('test'));
+        $this->assertCount(1, $extension->getLayoutUpdates($layoutItem));
         $this->assertInstanceOf(
             'Oro\Component\Layout\LayoutUpdateInterface',
-            $extension->getLayoutUpdates('test')[0]
+            $extension->getLayoutUpdates($layoutItem)[0]
         );
-        $this->assertSame([], $extension->getLayoutUpdates('unknown'));
+
+        $layoutItemUnknown = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemUnknown->expects($this->any())->method('getId')->willReturn('unknown');
+        $this->assertSame([], $extension->getLayoutUpdates($this->getLayoutItem('unknown')));
     }
 
     public function testHasContextConfigurators()
@@ -158,7 +163,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     public function testLoadInvalidLayoutUpdates()
     {
         $extension = new AbstractExtensionStub([], [], ['test' => [123]], [], []);
-        $extension->hasLayoutUpdates('test');
+        $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
     /**
@@ -176,7 +181,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             []
         );
-        $extension->hasLayoutUpdates('test');
+        $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
     // @codingStandardsIgnoreStart
@@ -196,7 +201,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [],
             []
         );
-        $extension->hasLayoutUpdates('test');
+        $extension->hasLayoutUpdates($this->getLayoutItem('test'));
     }
 
     // @codingStandardsIgnoreStart
@@ -244,5 +249,20 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
             [$this->getMock('Oro\Component\Layout\ContextConfiguratorInterface')],
             ['test' => $this->getMock('Oro\Component\Layout\DataProviderInterface')]
         );
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLayoutItem($id)
+    {
+        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
+        $layoutItem->expects($this->any())->method('getContext')
+            ->willReturn($this->getMock('Oro\Component\Layout\ContextInterface'));
+
+        return $layoutItem;
     }
 }

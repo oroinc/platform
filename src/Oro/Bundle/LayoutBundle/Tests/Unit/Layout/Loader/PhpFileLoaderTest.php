@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
 
+use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
@@ -98,6 +99,38 @@ class PhpFileLoaderTest extends \PHPUnit_Framework_TestCase
             );
 
         $loader->load($resource);
+    }
+
+
+
+    public function testProcessSyntaxExceptions()
+    {
+        $generator = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface');
+        $loader    = $this->getLoader($generator);
+
+        $exception = new SyntaxException(
+            'Some error found',
+            "\$layoutManipulator->add('header', 'root', 'header');\n",
+            0
+        );
+        $generator->expects($this->once())->method('generate')->willThrowException($exception);
+
+        $this->setExpectedException(
+            '\RuntimeException',
+            <<<MESSAGE
+Syntax error: Some error found at "0"
+\$layoutManipulator->add('header', 'root', 'header');
+
+
+Filename:
+MESSAGE
+        );
+
+        $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.php';
+        $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
+
+        $update = $loader->load(new FileResource($path));
+        $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 
     /**

@@ -285,16 +285,18 @@ class LayoutRegistryTest extends \PHPUnit_Framework_TestCase
         $id                = 'test';
         $layoutManipulator = $this->getMock('Oro\Component\Layout\LayoutManipulatorInterface');
         $item              = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $item->expects($this->once())->method('getContext')
+            ->willReturn($this->getMock('Oro\Component\Layout\ContextInterface'));
 
         $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->extension->expects($this->once())
             ->method('hasLayoutUpdates')
-            ->with($id)
+            ->with($item)
             ->will($this->returnValue(true));
         $this->extension->expects($this->once())
             ->method('getLayoutUpdates')
-            ->with($id)
+            ->with($item)
             ->will($this->returnValue([$layoutUpdate]));
         $layoutUpdate->expects($this->once())
             ->method('updateLayout')

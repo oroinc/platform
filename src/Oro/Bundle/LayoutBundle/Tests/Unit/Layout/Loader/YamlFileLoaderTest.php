@@ -4,10 +4,10 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Loader;
 
 use Symfony\Component\Filesystem\Filesystem;
 
+use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader;
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
-use Oro\Bundle\LayoutBundle\Layout\Loader\RouteFileResource;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
@@ -123,6 +123,35 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
             );
 
         $loader->load(new FileResource($path));
+    }
+
+    public function testProcessSyntaxExceptions()
+    {
+        $generator = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface');
+        $loader    = $this->getLoader($generator);
+
+        $exception = new SyntaxException(
+            'Syntax error: action name should start with "@" symbol, current name "add"',
+            ['add' => ['id' => 'myId', 'parentId' => 'myParentId']],
+            'actions.0'
+        );
+        $generator->expects($this->once())->method('generate')->willThrowException($exception);
+
+        $this->setExpectedException(
+            '\RuntimeException',
+            <<<MESSAGE
+Syntax error: Syntax error: action name should start with "@" symbol, current name "add" at "actions.0"
+add:
+    id: myId
+    parentId: myParentId
+
+
+Filename: path/to/my/file.yml
+MESSAGE
+        );
+
+        $update = $loader->load(new FileResource('path/to/my/file.yml'));
+        $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
     }
 
     /**

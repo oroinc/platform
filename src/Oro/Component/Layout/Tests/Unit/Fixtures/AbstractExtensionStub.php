@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Fixtures;
 
+use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
 
 class AbstractExtensionStub extends AbstractExtension
@@ -45,7 +46,7 @@ class AbstractExtensionStub extends AbstractExtension
         return $this->loadedTypeExtensions;
     }
 
-    protected function loadLayoutUpdates()
+    protected function loadLayoutUpdates(ContextInterface $context)
     {
         return $this->loadedLayoutUpdates;
     }

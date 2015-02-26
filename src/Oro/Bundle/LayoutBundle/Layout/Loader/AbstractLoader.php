@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
+use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
@@ -65,7 +66,14 @@ abstract class AbstractLoader implements LoaderInterface
         $resourceDataForGenerator = $this->loadResourceGeneratorData($resource);
         $resourceDataForGenerator->setFilename($resource->getFilename());
 
-        return $this->getGenerator()->generate($className, $resourceDataForGenerator, $resource->getConditions());
+        try {
+            return $this->getGenerator()->generate($className, $resourceDataForGenerator, $resource->getConditions());
+        } catch (SyntaxException $e) {
+            $message = $e->getMessage() . PHP_EOL . $this->dumpSource($e->getSource());
+            $message .= str_repeat(PHP_EOL, 2) . 'Filename: ' . $resource->getFilename();
+
+            throw new \RuntimeException($message, 0, $e);
+        }
     }
 
     /**
@@ -99,6 +107,18 @@ abstract class AbstractLoader implements LoaderInterface
     protected function getCache()
     {
         return $this->cache;
+    }
+
+    /**
+     * Dumps source back to human readable representation for error reporting. Could be overridden in descendants.
+     *
+     * @param mixed $source
+     *
+     * @return mixed
+     */
+    protected function dumpSource($source)
+    {
+        return $source;
     }
 
     /**

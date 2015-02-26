@@ -10,7 +10,7 @@ use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
     const NODE_ACTIONS   = 'actions';
-    const NODE_CONDITION = 'condition';
+    const NODE_CONDITION = 'conditions';
 
     /** @var ReflectionUtils */
     protected $helper;

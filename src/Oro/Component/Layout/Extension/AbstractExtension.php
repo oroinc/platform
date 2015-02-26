@@ -7,6 +7,8 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
 abstract class AbstractExtension implements ExtensionInterface
@@ -129,27 +131,31 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getLayoutUpdates($id)
+    public function getLayoutUpdates(LayoutItemInterface $item)
     {
+        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+
         if (null === $this->layoutUpdates) {
-            $this->initLayoutUpdates();
+            $this->initLayoutUpdates($item->getContext());
         }
 
-        return !empty($this->layoutUpdates[$id])
-            ? $this->layoutUpdates[$id]
+        return !empty($this->layoutUpdates[$idOrAlias])
+            ? $this->layoutUpdates[$idOrAlias]
             : [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasLayoutUpdates($id)
+    public function hasLayoutUpdates(LayoutItemInterface $item)
     {
+        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+
         if (null === $this->layoutUpdates) {
-            $this->initLayoutUpdates();
+            $this->initLayoutUpdates($item->getContext());
         }
 
-        return !empty($this->layoutUpdates[$id]);
+        return !empty($this->layoutUpdates[$idOrAlias]);
     }
 
     /**
@@ -235,9 +241,11 @@ abstract class AbstractExtension implements ExtensionInterface
      *      'itemId2' => [layoutUpdate3]
      *  ]
      *
+     * @param ContextInterface $context
+     *
      * @return array of array of LayoutUpdateInterface
      */
-    protected function loadLayoutUpdates()
+    protected function loadLayoutUpdates(ContextInterface $context)
     {
         return [];
     }
@@ -317,13 +325,15 @@ abstract class AbstractExtension implements ExtensionInterface
     /**
      * Initializes layout updates.
      *
+     * @param ContextInterface $context
+     *
      * @throws Exception\UnexpectedTypeException if any registered layout update is not
      *                                           an instance of LayoutUpdateInterface
      *                                           or layout item id is not a string
      */
-    private function initLayoutUpdates()
+    private function initLayoutUpdates(ContextInterface $context)
     {
-        $loadedLayoutUpdates = $this->loadLayoutUpdates();
+        $loadedLayoutUpdates = $this->loadLayoutUpdates($context);
         foreach ($loadedLayoutUpdates as $id => $layoutUpdates) {
             if (!is_string($id)) {
                 throw new Exception\UnexpectedTypeException(

@@ -68,13 +68,18 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertTrue($extension->hasLayoutUpdates($id));
-        $this->assertFalse($extension->hasLayoutUpdates('unknown'));
+        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
+        $layoutItemUnknown = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemUnknown->expects($this->any())->method('getId')->willReturn('unknown');
 
-        $this->assertCount(1, $extension->getLayoutUpdates($id));
-        $this->assertSame($layoutUpdate, $extension->getLayoutUpdates($id)[0]);
+        $this->assertTrue($extension->hasLayoutUpdates($layoutItem));
+        $this->assertFalse($extension->hasLayoutUpdates($layoutItemUnknown));
 
-        $this->assertSame([], $extension->getLayoutUpdates('unknown'));
+        $this->assertCount(1, $extension->getLayoutUpdates($layoutItem));
+        $this->assertSame($layoutUpdate, $extension->getLayoutUpdates($layoutItem)[0]);
+
+        $this->assertSame([], $extension->getLayoutUpdates($layoutItemUnknown));
     }
 
     public function testContextConfigurators()

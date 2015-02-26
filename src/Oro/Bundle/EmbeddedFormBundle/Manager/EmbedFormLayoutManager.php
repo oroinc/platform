@@ -46,26 +46,24 @@ class EmbedFormLayoutManager
      */
     public function getLayout(EmbeddedForm $formEntity, FormInterface $form = null)
     {
+        $formTypeName = $formEntity->getFormType();
+        $customLayout = $this->formManager->getCustomFormLayoutByFormType($formTypeName);
+
         $layoutContext = new LayoutContext();
-
-        // TODO discuss active theme as context param
-        $this->themeManager->setActiveTheme('embedded_default');
-
-        $layoutBuilder = $this->layoutManager->getLayoutBuilder();
-        // TODO discuss adding root automatically
-        $layoutBuilder->add('root', null, 'root');
 
         $layoutContext->getDataResolver()
             ->setRequired(['embedded_form_entity', 'embedded_form_type'])
             ->setOptional(['embedded_form', 'embedded_form_custom_layout']);
 
-        $formTypeName = $formEntity->getFormType();
-        $customLayout = $this->formManager->getCustomFormLayoutByFormType($formTypeName);
-
+        $layoutContext->set('theme', 'embedded_default');
         $layoutContext->set('embedded_form', null === $form ? null : new FormAccessor($form));
         $layoutContext->set('embedded_form_entity', $formEntity);
         $layoutContext->set('embedded_form_type', $formTypeName);
         $layoutContext->set('embedded_form_custom_layout', $customLayout);
+
+        $layoutBuilder = $this->layoutManager->getLayoutBuilder();
+        // TODO discuss adding root automatically
+        $layoutBuilder->add('root', null, 'root');
 
         return $layoutBuilder->getLayout($layoutContext);
     }

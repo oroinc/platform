@@ -42,15 +42,15 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
     public function resourceDataProvider()
     {
         return [
-            'invalid data'                    => [
+            'invalid data'                                            => [
                 '$data'      => new \stdClass(),
                 '$exception' => 'Syntax error: expected array with "actions" node at "."'
             ],
-            'should contains actions'         => [
+            'should contains actions'                                 => [
                 '$data'      => [],
                 '$exception' => 'Syntax error: expected array with "actions" node at "."'
             ],
-            'should contains known actions'   => [
+            'should contains known actions'                           => [
                 '$data'      => [
                     'actions' => [
                         ['@addSuperPuper' => null]
@@ -59,7 +59,13 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                 '$exception' => 'Syntax error: unknown action "addSuperPuper", '
                     . 'should be one of LayoutManipulatorInterface\'s methods at "actions.0"'
             ],
-            'action name should start from @' => [
+            'should contains array with action definition in actions' => [
+                '$data'      => [
+                    'actions' => ['some string']
+                ],
+                '$exception' => 'Syntax error: expected array with action name as key at "actions.0"'
+            ],
+            'action name should start from @'                         => [
                 '$data'      => [
                     'actions' => [
                         ['add' => null]
@@ -68,7 +74,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                 '$exception' => 'Syntax error: action name should start with "@" symbol,'
                     . ' current name "add" at "actions.0"'
             ],
-            'known action proceed'            => [
+            'known action proceed'                                    => [
                 '$data'      => [
                     'actions' => [
                         ['@add' => null]
