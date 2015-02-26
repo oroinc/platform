@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
 
-use Oro\Bundle\UIBundle\Provider\UserAgent;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Component\Layout\LayoutContext;
 
 use Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator;
+use Oro\Bundle\UIBundle\Provider\UserAgent;
 
 class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
