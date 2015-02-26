@@ -16,7 +16,11 @@ oro:
             email_configuration: Email Configuration
             email_threads:
                 label: Email Threads
-                use_threads_in_emails.label: Use email threads in My Emails
+                use_threads_in_emails:
+                    label: Display My Emails as
+                    choices:
+                        non_threaded.label: Non-Threaded
+                        threaded.label: Threaded
 
 
         emailtemplate:
