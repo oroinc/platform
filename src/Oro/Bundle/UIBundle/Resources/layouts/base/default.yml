@@ -1,0 +1,311 @@
+oro_layout:
+    actions:
+        - @add:
+            id:        head
+            parentId:  root
+            blockType: head
+        - @add:
+            id:        meta_viewport
+            parentId:  head
+            blockType: meta
+            options:
+                name:    'viewport'
+                content: 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no'
+        - @add:
+            id:        meta_cache_control_max_age
+            parentId:  head
+            blockType: meta
+            options:
+                http_equiv: 'cache-control'
+                content:    'max-age=0'
+        - @add:
+            id:        meta_cache_control_no_cache
+            parentId:  head
+            blockType: meta
+            options:
+                http_equiv: 'cache-control'
+                content:    'no-cache'
+        - @add:
+            id:        meta_expires
+            parentId:  head
+            blockType: meta
+            options:
+                http_equiv: 'expires'
+                content:    '0'
+        - @add:
+            id:        meta_pragma
+            parentId:  head
+            blockType: meta
+            options:
+                http_equiv: 'pragma'
+                content:    'no-cache'
+        - @add:
+            id:        head_style
+            parentId:  head
+            blockType: block
+        - @add:
+            id:        head_style_placeholder
+            parentId:  head
+            blockType: placeholder
+            options:
+                placeholder_name: 'head_style'
+        - @add:
+            id:        scripts
+            parentId:  head
+            blockType: container
+        - @add:
+            id:        scripts_before_placeholder
+            parentId:  scripts
+            blockType: placeholder
+            options:
+                placeholder_name: 'scripts_before'
+        - @add:
+            id:        require_js
+            parentId:  scripts
+            blockType: require_js
+        - @add:
+            id:        applicaton_script
+            parentId:  scripts
+            blockType: block
+        - @add:
+            id:        head_scripts
+            parentId:  scripts
+            blockType: block
+        - @add:
+            id:        scripts_after_placeholder
+            parentId:  scripts
+            blockType: placeholder
+            options:
+                placeholder_name: 'scripts_after'
+        - @add:
+            id:        body
+            parentId:  root
+            blockType: body
+            options:
+                attr:
+                    class:
+                        @iif:
+                            - $context.user_agent.mobile
+                            - 'mobile-version'
+                            - 'desktop-version'
+        - @add:
+            id:        after_body_start_placeholder
+            parentId:  body
+            blockType: placeholder
+            options:
+                placeholder_name: 'after_body_start'
+        - @add:
+            id:        progressbar
+            parentId:  body
+            blockType: block
+        - @add:
+            id:        page
+            parentId:  body
+            blockType: container
+        - @add:
+            id:        header
+            parentId:  page
+            blockType: container
+        - @add:
+            id:        before_navigation_placeholder
+            parentId:  header
+            blockType: placeholder
+            options:
+                placeholder_name: 'before_navigation'
+        - @add:
+            id:        navbar_container
+            parentId:  header
+            blockType: container
+        - @add:
+            id:        header_logo_placeholder
+            parentId:  navbar_container
+            blockType: placeholder
+            options:
+                placeholder_name: 'header_logo'
+        - @add:
+            id:        user_menu
+            parentId:  navbar_container
+            blockType: container
+        - @add:
+            id:        user_menu_placeholder
+            parentId:  user_menu
+            blockType: placeholder
+            options:
+                placeholder_name: 'user_menu'
+        - @add:
+            id:        dots_menu_placeholder
+            parentId:  navbar_container
+            blockType: placeholder
+            options:
+                placeholder_name: 'dots_menu'
+        - @add:
+            id:        navbar
+            parentId:  navbar_container
+            blockType: container
+        - @add:
+            id:        navbar_placeholder
+            parentId:  navbar
+            blockType: placeholder
+            options:
+                placeholder_name: 'navbar'
+        - @add:
+            id:        pin_tabs_list_placeholder
+            parentId:  navbar_container
+            blockType: placeholder
+            options:
+                placeholder_name: 'pin_tabs_list'
+        - @add:
+            id:        main_menu
+            parentId:  header
+            blockType: container
+            options:
+                visible:
+                    @or:
+                      - @eq: [ $context.user_agent.mobile, true ]
+                      - @eq: [ $context.navbar_position, 'top' ]
+        - @add:
+            id:        application_menu_placeholder
+            parentId:  main_menu
+            blockType: placeholder
+            options:
+                placeholder_name: 'application_menu'
+        - @add:
+            id:        after_navigation_placeholder
+            parentId:  header
+            blockType: placeholder
+            options:
+                placeholder_name: 'after_navigation'
+        - @add:
+            id:        left_panel
+            parentId:  page
+            blockType: container
+            options:
+                visible: { @value: $context.user_agent.desktop }
+        - @add:
+            id:        left_panel_placeholder
+            parentId:  left_panel
+            blockType: placeholder
+            options:
+                placeholder_name: 'left_panel'
+                placeholder_parameters:
+                    placement: 'left'
+        - @add:
+            id:        main
+            parentId:  page
+            blockType: container
+        - @add:
+            id:        before_content
+            parentId:  main
+            blockType: container
+        - @add:
+            id:        breadcrumb
+            parentId:  before_content
+            blockType: container
+        - @add:
+            id:        breadcrumb_placeholder
+            parentId:  breadcrumb
+            blockType: placeholder
+            options:
+                placeholder_name: 'breadcrumb'
+        - @add:
+            id:        pin_button_placeholder
+            parentId:  before_content
+            blockType: placeholder
+            options:
+                placeholder_name: 'pin_button'
+        - @add:
+            id:        before_content_addition
+            parentId:  before_content
+            blockType: container
+        - @add:
+            id:        flash_messages
+            parentId:  before_content
+            blockType: block
+        - @add:
+            id:        main_container
+            parentId:  main
+            blockType: container
+        - @add:
+            id:        content_before_placeholder
+            parentId:  main_container
+            blockType: placeholder
+            options:
+                placeholder_name: 'content_before'
+        - @add:
+            id:        content
+            parentId:  main_container
+            blockType: container
+        - @add:
+            id:        page_header
+            parentId:  content
+            blockType: container
+        - @add:
+            id:        page_title
+            parentId:  page_header
+            blockType: container
+        - @add:
+            id:        page_title_text
+            parentId:  page_title
+            blockType: text
+        - @add:
+            id:        page_title_buttons
+            parentId:  page_header
+            blockType: container
+        - @add:
+            id:        index_navButtons_before_placeholder
+            parentId:  page_title_buttons
+            blockType: placeholder
+            options:
+                placeholder_name: 'index_navButtons_before'
+                placeholder_parameters:
+                    entity_class: { @value: $context.entity_class }
+        - @add:
+            id:        nav_buttons
+            parentId:  page_title_buttons
+            blockType: container
+        - @add:
+            id:        index_navButtons_after_placeholder
+            parentId:  page_title_buttons
+            blockType: placeholder
+            options:
+                placeholder_name: 'index_navButtons_after'
+                placeholder_parameters:
+                    entity_class: { @value: $context.entity_class }
+        - @add:
+            id:        content_after_placeholder
+            parentId:  main_container
+            blockType: placeholder
+            options:
+                placeholder_name: 'content_after'
+        - @add:
+            id:        right_panel
+            parentId:  page
+            blockType: container
+            options:
+                visible: { @value: $context.user_agent.desktop }
+        - @add:
+            id:        right_panel_placeholder
+            parentId:  right_panel
+            blockType: placeholder
+            options:
+                placeholder_name: 'right_panel'
+                placeholder_parameters:
+                    placement: 'right'
+        - @add:
+            id:        footer
+            parentId:  page
+            blockType: container
+        - @add:
+            id:        footer_inner_placeholder
+            parentId:  footer
+            blockType: placeholder
+            options:
+                placeholder_name: 'footer_inner'
+        - @add:
+            id:        before_body_end_placeholder
+            parentId:  body
+            blockType: placeholder
+            options:
+                placeholder_name: 'before_body_end'
+        - @setBlockTheme:
+            themes: 'OroUIBundle:Layout:layout.html.twig'

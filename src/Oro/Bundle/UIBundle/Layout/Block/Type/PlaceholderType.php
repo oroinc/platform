@@ -33,7 +33,8 @@ class PlaceholderType extends AbstractType
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         $view->vars['placeholder_name']       = $options['placeholder_name'];
-        $view->vars['placeholder_parameters'] = $options['placeholder_parameters'];
+        $view->vars['placeholder_parameters'] = !empty($options['placeholder_parameters'])
+            ? $options['placeholder_parameters'] : [];
     }
 
     /**

@@ -11,9 +11,12 @@
 {% endblock %}
 
 {% block require_js_widget %}
+    {% set requirejs_config_extend %}
+        {%- placeholder requirejs_config_extend -%}
+    {% endset %}
     {% include 'OroRequireJSBundle::scripts.html.twig' with {
         compressed: compressed,
-        config_extend: placeholder('requirejs_config_extend')
+        config_extend: requirejs_config_extend
     } %}
 {% endblock %}
 
@@ -23,13 +26,18 @@
     </header>
 {% endblock %}
 
-{% block _navbar_widget %}
+{% block _navbar_container_widget %}
     <div class="navbar-inner">
         <div class="container">
             {{ block_widget(block) }}
         </div>
     </div>
-    {% include 'OroUIBundle:Default/navbar:top.html.twig' %}
+{% endblock %}
+
+{% block _main_menu_widget %}
+    <div id="main-menu" class="main-menu-top">
+        {{ block_widget(block) }}
+    </div>
 {% endblock %}
 
 {% block _left_panel_widget %}
@@ -87,6 +95,18 @@
     </div>
 {% endblock %}
 
+{% block _breadcrumb_widget %}
+    <div id="breadcrumb">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _before_content_addition_widget %}
+    <div id="before-content-addition">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
 {% block _flash_messages_widget %}
     <div id="flash-messages">
         <div class="flash-messages-frame">
@@ -119,8 +139,61 @@
     </div>
 {% endblock %}
 
-{% block _page_container_widget %}
+{% block _main_container_widget %}
     <div id="container" class="scrollable-container">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _progressbar_widget %}
+    <div id="progressbar">
+        <h3>{% trans %}Loading...{% endtrans %}</h3>
+        <div class="progress progress-striped active">
+            <div class="bar" style="width: 90%;"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_widget %}
+    <div id="page" style="display:none;">
+        <div id="top-page">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _head_style_widget %}
+    {% if oro_theme_icon() %}
+        <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
+    {% endif %}
+{% endblock %}
+
+{% block _application_script_widget %}
+    <script type="text/javascript">
+        require(['oroui/js/app']);
+    </script>
+{% endblock %}
+
+{% block _head_scripts_widget %}
+    <script type="text/javascript">
+        require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
+        {% if isMobileVersion() %}
+        require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
+        {% endif %}
+        {% if app.debug %}
+        require(['oroui/js/tools'], function (tools) {tools.debug = true;});
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block _user_menu_widget %}
+    <ul class="nav pull-right user-menu">
+        {{ block_widget(block) }}
+    </ul>
+{% endblock %}
+
+{% block _navbar_widget %}
+    <div class="nav top-search shortcuts">
         {{ block_widget(block) }}
     </div>
 {% endblock %}
