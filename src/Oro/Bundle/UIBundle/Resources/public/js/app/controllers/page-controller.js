@@ -34,7 +34,6 @@ define([
             page = new PageModel();
             this.listenTo(page, 'request', this.onPageRequest);
             this.listenTo(page, 'change', this.onPageLoaded);
-            this.listenTo(page, 'sync', this.onPageUpdated);
             this.listenTo(page, 'invalid', this.onPageInvalid);
             this.listenTo(page, 'error', this.onPageError);
             this.model = page;
@@ -84,9 +83,8 @@ define([
             };
 
             if (!route.previous) {
-                // page just loaded from server, does not require update
-                // just trigger event 'page:afterChange'
-                this.onPageUpdated(this.model, null, {actionArgs: args});
+                // page just loaded from server, does not require extra request
+                this.onPageLoaded(this.model, {actionArgs: args});
                 return;
             }
 
@@ -102,7 +100,6 @@ define([
                 options.fromCache = true;
                 this.onPageRequest(this.model, null, {actionArgs: args});
                 this.model.set(cacheItem.page, {actionArgs: args});
-                this.onPageUpdated(this.model, null, {actionArgs: args});
             } else {
                 this.model.fetch({
                     url: url,
@@ -150,10 +147,10 @@ define([
          *  - triggers 'page:request' event
          *
          * @param {Chaplin.Model} model
-         * @param {XMLHttpRequest} xhr
+         * @param {XMLHttpRequest} jqXHR
          * @param {Object} options
          */
-        onPageRequest: function (model, xhr, options) {
+        onPageRequest: function (model, jqXHR, options) {
             this.publishEvent('page:request', options.actionArgs);
         },
 
@@ -166,36 +163,22 @@ define([
          * @param {Object} options
          */
         onPageLoaded: function (model, options) {
-            var attributes;
-
-            // dispose all components, in case it's page update with the same controller instance
-            // (eg. POST data submitted and page data received instead of redirect)
-            this.disposePageComponents();
-
-            attributes = model.getAttributes();
-            this.adjustTitle(attributes.title);
-            this.publishEvent('page:update', attributes, options.actionArgs, options.xhr);
-        },
-
-        /**
-         * Handles page synchronization done
-         *  - triggers 'page:afterChange' event with
-         *
-         * @param {Chaplin.Model} model
-         * @param {Object} resp
-         * @param {Object} options
-         */
-        onPageUpdated: function (model, resp, options) {
-            var initPromise, self;
-            // suppress 'page:afterChange' event, on server redirection
-            if (options.redirection) {
-                return;
-            }
+            var pageData, actionArgs, jqXHR, self, updatePromises;
 
             self = this;
+            updatePromises = [];
+            pageData = model.getAttributes();
+            actionArgs = options.actionArgs;
+            jqXHR = options.xhr;
 
-            initPromise = mediator.execute('layout:init', document.body, this);
-            initPromise.done(_.debounce(function () {
+            if (pageData.title) {
+                this.adjustTitle(pageData.title);
+            }
+
+            this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
+
+            // once all views are have updated, trigger page:afterChange
+            $.when.apply($, updatePromises).done(_.debounce(function () {
                 self.publishEvent('page:afterChange');
             }, 0));
         },
@@ -222,22 +205,22 @@ define([
          *  - tries to parse raw data and keep updating page
          *
          * @param {Chaplin.Model} model
-         * @param {XMLHttpRequest} xhr
+         * @param {XMLHttpRequest} jqXHR
          * @param {Object} options
          */
-        onPageError: function (model, xhr, options) {
+        onPageError: function (model, jqXHR, options) {
             var rawData, data, payload;
-            rawData = xhr.responseText;
+            rawData = jqXHR.responseText;
             data = {};
 
-            if (xhr.status === 200 && rawData.indexOf('http') === 0) {
+            if (jqXHR.status === 200 && rawData.indexOf('http') === 0) {
                 data = {redirect: true, fullRedirect: true, location: rawData};
                 model.set(data, options);
                 return;
             }
 
             payload = {stopPageProcessing: false};
-            this.publishEvent('page:beforeError', xhr, payload);
+            this.publishEvent('page:beforeError', jqXHR, payload);
             if (payload.stopPageProcessing) {
                 history.back();
                 return;
@@ -257,8 +240,8 @@ define([
                 }
             }
 
-            this.publishEvent('page:error', model.getAttributes(), options.actionArgs, xhr);
-            this.onPageUpdated(model, null, options);
+            this.publishEvent('page:error', model.getAttributes(), options.actionArgs, jqXHR);
+            this.publishEvent('page:afterChange');
         },
 
         /**
@@ -285,7 +268,7 @@ define([
             }
             if (options.fullRedirect) {
                 query = utils.queryParams.parse(query);
-                query['_rand'] = Math.random();
+                query._rand = Math.random();
                 query = utils.queryParams.stringify(query);
                 url = pathname + (query && ('?' + query));
                 location.replace(url);
@@ -320,12 +303,6 @@ define([
             });
 
             mediator.setHandler('submitPage', this._submitPage, this);
-
-            //@TODO discuss why is this handler needed
-            mediator.setHandler('afterPageChange', function () {
-                // fake page:afterChange event trigger
-                mediator.trigger('page:afterChange');
-            });
         },
 
         /**

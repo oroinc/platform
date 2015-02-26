@@ -589,7 +589,7 @@ define(function (require) {
                 this.floatThead = newValue;
                 if (newValue) {
                     this.addFloatThead();
-                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
+                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 400);
                 } else {
                     self.removeFloatThead();
                     clearInterval(this.heightFixIntervalId);
