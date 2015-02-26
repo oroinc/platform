@@ -9,6 +9,7 @@ define(function (require) {
         tools = require('oroui/js/tools'),
         error = require('oroui/js/error'),
         messenger = require('oroui/js/messenger'),
+        mediator = require('oroui/js/mediator'),
         layout = require('oroui/js/layout'),
         AbstractWidget = require('oroui/js/widget/abstract-widget'),
         StateModel = require('orowindows/js/dialog/state/model');
@@ -36,6 +37,13 @@ define(function (require) {
         defaultPos: 'center center',
         openedWindows: 0,
         contentTop: null,
+        /**
+         * Flag if the widget is embedded to the page
+         * (dialog has own life cycle)
+         *
+         * @type {boolean}
+         */
+        _isEmbedded: false,
 
         listen: {
             'adoptedFormResetClick': 'remove',
@@ -59,6 +67,10 @@ define(function (require) {
                 minWidth: 375,
                 minHeight: 150
             });
+            if (tools.isMobile()) {
+                options.incrementalPosition = false;
+                options.dialogOptions.limitTo = 'body';
+            }
 
             // it's possible to track state only for not modal dialogs
             options.stateEnabled = options.stateEnabled && !dialogOptions.modal;
@@ -135,6 +147,16 @@ define(function (require) {
             }
 
             DialogWidget.__super__.dispose.call(this);
+        },
+
+        /**
+         * Returns flag if the widget is embedded to the parent content
+         *
+         * @returns {boolean}
+         */
+        isEmbedded: function () {
+            // modal dialogs has same life cycle as embedded widgets
+            return this._isEmbedded || this.options.dialogOptions.modal;
         },
 
         /**
@@ -239,18 +261,20 @@ define(function (require) {
         /**
          * Show dialog
          */
-        show: function() {
+        show: function () {
             var dialogOptions;
             if (!this.widget) {
-                if (typeof this.options.dialogOptions.position === 'undefined') {
-                    this.options.dialogOptions.position = this._getWindowPlacement();
+                dialogOptions = _.extend({}, this.options.dialogOptions);
+                if (typeof dialogOptions.position === 'undefined') {
+                    dialogOptions.position = this._getWindowPlacement();
                 }
-                this.options.dialogOptions.stateChange = _.bind(this.handleStateChange, this);
-                dialogOptions = _.extend(
-                    {dialogClass: 'invisible'},
-                    this.options.dialogOptions
-                );
-                this.widget = $('<div/>').append(this.$el).dialog(dialogOptions);
+                dialogOptions.stateChange = _.bind(this.handleStateChange, this);
+                if (dialogOptions.state !== 'minimized') {
+                    dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
+                }
+                this.widget = $('<div/>');
+                this._transmitDialogEvents();
+                this.widget.html(this.$el).dialog(dialogOptions);
                 this.widget.attr('data-layout', 'separate');
             } else {
                 this.widget.html(this.$el);
@@ -274,8 +298,8 @@ define(function (require) {
 
         _afterLayoutInit: function () {
             this.widget.closest('.invisible').removeClass('invisible');
-            this.renderDeffered.resolve();
-            delete this.renderDeffered;
+            this.renderDeferred.resolve();
+            delete this.renderDeferred;
         },
 
         _initAdjustHeight: function(content) {
@@ -350,6 +374,35 @@ define(function (require) {
                 my: offset,
                 at: DialogWidget.prototype.defaultPos
             };
+        },
+
+        /**
+         * Transmits dialog window state events over system message bus
+         *
+         * @protected
+         */
+        _transmitDialogEvents: function () {
+            var self = this;
+            this.widget.on('dialogbeforeclose', function () {
+                mediator.trigger('widget_dialog:close', self);
+            });
+            this.widget.on('dialogopen', function () {
+                mediator.trigger('widget_dialog:open', self);
+            });
+            this.widget.on('dialogstatechange', function (event, data) {
+                if (data.state !== data.oldState) {
+                    mediator.trigger('widget_dialog:stateChange', self);
+                }
+            });
+        },
+
+        /**
+         * Returns state of the dialog
+         *
+         * @returns {string}
+         */
+        getState: function () {
+            return this.widget.dialog('state');
         }
     });
 
