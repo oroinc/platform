@@ -45,12 +45,12 @@ define([
             this.updateState();
 
             data = this.getTemplateData();
-            if (!data) {
+            if (!data || !data.navigationElements) {
                 // no data, it is initial auto render, skip rendering
                 return this;
             }
 
-            if (data.navigationElements && data.navigationElements[this.navigationElementType]) {
+            if (data.navigationElements[this.navigationElementType]) {
                 titleShort = data.titleShort;
                 this.$el.show();
                 /**
