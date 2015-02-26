@@ -807,7 +807,7 @@ define(function (require) {
                 scrollStateModel.set({
                     headerHeight: self.headerHeight
                 });
-                self.scrollVisible = scrollContainer[0].clientHeight !== scrollContainer[0].scrollHeight;
+                self.scrollVisible = scrollContainer[0].clientHeight > scrollContainer[0].scrollHeight + 1; // IE fix
                 scrollStateModel.set({
                     scrollVisible: self.scrollVisible,
                     scrollHeight:  scrollContainer[0].scrollHeight,
