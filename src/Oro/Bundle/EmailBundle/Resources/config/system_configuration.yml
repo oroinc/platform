@@ -9,9 +9,12 @@ oro_system_configuration:
     fields:
         oro_email.use_threads_in_emails:
             data_type: boolean
-            type: oro_config_checkbox
+            type: choice
             options:
                 label: oro.email.system_configuration.email_threads.use_threads_in_emails.label
+                choices:
+                    - oro.email.system_configuration.email_threads.use_threads_in_emails.choices.non_threaded.label
+                    - oro.email.system_configuration.email_threads.use_threads_in_emails.choices.threaded.label
 
     tree:
         system_configuration:
