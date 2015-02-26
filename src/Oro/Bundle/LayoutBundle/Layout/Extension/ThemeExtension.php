@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
+use Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
@@ -13,7 +14,7 @@ use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ThemeResourceIterator;
+use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ContextConfiguratorInterface
@@ -64,12 +65,17 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
-        $updates   = $skipped = [];
-        $theme     = $this->manager->getTheme($context->getOr(self::PARAM_THEME));
-        $directory = $theme->getDirectory();
+        $updates = $skipped = [];
+        $theme   = $this->manager->getTheme($context->getOr(self::PARAM_THEME));
 
-        $themeResources = isset($this->resources[$directory]) ? $this->resources[$directory] : [];
-        foreach (new ThemeResourceIterator($this->factory, $themeResources) as $resource) {
+        $path = [$theme->getDirectory()];
+        if ($context->has(RouteContextConfigurator::PARAM_ROUTE_NAME)) {
+            $path[] = $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME);
+        }
+
+        $iterator = new ResourceIterator($this->factory, $this->resources);
+        $iterator->setFilterPath($path);
+        foreach ($iterator as $resource) {
             if ($this->loader->supports($resource)) {
                 $updates[] = $this->loader->load($resource);
             } else {

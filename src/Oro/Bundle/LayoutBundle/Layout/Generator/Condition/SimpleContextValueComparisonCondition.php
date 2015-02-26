@@ -39,8 +39,8 @@ class SimpleContextValueComparisonCondition implements ConditionInterface
         $methods       = $visitContext->getClass()->getMethods();
         $method        = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
         $bodyTemplate  = <<<CONTENT
-if ($%1\$s->getContext()->has('%2\$s') && $%1\$s->getContext()->get('%2\$s') %3\$s %4\$s) {
-    %5\$s
+if ($%s->getContext()->getOr('%s') %s %s) {
+    %s
 }
 CONTENT;
 

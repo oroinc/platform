@@ -4,8 +4,6 @@ namespace Oro\Bundle\LayoutBundle\Layout\Loader;
 
 interface ResourceFactoryInterface
 {
-    const PATH_DELIMITER = '/';
-
     /**
      * Creates resource object based on path and filename
      *

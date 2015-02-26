@@ -6,7 +6,6 @@ use Symfony\Component\HttpKernel\Tests\Logger;
 
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
-use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
@@ -141,27 +140,12 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Skipping resource "resource2.xml" because loader for it not found', reset($logs));
     }
 
-    public function testShouldCreateRouteFileResourceForNestingFiles()
+    public function testShouldNotLoadRouteRelatedUpdates()
     {
         $this->setUpActiveTheme('oro-black');
 
-        $callbackBuilder = $this->getCallbackBuilder();
-
-        $this->yamlLoader->expects($this->any())->method('supports')
-            ->willReturnCallback($callbackBuilder('yml'));
-
-        $this->yamlLoader->expects($this->once())->method('load')
-            ->willReturnCallback(
-                function (FileResource $resource) {
-                    $this->assertNotEmpty($resource->getConditions());
-                    $this->assertContainsOnlyInstancesOf(
-                        'Oro\Bundle\LayoutBundle\Layout\Generator\Condition\SimpleContextValueComparisonCondition',
-                        $resource->getConditions()
-                    );
-
-                    return $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
-                }
-            );
+        $this->yamlLoader->expects($this->never())->method('supports');
+        $this->yamlLoader->expects($this->never())->method('load');
 
         $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
     }
@@ -169,7 +153,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     public function testShouldPassDependenciesToUpdateInstance()
     {
         $update = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
-        $this->setUpActiveTheme('oro-black');
+        $this->setUpActiveTheme('oro-gold');
 
         $callbackBuilder = $this->getCallbackBuilder();
         $this->yamlLoader->expects($this->any())->method('supports')->willReturnCallback($callbackBuilder('yml'));

@@ -147,8 +147,8 @@ CLASS
             'testClassName',
             new GeneratorData(
                 [
-                    'actions'   => [],
-                    'condition' => [['@true' => null]]
+                    'actions'    => [],
+                    'conditions' => [['@true' => null]]
                 ]
             ),
             $collection
