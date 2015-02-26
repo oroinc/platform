@@ -22,9 +22,25 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
     {
         return array(
             array($this->getContainer(array('firstName' => 'John')), 'firstName', 'John'),
+            array($this->getContainer(array('firstName' => 'John')), '[firstName]', 'John'),
             array(
                 $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
                 'person.firstName',
+                'John'
+            ),
+            array(
+                $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
+                'person[firstName]',
+                'John'
+            ),
+            array(
+                $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
+                '[person][firstName]',
+                'John'
+            ),
+            array(
+                $this->getContainer(array('person' => $this->getContainer(array('firstName' => 'John')))),
+                '[person].firstName',
                 'John'
             ),
         );
