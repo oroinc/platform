@@ -589,7 +589,7 @@ define(function (require) {
                 this.floatThead = newValue;
                 if (newValue) {
                     this.addFloatThead();
-                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 400);
+                    this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 25);
                 } else {
                     self.removeFloatThead();
                     clearInterval(this.heightFixIntervalId);
@@ -712,7 +712,7 @@ define(function (require) {
 
                         // left side should be also tracked
                         // gives incorrect rendering when "document" scrolled horizontally
-                        // left:
+                        left: visibleRect.left
                     });
                     theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
                     this.$grid.find('thead:first tr:first').css({
@@ -869,9 +869,11 @@ define(function (require) {
                     right: midRect.right
                 };
             current = current.parentNode;
-            while (current.getBoundingClientRect) {
+            while (current !== document.documentElement) {
                 midRect = current.getBoundingClientRect();
                 borders = $.fn.getBorders(current);
+
+                console.log(current, current.id, midRect);
 
                 if (current.id === 'top-page' && tools.isMobile()) {
                     /**
