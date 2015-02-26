@@ -873,7 +873,7 @@ define(function (require) {
                 midRect = current.getBoundingClientRect();
                 borders = $.fn.getBorders(current);
 
-                console.log(current, current.id, midRect);
+                // console.log(current, current.id, midRect);
 
                 if (current.id === 'top-page' && tools.isMobile()) {
                     /**
