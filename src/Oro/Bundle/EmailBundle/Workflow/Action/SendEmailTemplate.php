@@ -3,6 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityNotFoundException;
+
+use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
 
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
@@ -10,7 +15,6 @@ use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 /**
@@ -20,7 +24,7 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class SendEmailTemplate extends AbstractAction
+class SendEmailTemplate extends AbstractSendEmail
 {
     /** @var array */
     protected $options;
@@ -31,14 +35,11 @@ class SendEmailTemplate extends AbstractAction
     /** @var EmailRenderer */
     protected $renderer;
 
-    /** @var EmailAddressHelper */
-    protected $emailAddressHelper;
-
-    /** @var NameFormatter */
-    protected $nameFormatter;
-
     /** @var ObjectManager */
     protected $objectManager;
+
+    /** @var Validator */
+    protected $validator;
 
     /**
      * @param ContextAccessor    $contextAccessor
@@ -47,6 +48,7 @@ class SendEmailTemplate extends AbstractAction
      * @param ObjectManager      $objectManager
      * @param EmailAddressHelper $emailAddressHelper
      * @param NameFormatter      $nameFormatter
+     * @param Validator          $validator
      */
     public function __construct(
         ContextAccessor $contextAccessor,
@@ -54,15 +56,15 @@ class SendEmailTemplate extends AbstractAction
         Processor $emailProcessor,
         ObjectManager $objectManager,
         EmailAddressHelper $emailAddressHelper,
-        NameFormatter $nameFormatter
+        NameFormatter $nameFormatter,
+        Validator $validator
     ) {
-        parent::__construct($contextAccessor);
+        parent::__construct($contextAccessor, $emailAddressHelper, $nameFormatter);
 
         $this->renderer = $renderer;
         $this->emailProcessor = $emailProcessor;
-        $this->emailAddressHelper = $emailAddressHelper;
-        $this->nameFormatter = $nameFormatter;
         $this->objectManager = $objectManager;
+        $this->validator = $validator;
     }
 
     /**
@@ -88,8 +90,7 @@ class SendEmailTemplate extends AbstractAction
             $this->assertEmailAddressOption($to);
         }
 
-        if (empty($options['template'])
-        ) {
+        if (empty($options['template'])) {
             throw new InvalidParameterException('Template parameter is required');
         }
 
@@ -102,24 +103,22 @@ class SendEmailTemplate extends AbstractAction
         return $this;
     }
 
-    protected function assertEmailAddressOption($option)
-    {
-        if (is_array($option) && array_key_exists('name', $option) && !array_key_exists('email', $option)) {
-            throw new InvalidParameterException('Email parameter is required');
-        }
-    }
-
     /**
      * {@inheritdoc}
      */
     protected function executeAction($context)
     {
         $emailModel = new Email();
-        $emailModel->setFrom($this->getEmailAddress($context, $this->options['from']));
-        $to = array();
+
+        $from = $this->getEmailAddress($context, $this->options['from']);
+        $this->validateAddress($from);
+        $emailModel->setFrom($from);
+        $to = [];
         foreach ($this->options['to'] as $email) {
             if ($email) {
-                $to[] = $this->getEmailAddress($context, $email);
+                $address = $this->getEmailAddress($context, $email);
+                $this->validateAddress($address);
+                $to[] = $this->getEmailAddress($context, $address);
             }
         }
         $emailModel->setTo($to);
@@ -128,15 +127,12 @@ class SendEmailTemplate extends AbstractAction
 
         $emailTemplate = $this->objectManager->getRepository('OroEmailBundle:EmailTemplate')
             ->findByName($template);
-
         if (!$emailTemplate) {
-            throw new InvalidParameterException('Template not found');
+            $errorMessage = sprintf('Template "%s" not found.', $template);
+            $this->logger->error('Workflow send email action.' . $errorMessage);
+            throw new EntityNotFoundException($errorMessage);
         }
-
-        $templateData = $this->renderer->compileMessage(
-            $emailTemplate,
-            ['entity' => $entity]
-        );
+        $templateData = $this->renderer->compileMessage($emailTemplate, ['entity' => $entity]);
 
         $type = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
         list ($subjectRendered, $templateRendered) = $templateData;
@@ -153,31 +149,22 @@ class SendEmailTemplate extends AbstractAction
     }
 
     /**
-     * Get email address prepared for sending.
+     * @param string $email
      *
-     * @param mixed $context
-     * @param string|array $data
-     * @return string
+     * @throws \Symfony\Component\Validator\Exception\ValidatorException
      */
-    protected function getEmailAddress($context, $data)
+    protected function validateAddress($email)
     {
-        $name = null;
-        $emailAddress = $this->contextAccessor->getValue($context, $data);
-
-        if (is_array($data)) {
-            $emailAddress = $this->contextAccessor->getValue($context, $data['email']);
-
-            if (array_key_exists('name', $data)) {
-                $data['name'] = $this->contextAccessor->getValue($context, $data['name']);
-
-                if (is_object($data['name'])) {
-                    $name = $this->nameFormatter->format($data['name']);
-                } else {
-                    $name = $data['name'];
-                }
+        $emailConstraint = new EmailConstraints();
+        $emailConstraint->message = 'Invalid email address';
+        if ($email) {
+            $errorList = $this->validator->validateValue(
+                $email,
+                $emailConstraint
+            );
+            if ($errorList && $errorList->count() > 0) {
+                throw new ValidatorException($errorList->get(0)->getMessage());
             }
         }
-
-        return $this->emailAddressHelper->buildFullEmailAddress($emailAddress, $name);
     }
 }
