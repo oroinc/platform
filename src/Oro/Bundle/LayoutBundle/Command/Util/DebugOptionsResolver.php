@@ -17,13 +17,19 @@ class DebugOptionsResolver extends OptionsResolver
     }
 
     /**
-     * @return string[]
+     * @return array
      */
     public function getKnownOptions()
     {
         $knownOptions = $this->getPrivatePropertyValue($this, 'knownOptions');
+        $allowedTypes = $this->getPrivatePropertyValue($this, 'allowedTypes');
 
-        return array_keys($knownOptions);
+        $result = [];
+        foreach (array_keys($knownOptions) as $name) {
+            $result[$name] = isset($allowedTypes[$name]) ? (array)$allowedTypes[$name] : [];
+        }
+
+        return $result;
     }
 
     /**

@@ -52,7 +52,7 @@ class DebugCommand extends ContainerAwareCommand
         if ($input->getOption('context')) {
             $context = new DebugLayoutContext();
             $registry->configureContext($context);
-            $output->writeln('Context extensions:');
+            $output->writeln('Context configurators:');
             $contextConfigurators = $registry->getContextConfigurators();
             foreach ($contextConfigurators as $configurator) {
                 $output->writeln(' ' . get_class($configurator));
@@ -73,7 +73,7 @@ class DebugCommand extends ContainerAwareCommand
                 array_unshift($hierarchy, $parentName);
                 $parentName = $registry->getType($parentName)->getParent();
             }
-            $output->writeln(sprintf('Type hierarchy: %s', implode(' <- ', $hierarchy)));
+            $output->writeln(sprintf('Type inheritance: %s', implode(' <- ', $hierarchy)));
             $output->writeln('Type extensions:');
             $blockTypeExtensions = $registry->getTypeExtensions($blockTypeName);
             foreach ($blockTypeExtensions as $extension) {
@@ -101,10 +101,10 @@ class DebugCommand extends ContainerAwareCommand
         $table->render($output);
 
         $output->writeln('Known Options:');
-        $table->setHeaders(['Name']);
+        $table->setHeaders(['Name', 'Type(s)']);
         $table->setRows([]);
-        foreach ($resolver->getKnownOptions() as $name) {
-            $table->addRow([$name]);
+        foreach ($resolver->getKnownOptions() as $name => $types) {
+            $table->addRow([$name, implode(', ', $types)]);
         }
         $table->render($output);
     }
