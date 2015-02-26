@@ -77,12 +77,7 @@ class SyncProcessor extends AbstractSyncProcessor
     protected function processConnectors(Integration $integration, array $parameters = [], callable $callback = null)
     {
         $isSuccess = true;
-
-        $connectors = $integration->getConnectors();
-
-        if ($callback) {
-            $connectors = array_filter($connectors, $callback);
-        }
+        $connectors = $this->getConnectorsToSync($integration, $callback);
 
         foreach ((array)$connectors as $connector) {
             try {
@@ -101,6 +96,22 @@ class SyncProcessor extends AbstractSyncProcessor
         }
 
         return $isSuccess;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param callable $callback
+     * @return array
+     */
+    protected function getConnectorsToSync(Integration $integration, callable $callback = null)
+    {
+        $connectors = $integration->getConnectors();
+
+        if ($callback) {
+            $connectors = array_filter($connectors, $callback);
+        }
+
+        return (array)$connectors;
     }
 
     /**
