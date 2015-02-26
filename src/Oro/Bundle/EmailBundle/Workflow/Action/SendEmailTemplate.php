@@ -29,9 +29,6 @@ class SendEmailTemplate extends AbstractSendEmail
     /** @var array */
     protected $options;
 
-    /**  @var Processor */
-    protected $emailProcessor;
-
     /** @var EmailRenderer */
     protected $renderer;
 
@@ -43,26 +40,25 @@ class SendEmailTemplate extends AbstractSendEmail
 
     /**
      * @param ContextAccessor    $contextAccessor
-     * @param EmailRenderer      $renderer
      * @param Processor          $emailProcessor
-     * @param ObjectManager      $objectManager
      * @param EmailAddressHelper $emailAddressHelper
      * @param NameFormatter      $nameFormatter
+     * @param EmailRenderer      $renderer
+     * @param ObjectManager      $objectManager
      * @param Validator          $validator
      */
     public function __construct(
         ContextAccessor $contextAccessor,
-        EmailRenderer $renderer,
         Processor $emailProcessor,
-        ObjectManager $objectManager,
         EmailAddressHelper $emailAddressHelper,
         NameFormatter $nameFormatter,
+        EmailRenderer $renderer,
+        ObjectManager $objectManager,
         Validator $validator
     ) {
-        parent::__construct($contextAccessor, $emailAddressHelper, $nameFormatter);
+        parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $nameFormatter);
 
         $this->renderer = $renderer;
-        $this->emailProcessor = $emailProcessor;
         $this->objectManager = $objectManager;
         $this->validator = $validator;
     }

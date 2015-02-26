@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
@@ -14,6 +15,11 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
+
+    /**
+     * @var Processor
+     */
+    protected $emailProcessor;
 
     /**
      * @var EmailAddressHelper
@@ -27,16 +33,19 @@ abstract class AbstractSendEmail extends AbstractAction implements LoggerAwareIn
 
     /**
      * @param ContextAccessor    $contextAccessor
+     * @param Processor          $emailProcessor
      * @param EmailAddressHelper $emailAddressHelper
      * @param NameFormatter      $nameFormatter
      */
     public function __construct(
         ContextAccessor $contextAccessor,
+        Processor $emailProcessor,
         EmailAddressHelper $emailAddressHelper,
         NameFormatter $nameFormatter
     ) {
         parent::__construct($contextAccessor);
 
+        $this->emailProcessor = $emailProcessor;
         $this->emailAddressHelper = $emailAddressHelper;
         $this->nameFormatter      = $nameFormatter;
     }

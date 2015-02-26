@@ -326,11 +326,11 @@ services:
         class: %oro_email.workflow.action.send_email_template.class%
         arguments:
             - @oro_workflow.context_accessor
-            - @oro_email.email_renderer
             - @oro_email.mailer.processor
-            - @doctrine.orm.entity_manager
             - @oro_email.email.address.helper
             - @oro_locale.formatter.name
+            - @oro_email.email_renderer
+            - @doctrine.orm.entity_manager
             - @validator
         calls:
             - [setLogger, [@logger]]

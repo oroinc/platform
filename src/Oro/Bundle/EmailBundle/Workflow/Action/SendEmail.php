@@ -17,11 +17,6 @@ class SendEmail extends AbstractSendEmail
     protected $options;
 
     /**
-     * @var Processor
-     */
-    protected $emailProcessor;
-
-    /**
      * @param ContextAccessor    $contextAccessor
      * @param Processor          $emailProcessor
      * @param EmailAddressHelper $emailAddressHelper
@@ -33,9 +28,8 @@ class SendEmail extends AbstractSendEmail
         EmailAddressHelper $emailAddressHelper,
         NameFormatter $nameFormatter
     ) {
-        parent::__construct($contextAccessor, $emailAddressHelper, $nameFormatter);
+        parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $nameFormatter);
 
-        $this->emailProcessor     = $emailProcessor;
     }
 
     /**
