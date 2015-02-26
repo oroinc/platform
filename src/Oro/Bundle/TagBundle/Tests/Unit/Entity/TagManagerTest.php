@@ -29,9 +29,6 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
     protected $mapper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityContext;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -61,21 +58,15 @@ class TagManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->will($this->returnValue(self::TEST_USER_ID));
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue($this->user));
-
-        $this->securityContext->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue($token));
+        $this->securityFacade->expects($this->any())
+            ->method('getLoggedUser')
+            ->willReturn($this->user);
 
         $this->manager = new TagManager(
             $this->em,
             'Oro\Bundle\TagBundle\Entity\Tag',
             'Oro\Bundle\TagBundle\Entity\Tagging',
             $this->mapper,
-            $this->securityContext,
             $this->securityFacade,
             $this->router
         );
