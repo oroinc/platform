@@ -15,6 +15,7 @@ oro:
         related_activity_id.label:    Related activity id
         created_at.label: Created at
         updated_at.label: Updated at
+        head.label:           Is Head
 
         no_activities_exist: No activities found
 
@@ -34,6 +35,12 @@ oro:
                         DESC: Descending
                         ASC:  Ascending
                 per_page.label: Items Per Page By Default
+            email_threads:
+                use_threads_in_activities:
+                    label: Display Emails in Activities as
+                    choices:
+                        non_threaded.label: Non-Threaded
+                        threaded.label: Threaded
 
         pagination:
             page: Page:

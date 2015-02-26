@@ -18,15 +18,45 @@
                 entityId: entity.id
         }),
         'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
-        'label' : email,
-        'widget' : {
-            'type' : 'dialog',
-            'multiple' : true,
-            'reload-grid-name' : 'activity-email-grid',
-            'options' : {
+        'label': email,
+        'widget': {
+            'type': 'dialog',
+            'multiple': true,
+            'reload-grid-name': 'activity-email-grid',
+            'options': {
                 'alias': 'email-dialog',
                 'dialogOptions' : {
                     'title' : 'oro.email.send_email'|trans,
+                    'allowMaximize': true,
+                    'allowMinimize': true,
+                    'dblclick': 'maximize',
+                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                    'width': 1000
+                }
+            }
+        }
+    }) -}}
+{% endmacro -%}
+
+{% macro replyButton(emailEntity, parameters) -%}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {{- UI.clientButton({
+        'dataUrl': path(
+            'oro_email_email_reply', {
+                id: emailEntity.id
+            }
+        ),
+        'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+        'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply' : 'icon-reply',
+        'label': 'Reply',
+        'widget': {
+            'type': 'dialog',
+            'multiple': false,
+            'reload-widget-alias': 'thread-view',
+            'options': {
+                'alias': 'reply-dialog',
+                'dialogOptions' : {
+                    'title' : 'oro.email.reply'|trans,
                     'allowMaximize': true,
                     'allowMinimize': true,
                     'dblclick': 'maximize',

@@ -17,7 +17,7 @@ class OrganizationUniqueEntity extends UniqueEntity
      */
     public function __construct($options = null)
     {
-        $this->service = 'oro_organization.orm.validator.organization_unique';
+        $this->service = 'organization_unique';
 
         parent::__construct($options);
     }

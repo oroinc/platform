@@ -12,6 +12,7 @@ use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestActivity
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestOrganization;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager\Fixture\TestUser;
 use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityProvider;
+use Oro\Bundle\ActivityListBundle\Tests\Unit\Provider\Fixture\TestActivityGroupedProvider;
 
 class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -110,6 +111,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                     if ($configKey === 'oro_activity_list.sorting_field') {
                         return 'createdBy';
                     }
+                    if ($configKey === 'oro_activity_list.grouping') {
+                        return false;
+                    }
                     return 'ASC';
                 }
             );
@@ -147,6 +151,9 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                     if ($configKey === 'oro_activity_list.sorting_field') {
                         return 'createdBy';
                     }
+                    if ($configKey === 'oro_activity_list.grouping') {
+                        return true;
+                    }
                     return 'DESC';
                 }
             );
@@ -174,7 +181,7 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
         $this->activityListManager->getListCount($testClass, $testId, $filter);
 
         $expectedDQL = 'SELECT COUNT(activity.id) FROM Oro\Bundle\ActivityListBundle\Entity\ActivityList activity '
-            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId';
+            . 'INNER JOIN activity.test_entity_9d8125dd r WHERE r.id = :entityId AND activity.head = 1';
         $this->assertEquals($expectedDQL, $qb->getDQL());
         $this->assertEquals($testId, $qb->getParameters()->first()->getValue());
     }
@@ -246,9 +253,20 @@ class ActivityListManagerTest extends \PHPUnit_Framework_TestCase
                 'editable'             => true,
                 'removable'            => true,
                 'commentCount'         => '',
-                'commentable'          => ''
+                'commentable'          => '',
+                'targetEntityData'     => [],
+                'is_head'              => false,
             ],
             $this->activityListManager->getItem(105)
         );
+    }
+
+    public function testGetGroupedEntitiesEmpty()
+    {
+        $this->provider
+            ->expects($this->once())
+            ->method('getProviderForEntity')
+            ->willReturn($this->returnValue(new TestActivityProvider()));
+        $this->assertCount(0, $this->activityListManager->getGroupedEntities(new \stdClass(), '', '', 0, []));
     }
 }
