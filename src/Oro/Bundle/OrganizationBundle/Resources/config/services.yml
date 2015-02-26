@@ -31,6 +31,8 @@ parameters:
 
     oro_organization.provider.phone.business_unit.class:       Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
 
+    oro_organization.orm.validator.oranization_unique.class:   Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntityValidator
+
 services:
     #
     # Business Unit API
@@ -182,3 +184,12 @@ services:
         class: %oro_organization.provider.phone.business_unit.class%
         tags:
             - { name: oro_address.phone_provider, class: %oro_organization.business_unit.entity.class% }
+
+    oro_organization.orm.validator.organization_unique:
+        class: %oro_organization.orm.validator.oranization_unique.class%
+        arguments:
+            - @doctrine
+            - @oro_security.owner.ownership_metadata_provider
+            - @oro_entity.doctrine_helper
+        tags:
+              - { name: validator.constraint_validator, alias: oro_organization.orm.validator.oranization_unique }
