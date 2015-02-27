@@ -30,7 +30,6 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['entityClass', 'testEntityClass'],
             ['entityId', 123],
             ['parentEmailId', 321],
-            ['direction', 1],
             ['from', 'test@example.com'],
             ['to', ['testGridNameTo']],
             ['cc', ['testGridNameCc']],
