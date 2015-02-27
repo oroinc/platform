@@ -193,6 +193,8 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         $this->rawLayoutBuilder->clear();
         $this->actions = [];
         $this->addCounter = 0;
+
+        return $this;
     }
 
     /**
