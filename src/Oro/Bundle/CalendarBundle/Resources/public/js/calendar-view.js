@@ -10,7 +10,8 @@ define(function (require) {
         __              = require('orotranslation/js/translator'),
         messenger       = require('oroui/js/messenger'),
         mediator        = require('oroui/js/mediator'),
-        LoadingMask     = require('oroui/js/loading-mask'),
+        LoadingMask     = require('oroui/js/app/views/loading-mask-view'),
+        BaseView        = require('oroui/js/app/views/base/view'),
         EventCollection = require('orocalendar/js/calendar/event/collection'),
         EventModel      = require('orocalendar/js/calendar/event/model'),
         EventView       = require('orocalendar/js/calendar/event/view'),
@@ -30,15 +31,13 @@ define(function (require) {
      * @class   orocalendar.Сalendar
      * @extends Backbone.View
      */
-    return Backbone.View.extend({
+    return BaseView.extend({
         MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
-        CALENDAR_BOTTOM_PADDING: 10,
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
                 '<div class="calendar-container">' +
                     '<div class="calendar"></div>' +
-                    '<div class="loading-mask"></div>' +
                 '</div>' +
             '</div>'
         ),
@@ -81,8 +80,7 @@ define(function (require) {
                 monthNames: localeSettings.getCalendarMonthNames('wide', true),
                 monthNamesShort: localeSettings.getCalendarMonthNames('abbreviated', true),
                 dayNames: localeSettings.getCalendarDayOfWeekNames('wide', true),
-                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true),
-                minimalHeightForFullScreenLayout: 500 // chrome 768px height and a lot
+                dayNamesShort: localeSettings.getCalendarDayOfWeekNames('abbreviated', true)
             },
             connectionsOptions: {
                 collection: null,
@@ -109,6 +107,10 @@ define(function (require) {
          * @property
          */
         eventsLoaded: {},
+
+        listen: {
+            'layout:reposition mediator': 'onWindowResize'
+        },
 
         /**
          * One of 'fullscreen' | 'scroll' | 'default'
@@ -138,12 +140,11 @@ define(function (require) {
             this.listenTo(this.collection, 'change', this.onEventChanged);
             this.listenTo(this.collection, 'destroy', this.onEventDeleted);
             this.colorManager = new ColorManager(this.options.colorManagerOptions);
+        },
 
-            this.devToolbarHeight = 0;
-            var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
-            if (devToolbarComposition && devToolbarComposition.view) {
-                this.devToolbarHeight = devToolbarComposition.view.$el.height();
-            }
+        onWindowResize: function () {
+            this.setTimeline();
+            this.updateLayout();
         },
 
         /**
@@ -197,8 +198,9 @@ define(function (require) {
          */
         getLoadingMask: function () {
             if (!this.loadingMask) {
-                this.loadingMask = new LoadingMask();
-                this.$el.find(this.selectors.loadingMask).append(this.loadingMask.render().$el);
+                this.loadingMask = new LoadingMask({
+                    container: this.getCalendarElement()
+                });
             }
             return this.loadingMask;
         },
@@ -289,6 +291,7 @@ define(function (require) {
 
         onConnectionAdded: function () {
             this.smartRefetch();
+            this.updateLayout();
         },
 
         onConnectionChanged: function (connectionModel) {
@@ -311,6 +314,7 @@ define(function (require) {
 
         onConnectionDeleted: function () {
             this.smartRefetch();
+            this.updateLayout();
         },
 
         onFcSelect: function (start, end) {
@@ -462,7 +466,7 @@ define(function (require) {
 
         smartRefetch: function () {
             try {
-                this._showMask();
+                this.showLoadingMask();
                 // load events from a server
                 this.collection.fetch({
                     reset: true,
@@ -610,21 +614,11 @@ define(function (require) {
         },
 
         showSavingMask: function () {
-            this._showMask(__('Saving...'));
+            this.getLoadingMask().show(__('Saving...'));
         },
 
         showLoadingMask: function () {
-            this._showMask(__('Loading...'));
-        },
-
-        _showMask: function (message) {
-            if (this.enableEventLoading) {
-                var loadingMaskInstance = this.getLoadingMask();
-                loadingMaskInstance.$el
-                    .find(this.selectors.loadingMaskContent)
-                    .text(message);
-                loadingMaskInstance.show();
-            }
+            this.getLoadingMask().show(__('Loading...'));
         },
 
         _hideMask: function () {
@@ -743,10 +737,6 @@ define(function (require) {
                 clearInterval(self.timelineUpdateIntervalId);
                 self.timelineUpdateIntervalId = setInterval(function () { self.setTimeline(); }, 60 * 1000);
             };
-            options.windowResize = function () {
-                self.setTimeline();
-                _.delay(_.bind(self.checkLayout, self));
-            };
 
             options.eventAfterRender = _.bind(function (fcEvent, $el) {
                 var event = this.collection.get(fcEvent.id);
@@ -757,7 +747,7 @@ define(function (require) {
             options.timezone = "UTC";
 
             this.getCalendarElement().fullCalendar(options);
-            this.checkLayout();
+            this.updateLayout();
             this.enableEventLoading = true;
         },
 
@@ -901,29 +891,32 @@ define(function (require) {
         },
 
         getAvailableHeight: function () {
-            var $calendarEl = this.getCalendarElement(),
-                $scrollableParents = $calendarEl.parents('.scrollable-container'),
-                $viewEl = $calendarEl.find('.fc-view:first'),
-                heightDiff = $(document).height() - $viewEl[0].getBoundingClientRect().top;
-            $scrollableParents.each(function () {
-                heightDiff += this.scrollTop;
-            });
-            return heightDiff - this.devToolbarHeight - this.CALENDAR_BOTTOM_PADDING;
+            var $fcView = this.getCalendarElement().find('.fc-view:first');
+            return mediator.execute('layout:getAvailableHeight', $fcView)
         },
 
-        checkLayout: function () {
+
+        /**
+         * Chooses layout on resize or during creation
+         */
+        updateLayout: function () {
             if (this.options.eventsOptions.aspectRatio) {
                 this.setLayout('default');
                 // do nothing
                 return;
             }
-            if (this.getAvailableHeight() > this.options.eventsOptions.minimalHeightForFullScreenLayout) {
-                this.setLayout('fullscreen');
-            } else {
-                this.setLayout('scroll');
+            var $fcView = this.getCalendarElement().find('.fc-view:first'),
+                $sidebar = $('.oro-page-sidebar'),
+                preferredLayout = mediator.execute('layout:getPreferredLayout', $fcView);
+            if (preferredLayout == 'fullscreen' && $sidebar.height() > mediator.execute('layout:getAvailableHeight', $sidebar)) {
+                preferredLayout = 'scroll';
             }
+            this.setLayout(preferredLayout);
         },
 
+        /**
+         * Sets layout and perform all required operations
+         */
         setLayout: function (newLayout) {
             if (newLayout === this.layout) {
                 if (newLayout === 'fullscreen') {
@@ -937,16 +930,16 @@ define(function (require) {
                 height = '';
             switch (newLayout) {
                 case 'fullscreen':
-                    this.disablePageScroll();
+                    mediator.execute('layout:disablePageScroll', $calendarEl);
                     contentHeight = this.getAvailableHeight();
                     break;
                 case 'scroll':
                     height = 'auto';
                     contentHeight = 'auto';
-                    this.enablePageScroll();
+                    mediator.execute('layout:enablePageScroll', $calendarEl);
                     break;
                 case 'default':
-                    this.enablePageScroll();
+                    mediator.execute('layout:enablePageScroll', $calendarEl);
                     // default values
                     break;
                 default:
@@ -954,16 +947,6 @@ define(function (require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
-        },
-
-        disablePageScroll: function () {
-            var $scrollableParents = this.getCalendarElement().parents('.scrollable-container');
-            $scrollableParents.scrollTop(0);
-            $scrollableParents.addClass('disable-scroll');
-        },
-
-        enablePageScroll: function () {
-            this.getCalendarElement().parents('.scrollable-container').removeClass('disable-scroll');
         }
     });
 });

@@ -11,16 +11,19 @@ class ConfigApiManager
     protected $configProvider;
 
     /** @var ConfigManager */
-    protected $configManager;
+    protected $configManagers;
 
     /**
      * @param ProviderInterface $configProvider
-     * @param ConfigManager     $configManager
      */
-    public function __construct(ProviderInterface $configProvider, ConfigManager $configManager)
+    public function __construct(ProviderInterface $configProvider)
     {
         $this->configProvider = $configProvider;
-        $this->configManager  = $configManager;
+    }
+
+    public function addConfigManager($scope, $manager)
+    {
+        $this->configManagers[$scope] = $manager;
     }
 
     /**
@@ -47,14 +50,16 @@ class ConfigApiManager
      *
      * @return array
      */
-    public function getData($path)
+    public function getData($path, $scope = 'user')
     {
+        /** @var ConfigManager $configManager */
+        $configManager = $this->configManagers[$scope];
         $variables = $this->configProvider->getApiTree($path)->getVariables(true);
         $result    = [];
         foreach ($variables as $variable) {
             $var          = $variable->toArray();
-            $var['value'] = $this->getTypedValue($variable->getType(), $this->configManager->get($variable->getKey()));
-            $var          = array_merge($var, $this->configManager->getInfo($variable->getKey()));
+            $var['value'] = $this->getTypedValue($variable->getType(), $configManager->get($variable->getKey()));
+            $var          = array_merge($var, $configManager->getInfo($variable->getKey()));
             $result[]     = $var;
         }
 

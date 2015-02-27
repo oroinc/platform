@@ -14,6 +14,16 @@ class OroEmailBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
+        self::addColumns($schema);
+    }
+
+    /**
+     * Add fields
+     *
+     * @param Schema $schema
+     */
+    public static function addColumns(Schema $schema)
+    {
         $table = $schema->getTable('oro_email_folder');
         $table->addColumn('outdated_at', 'datetime', ['notnull' => false]);
         $table->addIndex(['outdated_at'], 'email_folder_outdated_at_idx');

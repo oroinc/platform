@@ -56,13 +56,13 @@ class EmailTemplates extends AbstractPageFilteredGrid
     {
         $this->filterBy($filterBy, $entityName);
         $this->waitForAjax();
-        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $action->click();
         $action->click();
 
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Delete']")->click();
+        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
         $this->waitForAjax();
         $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
         $this->waitPageToLoad();
@@ -75,11 +75,11 @@ class EmailTemplates extends AbstractPageFilteredGrid
     {
         $this->filterBy($filterBy, $entityName);
         $this->waitForAjax();
-        $action = $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $action = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         $action->click();
         $action->click();
         $this->waitForAjax();
-        $this->test->byXpath("//td[@class='action-cell']//a[@title= 'Clone']")->click();
+        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Clone']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         return new EmailTemplate($this->test);
@@ -94,10 +94,10 @@ class EmailTemplates extends AbstractPageFilteredGrid
     {
         $this->filterBy('Recipient email', $entityName);
         $this->waitForAjax();
-        if ($this->isElementPresent("//td[@class='action-cell']//a[contains(., '...')]")) {
-            $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]")->click();
+        if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
+            $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
             $this->waitForAjax();
-            return $this->assertElementNotPresent("//td[@class='action-cell']//a[@title= '{$contextName}']");
+            return $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
         }
 
         return $this;

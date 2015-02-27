@@ -93,6 +93,9 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $msg->expects($this->once())
             ->method('getHeaders')
             ->will($this->returnValue($headers));
+        $msg->expects($this->exactly(2))
+            ->method('getFlags')
+            ->will($this->returnValue(['test1', 'test2']));
         $headers->expects($this->any())
             ->method('get')
             ->will(
@@ -112,6 +115,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
                         ['To', $toAddressList],
                         ['Cc', $ccAddressList],
                         ['Bcc', $bccAddressList],
+                        ['References', $this->getHeader('References')],
                     ]
                 )
             );
@@ -136,6 +140,7 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(1, $emails);
 
         $emails->rewind();
+        $this->assertTrue($emails->valid());
         $email = $emails->current();
         $this->assertEquals(123, $email->getId()->getUid());
         $this->assertEquals(456, $email->getId()->getUidValidity());
@@ -155,6 +160,9 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(0, $email->getImportance());
         $this->assertEquals('MessageId', $email->getMessageId());
+        $this->assertEquals('References', $email->getRefs());
+        $this->assertEquals(false, $email->hasFlag('test'));
+        $this->assertEquals(true, $email->hasFlag('test1'));
         $this->assertEquals('XMsgId', $email->getXMessageId());
         $this->assertEquals('XThrId', $email->getXThreadId());
         $toRecipients = $email->getToRecipients();
@@ -163,6 +171,47 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('ccEmail', $ccRecipients[0]);
         $bccRecipients = $email->getBccRecipients();
         $this->assertEquals('bccEmail', $bccRecipients[0]);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Cannot parse email message. Subject: Subject. Error: It is expected that the header "X-GM-THR-ID" has a string value, but several values are returned. Values: "XThrId1", "XThrId2".
+     */
+    // @codingStandardsIgnoreEnd
+    public function testConvertToEmailWithUnexpectedMultiValueHeader()
+    {
+        $msg = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Message')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $headers = $this->getMockBuilder('Zend\Mail\Headers')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $msg->expects($this->once())
+            ->method('getHeaders')
+            ->will($this->returnValue($headers));
+        $headers->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['UID', $this->getHeader('123')],
+                        ['Subject', $this->getHeader('Subject')],
+                        ['From', $this->getHeader('fromEmail')],
+                        ['Date', $this->getHeader('Fri, 31 Jun 2011 10:59:59 +1100')],
+                        ['Received', $this->getHeader('by server to email; Fri, 31 Jun 2011 10:58:58 +1100')],
+                        ['InternalDate', $this->getHeader('Fri, 31 Jun 2011 10:57:57 +1100')],
+                        ['Importance', false],
+                        ['Message-ID', $this->getHeader('MessageId')],
+                        ['References', $this->getHeader('References')],
+                        ['X-GM-MSG-ID', $this->getHeader('XMsgId')],
+                        ['X-GM-THR-ID', $this->getMultiValueHeader(['XThrId1', 'XThrId2'])],
+                        ['X-GM-LABELS', false],
+                    ]
+                )
+            );
+
+        $this->manager->convertToEmail($msg);
     }
 
     public function getEmailsProvider()
@@ -175,6 +224,8 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param mixed $value
+     *
      * @return HeaderInterface
      */
     protected function getHeader($value)
@@ -185,5 +236,24 @@ class ImapEmailManagerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($value));
 
         return $header;
+    }
+
+    /**
+     * @param array $values
+     *
+     * @return \ArrayIterator|HeaderInterface[]
+     */
+    protected function getMultiValueHeader(array $values)
+    {
+        $headers = [];
+        foreach ($values as $value) {
+            $header = $this->getMock('Zend\Mail\Header\HeaderInterface');
+            $header->expects($this->once())
+                ->method('getFieldValue')
+                ->will($this->returnValue($value));
+            $headers[] = $header;
+        }
+
+        return new \ArrayIterator($headers);
     }
 }

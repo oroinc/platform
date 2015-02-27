@@ -15,11 +15,23 @@ class Email
     /** @var mixed */
     protected $entityId;
 
+    /** @var int */
+    protected $parentEmailId;
+
+    /** @var int */
+    protected $direction;
+
     /** @var string */
     protected $from;
 
     /** @var string[] */
-    protected $to;
+    protected $to = [];
+
+    /** @var string[] */
+    protected $cc = [];
+
+    /** @var string[] */
+    protected $bcc = [];
 
     /** @var string */
     protected $subject;
@@ -33,13 +45,8 @@ class Email
     /** @var string */
     protected $body;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->to = array();
-    }
+    /** @var string */
+    protected $bodyFooter;
 
     /**
      * Get id of emails datagrid
@@ -114,6 +121,54 @@ class Email
     }
 
     /**
+     * Get parent email id
+     *
+     * @return int
+     */
+    public function getParentEmailId()
+    {
+        return $this->parentEmailId;
+    }
+
+    /**
+     * Set parent email id
+     *
+     * @param $parentEmailId
+     *
+     * @return $this
+     */
+    public function setParentEmailId($parentEmailId)
+    {
+        $this->parentEmailId = $parentEmailId;
+
+        return $this;
+    }
+
+    /**
+     * Set email direction
+     *
+     * @return int
+     */
+    public function getDirection()
+    {
+        return $this->direction;
+    }
+
+    /**
+     * Get email direction
+     *
+     * @param $direction
+     *
+     * @return $this
+     */
+    public function setDirection($direction)
+    {
+        $this->direction = $direction;
+
+        return $this;
+    }
+
+    /**
      * Indicates whether entity class and entity id is set
      *
      * @return bool
@@ -167,6 +222,54 @@ class Email
     public function setTo(array $to)
     {
         $this->to = $to;
+
+        return $this;
+    }
+
+    /**
+     * Get CC email addresses
+     *
+     * @return string[]
+     */
+    public function getCc()
+    {
+        return $this->cc;
+    }
+
+    /**
+     * Set CC email addresses
+     *
+     * @param string[] $cc
+     *
+     * @return $this
+     */
+    public function setCc(array $cc)
+    {
+        $this->cc = $cc;
+
+        return $this;
+    }
+
+    /**
+     * Get BCC email addresses
+     *
+     * @return string[]
+     */
+    public function getBcc()
+    {
+        return $this->bcc;
+    }
+
+    /**
+     * Set BCC email addresses
+     *
+     * @param string[] $bcc
+     *
+     * @return $this
+     */
+    public function setBcc(array $bcc)
+    {
+        $this->bcc = $bcc;
 
         return $this;
     }
@@ -255,6 +358,30 @@ class Email
     public function setBody($body)
     {
         $this->body = $body;
+
+        return $this;
+    }
+
+    /**
+     * Get email body footer
+     *
+     * @return string
+     */
+    public function getBodyFooter()
+    {
+        return $this->bodyFooter;
+    }
+
+    /**
+     * Set email body footer
+     *
+     * @param string $bodyFooter
+     *
+     * @return Email
+     */
+    public function setBodyFooter($bodyFooter)
+    {
+        $this->bodyFooter = $bodyFooter;
 
         return $this;
     }

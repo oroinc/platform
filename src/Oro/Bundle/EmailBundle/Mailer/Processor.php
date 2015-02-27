@@ -17,6 +17,13 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Class Processor
+ *
+ * @package Oro\Bundle\EmailBundle\Mailer
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Processor
 {
     /** @var EntityManager */
@@ -71,6 +78,7 @@ class Processor
      * Process email model sending.
      *
      * @param EmailModel $model
+     *
      * @return Email
      * @throws \Swift_SwiftException
      */
@@ -78,12 +86,19 @@ class Processor
     {
         $this->assertModel($model);
         $messageDate = new \DateTime('now', new \DateTimeZone('UTC'));
+        $parentMessageId = $this->getParentMessageId($model);
 
         /** @var \Swift_Message $message */
         $message = $this->mailer->createMessage();
+        if ($parentMessageId) {
+            $message->getHeaders()->addTextHeader('References', $parentMessageId);
+            $message->getHeaders()->addTextHeader('In-Reply-To', $parentMessageId);
+        }
         $message->setDate($messageDate->getTimestamp());
         $message->setFrom($this->getAddresses($model->getFrom()));
         $message->setTo($this->getAddresses($model->getTo()));
+        $message->setCc($this->getAddresses($model->getCc()));
+        $message->setBcc($this->getAddresses($model->getBcc()));
         $message->setSubject($model->getSubject());
         $message->setBody($model->getBody(), $model->getType() === 'html' ? 'text/html' : 'text/plain');
 
@@ -102,12 +117,19 @@ class Processor
             $model->getTo(),
             $messageDate,
             $messageDate,
-            $messageDate
+            $messageDate,
+            Email::NORMAL_IMPORTANCE,
+            $model->getCc(),
+            $model->getBcc()
         );
 
         $email->addFolder($origin->getFolder(FolderType::SENT));
         $email->setEmailBody($this->emailEntityBuilder->body($model->getBody(), $model->getType() === 'html', true));
         $email->setMessageId($messageId);
+        $email->setSeen(true);
+        if ($parentMessageId) {
+            $email->setRefs($parentMessageId);
+        }
 
         // persist the email and all related entities such as folders, email addresses etc.
         $this->emailEntityBuilder->getBatch()->persist($this->getEntityManager());
@@ -200,8 +222,8 @@ class Processor
         if (!$model->getFrom()) {
             throw new \InvalidArgumentException('Sender can not be empty');
         }
-        if (!$model->getTo()) {
-            throw new \InvalidArgumentException('Recipient can not be empty');
+        if (!$model->getTo() && !$model->getCc() && !$model->getBcc()) {
+                throw new \InvalidArgumentException('Recipient can not be empty');
         }
     }
 
@@ -236,6 +258,24 @@ class Processor
         }
 
         return $result;
+    }
+
+    /**
+     * @param EmailModel $model
+     *
+     * @return string
+     */
+    protected function getParentMessageId(EmailModel $model)
+    {
+        $messageId = '';
+        $parentEmailId = $model->getParentEmailId();
+        if ($parentEmailId) {
+            $parentEmail = $this->getEntityManager()
+                ->getRepository('OroEmailBundle:Email')
+                ->find($parentEmailId);
+            $messageId = $parentEmail->getMessageId();
+        }
+        return $messageId;
     }
 
     /**

@@ -28,10 +28,13 @@ define(function (require) {
                 updateItem: null,
                 deleteItem: null
             },
-            messages: {}
+            messages: {},
+            ignoreHead: false,
+            doNotFetch: false
         },
         listen: {
             'toView collection': '_viewItem',
+            'toViewGroup collection': '_viewGroup',
             'toEdit collection': '_editItem',
             'toDelete collection': '_deleteItem'
         },
@@ -66,7 +69,9 @@ define(function (require) {
 
             ActivityListView.__super__.initialize.call(this, options);
 
-            this._initPager();
+            if (!this.doNotFetch) {
+                this._initPager();
+            }
         },
 
         /**
@@ -92,7 +97,8 @@ define(function (require) {
                 return new this.itemView({
                     autoRender: false,
                     model: model,
-                    configuration: configuration
+                    configuration: configuration,
+                    ignoreHead: this.options.ignoreHead
                 });
             } else {
                 ActivityListView.__super__.render.apply(this, arguments);
@@ -226,6 +232,10 @@ define(function (require) {
 
         _reload: function () {
             this._showLoading();
+            if (this.options.doNotFetch) {
+                this._hideLoading();
+                return;
+            }
             try {
                 this.collection.fetch({
                     reset: true,
@@ -273,6 +283,41 @@ define(function (require) {
                             this._hideLoading();
                         }, this)
                     );
+            }
+        },
+
+        _viewGroup: function (model) {
+            var that = this,
+                currentModel = model,
+                options = {
+                    url: this._getUrl('groupView', model),
+                    type: 'get',
+                    dataType: 'html',
+                    data: {
+                        _widgetContainer: 'dialog',
+                        targetActivityClass: model.get('targetEntityData').class,
+                        targetActivityId: model.get('targetEntityData').id
+                    }
+                };
+
+            if (currentModel.get('is_loaded') !== true) {
+                this._showLoading();
+                Backbone.$.ajax(options)
+                    .done(function (data) {
+                        currentModel.set('contentHTML', data);
+                        that._hideLoading();
+                    })
+                    .fail(
+                    _.bind(function (response) {
+                        if (!_.isUndefined(response.status) && response.status === 403) {
+                            this._showForbiddenActivityDataError(response.responseJSON || {});
+                            currentModel.set('is_loaded', true);
+                        } else {
+                            this._showLoadItemsError(response.responseJSON || {});
+                        }
+                        this._hideLoading();
+                    }, this)
+                );
             }
         },
 

@@ -13,7 +13,6 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
     require('jquery-ui');
-    require('jquery-ui-timepicker');
     require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
 
@@ -22,6 +21,41 @@ define(function (require) {
     pageRenderedCbPool = [];
 
     layout = {
+        /**
+         * Default padding to keep when calculate available height for fullscreen layout
+         */
+        PAGE_BOTTOM_PADDING: 10,
+
+        /**
+         * Height of header on mobile devices
+         */
+        MOBILE_HEADER_HEIGHT: 54,
+
+        /**
+         * Minimal height for fullscreen layout
+         */
+        minimalHeightForFullScreenLayout: 300,
+
+        /**
+         * Keeps calculated devToolbarHeight. Please use getDevToolbarHeight() to retrieve it
+         */
+        devToolbarHeight: undefined,
+
+        /**
+         * @returns {number} development toolbar height in dev mode, 0 in production mode
+         */
+        getDevToolbarHeight: function () {
+            if (!this.devToolbarHeight) {
+                var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
+                if (devToolbarComposition && devToolbarComposition.view) {
+                    this.devToolbarHeight = devToolbarComposition.view.$el.height();
+                } else {
+                    this.devToolbarHeight = 0;
+                }
+            }
+            return this.devToolbarHeight;
+        },
+
         init: function (container, parent) {
             var promise;
             container = $(container);
@@ -62,7 +96,9 @@ define(function (require) {
                     // find nearest marked container with separate layout
                     $separateLayout = $elem.closest('[data-layout="separate"]');
                     // if it placed inside container - prevent component creation from here
-                    if ($separateLayout.length && $.contains(container[0], $separateLayout[0])) {
+                    if ($separateLayout.length
+                            && $.contains(container[0], $separateLayout[0])
+                            && this !== $separateLayout[0]) {
                         // optimize load time - push components to preload queue
                         preloadQueue.push(module);
                         return;
@@ -86,6 +122,10 @@ define(function (require) {
                     loadDeferred = $.Deferred();
 
                     require([module], function (component) {
+                        if (options.parent && options.parent.disposed) {
+                            loadDeferred.resolve();
+                            return;
+                        }
                         if (typeof component.init === "function") {
                             loadDeferred.resolve(component.init(options));
                         } else {
@@ -114,7 +154,7 @@ define(function (require) {
                 });
 
                 // optimize load time - preload components in separate layouts
-                require(preloadQueue, function (){});
+                require(preloadQueue, _.noop);
 
                 $.when.apply($, loadPromises).always(function () {
                     var initPromises = _.flatten(_.toArray(arguments), true);
@@ -131,7 +171,10 @@ define(function (require) {
         },
 
         initPopover: function (container) {
-            var $items = container.find('[data-toggle="popover"]');
+            var $items = container.find('[data-toggle="popover"]').filter(function () {
+                // skip already initialized popovers
+                return !$(this).data('popover');
+            });
             $items.not('[data-close="false"]').each(function (i, el) {
                 //append close link
                 var content = $(el).data('content');
@@ -271,6 +314,87 @@ define(function (require) {
             _.defer(function() {
                 $(document).responsive();
             });
+        },
+
+        /**
+         * Returns available height for element if page will be transformed to fullscreen mode
+         *
+         * @param $mainEl
+         * @returns {number}
+         */
+        getAvailableHeight: function ($mainEl) {
+            var $parents = $mainEl.parents(),
+                documentHeight = $(document).height(),
+                heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
+            $parents.each(function () {
+                heightDiff += this.scrollTop;
+            });
+            return heightDiff - this.getDevToolbarHeight() - this.PAGE_BOTTOM_PADDING;
+        },
+
+        /**
+         * Returns name of preferred layout for $mainEl
+         *
+         * @param $mainEl
+         * @returns {string}
+         */
+        getPreferredLayout: function ($mainEl) {
+            if (!this.hasHorizontalScroll() && !tools.isMobile()
+                && this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
+                return 'fullscreen';
+            } else {
+                return 'scroll';
+            }
+        },
+
+        /**
+         * Disables ability to scroll of $mainEl's scrollable parents
+         *
+         * @param $mainEl
+         * @returns {string}
+         */
+        disablePageScroll: function ($mainEl) {
+            var $scrollableParents = $mainEl.parents();
+            $scrollableParents.scrollTop(0);
+            $scrollableParents.addClass('disable-scroll');
+        },
+
+        /**
+         * Enables ability to scroll of $mainEl's scrollable parents
+         *
+         * @param $mainEl
+         * @returns {string}
+         */
+        enablePageScroll: function ($mainEl) {
+            $mainEl.parents().removeClass('disable-scroll');
+        },
+
+        /**
+         * Returns true if page has horizontal scroll
+         * @returns {boolean}
+         */
+        hasHorizontalScroll: function () {
+            return $('body').outerWidth() > $(window).width();
+        },
+
+        /**
+         * Try to calculate the scrollbar width for your browser/os
+         * @return {Number}
+         */
+        scrollbarWidth: function () {
+            if (!this._scrollbarWidth) {
+                var $div = $( //borrowed from anti-scroll
+                    '<div style="width:50px;height:50px;overflow-y:scroll;'
+                        + 'position:absolute;top:-200px;left:-200px;"><div style="height:100px;width:100%">'
+                        + '</div>'
+                );
+                $('body').append($div);
+                var w1 = $div.innerWidth();
+                var w2 = $('div', $div).innerWidth();
+                $div.remove();
+                this._scrollbarWidth =  w1 - w2;
+            }
+            return this._scrollbarWidth;
         }
     };
 

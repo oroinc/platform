@@ -158,4 +158,20 @@ class Config
 
         return $value;
     }
+
+    public function getValue($section, $name)
+    {
+        $values = $this->getValues()->filter(
+            function (ConfigValue $item) use ($name, $section) {
+                return $item->getName() == $name && $item->getSection() == $section;
+            }
+        );
+
+        /** @var ArrayCollection $values */
+        if ($values->first() !== false) {
+            return $values->first();
+        }
+
+        return null;
+    }
 }

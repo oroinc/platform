@@ -20,6 +20,12 @@ class ImapEmailIterator implements \Iterator, \Countable
     /** @var \Closure */
     private $onBatchLoaded;
 
+    /** @var \Closure */
+    private $onConvertError;
+
+    /** @var int|null */
+    private $iterationPos = 0;
+
     /**
      * Constructor
      *
@@ -34,7 +40,7 @@ class ImapEmailIterator implements \Iterator, \Countable
         $this->onBatchLoaded = function ($batch) {
             $this->handleBatchLoaded($batch);
         };
-        $this->iterator->setBatchCallback($this->onBatchLoaded);
+        $this->setBatchCallback();
     }
 
     /**
@@ -80,9 +86,19 @@ class ImapEmailIterator implements \Iterator, \Countable
     }
 
     /**
-     * The number of emails in this iterator
+     * Sets a callback function that will handle message convert error. If this callback set then iterator will work
+     * in fail safe mode invalid messages will just skipped
      *
-     * @return int
+     * @param callable $callback The callback function.
+     *                           function (\Exception)
+     */
+    public function setConvertErrorCallback(\Closure $callback = null)
+    {
+        $this->onConvertError = $callback;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function count()
     {
@@ -90,63 +106,85 @@ class ImapEmailIterator implements \Iterator, \Countable
     }
 
     /**
-     * Return the current element
-     *
-     * @return Email
+     * {@inheritdoc}
      */
     public function current()
     {
-        // call the underlying iterator to make sure a batch is loaded
-        // actually $this->batch is initialized at this moment
-        $this->iterator->current();
-
-        return $this->batch[$this->iterator->key()];
+        return $this->batch[$this->iterationPos];
     }
 
     /**
-     * Move forward to next element
+     * {@inheritdoc}
      */
     public function next()
     {
+        $this->iterationPos++;
+
+        // call the underlying iterator to make sure a batch is loaded
+        // actually $this->batch is initialized at this moment
         $this->iterator->next();
+
+        // skip invalid messages (they are not added to $this->batch)
+        while (!isset($this->batch[$this->iterationPos]) && $this->iterator->valid()) {
+            $this->iterationPos++;
+            $this->iterator->next();
+        }
     }
 
     /**
-     * Return the key of the current element
-     *
-     * @return int on success, or null on failure.
+     * {@inheritdoc}
      */
     public function key()
     {
-        return $this->iterator->key();
+        return $this->iterationPos;
     }
 
     /**
-     * Checks if current position is valid
-     *
-     * @return boolean Returns true on success or false on failure.
+     * {@inheritdoc}
      */
     public function valid()
     {
-        return $this->iterator->valid();
+        return isset($this->batch[$this->iterationPos]);
     }
 
     /**
-     * Rewind the Iterator to the first element
+     * {@inheritdoc}
      */
     public function rewind()
     {
+        $this->iterationPos = 0;
+        $this->batch        = [];
+
         $this->iterator->rewind();
     }
 
     /**
      * @param Message[] $batch
+     *
+     * @throws \Exception
      */
     protected function handleBatchLoaded($batch)
     {
         $this->batch = [];
+
+        $counter = 0;
         foreach ($batch as $key => $val) {
-            $this->batch[$key] = $this->manager->convertToEmail($val);
+            try {
+                $email = $this->manager->convertToEmail($val);
+            } catch (\Exception $e) {
+                if (null !== $this->onConvertError) {
+                    call_user_func($this->onConvertError, $e);
+                    $email = null;
+                } else {
+                    throw $e;
+                }
+            }
+
+            // do not add invalid messages to $this->batch
+            if ($email !== null) {
+                $this->batch[$this->iterationPos + $counter] = $email;
+            }
+            $counter++;
         }
     }
 }

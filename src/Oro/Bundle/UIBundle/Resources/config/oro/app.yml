@@ -10,3 +10,18 @@ liip_imagine:
             filters:
                 thumbnail:    { size: [16, 16], mode: outbound }
                 strip:        ~
+
+assetic:
+    assets:
+        jquery:
+            inputs:
+                - %kernel.root_dir%/../vendor/components/jquery/jquery.js
+            output: bundles/components/jquery/jquery.js
+        underscore:
+            inputs:
+                - %kernel.root_dir%/../vendor/components/underscore/underscore.js
+            output: bundles/components/underscore/underscore.js
+        backbone:
+            inputs:
+                - %kernel.root_dir%/../vendor/components/backbone/backbone.js
+            output: bundles/components/backbone/backbone.js

@@ -29,13 +29,26 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ['gridName', 'testGridName'],
             ['entityClass', 'testEntityClass'],
             ['entityId', 123],
+            ['parentEmailId', 321],
+            ['direction', 1],
             ['from', 'test@example.com'],
-            ['to', ['testGridName']],
+            ['to', ['testGridNameTo']],
+            ['cc', ['testGridNameCc']],
+            ['bcc', ['testGridNameBcc']],
             ['subject', 'testSubject'],
             ['body', 'testBody'],
             ['gridName', 'testGridName'],
             ['template', new EmailTemplate('test')],
         ];
+    }
+
+    public function testGetEmptyRecipients()
+    {
+        $obj = new Email();
+        $accessor = PropertyAccess::createPropertyAccessor();
+        $this->assertEquals([], $accessor->getValue($obj, 'to'));
+        $this->assertEquals([], $accessor->getValue($obj, 'cc'));
+        $this->assertEquals([], $accessor->getValue($obj, 'bcc'));
     }
 
     public function testHasEntity()

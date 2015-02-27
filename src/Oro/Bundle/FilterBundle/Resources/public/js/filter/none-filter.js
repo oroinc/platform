@@ -179,7 +179,9 @@ define([
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function () {
-                this.popupCriteriaShowed = false;
+                if (!this.disposed) {
+                    this.popupCriteriaShowed = false;
+                }
             }, this), 100);
         },
 

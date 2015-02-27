@@ -195,6 +195,17 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function ($
         };
     }(window.Select2['class'].single.prototype));
 
+    // Override methods of MultiSelect2 class
+    // Fix is valid for version 3.4.1
+    (function(prototype) {
+        var resizeSearch = prototype.resizeSearch;
+
+        prototype.resizeSearch = function() {
+            resizeSearch.apply(this, arguments);
+            this.search.width(Math.floor($(this.search).width()) - 1);
+        }
+    }(window.Select2['class'].multi.prototype));
+
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
         formatSearching: function() { return __('Searching...'); },
         formatNoMatches: function () { return __('No matches found'); }

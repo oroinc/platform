@@ -89,10 +89,38 @@
   &.responsive-medium .responsive-cell,
   &.responsive-small .responsive-cell,
   .responsive-cell:only-child {
+    margin-top: 7px;
     padding-right: 0;
   }
 }
-
+.oro-page-menu-items {
+  list-style: none;
+  margin: 0;
+  line-height: 21px;
+  > li {
+    min-height: 30px;
+    border-bottom: 1px solid #e6e6e6;
+    a {
+      display: block;
+      padding-top: 5px;
+      padding-bottom: 4px;
+    }
+    i[class^="icon-"] {
+      color: #444;
+      &.pull-right{
+        margin: 0 -14px 0 0;
+        line-height: 22px;
+      }
+    }
+    &.selected {
+      a{
+        font-weight: bold;
+        background-color: #e8e8e8 !important;
+        color: #444;
+      }
+    }
+  }
+}
 .oro-page {
   border-top: 1px solid @pageBorderColor;
   background: @pageSidebarBackgroundColor;
@@ -113,12 +141,12 @@
     background-color: #ffffff;
   }
   &.collapsible-sidebar {
-
     .oro-page-sidebar {
-      .dropdown-toggle {
+      > .dropdown-toggle {
         display: none;
       }
-      .dropdown-menu {
+      > .dropdown-menu {
+        .oro-page-menu-items;
         top: none;
         left: none;
         position: relative;

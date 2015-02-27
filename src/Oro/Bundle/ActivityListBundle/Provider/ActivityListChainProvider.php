@@ -6,14 +6,22 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager as Config;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 
+/**
+ * Class ActivityListChainProvider
+ * @package Oro\Bundle\ActivityListBundle\Provider
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ActivityListChainProvider
 {
     /** @var DoctrineHelper */
@@ -155,9 +163,11 @@ class ActivityListChainProvider
     }
 
     /**
+     * @param Config $config
+     *
      * @return array
      */
-    public function getActivityListOption()
+    public function getActivityListOption(Config $config)
     {
         $entityConfigProvider = $this->configManager->getProvider('entity');
         $templates            = [];
@@ -168,12 +178,17 @@ class ActivityListChainProvider
             if ($provider instanceof CommentProviderInterface) {
                 $hasComment = $provider->hasComments($this->configManager, $provider->getActivityClass());
             }
+            $template = $provider->getTemplate();
+            if ($provider instanceof ActivityListGroupProviderInterface &&
+                $config->get('oro_activity_list.grouping')) {
+                $template = $provider->getGroupedTemplate();
+            }
 
             $entityConfig = $entityConfigProvider->getConfig($provider->getActivityClass());
             $templates[$this->routingHelper->encodeClassName($provider->getActivityClass())] = [
                 'icon'         => $entityConfig->get('icon'),
                 'label'        => $this->translator->trans($entityConfig->get('label')),
-                'template'     => $provider->getTemplate(),
+                'template'     => $template,
                 'routes'       => $provider->getRoutes(),
                 'has_comments' => $hasComment,
             ];
@@ -207,7 +222,19 @@ class ActivityListChainProvider
      */
     public function getProviderForEntity($activityEntity)
     {
-        return $this->providers[$this->doctrineHelper->getEntityClass($activityEntity)];
+        return $this->getProviderByClass($this->doctrineHelper->getEntityClass($activityEntity));
+    }
+
+    /**
+     * Get activity list provider for entity class name
+     *
+     * @param string $className
+     *
+     * @return ActivityListProviderInterface
+     */
+    public function getProviderByClass($className)
+    {
+        return $this->providers[$className];
     }
 
     /**
@@ -230,6 +257,13 @@ class ActivityListChainProvider
             }
 
             $list->setSubject($provider->getSubject($entity));
+            if ($this->hasCustomDate($provider)) {
+                $list->setCreatedAt($provider->getDate($entity));
+                $list->setUpdatedAt($provider->getDate($entity));
+            }
+            if ($this->hasGrouping($provider)) {
+                $list->setHead($provider->isHead($entity));
+            }
             $list->setVerb($verb);
 
             if ($verb === ActivityList::VERB_UPDATE) {
@@ -255,5 +289,25 @@ class ActivityListChainProvider
         }
 
         return null;
+    }
+
+    /**
+     * @param ActivityListProviderInterface $provider
+     *
+     * @return bool
+     */
+    protected function hasCustomDate(ActivityListProviderInterface $provider)
+    {
+        return $provider instanceof ActivityListDateProviderInterface;
+    }
+
+    /**
+     * @param ActivityListProviderInterface $provider
+     *
+     * @return bool
+     */
+    protected function hasGrouping(ActivityListProviderInterface $provider)
+    {
+        return $provider instanceof ActivityListGroupProviderInterface;
     }
 }

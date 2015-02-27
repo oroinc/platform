@@ -7,21 +7,35 @@ use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
 
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 
+/**
+ * Class ActivityListChangesListener
+ *
+ * @package Oro\Bundle\ActivityListBundle\EventListener
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ActivityListChangesListener
 {
     /** @var ServiceLink */
     protected $securityFacadeLink;
 
+    /** @var  ActivityListChainProvider */
+    protected $activityListChainProvider;
+
     /**
      * @param ServiceLink $securityFacadeLink
+     * @param ActivityListChainProvider $activityListChainProvider
      */
-    public function __construct(ServiceLink $securityFacadeLink)
+    public function __construct(ServiceLink $securityFacadeLink, ActivityListChainProvider $activityListChainProvider)
     {
         $this->securityFacadeLink = $securityFacadeLink;
+        $this->activityListChainProvider = $activityListChainProvider;
     }
 
     /**
@@ -35,8 +49,12 @@ class ActivityListChangesListener
         }
 
         /** @var ActivityList $entity */
-        $this->setCreatedProperties($entity, $args->getEntityManager());
-        $this->setUpdatedProperties($entity, $args->getEntityManager());
+        if (!$entity->getCreatedAt()) {
+            $this->setCreatedProperties($entity, $args->getEntityManager());
+        }
+        if (!$entity->getUpdatedAt()) {
+            $this->setUpdatedProperties($entity, $args->getEntityManager());
+        }
     }
 
     /**
@@ -50,7 +68,9 @@ class ActivityListChangesListener
         }
 
         /** @var ActivityList $entity */
-        $this->setUpdatedProperties($entity, $args->getEntityManager(), true);
+        if ($this->isDateUpdatable($entity)) {
+            $this->setUpdatedProperties($entity, $args->getEntityManager(), true);
+        }
     }
 
     /**
@@ -107,5 +127,20 @@ class ActivityListChangesListener
 
         $activityList->setUpdatedAt($newUpdatedAt);
         $activityList->setEditor($newUpdatedBy);
+    }
+
+    /**
+     * @param ActivityList $entity
+     *
+     * @return bool
+     */
+    protected function isDateUpdatable($entity)
+    {
+        $provider = $this->activityListChainProvider->getProviderByClass($entity->getRelatedActivityClass());
+        if ($provider instanceof ActivityListDateProviderInterface) {
+            return $provider->isDateUpdatable();
+        } else {
+            return true;
+        }
     }
 }

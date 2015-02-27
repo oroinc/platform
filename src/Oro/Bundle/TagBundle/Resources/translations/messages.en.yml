@@ -31,7 +31,6 @@ oro:
         action:
             assign_unassign: "Tag assign/unassign"
             unassign_global: "Unassign all tags from entities"
-            view_cloud: "View tag cloud"
 
         tagging:
             alias.label:         Alias

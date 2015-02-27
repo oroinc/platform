@@ -335,8 +335,10 @@ class Channel
     }
 
     /**
-     * @param string  $connector
-     * @param int|int $codeFilter
+     * @deprecated Deprecated since 1.7.0 in favor of getLastStatusForConnector because of performance impact.
+     * @see Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::getLastStatusForConnector
+     * @param string $connector
+     * @param int|null $codeFilter
      *
      * @return ArrayCollection
      */

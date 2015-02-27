@@ -17,6 +17,13 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Util\DateTimeParser;
 
+/**
+ * Class ImapEmailManager
+ *
+ * @package Oro\Bundle\ImapBundle\Manager
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class ImapEmailManager
 {
     /** @var ImapConnector */
@@ -134,38 +141,53 @@ class ImapEmailManager
      * @param Message $msg
      *
      * @return Email
+     *
+     * @throws \RuntimeException if the given message cannot be converted to {@see Email} object
      */
     public function convertToEmail(Message $msg)
     {
         $headers = $msg->getHeaders();
-        $email   = new Email($msg);
-        $email
-            ->setId(
-                new ItemId(
-                    intval($headers->get('UID')->getFieldValue()),
-                    $this->connector->getUidValidity()
+        $email = new Email($msg);
+        try {
+            $email
+                ->setId(
+                    new ItemId(
+                        intval($headers->get('UID')->getFieldValue()),
+                        $this->connector->getUidValidity()
+                    )
                 )
-            )
-            ->setSubject($this->getString($headers, 'Subject'))
-            ->setFrom($this->getString($headers, 'From'))
-            ->setSentAt($this->getDateTime($headers, 'Date'))
-            ->setReceivedAt($this->getReceivedAt($headers))
-            ->setInternalDate($this->getDateTime($headers, 'InternalDate'))
-            ->setImportance($this->getImportance($headers))
-            ->setMessageId($this->getString($headers, 'Message-ID'))
-            ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
-            ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'));
-        foreach ($this->getRecipients($headers, 'To') as $val) {
-            $email->addToRecipient($val);
-        }
-        foreach ($this->getRecipients($headers, 'Cc') as $val) {
-            $email->addCcRecipient($val);
-        }
-        foreach ($this->getRecipients($headers, 'Bcc') as $val) {
-            $email->addBccRecipient($val);
-        }
+                ->setSubject($this->getString($headers, 'Subject'))
+                ->setFrom($this->getString($headers, 'From'))
+                ->setSentAt($this->getDateTime($headers, 'Date'))
+                ->setReceivedAt($this->getReceivedAt($headers))
+                ->setInternalDate($this->getDateTime($headers, 'InternalDate'))
+                ->setImportance($this->getImportance($headers))
+                ->setMessageId($this->getString($headers, 'Message-ID'))
+                ->setRefs($this->getReferences($headers, 'References'))
+                ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
+                ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'));
+            foreach ($this->getRecipients($headers, 'To') as $val) {
+                $email->addToRecipient($val);
+            }
+            foreach ($this->getRecipients($headers, 'Cc') as $val) {
+                $email->addCcRecipient($val);
+            }
+            foreach ($this->getRecipients($headers, 'Bcc') as $val) {
+                $email->addBccRecipient($val);
+            }
 
-        return $email;
+            return $email;
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Cannot parse email message. Subject: %s. Error: %s',
+                    $email->getSubject(),
+                    $e->getMessage()
+                ),
+                0,
+                $e
+            );
+        }
     }
 
     /**
@@ -175,15 +197,59 @@ class ImapEmailManager
      * @param string  $name
      *
      * @return string
+     *
+     * @throws \RuntimeException if a value of the requested header cannot be converted to a string
      */
     protected function getString(Headers $headers, $name)
     {
         $header = $headers->get($name);
         if ($header === false) {
             return '';
+        } elseif ($header instanceof \ArrayIterator) {
+            $values = [];
+            $header->rewind();
+            while ($header->valid()) {
+                $values[] = sprintf('"%s"', $header->current()->getFieldValue());
+                $header->next();
+            }
+            throw new \RuntimeException(
+                sprintf(
+                    'It is expected that the header "%s" has a string value, '
+                    . 'but several values are returned. Values: %s.',
+                    $name,
+                    implode(', ', $values)
+                )
+            );
         }
 
         return $header->getFieldValue();
+    }
+
+    /**
+     * Gets a email references header
+     *
+     * @param Headers $headers
+     * @param string  $name
+     *
+     * @return string|null
+     */
+    protected function getReferences(Headers $headers, $name)
+    {
+        $values = [];
+        $header = $headers->get($name);
+        if ($header === false) {
+            return null;
+        } elseif ($header instanceof \ArrayIterator) {
+            $header->rewind();
+            while ($header->valid()) {
+                $values[] = sprintf('"%s"', $header->current()->getFieldValue());
+                $header->next();
+            }
+        } else {
+            $values[] = $header->getFieldValue();
+        }
+
+        return implode(' ', $values);
     }
 
     /**

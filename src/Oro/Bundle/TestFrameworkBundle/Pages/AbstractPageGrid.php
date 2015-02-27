@@ -44,17 +44,18 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $pageSize = min($pageSize, $this->getRowsCount());
         $entityId = rand(1, $pageSize);
+        $gridPath = "{$this->gridPath}//table[contains(@class,'grid')]";
         /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $entity */
         $entity = $this->test
             ->elements(
                 $this->test->using('xpath')
-                    ->value("{$this->gridPath}//table[contains(@class,'grid')]/tbody/tr[{$entityId}]/td")
+                    ->value("{$gridPath}/tbody/tr[{$entityId}]/td")
             );
         /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element[] $headers */
         $headers = $this->test
             ->elements(
                 $this->test->using('xpath')
-                    ->value("{$this->gridPath}//table[contains(@class,'grid')]/thead/tr/th")
+                    ->value("{$gridPath}/thead/tr/th[not(contains(@class,'floatThead-col'))]")
             );
 
         $entityData = array();
@@ -285,14 +286,14 @@ abstract class AbstractPageGrid extends AbstractPage
     {
         $entity = $this->getEntity($entityData);
         $element = $entity->element(
-            $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '...')]")
+            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '...')]")
         );
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $element->click();
         $element->click();
 
         $entity->element(
-            $this->test->using('xpath')->value("td[@class = 'action-cell']//a[contains(., '{$actionName}')]")
+            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
         )->click();
         if ($confirmation) {
             $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[contains(., 'Yes')]")->click();
@@ -311,9 +312,10 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function getHeaders()
     {
+        $excludeHeadCell = "contains(@style, 'display: none;') or contains(@class,'floatThead-col')";
         $records = $this->test->elements(
             $this->test->using('xpath')
-                ->value("{$this->gridPath}//table/thead/tr/th[not(contains(@style, 'display: none;'))]")
+                ->value("{$this->gridPath}//table/thead/tr/th[not({$excludeHeadCell})]")
         );
         return $records;
     }
@@ -447,12 +449,12 @@ abstract class AbstractPageGrid extends AbstractPage
      */
     public function checkActionMenu($actionName)
     {
-        $actionMenu =  $this->test->byXpath("//td[@class='action-cell']//a[contains(., '...')]");
+        $actionMenu =  $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
         // hover will show menu, 1st click - will hide, 2nd - will show again
         $actionMenu->click();
         $actionMenu->click();
         $this->waitForAjax();
-        $this->assertElementNotPresent("//td[@class='action-cell']//a[@title= '{$actionName}']");
+        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
 
         return $this;
     }

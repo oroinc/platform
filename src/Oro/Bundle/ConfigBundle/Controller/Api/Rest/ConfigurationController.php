@@ -56,7 +56,10 @@ class ConfigurationController extends FOSRestController
      * )
      * @ApiDoc(
      *      description="Get all configuration data of the specified section",
-     *      resource=true
+     *      resource=true,
+     *      filters={
+     *          {"name"="scope", "dataType"="string", "description"="Scope name. By default - user"}
+     *      }
      * )
      * @AclAncestor("oro_config_system")
      *
@@ -67,7 +70,7 @@ class ConfigurationController extends FOSRestController
         $manager = $this->get('oro_config.manager.api');
 
         try {
-            $data = $manager->getData($path);
+            $data = $manager->getData($path, $this->getRequest()->get('scope', 'user'));
         } catch (ItemNotFoundException $e) {
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }

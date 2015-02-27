@@ -47,6 +47,8 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class Email extends ExtendEmail
 {
@@ -152,6 +154,24 @@ class Email extends ExtendEmail
     protected $internalDate;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_head", type="boolean")
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $head = true;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_seen", type="boolean")
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $seen = false;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="message_id", type="string", length=255)
@@ -170,6 +190,16 @@ class Email extends ExtendEmail
     protected $xMessageId;
 
     /**
+     * @var EmailThread
+     *
+     * @ORM\ManyToOne(targetEntity="EmailThread", inversedBy="emails", fetch="EAGER")
+     * @ORM\JoinColumn(name="thread_id", referencedColumnName="id", nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Exclude
+     */
+    protected $thread;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="x_thread_id", type="string", length=255, nullable=true)
@@ -177,6 +207,15 @@ class Email extends ExtendEmail
      * @JMS\Type("string")
      */
     protected $xThreadId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="refs", type="text", nullable=true)
+     * @Soap\ComplexType("string", nillable=true)
+     * @JMS\Type("string")
+     */
+    protected $refs;
 
     /**
      * @var ArrayCollection|EmailFolder[] $folders
@@ -432,6 +471,54 @@ class Email extends ExtendEmail
     }
 
     /**
+     * Get if email is either first unread, or the last item in the thread
+     *
+     * @return bool
+     */
+    public function isHead()
+    {
+        return $this->head;
+    }
+
+    /**
+     * Set email is_head flag
+     *
+     * @param boolean $head
+     *
+     * @return self
+     */
+    public function setHead($head)
+    {
+        $this->head = (bool)$head;
+
+        return $this;
+    }
+
+    /**
+     * Get if email is seen
+     *
+     * @return bool
+     */
+    public function isSeen()
+    {
+        return $this->seen;
+    }
+
+    /**
+     * Set email is read flag
+     *
+     * @param boolean $seen
+     *
+     * @return self
+     */
+    public function setSeen($seen)
+    {
+        $this->seen = (bool)$seen;
+
+        return $this;
+    }
+
+    /**
      * Get value of email Message-ID header
      *
      * @return string
@@ -499,6 +586,54 @@ class Email extends ExtendEmail
     public function setXThreadId($xThreadId)
     {
         $this->xThreadId = $xThreadId;
+
+        return $this;
+    }
+
+    /**
+     * Get thread
+     *
+     * @return EmailThread
+     */
+    public function getThread()
+    {
+        return $this->thread;
+    }
+
+    /**
+     * Set thread
+     *
+     * @param EmailThread|null $thread
+     *
+     * @return Email
+     */
+    public function setThread($thread)
+    {
+        $this->thread = $thread;
+
+        return $this;
+    }
+
+    /**
+     * Get email references
+     *
+     * @return string
+     */
+    public function getRefs()
+    {
+        return $this->refs;
+    }
+
+    /**
+     * Set email references
+     *
+     * @param $refs
+     *
+     * @return $this
+     */
+    public function setRefs($refs)
+    {
+        $this->refs = $refs;
 
         return $this;
     }
@@ -591,5 +726,46 @@ class Email extends ExtendEmail
     public function beforeSave()
     {
         $this->created = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getTo()
+    {
+        return $this->getRecipients(EmailRecipient::TO);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getCc()
+    {
+        return $this->getRecipients(EmailRecipient::CC);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getBcc()
+    {
+        return $this->getRecipients(EmailRecipient::BCC);
+    }
+
+    public function getToCc()
+    {
+        return new ArrayCollection(
+            array_merge($this->getTo()->toArray(), $this->getCc()->toArray())
+        );
+    }
+
+    /**
+     * @return EmailRecipient[]
+     */
+    public function getCcBcc()
+    {
+        return new ArrayCollection(
+            array_merge($this->getCc()->toArray(), $this->getBcc()->toArray())
+        );
     }
 }

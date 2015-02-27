@@ -1,0 +1,4 @@
+password_management:
+    label: oro.user.action.password_management
+    type: action
+    group_name: ""

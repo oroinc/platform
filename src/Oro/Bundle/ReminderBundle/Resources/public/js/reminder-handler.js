@@ -162,7 +162,7 @@ define(
                     if ($.trim(template) == '') {
                         template = $('.reminder_templates[data-identifier="default"]').html();
                     }
-                    message += _.template(template, reminder);
+                    message += _.template(template)(reminder);
                 } catch (ex) {
                     // Suppress possible exceptions during template processing
                     if (console && (typeof console.log === 'function')) {
