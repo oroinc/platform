@@ -17,6 +17,11 @@ class OroEmailBundle implements Migration
         self::addColumns($schema);
     }
 
+    /**
+     * Add fields
+     *
+     * @param Schema $schema
+     */
     public static function addColumns(Schema $schema)
     {
         $table = $schema->getTable('oro_email_folder');

@@ -14,9 +14,16 @@ oro:
 
         system_configuration:
             email_configuration: Email Configuration
+            email_threads:
+                label: Email Threads
+                use_threads_in_emails:
+                    label: Display My Emails as
+                    choices:
+                        non_threaded.label: Non-Threaded
+                        threaded.label: Threaded
             signature_configuration:
-              label: Signature
-              signature.label: Signature Content
+                label: Signature
+                signature.label: Signature Content
 
         emailtemplate:
             entity_label:        Template
@@ -111,15 +118,25 @@ oro:
         x_thread_id.label:        xThread Id
         template.label:           Apply template
         type.label:               Type
+        head.label:               Is Head
+        refs.label:               References Header
+        seen.label:               Is Seen
+        thread_id.label:          Thread ID
 
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
+        body_is_unavailable:      Body is unavailable
 
         entity_config:
             email:
                 field:
                     items:
                         available_in_template: Available in email templates
+
+        reply:                    Reply
+        forward:                  Forward
+        forwarded_message:        Forwarded message
+        parent_message_header:    "On %date% %user% wrote:"
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"
@@ -134,3 +151,4 @@ oro:
 "Send": "Send"
 "Content": "Content"
 "Cc/Bcc": "Cc/Bcc"
+"Thread view": "Thread view"

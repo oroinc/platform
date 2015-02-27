@@ -59,6 +59,11 @@ class EmailHeader
     /**
      * @var string
      */
+    protected $refs;
+
+    /**
+     * @var string
+     */
     protected $xMessageId;
 
     /**
@@ -302,6 +307,30 @@ class EmailHeader
     public function setMessageId($messageId)
     {
         $this->messageId = $messageId;
+
+        return $this;
+    }
+
+    /**
+     * Get value of email References header
+     *
+     * @return string
+     */
+    public function getRefs()
+    {
+        return $this->refs;
+    }
+
+    /**
+     * Set value of email References header
+     *
+     * @param string $references
+     *
+     * @return self
+     */
+    public function setRefs($references)
+    {
+        $this->refs = $references;
 
         return $this;
     }
