@@ -6,6 +6,9 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
+use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -97,7 +100,12 @@ class ActivityListManager
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
         $pager->init();
 
-        return $this->getEntityViewModels($pager->getResults());
+        $targetEntityData = [
+            'class' => $entityClass,
+            'id'    => $entityId,
+        ];
+
+        return $this->getEntityViewModels($pager->getResults(), $targetEntityData);
     }
 
     /**
@@ -138,14 +146,15 @@ class ActivityListManager
 
     /**
      * @param ActivityList[] $entities
+     * @param array          $targetEntityData
      *
      * @return array
      */
-    public function getEntityViewModels($entities)
+    public function getEntityViewModels($entities, $targetEntityData = [])
     {
         $result = [];
         foreach ($entities as $entity) {
-            $result[] = $this->getEntityViewModel($entity);
+            $result[] = $this->getEntityViewModel($entity, $targetEntityData);
         }
 
         return $result;
@@ -153,10 +162,11 @@ class ActivityListManager
 
     /**
      * @param ActivityList $entity
+     * @param []           $targetEntityData
      *
      * @return array
      */
-    public function getEntityViewModel(ActivityList $entity)
+    public function getEntityViewModel(ActivityList $entity, $targetEntityData = [])
     {
         $entityProvider = $this->chainProvider->getProviderForEntity($entity->getRelatedActivityClass());
 
@@ -179,6 +189,15 @@ class ActivityListManager
             $entity->getRelatedActivityId()
         );
 
+        $isHead = false;
+        if ($this->isGroupingApplicable($entityProvider)) {
+            $isHead = $entity->isHead();
+        }
+        $data = $entityProvider->getData($entity);
+        if (isset($data['isHead']) && !$data['isHead']) {
+            $isHead = false;
+        }
+
         $result = [
             'id'                   => $entity->getId(),
             'owner'                => $ownerName,
@@ -187,7 +206,7 @@ class ActivityListManager
             'editor_id'            => $editorId,
             'verb'                 => $entity->getVerb(),
             'subject'              => $entity->getSubject(),
-            'data'                 => $entityProvider->getData($entity),
+            'data'                 => $data,
             'relatedActivityClass' => $entity->getRelatedActivityClass(),
             'relatedActivityId'    => $entity->getRelatedActivityId(),
             'createdAt'            => $entity->getCreatedAt()->format('c'),
@@ -196,6 +215,8 @@ class ActivityListManager
             'removable'            => $this->securityFacade->isGranted('DELETE', $entity),
             'commentCount'         => $numberOfComments,
             'commentable'          => $this->commentManager->isCommentable(),
+            'targetEntityData'     => $targetEntityData,
+            'is_head'              => $isHead,
         ];
 
         return $result;
@@ -213,7 +234,61 @@ class ActivityListManager
             $entityClass,
             $entityId,
             $this->config->get('oro_activity_list.sorting_field'),
-            $this->config->get('oro_activity_list.sorting_direction')
+            $this->config->get('oro_activity_list.sorting_direction'),
+            $this->config->get('oro_activity_list.grouping')
         );
+    }
+
+    /**
+     * Get Grouped Entities by Activity Entity
+     *
+     * @param object $entity
+     * @param string $widgetId
+     * @param array $filterMetadata
+     * @return array
+     */
+    public function getGroupedEntities($entity, $targetActivityClass, $targetActivityId, $widgetId, $filterMetadata)
+    {
+        $results = [];
+        $entityProvider    = $this->chainProvider->getProviderForEntity(ClassUtils::getRealClass($entity));
+        if ($this->isGroupingApplicable($entityProvider)) {
+            $groupedActivities = $entityProvider->getGroupedEntities($entity);
+            $activityResults = $this->getEntityViewModels($groupedActivities, [
+                'class' => $targetActivityClass,
+                'id' => $targetActivityId,
+            ]);
+
+            $results = [
+                'entityId'            => $entity->getId(),
+                'ignoreHead'          => true,
+                'widgetId'            => $widgetId,
+                'activityListData'    => json_encode(['count' => count($activityResults), 'data'  => $activityResults]),
+                'commentOptions'      => [
+                    'listTemplate' => '#template-activity-item-comment',
+                    'canCreate'    => true,
+                ],
+                'activityListOptions' => [
+                    'configuration'            => $this->chainProvider->getActivityListOption($this->config),
+                    'template'                 => '#template-activity-list',
+                    'itemTemplate'             => '#template-activity-item',
+                    'urls'                     => [],
+                    'loadingContainerSelector' => '.activity-list.sub-list',
+                    'dateRangeFilterMetadata'  => $filterMetadata,
+                    'routes'                   => [],
+                    'pager'                    => false,
+                ],
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param object $entityProvider
+     * @return bool
+     */
+    protected function isGroupingApplicable($entityProvider)
+    {
+        return $entityProvider instanceof ActivityListGroupProviderInterface;
     }
 }

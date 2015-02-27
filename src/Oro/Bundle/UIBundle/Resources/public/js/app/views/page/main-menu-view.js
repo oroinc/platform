@@ -43,6 +43,8 @@ define([
 
             mediator.trigger('mainMenuUpdated', this);
             this.$el.trigger('mainMenuUpdated');
+
+            return this;
         },
 
         /**

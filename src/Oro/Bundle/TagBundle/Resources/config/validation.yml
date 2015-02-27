@@ -1,6 +1,6 @@
 Oro\Bundle\TagBundle\Entity\Tag:
     constraints:
-        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: name
+        - Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntity: name
     properties:
         name:
             - NotBlank:     ~

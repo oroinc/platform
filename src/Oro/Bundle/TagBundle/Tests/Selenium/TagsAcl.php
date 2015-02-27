@@ -24,8 +24,7 @@ class TagsAcl extends Selenium2TestCase
             ->setCapability(
                 array(
                     'Tag assign/unassign',
-                    'Unassign all tags from entities',
-                    'View tag cloud'),
+                    'Unassign all tags from entities'),
                 'System'
             )
             ->save()
