@@ -16,7 +16,10 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\GroupRepository")
- * @ORM\Table(name="oro_access_group")
+ * @ORM\Table(
+ *      name="oro_access_group",
+ *      uniqueConstraints={@ORM\UniqueConstraint(name="uq_name_org_idx", columns={"name", "organization_id"})}
+ * )
  * @Config(
  *      routeName="oro_user_group_index",
  *      defaultValues={

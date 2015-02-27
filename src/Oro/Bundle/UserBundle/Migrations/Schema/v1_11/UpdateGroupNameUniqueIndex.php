@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
-class DropGroupNameUniqueIndex implements Migration
+class UpdateGroupNameUniqueIndex implements Migration
 {
     /**
      * {@inheritdoc}
@@ -16,5 +16,6 @@ class DropGroupNameUniqueIndex implements Migration
     {
         $table = $schema->getTable('oro_access_group');
         $table->dropIndex('UNIQ_FEF9EDB75E237E06');
+        $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
     }
 }
