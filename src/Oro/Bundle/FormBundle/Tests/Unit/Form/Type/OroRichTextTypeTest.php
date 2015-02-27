@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
@@ -24,7 +25,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     protected $assetsHelper;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var HtmlTagProvider
      */
     protected $htmlTagProvider;
 
@@ -36,7 +37,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->assetsHelper = $this->getMock('Symfony\Component\Templating\Asset\PackageInterface');
-        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $this->htmlTagProvider = new HtmlTagProvider();
         $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider);
         $this->formType->setAssetHelper($this->assetsHelper);
     }
