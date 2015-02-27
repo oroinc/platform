@@ -54,9 +54,9 @@ define(function (require) {
                 '<div class="container-fluid grid-scrollable-container">' +
                     '<div class="grid-container">' +
                         '<table class="grid table-hover table table-bordered table-condensed"></table>' +
-                        '<div class="no-data"></div>' +
                     '</div>' +
                 '</div>' +
+                '<div class="no-data"></div>' +
             '</div>'
         ),
 
@@ -710,7 +710,6 @@ define(function (require) {
                             sizingThead.insertAfter(this.$grid.find('thead'));
                         }
                     }
-                    console.log(visibleRect.bottom - visibleRect.top);
                     this.cachedEls.thead.css({
                         // show only visible part
                         top: visibleRect.top,
@@ -890,13 +889,16 @@ define(function (require) {
 
                 // console.log(current, current.id, midRect);
 
-                if (current.id === 'top-page' && tools.isMobile()) {
+                if (tools.isMobile()) {
                     /**
                      * Equals header height. Cannot calculate dynamically due to issues on ipad
                      */
-                    if (resultRect.top < 54) {
+                    if (resultRect.top < 54 && current.id === 'top-page') {
                         resultRect.top = 54;
+                    } else if (resultRect.top < 44 && current.className === 'widget-content') {
+                        resultRect.top = 44;
                     }
+
                 }
 
                 if (resultRect.top < midRect.top + borders.top) {
