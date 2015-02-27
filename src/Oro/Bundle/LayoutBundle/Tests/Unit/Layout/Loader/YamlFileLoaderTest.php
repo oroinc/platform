@@ -137,9 +137,7 @@ class YamlFileLoaderTest extends \PHPUnit_Framework_TestCase
         );
         $generator->expects($this->once())->method('generate')->willThrowException($exception);
 
-        $this->setExpectedException(
-            '\RuntimeException',
-            <<<MESSAGE
+        $message = <<<MESSAGE
 Syntax error: action name should start with "@" symbol, current name "add" at "actions.0"
 add:
     id: myId
@@ -147,8 +145,9 @@ add:
 
 
 Filename: path/to/my/file.yml
-MESSAGE
-        );
+MESSAGE;
+
+        $this->setExpectedException('\RuntimeException', str_replace("\n", PHP_EOL, $message));
 
         $update = $loader->load(new FileResource('path/to/my/file.yml'));
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
