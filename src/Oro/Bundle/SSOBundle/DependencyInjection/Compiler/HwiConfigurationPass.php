@@ -8,6 +8,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class HwiConfigurationPass implements CompilerPassInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContainerBuilder $container)
     {
         $resourceOwners = [
