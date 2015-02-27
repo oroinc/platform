@@ -81,8 +81,10 @@ class RendererTest extends LayoutTestCase
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }'])
             ->add('script', 'head', 'script', ['content' => 'alert(\'test\');'])
+            ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
             ->add('content', 'root', 'body')
-            ->add('title', 'content', 'text', ['text' => 'Hi %val%!', 'text_parameters' => ['%val%' => 'World']])
+            ->add('list', 'content', 'list')
+            ->add('list_tem_1', 'list', 'text', ['text' => 'Hi %val%!', 'text_parameters' => ['%val%' => 'World']])
             ->add(
                 'form',
                 'content',
@@ -173,8 +175,12 @@ class RendererTest extends LayoutTestCase
         <script type="text/javascript">
             alert('test');
         </script>
+        <link rel="stylesheet" href="test.css"/>
     </head>
 <body>
+    <ul>
+        <li>Hi World!</li>
+    </ul>
     {form_layout}
 </body>
 </html>
@@ -190,7 +196,7 @@ HTML;
     protected function getTwigFormLayoutResult()
     {
         $expected = <<<HTML
-Hi World!    <fieldset>
+<fieldset>
     <legend>Additional Info</legend>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
@@ -247,7 +253,7 @@ HTML;
     protected function getPhpFormLayoutResult()
     {
         $expected = <<<HTML
-Hi World!                <fieldset>
+<fieldset>
     <legend>Additional Info</legend>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>

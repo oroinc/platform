@@ -170,7 +170,7 @@ class LayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->rawLayoutBuilder->expects($this->once())
             ->method('clear');
 
-        $this->layoutBuilder->clear();
+        $this->assertSame($this->layoutBuilder, $this->layoutBuilder->clear());
     }
 
     public function testGetLayout()

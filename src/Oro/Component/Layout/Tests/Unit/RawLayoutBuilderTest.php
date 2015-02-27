@@ -21,7 +21,7 @@ class RawLayoutBuilderTest extends LayoutTestCase
         $this->rawLayoutBuilder
             ->add('root', null, 'root');
 
-        $this->rawLayoutBuilder->clear();
+        $this->assertSame($this->rawLayoutBuilder, $this->rawLayoutBuilder->clear());
         $this->assertTrue($this->rawLayoutBuilder->isEmpty());
     }
 

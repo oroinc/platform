@@ -65,3 +65,8 @@ services:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ExternalResourceType
         tags:
              - { name: layout.block_type, alias: external_resource }
+
+    oro_layout.block_type.list:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ListType
+        tags:
+             - { name: layout.block_type, alias: list }

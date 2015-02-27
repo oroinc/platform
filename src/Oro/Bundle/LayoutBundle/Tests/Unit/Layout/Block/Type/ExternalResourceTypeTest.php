@@ -26,7 +26,7 @@ class ExternalResourceTypeTest extends BlockTypeTestCase
      */
     public function testBuildViewThrowsExceptionIfRequiredOptionsNotSpecified()
     {
-        $this->getBlockView(new ExternalResourceType());
+        $this->getBlockView(ExternalResourceType::NAME);
     }
 
     public function testBuildView()
