@@ -249,6 +249,12 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
                 ['route_name', null, $route],
             ]
         );
+        $context->expects($this->any())->method('has')->willReturnMap(
+            [
+                ['theme', null !== $theme],
+                ['route_name', null !== $route],
+            ]
+        );
 
         return $layoutItem;
     }
