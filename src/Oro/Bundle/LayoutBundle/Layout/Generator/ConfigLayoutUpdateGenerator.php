@@ -77,7 +77,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         $actions = $source[self::NODE_ACTIONS];
         foreach ($actions as $nodeNo => $actionDefinition) {
             if (isset($actionDefinition[self::PATH_ATTR])) {
-                $path = $actionDefinition[self::PATH_ATTR] . '.' . $nodeNo;
+                $path = $actionDefinition[self::PATH_ATTR];
                 unset ($actionDefinition[self::PATH_ATTR]);
             } else {
                 $path = self::NODE_ACTIONS . '.' . $nodeNo;
@@ -161,7 +161,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                         array_walk(
                             $transformedActions,
                             function (&$val) use ($path) {
-                                $val[0][self::PATH_ATTR] = $path;
+                                $val[self::PATH_ATTR] = $path;
                             }
                         );
                         $source[self::NODE_ACTIONS] = array_merge($source[self::NODE_ACTIONS], $transformedActions);

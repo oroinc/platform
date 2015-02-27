@@ -30,7 +30,7 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
     public function testShouldValidateData($data, $exception = false)
     {
         if (false !== $exception) {
-            $this->setExpectedException('\LogicException', $exception);
+            $this->setExpectedException('\Oro\Bundle\LayoutBundle\Exception\SyntaxException', $exception);
         }
 
         $this->generator->generate('testClassName', new GeneratorData($data), new ConditionCollection());
@@ -42,15 +42,15 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
     public function resourceDataProvider()
     {
         return [
-            'invalid data'                                            => [
+            'invalid data'                                                   => [
                 '$data'      => new \stdClass(),
                 '$exception' => 'Syntax error: expected array with "actions" node at "."'
             ],
-            'should contains actions'                                 => [
+            'should contains actions'                                        => [
                 '$data'      => [],
                 '$exception' => 'Syntax error: expected array with "actions" node at "."'
             ],
-            'should contains known actions'                           => [
+            'should contains known actions'                                  => [
                 '$data'      => [
                     'actions' => [
                         ['@addSuperPuper' => null]
@@ -59,13 +59,13 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                 '$exception' => 'Syntax error: unknown action "addSuperPuper", '
                     . 'should be one of LayoutManipulatorInterface\'s methods at "actions.0"'
             ],
-            'should contains array with action definition in actions' => [
+            'should contains array with action definition in actions'        => [
                 '$data'      => [
                     'actions' => ['some string']
                 ],
                 '$exception' => 'Syntax error: expected array with action name as key at "actions.0"'
             ],
-            'action name should start from @'                         => [
+            'action name should start from @'                                => [
                 '$data'      => [
                     'actions' => [
                         ['add' => null]
@@ -74,14 +74,50 @@ class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
                 '$exception' => 'Syntax error: action name should start with "@" symbol,'
                     . ' current name "add" at "actions.0"'
             ],
-            'known action proceed'                                    => [
+            'known action proceed'                                           => [
                 '$data'      => [
                     'actions' => [
                         ['@add' => null]
                     ]
                 ],
                 '$exception' => '"add" action requires at least 3 argument(s) to be passed, 1 given at "actions.0"'
-            ]
+            ],
+            '@addTree with invalid structure'                                => [
+                '$data'      => [
+                    'actions' => [
+                        ['@addTree' => null]
+                    ]
+                ],
+                '$exception' => 'expected array with keys "items" and "tree" at "actions.0"'
+            ],
+            '@addTree item not found in "items" list'                        => [
+                '$data'      => [
+                    'actions' => [
+                        ['@addTree' => ['items' => [], 'tree' => ['root' => ['head' => null]]]]
+                    ]
+                ],
+                '$exception' => 'invalid tree definition. Item with id "head" not found in items list at "actions.0"'
+            ],
+            '@addTree item has invalid definition, should show correct path' => [
+                '$data'      => [
+                    'actions' => [
+                        [
+                            '@add' => [
+                                'id'        => 'root',
+                                'parentId'  => null,
+                                'blockType' => 'root'
+                            ]
+                        ],
+                        [
+                            '@addTree' => [
+                                'items' => ['head' => ['test' => 1]],
+                                'tree'  => ['root' => ['head' => null]]
+                            ]
+                        ]
+                    ]
+                ],
+                '$exception' => 'Unknown argument(s) for "add" action given: test at "actions.1"'
+            ],
         ];
     }
 
