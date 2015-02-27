@@ -192,6 +192,7 @@ define(function (require) {
             this._listenToCommands();
 
             this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
+            this.listenTo(mediator, 'layout:headerStateChange', this.reposition, this);
             this.reposition = _.bind(this.reposition, this);
         },
 
@@ -582,6 +583,7 @@ define(function (require) {
         setupCache: function () {
             this.documentHeight = $(document).height();
             this.cachedEls = {
+                body: $(document.body),
                 gridContainer: this.$grid.parent(),
                 headerCells: this.$grid.find('th:first').parent().find('th'),
                 firstRowCells: this.$grid.find('tbody tr:not(.thead-sizing-row):first td'),
@@ -893,12 +895,11 @@ define(function (require) {
                     /**
                      * Equals header height. Cannot calculate dynamically due to issues on ipad
                      */
-                    if (resultRect.top < 54 && current.id === 'top-page') {
+                    if (resultRect.top < 54 && current.id === 'top-page' && !this.cachedEls.body.hasClass('input-focused')) {
                         resultRect.top = 54;
                     } else if (resultRect.top < 44 && current.className === 'widget-content') {
                         resultRect.top = 44;
                     }
-
                 }
 
                 if (resultRect.top < midRect.top + borders.top) {
@@ -914,6 +915,10 @@ define(function (require) {
                     resultRect.right = midRect.right - borders.right;
                 }
                 current = current.parentNode;
+            }
+
+            if (resultRect.top < 0) {
+                resultRect.top = 0;
             }
 
             return resultRect;
