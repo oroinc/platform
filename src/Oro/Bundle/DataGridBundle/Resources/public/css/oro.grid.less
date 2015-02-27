@@ -20,6 +20,10 @@
   font-size: 14px;
   padding: 20px;
   background:#f9f9f9;
+  border-radius:4px;
+  -moz-border-radius:4px;
+  -webkit-border-radius:4px;
+  border: 1px solid #ddd;
 }
 
 .grid-views {
@@ -126,7 +130,11 @@ table.grid {
   > .toolbar, > .other-scroll-container > *, > .filter-box {
     display: none;
   }
-  > .other-scroll-container > .no-data, > .other-scroll-container > .loading-mask {
+  > .other-scroll-container > .no-data {
+    border: none;
+    display: block;
+  }
+  > .other-scroll-container > .loading-mask {
     display: block;
   }
 }
@@ -153,6 +161,7 @@ table.grid {
       width: auto;
       display: block;
       border-bottom: 1px solid #ddd;
+      box-sizing: content-box;
       tr {
         display: block;
       }
@@ -167,6 +176,7 @@ table.grid {
       display: block;
       overflow: hidden;
       border-bottom: 1px solid #ddd;
+      box-sizing: content-box;
       tr {
         display: block;
       }

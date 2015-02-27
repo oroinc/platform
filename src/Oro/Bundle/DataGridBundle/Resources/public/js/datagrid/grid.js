@@ -1077,7 +1077,9 @@ define(function (require) {
                 _.defer(_.bind(this.updateLayout, this));
                 return;
             }
-            this.setFloatThead(true);
+            if (tools.isMobile()) {
+                this.setFloatThead(true);
+            }
             var layout = 'default';
             if (this.enableFullScreenLayout) {
                 layout = mediator.execute('layout:getPreferredLayout', this.$grid);
@@ -1101,6 +1103,7 @@ define(function (require) {
             this.layout = newLayout;
             switch (newLayout) {
                 case 'fullscreen':
+                    this.setFloatThead(true);
                     this.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: this.getCssHeightCalcExpression()
                     });
@@ -1108,6 +1111,7 @@ define(function (require) {
                     break;
                 case 'scroll':
                 case 'default':
+                    this.setFloatThead(false);
                     this.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: ''
                     });
