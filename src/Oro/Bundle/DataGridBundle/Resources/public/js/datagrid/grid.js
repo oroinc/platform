@@ -575,7 +575,20 @@ define(function (require) {
             if (!this.floatThead) {
                 return;
             }
+            this.setupCache();
             this.fixHeaderCellWidth();
+        },
+
+        setupCache: function () {
+            this.documentHeight = $(document).height();
+            this.cachedEls = {
+                gridContainer: this.$grid.parent(),
+                headerCells: this.$grid.find('th:first').parent().find('th'),
+                firstRowCells: this.$grid.find('tbody tr:not(.thead-sizing-row):first td'),
+                otherScrollContainer: this.$grid.parents('.other-scroll-container'),
+                thead: this.$grid.find('thead:first'),
+                theadTr: this.$grid.find('thead:first tr:first')
+            }
         },
 
         /**
@@ -597,17 +610,9 @@ define(function (require) {
             }
         },
 
-        getHeaderCells: function () {
-            return this.$grid.find('th:first').parent().find('th');
-        },
-
-        getFirstRowCells: function () {
-            return this.$grid.find('tbody tr:not(.thead-sizing-row):first td');
-        },
-
         fixHeaderCellWidth: function () {
-            var headerCells = this.getHeaderCells(),
-                firstRowCells = this.getFirstRowCells(),
+            var headerCells = this.cachedEls.headerCells,
+                firstRowCells = this.cachedEls.firstRowCells,
                 totalWidth = 0,
                 self = this,
                 scrollBarWidth = mediator.execute('layout:scrollbarWidth');
@@ -615,7 +620,7 @@ define(function (require) {
             headerCells.attr('style', '');
             firstRowCells.attr('style', '');
             this.$grid.css({width: ''});
-            this.$grid.parent().css({width: ''});
+            this.cachedEls.gridContainer.css({width: ''});
             if (this.scrollVisible) {
                 this.$grid.css({borderRight: scrollBarWidth + 'px solid darkblue'});
             }
@@ -641,7 +646,7 @@ define(function (require) {
             this.$grid.css({
                 width: totalWidth
             });
-            this.$grid.parent().css({
+            this.cachedEls.gridContainer.css({
                 width: totalWidth
             });
 
@@ -650,15 +655,15 @@ define(function (require) {
 
         reposition: function () {
             // get gridRect
-            var tableRect = this.$grid[0].getBoundingClientRect(),
-                visibleRect = this.getVisibleRect(this.$grid[0]),
+            var tableRect = this.cachedEls.gridContainer[0].getBoundingClientRect(),
+                visibleRect = this.getVisibleRect(this.cachedEls.gridContainer[0]),
                 mode = 'default';
             if (visibleRect.top !== tableRect.top || this.layout === 'fullscreen') {
                 mode = 'fixed';
             }
             this.setFloatTheadMode(mode, visibleRect, tableRect);
             // update lastClientRect to prevent calling this function again
-            this.lastClientRect = this.$grid.parents('.other-scroll-container')[0].getBoundingClientRect();
+            this.lastClientRect = this.cachedEls.otherScrollContainer[0].getBoundingClientRect();
             if (this.rescrollCb) {
                 this.rescrollCb();
             }
@@ -668,10 +673,10 @@ define(function (require) {
             var theadRect, sizingThead;
             // pass this argument to avoid expensive calculations
             if (!visibleRect) {
-                visibleRect = this.getVisibleRect(this.$grid[0]);
+                visibleRect = this.getVisibleRect(this.cachedEls.gridContainer[0]);
             }
             if (!tableRect) {
-                tableRect = this.$grid[0].getBoundingClientRect();
+                tableRect = this.cachedEls.gridContainer[0].getBoundingClientRect();
             }
             switch (mode) {
                 case 'relative':
@@ -680,16 +685,16 @@ define(function (require) {
                         this.$el.removeClass('floatThead-fixed');
                         this.$el.addClass('floatThead-relative');
                         if (!this.$grid.find('.thead-sizing').length) {
-                            sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            sizingThead = this.cachedEls.thead.clone().addClass('thead-sizing');
                             sizingThead.find('th').attr('style', '');
                             this.$grid.prepend(sizingThead);
                         }
                     }
-                    this.$grid.find('thead:first').css({
+                    this.cachedEls.thead.css({
                         top: visibleRect.top - tableRect.top
                     });
-                    theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
-                    this.$grid.find('thead:first tr:first').css({
+                    theadRect = this.cachedEls.thead[0].getBoundingClientRect();
+                    this.cachedEls.theadTr.css({
                         marginLeft: tableRect.left - theadRect.left
                     });
                     break;
@@ -700,22 +705,24 @@ define(function (require) {
                         this.$el.addClass('floatThead-fixed');
                         this.$grid.find('thead:first .dropdown.open').removeClass('open');
                         if (!this.$grid.find('.thead-sizing').length) {
-                            sizingThead = this.$grid.find('thead').clone().addClass('thead-sizing');
+                            sizingThead = this.cachedEls.thead.clone().addClass('thead-sizing');
                             sizingThead.find('th').attr('style', '');
                             sizingThead.insertAfter(this.$grid.find('thead'));
                         }
                     }
-                    this.$grid.find('thead:first').css({
+                    console.log(visibleRect.bottom - visibleRect.top);
+                    this.cachedEls.thead.css({
                         // show only visible part
                         top: visibleRect.top,
                         width: visibleRect.right - visibleRect.left,
+                        height: Math.min(this.headerHeight, visibleRect.bottom - visibleRect.top),
 
                         // left side should be also tracked
                         // gives incorrect rendering when "document" scrolled horizontally
                         left: visibleRect.left
                     });
-                    theadRect = this.$grid.find('thead:first')[0].getBoundingClientRect();
-                    this.$grid.find('thead:first tr:first').css({
+                    theadRect = this.cachedEls.thead[0].getBoundingClientRect();
+                    this.cachedEls.theadTr.css({
                         // possible solution set scrollLeft instead
                         // could be more fast for rendering
                         marginLeft: tableRect.left - theadRect.left
@@ -726,7 +733,8 @@ define(function (require) {
                         this.$grid.find('.thead-sizing').remove();
                         this.$el.removeClass('floatThead-relative floatThead-fixed');
                         // remove extra styles
-                        this.$grid.find('thead:first, thead:first tr:first').attr('style', '');
+                        this.cachedEls.thead.attr('style', '');
+                        this.cachedEls.theadTr.attr('style', '');
                         // cleanup
                     }
                     break;
@@ -735,22 +743,22 @@ define(function (require) {
         },
 
         addFloatThead: function () {
+            this.setupCache();
             this.rescrollCb = this.rescroll();
-            this.headerHeight = this.$grid.find('thead tr:first').height();
+            this.headerHeight = this.cachedEls.theadTr.height();
             this.fixHeaderCellWidth();
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
                 this.setFloatTheadMode('relative');
             }, this));
-            this.$grid.parents('.grid-container').parents().add(document).on('scroll', this.reposition);
+            this.cachedEls.gridContainer.parents().add(document).on('scroll', this.reposition);
         },
 
         removeFloatThead: function () {
-            this.$grid.find('tbody .thead-sizing-row').remove();
+            this.setFloatTheadMode('default');
             this.$grid.parents().add(document).off('scroll', this.reposition);
             // remove css
-            this.$grid.find('thead:first, thead:first tr:first').parent().attr('style', '');
-            this.getHeaderCells().attr('style', '');
-            this.getFirstRowCells().attr('style', '');
+            this.cachedEls.headerCells.attr('style', '');
+            this.cachedEls.firstRowCells.attr('style', '');
         },
 
         rescroll: function () {
@@ -832,7 +840,7 @@ define(function (require) {
         },
 
         fixHeightInFloatTheadMode: function () {
-            var currentClientRect = this.$grid.parents('.other-scroll-container')[0].getBoundingClientRect();
+            var currentClientRect = this.cachedEls.otherScrollContainer[0].getBoundingClientRect();
             if (!this.lastClientRect || (this.lastClientRect.top !== currentClientRect.top ||
                 this.lastClientRect.left !== currentClientRect.left ||
                 this.lastClientRect.right !== currentClientRect.right)) {
@@ -868,6 +876,13 @@ define(function (require) {
                     bottom: midRect.bottom,
                     right: midRect.right
                 };
+            if (
+                (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
+                (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible
+                ) {
+                // no need to calculate anything
+                return resultRect;
+            }
             current = current.parentNode;
             while (current !== document.documentElement) {
                 midRect = current.getBoundingClientRect();
@@ -1051,6 +1066,8 @@ define(function (require) {
         updateLayout: function () {
             if (!this.$grid.parents('body').length) {
                 // not ready to apply layout
+                // try to do that at next js cycle1
+                _.defer(_.bind(this.updateLayout, this));
                 return;
             }
             this.setFloatThead(true);
