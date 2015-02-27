@@ -126,20 +126,19 @@ and ensure that process works.
  - If you want to get one element from collection you could use this syntax `'$contact.accounts[0]'`. Single quotes are
   necessary, otherwise you will get ParseException  `Unexpected characters near "]"`
 
-If you want to use `@foreach` with some conditions, you should add `@tree` block after action:
+If you want to use `@foreach` with some conditions, you should add action block, and write condition inside:
 
 ```
     - @foreach:
         array: $contact.accounts
         value: $.accountItem
         actions:
-            - @tree:
+            - @assign_value:
                 conditions:
                     @and:
                         - @empty: $account
                         - @not_empty: $.accountItem
-                actions:
-                    - @assign_value: [$account, $.accountItem]
+                parameters: [$account, $.accountItem]
 ```
 
 Console commands
