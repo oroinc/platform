@@ -1,6 +1,7 @@
 parameters:
     oro_sso.oauth_provider.class: Oro\Bundle\SSOBundle\Security\Core\User\OAuthUserProvider
     hwi_oauth.authentication.provider.oauth.class: Oro\Bundle\SSOBundle\Security\OAuthProvider
+    hwi_oauth.resource_owner.google.class: Oro\Bundle\SSOBundle\OAuth\ResourceOwner\GoogleResourceOwner
 
 services:
     oro_sso.oauth_provider:

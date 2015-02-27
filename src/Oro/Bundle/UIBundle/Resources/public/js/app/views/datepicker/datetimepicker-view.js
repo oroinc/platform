@@ -13,9 +13,10 @@ define(function (require) {
         defaults: _.extend({}, DatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         /**
-         * Returns supper prototype
+         * Returns supper prototype for datetime picker view mixin
          *
          * @returns {Object}
+         * @final
          * @protected
          */
         _super: function () {

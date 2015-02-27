@@ -16,10 +16,10 @@ define([
         render: function () {
             // does not update view is data is from cache
             if (!this.actionArgs || this.actionArgs.options.fromCache === true) {
-                return;
+                return this;
             }
 
-            MostViewedView.__super__.render.call(this);
+            return MostViewedView.__super__.render.call(this);
         }
     });
 

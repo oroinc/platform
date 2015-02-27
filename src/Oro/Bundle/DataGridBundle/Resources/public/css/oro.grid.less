@@ -35,10 +35,11 @@ table.grid {
   thead {
     th {
       vertical-align: top;
-      > a {
+      > a, > span {
         display: block;
         line-height: 12px;
         padding: 7px 0 5px;
+        color: #5e5e5e;
         &a:focus {
           outline: none;
         }
@@ -148,13 +149,8 @@ table.grid {
   }
 
   .grid-container {
-    border: 1px solid rgb(221, 221, 221);
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
-  }
-
-  &.no-data-visible .grid-container {
-    border: none;
   }
 
   .grid {

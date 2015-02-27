@@ -28,6 +28,14 @@ class Configuration implements ConfigurationInterface
                 'value' => [],
                 'type' => 'array',
             ],
+            'google_sso_client_id' => [
+                'value' => 'changeMe',
+                'type' => 'text',
+            ],
+            'google_sso_client_secret' => [
+                'value' => 'changeMe',
+                'type' => 'text',
+            ],
         ]);
 
         return $treeBuilder;

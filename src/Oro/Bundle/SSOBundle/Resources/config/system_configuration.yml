@@ -13,6 +13,7 @@ oro_system_configuration:
             type: oro_config_checkbox
             options:
                 label: oro.sso.system_configuration.fields.enable_google_sso.label
+            priority: 40
         oro_sso.google_sso_domains:
             data_type: string
             type: oro_collection
@@ -20,6 +21,23 @@ oro_system_configuration:
                 label: oro.sso.system_configuration.fields.google_sso_domains.label
                 handle_primary: false
                 type: text
+            priority: 10
+        oro_sso.google_sso_client_id:
+            data_type: string
+            type: text
+            options:
+                label: oro.sso.system_configuration.fields.google_sso_client_id.label
+                constraints:
+                    - NotBlank: ~
+            priority: 30
+        oro_sso.google_sso_client_secret:
+            data_type: string
+            type: text
+            options:
+                label: oro.sso.system_configuration.fields.google_sso_client_secret.label
+                constraints:
+                    - NotBlank: ~
+            priority: 20
 
     tree:
         system_configuration:
@@ -33,3 +51,5 @@ oro_system_configuration:
                                         children:
                                             - oro_sso.enable_google_sso
                                             - oro_sso.google_sso_domains
+                                            - oro_sso.google_sso_client_id
+                                            - oro_sso.google_sso_client_secret

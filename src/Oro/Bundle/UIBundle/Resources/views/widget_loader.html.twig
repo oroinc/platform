@@ -1,18 +1,10 @@
-<div id="{{ elementId }}" style="visibility: hidden;">
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% set widgetComponentOptions = {
+    'type' : widgetType,
+    'options' : options
+} %}
+<div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }} data-layout="separate">
     {% if options.elementFirst %}
         {% render options.url %}
     {% endif %}
 </div>
-
-<script type="text/javascript">
-    require(['jquery', 'oro/{{ widgetType ~ '-widget' }}', 'ready!app'],
-    function($, Widget){
-        $(function(){
-            var widget = new Widget({{ options|json_encode|raw }});
-            $("#{{ elementId }}").css('visibility', 'visible');
-            {% if options.elementFirst %}
-            widget.render();
-            {% endif %}
-        })
-    });
-</script>

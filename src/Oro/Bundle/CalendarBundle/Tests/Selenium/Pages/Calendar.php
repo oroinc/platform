@@ -29,7 +29,7 @@ class Calendar extends AbstractPage
         $this->test->byXpath("//td[contains(@class,'fc-today fc-state-highlight')]")->click();
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
+            "//div[contains(@class,'ui-dialog-titlebar')]".
             "/span[normalize-space(.)='Add New Event']"
         );
 
@@ -47,7 +47,7 @@ class Calendar extends AbstractPage
         $this->test->byXpath("//button[@type='button'][normalize-space(.)='Edit']")->click();
         $this->waitForAjax();
         $this->assertElementPresent(
-            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']".
+            "//div[contains(@class,'ui-dialog-titlebar')]".
             "/span[normalize-space(.)='Edit Event']"
         );
 
@@ -75,7 +75,7 @@ class Calendar extends AbstractPage
         $this->test->byXpath("//button[@type='submit'][normalize-space(.)='Save']")->click();
         $this->waitForAjax();
         $this->assertElementNotPresent(
-            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']",
+            "//div[contains(@class,'ui-dialog-titlebar')]",
             'Event window is still open'
         );
 
@@ -95,7 +95,7 @@ class Calendar extends AbstractPage
         )->click();
         $this->waitForAjax();
         $this->assertElementNotPresent(
-            "//div[@class='ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix']",
+            "//div[contains(@class,'ui-dialog-titlebar')]",
             'Event window is still open'
         );
 

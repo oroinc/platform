@@ -1,7 +1,8 @@
 /*jslint nomen:true*/
 /*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget', 'oroui/js/loading-mask',
-    'orocalendar/js/form-validation', 'oroui/js/delete-confirmation', 'oroform/js/formatter/field'
+define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'oro/dialog-widget',
+    'oroui/js/app/views/loading-mask-view', 'orocalendar/js/form-validation', 'oroui/js/delete-confirmation',
+    'oroform/js/formatter/field'
 ], function (_, Backbone, __, routing, DialogWidget, LoadingMask, FormValidation, DeleteConfirmation, fieldFormatter) {
     'use strict';
 
@@ -123,8 +124,9 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
             });
 
             // init loading mask control
-            this.loadingMask = new LoadingMask();
-            this.eventDialog.$el.closest('.ui-dialog').append(this.loadingMask.render().$el);
+            this.loadingMask = new LoadingMask({
+                container: this.eventDialog.$el.closest('.ui-dialog')
+            });
 
             return this;
         },
@@ -180,10 +182,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', 'routing', 'or
 
         _showMask: function (message) {
             if (this.loadingMask) {
-                this.loadingMask.$el
-                    .find(this.selectors.loadingMaskContent)
-                    .text(message);
-                this.loadingMask.show();
+                this.loadingMask.show(message);
             }
         },
 

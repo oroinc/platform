@@ -10,3 +10,5 @@ oro:
                 fields:
                     enable_google_sso.label: Enable SSO
                     google_sso_domains.label: Domains
+                    google_sso_client_id.label: Client Id
+                    google_sso_client_secret.label: Client secret

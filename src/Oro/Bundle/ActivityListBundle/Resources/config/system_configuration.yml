@@ -36,6 +36,14 @@ oro_system_configuration:
                     100:    100
                 constraints:
                     - NotBlank: ~
+        oro_activity_list.grouping:
+            data_type: boolean
+            type: choice
+            options:
+                label: oro.activitylist.system_configuration.email_threads.use_threads_in_activities.label
+                choices:
+                    - oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.non_threaded.label
+                    - oro.activitylist.system_configuration.email_threads.use_threads_in_activities.choices.threaded.label
 
     tree:
         system_configuration:
@@ -50,9 +58,16 @@ oro_system_configuration:
                                             - oro_activity_list.sorting_field
                                             - oro_activity_list.sorting_direction
                                             - oro_activity_list.per_page
+                            email_configuration:
+                                children:
+                                    email_threads:
+                                        children:
+                                            - oro_activity_list.grouping
 
     api_tree:
         activity_list:
             oro_activity_list.sorting_field: ~
             oro_activity_list.sorting_direction: ~
             oro_activity_list.per_page: ~
+        email_threads:
+            oro_activity_list.grouping: ~

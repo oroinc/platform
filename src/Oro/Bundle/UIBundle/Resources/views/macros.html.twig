@@ -223,7 +223,7 @@
         <ul class="dropdown-menu {{ parameters.aCss is defined? parameters.aCss : '' }}">
             {% if parameters.elements is defined and parameters.elements is not empty %}
                 {% for item in parameters.elements %}
-                    {{ _self.dropdownItem(parameters) }}
+                    {{ _self.dropdownItem(item) }}
                 {% endfor %}
             {% endif %}
             {% if parameters.html is defined and parameters.html is not empty %}
@@ -498,7 +498,13 @@
         style="display: none"
         {% endif -%}
         {% if parameters.widget is defined and parameters.widget|length %}
-            {{ _self.renderWidgetDataAttributes(parameters.widget) }}
+            {% set options = parameters.widget %}
+            {% if (options.createOnEvent is not defined) %}
+                {% set options = options|merge({
+                    'createOnEvent' : options.event|default('click')
+                }) %}
+            {% endif %}
+            {{ _self.renderWidgetAttributes(options) }}
         {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
@@ -511,9 +517,21 @@
     </a>
 {% endmacro %}
 
-{% macro renderWidgetDataAttributes(options) %}
+{% macro renderWidgetAttributes(options) %}
     data-page-component-module="oroui/js/app/components/widget-component"
-    data-page-component-options="{{ options|json_encode(constant('JSON_FORCE_OBJECT')) }}"
+    data-page-component-options="{{ options|json_encode }}"
+{% endmacro %}
+{#
+    @deprecated
+    Please use renderWidgetAttributes() with createOnEvent option specified instead
+#}
+{% macro renderWidgetDataAttributes(options) %}
+    {% if (options.createOnEvent is not defined) %}
+        {% set options = options|merge({
+            'createOnEvent' : options.event|default('click')
+        }) %}
+    {% endif %}
+    {{ _self.renderWidgetAttributes(options) }}
 {% endmacro %}
 
 {% macro renderAttributes(options, prefix) %}

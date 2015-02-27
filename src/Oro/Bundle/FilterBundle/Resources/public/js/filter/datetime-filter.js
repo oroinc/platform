@@ -12,10 +12,6 @@ define(function (require) {
 
     /**
      * Datetime filter: filter type as option + interval begin and end dates
-     *
-     * @export  oro/filter/datetime-filter
-     * @class   oro.filter.DatetimeFilter
-     * @extends oro.filter.DateFilter
      */
     DatetimeFilter = DateFilter.extend({
         /**
@@ -87,7 +83,8 @@ define(function (require) {
         _getPickerConfigurationOptions: function (options) {
             DatetimeFilter.__super__._getPickerConfigurationOptions.call(this, options);
             _.extend(options, {
-                backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat]
+                backendFormat: [datetimeFormatter.getDateTimeFormat(), this.backendFormat],
+                timezoneShift: 0
             });
             return options;
         },

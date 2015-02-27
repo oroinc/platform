@@ -4,6 +4,7 @@ define(function (require) {
 
     var WidgetComponent,
         $ = require('jquery'),
+        _ = require('underscore'),
         BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools'),
@@ -45,7 +46,12 @@ define(function (require) {
                 if (!this.options.options.url) {
                     this.options.options.url = this.$element.data('url') || this.$element.attr('href');
                 }
-                this._bindOpenEvent();
+                if (this.options.createOnEvent) {
+                    this._bindOpenEvent();
+                } else {
+                    this._deferredInit();
+                    this.openWidget();
+                }
             }
         },
 
@@ -66,7 +72,7 @@ define(function (require) {
          */
         _bindOpenEvent: function () {
             var eventName, handler;
-            eventName = this.options.event || 'click';
+            eventName = this.options.createOnEvent;
             handler = _.bind(function (e) {
                 e.preventDefault();
                 this.openWidget();
@@ -122,6 +128,15 @@ define(function (require) {
             }
 
             widget.render();
+
+            if (widget.isEmbedded()) {
+                /**
+                 * if the widget is embedded, bind its life cycle with the component
+                 */
+                widget.listenTo(this, 'dispose', widget.dispose);
+            }
+
+            this._resolveDeferredInit();
         },
 
         /**
