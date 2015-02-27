@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
-use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
@@ -15,6 +14,7 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
 class EmailTypeTest extends TypeTestCase
 {
