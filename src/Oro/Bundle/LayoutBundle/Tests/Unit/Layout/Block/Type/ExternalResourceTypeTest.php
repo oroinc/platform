@@ -12,25 +12,31 @@ class ExternalResourceTypeTest extends BlockTypeTestCase
     public function testSetDefaultOptions()
     {
         $this->assertEquals(
-            [],
-            $this->resolveOptions(ExternalResourceType::NAME, [])
-        );
-        $this->assertEquals(
-            ['type' => 'text/css', 'href' => 'test.css', 'rel' => 'stylesheet'],
+            ['href' => 'test.css', 'rel' => 'stylesheet'],
             $this->resolveOptions(
                 ExternalResourceType::NAME,
-                ['type' => 'text/css', 'href' => 'test.css', 'rel' => 'stylesheet']
+                ['href' => 'test.css', 'rel' => 'stylesheet']
             )
         );
+    }
+
+    /**
+     * @expectedException \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @expectedExceptionMessage The required options "href", "rel" are missing.
+     */
+    public function testBuildViewThrowsExceptionIfRequiredOptionsNotSpecified()
+    {
+        $this->getBlockView(new ExternalResourceType());
     }
 
     public function testBuildView()
     {
         $view = $this->getBlockView(
             ExternalResourceType::NAME,
-            ['type' => 'text/css', 'href' => 'test.css', 'rel' => 'stylesheet']
+            ['rel' => 'stylesheet', 'type' => 'text/css', 'href' => 'test.css', ]
         );
 
+        $this->assertEquals('stylesheet', $view->vars['attr']['rel']);
         $this->assertEquals('text/css', $view->vars['attr']['type']);
         $this->assertEquals('test.css', $view->vars['attr']['href']);
     }

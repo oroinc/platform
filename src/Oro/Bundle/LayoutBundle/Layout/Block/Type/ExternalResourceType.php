@@ -12,20 +12,14 @@ class ExternalResourceType extends AbstractType
 {
     const NAME = 'external_resource';
 
-    /** @var array */
-    protected static $attributes = [
-        'href' => 'href',
-        'rel'  => 'rel',
-        'type' => 'type'
-    ];
-
     /**
      * {@inheritdoc}
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $optionalOptions = array_values(self::$attributes);
-        $resolver->setOptional($optionalOptions);
+        $resolver
+            ->setRequired(['rel', 'href'])
+            ->setOptional(['type']);
     }
 
     /**
@@ -33,10 +27,10 @@ class ExternalResourceType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        foreach (self::$attributes as $attr => $opt) {
-            if (isset($options[$opt])) {
-                $view->vars['attr'][$attr] = $options[$opt];
-            }
+        $view->vars['attr']['rel']  = $options['rel'];
+        $view->vars['attr']['href'] = $options['href'];
+        if (!empty($options['type'])) {
+            $view->vars['attr']['type'] = $options['type'];
         }
     }
 
