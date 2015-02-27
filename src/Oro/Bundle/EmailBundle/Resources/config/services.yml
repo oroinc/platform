@@ -62,10 +62,16 @@ parameters:
     oro_email.listener.datagrid.user_emails.main.class:   Oro\Bundle\EmailBundle\EventListener\Datagrid\MainUserEmailGridListener
     oro_email.listener.datagrid.grouping.class:           Oro\Bundle\EmailBundle\EventListener\Datagrid\GroupingGridListener
 
-    #Email Action for workflows
+    # Email Action for workflows
     oro_email.workflow.action.send_email.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmail
+    oro_email.workflow.action.send_email_template.class: Oro\Bundle\EmailBundle\Workflow\Action\SendEmailTemplate
 
     oro_email.listener.search_listener.class: Oro\Bundle\EmailBundle\EventListener\SearchListener
+
+    # Validators
+    oro_email.validator.email_template_syntax_validator.class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
+    oro_email.validator.email_address_validator.class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
+    oro_email.validator.email_recipients_validator.class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
 
 services:
     oro_email.entity.cache.warmer:
@@ -284,7 +290,7 @@ services:
             - { name: oro_email.emailtemplate.variable_provider, scope: system }
 
     oro_email.validator.email_template_syntax:
-        class: Oro\Bundle\EmailBundle\Validator\EmailTemplateSyntaxValidator
+        class: %oro_email.validator.email_template_syntax_validator.class%
         arguments:
             - @oro_email.email_renderer
             - @oro_locale.settings
@@ -294,14 +300,14 @@ services:
             - { name: validator.constraint_validator, alias: oro_email.email_template_syntax_validator }
 
     oro_email.validator.email_address_validator:
-        class: Oro\Bundle\EmailBundle\Validator\EmailAddressValidator
+        class: %oro_email.validator.email_address_validator.class%
         arguments:
             - @oro_email.email.address.helper
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_address_validator }
 
     oro_email.validator.email_recipients:
-        class: Oro\Bundle\EmailBundle\Validator\EmailRecipientsValidator
+        class: %oro_email.validator.email_recipients_validator.class%
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_recipients_validator }
 
@@ -339,8 +345,25 @@ services:
             - @oro_email.mailer.processor
             - @oro_email.email.address.helper
             - @oro_locale.formatter.name
+        calls:
+            - [setLogger, [@logger]]
         tags:
             - { name: oro_workflow.action, alias: send_email }
+
+    oro_email.workflow.action.send_email_template:
+        class: %oro_email.workflow.action.send_email_template.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_email.mailer.processor
+            - @oro_email.email.address.helper
+            - @oro_locale.formatter.name
+            - @oro_email.email_renderer
+            - @doctrine.orm.entity_manager
+            - @validator
+        calls:
+            - [setLogger, [@logger]]
+        tags:
+            - { name: oro_workflow.action, alias: send_email_template }
 
     oro_email.helper.datagrid.emails:
         class: %oro_email.helper.datagrid.emails.class%

@@ -56,6 +56,7 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
             $emails = $queryBuilder->getQuery()->execute();
             if (count($emails)) {
                 $newThread = new EmailThread();
+                $manager->persist($newThread);
                 foreach ($emails as $key => $email) {
                     /** @var Email $email */
                     $email->setThread($newThread);

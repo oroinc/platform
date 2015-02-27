@@ -134,9 +134,13 @@ abstract class OroKernel extends Kernel
         $exclusions = array();
         foreach ($files as $file) {
             $import  = Yaml::parse($file);
-            $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
-            if (!empty($import['exclusions'])) {
-                $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
+            if (!empty($import)) {
+                if (!empty($import['bundles'])) {
+                    $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
+                }
+                if (!empty($import['exclusions'])) {
+                    $exclusions = array_merge($exclusions, $this->getBundlesMapping($import['exclusions']));
+                }
             }
         }
 

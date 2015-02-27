@@ -39,8 +39,8 @@ class Processor
 
     /**
      * @param ObjectManager $objectManager
-     * @param EmailRenderer $renderer
      * @param ConfigManager $configManager
+     * @param EmailRenderer $renderer
      * @param UserManager   $userManager
      * @param \Swift_Mailer $mailer
      */
