@@ -119,6 +119,13 @@ provoke self-triggering.
 ``app/console oro:process:configuration:load`` - after that you can create ``Contact`` of changed assigned user
 and ensure that process works.
 
+**Note:**
+
+ - Expression `$` or `$.data` means that you use current entity, above in example it's `OroCRM\Bundle\ContactBundle\Entity\Contact`
+ - Expression `$.` means that you use instance of `Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity`
+ - If you want to get one element from collection you could use this syntax `'$contact.accounts[0]'`. Single quotes are
+  necessary, otherwise you will get ParseException  `Unexpected characters near "]"`
+
 Console commands
 ----------------
 
@@ -131,6 +138,8 @@ during application installation and update. Command has two optional options:
 
 - **--directories** - specifies directories used to find configuration files (multiple values allowed);
 - **--definitions** - specifies names of the process definitions that should be loaded (multiple values allowed).
+
+**Note:** You should run this command if process configuration was changed for loading changes.
 
 #### oro:process:execute:job
 
