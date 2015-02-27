@@ -218,15 +218,21 @@ class FormTypeTest extends BlockTypeTestCase
         $formView           = new FormView();
         $view->vars['form'] = $formView;
 
-        $view->children['block1']     = new BlockView($view);
-        $rootView->children['block3'] = new BlockView($rootView);
-
         $formView->children['field1']    = new FormView($formView);
         $formView->children['field2']    = new FormView($formView);
         $field3View                      = new FormView($formView);
         $formView->children['field3']    = $field3View;
         $field3View->children['field31'] = new FormView($field3View);
         $field3View->children['field32'] = new FormView($field3View);
+
+        $view->children['block1']         = new BlockView($view);
+        $view['block1']->vars['form']     = $formView['field1'];
+        $rootView->children['block3']     = new BlockView($rootView);
+        $rootView['block3']->vars['form'] = $field3View['field31'];
+        $rootView->children['block4']     = new BlockView($rootView);
+        // emulate remove form field blocks and then add new blocks with same ids
+        $view->children['block2']         = new BlockView($view);
+        $rootView['block4']->vars['form'] = new FormView();
 
         $context->set('form', $formAccessor);
 
@@ -268,15 +274,17 @@ class FormTypeTest extends BlockTypeTestCase
         $formView           = new FormView();
         $view->vars['form'] = $formView;
 
-        $view->children['block1'] = new BlockView($view);
-        $view->children['block3'] = new BlockView($view);
-
         $formView->children['field1']    = new FormView($formView);
         $formView->children['field2']    = new FormView($formView);
         $field3View                      = new FormView($formView);
         $formView->children['field3']    = $field3View;
         $field3View->children['field31'] = new FormView($field3View);
         $field3View->children['field32'] = new FormView($field3View);
+
+        $view->children['block1']     = new BlockView($view);
+        $view['block1']->vars['form'] = $formView['field1'];
+        $view->children['block3']     = new BlockView($view);
+        $view['block3']->vars['form'] = $field3View['field31'];
 
         $context->set('form', $formAccessor);
 

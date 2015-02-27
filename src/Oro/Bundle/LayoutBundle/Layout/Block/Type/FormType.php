@@ -134,6 +134,7 @@ class FormType extends AbstractContainerType
         $rootView     = null;
         foreach ($formAccessor->getProcessedFields() as $formFieldPath => $blockId) {
             if (isset($view[$blockId])) {
+                $this->checkExistingFieldView($view, $view[$blockId], $formFieldPath);
                 continue;
             }
             if ($rootView === null) {
@@ -142,15 +143,11 @@ class FormType extends AbstractContainerType
                     : false;
             }
             if ($rootView !== false && isset($rootView[$blockId])) {
+                $this->checkExistingFieldView($view, $rootView[$blockId], $formFieldPath);
                 continue;
             }
 
-            /** @var FormView $form */
-            $form = $view->vars['form'];
-            foreach (explode('.', $formFieldPath) as $field) {
-                $form = $form[$field];
-            }
-            $form->setRendered();
+            $this->getFormFieldView($view, $formFieldPath)->setRendered();
         }
     }
 
@@ -175,5 +172,44 @@ class FormType extends AbstractContainerType
         }
 
         return $result;
+    }
+
+    /**
+     * Returns form field view
+     *
+     * @param BlockView $view
+     * @param string    $formFieldPath
+     *
+     * @return FormView
+     */
+    protected function getFormFieldView(BlockView $view, $formFieldPath)
+    {
+        /** @var FormView $form */
+        $form = $view->vars['form'];
+        foreach (explode('.', $formFieldPath) as $field) {
+            $form = $form[$field];
+        }
+
+        return $form;
+    }
+
+    /**
+     * Checks whether an existing field view is the view created in buildBlock method,
+     * and if it is another view mark the corresponding form field as rendered
+     *
+     * @param BlockView $view
+     * @param BlockView $childView
+     * @param string    $formFieldPath
+     */
+    protected function checkExistingFieldView(BlockView $view, BlockView $childView, $formFieldPath)
+    {
+        if (!isset($childView->vars['form'])) {
+            $this->getFormFieldView($view, $formFieldPath)->setRendered();
+        } else {
+            $formFieldView = $this->getFormFieldView($view, $formFieldPath);
+            if ($childView->vars['form'] !== $formFieldView) {
+                $formFieldView->setRendered();
+            }
+        }
     }
 }
