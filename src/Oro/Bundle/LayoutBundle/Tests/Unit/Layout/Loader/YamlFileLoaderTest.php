@@ -147,7 +147,7 @@ add:
 Filename: path/to/my/file.yml
 MESSAGE;
 
-        $this->setExpectedException('\RuntimeException', str_replace("\n", PHP_EOL, $message));
+        $this->setExpectedException('\RuntimeException', str_replace("\r\n", "\n", $message));
 
         $update = $loader->load(new FileResource('path/to/my/file.yml'));
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);

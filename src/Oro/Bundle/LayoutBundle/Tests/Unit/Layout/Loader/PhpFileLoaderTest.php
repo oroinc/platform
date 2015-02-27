@@ -120,7 +120,7 @@ Syntax error: Some error found at "0"
 Filename:
 MESSAGE;
 
-        $this->setExpectedException('\RuntimeException', str_replace("\n", PHP_EOL, $message));
+        $this->setExpectedException('\RuntimeException', str_replace("\r\n", "\n", $message));
 
         $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../../Stubs/Updates/layout_update4.php';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
