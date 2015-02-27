@@ -14,7 +14,6 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAddressType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType;
-use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 
 class EmailTypeTest extends TypeTestCase
 {
@@ -46,7 +45,10 @@ class EmailTypeTest extends TypeTestCase
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $htmlTagProvider = new HtmlTagProvider();
+        $htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
+        $htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['br', 'a']);
         $richTextType = new OroRichTextType($configManager, $htmlTagProvider);
 
         return [

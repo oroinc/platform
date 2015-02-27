@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
@@ -25,7 +24,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     protected $assetsHelper;
 
     /**
-     * @var HtmlTagProvider
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
     protected $htmlTagProvider;
 
@@ -37,7 +36,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->assetsHelper = $this->getMock('Symfony\Component\Templating\Asset\PackageInterface');
-        $this->htmlTagProvider = new HtmlTagProvider();
+        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
         $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider);
         $this->formType->setAssetHelper($this->assetsHelper);
     }
@@ -63,10 +62,16 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
      * @param array $options
      * @param bool $globalEnable
      * @param array $viewData
+     * @param array $elements
      * @param bool $expectedEnable
      */
-    public function testBuildForm(array $options, $globalEnable, array $viewData, $expectedEnable = true)
-    {
+    public function testBuildForm(
+        array $options,
+        $globalEnable,
+        array $viewData,
+        array $elements,
+        $expectedEnable = true
+    ) {
         $data = 'test';
 
         $this->configManager->expects($this->once())
@@ -84,6 +89,10 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 )
             );
 
+        $this->htmlTagProvider->expects($this->once())
+            ->method('getAllowedElements')
+            ->willReturn($elements);
+
         $viewData['attr']['data-page-component-options']['content_css']
             = '/prefix/' . $viewData['attr']['data-page-component-options']['content_css'];
         $viewData['attr']['data-page-component-options']['skin_url']
@@ -100,8 +109,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             $this->assertArrayHasKey($key, $view->vars);
             $this->assertEquals($value['data-page-component-module'], $view->vars[$key]['data-page-component-module']);
             $this->assertEquals(
-                json_decode($value['data-page-component-options'], true),
-                json_decode($view->vars[$key]['data-page-component-options'], true)
+                ksort(json_decode($value['data-page-component-options'], true)),
+                ksort(json_decode($view->vars[$key]['data-page-component-options'], true))
             );
         }
     }
@@ -166,7 +175,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 true,
                 [
                     'attr' => $defaultAttrs
-                ]
+                ],
+                [],
             ],
             'default options global disabled' => [
                 [],
@@ -174,6 +184,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 [
                     'attr' => $defaultAttrs
                 ],
+                [],
                 false,
             ],
             'global enabled local disabled' => [
@@ -182,6 +193,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                 [
                     'attr' => $defaultAttrs
                 ],
+                [],
                 false,
             ],
             'wysiwyg_options' => [
@@ -204,7 +216,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                                 'skin_url' => 'bundles/oroform/css/tinymce',
                                 'plugins' => ['textcolor', 'code', 'link'],
                                 'toolbar' => $toolbar,
-                                'valid_elements' => implode(',', $elements),
+                                //'valid_elements' => implode(',', $elements),
                                 'menubar' => false,
                                 'statusbar' => false,
                                 'relative_urls' => false,
@@ -219,7 +231,8 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
                             ]
                         )
                     ]
-                ]
+                ],
+                $elements,
             ],
         ];
     }
