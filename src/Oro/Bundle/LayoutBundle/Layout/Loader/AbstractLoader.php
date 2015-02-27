@@ -69,8 +69,8 @@ abstract class AbstractLoader implements LoaderInterface
         try {
             return $this->getGenerator()->generate($className, $resourceDataForGenerator, $resource->getConditions());
         } catch (SyntaxException $e) {
-            $message = $e->getMessage() . PHP_EOL . $this->dumpSource($e->getSource());
-            $message .= str_repeat(PHP_EOL, 2) . 'Filename: ' . $resource->getFilename();
+            $message = $e->getMessage() . "\n" . $this->dumpSource($e->getSource());
+            $message .= str_repeat("\n", 2) . 'Filename: ' . $resource->getFilename();
 
             throw new \RuntimeException($message, 0, $e);
         }
