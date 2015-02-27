@@ -40,4 +40,18 @@ class ApplicationContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($context->getDataResolver()->isKnown('debug'));
         $this->assertTrue($context['debug']);
     }
+
+    public function testConfigureContextOverride()
+    {
+        $context = new LayoutContext();
+
+        $this->kernel->expects($this->never())
+            ->method('isDebug');
+
+        $context['debug'] = false;
+        $this->contextConfigurator->configureContext($context);
+        $context->resolve();
+
+        $this->assertFalse($context['debug']);
+    }
 }
