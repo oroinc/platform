@@ -7,14 +7,14 @@ oro_layout:
             parentId:  root
             blockType: container
         - @move:
-            id:        scripts
+            id:        head_script
             parentId:  hash_navigation_data
         - @move:
-            id:        main
+            id:        main_container
             parentId:  hash_navigation_data
-#        - @move:
-#            id:        breadcrumb
-#            parentId:  hash_navigation_data
+        - @move:
+            id:        breadcrumb
+            parentId:  hash_navigation_data
         - @move:
             id:        before_content_addition
             parentId:  hash_navigation_data

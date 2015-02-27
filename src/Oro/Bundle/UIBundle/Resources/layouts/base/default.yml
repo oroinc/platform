@@ -86,6 +86,10 @@ oro_layout:
             options:
                 placeholder_name: 'scripts_after'
         - @add:
+            id:        head_script
+            parentId:  head
+            blockType: container
+        - @add:
             id:        body
             parentId:  root
             blockType: body
