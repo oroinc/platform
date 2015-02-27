@@ -38,6 +38,7 @@ class Configuration implements ConfigurationInterface
             $rootNode,
             [
                 'signature' => ['value' => ''],
+                'use_threads_in_emails' => ['value' => true],
             ]
         );
 

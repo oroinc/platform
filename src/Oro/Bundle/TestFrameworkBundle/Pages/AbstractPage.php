@@ -274,4 +274,24 @@ abstract class AbstractPage
         $this->test->url('/user/logout');
         return new Login($this->test);
     }
+
+    /**
+     * @return $this
+     */
+    public function pin()
+    {
+        $this->test->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button']")->click();
+        $this->waitForAjax();
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function unpin()
+    {
+        $this->test->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button gold-icon']")->click();
+        $this->waitForAjax();
+        return $this;
+    }
 }

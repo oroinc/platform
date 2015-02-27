@@ -3,22 +3,26 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 
 class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
+    ActivityListGroupProviderInterface,
     CommentProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\Email';
@@ -38,25 +42,31 @@ class EmailActivityListProvider implements
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var EmailThreadProvider */
+    protected $emailThreadProvider;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param ServiceLink    $doctrineRegistryLink
-     * @param ServiceLink    $nameFormatterLink
-     * @param Router         $router
-     * @param ConfigManager  $configManager
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ServiceLink         $doctrineRegistryLink
+     * @param ServiceLink         $nameFormatterLink
+     * @param Router              $router
+     * @param ConfigManager       $configManager
+     * @param EmailThreadProvider $emailThreadProvider
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         ServiceLink $doctrineRegistryLink,
         ServiceLink $nameFormatterLink,
         Router $router,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        EmailThreadProvider $emailThreadProvider
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->doctrineRegistryLink = $doctrineRegistryLink;
         $this->nameFormatterLink    = $nameFormatterLink;
         $this->router               = $router;
         $this->configManager        = $configManager;
+        $this->emailThreadProvider  = $emailThreadProvider;
     }
 
     /**
@@ -77,7 +87,8 @@ class EmailActivityListProvider implements
     public function getRoutes()
     {
         return [
-            'itemView' => 'oro_email_view',
+            'itemView'  => 'oro_email_view',
+            'groupView' => 'oro_email_view_group',
         ];
     }
 
@@ -108,6 +119,15 @@ class EmailActivityListProvider implements
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isHead($entity)
+    {
+        /** @var $entity Email */
+        return $entity->isHead();
+    }
+
+    /**
      *  {@inheritdoc}
      */
     public function isDateUpdatable()
@@ -130,13 +150,24 @@ class EmailActivityListProvider implements
     public function getData(ActivityList $activityListEntity)
     {
         /** @var Email $email */
-        $email = $this->doctrineRegistryLink->getService()
+        $email = $headEmail = $this->doctrineRegistryLink->getService()
             ->getRepository($activityListEntity->getRelatedActivityClass())
             ->find($activityListEntity->getRelatedActivityId());
+        if ($email->isHead() && $email->getThread()) {
+            $headEmail = $this->emailThreadProvider->getHeadEmail(
+                $this->doctrineHelper->getEntityManager($activityListEntity->getRelatedActivityClass()),
+                $email
+            );
+        }
 
         $data = [
-            'ownerName' => $email->getFromName(),
-            'ownerLink' => null
+            'ownerName'     => $email->getFromName(),
+            'ownerLink'     => null,
+            'entityId'      => $email->getId(),
+            'headOwnerName' => $headEmail->getFromName(),
+            'headSubject'   => $headEmail->getSubject(),
+            'headSentAt'    => $headEmail->getSentAt()->format('c'),
+            'isHead'        => $email->isHead() && $email->getThread()
         ];
 
         if ($email->getFromEmailAddress()->hasOwner()) {
@@ -160,6 +191,14 @@ class EmailActivityListProvider implements
     public function getTemplate()
     {
         return 'OroEmailBundle:Email:js/activityItemTemplate.js.twig';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupedTemplate()
+    {
+        return 'OroEmailBundle:Email:js/groupedActivityItemTemplate.js.twig';
     }
 
     /**
@@ -195,5 +234,27 @@ class EmailActivityListProvider implements
         $config = $configManager->getProvider('comment')->getConfig($entity);
 
         return $config->is('enabled');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGroupedEntities($email)
+    {
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $this->doctrineRegistryLink->getService()
+            ->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('a');
+
+        $queryBuilder->innerJoin(
+            'OroEmailBundle:Email',
+            'e',
+            'INNER',
+            'a.relatedActivityId = e.id and a.relatedActivityClass = :class'
+        )
+            ->setParameter('class', self::ACTIVITY_CLASS)
+            ->andWhere('e.thread = :thread')
+            ->setParameter('thread', $email->getThread());
+
+        return $queryBuilder->getQuery()->getResult();
     }
 }

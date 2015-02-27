@@ -24,6 +24,7 @@ class EmailTest extends \PHPUnit_Framework_TestCase
         $sentAt = new \DateTime('now');
         $receivedAt = new \DateTime('now');
         $internalDate = new \DateTime('now');
+        $flags = ["\\Test"];
 
         $obj = new Email($message);
         $obj
@@ -81,6 +82,11 @@ class EmailTest extends \PHPUnit_Framework_TestCase
             ->method('getBody')
             ->will($this->returnValue($srcBody));
         $this->assertEquals($body, $obj->getBody());
+        $message->expects($this->exactly(2))
+            ->method('getFlags')
+            ->will($this->returnValue($flags));
+        $this->assertTrue($obj->hasFlag("\\Test"));
+        $this->assertFalse($obj->hasFlag("\\Test2"));
 
         $srcAttachmentContent = $this->getMockBuilder('Oro\Bundle\ImapBundle\Mail\Storage\Content')
             ->disableOriginalConstructor()
