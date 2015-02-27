@@ -98,6 +98,13 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_ui.layout_context_configurator.hash_navigation:
+        class: Oro\Bundle\UIBundle\Layout\Extension\HashNavContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+
     oro_ui.layout_context_configurator.config:
         class: Oro\Bundle\UIBundle\Layout\Extension\ConfigContextConfigurator
         arguments:
