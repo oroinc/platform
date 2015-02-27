@@ -91,6 +91,22 @@ services:
         calls:
             - [setRequest, ["@?request="]]
 
+    oro_ui.layout_context_configurator.user_agent:
+        class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+
+    oro_ui.layout_context_configurator.config:
+        class: Oro\Bundle\UIBundle\Layout\Extension\ConfigContextConfigurator
+        arguments:
+            - @oro_config.user
+            - # alias: config key
+                navbar_position: oro_ui.navbar_position
+        tags:
+            - { name: layout.context_configurator }
+
     oro_ui.block_type_extension.head:
         class: Oro\Bundle\UIBundle\Layout\Extension\HeadBlockTypeExtension
         arguments:

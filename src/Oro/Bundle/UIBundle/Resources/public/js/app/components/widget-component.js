@@ -4,6 +4,7 @@ define(function (require) {
 
     var WidgetComponent,
         $ = require('jquery'),
+        _ = require('underscore'),
         BaseComponent = require('oroui/js/app/components/base/component'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools'),
@@ -127,7 +128,13 @@ define(function (require) {
             }
 
             widget.render();
-            widget.listenTo(this, 'dispose', widget.dispose);
+
+            if (widget.isEmbedded()) {
+                /**
+                 * if the widget is embedded, bind its life cycle with the component
+                 */
+                widget.listenTo(this, 'dispose', widget.dispose);
+            }
 
             this._resolveDeferredInit();
         },

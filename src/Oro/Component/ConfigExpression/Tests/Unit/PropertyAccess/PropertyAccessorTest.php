@@ -226,7 +226,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\NoSuchPropertyException
+     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidPropertyPathException
      */
     public function testSetValueThrowsExceptionIfThereIsInvalidItemInGraph()
     {
@@ -340,9 +340,17 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(array('John', 'Doo'), '0', 'John'),
             array(array('John', 'Doo'), '1', 'Doo'),
             array(array('firstName' => 'John'), 'firstName', 'John'),
+            array(array('firstName' => 'John'), '[firstName]', 'John'),
             array(array('index' => array('firstName' => 'John')), 'index.firstName', 'John'),
+            array(array('index' => array('firstName' => 'John')), '[index][firstName]', 'John'),
+            array(array('index' => array('firstName' => 'John')), '[index].firstName', 'John'),
+            array(array('index' => array('firstName' => 'John')), 'index[firstName]', 'John'),
             array((object)array('firstName' => 'John'), 'firstName', 'John'),
+            array((object)array('firstName' => 'John'), '[firstName]', 'John'),
             array((object)array('property' => array('firstName' => 'John')), 'property.firstName', 'John'),
+            array((object)array('property' => array('firstName' => 'John')), '[property][firstName]', 'John'),
+            array((object)array('property' => array('firstName' => 'John')), '[property].firstName', 'John'),
+            array((object)array('property' => array('firstName' => 'John')), 'property[firstName]', 'John'),
             array(array('index' => (object)array('firstName' => 'John')), 'index.firstName', 'John'),
             array((object)array('property' => (object)array('firstName' => 'John')), 'property.firstName', 'John'),
             // Accessor methods
@@ -357,7 +365,8 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(new TestClass('John'), '_public_accessor', 'John'),
             // Special chars
             array(array('%!@$§' => 'John'), '%!@$§', 'John'),
-            array(array('index' => array('%!@$§' => 'John')), 'index.%!@$§', 'John'),
+            array(array('%!@$§.' => 'John'), '[%!@$§.]', 'John'),
+            array(array('index' => array('%!@$§.' => 'John')), 'index[%!@$§.]', 'John'),
             array((object)array('%!@$§' => 'John'), '%!@$§', 'John'),
             array((object)array('property' => (object)array('%!@$§' => 'John')), 'property.%!@$§', 'John'),
         );

@@ -49,7 +49,6 @@ services:
         class: %oro_config.twig_extension.class%
         arguments:
            - @oro_config.user
-           - @oro_entity_config.config_manager
         tags:
             - { name: twig.extension }
 

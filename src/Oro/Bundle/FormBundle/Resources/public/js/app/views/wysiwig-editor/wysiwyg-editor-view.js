@@ -3,6 +3,7 @@ define(function (require) {
 
     var WysiwygEditorView,
         BaseView = require('oroui/js/app/views/base/view'),
+        _ = require('underscore'),
         $ = require('tinymce/jquery.tinymce.min'),
         txtHtmlTransformer = require('./txt-html-transformer'),
         LoadingMask = require('oroui/js/app/views/loading-mask-view');
@@ -34,9 +35,8 @@ define(function (require) {
         },
 
         render: function () {
-            var self = this,
-                loadingMask,
-                loadingMaskContainer;
+            var loadingMaskContainer, id,
+                self = this;
             if (this.tinymceConnected) {
                 if (!this.tinymceInstance) {
                     throw new Error('Cannot disable tinyMCE before its instance is created');
@@ -69,7 +69,14 @@ define(function (require) {
                         this.$el.val(txtHtmlTransformer.text2html(this.$el.val()));
                     }
                 }
-                this.renderDeffered = $.Deferred();
+                this.renderDeferred = $.Deferred();
+                id = this.$el.attr('id');
+                if ($('[id="' + id + '"]').length > 1) {
+                    /**
+                     * tinymce editor does not work with elements that has not unique id
+                     */
+                    this.$el.attr('id', id + '-' + this.cid);
+                }
                 this.$el.tinymce(_.extend({
                     init_instance_callback: function (editor) {
                         /**
@@ -85,8 +92,14 @@ define(function (require) {
 
                         self.removeSubview('loadingMask');
                         self.tinymceInstance = editor;
-                        self.renderDeffered.resolve();
-                        delete self.renderDeffered;
+                        _.defer(function () {
+                            /**
+                             * fixes jumping dialog on refresh page
+                             * (promise should be resolved in a separate process)
+                             */
+                            self.renderDeferred.resolve();
+                            delete self.renderDeferred;
+                        });
                     }
                 }, this.options));
                 this.tinymceConnected = true;

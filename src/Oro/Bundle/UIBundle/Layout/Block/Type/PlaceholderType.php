@@ -8,6 +8,11 @@ use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 
+/**
+ * We have to use this approach to keep backward compatibility with old pages.
+ * It is not recommended to use this block type in new layouts, because placeholders
+ * generate HTML based on data and it prevents to effectively layout caching.
+ */
 class PlaceholderType extends AbstractType
 {
     const NAME = 'placeholder';
@@ -19,7 +24,7 @@ class PlaceholderType extends AbstractType
     {
         $resolver
             ->setRequired(['placeholder_name'])
-            ->setOptional(['placeholder_parameters']);
+            ->setDefaults(['placeholder_parameters' => []]);
     }
 
     /**

@@ -6,6 +6,69 @@
     </head>
 {% endblock %}
 
+{% block placeholder_widget %}
+    {{ placeholder(placeholder_name, placeholder_parameters) }}
+{% endblock %}
+
+{% block require_js_widget %}
+    {% set requirejs_config_extend %}
+        {%- placeholder requirejs_config_extend -%}
+    {% endset %}
+    {% include 'OroRequireJSBundle::scripts.html.twig' with {
+        compressed: compressed,
+        config_extend: requirejs_config_extend
+    } %}
+{% endblock %}
+
+{% block _header_widget %}
+    <header class="navbar" id="oroplatform-header">
+        {{ block_widget(block) }}
+    </header>
+{% endblock %}
+
+{% block _navbar_container_widget %}
+    <div class="navbar-inner">
+        <div class="container">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _main_menu_widget %}
+    <div id="main-menu" class="main-menu-top">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _left_panel_widget %}
+    <div id="left-panel">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _right_panel_widget %}
+    <div id="right-panel">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _footer_widget %}
+    <div id="dialog-extend-fixed-container"></div>
+    <footer id="footer" class="footer">
+        {{ block_widget(block) }}
+    </footer>
+{% endblock %}
+
+{% block _page_header_widget %}
+    <div class="container-fluid page-title">
+        <div class="navigation clearfix navbar-extra navbar-extra-right">
+            <div class="row">
+                {{ block_widget(block) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block _page_title_widget %}
     <div class="pull-left pull-left-extra">
         <div class="pull-left">
@@ -14,13 +77,123 @@
     </div>
 {% endblock %}
 
-{% block placeholder_widget %}
-    {{ placeholder(placeholder_name, placeholder_parameters) }}
+{% block _page_title_buttons_widget %}
+    <div class="pull-right title-buttons-container">
+        {{ block_widget(block) }}
+    </div>
 {% endblock %}
 
-{% block require_js_widget %}
-    {% include 'OroRequireJSBundle::scripts.html.twig' with {
-        compressed: compressed,
-        config_extend: placeholder('requirejs_config_extend')
-    } %}
+{% block _main_widget %}
+    <div id="main">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _before_content_widget %}
+    <div class="breadcrumb-pin">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _breadcrumb_widget %}
+    <div id="breadcrumb">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _before_content_addition_widget %}
+    <div id="before-content-addition">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _flash_messages_widget %}
+    <div id="flash-messages">
+        <div class="flash-messages-frame">
+            <div class="flash-messages-holder"></div>
+        </div>
+        <script type="text/template" id="message-item-template">
+            <div class="alert <% if (type) {  %><%= 'alert-' + type %><% } %> fade in top-messages ">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <div class="message"><%= message %></div>
+            </div>
+        </script>
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/messenger'],
+                    function($, messenger) {
+                        messenger.setup({
+                            container: '#flash-messages .flash-messages-holder',
+                            template: _.template($.trim($('#message-item-template').html()))
+                        });
+                        {% if app.session.flashbag.peekAll|length > 0 %}
+                        $(function() {
+                            {% for type, messages in app.session.flashbag.all %}
+                            {% for message in messages %}
+                            messenger.notificationFlashMessage({{ type|json_encode|raw }}, {{ message|trans|json_encode|raw }});
+                            {% endfor %}
+                            {% endfor %}
+                        });
+                        {% endif %}
+                    });
+        </script>
+    </div>
+{% endblock %}
+
+{% block _main_container_widget %}
+    <div id="container" class="scrollable-container">
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
+{% block _progressbar_widget %}
+    <div id="progressbar">
+        <h3>{% trans %}Loading...{% endtrans %}</h3>
+        <div class="progress progress-striped active">
+            <div class="bar" style="width: 90%;"></div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block _page_widget %}
+    <div id="page" style="display:none;">
+        <div id="top-page">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block _head_style_widget %}
+    {% if oro_theme_icon() %}
+        <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
+    {% endif %}
+{% endblock %}
+
+{% block _application_script_widget %}
+    <script type="text/javascript">
+        require(['oroui/js/app']);
+    </script>
+{% endblock %}
+
+{% block _head_scripts_widget %}
+    <script type="text/javascript">
+        require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
+        {% if isMobileVersion() %}
+        require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
+        {% endif %}
+        {% if app.debug %}
+        require(['oroui/js/tools'], function (tools) {tools.debug = true;});
+        {% endif %}
+    </script>
+{% endblock %}
+
+{% block _user_menu_widget %}
+    <ul class="nav pull-right user-menu">
+        {{ block_widget(block) }}
+    </ul>
+{% endblock %}
+
+{% block _navbar_widget %}
+    <div class="nav top-search shortcuts">
+        {{ block_widget(block) }}
+    </div>
 {% endblock %}
