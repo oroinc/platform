@@ -101,19 +101,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()
-            ->setOptional([self::PARAM_THEME])
-            ->setNormalizers(
-                [
-                    self::PARAM_THEME => function ($options, $value) {
-                        if (null === $value) {
-                            return $this->manager->getActiveTheme();
-                        }
-
-                        return $value;
-                    }
-                ]
-            );
+        $context->getDataResolver()->setOptional([self::PARAM_THEME]);
     }
 
     /**

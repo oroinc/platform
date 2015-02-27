@@ -207,19 +207,6 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('my-oro-theme', $context->get('theme'));
     }
 
-    public function testConfigureContextThemeShouldBeTakenFormManager()
-    {
-        $context = new LayoutContext();
-        $this->extension->configureContext($context);
-
-        $themeName = 'my-oro-theme';
-        $this->themeManager->expects($this->once())->method('getActiveTheme')->willReturn($themeName);
-
-        $context->resolve();
-
-        $this->assertSame($themeName, $context->get('theme'));
-    }
-
     protected function getCallbackBuilder()
     {
         return function ($extension) {
