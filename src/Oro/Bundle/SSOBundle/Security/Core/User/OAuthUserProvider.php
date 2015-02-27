@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SSOBundle\Security\Core\User;
 
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
-use HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -11,6 +10,8 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\SSOBundle\Security\Core\Exception\EmailDomainNotAllowedException;
 
 use RuntimeException;
+
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * OAuth user provider
@@ -49,7 +50,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
 
         $username = $response->getUsername();
         if ($username === null) {
-            throw new AccountNotLinkedException(sprintf("User '%s' not found.", $username));
+            throw new BadCredentialsException('Bad credentials');
         }
 
         $user = $this->userManager->findUserBy([$this->getOAuthProperty($response) => $username]);
@@ -66,7 +67,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
         }
 
         if (!$user) {
-            throw new AccountNotLinkedException(sprintf("User '%s' not found.", $username));
+            throw new BadCredentialsException('Bad credentials');
         }
 
         return $user;
