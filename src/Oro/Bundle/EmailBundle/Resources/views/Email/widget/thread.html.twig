@@ -16,7 +16,10 @@
                         <span class="sentAt">{{ email.sentAt|oro_format_datetime }}</span>
                     </div>
                     <div class="pull-right">
-                        {{ Actions.replyButton(email) }}
+                        <div class="btn-group">
+                            {{ Actions.replyButton(email) }}
+                            {{ Actions.forwardButton(email) }}
+                        </div>
                     </div>
                 </div>
                 <div id="collapse{{ loop.index }}"
