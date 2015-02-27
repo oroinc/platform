@@ -56,15 +56,8 @@ services:
         arguments:
             - @oro_email.form.email
             - @request
-            - @doctrine.orm.entity_manager
-            - @translator
-            - @security.context
-            - @oro_email.email.address.manager
-            - @oro_email.email.address.helper
             - @oro_email.mailer.processor
             - @logger
-            - @oro_locale.formatter.name
-            - @oro_entity.routing_helper
 
     oro_email.form.email:
         class: Symfony\Component\Form\Form
