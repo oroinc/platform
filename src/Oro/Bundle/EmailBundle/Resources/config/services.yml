@@ -163,6 +163,7 @@ services:
           - @oro_email.email.model.builder.helper
           - @request
           - @doctrine.orm.entity_manager
+          - @oro_config.manager
 
     oro_email.email.entity.batch_processor:
         class: %oro_email.email.entity.batch_processor.class%

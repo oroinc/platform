@@ -43,7 +43,7 @@ class Email
     protected $body;
 
     /** @var string */
-    protected $bodyFooter;
+    protected $bodyFooter = '';
 
     /**
      * Get id of emails datagrid
@@ -348,13 +348,25 @@ class Email
     /**
      * Set email body footer
      *
-     * @param string $bodyFooter
+     * @param string  $bodyFooter
      *
      * @return Email
      */
     public function setBodyFooter($bodyFooter)
     {
         $this->bodyFooter = $bodyFooter;
+
+        return $this;
+    }
+
+    /**
+     * @param $bodyFooter
+     *
+     * @return $this
+     */
+    public function prependToBodyFooter($bodyFooter)
+    {
+        $this->bodyFooter = $bodyFooter . $this->bodyFooter;
 
         return $this;
     }

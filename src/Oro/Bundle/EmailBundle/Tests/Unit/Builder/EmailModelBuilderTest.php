@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,6 +29,11 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
     protected $request;
 
     /**
+     * @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $configManager;
+
+    /**
      * @var EntityManager|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $entityManager;
@@ -44,10 +50,15 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
             $this->request,
-            $this->entityManager
+            $this->entityManager,
+            $this->configManager
         );
     }
 
@@ -101,7 +112,8 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
             $this->request,
-            $this->entityManager
+            $this->entityManager,
+            $this->configManager
         );
 
         $this->helper->expects($this->exactly($helperDecodeClassNameCalls))
@@ -125,6 +137,10 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->helper->expects($this->exactly($helperBuildFullEmailAddress))
             ->method('buildFullEmailAddress');
+
+        $this->configManager->expects($this->once())
+            ->method('get')
+            ->with('oro_email.signature');
 
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
         $this->assertEquals($emailModel, $result);

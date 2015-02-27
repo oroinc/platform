@@ -11,11 +11,14 @@ use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 /**
  * Class EmailModelBuilder
  *
  * @package Oro\Bundle\EmailBundle\Builder
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  *
  */
 class EmailModelBuilder
@@ -35,18 +38,26 @@ class EmailModelBuilder
     protected $entityManager;
 
     /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * @param EmailModelBuilderHelper $emailModelBuilderHelper
      * @param Request                 $request
      * @param EntityManager           $entityManager
+     * @param ConfigManager           $configManager
      */
     public function __construct(
         EmailModelBuilderHelper $emailModelBuilderHelper,
         Request $request,
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        ConfigManager $configManager
     ) {
         $this->helper              = $emailModelBuilderHelper;
         $this->request             = $request;
         $this->entityManager       = $entityManager;
+        $this->configManager       = $configManager;
     }
 
     /**
@@ -63,6 +74,7 @@ class EmailModelBuilder
         if ($this->request->getMethod() === 'GET') {
             $this->applyRequest($emailModel);
         }
+        $this->applySignature($emailModel);
 
         return $emailModel;
     }
@@ -225,5 +237,12 @@ class EmailModelBuilder
                 return;
             }
         }
+    }
+
+    protected function applySignature(EmailModel $emailModel)
+    {
+        $signature = $this->configManager->get('oro_email.signature');
+        $emailModel->prependToBodyFooter($signature);
+        $emailModel->setBody($emailModel->getBodyFooter());
     }
 }
