@@ -2,9 +2,6 @@
 define(['jquery'], function ($) {
     'use strict';
 
-    function isMobile() {
-        return $('body').hasClass('mobile-version');
-    }
     $.ajaxSetup({
         headers: {
             'X-CSRF-Header': 1
