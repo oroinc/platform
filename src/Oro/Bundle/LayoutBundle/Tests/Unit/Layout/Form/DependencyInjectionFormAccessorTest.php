@@ -58,4 +58,13 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($field1View, $this->formAccessor->getView('field1'));
         $this->assertSame($field2View, $this->formAccessor->getView('field1.field2'));
     }
+
+    public function testProcessedFields()
+    {
+        $this->assertNull($this->formAccessor->getProcessedFields());
+
+        $processedFields = ['field' => 'block_id'];
+        $this->formAccessor->setProcessedFields($processedFields);
+        $this->assertSame($processedFields, $this->formAccessor->getProcessedFields());
+    }
 }

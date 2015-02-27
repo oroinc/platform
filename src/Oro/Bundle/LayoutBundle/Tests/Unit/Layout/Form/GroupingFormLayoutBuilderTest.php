@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Form;
 
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
@@ -88,7 +89,8 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $form = $this->getForm();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, 'type1', 'field1'));
         $childForm = $this->getForm(true, 'type2', 'field2');
         $childForm->add($this->getForm(false, 'type21', 'field21'));
@@ -133,7 +135,14 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(4))
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field1'         => self::FIELD_PREFIX . 'field1',
+                'field2.field21' => self::FIELD_PREFIX . 'field2:field21'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     public function testGroupingWithPreferredFields()
@@ -154,7 +163,8 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $form = $this->getForm();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, 'type1', 'field1'));
         $childForm = $this->getForm(true, 'type2', 'field2');
         $childForm->add($this->getForm(false, 'type21', 'field21'));
@@ -209,7 +219,15 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(5))
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field2.field22' => self::FIELD_PREFIX . 'field2:field22',
+                'field1'         => self::FIELD_PREFIX . 'field1',
+                'field2.field21' => self::FIELD_PREFIX . 'field2:field21'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     public function testGroupingByParentFieldPath()
@@ -229,7 +247,8 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $form = $this->getForm();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, 'type1', 'field1'));
         $childForm = $this->getForm(true, 'type2', 'field2');
         $childForm->add($this->getForm(false, 'type21', 'field21'));
@@ -284,7 +303,15 @@ class GroupingFormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(5))
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field1'         => self::FIELD_PREFIX . 'field1',
+                'field2.field21' => self::FIELD_PREFIX . 'field2:field21',
+                'field2.field22' => self::FIELD_PREFIX . 'field2:field22'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     /**
