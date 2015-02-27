@@ -33,10 +33,10 @@ define(function (require) {
             $(document).scrollTop($(document).scrollTop());
         }, 1);
         $(document)
-            .on('focus', ':input', function () {
+            .on('focus', 'input[type=text], textarea, [content-editable]', function () {
                 $body.addClass('input-focused');
             })
-            .on('blur', ':input', function () {
+            .on('blur', 'input[type=text], textarea, [content-editable]', function () {
                 $body.removeClass('input-focused');
                 forceHeaderLayoutUpdate();
             });

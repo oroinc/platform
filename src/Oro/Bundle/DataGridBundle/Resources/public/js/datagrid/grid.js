@@ -687,7 +687,7 @@ define(function (require) {
                         if (!this.$grid.find('.thead-sizing').length) {
                             sizingThead = this.cachedEls.thead.clone().addClass('thead-sizing');
                             sizingThead.find('th').attr('style', '');
-                            this.$grid.prepend(sizingThead);
+                            sizingThead.insertAfter(this.cachedEls.thead);
                         }
                     }
                     this.cachedEls.thead.css({
@@ -707,7 +707,7 @@ define(function (require) {
                         if (!this.$grid.find('.thead-sizing').length) {
                             sizingThead = this.cachedEls.thead.clone().addClass('thead-sizing');
                             sizingThead.find('th').attr('style', '');
-                            sizingThead.insertAfter(this.$grid.find('thead'));
+                            sizingThead.insertAfter(this.cachedEls.thead);
                         }
                     }
                     this.cachedEls.thead.css({
