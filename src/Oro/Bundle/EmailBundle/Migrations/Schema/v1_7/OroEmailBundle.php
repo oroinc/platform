@@ -41,8 +41,8 @@ class OroEmailBundle implements Migration
     public static function addColumns(Schema $schema)
     {
         $table = $schema->getTable('oro_email');
-        $table->addColumn('is_head', 'boolean', ['default' => '1']);
-        $table->addColumn('is_seen', 'boolean', ['default' => '1']);
+        $table->addColumn('is_head', 'boolean', ['default' => true]);
+        $table->addColumn('is_seen', 'boolean', ['default' => true]);
         $table->addColumn('thread_id', 'integer', ['notnull' => false]);
         $table->addColumn('refs', 'text', ['notnull' => false]);
 

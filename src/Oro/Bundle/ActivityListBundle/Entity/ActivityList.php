@@ -17,6 +17,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
+ *     @ORM\Index(name="al_related_activity_class", columns={"related_activity_class"}),
+ *     @ORM\Index(name="al_related_activity_id", columns={"related_activity_id"}),
+ *     @ORM\Index(name="al_is_head", columns={"is_head"}),
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
  * @Config(
@@ -91,7 +94,7 @@ class ActivityList extends ExtendActivityList
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_head", type="boolean")
+     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
      * @Soap\ComplexType("boolean")
      */
     protected $head = true;
