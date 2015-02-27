@@ -127,6 +127,11 @@ define(function (require) {
         heightFixIntervalId: null,
 
         /**
+         * Disabled from the start
+         */
+        floatThead: false,
+
+        /**
          * Initialize grid
          *
          * @param {Object} options
