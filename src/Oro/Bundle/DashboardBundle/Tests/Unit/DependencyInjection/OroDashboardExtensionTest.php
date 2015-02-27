@@ -46,7 +46,9 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                 }
             )
         );
-        $container->expects($this->once())->method('getDefinition')->will($this->returnValue($definition));
+        $container->expects($this->once())
+            ->method('getDefinition')
+            ->will($this->returnValue($definition));
         $this->target->load($configs, $container);
     }
 
@@ -91,7 +93,8 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                     'route' => 'test2',
                                     'route_parameters' => array()
                                 ),
-                            )
+                            ),
+                            'enabled' => true
                         ),
                         'second_quick_launchpad' => array(
                             'route' => 'second_quick_launchpad_test_route',
@@ -99,7 +102,8 @@ class OroDashboardExtensionTest extends \PHPUnit_Framework_TestCase
                                 'bundle' => 'SecondTestBundle',
                                 'name'   => 'secondQuickLaunchpad',
                                 'widget' => 'second_quick_launchpad'
-                            )
+                            ),
+                            'enabled' => true
                         )
                     ),
                     'dashboards' => array(
