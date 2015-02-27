@@ -107,6 +107,13 @@ services:
         tags:
             - { name: layout.context_configurator }
 
+    oro_ui.layout_context_configurator.application:
+        class: Oro\Bundle\UIBundle\Layout\Extension\ApplicationContextConfigurator
+        arguments:
+            - @kernel
+        tags:
+            - { name: layout.context_configurator }
+
     oro_ui.block_type_extension.head:
         class: Oro\Bundle\UIBundle\Layout\Extension\HeadBlockTypeExtension
         arguments:
