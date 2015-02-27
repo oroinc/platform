@@ -114,17 +114,33 @@ When contact ``Assigned To`` field is updated then process "contact_definition" 
 value  of ``Assigned To`` field could be changed. But option "exclude_definitions" is specified, thus this process won't
 provoke self-triggering.
 
-**Note:** If you want to test this process configuration in real application, you can put this configuration in file
+**Notes:** 
+
+ - If you want to test this process configuration in real application, you can put this configuration in file
 ``Oro/Bundle/WorkflowBundle/Resources/config/process.yml`` and reload definitions using console command
 ``app/console oro:process:configuration:load`` - after that you can create ``Contact`` of changed assigned user
 and ensure that process works.
-
-**Note:**
 
  - Expression `$` or `$.data` means that you use current entity, above in example it's `OroCRM\Bundle\ContactBundle\Entity\Contact`
  - Expression `$.` means that you use instance of `Oro\Bundle\WorkflowBundle\Model\Action\RequestEntity`
  - If you want to get one element from collection you could use this syntax `'$contact.accounts[0]'`. Single quotes are
   necessary, otherwise you will get ParseException  `Unexpected characters near "]"`
+
+If you want to use `@foreach` with some conditions, you should add `@tree` block after action:
+
+```
+    - @foreach:
+        array: $contact.accounts
+        value: $.accountItem
+        actions:
+            - @tree:
+                conditions:
+                    @and:
+                        - @empty: $account
+                        - @not_empty: $.accountItem
+                actions:
+                    - @assign_value: [$account, $.accountItem]
+```
 
 Console commands
 ----------------
