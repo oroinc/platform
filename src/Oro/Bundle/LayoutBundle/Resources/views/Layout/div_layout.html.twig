@@ -87,3 +87,7 @@
 {% block text_widget -%}
     {{ text|trans(text_parameters, translation_domain) }}
 {%- endblock %}
+
+{% block external_resource_widget %}
+    <link {{ block('block_attributes') }} />
+{% endblock %}
