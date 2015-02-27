@@ -65,28 +65,35 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
      */
     protected function loadLayoutUpdates(ContextInterface $context)
     {
-        $updates = $skipped = [];
-        $theme   = $this->manager->getTheme($context->getOr(self::PARAM_THEME));
+        $result    = [];
+        $themeName = $context->getOr(self::PARAM_THEME);
+        if ($themeName) {
+            $updates = $skipped = [];
+            $theme   = $this->manager->getTheme($themeName);
 
-        $path = [$theme->getDirectory()];
-        if ($context->has(RouteContextConfigurator::PARAM_ROUTE_NAME)) {
-            $path[] = $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME);
-        }
-
-        $iterator = new ResourceIterator($this->factory, $this->resources);
-        $iterator->setFilterPath($path);
-        foreach ($iterator as $resource) {
-            if ($this->loader->supports($resource)) {
-                $updates[] = $this->loader->load($resource);
-            } else {
-                $skipped[] = $resource;
+            $path      = [$theme->getDirectory()];
+            $routeName = $context->getOr(RouteContextConfigurator::PARAM_ROUTE_NAME);
+            if ($routeName) {
+                $path[] = $routeName;
             }
+
+            $iterator = new ResourceIterator($this->factory, $this->resources);
+            $iterator->setFilterPath($path);
+            foreach ($iterator as $resource) {
+                if ($this->loader->supports($resource)) {
+                    $updates[] = $this->loader->load($resource);
+                } else {
+                    $skipped[] = $resource;
+                }
+            }
+
+            array_walk($skipped, [$this, 'logUnknownResource']);
+            array_walk($updates, [$this->dependencyInitializer, 'initialize']);
+
+            $result = ['root' => $updates];
         }
 
-        array_walk($skipped, [$this, 'logUnknownResource']);
-        array_walk($updates, [$this->dependencyInitializer, 'initialize']);
-
-        return ['root' => $updates];
+        return $result;
     }
 
     /**
@@ -94,7 +101,19 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
      */
     public function configureContext(ContextInterface $context)
     {
-        $context->getDataResolver()->setOptional([self::PARAM_THEME]);
+        $context->getDataResolver()
+            ->setOptional([self::PARAM_THEME])
+            ->setNormalizers(
+                [
+                    self::PARAM_THEME => function ($options, $value) {
+                        if (null === $value) {
+                            return $this->manager->getActiveTheme();
+                        }
+
+                        return $value;
+                    }
+                ]
+            );
     }
 
     /**

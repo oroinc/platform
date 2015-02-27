@@ -4,11 +4,11 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Symfony\Component\HttpKernel\Tests\Logger;
 
+use Oro\Component\Layout\LayoutContext;
 use Oro\Bundle\LayoutBundle\Theme\ThemeManager;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ChainLoader;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactory;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension;
 use Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer;
 
@@ -85,17 +85,19 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testThemeWithoutUpdatesTheme()
     {
-        $this->setUpActiveTheme('empty-dir');
+        $themeName = 'my-theme';
+        $this->setUpActiveTheme($themeName, 'empty-dir');
 
         $this->yamlLoader->expects($this->never())->method('supports');
         $this->phpLoader->expects($this->never())->method('supports');
 
-        $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
     public function testThemeYamlUpdateFound()
     {
-        $this->setUpActiveTheme('oro-gold');
+        $themeName = 'oro-gold';
+        $this->setUpActiveTheme($themeName);
 
         $callbackBuilder = $this->getCallbackBuilder();
 
@@ -109,13 +111,14 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->yamlLoader->expects($this->once())->method('load')->with('resource-gold.yml')
             ->willReturn($updateMock);
 
-        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
+        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertContains($updateMock, $result);
     }
 
     public function testThemeUpdatesFoundWithOneSkipped()
     {
-        $this->setUpActiveTheme('oro-default');
+        $themeName = 'oro-default';
+        $this->setUpActiveTheme($themeName);
 
         $callbackBuilder = $this->getCallbackBuilder();
 
@@ -124,7 +127,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->phpLoader->expects($this->any())->method('supports')
             ->willReturnCallback($callbackBuilder('php'));
 
-        $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $updateMock  = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $update2Mock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
         $this->yamlLoader->expects($this->once())->method('load')->with('resource1.yml')
@@ -132,7 +135,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->phpLoader->expects($this->once())->method('load')->with('resource3.php')
             ->willReturn($update2Mock);
 
-        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
+        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
         $this->assertContains($updateMock, $result);
         $this->assertContains($update2Mock, $result);
 
@@ -140,20 +143,39 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Skipping resource "resource2.xml" because loader for it not found', reset($logs));
     }
 
+    public function testShouldLoadRouteRelatedUpdatesIfContextConfigured()
+    {
+        $themeName = 'oro-black';
+        $this->setUpActiveTheme($themeName);
+
+        $callbackBuilder = $this->getCallbackBuilder();
+
+        $this->yamlLoader->expects($this->any())->method('supports')
+            ->willReturnCallback($callbackBuilder('yml'));
+
+        $updateMock = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $this->yamlLoader->expects($this->once())->method('load')->with('resource1.yml')->willReturn($updateMock);
+
+        $result = $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName, 'route_name'));
+        $this->assertContains($updateMock, $result);
+    }
+
     public function testShouldNotLoadRouteRelatedUpdates()
     {
-        $this->setUpActiveTheme('oro-black');
+        $themeName = 'oro-black';
+        $this->setUpActiveTheme($themeName);
 
         $this->yamlLoader->expects($this->never())->method('supports');
         $this->yamlLoader->expects($this->never())->method('load');
 
-        $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
     public function testShouldPassDependenciesToUpdateInstance()
     {
-        $update = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
-        $this->setUpActiveTheme('oro-gold');
+        $themeName = 'oro-gold';
+        $update    = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+        $this->setUpActiveTheme($themeName);
 
         $callbackBuilder = $this->getCallbackBuilder();
         $this->yamlLoader->expects($this->any())->method('supports')->willReturnCallback($callbackBuilder('yml'));
@@ -161,18 +183,41 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->dependencyInitializer->expects($this->once())->method('initialize')->with($this->identicalTo($update));
 
-        $this->extension->getLayoutUpdates($this->getLayoutItem('root'));
+        $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
-    public function testConfigureContextSetOptionalActiveThemeOption()
+    public function testConfigureContextSetOptionalThemeOption()
     {
-        $context = new DebugLayoutContext();
+        $context = new LayoutContext();
         $this->extension->configureContext($context);
 
-        $this->assertContains('theme', $context->getDataResolver()->getKnownOptions());
         $context->resolve();
 
         $this->assertNull($context->getOr('theme'));
+    }
+
+    public function testConfigureContextThemeIsAKnownOption()
+    {
+        $context = new LayoutContext();
+        $context->set('theme', 'my-oro-theme');
+        $this->extension->configureContext($context);
+
+        $context->resolve();
+
+        $this->assertSame('my-oro-theme', $context->get('theme'));
+    }
+
+    public function testConfigureContextThemeShouldBeTakenFormManager()
+    {
+        $context = new LayoutContext();
+        $this->extension->configureContext($context);
+
+        $themeName = 'my-oro-theme';
+        $this->themeManager->expects($this->once())->method('getActiveTheme')->willReturn($themeName);
+
+        $context->resolve();
+
+        $this->assertSame($themeName, $context->get('theme'));
     }
 
     protected function getCallbackBuilder()
@@ -185,30 +230,38 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param string $themeName
      * @param string $dir
      */
-    protected function setUpActiveTheme($dir)
+    protected function setUpActiveTheme($themeName, $dir = null)
     {
         $themeMock = $this->getMock('Oro\Bundle\LayoutBundle\Model\Theme', [], [], '', false);
 
-        $this->themeManager->expects($this->once())->method('getTheme')->with($this->isNull())
-            ->willReturn($themeMock);
-
-        $themeMock->expects($this->any())->method('getDirectory')
-            ->willReturn($dir);
+        $this->themeManager->expects($this->once())->method('getTheme')->with($themeName)->willReturn($themeMock);
+        $themeMock->expects($this->any())->method('getDirectory')->willReturn($dir ?: $themeName);
     }
 
     /**
-     * @param string $id
+     * @param string      $id
+     * @param null|string $theme
+     * @param null|string $route
      *
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getLayoutItem($id)
+    protected function getLayoutItem($id, $theme = null, $route = null)
     {
         $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $context    = $this->getMock('Oro\Component\Layout\ContextInterface');
+
         $layoutItem->expects($this->any())->method('getId')->willReturn($id);
-        $layoutItem->expects($this->any())->method('getContext')
-            ->willReturn($this->getMock('Oro\Component\Layout\ContextInterface'));
+        $layoutItem->expects($this->any())->method('getContext')->willReturn($context);
+
+        $context->expects($this->any())->method('getOr')->willReturnMap(
+            [
+                ['theme', null, $theme],
+                ['route_name', null, $route],
+            ]
+        );
 
         return $layoutItem;
     }

@@ -157,6 +157,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                             );
                         }
 
+                        // pre-generate "path" option in order to show correct path if validation error will occur
                         array_walk(
                             $transformedActions,
                             function (&$val) use ($path) {
@@ -165,6 +166,7 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
                         );
                         $source[self::NODE_ACTIONS] = array_merge($source[self::NODE_ACTIONS], $transformedActions);
 
+                        // unset processed "@addTree" action
                         unset($source[self::NODE_ACTIONS][$nodeNo]);
                     }
                 }
@@ -180,18 +182,20 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     }
 
     /**
+     * Walk recursively through the tree, completing block definition in tree by found correspondent data "items" list
+     *
      * @param array  $actions
-     * @param mixed  $tree
-     * @param string $parent
-     * @param array $items
+     * @param mixed  $currentSubTree
+     * @param string $parentId
+     * @param array  $items
      */
-    protected function processTree(array &$actions, $tree, $parent, array $items)
+    protected function processTree(array &$actions, $currentSubTree, $parentId, array $items)
     {
-        if (!is_array($tree)) {
+        if (!is_array($currentSubTree)) {
             return;
         }
 
-        foreach ($tree as $k => $subtree) {
+        foreach ($currentSubTree as $k => $subtree) {
             $blockId = is_numeric($k) && is_string($subtree) ? $subtree : $k;
 
             if (!isset($items[$blockId])) {
@@ -201,9 +205,11 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             $itemDefinition = $items[$blockId];
 
             if (ArrayUtils::isAssoc($itemDefinition)) {
-                $itemDefinition = array_merge($itemDefinition, ['id' => $blockId, 'parentId' => $parent]);
+                // merge associative values to arguments
+                $itemDefinition = array_merge($itemDefinition, ['id' => $blockId, 'parentId' => $parentId]);
             } else {
-                array_unshift($itemDefinition, $blockId, $parent);
+                // prepend blockId and parentId to arguments
+                array_unshift($itemDefinition, $blockId, $parentId);
             }
 
             $actions[] = [self::ACTION_ADD => $itemDefinition];

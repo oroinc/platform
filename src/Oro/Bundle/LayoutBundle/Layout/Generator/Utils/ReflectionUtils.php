@@ -36,6 +36,8 @@ class ReflectionUtils
     }
 
     /**
+     * Does given method exist in class declaration
+     *
      * @param string $method
      *
      * @return bool
@@ -50,6 +52,8 @@ class ReflectionUtils
     }
 
     /**
+     * Validates arguments list. $this->getLastError() will return error message if this method return FALSE
+     *
      * @param string $action
      * @param array  $arguments
      *
@@ -109,15 +113,14 @@ class ReflectionUtils
     }
 
     /**
+     * Complete arguments array by default values that were not passed, but set at declaration
+     *
      * @param string $method
      * @param array  $arguments
      */
     public function completeArguments($method, array &$arguments)
     {
-        $argumentsKeys = array_keys($arguments);
-        $isAssoc       = !(count(array_filter($argumentsKeys, 'is_numeric')) === count($arguments));
-
-        if ($isAssoc) {
+        if (ArrayUtils::isAssoc($arguments)) {
             $result = [];
             $method = $this->getMethod($method);
             $params = $method->getParameters();
@@ -154,6 +157,8 @@ class ReflectionUtils
     }
 
     /**
+     * Lazy initialization of reflection class instance
+     *
      * @return \ReflectionClass
      */
     protected function getRefClass()
@@ -166,6 +171,8 @@ class ReflectionUtils
     }
 
     /**
+     * Lazy initialization of reflection method instance
+     *
      * @param string $method
      *
      * @return \ReflectionMethod

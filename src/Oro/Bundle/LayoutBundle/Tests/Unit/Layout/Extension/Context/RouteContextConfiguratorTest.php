@@ -4,7 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Layout\Extension\Context;
 
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\LayoutBundle\Command\Util\DebugLayoutContext;
+use Oro\Component\Layout\LayoutContext;
 
 class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,18 +23,17 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigureContextWithOutRequest()
     {
-        $context = new DebugLayoutContext();
+        $context = new LayoutContext();
 
         $this->configurator->configureContext($context);
 
         $context->resolve();
-        $this->assertContains('route_name', $context->getDataResolver()->getKnownOptions());
         $this->assertSame(null, $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
     }
 
     public function testConfigureContextWithRequest()
     {
-        $context = new DebugLayoutContext();
+        $context = new LayoutContext();
 
         $request = Request::create('');
         $request->attributes->set('_route', 'testRoteName');
@@ -43,8 +42,22 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->configurator->configureContext($context);
 
         $context->resolve();
-        $this->assertContains('route_name', $context->getDataResolver()->getKnownOptions());
         $this->assertSame('testRoteName', $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
+    }
+
+    public function testConfigureContextWithRequestAndDataSetInContext()
+    {
+        $context = new LayoutContext();
+        $context->set(RouteContextConfigurator::PARAM_ROUTE_NAME, 'routeShouldNotBeOverridden');
+
+        $request = Request::create('');
+        $request->attributes->set('_route', 'testRoteName');
+
+        $this->configurator->setRequest($request);
+        $this->configurator->configureContext($context);
+
+        $context->resolve();
+        $this->assertSame('routeShouldNotBeOverridden', $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
     }
 
     public function testRequestSetterSynchronized()

@@ -39,6 +39,14 @@ class ThemeManager
     }
 
     /**
+     * @return string
+     */
+    public function getActiveTheme()
+    {
+        return $this->activeTheme;
+    }
+
+    /**
      * Returns all known themes names
      *
      * @return string[]

@@ -137,7 +137,75 @@ CLASS
             )
         );
     }
+    // @codingStandardsIgnoreEnd
 
+    // @codingStandardsIgnoreStart
+    public function testGenerateFormTree()
+    {
+        $this->assertSame(
+<<<CLASS
+<?php
+
+class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
+{
+    public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
+    {
+        // filename: testfilename.yml
+        \$layoutManipulator->add( 'header', 'root', 'header' );
+        \$layoutManipulator->add( 'css', 'header', 'style' );
+        \$layoutManipulator->add( 'body', 'root', 'content', array (
+          'test' => true,
+        ) );
+        \$layoutManipulator->add( 'footer', 'root', 'header' );
+        \$layoutManipulator->add( 'copyrights', 'footer', 'block' );
+    }
+}
+CLASS
+            ,
+            $this->generator->generate(
+                'testClassName',
+                new GeneratorData(
+                    [
+                        'actions' => [
+                            [
+                                '@addTree' => [
+                                    'items' => [
+                                        'header' => [
+                                            'blockType' => 'header'
+                                        ],
+                                        'css'    => [
+                                            'style' // sequential declaration
+                                        ],
+                                        'body'   => [
+                                            'blockType' => 'content',
+                                            'options'   => [
+                                                'test' => true
+                                            ]
+                                        ],
+                                        'footer' => [
+                                            'blockType' => 'header'
+                                        ],
+                                        'copyrights' => [
+                                            'blockType' => 'block'
+                                        ]
+                                    ],
+                                    'tree'  => [
+                                        'root' => [
+                                            'header' => ['css' => null],
+                                            'body'   => null,
+                                            'footer' => ['copyrights']  // sequential leafs
+                                        ]
+                                    ]
+                                ]
+                            ],
+                        ]
+                    ],
+                    'testfilename.yml'
+                ),
+                new ConditionCollection()
+            )
+        );
+    }
     // @codingStandardsIgnoreEnd
 
     public function testShouldProcessCondition()
