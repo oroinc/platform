@@ -47,6 +47,8 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class Email extends ExtendEmail
 {

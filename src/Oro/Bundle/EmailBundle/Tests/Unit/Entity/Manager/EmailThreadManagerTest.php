@@ -122,8 +122,8 @@ class EmailThreadManagerTest extends \PHPUnit_Framework_TestCase
     public function testUpdateThreadHead(
         $heads,
         $seens,
-        $calls)
-    {
+        $calls
+    ) {
         $threadId = 'testThreadId';
         $thread = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailThread');
         $thread->expects($this->any())
