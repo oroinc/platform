@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
-
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 
 class EmailManagerTest extends \PHPUnit_Framework_TestCase
