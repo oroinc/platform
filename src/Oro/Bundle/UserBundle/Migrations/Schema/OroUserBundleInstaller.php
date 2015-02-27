@@ -106,6 +106,8 @@ class OroUserBundleInstaller implements
 
         ExtendTitle::addTitleColumn($schema);
         PasswordChanged::addPasswordChangedColumn($schema);
+
+        $this->addOroAccessGroupIndexes($schema);
     }
 
     /**
@@ -247,8 +249,6 @@ class OroUserBundleInstaller implements
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 30, 'precision' => 0]);
-        $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
-        $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
         $table->setPrimaryKey(['id']);
     }
 
@@ -512,5 +512,15 @@ class OroUserBundleInstaller implements
             ['id'],
             []
         );
+    }
+
+    /**
+     * @param Schema $schema
+     */
+    protected function addOroAccessGroupIndexes(Schema $schema)
+    {
+        $table = $schema->createTable('oro_access_group');
+        $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
+        $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
     }
 }
