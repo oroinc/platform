@@ -56,7 +56,7 @@ class Group
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=30, nullable=false)
+     * @ORM\Column(type="string", length=30, nullable=false)
      * @JMS\Type("string")
      * @JMS\Expose
      * @ConfigField(
