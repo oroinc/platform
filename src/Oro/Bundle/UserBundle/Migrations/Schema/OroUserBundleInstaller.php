@@ -519,7 +519,7 @@ class OroUserBundleInstaller implements
      */
     protected function addOroAccessGroupIndexes(Schema $schema)
     {
-        $table = $schema->createTable('oro_access_group');
+        $table = $schema->getTable('oro_access_group');
         $table->addUniqueIndex(['name', 'organization_id'], 'uq_name_org_idx');
         $table->addIndex(['business_unit_owner_id'], 'IDX_FEF9EDB759294170', []);
     }
