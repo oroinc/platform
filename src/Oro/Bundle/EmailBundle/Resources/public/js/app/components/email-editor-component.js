@@ -9,7 +9,8 @@ define(function (require) {
         routing = require('routing'),
         __ = require('orotranslation/js/translator'),
         messenger = require('oroui/js/messenger'),
-        mediator = require('oroui/js/mediator');
+        mediator = require('oroui/js/mediator'),
+        ApplyTemplateConfirmation = require('oroemail/js/app/apply-template-confirmation');
 
     function showField(fieldName) {
         var field = fieldName.toLowerCase();
@@ -50,34 +51,48 @@ define(function (require) {
                 $subject = this.options._sourceElement.find('[name$="[subject]"]'),
                 $body = this.options._sourceElement.find('[name$="[body]"]'),
                 $type = this.options._sourceElement.find('[name$="[type]"]'),
-                $template = this.options._sourceElement.find('[name$="[template]"]');
+                $template = this.options._sourceElement.find('[name$="[template]"]'),
+                $bodyFooter = this.options._sourceElement.find('[name$="[bodyFooter]"]');
 
             $template.on('change.' + this.cid, function (e) {
                 if (!$(this).val()) {
                     return;
                 }
-                var url = routing.generate(
-                    'oro_api_get_emailtemplate_compiled',
-                    {'id': $(this).val(), 'entityId': self.options.entityId}
-                );
 
-                mediator.execute('showLoading');
-
-                $.ajax(url, {
-                    success: function (res) {
-                        $subject.val(res.subject);
-                        $body.val(res.body);
-                        $type.find('input[value=' + res.type + ']')
-                            .prop('checked', true)
-                            .trigger('change');
-                    },
-                    error: function () {
-                        messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
-                    },
-                    dataType: 'json'
-                }).always(function () {
-                    mediator.execute('hideLoading');
+                var confirm = new ApplyTemplateConfirmation({
+                    content: __('oro.email.emailtemplate.apply_template_confirmation_content')
                 });
+                confirm.on('ok', _.bind(function () {
+                    var url = routing.generate(
+                        'oro_api_get_emailtemplate_compiled',
+                        {'id': $(this).val(), 'entityId': self.options.entityId}
+                    );
+
+                    mediator.execute('showLoading');
+
+                    $.ajax(url, {
+                        success: function (res) {
+                            if (!$bodyFooter.val()) {
+                                $subject.val(res.subject);
+                            }
+                            var body = res.body;
+                            if ($bodyFooter.val()) {
+                                body += $bodyFooter.val();
+                            }
+                            $body.val(body);
+                            $type.find('input[value=' + res.type + ']')
+                                .prop('checked', true)
+                                .trigger('change');
+                        },
+                        error: function () {
+                            messenger.notificationMessage('error', __('oro.email.emailtemplate.load_failed'));
+                        },
+                        dataType: 'json'
+                    }).always(function () {
+                        mediator.execute('hideLoading');
+                    });
+                }, this));
+                confirm.open();
             });
 
             $type.on('change.' + this.cid, function() {

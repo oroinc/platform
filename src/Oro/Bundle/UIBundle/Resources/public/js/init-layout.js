@@ -390,24 +390,4 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             return false;
         });
     });
-
-    /* ============================================================
-     * from form/collection.js'
-     * ============================================================ */
-    $(document).on('click', '.add-list-item', function (e) {
-        e.preventDefault();
-        var cList  = $(this).siblings('.collection-fields-list'),
-            widget = cList.attr('data-prototype').replace(/__name__/g, cList.children().length),
-            data = $('<div/>').html(widget);
-
-        data.children().appendTo(cList);
-        /* temporary solution need add init only for new created row */
-        layout.styleForm(cList);
-        /* temporary solution finish */
-    });
-
-    $(document).on('click', '.removeRow', function (e) {
-        e.preventDefault();
-        $(this).parents('*[data-content]').remove();
-    });
 });
