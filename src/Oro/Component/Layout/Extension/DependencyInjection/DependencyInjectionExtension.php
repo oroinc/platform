@@ -5,6 +5,7 @@ namespace Oro\Component\Layout\Extension\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Component\Layout\Exception;
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\Extension\ExtensionInterface;
 
 class DependencyInjectionExtension implements ExtensionInterface
@@ -152,12 +153,13 @@ class DependencyInjectionExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getLayoutUpdates($id)
+    public function getLayoutUpdates(LayoutItemInterface $item)
     {
+        $idOrAlias     = $item->getAlias() ? $item->getAlias() : $item->getId();
         $layoutUpdates = [];
 
-        if (isset($this->layoutUpdateServiceIds[$id])) {
-            foreach ($this->layoutUpdateServiceIds[$id] as $serviceId) {
+        if (isset($this->layoutUpdateServiceIds[$idOrAlias])) {
+            foreach ($this->layoutUpdateServiceIds[$idOrAlias] as $serviceId) {
                 $layoutUpdates[] = $this->container->get($serviceId);
             }
         }
@@ -168,9 +170,11 @@ class DependencyInjectionExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasLayoutUpdates($id)
+    public function hasLayoutUpdates(LayoutItemInterface $item)
     {
-        return isset($this->layoutUpdateServiceIds[$id]);
+        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+
+        return isset($this->layoutUpdateServiceIds[$idOrAlias]);
     }
 
     /**

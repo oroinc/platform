@@ -138,6 +138,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit_Framework_TestCase
         $layoutUpdate      = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
         $layoutManipulator = $this->getMock('Oro\Component\Layout\DeferredLayoutManipulatorInterface');
         $layoutItem        = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
 
         $layoutFactory = $this->layoutFactoryBuilder
             ->addLayoutUpdate($id, $layoutUpdate)

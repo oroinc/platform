@@ -30,16 +30,4 @@ class ResourceFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEmpty($result->getConditions());
     }
-
-    public function testCreateWithRouteCondition()
-    {
-        $filename = uniqid('testFilename', true);
-
-        $result = $this->factory->create('my_route/2', $filename);
-
-        $this->assertInstanceOf('Oro\Bundle\LayoutBundle\Layout\Loader\FileResource', $result);
-        $this->assertSame($filename, $result->getFilename());
-
-        $this->assertNotEmpty($result->getConditions());
-    }
 }

@@ -44,7 +44,7 @@ class SimpleContextValueComparisonConditionTest extends \PHPUnit_Framework_TestC
                 '$value'              => 'my_value',
                 '$condition'          => '===',
                 '$expectedMethodBody' => <<<CONTENT
-if (\$item->getContext()->has('valueToCompare') && \$item->getContext()->get('valueToCompare') === 'my_value') {
+if (\$item->getContext()->getOr('valueToCompare') === 'my_value') {
     echo 123;
 }
 CONTENT
@@ -54,7 +54,7 @@ CONTENT
                 '$value'              => ['testValue', 'testValue2'],
                 '$condition'          => '!==',
                 '$expectedMethodBody' => <<<CONTENT
-if (\$item->getContext()->has('valueToCompare') && \$item->getContext()->get('valueToCompare') !== array (
+if (\$item->getContext()->getOr('valueToCompare') !== array (
   0 => 'testValue',
   1 => 'testValue2',
 )) {

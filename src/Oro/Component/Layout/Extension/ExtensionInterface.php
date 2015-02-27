@@ -7,6 +7,7 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
 /**
@@ -55,20 +56,20 @@ interface ExtensionInterface
     /**
      * Returns layout updates for the given layout item.
      *
-     * @param string $id The id of the layout item
+     * @param LayoutItemInterface $item
      *
-     * @return LayoutUpdateInterface[]
+     * @return \Oro\Component\Layout\LayoutUpdateInterface[]
      */
-    public function getLayoutUpdates($id);
+    public function getLayoutUpdates(LayoutItemInterface $item);
 
     /**
      * Checks whether this extension provides layout updates for the given layout item.
      *
-     * @param string $id The id of the layout item
+     * @param LayoutItemInterface $item
      *
      * @return bool true, if the given layout item has additional layout updates; otherwise, false
      */
-    public function hasLayoutUpdates($id);
+    public function hasLayoutUpdates(LayoutItemInterface $item);
 
     /**
      * Returns layout context configurators.

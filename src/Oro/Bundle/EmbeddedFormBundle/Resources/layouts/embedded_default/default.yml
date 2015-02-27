@@ -1,44 +1,43 @@
 oro_layout:
     actions:
-        - @add:
-            id:          head
-            parentId:    root
-            blockType:   head
-            options:
-                title:   Form
-        - @add:
-            id:          meta_charset
-            parentId:    head
-            blockType:   meta
-            options:
-                charset: 'utf-8'
-        - @add:
-            id:          meta_x_ua_compatible
-            parentId:    head
-            blockType:   meta
-            options:
-                http_equiv: 'X-UA-Compatible'
-                content:    'IE=edge,chrome=1'
-        - @add:
-            id:          meta_viewport
-            parentId:    head
-            blockType:   meta
-            options:
-                name:    'viewport'
-                content: 'width=device-width, initial-scale=1.0'
-        - @add:
-            id:          base_css
-            parentId:    head
-            blockType:   style
-        - @add:
-            id:          form_css
-            parentId:    head
-            blockType:   style
-            options:
-                content: { @value: $context.embedded_form_entity.css }
-        - @add:
-            id:          content
-            parentId:    root
-            blockType:   body
+        - @addTree:
+            items:
+                head:
+                    blockType:   head
+                    options:
+                        title:   Form
+                meta_charset:
+                    blockType:   meta
+                    options:
+                        charset: 'utf-8'
+                meta_x_ua_compatible:
+                    blockType:   meta
+                    options:
+                        http_equiv: 'X-UA-Compatible'
+                        content:    'IE=edge,chrome=1'
+                meta_viewport:
+                    blockType:   meta
+                    options:
+                        name:    'viewport'
+                        content: 'width=device-width, initial-scale=1.0'
+                base_css:
+                    blockType:   style
+                form_css:
+                    blockType:   style
+                    options:
+                        content: { @value: $context.embedded_form_entity.css }
+                content:
+                    blockType: body
+            tree:
+                root:
+                    head:
+                        meta_charset: ~
+                        meta_x_ua_compatible: ~
+                        meta_viewport: ~
+                        base_css: ~
+                        form_css: ~
+                    content: ~
+
         - @setBlockTheme:
             themes: 'OroEmbeddedFormBundle:Layout:embed_form.html.twig'
+

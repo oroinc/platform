@@ -17,8 +17,8 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
      */
     public function generate($className, GeneratorData $data, ConditionCollection $conditionCollection)
     {
+        $this->prepare($data, $conditionCollection);
         $this->validate($data);
-        $this->prepareConditionCollection($data, $conditionCollection);
 
         $class   = PhpClass::create($className);
         $visitor = new VisitContext($class);
@@ -49,36 +49,30 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
     }
 
     /**
-     * Performs code generation itself based on data given
+     * Performs code generation itself based on source data given
      *
      * @param GeneratorData $data
-     *
-     * @return string
      */
     abstract protected function doGenerateBody(GeneratorData $data);
+
+    /**
+     * Do preparation of data and condition collection based on resource data.
+     * Empty implementation, could be overridden in descendants.
+     *
+     * @param GeneratorData       $data
+     * @param ConditionCollection $conditionCollection
+     */
+    protected function prepare(GeneratorData $data, ConditionCollection $conditionCollection)
+    {
+    }
 
     /**
      * Validates given resource data. Should throw exception if error found.
      * Empty implementation, could be overridden in descendants.
      *
-     * @param GeneratorData $source
-     *
-     * @return void
+     * @param GeneratorData $data
      */
-    protected function validate(GeneratorData $source)
-    {
-    }
-
-    /**
-     * Do preparation of condition collection based on resource data.
-     * Empty implementation, could be overridden in descendants.
-     *
-     * @param GeneratorData       $data
-     * @param ConditionCollection $conditionCollection
-     *
-     * @return void
-     */
-    protected function prepareConditionCollection(GeneratorData $data, ConditionCollection $conditionCollection)
+    protected function validate(GeneratorData $data)
     {
     }
 }

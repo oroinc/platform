@@ -12,6 +12,13 @@ parameters:
     oro_layout.updates_cache_dir:       %kernel.cache_dir%/layouts
 
 services:
+    oro_layout.dependency_initializer:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\DependencyInitializer
+        arguments:
+            - @service_container
+        calls:
+            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface', 'setAssembler', 'oro_layout.expression.assembler']]
+
     oro_layout.theme_factory:
         class: %oro_layout.theme_factory.class%
         public: false
@@ -51,16 +58,15 @@ services:
 
     oro_layout.theme_extension:
         class:  %oro_layout.theme_extension.class%
-        public: false
         arguments:
             - %oro_layout.theme_updates_resources%
             - @oro_layout.theme_manager
             - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader.chain_loader
-        calls:
-            - [setAssembler, [@oro_layout.expression.assembler]]
+            - @oro_layout.dependency_initializer
         tags:
             - { name: monolog.logger, channel: main }
+            - { name: layout.context_configurator }
 
     oro_layout.extension.route_context_configurator:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator

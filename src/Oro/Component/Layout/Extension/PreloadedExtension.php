@@ -7,6 +7,7 @@ use Oro\Component\Layout\BlockTypeInterface;
 use Oro\Component\Layout\ContextConfiguratorInterface;
 use Oro\Component\Layout\DataProviderInterface;
 use Oro\Component\Layout\Exception;
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\LayoutUpdateInterface;
 
 /**
@@ -147,19 +148,23 @@ class PreloadedExtension implements ExtensionInterface
     /**
      * {@inheritdoc}
      */
-    public function getLayoutUpdates($id)
+    public function getLayoutUpdates(LayoutItemInterface $item)
     {
-        return isset($this->layoutUpdates[$id])
-            ? $this->layoutUpdates[$id]
+        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+
+        return isset($this->layoutUpdates[$idOrAlias])
+            ? $this->layoutUpdates[$idOrAlias]
             : [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function hasLayoutUpdates($id)
+    public function hasLayoutUpdates(LayoutItemInterface $item)
     {
-        return !empty($this->layoutUpdates[$id]);
+        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+
+        return !empty($this->layoutUpdates[$idOrAlias]);
     }
 
     /**

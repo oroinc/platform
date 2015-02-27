@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Generator;
 
 use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
+use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ArrayUtils;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ReflectionUtils;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition;
@@ -10,7 +11,14 @@ use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition
 class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 {
     const NODE_ACTIONS   = 'actions';
-    const NODE_CONDITION = 'condition';
+    const NODE_CONDITION = 'conditions';
+    const NODE_ITEMS     = 'items';
+    const NODE_TREE      = 'tree';
+
+    const ACTION_ADD_TREE = '@addTree';
+    const ACTION_ADD      = '@add';
+
+    const PATH_ATTR = '__path';
 
     /** @var ReflectionUtils */
     protected $helper;
@@ -66,8 +74,14 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             throw new SyntaxException(sprintf('expected array with "%s" node', self::NODE_ACTIONS), $source);
         }
 
-        foreach ($source[self::NODE_ACTIONS] as $nodeNo => $actionDefinition) {
-            $path = self::NODE_ACTIONS . '.' . $nodeNo;
+        $actions = $source[self::NODE_ACTIONS];
+        foreach ($actions as $nodeNo => $actionDefinition) {
+            if (isset($actionDefinition[self::PATH_ATTR])) {
+                $path = $actionDefinition[self::PATH_ATTR];
+                unset ($actionDefinition[self::PATH_ATTR]);
+            } else {
+                $path = self::NODE_ACTIONS . '.' . $nodeNo;
+            }
 
             if (!is_array($actionDefinition)) {
                 throw new SyntaxException('expected array with action name as key', $actionDefinition, $path);
@@ -106,12 +120,101 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
      *
      * {@inheritdoc}
      */
-    protected function prepareConditionCollection(GeneratorData $data, ConditionCollection $conditionCollection)
+    protected function prepare(GeneratorData $data, ConditionCollection $conditionCollection)
     {
         $source = $data->getSource();
+        if (is_array($source)) {
+            if (isset($source[self::NODE_ACTIONS])) {
+                // traversing through actions, looking for "@addTree" action
+                $actions = $source[self::NODE_ACTIONS];
+                foreach ($actions as $nodeNo => $actionDefinition) {
+                    // do not validate syntax, error will be thrown afterwards
+                    $actionName = is_array($actionDefinition) ? key($actionDefinition) : '';
 
-        if (isset($source[self::NODE_CONDITION])) {
-            $conditionCollection->append(new ConfigExpressionCondition($source[self::NODE_CONDITION]));
+                    if (self::ACTION_ADD_TREE === $actionName) {
+                        $path       = self::NODE_ACTIONS . '.' . $nodeNo;
+                        $actionNode = reset($actionDefinition);
+
+                        // looking for items, parent and tree it self
+                        if (!(isset($actionNode[self::NODE_ITEMS], $actionNode[self::NODE_TREE]))) {
+                            throw new SyntaxException(
+                                'expected array with keys "items" and "tree"',
+                                $actionDefinition,
+                                $path
+                            );
+                        }
+
+                        $transformedActions = [];
+                        $treeParent         = key($actionNode[self::NODE_TREE]);
+                        $tree               = current($actionNode[self::NODE_TREE]);
+                        try {
+                            $this->processTree($transformedActions, $tree, $treeParent, $actionNode[self::NODE_ITEMS]);
+                        } catch (\LogicException $e) {
+                            throw new SyntaxException(
+                                'invalid tree definition. ' . $e->getMessage(),
+                                $actionDefinition,
+                                $path
+                            );
+                        }
+
+                        // pre-generate "path" option in order to show correct path if validation error will occur
+                        array_walk(
+                            $transformedActions,
+                            function (&$val) use ($path) {
+                                $val[self::PATH_ATTR] = $path;
+                            }
+                        );
+                        $source[self::NODE_ACTIONS] = array_merge($source[self::NODE_ACTIONS], $transformedActions);
+
+                        // unset processed "@addTree" action
+                        unset($source[self::NODE_ACTIONS][$nodeNo]);
+                    }
+                }
+            }
+
+            // prepare condition collection
+            if (isset($source[self::NODE_CONDITION])) {
+                $conditionCollection->append(new ConfigExpressionCondition($source[self::NODE_CONDITION]));
+            }
+        }
+
+        $data->setSource($source);
+    }
+
+    /**
+     * Walk recursively through the tree, completing block definition in tree by found correspondent data "items" list
+     *
+     * @param array  $actions
+     * @param mixed  $currentSubTree
+     * @param string $parentId
+     * @param array  $items
+     */
+    protected function processTree(array &$actions, $currentSubTree, $parentId, array $items)
+    {
+        if (!is_array($currentSubTree)) {
+            return;
+        }
+
+        foreach ($currentSubTree as $k => $subtree) {
+            $blockId = is_numeric($k) && is_string($subtree) ? $subtree : $k;
+
+            if (!isset($items[$blockId])) {
+                throw new \LogicException(sprintf('Item with id "%s" not found in items list', $blockId));
+            }
+
+            $itemDefinition = $items[$blockId];
+
+            if (ArrayUtils::isAssoc($itemDefinition)) {
+                // merge associative values to arguments
+                $itemDefinition = array_merge($itemDefinition, ['id' => $blockId, 'parentId' => $parentId]);
+            } else {
+                // prepend blockId and parentId to arguments
+                array_unshift($itemDefinition, $blockId, $parentId);
+            }
+
+            $actions[] = [self::ACTION_ADD => $itemDefinition];
+
+            $this->processTree($actions, $subtree, $blockId, $items);
         }
     }
 

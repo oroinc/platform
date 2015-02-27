@@ -103,8 +103,8 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testHasLayoutUpdates()
     {
-        $this->assertTrue($this->extension->hasLayoutUpdates('test'));
-        $this->assertFalse($this->extension->hasLayoutUpdates('unknown'));
+        $this->assertTrue($this->extension->hasLayoutUpdates($this->getLayoutItem('test')));
+        $this->assertFalse($this->extension->hasLayoutUpdates($this->getLayoutItem('unknown')));
     }
 
     public function testGetLayoutUpdates()
@@ -116,14 +116,14 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('layout_update_service')
             ->will($this->returnValue($layoutUpdate));
 
-        $layoutUpdates = $this->extension->getLayoutUpdates('test');
+        $layoutUpdates = $this->extension->getLayoutUpdates($this->getLayoutItem('test'));
         $this->assertCount(1, $layoutUpdates);
         $this->assertSame($layoutUpdate, $layoutUpdates[0]);
     }
 
     public function testGetUnknownBlockLayoutUpdates()
     {
-        $this->assertSame([], $this->extension->getLayoutUpdates('unknown'));
+        $this->assertSame([], $this->extension->getLayoutUpdates($this->getLayoutItem('unknown')));
     }
 
     public function testHasContextConfigurators()
@@ -184,5 +184,18 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetUnknownDataProvider()
     {
         $this->extension->getDataProvider('unknown');
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getLayoutItem($id)
+    {
+        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
+
+        return $layoutItem;
     }
 }

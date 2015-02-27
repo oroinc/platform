@@ -169,8 +169,8 @@ class LayoutRegistry implements LayoutRegistryInterface
     public function updateLayout($id, LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
         foreach ($this->getExtensions() as $extension) {
-            if ($extension->hasLayoutUpdates($id)) {
-                $layoutUpdates = $extension->getLayoutUpdates($id);
+            if ($extension->hasLayoutUpdates($item)) {
+                $layoutUpdates = $extension->getLayoutUpdates($item);
                 foreach ($layoutUpdates as $layoutUpdate) {
                     $layoutUpdate->updateLayout($layoutManipulator, $item);
                 }

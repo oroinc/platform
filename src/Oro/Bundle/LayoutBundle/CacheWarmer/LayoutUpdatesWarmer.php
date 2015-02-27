@@ -5,7 +5,7 @@ namespace Oro\Bundle\LayoutBundle\CacheWarmer;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
-use Oro\Bundle\LayoutBundle\Layout\Loader\ThemeResourceIterator;
+use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
 
 class LayoutUpdatesWarmer implements CacheWarmerInterface
@@ -36,14 +36,12 @@ class LayoutUpdatesWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        foreach ($this->resources as $themeResources) {
-            foreach (new ThemeResourceIterator($this->factory, $themeResources) as $resource) {
-                if (!$this->loader->supports($resource)) {
-                    continue;
-                }
-
-                $this->loader->load($resource);
+        foreach (new ResourceIterator($this->factory, $this->resources) as $resource) {
+            if (!$this->loader->supports($resource)) {
+                continue;
             }
+
+            $this->loader->load($resource);
         }
     }
 
