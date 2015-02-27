@@ -125,8 +125,12 @@ class ConfigProvider
      */
     protected function copyConfigurationArray(array $configurations)
     {
-        return array_map(function ($item) {
-            return $item;
+        return array_map(function ($config) {
+            if (!is_array($config)) {
+                return $config;
+            }
+
+            return $this->copyConfigurationArray($config);
         }, $configurations);
     }
 }
