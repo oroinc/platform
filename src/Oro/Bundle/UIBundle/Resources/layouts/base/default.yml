@@ -40,7 +40,7 @@ oro_layout:
                 http_equiv: 'pragma'
                 content:    'no-cache'
         - @add:
-            id:        head_style
+            id:        theme_icon
             parentId:  head
             blockType: block
         - @add:
@@ -50,30 +50,38 @@ oro_layout:
             options:
                 placeholder_name: 'head_style'
         - @add:
-            id:        scripts
-            parentId:  head
-            blockType: container
-        - @add:
             id:        scripts_before_placeholder
-            parentId:  scripts
+            parentId:  head
             blockType: placeholder
             options:
                 placeholder_name: 'scripts_before'
         - @add:
             id:        require_js
-            parentId:  scripts
+            parentId:  head
             blockType: require_js
         - @add:
             id:        applicaton_script
-            parentId:  scripts
+            parentId:  head
             blockType: block
         - @add:
-            id:        head_scripts
-            parentId:  scripts
+            id:        core_scripts
+            parentId:  head
             blockType: block
+        - @add:
+            id:        debug_scripts
+            parentId:  head
+            blockType: block
+            options:
+                visible: { @value: $context.debug }
+        - @add:
+            id:        mobile_scripts
+            parentId:  head
+            blockType: block
+            options:
+                visible: { @value: $context.user_agent.mobile }
         - @add:
             id:        scripts_after_placeholder
-            parentId:  scripts
+            parentId:  head
             blockType: placeholder
             options:
                 placeholder_name: 'scripts_after'

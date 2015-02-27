@@ -9,9 +9,3 @@ oro_tag_unassign_global:
     type: action
     group_name: ""
     bindings: ~
-
-oro_tag_view_tag_cloud:
-    label: oro.tag.action.view_cloud
-    type: action
-    group_name: ""
-    bindings: ~

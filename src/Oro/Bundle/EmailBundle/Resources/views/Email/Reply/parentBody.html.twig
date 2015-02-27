@@ -1,0 +1,16 @@
+<body> {# this template requires body tag because it will be cut depending on it by the component #}
+    <br><br>
+    <div class="quote">
+        <p>
+            {{ 'oro.email.parent_message_header'|trans({
+                '%date%': email.sentAt|oro_format_date,
+                '%user%': email.fromName
+            }) }}
+        </p>
+        <div class="email-prev-body">
+            {% if email.emailBody %}
+                {{ email.emailBody.bodyContent|raw }}
+            {% endif %}
+        </div>
+    </div>
+</body>

@@ -162,7 +162,7 @@
     </div>
 {% endblock %}
 
-{% block _head_style_widget %}
+{% block _theme_icon_widget %}
     {% if oro_theme_icon() %}
         <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
     {% endif %}
@@ -174,15 +174,21 @@
     </script>
 {% endblock %}
 
-{% block _head_scripts_widget %}
+{% block _core_scripts_widget %}
     <script type="text/javascript">
         require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
-        {% if isMobileVersion() %}
-        require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
-        {% endif %}
-        {% if app.debug %}
+    </script>
+{% endblock %}
+
+{% block _debug_scripts_widget %}
+    <script type="text/javascript">
         require(['oroui/js/tools'], function (tools) {tools.debug = true;});
-        {% endif %}
+    </script>
+{% endblock %}
+
+{% block _mobile_scripts_widget %}
+    <script type="text/javascript">
+        require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
     </script>
 {% endblock %}
 
