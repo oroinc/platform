@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
 use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
+use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Form\PreloadedExtension;
 
@@ -26,6 +27,7 @@ class EmailTypeTest extends TypeTestCase
     {
         parent::setUp();
         $this->securityContext  = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
+        $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
     }
 
     protected function getExtensions()
@@ -44,7 +46,8 @@ class EmailTypeTest extends TypeTestCase
         $configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $richTextType = new OroRichTextType($configManager);
+        $htmlTagProvider = new HtmlTagProvider();
+        $richTextType = new OroRichTextType($configManager, $htmlTagProvider);
 
         return [
             new PreloadedExtension(
