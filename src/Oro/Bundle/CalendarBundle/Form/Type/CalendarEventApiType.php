@@ -120,6 +120,17 @@ class CalendarEventApiType extends CalendarEventType
                 [
                     'mapped' => false
                 ]
+            )
+            ->add(
+                'createdAt',
+                'datetime',
+                [
+                    'required'       => false,
+                    'with_seconds'   => true,
+                    'widget'         => 'single_text',
+                    'format'         => DateTimeType::HTML5_FORMAT,
+                    'model_timezone' => 'UTC'
+                ]
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());
