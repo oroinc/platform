@@ -91,3 +91,11 @@
 {% block external_resource_widget %}
     <link {{ block('block_attributes') }} />
 {% endblock %}
+
+{% block list_widget -%}
+    <ul{{ block('block_attributes') }}>
+    {% for child in block if child.vars.visible -%}
+        <li>{{ block_widget(child) }}</li>
+    {%- endfor %}
+    </ul>
+{%- endblock %}

@@ -272,6 +272,8 @@ class RawLayoutBuilder implements RawLayoutBuilderInterface
     public function clear()
     {
         $this->rawLayout->clear();
+
+        return $this;
     }
 
     /**

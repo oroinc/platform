@@ -143,6 +143,8 @@ class LayoutBuilder implements LayoutBuilderInterface
     {
         $this->layoutManipulator->clear();
         $this->rawLayoutBuilder->clear();
+
+        return $this;
     }
 
     /**

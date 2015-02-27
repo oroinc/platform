@@ -25,7 +25,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
             ->remove('header');
 
         // do test
-        $this->layoutManipulator->clear();
+        $this->assertSame($this->layoutManipulator, $this->layoutManipulator->clear());
         $this->layoutManipulator->applyChanges($this->context, true);
         $this->assertTrue($this->rawLayoutBuilder->isEmpty());
         $this->assertSame(0, $this->layoutManipulator->getNumberOfAddedItems());
