@@ -110,4 +110,10 @@ class HashNavContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($context['hash_navigation']);
     }
+
+    public function testRequestSetterSynchronized()
+    {
+        $this->contextConfigurator->setRequest(new Request());
+        $this->contextConfigurator->setRequest(null);
+    }
 }

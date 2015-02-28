@@ -6,6 +6,8 @@ use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\ContextConfiguratorInterface;
@@ -21,6 +23,9 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
     use LoggerAwareTrait;
 
     const PARAM_THEME = 'theme';
+
+    /** @var Request|null */
+    protected $request;
 
     /** @var array */
     protected $resources;
@@ -60,6 +65,40 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
     }
 
     /**
+     * Synchronized DI method call, sets current request for further usage
+     *
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureContext(ContextInterface $context)
+    {
+        $context->getDataResolver()
+            ->setOptional([self::PARAM_THEME])
+            ->setAllowedTypes([self::PARAM_THEME => ['string', 'null']])
+            ->setNormalizers(
+                [
+                    self::PARAM_THEME => function ($options, $theme) {
+                        if (null === $theme && $this->request) {
+                            $theme = $this->request->query->get('_theme');
+                            if (null === $theme) {
+                                $theme = $this->request->attributes->get('_theme');
+                            }
+                        }
+
+                        return $theme;
+                    }
+                ]
+            );
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function loadLayoutUpdates(ContextInterface $context)
@@ -93,14 +132,6 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureContext(ContextInterface $context)
-    {
-        $context->getDataResolver()->setOptional([self::PARAM_THEME]);
     }
 
     /**

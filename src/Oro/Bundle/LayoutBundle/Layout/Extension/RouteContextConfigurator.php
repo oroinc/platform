@@ -33,14 +33,18 @@ class RouteContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getDataResolver()
             ->setOptional([self::PARAM_ROUTE_NAME])
+            ->setAllowedTypes([self::PARAM_ROUTE_NAME => ['string', 'null']])
             ->setNormalizers(
                 [
-                    self::PARAM_ROUTE_NAME => function ($options, $value) {
-                        if (null === $value) {
-                            return $this->request ? $this->request->get('_route') : null;
+                    self::PARAM_ROUTE_NAME => function ($options, $route) {
+                        if (null === $route && $this->request) {
+                            $route = $this->request->attributes->get('_route');
+                            if (null === $route) {
+                                $route = $this->request->attributes->get('_master_request_route');
+                            }
                         }
 
-                        return $value;
+                        return $route;
                     }
                 ]
             );

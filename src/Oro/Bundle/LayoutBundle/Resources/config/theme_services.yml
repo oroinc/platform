@@ -64,6 +64,8 @@ services:
             - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader.chain_loader
             - @oro_layout.dependency_initializer
+        calls:
+            - [setRequest, [@?request=]]
         tags:
             - { name: monolog.logger, channel: main }
             - { name: layout.context_configurator }
@@ -85,3 +87,10 @@ services:
     oro_layout.php_layout_update_generator:
         class:  Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator
         public: false
+
+    oro_layout.theme_listener:
+        class: Oro\Bundle\LayoutBundle\EventListener\ThemeListener
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: kernel.event_subscriber }
