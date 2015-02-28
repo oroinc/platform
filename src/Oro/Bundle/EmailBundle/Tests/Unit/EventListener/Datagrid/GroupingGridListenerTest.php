@@ -9,7 +9,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
-use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EmailBundle\EventListener\Datagrid\GroupingGridListener;
 
 class GroupingGridListenerTest extends \PHPUnit_Framework_TestCase
@@ -75,40 +74,6 @@ class GroupingGridListenerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->queryBuilder);
 
         $this->groupingGridListener = new GroupingGridListener($this->configManager);
-    }
-
-    /**
-     * @param $enabled
-     * @param $arrayModify
-     *
-     * @dataProvider buildBeforeProvider
-     */
-    public function testOnBuildBefore($enabled, $arrayModify)
-    {
-        $this->configManager->expects($this->once())
-            ->method('get')
-            ->with('oro_email.use_threads_in_emails')
-            ->willReturn($enabled);
-
-        $this->config->expects($this->exactly($arrayModify))
-            ->method('offsetAddToArray');
-
-        $buildBeforeEvent = new BuildBefore($this->datagrid, $this->config);
-        $this->groupingGridListener->onBuildBefore($buildBeforeEvent);
-    }
-
-    public function buildBeforeProvider()
-    {
-        return [
-            'configEnabled' => [
-                'enabled' => true,
-                'arrayModify' => 1,
-            ],
-            'configDisabled' => [
-                'enabled' => false,
-                'arrayModify' => 0,
-            ],
-        ];
     }
 
     /**

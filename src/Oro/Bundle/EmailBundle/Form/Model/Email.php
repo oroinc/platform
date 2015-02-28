@@ -18,9 +18,6 @@ class Email
     /** @var int */
     protected $parentEmailId;
 
-    /** @var int */
-    protected $direction;
-
     /** @var string */
     protected $from;
 
@@ -140,30 +137,6 @@ class Email
     public function setParentEmailId($parentEmailId)
     {
         $this->parentEmailId = $parentEmailId;
-
-        return $this;
-    }
-
-    /**
-     * Set email direction
-     *
-     * @return int
-     */
-    public function getDirection()
-    {
-        return $this->direction;
-    }
-
-    /**
-     * Get email direction
-     *
-     * @param $direction
-     *
-     * @return $this
-     */
-    public function setDirection($direction)
-    {
-        $this->direction = $direction;
 
         return $this;
     }
