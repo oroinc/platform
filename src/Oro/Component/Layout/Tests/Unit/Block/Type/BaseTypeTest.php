@@ -70,7 +70,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
                         'block',
                         '_test_block_1'
                     ],
-                    'cache_key'           => '_test_block_1_block',
+                    'cache_key'           => '_test:block--1_block',
                     'translation_domain'  => 'messages'
                 ]
             ],
