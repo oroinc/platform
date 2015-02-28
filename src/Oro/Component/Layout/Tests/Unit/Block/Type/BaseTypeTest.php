@@ -54,7 +54,7 @@ class BaseTypeTest extends BaseBlockTypeTestCase
 
     public function testBuildViewWithoutOptions()
     {
-        $view = $this->getBlockBuilder(BaseType::NAME, [])
+        $view = $this->getBlockBuilder(BaseType::NAME, [], 'test:block--1')
             ->getBlockView();
 
         $this->assertSame($view, $view->vars['block']);
@@ -63,14 +63,14 @@ class BaseTypeTest extends BaseBlockTypeTestCase
         $this->assertBlockView(
             [
                 'vars' => [
-                    'id'                  => 'block_id',
+                    'id'                  => 'test:block--1',
                     'block_type'          => 'block',
-                    'unique_block_prefix' => '_block_id',
+                    'unique_block_prefix' => '_test_block_1',
                     'block_prefixes'      => [
                         'block',
-                        '_block_id'
+                        '_test_block_1'
                     ],
-                    'cache_key'           => '_block_id_block',
+                    'cache_key'           => '_test_block_1_block',
                     'translation_domain'  => 'messages'
                 ]
             ],

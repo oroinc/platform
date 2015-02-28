@@ -50,11 +50,15 @@ class BaseType extends AbstractType
         $view->vars['translation_domain'] = $this->getTranslationDomain($view, $options);
 
         // add core variables to the block view, like id, block type and variables required for rendering engine
-        $id                                = $block->getId();
-        $name                              = $block->getTypeName();
-        $uniqueBlockPrefix                 = '_' . $id;
-        $blockPrefixes                     = $block->getTypeHelper()->getTypeNames($name);
-        $blockPrefixes[]                   = $uniqueBlockPrefix;
+        $id   = $block->getId();
+        $name = $block->getTypeName();
+
+        // the block prefix must contain only letters, numbers and underscores (_)
+        // due to limitations of block names in TWIG
+        $uniqueBlockPrefix = '_' . preg_replace('/[^a-z0-9_]+/i', '_', $id);
+        $blockPrefixes     = $block->getTypeHelper()->getTypeNames($name);
+        $blockPrefixes[]   = $uniqueBlockPrefix;
+
         $view->vars['id']                  = $id;
         $view->vars['block_type']          = $name;
         $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
