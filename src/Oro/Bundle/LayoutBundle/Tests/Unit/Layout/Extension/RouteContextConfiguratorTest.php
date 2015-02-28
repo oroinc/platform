@@ -1,10 +1,12 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Extension\Context;
+namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Component\Layout\LayoutContext;
+
+use Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator;
 
 class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 {

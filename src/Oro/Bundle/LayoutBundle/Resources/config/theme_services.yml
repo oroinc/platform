@@ -68,13 +68,6 @@ services:
             - { name: monolog.logger, channel: main }
             - { name: layout.context_configurator }
 
-    oro_layout.extension.route_context_configurator:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator
-        calls:
-            - [setRequest, [@?request=]]
-        tags:
-            - { name: layout.context_configurator }
-
     oro_layout.yaml_updates_warmer:
         class: Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer
         public: false

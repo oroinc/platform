@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LayoutBundle\Layout\Extension\Context;
+namespace Oro\Bundle\LayoutBundle\Layout\Extension;
 
 use Symfony\Component\HttpFoundation\Request;
 
