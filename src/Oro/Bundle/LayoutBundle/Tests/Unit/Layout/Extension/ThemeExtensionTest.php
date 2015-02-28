@@ -141,6 +141,7 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertContains($update2Mock, $result);
 
         $logs = $this->logger->getLogs('notice');
+        $this->assertCount(1, $logs);
         $this->assertSame('Skipping resource "resource2.xml" because loader for it not found', reset($logs));
     }
 

@@ -106,7 +106,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
         $result    = [];
         $themeName = $context->getOr(self::PARAM_THEME);
         if ($themeName) {
-            $updates = $skipped = [];
+            $updates = [];
             $theme   = $this->manager->getTheme($themeName);
 
             $path      = [$theme->getDirectory()];
@@ -119,14 +119,13 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
             $iterator->setFilterPath($path);
             foreach ($iterator as $resource) {
                 if ($this->loader->supports($resource)) {
-                    $updates[] = $this->loader->load($resource);
+                    $update = $this->loader->load($resource);
+                    $this->dependencyInitializer->initialize($update);
+                    $updates[] = $update;
                 } else {
-                    $skipped[] = $resource;
+                    $this->logUnknownResource($resource);
                 }
             }
-
-            array_walk($skipped, [$this, 'logUnknownResource']);
-            array_walk($updates, [$this->dependencyInitializer, 'initialize']);
 
             $result = ['root' => $updates];
         }
