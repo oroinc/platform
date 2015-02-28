@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Tests\Logger;
 
 use Oro\Component\Layout\LayoutContext;
@@ -186,25 +187,63 @@ class ThemeExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
-    public function testConfigureContextSetOptionalThemeOption()
+    public function testConfigureContextWithOutRequest()
     {
         $context = new LayoutContext();
+
         $this->extension->configureContext($context);
 
         $context->resolve();
-
-        $this->assertNull($context->getOr('theme'));
+        $this->assertNull($context->get(ThemeExtension::PARAM_THEME));
     }
 
-    public function testConfigureContextThemeIsAKnownOption()
+    public function testConfigureContextWithRequest()
     {
         $context = new LayoutContext();
-        $context->set('theme', 'my-oro-theme');
+
+        $request = Request::create('');
+        $request->attributes->set('_theme', 'testTheme');
+
+        $this->extension->setRequest($request);
         $this->extension->configureContext($context);
 
         $context->resolve();
+        $this->assertSame('testTheme', $context->get(ThemeExtension::PARAM_THEME));
+    }
 
-        $this->assertSame('my-oro-theme', $context->get('theme'));
+    public function testConfigureContextWithThemeInQueryString()
+    {
+        $context = new LayoutContext();
+
+        $request = Request::create('');
+        $request->query->set('_theme', 'testTheme');
+
+        $this->extension->setRequest($request);
+        $this->extension->configureContext($context);
+
+        $context->resolve();
+        $this->assertSame('testTheme', $context->get(ThemeExtension::PARAM_THEME));
+    }
+
+    public function testConfigureContextWithRequestAndDataSetInContext()
+    {
+        $context = new LayoutContext();
+        $context->set(ThemeExtension::PARAM_THEME, 'themeShouldNotBeOverridden');
+
+        $request = Request::create('');
+        $request->attributes->set('_theme', 'testTheme');
+
+        $this->extension->setRequest($request);
+        $this->extension->configureContext($context);
+
+        $context->resolve();
+        $this->assertSame('themeShouldNotBeOverridden', $context->get(ThemeExtension::PARAM_THEME));
+    }
+
+    public function testRequestSetterSynchronized()
+    {
+        $this->extension->setRequest(new Request());
+        $this->extension->setRequest(null);
     }
 
     protected function getCallbackBuilder()

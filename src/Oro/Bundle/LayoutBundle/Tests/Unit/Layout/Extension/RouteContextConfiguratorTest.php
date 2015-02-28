@@ -47,6 +47,20 @@ class RouteContextConfiguratorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('testRoteName', $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
     }
 
+    public function testConfigureContextWithSubRequest()
+    {
+        $context = new LayoutContext();
+
+        $request = Request::create('');
+        $request->attributes->set('_master_request_route', 'testRoteName');
+
+        $this->configurator->setRequest($request);
+        $this->configurator->configureContext($context);
+
+        $context->resolve();
+        $this->assertSame('testRoteName', $context->get(RouteContextConfigurator::PARAM_ROUTE_NAME));
+    }
+
     public function testConfigureContextWithRequestAndDataSetInContext()
     {
         $context = new LayoutContext();
