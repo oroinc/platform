@@ -155,7 +155,7 @@ class DependencyInjectionExtension implements ExtensionInterface
      */
     public function getLayoutUpdates(LayoutItemInterface $item)
     {
-        $idOrAlias     = $item->getAlias() ? $item->getAlias() : $item->getId();
+        $idOrAlias     = $item->getAlias() ?: $item->getId();
         $layoutUpdates = [];
 
         if (isset($this->layoutUpdateServiceIds[$idOrAlias])) {
@@ -172,7 +172,7 @@ class DependencyInjectionExtension implements ExtensionInterface
      */
     public function hasLayoutUpdates(LayoutItemInterface $item)
     {
-        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+        $idOrAlias = $item->getAlias() ?: $item->getId();
 
         return isset($this->layoutUpdateServiceIds[$idOrAlias]);
     }

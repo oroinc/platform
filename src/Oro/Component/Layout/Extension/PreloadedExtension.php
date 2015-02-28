@@ -150,7 +150,7 @@ class PreloadedExtension implements ExtensionInterface
      */
     public function getLayoutUpdates(LayoutItemInterface $item)
     {
-        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+        $idOrAlias = $item->getAlias() ?: $item->getId();
 
         return isset($this->layoutUpdates[$idOrAlias])
             ? $this->layoutUpdates[$idOrAlias]
@@ -162,7 +162,7 @@ class PreloadedExtension implements ExtensionInterface
      */
     public function hasLayoutUpdates(LayoutItemInterface $item)
     {
-        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+        $idOrAlias = $item->getAlias() ?: $item->getId();
 
         return !empty($this->layoutUpdates[$idOrAlias]);
     }
