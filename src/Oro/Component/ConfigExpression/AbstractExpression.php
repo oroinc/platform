@@ -147,6 +147,8 @@ abstract class AbstractExpression implements ExpressionInterface
                     $compiledParams[] = $param->compile($factoryAccessor);
                 } elseif (is_string($param)) {
                     $compiledParams[] = '\'' . str_replace('\'', '\\\'', $param) . '\'';
+                } elseif (is_bool($param)) {
+                    $compiledParams[] = $param ? 'true' : 'false';
                 } else {
                     $compiledParams[] = (string)$param;
                 }
