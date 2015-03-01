@@ -2,18 +2,25 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Generator;
 
+use Oro\Component\ConfigExpression\Condition;
+
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $expressionAssembler;
+
     /** @var ConfigLayoutUpdateGenerator */
     protected $generator;
 
     protected function setUp()
     {
-        $this->generator = new ConfigLayoutUpdateGenerator();
+        $this->expressionAssembler = $this->getMock('Oro\Component\ConfigExpression\AssemblerInterface');
+
+        $this->generator = new ConfigLayoutUpdateGenerator($this->expressionAssembler);
     }
 
     protected function tearDown()
@@ -246,6 +253,11 @@ CLASS
 
     public function testShouldProcessCondition()
     {
+        $this->expressionAssembler->expects($this->once())
+            ->method('assemble')
+            ->with([['@true' => null]])
+            ->willReturn(new Condition\True());
+
         $collection = new ConditionCollection();
         $this->generator->generate(
             'testClassName',
@@ -263,5 +275,27 @@ CLASS
             'Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition',
             $collection
         );
+    }
+
+    public function testShouldProcessConditionIfAssemblerReturnsNull()
+    {
+        $this->expressionAssembler->expects($this->once())
+            ->method('assemble')
+            ->with(['not supported'])
+            ->willReturn(null);
+
+        $collection = new ConditionCollection();
+        $this->generator->generate(
+            'testClassName',
+            new GeneratorData(
+                [
+                    'actions'    => [],
+                    'conditions' => ['not supported']
+                ]
+            ),
+            $collection
+        );
+
+        $this->assertEmpty($collection);
     }
 }

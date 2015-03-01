@@ -108,12 +108,16 @@ class GetArrayTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => [new PropertyPath('foo'), 'const', new Condition\True()],
                 'message'  => null,
-                'expected' => '$factory->create(\'array\', [\'$foo\', \'const\', $factory->create(\'true\', [])])'
+                'expected' => '$factory->create(\'array\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', \'const\', $factory->create(\'true\', [])])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), 'const', new Condition\True()],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'array\', [\'$foo\', \'const\', $factory->create(\'true\', [])])'
+                'expected' => '$factory->create(\'array\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', \'const\', $factory->create(\'true\', [])])'
                     . '->setMessage(\'Test\')'
             ]
         ];

@@ -6,20 +6,22 @@ use CG\Generator\PhpMethod;
 use CG\Generator\PhpProperty;
 use CG\Generator\PhpParameter;
 
+use Oro\Component\ConfigExpression\ExpressionInterface;
+
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
 class ConfigExpressionCondition implements ConditionInterface
 {
-    /** @var array */
-    protected $configuration;
+    /** @var ExpressionInterface */
+    protected $expression;
 
     /**
-     * @param array $configuration
+     * @param ExpressionInterface $expression
      */
-    public function __construct(array $configuration)
+    public function __construct(ExpressionInterface $expression)
     {
-        $this->configuration = $configuration;
+        $this->expression = $expression;
     }
 
     /**
@@ -30,18 +32,18 @@ class ConfigExpressionCondition implements ConditionInterface
         $writer = $visitContext->createWriter();
         $class  = $visitContext->getClass();
 
-        $class->addInterfaceName('\Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface');
+        $class->addInterfaceName('\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface');
 
-        $setAssemblerMethod = PhpMethod::create('setAssembler');
+        $setAssemblerMethod = PhpMethod::create('setExpressionFactory');
         $setAssemblerMethod->addParameter(
-            PhpParameter::create('assembler')
-                ->setType('\Oro\Component\ConfigExpression\ExpressionAssembler')
+            PhpParameter::create('expressionFactory')
+                ->setType('\Oro\Component\ConfigExpression\ExpressionFactoryInterface')
         );
-        $setAssemblerMethod->setBody($writer->write('$this->expressionAssembler = $assembler;')->getContent());
+        $setAssemblerMethod->setBody($writer->write('$this->expressionFactory = $expressionFactory;')->getContent());
         $class->setMethod($setAssemblerMethod);
         $writer->reset();
 
-        $assemblerProperty = PhpProperty::create('expressionAssembler');
+        $assemblerProperty = PhpProperty::create('expressionFactory');
         $assemblerProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
         $class->setProperty($assemblerProperty);
 
@@ -50,13 +52,13 @@ class ConfigExpressionCondition implements ConditionInterface
         $method = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
 
         $bodyTemplate = <<<CONTENT
-    if (null === \$this->expressionAssembler) {
-        throw new \\RuntimeException('Missing expression assembler for layout update');
+    if (null === \$this->expressionFactory) {
+        throw new \\RuntimeException('Missing expression factory for layout update');
     }
 
-    \$expr = \$this->expressionAssembler->assemble(%s);
+    \$expr = %s;
     \$context = ['context' => $%s->getContext()];
-    if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
+    if (\$expr->evaluate(\$context)) {
         %s
     }
 CONTENT;
@@ -66,7 +68,7 @@ CONTENT;
                 ->write(
                     sprintf(
                         $bodyTemplate,
-                        var_export($this->configuration, true),
+                        $this->expression->compile('$this->expressionFactory'),
                         LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
                         $method->getBody()
                     )

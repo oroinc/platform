@@ -288,7 +288,9 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => ['VIEW', new PropertyPath('entity')],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'acl\', [\'VIEW\', \'$entity\'])->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'acl\', [\'VIEW\', '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'entity\', [\'entity\'])'
+                    . '])->setMessage(\'Test\')'
             ]
         ];
     }

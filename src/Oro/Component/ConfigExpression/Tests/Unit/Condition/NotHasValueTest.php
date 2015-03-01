@@ -117,12 +117,16 @@ class NotHasValueTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => [new PropertyPath('value')],
                 'message'  => null,
-                'expected' => '$factory->create(\'not_has\', [\'$value\'])'
+                'expected' => '$factory->create(\'not_has\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'])'
+                    . '])'
             ],
             [
                 'options'  => [new PropertyPath('value')],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'not_has\', [\'$value\'])->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'not_has\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'])'
+                    . '])->setMessage(\'Test\')'
             ]
         ];
     }

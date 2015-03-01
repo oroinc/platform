@@ -128,11 +128,25 @@ abstract class AbstractExpression implements ExpressionInterface
             }
             foreach ($params as $param) {
                 if ($param instanceof PropertyPathInterface) {
-                    $compiledParams[] = sprintf('\'$%s\'', str_replace('\'', '\\\'', (string)$param));
+                    $compiledPathElements = implode(
+                        ', ',
+                        array_map(
+                            function ($val) {
+                                return '\'' . $val . '\'';
+                            },
+                            $param->getElements()
+                        )
+                    );
+                    $compiledParams[]     =
+                        'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\''
+                        . str_replace('\'', '\\\'', (string)$param)
+                        . '\', ['
+                        . $compiledPathElements
+                        . '])';
                 } elseif ($param instanceof ExpressionInterface) {
                     $compiledParams[] = $param->compile($factoryAccessor);
                 } elseif (is_string($param)) {
-                    $compiledParams[] = sprintf('\'%s\'', str_replace('\'', '\\\'', $param));
+                    $compiledParams[] = '\'' . str_replace('\'', '\\\'', $param) . '\'';
                 } else {
                     $compiledParams[] = (string)$param;
                 }
@@ -140,18 +154,16 @@ abstract class AbstractExpression implements ExpressionInterface
         }
 
 
-        $compiled = sprintf(
-            '%s->create(\'%s\', [%s])',
-            $factoryAccessor,
-            $this->getName(),
-            implode(', ', $compiledParams)
-        );
+        $compiled =
+            $factoryAccessor
+            . '->create(\''
+            . $this->getName()
+            . '\', ['
+            . implode(', ', $compiledParams)
+            . '])';
         $message  = $this->getMessage();
         if ($message !== null) {
-            $compiled .= sprintf(
-                '->setMessage(\'%s\')',
-                str_replace('\'', '\\\'', $message)
-            );
+            $compiled .= '->setMessage(\'' . str_replace('\'', '\\\'', $message) . '\')';
         }
 
         return $compiled;

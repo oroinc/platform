@@ -127,12 +127,16 @@ class GetValueTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => [new PropertyPath('foo')],
                 'message'  => null,
-                'expected' => '$factory->create(\'value\', [\'$foo\'])'
+                'expected' => '$factory->create(\'value\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . '])'
             ],
             [
                 'options'  => [new PropertyPath('foo')],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'value\', [\'$foo\'])->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'value\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . '])->setMessage(\'Test\')'
             ]
         ];
     }

@@ -117,12 +117,16 @@ class HasValueTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => [new PropertyPath('value')],
                 'message'  => null,
-                'expected' => '$factory->create(\'has\', [\'$value\'])'
+                'expected' => '$factory->create(\'has\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'])'
+                    . '])'
             ],
             [
                 'options'  => [new PropertyPath('value')],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'has\', [\'$value\'])->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'has\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'value\', [\'value\'])'
+                    . '])->setMessage(\'Test\')'
             ]
         ];
     }

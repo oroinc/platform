@@ -7,6 +7,8 @@ use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 use CG\Core\DefaultGeneratorStrategy;
 
+use Oro\Component\ConfigExpression\Condition;
+
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
@@ -16,7 +18,7 @@ class ConfigExpressionConditionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     public function testVisit()
     {
-        $condition    = new ConfigExpressionCondition(['@true' => null]);
+        $condition    = new ConfigExpressionCondition(new Condition\True());
         $visitContext = $this->setUpVisitContext('echo 123;');
 
         $condition->visit($visitContext);
@@ -24,28 +26,26 @@ class ConfigExpressionConditionTest extends \PHPUnit_Framework_TestCase
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CLASS
-class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface
+class LayoutUpdateClass implements \Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface
 {
-    private \$expressionAssembler;
+    private \$expressionFactory;
 
     public function updateLayout(\$layoutManipulator, \$item)
     {
-            if (null === \$this->expressionAssembler) {
-                throw new \RuntimeException('Missing expression assembler for layout update');
+            if (null === \$this->expressionFactory) {
+                throw new \RuntimeException('Missing expression factory for layout update');
             }
 
-            \$expr = \$this->expressionAssembler->assemble(array (
-          '@true' => NULL,
-        ));
+            \$expr = \$this->expressionFactory->create('true', []);
             \$context = ['context' => \$item->getContext()];
-            if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
+            if (\$expr->evaluate(\$context)) {
                 echo 123;
             }
     }
 
-    public function setAssembler(\Oro\Component\ConfigExpression\ExpressionAssembler \$assembler)
+    public function setExpressionFactory(\Oro\Component\ConfigExpression\ExpressionFactoryInterface \$expressionFactory)
     {
-        \$this->expressionAssembler = \$assembler;
+        \$this->expressionFactory = \$expressionFactory;
     }
 }
 CLASS

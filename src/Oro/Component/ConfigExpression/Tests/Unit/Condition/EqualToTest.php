@@ -138,12 +138,16 @@ class EqualToTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => null,
-                'expected' => '$factory->create(\'eq\', [\'$foo\', 123])'
+                'expected' => '$factory->create(\'eq\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', 123])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), 'test'],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'eq\', [\'$foo\', \'test\'])->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'eq\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', \'test\'])->setMessage(\'Test\')'
             ]
         ];
     }

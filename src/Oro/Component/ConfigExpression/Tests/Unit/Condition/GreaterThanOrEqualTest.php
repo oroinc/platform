@@ -112,12 +112,16 @@ class GreaterThanOrEqualTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => null,
-                'expected' => '$factory->create(\'gte\', [\'$foo\', 123])'
+                'expected' => '$factory->create(\'gte\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', 123])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), 123],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'gte\', [\'$foo\', 123])->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'gte\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', 123])->setMessage(\'Test\')'
             ]
         ];
     }

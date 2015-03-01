@@ -148,18 +148,26 @@ class IifTest extends \PHPUnit_Framework_TestCase
             [
                 'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
-                'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), \'$foo\', \'$bar\'])'
+                'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\']), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'])'
+                    . '])'
             ],
             [
                 'options'  => [new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
-                'expected' => '$factory->create(\'iif\', [\'$foo\', \'$bar\'])'
+                'expected' => '$factory->create(\'iif\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\']), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'])'
+                    . '])'
             ],
             [
                 'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => 'Test',
-                'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), \'$foo\', \'$bar\'])'
-                    . '->setMessage(\'Test\')'
+                'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\']), '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'bar\', [\'bar\'])'
+                    . '])->setMessage(\'Test\')'
             ]
         ];
     }
