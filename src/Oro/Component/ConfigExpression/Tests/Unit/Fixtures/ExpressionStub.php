@@ -85,4 +85,12 @@ class ExpressionStub implements ExpressionInterface
     {
         return [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile($factoryAccessor)
+    {
+        return '';
+    }
 }

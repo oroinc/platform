@@ -32,6 +32,14 @@ class Not extends AbstractCondition
     /**
      * {@inheritdoc}
      */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode($this->operand, $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(array $options)
     {
         if (1 == count($options)) {

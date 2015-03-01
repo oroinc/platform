@@ -107,4 +107,33 @@ class GetValueTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->function->initialize($options);
+        if ($message !== null) {
+            $this->function->setMessage($message);
+        }
+        $actual = $this->function->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => [new PropertyPath('foo')],
+                'message'  => null,
+                'expected' => '$factory->create(\'value\', [\'$foo\'])'
+            ],
+            [
+                'options'  => [new PropertyPath('foo')],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'value\', [\'$foo\'])->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

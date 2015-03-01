@@ -97,4 +97,33 @@ class NotHasValueTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->condition->initialize($options);
+        if ($message !== null) {
+            $this->condition->setMessage($message);
+        }
+        $actual = $this->condition->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => [new PropertyPath('value')],
+                'message'  => null,
+                'expected' => '$factory->create(\'not_has\', [\'$value\'])'
+            ],
+            [
+                'options'  => [new PropertyPath('value')],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'not_has\', [\'$value\'])->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

@@ -31,6 +31,14 @@ class GetArray extends AbstractFunction
     /**
      * {@inheritdoc}
      */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode($this->values, $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(array $options)
     {
         $this->values = $options;

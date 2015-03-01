@@ -101,6 +101,18 @@ class IifTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
+                'options'  => [new PropertyPath('foo'), new PropertyPath('bar')],
+                'message'  => null,
+                'expected' => [
+                    '@iif' => [
+                        'parameters' => [
+                            '$foo',
+                            '$bar'
+                        ]
+                    ]
+                ]
+            ],
+            [
                 'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => 'Test',
                 'expected' => [
@@ -113,6 +125,41 @@ class IifTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ]
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->function->initialize($options);
+        if ($message !== null) {
+            $this->function->setMessage($message);
+        }
+        $actual = $this->function->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'message'  => null,
+                'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), \'$foo\', \'$bar\'])'
+            ],
+            [
+                'options'  => [new PropertyPath('foo'), new PropertyPath('bar')],
+                'message'  => null,
+                'expected' => '$factory->create(\'iif\', [\'$foo\', \'$bar\'])'
+            ],
+            [
+                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), \'$foo\', \'$bar\'])'
+                    . '->setMessage(\'Test\')'
             ]
         ];
     }

@@ -35,6 +35,14 @@ class Blank extends AbstractCondition implements ContextAccessorAwareInterface
     /**
      * {@inheritdoc}
      */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode($this->value, $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(array $options)
     {
         if (1 === count($options)) {

@@ -36,6 +36,14 @@ class HasValue extends AbstractCondition implements ContextAccessorAwareInterfac
     /**
      * {@inheritdoc}
      */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode($this->value, $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(array $options)
     {
         if (1 === count($options)) {

@@ -111,4 +111,35 @@ class OrxTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->condition->initialize($options);
+        if ($message !== null) {
+            $this->condition->setMessage($message);
+        }
+        $actual = $this->condition->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => [new Condition\True()],
+                'message'  => null,
+                'expected' => '$factory->create(\'or\', [$factory->create(\'true\', [])])'
+            ],
+            [
+                'options'  => [new Condition\True(), new Condition\False()],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'or\', '
+                    . '[$factory->create(\'true\', []), $factory->create(\'false\', [])])'
+                    . '->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

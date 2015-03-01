@@ -37,6 +37,22 @@ abstract class AbstractComposite extends AbstractCondition
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        return $this->convertToArray($this->operands);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode($this->operands, $factoryAccessor);
+    }
+
+    /**
      * Adds an operand to the composite.
      *
      * @param ExpressionInterface $operand

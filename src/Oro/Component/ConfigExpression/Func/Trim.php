@@ -39,6 +39,19 @@ class Trim extends AbstractFunction
     /**
      * {@inheritdoc}
      */
+    public function compile($factoryAccessor)
+    {
+        $params = [$this->value];
+        if ($this->charlist !== null) {
+            $params[] = $this->charlist;
+        }
+
+        return $this->convertToPhpCode($params, $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(array $options)
     {
         $count = count($options);

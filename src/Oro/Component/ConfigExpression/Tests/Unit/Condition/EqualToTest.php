@@ -118,4 +118,33 @@ class EqualToTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->condition->initialize($options);
+        if ($message !== null) {
+            $this->condition->setMessage($message);
+        }
+        $actual = $this->condition->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => [new PropertyPath('foo'), 123],
+                'message'  => null,
+                'expected' => '$factory->create(\'eq\', [\'$foo\', 123])'
+            ],
+            [
+                'options'  => [new PropertyPath('foo'), 'test'],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'eq\', [\'$foo\', \'test\'])->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

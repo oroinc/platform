@@ -112,4 +112,48 @@ abstract class AbstractExpression implements ExpressionInterface
 
         return ['@' . $this->getName() => $result];
     }
+
+    /**
+     * @param mixed  $params
+     * @param string $factoryAccessor
+     *
+     * @return array
+     */
+    protected function convertToPhpCode($params, $factoryAccessor)
+    {
+        $compiledParams = [];
+        if ($params !== null) {
+            if (!is_array($params)) {
+                $params = [$params];
+            }
+            foreach ($params as $param) {
+                if ($param instanceof PropertyPathInterface) {
+                    $compiledParams[] = sprintf('\'$%s\'', str_replace('\'', '\\\'', (string)$param));
+                } elseif ($param instanceof ExpressionInterface) {
+                    $compiledParams[] = $param->compile($factoryAccessor);
+                } elseif (is_string($param)) {
+                    $compiledParams[] = sprintf('\'%s\'', str_replace('\'', '\\\'', $param));
+                } else {
+                    $compiledParams[] = (string)$param;
+                }
+            }
+        }
+
+
+        $compiled = sprintf(
+            '%s->create(\'%s\', [%s])',
+            $factoryAccessor,
+            $this->getName(),
+            implode(', ', $compiledParams)
+        );
+        $message  = $this->getMessage();
+        if ($message !== null) {
+            $compiled .= sprintf(
+                '->setMessage(\'%s\')',
+                str_replace('\'', '\\\'', $message)
+            );
+        }
+
+        return $compiled;
+    }
 }
