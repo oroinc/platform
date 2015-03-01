@@ -187,9 +187,17 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
 
             // prepare condition collection
             if (!empty($source[self::NODE_CONDITION])) {
-                $expr = $this->expressionAssembler->assemble($source[self::NODE_CONDITION]);
-                if ($expr) {
-                    $conditionCollection->append(new ConfigExpressionCondition($expr));
+                try {
+                    $expr = $this->expressionAssembler->assemble($source[self::NODE_CONDITION]);
+                    if ($expr) {
+                        $conditionCollection->append(new ConfigExpressionCondition($expr));
+                    }
+                } catch (\Exception $e) {
+                    throw new SyntaxException(
+                        'invalid conditions. ' . $e->getMessage(),
+                        $source[self::NODE_CONDITION],
+                        self::NODE_CONDITION
+                    );
                 }
             }
         }
