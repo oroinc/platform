@@ -140,3 +140,13 @@ services:
             - %kernel.debug%
         tags:
              - { name: layout.block_type, alias: require_js }
+
+    oro_ui.block_type.breadcrumb_list:
+        class: Oro\Bundle\UIBundle\Layout\Block\Type\BreadcrumbListType
+        tags:
+             - { name: layout.block_type, alias: breadcrumbs }
+
+    oro_ui.block_type_extension.link:
+        class: Oro\Bundle\UIBundle\Layout\Block\Extension\LinkExtension
+        tags:
+            - { name: layout.block_type_extension, alias: link }

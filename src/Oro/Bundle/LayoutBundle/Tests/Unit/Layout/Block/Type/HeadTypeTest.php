@@ -14,12 +14,27 @@ class HeadTypeTest extends BlockTypeTestCase
     public function testSetDefaultOptions()
     {
         $this->assertEquals(
-            ['title' => '', 'title_parameters' => []],
+            [
+                'title'            => '',
+                'title_parameters' => [],
+                'translatable'     => true
+            ],
             $this->resolveOptions(HeadType::NAME, [])
         );
         $this->assertEquals(
-            ['title' => 'test', 'title_parameters' => ['{{ foo }}' => 'bar']],
-            $this->resolveOptions(HeadType::NAME, ['title' => 'test', 'title_parameters' => ['{{ foo }}' => 'bar']])
+            [
+                'title'            => 'test',
+                'title_parameters' => ['{{ foo }}' => 'bar'],
+                'translatable'     => false
+            ],
+            $this->resolveOptions(
+                HeadType::NAME,
+                [
+                    'title'            => 'test',
+                    'title_parameters' => ['{{ foo }}' => 'bar'],
+                    'translatable'     => false
+                ]
+            )
         );
     }
 
@@ -36,6 +51,7 @@ class HeadTypeTest extends BlockTypeTestCase
 
         $this->assertEquals('test', $view->vars['title']);
         $this->assertEquals(['{{ foo }}' => 'bar'], $view->vars['title_parameters']);
+        $this->assertTrue($view->vars['translatable']);
 
         // check that children are in the right order
         $this->assertEquals(
