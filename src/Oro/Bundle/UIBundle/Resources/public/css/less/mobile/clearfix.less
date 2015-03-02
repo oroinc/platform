@@ -73,8 +73,8 @@
 }
 
 .modal {
-  min-width: 100vw;
-  min-height: 100vh;
+  min-width: 100%;
+  height: 100%;
   top:0;
   left: 0;
   overflow-x: hidden;
@@ -83,20 +83,10 @@
   margin: 0;
   .modal-header, .modal-footer {
     width: 100%;
-    z-index: 1;
-  }
-  .modal-header {
-    top: 0px;
-  }
-  .modal-footer {
-    bottom: 0px;
   }
   .modal-body {
     max-height: 100%;
-    padding-bottom: 55px;
-    padding-top: 37px;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: auto;
   }
 }
 
