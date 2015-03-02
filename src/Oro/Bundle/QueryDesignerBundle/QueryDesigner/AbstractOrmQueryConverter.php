@@ -74,6 +74,20 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getUnidirectionalJoinCondition($joinTableAlias, $joinFieldName, $joinAlias, $entityClassName)
+    {
+        $metaData = $this->getClassMetadata($entityClassName);
+        $associationMapping = $metaData->getAssociationMapping($joinFieldName);
+        if ($associationMapping['type'] & ClassMetadataInfo::TO_MANY) {
+            return sprintf('%s MEMBER OF %s.%s', $joinTableAlias, $joinAlias, $joinFieldName);
+        }
+
+        return sprintf('%s.%s = %s', $joinAlias, $joinFieldName, $joinTableAlias);
+    }
+
+    /**
      * Returns a metadata for the given entity
      *
      * @param string $className
