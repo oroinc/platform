@@ -18,7 +18,10 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *
  * @ORM\Table(
  *      name="oro_email",
- *      indexes={@ORM\Index(name="IDX_email_message_id", columns={"message_id"})}
+ *      indexes={
+ *          @ORM\Index(name="IDX_email_message_id", columns={"message_id"}),
+ *          @ORM\Index(name="oro_email_is_head", columns={"is_head"})
+ *      }
  * )
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
@@ -156,7 +159,7 @@ class Email extends ExtendEmail
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_head", type="boolean")
+     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
      * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
@@ -165,7 +168,7 @@ class Email extends ExtendEmail
     /**
      * @var bool
      *
-     * @ORM\Column(name="is_seen", type="boolean")
+     * @ORM\Column(name="is_seen", type="boolean", options={"default"=true})
      * @Soap\ComplexType("boolean")
      * @JMS\Type("boolean")
      */
