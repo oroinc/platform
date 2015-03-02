@@ -104,6 +104,9 @@ define(function (require) {
                 }, this.options));
                 this.tinymceConnected = true;
                 this.$el.attr('data-focusable', true);
+                if ($(this.$el).prop('disabled')) {
+                    this.tinymceInstance.editorManager.activeEditor.hide()
+                }
             } else {
                 this.$el.removeAttr('data-focusable');
             }
