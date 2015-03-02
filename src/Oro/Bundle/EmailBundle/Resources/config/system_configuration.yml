@@ -3,12 +3,22 @@ oro_system_configuration:
         email_configuration:
             icon:  icon-envelope
             title: oro.email.system_configuration.email_configuration
-        email_threads:
-            title: oro.email.system_configuration.email_threads.label
+
         signature_configuration:
             title: oro.email.system_configuration.signature_configuration.label
+            priority: 100
+
+        email_threads:
+            title: oro.email.system_configuration.email_threads.label
+            priority: 90
 
     fields:
+        oro_email.signature:
+            data_type: string
+            type: oro_rich_text
+            options:
+                label: oro.email.system_configuration.signature_configuration.signature.label
+
         oro_email.use_threads_in_emails:
             data_type: boolean
             type: choice
@@ -17,11 +27,6 @@ oro_system_configuration:
                 choices:
                     - oro.email.system_configuration.email_threads.use_threads_in_emails.choices.non_threaded.label
                     - oro.email.system_configuration.email_threads.use_threads_in_emails.choices.threaded.label
-        oro_email.signature:
-            data_type: string
-            type: oro_rich_text
-            options:
-                label: oro.email.system_configuration.signature_configuration.signature.label
 
     tree:
         system_configuration:
@@ -31,15 +36,15 @@ oro_system_configuration:
                         children:
                             email_configuration:
                                 children:
-                                    email_threads:
-                                        children:
-                                            - oro_email.use_threads_in_emails
                                     signature_configuration:
                                         children:
                                             - oro_email.signature
+                                    email_threads:
+                                        children:
+                                            - oro_email.use_threads_in_emails
 
     api_tree:
-        email_threads:
-            oro_email.use_threads_in_emails: ~
         signature_configuration:
             oro_email.signature: ~
+        email_threads:
+            oro_email.use_threads_in_emails: ~

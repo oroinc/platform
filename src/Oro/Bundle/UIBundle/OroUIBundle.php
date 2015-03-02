@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass;
 use Oro\Bundle\UIBundle\DependencyInjection\Compiler\ViewActionWidgetProviderPass;
+use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 
 class OroUIBundle extends Bundle
 {
@@ -19,5 +20,6 @@ class OroUIBundle extends Bundle
 
         $container->addCompilerPass(new ViewActionWidgetProviderPass());
         $container->addCompilerPass(new ContentProviderPass());
+        $container->addCompilerPass(new TwigSandboxConfigurationPass());
     }
 }

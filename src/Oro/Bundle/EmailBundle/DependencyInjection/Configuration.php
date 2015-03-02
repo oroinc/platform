@@ -37,8 +37,8 @@ class Configuration implements ConfigurationInterface
         SettingsBuilder::append(
             $rootNode,
             [
+                'signature' => ['value' => ''],
                 'use_threads_in_emails' => ['value' => true],
-                'signature'             => ['value' => ''],
             ]
         );
 
