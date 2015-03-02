@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension;
 
+use Oro\Component\Layout\LayoutItemInterface;
 use Oro\Component\Layout\Tests\Unit\Fixtures\AbstractExtensionStub;
 
 class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
@@ -55,22 +56,30 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = $this->getAbstractExtension();
         $this->assertTrue($extension->hasLayoutUpdates($this->getLayoutItem('test')));
         $this->assertFalse($extension->hasLayoutUpdates($this->getLayoutItem('unknown')));
+
+        // test by alias
+        $layoutItem = $this->getLayoutItem('unknown');
+        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $this->assertTrue($extension->hasLayoutUpdates($layoutItem));
     }
 
     public function testGetLayoutUpdates()
     {
         $layoutItem = $this->getLayoutItem('test');
 
-        $extension = $this->getAbstractExtension();
-        $this->assertCount(1, $extension->getLayoutUpdates($layoutItem));
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\LayoutUpdateInterface',
-            $extension->getLayoutUpdates($layoutItem)[0]
-        );
+        $extension     = $this->getAbstractExtension();
+        $layoutUpdates = $extension->getLayoutUpdates($layoutItem);
+        $this->assertCount(1, $layoutUpdates);
+        $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $layoutUpdates[0]);
 
-        $layoutItemUnknown = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItemUnknown->expects($this->any())->method('getId')->willReturn('unknown');
         $this->assertSame([], $extension->getLayoutUpdates($this->getLayoutItem('unknown')));
+
+        // test by alias
+        $layoutItem = $this->getLayoutItem('unknown');
+        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $layoutUpdates = $extension->getLayoutUpdates($layoutItem);
+        $this->assertCount(1, $layoutUpdates);
+        $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $layoutUpdates[0]);
     }
 
     public function testHasContextConfigurators()
@@ -254,7 +263,7 @@ class AbstractExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $id
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|LayoutItemInterface
      */
     protected function getLayoutItem($id)
     {

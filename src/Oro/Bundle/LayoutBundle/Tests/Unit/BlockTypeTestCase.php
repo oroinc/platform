@@ -29,7 +29,6 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
         $layoutFactoryBuilder
             ->addType(new Type\RootType())
             ->addType(new Type\BodyType())
-            ->addType(new Type\ExternalResourceType())
             ->addType(new Type\FormType($this->formLayoutBuilder))
             ->addType(new Type\FormFieldType())
             ->addType(new Type\FieldsetType())
@@ -37,8 +36,9 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
             ->addType(new Type\MetaType())
             ->addType(new Type\ScriptType())
             ->addType(new Type\StyleType())
-            ->addType(new Type\TextType())
             ->addType(new Type\ExternalResourceType())
+            ->addType(new Type\TextType())
+            ->addType(new Type\LinkType())
             ->addType(new Type\ListType());
     }
 }

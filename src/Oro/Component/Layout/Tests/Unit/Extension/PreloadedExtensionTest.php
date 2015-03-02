@@ -55,7 +55,7 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $extension->getTypeExtensions('unknown'));
     }
 
-    public function testLayoutUpdates()
+    public function testGetLayoutUpdates()
     {
         $id           = 'test';
         $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
@@ -69,17 +69,48 @@ class PreloadedExtensionTest extends \PHPUnit_Framework_TestCase
         );
 
         $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItem->expects($this->any())->method('getId')->willReturn($id);
+        $layoutItem->expects($this->once())->method('getId')->willReturn($id);
         $layoutItemUnknown = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
-        $layoutItemUnknown->expects($this->any())->method('getId')->willReturn('unknown');
+        $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
+        $layoutItemAlias = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemAlias->expects($this->never())->method('getId');
+        $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
+
+        $layoutUpdates = $extension->getLayoutUpdates($layoutItem);
+        $this->assertCount(1, $layoutUpdates);
+        $this->assertSame($layoutUpdate, $layoutUpdates[0]);
+
+        $this->assertSame([], $extension->getLayoutUpdates($layoutItemUnknown));
+
+        $layoutUpdates = $extension->getLayoutUpdates($layoutItemAlias);
+        $this->assertCount(1, $layoutUpdates);
+        $this->assertSame($layoutUpdate, $layoutUpdates[0]);
+    }
+
+    public function testHasLayoutUpdates()
+    {
+        $id           = 'test';
+        $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
+
+        $extension = new PreloadedExtension(
+            [],
+            [],
+            [
+                $id => [$layoutUpdate]
+            ]
+        );
+
+        $layoutItem = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItem->expects($this->once())->method('getId')->willReturn($id);
+        $layoutItemUnknown = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemUnknown->expects($this->once())->method('getId')->willReturn('unknown');
+        $layoutItemAlias = $this->getMock('Oro\Component\Layout\LayoutItemInterface');
+        $layoutItemAlias->expects($this->never())->method('getId');
+        $layoutItemAlias->expects($this->once())->method('getAlias')->willReturn($id);
 
         $this->assertTrue($extension->hasLayoutUpdates($layoutItem));
         $this->assertFalse($extension->hasLayoutUpdates($layoutItemUnknown));
-
-        $this->assertCount(1, $extension->getLayoutUpdates($layoutItem));
-        $this->assertSame($layoutUpdate, $extension->getLayoutUpdates($layoutItem)[0]);
-
-        $this->assertSame([], $extension->getLayoutUpdates($layoutItemUnknown));
+        $this->assertTrue($extension->hasLayoutUpdates($layoutItemAlias));
     }
 
     public function testContextConfigurators()

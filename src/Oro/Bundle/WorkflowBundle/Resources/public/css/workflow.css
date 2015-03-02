@@ -1,5 +1,6 @@
 .workflow-step-list {
     list-style: none outside none;
+    margin: 0;
 }
 
 .workflow-step-list li:before{
@@ -55,14 +56,15 @@ li.current:before{
 }
 .workflow-steps-container{
     text-align: center;
-    position: relative;
+    position: absolute;
+    left: 25%;
+    width: 50%;
+    margin: -25px auto 0;
+}
+.workflow-steps-container .box-type1{
+    background: transparent;
 }
 .workflow-steps-container .widget-content{
-    position: absolute;
-    top: -25px;
-    left: 25%;
-    margin: 0;
-    width: 50%;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;

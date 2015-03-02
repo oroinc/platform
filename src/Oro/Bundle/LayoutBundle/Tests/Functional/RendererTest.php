@@ -86,6 +86,12 @@ class RendererTest extends LayoutTestCase
             ->add('list', 'content', 'list')
             ->add('list_tem_1', 'list', 'text', ['text' => 'Hi %val%!', 'text_parameters' => ['%val%' => 'World']])
             ->add(
+                'list_tem_2',
+                'list',
+                'link',
+                ['path' => 'http://example.com', 'text' => 'Hi %val%!', 'text_parameters' => ['%val%' => 'World']]
+            )
+            ->add(
                 'form',
                 'content',
                 'form',
@@ -180,6 +186,7 @@ class RendererTest extends LayoutTestCase
 <body>
     <ul>
         <li>Hi World!</li>
+        <li><a href="http://example.com">Hi World!</a></li>
     </ul>
     {form_layout}
 </body>

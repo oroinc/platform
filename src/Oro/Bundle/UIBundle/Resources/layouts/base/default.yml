@@ -1,323 +1,272 @@
 oro_layout:
     actions:
-        - @add:
-            id:        head
-            parentId:  root
-            blockType: head
-        - @add:
-            id:        meta_viewport
-            parentId:  head
-            blockType: meta
-            options:
-                name:    'viewport'
-                content: 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no'
-        - @add:
-            id:        meta_cache_control_max_age
-            parentId:  head
-            blockType: meta
-            options:
-                http_equiv: 'cache-control'
-                content:    'max-age=0'
-        - @add:
-            id:        meta_cache_control_no_cache
-            parentId:  head
-            blockType: meta
-            options:
-                http_equiv: 'cache-control'
-                content:    'no-cache'
-        - @add:
-            id:        meta_expires
-            parentId:  head
-            blockType: meta
-            options:
-                http_equiv: 'expires'
-                content:    '0'
-        - @add:
-            id:        meta_pragma
-            parentId:  head
-            blockType: meta
-            options:
-                http_equiv: 'pragma'
-                content:    'no-cache'
-        - @add:
-            id:        theme_icon
-            parentId:  head
-            blockType: block
-        - @add:
-            id:        head_style_placeholder
-            parentId:  head
-            blockType: placeholder
-            options:
-                placeholder_name: 'head_style'
-        - @add:
-            id:        scripts_before_placeholder
-            parentId:  head
-            blockType: placeholder
-            options:
-                placeholder_name: 'scripts_before'
-        - @add:
-            id:        require_js
-            parentId:  head
-            blockType: require_js
-        - @add:
-            id:        applicaton_script
-            parentId:  head
-            blockType: block
-        - @add:
-            id:        core_scripts
-            parentId:  head
-            blockType: block
-        - @add:
-            id:        debug_scripts
-            parentId:  head
-            blockType: block
-            options:
-                visible: { @value: $context.debug }
-        - @add:
-            id:        mobile_scripts
-            parentId:  head
-            blockType: block
-            options:
-                visible: { @value: $context.user_agent.mobile }
-        - @add:
-            id:        scripts_after_placeholder
-            parentId:  head
-            blockType: placeholder
-            options:
-                placeholder_name: 'scripts_after'
-        - @add:
-            id:        head_script
-            parentId:  head
-            blockType: container
-        - @add:
-            id:        body
-            parentId:  root
-            blockType: body
-            options:
-                attr:
-                    class:
-                        @iif:
-                            - $context.user_agent.mobile
-                            - 'mobile-version'
-                            - 'desktop-version'
-        - @add:
-            id:        after_body_start_placeholder
-            parentId:  body
-            blockType: placeholder
-            options:
-                placeholder_name: 'after_body_start'
-        - @add:
-            id:        progressbar
-            parentId:  body
-            blockType: block
-        - @add:
-            id:        page
-            parentId:  body
-            blockType: container
-        - @add:
-            id:        header
-            parentId:  page
-            blockType: container
-        - @add:
-            id:        before_navigation_placeholder
-            parentId:  header
-            blockType: placeholder
-            options:
-                placeholder_name: 'before_navigation'
-        - @add:
-            id:        navbar_container
-            parentId:  header
-            blockType: container
-        - @add:
-            id:        header_logo_placeholder
-            parentId:  navbar_container
-            blockType: placeholder
-            options:
-                placeholder_name: 'header_logo'
-        - @add:
-            id:        user_menu
-            parentId:  navbar_container
-            blockType: container
-        - @add:
-            id:        user_menu_placeholder
-            parentId:  user_menu
-            blockType: placeholder
-            options:
-                placeholder_name: 'user_menu'
-        - @add:
-            id:        dots_menu_placeholder
-            parentId:  navbar_container
-            blockType: placeholder
-            options:
-                placeholder_name: 'dots_menu'
-        - @add:
-            id:        navbar
-            parentId:  navbar_container
-            blockType: container
-        - @add:
-            id:        navbar_placeholder
-            parentId:  navbar
-            blockType: placeholder
-            options:
-                placeholder_name: 'navbar'
-        - @add:
-            id:        pin_tabs_list_placeholder
-            parentId:  navbar_container
-            blockType: placeholder
-            options:
-                placeholder_name: 'pin_tabs_list'
-        - @add:
-            id:        main_menu
-            parentId:  header
-            blockType: container
-            options:
-                visible:
-                    @or:
-                      - @eq: [ $context.user_agent.mobile, true ]
-                      - @eq: [ $context.navbar_position, 'top' ]
-        - @add:
-            id:        application_menu_placeholder
-            parentId:  main_menu
-            blockType: placeholder
-            options:
-                placeholder_name: 'application_menu'
-        - @add:
-            id:        after_navigation_placeholder
-            parentId:  header
-            blockType: placeholder
-            options:
-                placeholder_name: 'after_navigation'
-        - @add:
-            id:        left_panel
-            parentId:  page
-            blockType: container
-            options:
-                visible: { @value: $context.user_agent.desktop }
-        - @add:
-            id:        left_panel_placeholder
-            parentId:  left_panel
-            blockType: placeholder
-            options:
-                placeholder_name: 'left_panel'
-                placeholder_parameters:
-                    placement: 'left'
-        - @add:
-            id:        main
-            parentId:  page
-            blockType: container
-        - @add:
-            id:        before_content
-            parentId:  main
-            blockType: container
-        - @add:
-            id:        breadcrumb
-            parentId:  before_content
-            blockType: container
-        - @add:
-            id:        breadcrumb_placeholder
-            parentId:  breadcrumb
-            blockType: placeholder
-            options:
-                placeholder_name: 'breadcrumb'
-        - @add:
-            id:        pin_button_placeholder
-            parentId:  before_content
-            blockType: placeholder
-            options:
-                placeholder_name: 'pin_button'
-        - @add:
-            id:        before_content_addition
-            parentId:  before_content
-            blockType: container
-        - @add:
-            id:        flash_messages
-            parentId:  before_content
-            blockType: block
-        - @add:
-            id:        main_container
-            parentId:  main
-            blockType: container
-        - @add:
-            id:        content_before_placeholder
-            parentId:  main_container
-            blockType: placeholder
-            options:
-                placeholder_name: 'content_before'
-        - @add:
-            id:        content
-            parentId:  main_container
-            blockType: container
-        - @add:
-            id:        page_header
-            parentId:  content
-            blockType: container
-        - @add:
-            id:        page_title
-            parentId:  page_header
-            blockType: container
-        - @add:
-            id:        page_title_text
-            parentId:  page_title
-            blockType: text
-        - @add:
-            id:        page_title_buttons
-            parentId:  page_header
-            blockType: container
-        - @add:
-            id:        index_navButtons_before_placeholder
-            parentId:  page_title_buttons
-            blockType: placeholder
-            options:
-                placeholder_name: 'index_navButtons_before'
-                placeholder_parameters:
-                    entity_class: { @value: $context.entity_class }
-        - @add:
-            id:        nav_buttons
-            parentId:  page_title_buttons
-            blockType: container
-        - @add:
-            id:        index_navButtons_after_placeholder
-            parentId:  page_title_buttons
-            blockType: placeholder
-            options:
-                placeholder_name: 'index_navButtons_after'
-                placeholder_parameters:
-                    entity_class: { @value: $context.entity_class }
-        - @add:
-            id:        content_after_placeholder
-            parentId:  main_container
-            blockType: placeholder
-            options:
-                placeholder_name: 'content_after'
-        - @add:
-            id:        right_panel
-            parentId:  page
-            blockType: container
-            options:
-                visible: { @value: $context.user_agent.desktop }
-        - @add:
-            id:        right_panel_placeholder
-            parentId:  right_panel
-            blockType: placeholder
-            options:
-                placeholder_name: 'right_panel'
-                placeholder_parameters:
-                    placement: 'right'
-        - @add:
-            id:        footer
-            parentId:  page
-            blockType: container
-        - @add:
-            id:        footer_inner_placeholder
-            parentId:  footer
-            blockType: placeholder
-            options:
-                placeholder_name: 'footer_inner'
-        - @add:
-            id:        before_body_end_placeholder
-            parentId:  body
-            blockType: placeholder
-            options:
-                placeholder_name: 'before_body_end'
         - @setBlockTheme:
             themes: 'OroUIBundle:Layout:layout.html.twig'
+
+        - @addTree:
+
+            items:
+                head:
+                    blockType: head
+                meta_viewport:
+                    blockType: meta
+                    options:
+                        name:    'viewport'
+                        content: 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no'
+                meta_cache_control_max_age:
+                    blockType: meta
+                    options:
+                        http_equiv: 'cache-control'
+                        content:    'max-age=0'
+                meta_cache_control_no_cache:
+                    blockType: meta
+                    options:
+                        http_equiv: 'cache-control'
+                        content:    'no-cache'
+                meta_expires:
+                    blockType: meta
+                    options:
+                        http_equiv: 'expires'
+                        content:    '0'
+                meta_pragma:
+                    blockType: meta
+                    options:
+                        http_equiv: 'pragma'
+                        content:    'no-cache'
+                theme_icon:
+                    blockType: block
+                head_style_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'head_style'
+                scripts_before_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'scripts_before'
+                require_js:
+                    blockType: require_js
+                applicaton_script:
+                    blockType: block
+                core_scripts:
+                    blockType: block
+                debug_scripts:
+                    blockType: block
+                    options:
+                        visible: { @value: $context.debug }
+                mobile_scripts:
+                    blockType: block
+                    options:
+                        visible: { @value: $context.user_agent.mobile }
+                scripts_after_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'scripts_after'
+                head_script:
+                    blockType: container
+                body:
+                    blockType: body
+                    options:
+                        attr:
+                            class:
+                                @iif:
+                                    - $context.user_agent.mobile
+                                    - 'mobile-version'
+                                    - 'desktop-version'
+                after_body_start_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'after_body_start'
+                progressbar:
+                    blockType: block
+                page:
+                    blockType: container
+                header:
+                    blockType: container
+                before_navigation_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'before_navigation'
+                navbar_container:
+                    blockType: container
+                header_logo_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'header_logo'
+                user_menu:
+                    blockType: container
+                user_menu_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'user_menu'
+                dots_menu_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'dots_menu'
+                navbar:
+                    blockType: container
+                navbar_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'navbar'
+                pin_tabs_list_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'pin_tabs_list'
+                main_menu:
+                    blockType: container
+                    options:
+                        visible:
+                            @or:
+                              - @eq: [ $context.user_agent.mobile, true ]
+                              - @eq: [ $context.navbar_position, 'top' ]
+                application_menu_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'application_menu'
+                after_navigation_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'after_navigation'
+                left_panel:
+                    blockType: container
+                    options:
+                        visible: { @value: $context.user_agent.desktop }
+                left_panel_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'left_panel'
+                        placeholder_parameters:
+                            placement: 'left'
+                main:
+                    blockType: container
+                before_content:
+                    blockType: container
+                breadcrumb:
+                    blockType: container
+                breadcrumb_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'breadcrumb'
+                pin_button_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'pin_button'
+                before_content_addition:
+                    blockType: container
+                flash_messages:
+                    blockType: block
+                main_container:
+                    blockType: container
+                content_before_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'content_before'
+                content:
+                    blockType: container
+                page_header:
+                    blockType: container
+                page_title:
+                    blockType: container
+                page_title_text:
+                    blockType: text
+                page_title_buttons:
+                    blockType: container
+                index_navButtons_before_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'index_navButtons_before'
+                        placeholder_parameters:
+                            entity_class: { @value: $context.entity_class }
+                nav_buttons:
+                    blockType: container
+                index_navButtons_after_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'index_navButtons_after'
+                        placeholder_parameters:
+                            entity_class: { @value: $context.entity_class }
+                content_after_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'content_after'
+                right_panel:
+                    blockType: container
+                    options:
+                        visible: { @value: $context.user_agent.desktop }
+                right_panel_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'right_panel'
+                        placeholder_parameters:
+                            placement: 'right'
+                footer:
+                    blockType: container
+                footer_inner_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'footer_inner'
+                before_body_end_placeholder:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: 'before_body_end'
+
+            tree:
+                root:
+                    head:
+                        meta_viewport: ~
+                        meta_cache_control_max_age: ~
+                        meta_cache_control_no_cache: ~
+                        meta_expires: ~
+                        meta_pragma: ~
+                        theme_icon: ~
+                        head_style_placeholder: ~
+                        scripts_before_placeholder: ~
+                        require_js: ~
+                        applicaton_script: ~
+                        core_scripts: ~
+                        debug_scripts: ~
+                        mobile_scripts: ~
+                        scripts_after_placeholder: ~
+                        head_script: ~
+                    body:
+                        after_body_start_placeholder: ~
+                        progressbar: ~
+                        page:
+                            header:
+                                before_navigation_placeholder: ~
+                                navbar_container:
+                                    header_logo_placeholder: ~
+                                    user_menu:
+                                        user_menu_placeholder: ~
+                                    dots_menu_placeholder: ~
+                                    navbar:
+                                        navbar_placeholder: ~
+                                    pin_tabs_list_placeholder: ~
+                                main_menu:
+                                    application_menu_placeholder: ~
+                                after_navigation_placeholder: ~
+                            left_panel:
+                                left_panel_placeholder: ~
+                            main:
+                                before_content:
+                                    breadcrumb:
+                                        breadcrumb_placeholder: ~
+                                    pin_button_placeholder: ~
+                                    before_content_addition: ~
+                                    flash_messages: ~
+                                main_container:
+                                    content_before_placeholder: ~
+                                    content:
+                                        page_header:
+                                            page_title:
+                                                page_title_text: ~
+                                            page_title_buttons:
+                                                index_navButtons_before_placeholder: ~
+                                                nav_buttons: ~
+                                                index_navButtons_after_placeholder: ~
+                                    content_after_placeholder: ~
+                            right_panel:
+                                right_panel_placeholder: ~
+                            footer:
+                                footer_inner_placeholder: ~
+                        before_body_end_placeholder: ~

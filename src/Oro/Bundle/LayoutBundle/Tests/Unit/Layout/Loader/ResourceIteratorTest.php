@@ -28,7 +28,7 @@ class ResourceIteratorTest extends \PHPUnit_Framework_TestCase
         ]
     ];
 
-    public function testIteratorReturnAllKnwonResources()
+    public function testIteratorReturnAllKnownResources()
     {
         $this->assertSame(
             [

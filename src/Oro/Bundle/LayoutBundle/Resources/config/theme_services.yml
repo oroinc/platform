@@ -64,15 +64,10 @@ services:
             - @oro_layout.loader.default_resource_factory
             - @oro_layout.loader.chain_loader
             - @oro_layout.dependency_initializer
-        tags:
-            - { name: monolog.logger, channel: main }
-            - { name: layout.context_configurator }
-
-    oro_layout.extension.route_context_configurator:
-        class: Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator
         calls:
             - [setRequest, [@?request=]]
         tags:
+            - { name: monolog.logger, channel: main }
             - { name: layout.context_configurator }
 
     oro_layout.yaml_updates_warmer:
@@ -92,3 +87,10 @@ services:
     oro_layout.php_layout_update_generator:
         class:  Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator
         public: false
+
+    oro_layout.theme_listener:
+        class: Oro\Bundle\LayoutBundle\EventListener\ThemeListener
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: kernel.event_subscriber }

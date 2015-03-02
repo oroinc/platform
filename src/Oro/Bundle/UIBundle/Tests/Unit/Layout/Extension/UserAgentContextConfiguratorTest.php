@@ -65,4 +65,10 @@ class UserAgentContextConfiguratorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($context['user_agent']['desktop']);
     }
+
+    public function testRequestSetterSynchronized()
+    {
+        $this->contextConfigurator->setRequest(new Request());
+        $this->contextConfigurator->setRequest(null);
+    }
 }

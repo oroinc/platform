@@ -126,15 +126,15 @@ class ReflectionUtils
             $params = $method->getParameters();
 
             foreach ($params as $param) {
-                $hasValue = array_key_exists($param->getName(), $arguments);
+                $hasValue = isset($arguments[$param->name]) || array_key_exists($param->name, $arguments);
 
-                if ($param->isOptional() && !empty($arguments) && !$hasValue) {
-                    $result[$param->getName()] = $param->getDefaultValue();
+                if (!$hasValue && $param->isOptional() && !empty($arguments)) {
+                    $result[$param->name] = $param->getDefaultValue();
                 } elseif ($hasValue) {
-                    $result[$param->getName()] = $arguments[$param->getName()];
+                    $result[$param->name] = $arguments[$param->name];
                 }
 
-                unset($arguments[$param->getName()]);
+                unset($arguments[$param->name]);
             }
 
             $arguments = $result;
@@ -144,13 +144,13 @@ class ReflectionUtils
     /**
      * @param \ReflectionParameter[] $parameters
      *
-     * @return array
+     * @return string[]
      */
     protected function mapParameterListToNames(array $parameters)
     {
         return array_map(
             function (\ReflectionParameter $parameter) {
-                return $parameter->getName();
+                return $parameter->name;
             },
             $parameters
         );

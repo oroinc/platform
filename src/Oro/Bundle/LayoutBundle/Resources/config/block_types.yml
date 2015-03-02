@@ -61,6 +61,11 @@ services:
         tags:
              - { name: layout.block_type, alias: text }
 
+    oro_layout.block_type.link:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\LinkType
+        tags:
+             - { name: layout.block_type, alias: link }
+
     oro_layout.block_type.resource:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ExternalResourceType
         tags:
