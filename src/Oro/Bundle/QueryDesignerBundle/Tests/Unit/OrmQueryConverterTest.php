@@ -96,7 +96,11 @@ abstract class OrmQueryConverterTest extends \PHPUnit_Framework_TestCase
                 if (!is_array($fieldType)) {
                     $typeMap[] = [$fieldName, $fieldType];
                 } else {
-                    $associationMap[] = [$fieldName, ['joinColumns' => [$fieldType]]];
+                    $associationMapValue = [$fieldName, ['joinColumns' => [$fieldType]]];
+                    if (!empty($fieldType['type'])) {
+                        $associationMapValue[1]['type'] = $fieldType['type'];
+                    }
+                    $associationMap[] = $associationMapValue;
                 }
             }
 
