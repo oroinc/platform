@@ -158,7 +158,7 @@ OR
 Create Object
 -------------
 
-**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateEntity
+**Class:** Oro\Bundle\WorkflowBundle\Model\Action\CreateObject
 
 **Alias:** create_object
 

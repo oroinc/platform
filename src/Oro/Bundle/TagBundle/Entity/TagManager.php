@@ -8,9 +8,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
-use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\TagBundle\Entity\Repository\TagRepository;
@@ -41,11 +41,6 @@ class TagManager
     protected $mapper;
 
     /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
-
-    /**
      * @var SecurityFacade
      */
     protected $securityFacade;
@@ -60,7 +55,6 @@ class TagManager
         $tagClass,
         $taggingClass,
         ObjectMapper $mapper,
-        SecurityContextInterface $securityContext,
         SecurityFacade $securityFacade,
         Router $router
     ) {
@@ -69,7 +63,6 @@ class TagManager
         $this->tagClass = $tagClass;
         $this->taggingClass = $taggingClass;
         $this->mapper = $mapper;
-        $this->securityContext = $securityContext;
         $this->securityFacade = $securityFacade;
         $this->router = $router;
     }
@@ -98,7 +91,7 @@ class TagManager
     public function loadOrCreateTags(array $names)
     {
         if (empty($names)) {
-            return array();
+            return [];
         }
 
         array_walk(
@@ -108,9 +101,11 @@ class TagManager
             }
         );
         $names = array_unique($names);
-        $tags = $this->em->getRepository($this->tagClass)->findBy(array('name' =>  $names));
+        $tags = $this->em->getRepository($this->tagClass)->findBy(
+            ['name' => $names, 'organization' => $this->getOrganization()]
+        );
 
-        $loadedNames = array();
+        $loadedNames = [];
         /** @var Tag $tag */
         foreach ($tags as $tag) {
             $loadedNames[] = $tag->getName();
@@ -141,30 +136,30 @@ class TagManager
             $this->loadTagging($entity);
             $tags = $entity->getTags();
         }
-        $result = array();
+        $result = [];
 
         /** @var Tag $tag */
         foreach ($tags as $tag) {
-            $entry = array(
+            $entry = [
                 'name' => $tag->getName()
-            );
+            ];
             if (!$tag->getId()) {
                 $entry = array_merge(
                     $entry,
-                    array(
+                    [
                         'id'    => $tag->getName(),
                         'url'   => false,
                         'owner' => true
-                    )
+                    ]
                 );
             } else {
                 $entry = array_merge(
                     $entry,
-                    array(
+                    [
                         'id'    => $tag->getId(),
-                        'url'   => $this->router->generate('oro_tag_search', array('id' => $tag->getId())),
+                        'url'   => $this->router->generate('oro_tag_search', ['id' => $tag->getId()]),
                         'owner' => false
-                    )
+                    ]
                 );
             }
 
@@ -313,7 +308,7 @@ class TagManager
         $repository = $this->em->getRepository($this->tagClass);
 
         if (!$tagIds) {
-            $tagIds = array();
+            $tagIds = [];
         } elseif ($tagIds instanceof ArrayCollection) {
             $tagIds = array_map(
                 function ($item) {
@@ -363,7 +358,7 @@ class TagManager
         /** @var TagRepository $repository */
         $repository = $this->em->getRepository($this->tagClass);
 
-        return new ArrayCollection($repository->getTagging($resource, $createdBy, $all));
+        return new ArrayCollection($repository->getTagging($resource, $createdBy, $all, $this->getOrganization()));
     }
 
     /**
@@ -373,6 +368,16 @@ class TagManager
      */
     private function getUser()
     {
-        return $this->securityContext->getToken()->getUser();
+        return $this->securityFacade->getLoggedUser();
+    }
+
+    /**
+     * Return current organization
+     *
+     * @return Organization
+     */
+    private function getOrganization()
+    {
+        return $this->securityFacade->getOrganization();
     }
 }

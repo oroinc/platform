@@ -1,0 +1,20 @@
+{% import 'OroEmailBundle::macros.html.twig' as EA %}
+
+<body> {# this template requires body tag because it will be cut depending on it by the component #}
+<br><br>
+<div class="quote">
+    <div>
+        <p>---------- {{ 'oro.email.forwarded_message'|trans }} ----------</p>
+        <p>{{ 'From'|trans }}: {{ EA.email_address_link(email.fromEmailAddress) }}</p>
+        <p>{{ 'oro.email.sent_at.label'|trans }}: {{ email.sentAt|oro_format_datetime }}</p>
+        <p>{{ 'Subject'|trans }}: {{ email.subject }}</p>
+        <p>{{ 'To'|trans }}: {{ EA.recipient_email_addresses(email.toCc, false, false) }}</p>
+    </div>
+    <br>
+    <div class="email-prev-body">
+        {% if email.emailBody %}
+            {{ email.emailBody.bodyContent|raw }}
+        {% endif %}
+    </div>
+</div>
+</body>

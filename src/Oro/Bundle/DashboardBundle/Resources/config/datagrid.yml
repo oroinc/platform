@@ -35,7 +35,7 @@ datagrid:
                 label:
                     data_name: dashboard.label
                 ownerName:
-                    data_name: dashboard.ownerName
+                    data_name: ownerName
                 createdAt:
                     data_name: dashboard.createdAt
                 updatedAt:

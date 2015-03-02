@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\ActivityListBundle\Migrations\Schema\v1_1\OroActivityListBundle as OroActivityListBundle11;
 
 class OroActivityListBundleInstaller implements Installation
 {
@@ -14,7 +15,7 @@ class OroActivityListBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
     /**
@@ -27,6 +28,8 @@ class OroActivityListBundleInstaller implements Installation
 
         /** Foreign keys generation **/
         $this->addOroActivityListForeignKeys($schema);
+
+        OroActivityListBundle11::addColumns($schema);
     }
 
     /**
