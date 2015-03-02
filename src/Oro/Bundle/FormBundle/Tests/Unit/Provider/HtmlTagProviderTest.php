@@ -11,6 +11,12 @@ class HtmlTagProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected $htmlTagProvider;
 
+    /**
+     * List of allowed element.
+     *
+     * @url http://www.tinymce.com/wiki.php/Configuration:valid_elements
+     * @var array
+     */
     protected $allowedElements = [
         '@[style|class]',
         'table[cellspacing|cellpadding|border|align|width]',
