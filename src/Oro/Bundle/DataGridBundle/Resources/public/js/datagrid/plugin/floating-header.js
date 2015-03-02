@@ -1,26 +1,28 @@
 define(function (require) {
     'use strict';
-    var $ = require('jquery'),
+    var FloatingHeader,
+        $ = require('jquery'),
         _ = require('underscore'),
+        BasePlugin = require('oroui/js/plugin/base'),
         Backbone = require('backbone'),
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
 
-    function FloatingHeader(grid) {
-        this.grid = grid;
-        this.$grid = grid.$grid;
-        this.$el = grid.$el;
-
-        this.reposition = _.bind(this.reposition, this);
-    }
-
-    FloatingHeader.prototype = {
+    FloatingHeader = BasePlugin.extend({
 
         /**
          * Interval id of height fix check function
          * @private
          */
         heightFixIntervalId: null,
+
+        initialize: function (grid) {
+            this.grid = grid;
+            this.$grid = grid.$grid;
+            this.$el = grid.$el;
+
+            this.reposition = _.bind(this.reposition, this);
+        },
 
         enable: function () {
             this.setupCache();
@@ -357,7 +359,7 @@ define(function (require) {
 
             return resultRect;
         }
-    };
+    });
 
     return FloatingHeader;
 });

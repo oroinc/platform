@@ -20,7 +20,7 @@ define(function (require) {
         RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action'),
         ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
         ExportAction = require('oro/datagrid/action/export-action'),
-        PluginManager = require('oroui/js/tools/plugin-manager'),
+        PluginManager = require('oroui/js/plugin/plugin-manager'),
         FloatingHeaderPlugin = require('./plugin/floating-header'),
         tools = require('oroui/js/tools');
 
@@ -192,7 +192,7 @@ define(function (require) {
                 return;
             }
 
-            this.pluginManager.disableAll();
+            this.pluginManager.dispose();
             this.setLayout('default');
 
             _.each(this.columns.models, function (column) {
