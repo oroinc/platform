@@ -192,8 +192,8 @@ define(function (require) {
                 return;
             }
 
-            this.pluginManager.dispose();
             this.setLayout('default');
+            this.pluginManager.dispose();
 
             _.each(this.columns.models, function (column) {
                 column.dispose();
