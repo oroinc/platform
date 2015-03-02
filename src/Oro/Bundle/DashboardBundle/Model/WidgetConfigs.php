@@ -91,7 +91,7 @@ class WidgetConfigs
     }
 
     /**
-     * Filter widget configs based on acl and applicable flag
+     * Filter widget configs based on acl enabled and applicable flag
      *
      * @param array $items
      *
@@ -107,14 +107,15 @@ class WidgetConfigs
             function (&$item) use ($securityFacade, $resolver) {
                 $accessGranted = !isset($item['acl']) || $securityFacade->isGranted($item['acl']);
                 $applicable    = true;
+                $enabled = $item['enabled'];
                 if (isset($item['applicable'])) {
                     $resolved   = $resolver->resolve([$item['applicable']]);
                     $applicable = reset($resolved);
                 }
 
-                unset ($item['acl'], $item['applicable']);
+                unset ($item['acl'], $item['applicable'], $item['enabled']);
 
-                return $accessGranted && $applicable;
+                return $enabled && $accessGranted && $applicable;
             }
         );
     }
