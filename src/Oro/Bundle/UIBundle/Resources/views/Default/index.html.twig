@@ -1,6 +1,6 @@
 {% if not oro_is_hash_navigation() %}
     <!DOCTYPE html>
-    <html>
+    <html class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version">
     <head>
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
