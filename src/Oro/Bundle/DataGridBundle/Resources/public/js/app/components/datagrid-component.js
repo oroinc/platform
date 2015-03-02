@@ -64,9 +64,7 @@ define(function (require) {
             });
 
             $.when.apply($, promises).always(function () {
-                $(options.el).html(options.$el.children());
                 self.subComponents = _.compact(arguments);
-                self.grid.reflow();
                 self._resolveDeferredInit();
             });
         },
@@ -77,7 +75,7 @@ define(function (require) {
          * @param options
          */
         processOptions: function (options) {
-            options.$el = $(document.createDocumentFragment());
+            options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
             options.builders.push('orodatagrid/js/grid-views-builder');
@@ -90,7 +88,9 @@ define(function (require) {
          * @param {Object} options
          */
         initDataGrid: function (options) {
-            this.$el = options.$el;
+            var el = $('<div>');
+            $(options.el).append(el);
+            this.el = el[0];
             this.gridName = options.gridName;
             this.data = options.data;
             this.metadata = _.defaults(options.metadata, {
@@ -135,7 +135,7 @@ define(function (require) {
          * Build grid
          */
         build: function () {
-            var options, collectionOptions, collection, collectionName, grid;
+            var options, collectionOptions, collection, collectionName, grid, $gridEl;
 
             collectionName = this.gridName;
             collection = gridContentManager.get(collectionName);
@@ -148,9 +148,11 @@ define(function (require) {
             // create grid
             options = this.combineGridOptions();
             mediator.trigger('datagrid_create_before', options, collection);
+
+            options.el = this.el;
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
-            this.$el.append(grid.render().$el);
+            grid.render();
             mediator.trigger('datagrid:rendered');
 
             if (options.routerEnabled !== false) {
