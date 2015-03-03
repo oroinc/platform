@@ -82,7 +82,7 @@ services:
             - @service_container
             - {}
         tags:
-            - { name: layout.block_type_extension, alias: block }
+            - { name: layout.block_type_extension, alias: block, priority: 255 }
             - { name: layout.context_configurator }
 
     oro_layout.expression.json_encoder:

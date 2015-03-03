@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Component\Layout\Block\Type\AbstractType;
@@ -44,6 +45,20 @@ class FormFieldType extends AbstractType
         }
 
         $view->vars['form'] = $formAccessor->getView($options['field_path']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        // prevent the form field rendering by form_rest() method,
+        // if the corresponding layout block is invisible
+        if ($view->vars['visible'] === false) {
+            /** @var FormView $formView */
+            $formView = $view->vars['form'];
+            $formView->setRendered();
+        }
     }
 
     /**

@@ -23,4 +23,20 @@ interface FormAccessorInterface
      * @return FormView
      */
     public function getView($fieldPath = null);
+
+    /**
+     * Returns all form fields for which blocks were created.
+     *
+     * @return string[] key = form field path, value = block id
+     */
+    public function getProcessedFields();
+
+    /**
+     * Sets form fields with corresponding blocks.
+     *
+     * @param string[] $processedFields key = form field path, value = block id
+     *
+     * @return string[] key = form field path, value = block id
+     */
+    public function setProcessedFields($processedFields);
 }

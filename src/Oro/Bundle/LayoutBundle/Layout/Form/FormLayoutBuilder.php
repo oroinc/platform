@@ -17,6 +17,9 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     /** @var array */
     protected $simpleFormTypes = [];
 
+    /** @var FormAccessorInterface */
+    protected $formAccessor;
+
     /** @var BlockBuilderInterface */
     protected $builder;
 
@@ -32,11 +35,11 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function build(FormInterface $form, BlockBuilderInterface $builder, array $options)
+    public function build(FormAccessorInterface $formAccessor, BlockBuilderInterface $builder, array $options)
     {
-        $this->initializeState($builder, $options);
+        $this->initializeState($formAccessor, $builder, $options);
         try {
-            $this->doBuild($form);
+            $this->doBuild();
             $this->clearState();
         } catch (\Exception $e) {
             $this->clearState();
@@ -57,12 +60,11 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
     }
 
     /**
-     * Builds the layout for the given form.
-     *
-     * @param FormInterface $form
+     * Builds the form layout.
      */
-    protected function doBuild(FormInterface $form)
+    protected function doBuild()
     {
+        $form = $this->formAccessor->getForm();
         // add preferred fields
         foreach ($this->options['preferred_fields'] as $fieldPath) {
             $this->processForm($this->getChildForm($form, $fieldPath), $this->getParentFieldPath($fieldPath));
@@ -72,16 +74,22 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
         foreach ($form as $child) {
             $this->processForm($child);
         }
+        $this->formAccessor->setProcessedFields($this->processedFields);
     }
 
     /**
      * Initializes the state of this builder.
      *
+     * @param FormAccessorInterface $formAccessor
      * @param BlockBuilderInterface $builder
      * @param array                 $options
      */
-    protected function initializeState(BlockBuilderInterface $builder, array $options)
-    {
+    protected function initializeState(
+        FormAccessorInterface $formAccessor,
+        BlockBuilderInterface $builder,
+        array $options
+    ) {
+        $this->formAccessor      = $formAccessor;
         $this->builder           = $builder;
         $this->options           = $options;
         $this->layoutManipulator = $builder->getLayoutManipulator();
@@ -93,6 +101,7 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
      */
     protected function clearState()
     {
+        $this->formAccessor      = null;
         $this->builder           = null;
         $this->options           = null;
         $this->layoutManipulator = null;
@@ -167,8 +176,9 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
                 $this->processForm($child, $fieldPath);
             }
         } else {
-            $this->addField($fieldPath);
-            $this->processedFields[$fieldPath] = true;
+            $id = $this->getFieldId($fieldPath);
+            $this->addField($fieldPath, $id);
+            $this->processedFields[$fieldPath] = $id;
         }
     }
 
@@ -176,12 +186,13 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
      * Add the given field to the layout.
      *
      * @param string      $fieldPath
+     * @param string      $id
      * @param string|null $parentId
      */
-    protected function addField($fieldPath, $parentId = null)
+    protected function addField($fieldPath, $id, $parentId = null)
     {
         $this->layoutManipulator->add(
-            $this->getFieldId($fieldPath),
+            $id,
             $parentId ?: $this->builder->getId(),
             FormFieldType::NAME,
             ['form_name' => $this->options['form_name'], 'field_path' => $fieldPath]
