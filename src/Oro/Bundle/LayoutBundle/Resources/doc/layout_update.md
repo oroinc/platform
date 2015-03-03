@@ -4,7 +4,7 @@ Layout update
 Overview
 --------
 
-**Layout update** is set of actions that should be performed with **layout** in order to make the page look depends on our needs.
+**Layout update** is a set of actions that should be performed with **layout** in order to make the page look depends on our needs.
 Based on context where you use **layout** update may be performed manually (via `\Oro\Component\Layout\LayoutBuilder`) or may be collected
 by *Oro Platform*'s loaders automatically.
 
@@ -28,6 +28,7 @@ This section covers basic layout update file structure and syntax, that could be
 **Layout update** file should has `oro_layout` as root node and may consist `actions` and `conditions` nodes.
 
 ### Actions
+
 **Actions** -- array node with a set of actions to execute. Generally each action will be compiled as separate call
 of some method of `\Oro\Component\Layout\LayoutManipulatorInterface`.
 
@@ -88,6 +89,7 @@ It's might be useful and more readable to add a set of blocks defined in tree st
 It requires two nodes to be defined `items` and `tree`.
 
 **Items** -- array node consist of block definitions where key will be utilized as `id` for `@add` action.
+
 **Tree** -- blocks hierarchy to be built. First node of the tree should be set to **block id** that will be utilized as parent block.
 
 **Example**
@@ -124,7 +126,6 @@ The syntax of condition declaration is very similar to *actions* except that the
 and special grouping conditions(such as `@tree`, `@or`, `@and` could be utilized in order to combine multiple conditions.
 
 **Example**
-
 ```yml
 oro_layout:
     actions:
@@ -135,7 +136,7 @@ oro_layout:
             - @gt:  [$call_timeout, 0]
 ```
 
-**Layout context** could be accessed through the condtion expressions via referencing to `$context` variable.
+**Layout context** could be accessed through the condition expressions via referencing to `$context` variable.
 
 Please refer to the [ConfigExpression component](../../../../Component/ConfigExpression/README.md) documentation for further detailed explanation.
 
@@ -147,7 +148,6 @@ case if another *config* based loaders do not allow to meet some specific need.
 Open and close *PHP* tags could be omitted. It's recommended to use open tag and *PHPDoc* variable typehints to get your IDE autocomplete works.
 
 **Example**
-
 ```php
 /** @var Oro\Component\Layout\LayoutManipulatorInterface $layoutManipulator */
 /** @var Oro\Component\Layout\LayoutItemInterface $item */
