@@ -1,10 +1,10 @@
 /*jslint vars: true, nomen: true, browser: true*/
-/*jshint browser: true*/
-/*global define, require, window*/
+/* jshint browser: true */
+/* global define */
 define(function (require) {
     'use strict';
 
-    var DataGridComponent, helpers, document,
+    var DataGridComponent, helpers,
         $ = require('jquery'),
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
@@ -15,8 +15,6 @@ define(function (require) {
         mapActionModuleName = require('orodatagrid/js/map-action-module-name'),
         mapCellModuleName = require('orodatagrid/js/map-cell-module-name'),
         gridContentManager = require('orodatagrid/js/content-manager');
-
-    document = window.document;
 
     helpers = {
         cellType: function (type) {
@@ -66,6 +64,8 @@ define(function (require) {
             $.when.apply($, promises).always(function () {
                 self.subComponents = _.compact(arguments);
                 self._resolveDeferredInit();
+                self.$el.show();
+                self.grid.updateLayout();
             });
         },
 
@@ -88,9 +88,8 @@ define(function (require) {
          * @param {Object} options
          */
         initDataGrid: function (options) {
-            var el = $('<div>');
-            $(options.el).append(el);
-            this.el = el[0];
+            this.$el = $('<div>');
+            $(options.el).append(this.$el);
             this.gridName = options.gridName;
             this.data = options.data;
             this.metadata = _.defaults(options.metadata, {
@@ -149,7 +148,8 @@ define(function (require) {
             options = this.combineGridOptions();
             mediator.trigger('datagrid_create_before', options, collection);
 
-            options.el = this.el;
+            this.$el.hide();
+            options.el = this.$el[0];
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();

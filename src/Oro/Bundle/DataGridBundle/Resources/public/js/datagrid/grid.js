@@ -700,10 +700,10 @@ define(function (require) {
          * Chooses layout on resize or during creation
          */
         updateLayout: function () {
-            if (!this.$grid.parents('body').length) {
+            if (!this.$grid.parents('body').length || !this.$el.is(':visible')) {
                 // not ready to apply layout
                 // try to do that at next js cycle1
-                _.defer(_.bind(this.updateLayout, this));
+                _.delay(_.bind(this.updateLayout, this), 50);
                 return;
             }
             if (tools.isMobile()) {

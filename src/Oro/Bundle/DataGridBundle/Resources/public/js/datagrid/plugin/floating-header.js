@@ -6,6 +6,7 @@ define(function (require) {
         BasePlugin = require('oroui/js/plugin/base'),
         Backbone = require('backbone'),
         mediator = require('oroui/js/mediator'),
+        layout = require('oroui/js/layout'),
         tools = require('oroui/js/tools');
 
     FloatingHeaderPlugin = BasePlugin.extend({
@@ -14,14 +15,16 @@ define(function (require) {
          * Interval id of height fix check function
          * @private
          */
-        heightFixIntervalId: null,
+        checkLayoutIntervalId: null,
 
         initialize: function (grid) {
             this.grid = grid;
             this.$grid = grid.$grid;
             this.$el = grid.$el;
 
-            this.reposition = _.bind(this.reposition, this);
+            this.selectMode = _.bind(this.selectMode, this);
+            this.checkLayout = _.bind(this.checkLayout, this);
+            this.fixHeaderCellWidth = _.bind(this.fixHeaderCellWidth, this);
         },
 
         enable: function () {
@@ -32,24 +35,26 @@ define(function (require) {
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
                 this.setFloatTheadMode('relative');
             }, this));
-            this.cachedEls.gridContainer.parents().add(document).on('scroll', this.reposition);
+            this.cachedEls.gridScrollableContainer.parents().add(document).on('scroll', this.checkLayout);
+            this.cachedEls.gridScrollableContainer.on('scroll', this.selectMode);
 
-            mediator.on('layout:headerStateChange', this.reposition, this);
-            this.grid.on('content:update', this.fixHeaderCellWidth, this);
-            this.grid.on('layout:update', this.fixHeaderCellWidth, this);
-            this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 400);
+            mediator.on('layout:headerStateChange', this.selectMode);
+            this.grid.on('content:update', this.fixHeaderCellWidth);
+            this.grid.on('layout:update', this.fixHeaderCellWidth);
+            this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
             FloatingHeaderPlugin.__super__.enable.call(this);
         },
 
         disable: function () {
-            clearInterval(this.heightFixIntervalId);
-            mediator.off('layout:headerStateChange', this.reposition, this);
+            clearInterval(this.checkLayoutIntervalId);
+            mediator.off('layout:headerStateChange', this.selectMode, this);
             this.grid.off('content:update', this.fixHeaderCellWidth, this);
             this.grid.off('layout:update', this.fixHeaderCellWidth, this);
 
             this.setFloatTheadMode('default');
             this.disableOtherScroll();
-            this.$grid.parents().add(document).off('scroll', this.reposition);
+            this.cachedEls.gridScrollableContainer.on('scroll', this.selectMode);
+            this.cachedEls.gridScrollableContainer.parents().add(document).off('scroll', this.checkLayout);
             // remove css
             this.cachedEls.headerCells.attr('style', '');
             this.cachedEls.firstRowCells.attr('style', '');
@@ -77,6 +82,7 @@ define(function (require) {
             var headerCells = this.cachedEls.headerCells,
                 firstRowCells = this.cachedEls.firstRowCells,
                 totalWidth = 0,
+                widths = [],
                 self = this,
                 scrollBarWidth = mediator.execute('layout:scrollbarWidth');
             // remove style
@@ -85,21 +91,26 @@ define(function (require) {
             this.$grid.css({width: ''});
             this.cachedEls.gridContainer.css({width: ''});
             if (this.scrollVisible) {
-                this.$grid.css({borderRight: scrollBarWidth + 'px solid darkblue'});
+                this.$grid.css({borderRight: scrollBarWidth + 'px solid transparent'});
             }
             this.$el.removeClass('floatThead');
 
             // copy widths
             headerCells.each(function (i, headerCell) {
-                var cellWidth = headerCell.offsetWidth;
+                widths.push(headerCell.offsetWidth);
+            });
+            headerCells.each(function (i, headerCell) {
+                var cellWidth = widths[i];
                 if (self.scrollVisible && i === headerCells.length - 1) {
                     cellWidth += scrollBarWidth;
                 }
                 totalWidth += cellWidth;
-                headerCell.style.minWidth = headerCell.style.width = cellWidth + 'px';
+                headerCell.style.width = cellWidth + 'px';
+                headerCell.style.minWidth = cellWidth + 'px';
                 headerCell.style.boxSizing = 'border-box';
                 if (firstRowCells[i]) {
-                    firstRowCells[i].style.minWidth = firstRowCells[i].style.width = cellWidth + 'px';
+                    firstRowCells[i].style.width = cellWidth + 'px';
+                    firstRowCells[i].style.minWidth = cellWidth + 'px';
                     firstRowCells[i].style.boxSizing = 'border-box';
                 }
             });
@@ -113,25 +124,31 @@ define(function (require) {
                 width: totalWidth
             });
 
-            this.reposition();
+            this.selectMode();
         },
 
-        reposition: function () {
+        /**
+         * Selects floating header mode
+         */
+        selectMode: function () {
             // get gridRect
             var tableRect = this.cachedEls.gridContainer[0].getBoundingClientRect(),
                 visibleRect = this.getVisibleRect(this.cachedEls.gridContainer[0]),
                 mode = 'default';
-            if (visibleRect.top !== tableRect.top || this.layout === 'fullscreen') {
+            if (visibleRect.top !== tableRect.top || this.grid.layout === 'fullscreen') {
                 mode = 'fixed';
             }
             this.setFloatTheadMode(mode, visibleRect, tableRect);
-            // update lastClientRect to prevent calling this function again
-            this.lastClientRect = this.cachedEls.otherScrollContainer[0].getBoundingClientRect();
+            // update _lastClientRect to prevent calling this function again
+            this._lastClientRect = this.cachedEls.otherScrollContainer[0].getBoundingClientRect();
             if (this.rescrollCb) {
                 this.rescrollCb();
             }
         },
 
+        /**
+         * Setups floating header mode
+         */
         setFloatTheadMode: function (mode, visibleRect, tableRect) {
             var theadRect, sizingThead;
             // pass this argument to avoid expensive calculations
@@ -204,6 +221,9 @@ define(function (require) {
             this.currentFloatTheadMode = mode;
         },
 
+        /**
+         * Enables other scroll functionality
+         */
         enableOtherScroll: function () {
             var self = this,
                 scrollContainer = this.cachedEls.gridScrollableContainer,
@@ -275,13 +295,16 @@ define(function (require) {
                     otherScrollTop = otherScroll.scrollTop();
                 if (mainScrollTop !== otherScrollTop) {
                     scrollContainer.scrollTop(otherScroll.scrollTop());
-                    self.reposition();
+                    self.checkLayout();
                 }
             });
             setup();
             return setup;
         },
 
+        /**
+         * Disables other scroll functionality
+         */
         disableOtherScroll: function () {
             this.cachedEls.gridScrollableContainer.off('scroll', this.rescrollCb);
             this.cachedEls.otherScroll.off('scroll');
@@ -290,28 +313,41 @@ define(function (require) {
             delete this.rescrollCb;
         },
 
-        fixHeightInFloatTheadMode: function () {
-            var currentClientRect = this.cachedEls.otherScrollContainer[0].getBoundingClientRect();
-            if (!this.lastClientRect || (this.lastClientRect.top !== currentClientRect.top ||
-                this.lastClientRect.left !== currentClientRect.left ||
-                this.lastClientRect.right !== currentClientRect.right)) {
-                if (this.layout === 'fullscreen') {
-                    // adjust max height
-                    this.$grid.parents('.grid-scrollable-container').css({
-                        maxHeight: this.grid.getCssHeightCalcExpression()
-                    });
-                }
-                if (!this.lastClientRect || (this.lastClientRect.left !== currentClientRect.left ||
-                    this.lastClientRect.right !== currentClientRect.right)) {
-                    this.fixHeaderCellWidth();
-                } else {
-                    this.reposition();
+        /**
+         * Checks and performs required actions
+         */
+        checkLayout: function (e) {
+            var scrollContainerRect, scrollLeft;
+            if (this.currentFloatTheadMode === 'default') {
+                if (this.grid.layout === 'fullscreen' &&
+                        this.currentFloatTheadMode === 'default' &&
+                        this.cachedEls.gridScrollableContainer.scrollTop() !== 0) {
+                    this.selectMode();
+                    return;
                 }
             }
-            this.lastClientRect = currentClientRect;
+            scrollContainerRect = this.cachedEls.otherScrollContainer[0].getBoundingClientRect();
+            if (!this._lastClientRect || (this._lastClientRect.top !== scrollContainerRect.top ||
+                    this._lastClientRect.left !== scrollContainerRect.left ||
+                    this._lastClientRect.right !== scrollContainerRect.right)) {
+                if (!this._lastClientRect || (this._lastClientRect.left !== scrollContainerRect.left ||
+                    this._lastClientRect.right !== scrollContainerRect.right)) {
+                    this.fixHeaderCellWidth();
+                } else {
+                    this.selectMode();
+                }
+            } else {
+                scrollLeft = this.cachedEls.gridScrollableContainer.scrollLeft();
+                if (this._lastScrollLeft !== scrollLeft) {
+                    this.selectMode();
+                    this._lastScrollLeft = scrollLeft;
+                }
+            }
+            this._lastClientRect = scrollContainerRect;
         },
 
         /**
+         * Returns visible rect of DOM element
          *
          * @param el
          * @returns {{top: number, left: Number, bottom: Number, right: Number}}
@@ -339,17 +375,15 @@ define(function (require) {
                 midRect = current.getBoundingClientRect();
                 borders = $.fn.getBorders(current);
 
-                // console.log(current, current.id, midRect);
-
                 if (tools.isMobile()) {
                     /**
                      * Equals header height. Cannot calculate dynamically due to issues on ipad
                      */
-                    if (resultRect.top < 54 && current.id === 'top-page' &&
+                    if (resultRect.top < layout.MOBILE_HEADER_HEIGHT && current.id === 'top-page' &&
                         !this.cachedEls.body.hasClass('input-focused')) {
-                        resultRect.top = 54;
-                    } else if (resultRect.top < 44 && current.className === 'widget-content') {
-                        resultRect.top = 44;
+                        resultRect.top = layout.MOBILE_HEADER_HEIGHT;
+                    } else if (resultRect.top < layout.MOBILE_POPUP_HEADER_HEIGHT && current.className === 'widget-content') {
+                        resultRect.top = layout.MOBILE_POPUP_HEADER_HEIGHT;
                     }
                 }
 
