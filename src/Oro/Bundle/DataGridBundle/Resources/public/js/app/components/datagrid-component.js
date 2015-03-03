@@ -75,7 +75,6 @@ define(function (require) {
          * @param options
          */
         processOptions: function (options) {
-            options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
             options.builders.push('orodatagrid/js/grid-views-builder');
@@ -134,7 +133,7 @@ define(function (require) {
          * Build grid
          */
         build: function () {
-            var options, collectionOptions, collection, collectionName, grid, $gridEl;
+            var options, collectionOptions, collection, collectionName, grid;
 
             collectionName = this.gridName;
             collection = gridContentManager.get(collectionName);
