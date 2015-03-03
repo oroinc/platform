@@ -468,7 +468,7 @@ As you can see this configuration file declares new entity config scope named `a
  - **activities** - this attribute indicates which activity entities can be associated with a target entity.
  - **immutable** - this attribute can be used to prohibit changing the association state. This attribute can be used to prohibit disable already enabled association and vise versa.
 
-The implementation of **activities** attribute you can find in [MultipleAssociationChoiceType](../../Form/Type/MultipleAssociationChoiceType.php) (please note that this form type have been configured to be used with this attribute). The implementation of the **immutable** attribute you can find in [AbstractConfigType](../../../EntityConfigBundle/Form/Type/AbstractConfigType.php).
+The implementation of both attributes you can find in [MultipleAssociationChoiceType](../../Form/Type/MultipleAssociationChoiceType.php) (please note that this form type have been configured to be used with this attribute).
 
 For example if you want to prohibit to associate any activity for some entity you just need to set **immutable** attribute to true for this entity (in the following code we use annotations, but the can be done using migrations):
 
