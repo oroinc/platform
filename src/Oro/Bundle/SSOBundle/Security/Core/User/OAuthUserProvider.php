@@ -53,10 +53,11 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
             throw new BadCredentialsException('Bad credentials');
         }
 
-        $user = $this->userManager->findUserBy([$this->getOAuthProperty($response) => $username]);
-        if (!$user && !$this->isEmailEnabledForOauth($response->getEmail())) {
+        if (!$this->isEmailEnabledForOauth($response->getEmail())) {
             throw new EmailDomainNotAllowedException();
         }
+
+        $user = $this->userManager->findUserBy([$this->getOAuthProperty($response) => $username]);
 
         if (!$user) {
             $user = $this->userManager->findUserByEmail($response->getEmail());
