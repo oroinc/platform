@@ -37,7 +37,7 @@ class ActivityListController extends Controller
 
         return [
             'entity'                  => $entity,
-            'configuration'           => $activitiesProvider->getActivityListOption(),
+            'configuration'           => $activitiesProvider->getActivityListOption($this->get('oro_config.user')),
             'dateRangeFilterMetadata' => $dateRangeFilter->getMetadata(),
         ];
     }

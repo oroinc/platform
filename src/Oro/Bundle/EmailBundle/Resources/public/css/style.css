@@ -76,3 +76,40 @@
 #showCc:hover, #showBcc:hover {
     text-decoration: underline;
 }
+.thread-view .email-head {
+    border-bottom: 1px solid #eee;
+    overflow: hidden;
+    padding: 10px;
+}
+.thread-view .email-head a.subject {
+    font-size: 16px;
+}
+.thread-view .email-body {
+    margin: 10px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.thread-view .email-body .quote, .thread-view .email-body .gmail_quote {
+    background-color: #eee;
+    padding: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.accordion-group .accordion-heading .title-item span.icon.head {
+    position: relative;
+    left: 2px;
+}
+.accordion-group .accordion-heading .title-item span.icon  i.icon-envelope {
+    background: white;
+}
+.accordion-group .accordion-heading .title-item span.icon.head-alt {
+    position: absolute;
+}
+.accordion-group .accordion-heading .title-item span.icon  i.icon-envelope-alt {
+    position: absolute;
+    top: 6px;
+    left: -32px;
+    background: white;
+    line-height: 16px;
+    border-radius: 2px;
+}

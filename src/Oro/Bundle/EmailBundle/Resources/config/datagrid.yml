@@ -73,6 +73,20 @@ datagrid:
     user-email-grid:
         extends: email-grid
 
+        properties:
+            id: ~
+            view_thread_link:
+                type: url
+                route: oro_email_thread_view
+                params: [ id ]
+
+        actions:
+            view_thread:
+                type: navigate
+                label: oro.grid.action.view
+                link: view_thread_link
+                icon: eye-open
+
     dashboard-recent-emails-grid:
         source:
             type: orm

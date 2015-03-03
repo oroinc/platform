@@ -17,6 +17,9 @@ use Oro\Bundle\UserBundle\Entity\User;
 /**
  * @ORM\Table(name="oro_activity_list", indexes={
  *     @ORM\Index(name="oro_activity_list_updated_idx", columns={"updated_at"}),
+ *     @ORM\Index(name="al_related_activity_class", columns={"related_activity_class"}),
+ *     @ORM\Index(name="al_related_activity_id", columns={"related_activity_id"}),
+ *     @ORM\Index(name="al_is_head", columns={"is_head"}),
  * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository")
  * @Config(
@@ -87,6 +90,14 @@ class ActivityList extends ExtendActivityList
      * @Soap\ComplexType("string", nillable=true)
      */
     protected $subject;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_head", type="boolean", options={"default"=true})
+     * @Soap\ComplexType("boolean")
+     */
+    protected $head = true;
 
     /**
      * @var string
@@ -202,6 +213,30 @@ class ActivityList extends ExtendActivityList
     public function setSubject($subject)
     {
         $this->subject = $subject;
+
+        return $this;
+    }
+
+    /**
+     * Get head item in the thread
+     *
+     * @return bool
+     */
+    public function isHead()
+    {
+        return $this->head;
+    }
+
+    /**
+     * Set head flag
+     *
+     * @param boolean $head
+     *
+     * @return self
+     */
+    public function setHead($head)
+    {
+        $this->head = (bool)$head;
 
         return $this;
     }

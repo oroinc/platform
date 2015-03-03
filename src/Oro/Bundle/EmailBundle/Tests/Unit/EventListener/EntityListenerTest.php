@@ -15,6 +15,9 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $emailActivityManager;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $emailThreadManager;
+
     protected function setUp()
     {
         $this->emailOwnerManager    =
@@ -25,9 +28,14 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $this->emailThreadManager =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager')
+                ->disableOriginalConstructor()
+                ->getMock();
         $this->listener             = new EntityListener(
             $this->emailOwnerManager,
-            $this->emailActivityManager
+            $this->emailActivityManager,
+            $this->emailThreadManager
         );
     }
 
@@ -41,6 +49,9 @@ class EntitySubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('handleOnFlush')
             ->with($this->identicalTo($eventArgs));
         $this->emailActivityManager->expects($this->once())
+            ->method('handleOnFlush')
+            ->with($this->identicalTo($eventArgs));
+        $this->emailThreadManager->expects($this->once())
             ->method('handleOnFlush')
             ->with($this->identicalTo($eventArgs));
 

@@ -35,7 +35,7 @@ class ConfigProvider
             throw new InvalidConfigurationException($key);
         }
 
-        return $this->configs[$key];
+        return $this->copyConfigurationArray($this->configs[$key]);
     }
 
     /**
@@ -43,7 +43,7 @@ class ConfigProvider
      */
     public function getConfigs()
     {
-        return $this->configs;
+        return $this->copyConfigurationArray($this->configs);
     }
 
     /**
@@ -51,7 +51,7 @@ class ConfigProvider
      */
     public function getDashboardConfigs()
     {
-        return $this->configs[self::NODE_DASHBOARD];
+        return $this->copyConfigurationArray($this->configs[self::NODE_DASHBOARD]);
     }
 
     /**
@@ -59,7 +59,7 @@ class ConfigProvider
      */
     public function getWidgetConfigs()
     {
-        return $this->configs[self::NODE_WIDGET];
+        return $this->copyConfigurationArray($this->configs[self::NODE_WIDGET]);
     }
 
     /**
@@ -73,7 +73,7 @@ class ConfigProvider
             throw new InvalidConfigurationException($dashboardName);
         }
 
-        return $this->configs[self::NODE_DASHBOARD][$dashboardName];
+        return $this->copyConfigurationArray($this->configs[self::NODE_DASHBOARD][$dashboardName]);
     }
 
     /**
@@ -105,7 +105,7 @@ class ConfigProvider
             throw new InvalidConfigurationException($widgetName);
         }
 
-        return $this->configs[self::NODE_WIDGET][$widgetName];
+        return $this->copyConfigurationArray($this->configs[self::NODE_WIDGET][$widgetName]);
     }
 
     /**
@@ -115,5 +115,22 @@ class ConfigProvider
     public function hasWidgetConfig($widgetName)
     {
         return isset($this->configs[self::NODE_WIDGET][$widgetName]);
+    }
+
+    /**
+     * Copy array to avoid rewrite original array items by reference
+     *
+     * @param array $configurations
+     * @return array
+     */
+    protected function copyConfigurationArray(array $configurations)
+    {
+        return array_map(function ($config) {
+            if (!is_array($config)) {
+                return $config;
+            }
+
+            return $this->copyConfigurationArray($config);
+        }, $configurations);
     }
 }

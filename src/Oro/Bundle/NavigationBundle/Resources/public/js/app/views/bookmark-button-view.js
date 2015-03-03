@@ -45,11 +45,12 @@ define([
             this.updateState();
 
             data = this.getTemplateData();
-            if (!data) {
-                return;
+            if (!data || !data.navigationElements) {
+                // no data, it is initial auto render, skip rendering
+                return this;
             }
 
-            if (data.navigationElements && data.navigationElements[this.navigationElementType]) {
+            if (data.navigationElements[this.navigationElementType]) {
                 titleShort = data.titleShort;
                 this.$el.show();
                 /**
@@ -63,6 +64,8 @@ define([
             } else {
                 this.$el.hide();
             }
+
+            return this;
         },
 
         updateState: function () {
@@ -89,8 +92,8 @@ define([
             title = this.$el.data('title');
             attrs = {
                 url: mediator.execute('currentUrl'),
-                title_rendered: document.title,
-                title_rendered_short: this.$el.data('title-rendered-short') || document.title,
+                'title_rendered': document.title,
+                'title_rendered_short': this.$el.data('title-rendered-short') || document.title,
                 title: title ? JSON.stringify(title) : '{"template": "' + document.title + '"}'
             };
             return attrs;

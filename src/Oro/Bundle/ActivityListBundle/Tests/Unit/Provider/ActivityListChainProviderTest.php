@@ -130,6 +130,8 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()->getMock();
         $configId     = new EntityConfigId('entity', 'Test\Entity');
         $entityConfig = new Config($configId);
+        $userConfig = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()->getMock();
 
         $entityConfig->set('icon', 'test_icon');
         $entityConfig->set('label', 'test_label');
@@ -139,7 +141,7 @@ class ActivityListChainProviderTest extends \PHPUnit_Framework_TestCase
             ->willReturn('Test_Entity');
         $this->configManager->expects($this->once())->method('getProvider')->willReturn($entityConfigProvider);
 
-        $result = $this->provider->getActivityListOption();
+        $result = $this->provider->getActivityListOption($userConfig);
         $this->assertEquals(
             [
                 'Test_Entity' => [

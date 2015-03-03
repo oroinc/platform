@@ -3,6 +3,8 @@
 namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBuilder;
 
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
+
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
@@ -105,9 +107,10 @@ class JoinCasesTest extends OrmQueryConverterTest
                 ['name' => 'column1', 'label' => 'lbl1', 'sorting' => ''],
                 ['name' => $enR1 . '::rc1+' . $en1 . '::column2', 'label' => 'lbl2', 'sorting' => ''],
                 ['name' => $enR1 . '::rc2+' . $en1 . '::column2', 'label' => 'lbl3', 'sorting' => ''],
+                ['name' => $enR1 . '::rc3+' . $en1 . '::column2', 'label' => 'lbl4', 'sorting' => ''],
                 [
                     'name'    => 'rc1+' . $en1 . '::' . $enR1 . '::rc1+' . $en2 . '::column1',
-                    'label'   => 'lbl4',
+                    'label'   => 'lbl5',
                     'sorting' => ''
                 ],
             ],
@@ -117,7 +120,10 @@ class JoinCasesTest extends OrmQueryConverterTest
             [
                 $en   => [
                     'column1' => 'string',
-                    'rc1'     => ['nullable' => true],
+                    'rc1'     => [
+                        'nullable' => true,
+                        'type' => ClassMetadataInfo::MANY_TO_ONE
+                    ],
                 ],
                 $en1  => [
                     'column2' => 'string',
@@ -126,8 +132,18 @@ class JoinCasesTest extends OrmQueryConverterTest
                     'column1' => 'string',
                 ],
                 $enR1 => [
-                    'rc1' => ['nullable' => true],
-                    'rc2' => ['nullable' => false],
+                    'rc1' => [
+                        'nullable' => true,
+                        'type' => ClassMetadataInfo::MANY_TO_ONE
+                    ],
+                    'rc2' => [
+                        'nullable' => false,
+                        'type' => ClassMetadataInfo::ONE_TO_MANY
+                    ],
+                    'rc3' => [
+                        'nullable' => false,
+                        'type' => ClassMetadataInfo::MANY_TO_MANY
+                    ]
                 ],
             ],
             [
@@ -150,7 +166,8 @@ class JoinCasesTest extends OrmQueryConverterTest
                         't1.column1 as c1',
                         't2.column2 as c2',
                         't3.column2 as c3',
-                        't5.column1 as c4',
+                        't4.column2 as c4',
+                        't6.column1 as c5',
                     ],
                     'from'   => [
                         ['table' => $en, 'alias' => 't1']
@@ -165,13 +182,13 @@ class JoinCasesTest extends OrmQueryConverterTest
                             ],
                             [
                                 'join'  => 't1.rc1',
-                                'alias' => 't4',
+                                'alias' => 't5',
                             ],
                             [
                                 'join'          => $enR1,
-                                'alias'         => 't5',
+                                'alias'         => 't6',
                                 'conditionType' => 'WITH',
-                                'condition'     => 't5.rc1 = t4'
+                                'condition'     => 't6.rc1 = t5'
                             ],
                         ],
                         'inner' => [
@@ -179,8 +196,14 @@ class JoinCasesTest extends OrmQueryConverterTest
                                 'join'          => $enR1,
                                 'alias'         => 't3',
                                 'conditionType' => 'WITH',
-                                'condition'     => 't3.rc2 = t1'
+                                'condition'     => 't1 MEMBER OF t3.rc2'
                             ],
+                            [
+                                'join'          => $enR1,
+                                'alias'         => 't4',
+                                'conditionType' => 'WITH',
+                                'condition'     => 't1 MEMBER OF t4.rc3'
+                            ]
                         ],
                     ]
                 ],
@@ -189,14 +212,16 @@ class JoinCasesTest extends OrmQueryConverterTest
                         ''                                             => 't1',
                         $en . '::' . $enR1 . '::rc1'                   => 't2',
                         $en . '::' . $enR1 . '::rc2'                   => 't3',
-                        $en . '::rc1'                                  => 't4',
-                        $en . '::rc1+' . $en1 . '::' . $enR1 . '::rc1' => 't5',
+                        $en . '::' . $enR1 . '::rc3'                   => 't4',
+                        $en . '::rc1'                                  => 't5',
+                        $en . '::rc1+' . $en1 . '::' . $enR1 . '::rc1' => 't6',
                     ],
                     'column_aliases' => [
                         'column1'                                                    => 'c1',
                         $enR1 . '::rc1+' . $en1 . '::column2'                        => 'c2',
                         $enR1 . '::rc2+' . $en1 . '::column2'                        => 'c3',
-                        'rc1+' . $en1 . '::' . $enR1 . '::rc1+' . $en2 . '::column1' => 'c4',
+                        $enR1 . '::rc3+'  .$en1 . '::column2'                        => 'c4',
+                        'rc1+' . $en1 . '::' . $enR1 . '::rc1+' . $en2 . '::column1' => 'c5',
                     ],
                 ],
                 'hints' => [
@@ -211,6 +236,7 @@ class JoinCasesTest extends OrmQueryConverterTest
                 'c2' => ['label' => 'lbl2', 'frontend_type' => 'string', 'translatable' => false],
                 'c3' => ['label' => 'lbl3', 'frontend_type' => 'string', 'translatable' => false],
                 'c4' => ['label' => 'lbl4', 'frontend_type' => 'string', 'translatable' => false],
+                'c5' => ['label' => 'lbl5', 'frontend_type' => 'string', 'translatable' => false]
             ],
             'name'    => 'test_grid',
             'sorters' => [
@@ -219,6 +245,7 @@ class JoinCasesTest extends OrmQueryConverterTest
                     'c2' => ['data_name' => 'c2'],
                     'c3' => ['data_name' => 'c3'],
                     'c4' => ['data_name' => 'c4'],
+                    'c5' => ['data_name' => 'c5'],
                 ]
             ],
             'filters' => [
@@ -227,6 +254,7 @@ class JoinCasesTest extends OrmQueryConverterTest
                     'c2' => ['data_name' => 'c2', 'type' => 'string', 'translatable' => false],
                     'c3' => ['data_name' => 'c3', 'type' => 'string', 'translatable' => false],
                     'c4' => ['data_name' => 'c4', 'type' => 'string', 'translatable' => false],
+                    'c5' => ['data_name' => 'c5', 'type' => 'string', 'translatable' => false],
                 ]
             ]
         ];

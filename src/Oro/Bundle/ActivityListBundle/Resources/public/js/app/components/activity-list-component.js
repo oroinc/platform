@@ -35,7 +35,9 @@ define(function (require) {
             activityListData: '[]',
             activityListCount: 0,
             widgetId: '',
-            modules: {}
+            modules: {},
+            ignoreHead: false,
+            doNotFetch: false
         },
 
         /** @type MultiSelectFilter */
@@ -83,6 +85,8 @@ define(function (require) {
             if (typeof this.options.activityListOptions.itemModel === 'string') {
                 this.options.modules.itemModel = this.options.activityListOptions.itemModel;
             }
+            this.options.activityListOptions.ignoreHead = this.options.ignoreHead;
+            this.options.activityListOptions.doNotFetch = this.options.doNotFetch;
         },
 
         _init: function () {
@@ -95,8 +99,10 @@ define(function (require) {
             });
             collection.route = activityOptions.urls.route;
             collection.routeParameters = activityOptions.urls.parameters;
-            collection.setPageSize(this.options.activityListOptions.pager.pagesize);
-            collection.setCount(this.options.activityListCount);
+            if (this.options.activityListOptions.pager) {
+                collection.setPageSize(this.options.activityListOptions.pager.pagesize);
+                collection.setCount(this.options.activityListCount);
+            }
 
             activityOptions.collection = collection;
 

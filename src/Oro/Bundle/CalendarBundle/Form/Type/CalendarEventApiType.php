@@ -49,20 +49,8 @@ class CalendarEventApiType extends CalendarEventType
                     'mapped'   => false
                 ]
             )
-            ->add(
-                'title',
-                'text',
-                [
-                    'required' => true
-                ]
-            )
-            ->add(
-                'description',
-                'text',
-                [
-                    'required' => false
-                ]
-            )
+            ->add('title', 'text', ['required' => true])
+            ->add('description', 'text', ['required' => false])
             ->add(
                 'start',
                 'datetime',
@@ -85,27 +73,9 @@ class CalendarEventApiType extends CalendarEventType
                     'model_timezone' => 'UTC'
                 ]
             )
-            ->add(
-                'allDay',
-                'checkbox',
-                [
-                    'required' => false
-                ]
-            )
-            ->add(
-                'backgroundColor',
-                'text',
-                [
-                    'required' => false
-                ]
-            )
-            ->add(
-                'reminders',
-                'oro_reminder_collection',
-                [
-                    'required' => false,
-                ]
-            )
+            ->add('allDay', 'checkbox', ['required' => false])
+            ->add('backgroundColor', 'text', ['required' => false])
+            ->add('reminders', 'oro_reminder_collection', ['required' => false])
             ->add(
                 'invitedUsers',
                 'oro_calendar_event_invitees',
@@ -114,11 +84,16 @@ class CalendarEventApiType extends CalendarEventType
                     'property_path' => 'childEvents'
                 ]
             )
+            ->add('notifyInvitedUsers', 'hidden', ['mapped' => false])
             ->add(
-                'notifyInvitedUsers',
-                'hidden',
+                'createdAt',
+                'datetime',
                 [
-                    'mapped' => false
+                    'required'       => false,
+                    'with_seconds'   => true,
+                    'widget'         => 'single_text',
+                    'format'         => DateTimeType::HTML5_FORMAT,
+                    'model_timezone' => 'UTC'
                 ]
             );
 

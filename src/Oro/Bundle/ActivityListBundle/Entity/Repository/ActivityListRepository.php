@@ -18,6 +18,7 @@ class ActivityListRepository extends EntityRepository
      * @param \DateTime|bool $dateTo          Date to
      * @param string         $orderField      Order by field
      * @param string         $orderDirection  Order direction
+     * @param boolean        $grouping        Do grouping
      *
      * @return QueryBuilder
      */
@@ -28,9 +29,10 @@ class ActivityListRepository extends EntityRepository
         $dateFrom = null,
         $dateTo = null,
         $orderField = 'updatedAt',
-        $orderDirection = 'DESC'
+        $orderDirection = 'DESC',
+        $grouping = false
     ) {
-        $qb = $this->getBaseActivityListQueryBuilder($entityClass, $entityId, $orderField, $orderDirection);
+        $qb = $this->getBaseActivityListQueryBuilder($entityClass, $entityId, $orderField, $orderDirection, $grouping);
 
         if ($activityClasses) {
             $qb->andWhere($qb->expr()->in('activity.relatedActivityClass', ':activityClasses'))
@@ -55,19 +57,28 @@ class ActivityListRepository extends EntityRepository
      * @param integer $entityId
      * @param string  $orderField
      * @param string  $orderDirection
+     * @param boolean $grouping
+     *
      * @return QueryBuilder
      */
     public function getBaseActivityListQueryBuilder(
         $entityClass,
         $entityId,
         $orderField = 'updatedAt',
-        $orderDirection = 'DESC'
+        $orderDirection = 'DESC',
+        $grouping = false
     ) {
-        return $this->createQueryBuilder('activity')
+        $queryBuilder = $this->createQueryBuilder('activity')
             ->join('activity.' . $this->getAssociationName($entityClass), 'r')
             ->where('r.id = :entityId')
             ->setParameter('entityId', $entityId)
             ->orderBy('activity.' . $orderField, $orderDirection);
+
+        if ($grouping) {
+            $queryBuilder->andWhere('activity.head = true');
+        }
+
+        return $queryBuilder;
     }
 
     /**
