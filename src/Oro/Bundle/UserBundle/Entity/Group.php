@@ -16,7 +16,10 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\GroupRepository")
- * @ORM\Table(name="oro_access_group")
+ * @ORM\Table(
+ *      name="oro_access_group",
+ *      uniqueConstraints={@ORM\UniqueConstraint(name="uq_name_org_idx", columns={"name", "organization_id"})}
+ * )
  * @Config(
  *      routeName="oro_user_group_index",
  *      defaultValues={
@@ -56,7 +59,7 @@ class Group
     protected $id;
 
     /**
-     * @ORM\Column(type="string", unique=true, length=30, nullable=false)
+     * @ORM\Column(type="string", length=30, nullable=false)
      * @JMS\Type("string")
      * @JMS\Expose
      * @ConfigField(
@@ -90,6 +93,14 @@ class Group
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ConfigField(
+     *      defaultValues={
+     *          "importexport"={
+     *              "identity"=true,
+     *              "short"=true
+     *          }
+     *      }
+     * )
      */
     protected $organization;
 

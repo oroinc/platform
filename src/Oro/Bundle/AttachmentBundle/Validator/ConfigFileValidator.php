@@ -80,9 +80,8 @@ class ConfigFileValidator
             [
                 new FileConstraint(
                     [
-                        'maxSize'          => $fileSize,
-                        'mimeTypes'        => $mimeTypes,
-                        'mimeTypesMessage' => 'This file type is not allowed.'
+                        'maxSize'   => $fileSize,
+                        'mimeTypes' => $mimeTypes
                     ]
                 )
             ]

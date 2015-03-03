@@ -59,18 +59,34 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
         $notAllowedAcl      = 'invalid_acl';
         $allowedAcl         = 'valid_acl';
         $expectedItem       = 'expected_item';
-        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl];
+        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
         $notGrantedItem     = 'not_granted_item';
-        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl];
+        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
         $applicableItem     = 'applicable_item';
-        $applicable         = ['label' => 'applicable is set and resolved to true', 'applicable' => '@true'];
+        $applicable         = [
+            'label' => 'applicable is set and resolved to true',
+            'applicable' => '@true',
+            'enabled' => true
+        ];
         $notApplicableItem  = 'not_applicable_item';
-        $notApplicable      = ['label' => 'applicable is set and resolved to false', 'applicable' => '@false'];
+        $notApplicable      = [
+            'label' => 'applicable is set and resolved to false',
+            'applicable' => '@false',
+            'enabled' => true
+        ];
+        $disabledItem  = 'not_applicable_item';
+        $disabled      = [
+            'label' => 'applicable is set and resolved to false',
+            'acl' => $allowedAcl,
+            'enabled' => false
+        ];
+
         $configs            = [
-            $expectedItem      => $expectedValue,
-            $notGrantedItem    => $notGrantedValue,
-            $applicableItem    => $applicable,
-            $notApplicableItem => $notApplicable
+            $expectedItem       => $expectedValue,
+            $notGrantedItem     => $notGrantedValue,
+            $applicableItem     => $applicable,
+            $notApplicableItem  => $notApplicable,
+            $disabledItem       => $disabled
         ];
 
         $this->configProvider->expects($this->once())
@@ -78,7 +94,7 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
             ->with($expectedWidgetName)
             ->will($this->returnValue(['items' => $configs]));
 
-        $this->securityFacade->expects($this->exactly(2))
+        $this->securityFacade->expects($this->exactly(3))
             ->method('isGranted')
             ->will(
                 $this->returnValueMap(
@@ -88,7 +104,7 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->resolver->expects($this->exactly(2))
+        $this->resolver->expects($this->exactly(1))
             ->method('resolve')
             ->will(
                 $this->returnValueMap(
@@ -110,13 +126,21 @@ class WidgetAttributesTest extends \PHPUnit_Framework_TestCase
         $notAllowedAcl      = 'invalid_acl';
         $allowedAcl         = 'valid_acl';
         $expectedItem       = 'expected_item';
-        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl];
+        $expectedValue      = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
         $notGrantedItem     = 'not_granted_item';
-        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl];
+        $notGrantedValue    = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
         $applicableItem     = 'applicable_item';
-        $applicable         = ['label' => 'applicable is set and resolved to true', 'applicable' => '@true'];
+        $applicable         = [
+            'label' => 'applicable is set and resolved to true',
+            'applicable' => '@true',
+            'enabled' => true
+        ];
         $notApplicableItem  = 'not_applicable_item';
-        $notApplicable      = ['label' => 'applicable is set and resolved to false', 'applicable' => '@false'];
+        $notApplicable      = [
+            'label' => 'applicable is set and resolved to false',
+            'applicable' => '@false',
+            'enabled' => true
+        ];
         $configs            = [
             $expectedItem      => $expectedValue,
             $notGrantedItem    => $notGrantedValue,
