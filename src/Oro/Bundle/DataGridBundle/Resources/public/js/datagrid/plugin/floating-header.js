@@ -1,6 +1,6 @@
 define(function (require) {
     'use strict';
-    var FloatingHeader,
+    var FloatingHeaderPlugin,
         $ = require('jquery'),
         _ = require('underscore'),
         BasePlugin = require('oroui/js/plugin/base'),
@@ -8,7 +8,7 @@ define(function (require) {
         mediator = require('oroui/js/mediator'),
         tools = require('oroui/js/tools');
 
-    FloatingHeader = BasePlugin.extend({
+    FloatingHeaderPlugin = BasePlugin.extend({
 
         /**
          * Interval id of height fix check function
@@ -38,6 +38,7 @@ define(function (require) {
             this.grid.on('content:update', this.fixHeaderCellWidth, this);
             this.grid.on('layout:update', this.fixHeaderCellWidth, this);
             this.heightFixIntervalId = setInterval(_.bind(this.fixHeightInFloatTheadMode, this), 400);
+            FloatingHeaderPlugin.__super__.enable.call(this);
         },
 
         disable: function () {
@@ -51,6 +52,7 @@ define(function (require) {
             // remove css
             this.cachedEls.headerCells.attr('style', '');
             this.cachedEls.firstRowCells.attr('style', '');
+            FloatingHeaderPlugin.__super__.disable.call(this);
         },
 
         setupCache: function () {
@@ -362,5 +364,5 @@ define(function (require) {
         }
     });
 
-    return FloatingHeader;
+    return FloatingHeaderPlugin;
 });
