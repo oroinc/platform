@@ -9,6 +9,6 @@ class OrganizationUniqueEntityTest extends \PHPUnit_Framework_TestCase
     public function testService()
     {
         $testClass = new OrganizationUniqueEntity(['fields' => 'test']);
-        $this->assertEquals('oro_organization.orm.validator.organization_unique', $testClass->service);
+        $this->assertEquals('organization_unique', $testClass->service);
     }
 }

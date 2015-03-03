@@ -46,12 +46,12 @@
                             <li>
                                 <ul class="nav nav-pills icons-holder launchers-list">
                                     <li class="launcher-item">
-                                        <a data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>" {{ UI.renderWidgetDataAttributes({
+                                        <a title="{{ 'oro.email.reply'|trans }}" data-url="<%= routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>" {{ UI.renderWidgetDataAttributes({
                                             'type': 'dialog',
                                             'multiple': true,
                                             'refresh-widget-alias': 'activity-list-widget',
                                             'options': {
-                                                'alias': 'email-dialog',
+                                                'alias': 'reply-dialog',
                                                 'dialogOptions': {
                                                     'title': 'oro.email.send_email'|trans,
                                                     'allowMaximize': true,
@@ -62,6 +62,24 @@
                                                 }
                                             }
                                         }) }}><i class="icon-reply hide-text">{{ 'oro.email.reply'|trans|raw }}</i></a>
+                                    </li>
+                                    <li class="launcher-item">
+                                        <a title="{{ 'oro.email.forward'|trans }}" data-url="<%= routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>" {{ UI.renderWidgetDataAttributes({
+                                            'type' : 'dialog',
+                                            'multiple' : true,
+                                            'refresh-widget-alias': 'activity-list-widget',
+                                            'options': {
+                                                'alias': 'forward-dialog',
+                                                'dialogOptions': {
+                                                    'title': 'oro.email.send_email'|trans,
+                                                    'allowMaximize': true,
+                                                    'allowMinimize': true,
+                                                    'dblclick': 'maximize',
+                                                    'maximizedHeightDecreaseBy': 'minimize-bar',
+                                                    'width': 1000
+                                                }
+                                            }
+                                        }) }}><i class="icon-mail-forward hide-text">{{ 'oro.email.forward'|trans|raw }}</i></a>
                                     </li>
                                 </ul>
                             </li>
