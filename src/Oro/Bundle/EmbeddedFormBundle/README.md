@@ -66,13 +66,13 @@ To add back link to success message use following syntax `{back_link|Back link t
 For backward compatibility, the legacy mechanism of customizing embedded forms layout is supported:
 for this a FormType should implement `Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface`.
 
-However, it is advisable to use Layouts engine from OroLayoutBundle to customize the form layout.
-Embedded forms use `embedded_form` layout theme and layout update files should be placed in `Acme\Bundle\DemoBundle\Resources\layouts\embedded_form` directory.
+However, it is advisable to use Layouts engine from the LayoutBundle to customize the form layout.
+Embedded forms use the `embedded_form` layout theme and layout update files should be placed in `Acme\Bundle\DemoBundle\Resources\layouts\embedded_form` directory.
 
-Layout update files can be placed in subdirectory corresponding to a route name (e.g. `oro_embedded_form_submit`) if it needs to be applied a specific action only.
-Please, refer to OroLayoutBundle documentation for more information.
+Layout update files can be placed in subdirectory corresponding to a route name (e.g. `oro_embedded_form_submit`, `oro_embedded_form_success`) if it needs to be applied a specific action only.
+Please, refer to the [LayoutBundle](../LayoutBundle/Resources/doc/index.md) documentation for more information.
 
-Let's consider an example when we need to move email field before first name field on the embedded form:
+Let's consider an example when we need to move the email field before the first name field on the embedded form:
 
 **Example**
 ```yml
@@ -87,11 +87,12 @@ oro_layout:
     conditions:
         @eq:
             - $context.embedded_form_type
-            - 'acme_demo_contact_us.embedded_form' # form type name in container
+            - 'acme_demo.form.embedded_form' # form type name in container
 ```
 
 We need to specify layout update conditions since all embedded forms are using the same route.
-To make sure that layout updates are loading only for the certain embedded form we can check if the required FormType is the same as registered in context.
+The condition should check that your custom form type is equal to the form type stored in the layout context.
+This will make sure that your layout updates are loaded only for the your embedded form type.
 
 
 
