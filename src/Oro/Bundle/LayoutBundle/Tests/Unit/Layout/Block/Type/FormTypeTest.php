@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
+use Symfony\Component\Form\FormView;
+
+use Oro\Component\Layout\BlockView;
+use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\Block\Type\ContainerType;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormType;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
-use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\LayoutContext;
-use Symfony\Component\Form\FormView;
 
 class FormTypeTest extends BlockTypeTestCase
 {

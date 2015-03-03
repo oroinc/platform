@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Form;
 
-use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ResolvedFormType;
 
 use Oro\Component\Layout\BlockBuilderInterface;
 
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FieldsetType;
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
 use Oro\Bundle\LayoutBundle\Layout\Form\GroupingFormLayoutBuilder;
