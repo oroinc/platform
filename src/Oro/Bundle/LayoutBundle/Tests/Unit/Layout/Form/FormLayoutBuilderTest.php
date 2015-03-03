@@ -9,6 +9,7 @@ use Symfony\Component\Form\ResolvedFormType;
 use Oro\Component\Layout\BlockBuilderInterface;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
+use Oro\Bundle\LayoutBundle\Layout\Form\FormAccessor;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilder;
 
 class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
@@ -43,19 +44,22 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testEmptyForm()
     {
-        $options = $this->getOptions();
-        $form    = $this->getForm();
+        $options      = $this->getOptions();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
 
         $this->layoutManipulator->expects($this->never())
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame([], $formAccessor->getProcessedFields());
     }
 
     public function testFlatForm()
     {
-        $options = $this->getOptions();
-        $form    = $this->getForm();
+        $options      = $this->getOptions();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, 'type1', 'field1'));
         $form->add($this->getForm(false, 'type2', 'field2'));
 
@@ -80,14 +84,22 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(2))
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field1' => self::FIELD_PREFIX . 'field1',
+                'field2' => self::FIELD_PREFIX . 'field2'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     public function testCompoundChildForm()
     {
-        $options   = $this->getOptions();
-        $form      = $this->getForm();
-        $childForm = $this->getForm(true, 'type1', 'field1');
+        $options      = $this->getOptions();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
+        $childForm    = $this->getForm(true, 'type1', 'field1');
         $childForm->add($this->getForm(false, 'type11', 'field11'));
         $form->add($childForm);
         $form->add($this->getForm(false, 'type2', 'field2'));
@@ -113,14 +125,22 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(2))
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field1.field11' => self::FIELD_PREFIX . 'field1:field11',
+                'field2'         => self::FIELD_PREFIX . 'field2'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     public function testCompoundChildFormWhichMarkedAsSimpleForm()
     {
-        $options   = $this->getOptions();
-        $form      = $this->getForm();
-        $childForm = $this->getForm(true, 'type1', 'field1');
+        $options      = $this->getOptions();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
+        $childForm    = $this->getForm(true, 'type1', 'field1');
         $childForm->add($this->getForm(false, 'type11', 'field11'));
         $form->add($childForm);
         $form->add($this->getForm(false, 'type2', 'field2'));
@@ -147,7 +167,14 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('add');
 
         $this->builder->addSimpleFormTypes(['type1']);
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field1' => self::FIELD_PREFIX . 'field1',
+                'field2' => self::FIELD_PREFIX . 'field2'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     public function testPreferredFields()
@@ -155,7 +182,8 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $options                     = $this->getOptions();
         $options['preferred_fields'] = ['field2'];
 
-        $form = $this->getForm();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, 'type1', 'field1'));
         $form->add($this->getForm(false, 'type2', 'field2'));
 
@@ -180,7 +208,14 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(2))
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field2' => self::FIELD_PREFIX . 'field2',
+                'field1' => self::FIELD_PREFIX . 'field1'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     public function testPreferredCompoundFields()
@@ -188,7 +223,8 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $options                     = $this->getOptions();
         $options['preferred_fields'] = ['field2.field21'];
 
-        $form      = $this->getForm();
+        $form         = $this->getForm();
+        $formAccessor = new FormAccessor($form);
         $form->add($this->getForm(false, 'type1', 'field1'));
         $childForm = $this->getForm(true, 'type2', 'field2');
         $childForm->add($this->getForm(false, 'type21', 'field21'));
@@ -215,7 +251,14 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->exactly(2))
             ->method('add');
 
-        $this->builder->build($form, $this->blockBuilder, $options);
+        $this->builder->build($formAccessor, $this->blockBuilder, $options);
+        $this->assertSame(
+            [
+                'field2.field21' => self::FIELD_PREFIX . 'field2:field21',
+                'field1'         => self::FIELD_PREFIX . 'field1'
+            ],
+            $formAccessor->getProcessedFields()
+        );
     }
 
     /**
