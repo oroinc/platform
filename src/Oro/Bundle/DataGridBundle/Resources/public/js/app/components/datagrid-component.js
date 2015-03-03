@@ -75,6 +75,7 @@ define(function (require) {
          * @param options
          */
         processOptions: function (options) {
+            options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
             options.builders.push('orodatagrid/js/grid-views-builder');
