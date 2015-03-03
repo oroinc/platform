@@ -70,7 +70,7 @@ However, it is advisable to use Layouts engine from the LayoutBundle to customiz
 Embedded forms use the `embedded_form` layout theme and layout update files should be placed in `Acme\Bundle\DemoBundle\Resources\layouts\embedded_form` directory.
 
 Layout update files can be placed in subdirectory corresponding to a route name (e.g. `oro_embedded_form_submit`, `oro_embedded_form_success`) if it needs to be applied a specific action only.
-Please, refer to the [LayoutBundle](../LayoutBundle/Resources/doc/index.md) documentation for more information.
+Please, refer to the [LayoutBundle](../LayoutBundle/README.md) documentation for more information.
 
 Let's consider an example when we need to move the email field before the first name field on the embedded form:
 
