@@ -20,8 +20,7 @@ define(function (require) {
         RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action'),
         ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
         ExportAction = require('oro/datagrid/action/export-action'),
-        PluginManager = require('oroui/js/plugin/plugin-manager'),
-        FloatingHeaderPlugin = require('./plugin/floating-header'),
+        PluginManager = require('oroui/js/app/plugins/plugin-manager'),
         tools = require('oroui/js/tools');
 
     /**
@@ -110,11 +109,6 @@ define(function (require) {
         },
 
         /**
-         * Disabled from the start
-         */
-        floatThead: false,
-
-        /**
          * Initialize grid
          *
          * @param {Object} options
@@ -134,6 +128,9 @@ define(function (require) {
             var opts = options || {};
             this.subviews = [];
             this.pluginManager = new PluginManager(this);
+            if (options.plugins) {
+                this.pluginManager.enable(options.plugins);
+            }
 
             // Check required options
             if (!opts.collection) {
@@ -179,8 +176,6 @@ define(function (require) {
             this._listenToCollectionEvents();
             this._listenToBodyEvents();
             this._listenToCommands();
-
-            this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
         },
 
         /**
@@ -192,7 +187,6 @@ define(function (require) {
                 return;
             }
 
-            this.setLayout('default');
             this.pluginManager.dispose();
 
             _.each(this.columns.models, function (column) {
@@ -524,20 +518,20 @@ define(function (require) {
 
             this.listenTo(this.collection, 'reset', this.renderNoDataBlock);
 
-            /**
-             * Backbone event. Fired when the grid has been successfully rendered.
-             * @event rendered
-             */
-            this.trigger('rendered');
+            mediator.execute('layout:init', this.$el, this).always(_.bind(function () {
+                this.rendered = true;
+                /**
+                 * Backbone event. Fired when the grid has been successfully rendered.
+                 * @event rendered
+                 */
+                this.trigger('rendered');
 
-            /**
-             * Backbone event. Fired when data for grid has been successfully rendered.
-             * @event grid_render:complete
-             */
-            mediator.trigger('grid_render:complete', this.$el);
-            mediator.execute('layout:init', this.$el, this);
-
-            this.updateLayout();
+                /**
+                 * Backbone event. Fired when data for grid has been successfully rendered.
+                 * @event grid_render:complete
+                 */
+                mediator.trigger('grid_render:complete', this.$el);
+            }, this));
 
             return this;
         },
@@ -683,73 +677,6 @@ define(function (require) {
             if (_.has(state, 'parameters')) {
                 delete state.parameters[name];
             }
-        },
-
-        /**
-         * Returns css expression for fullscreen layout
-         * @returns {string}
-         */
-        getCssHeightCalcExpression: function () {
-            var documentHeight = $(document).height(),
-                availableHeight = mediator.execute('layout:getAvailableHeight',
-                    this.$grid.parents('.grid-scrollable-container:first'));
-            return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
-        },
-
-        /**
-         * Chooses layout on resize or during creation
-         */
-        updateLayout: function () {
-            if (!this.$grid.parents('body').length) {
-                // not ready to apply layout
-                // try to do that at next js cycle1
-                _.defer(_.bind(this.updateLayout, this));
-                return;
-            }
-            if (tools.isMobile()) {
-                this.pluginManager.enable(FloatingHeaderPlugin);
-            }
-            var layout = 'default';
-            if (this.enableFullScreenLayout) {
-                layout = mediator.execute('layout:getPreferredLayout', this.$grid);
-            }
-            this.setLayout(layout);
-        },
-
-        /**
-         * Sets layout and perform all required operations
-         */
-        setLayout: function (newLayout) {
-            if (newLayout === this.layout) {
-                if (newLayout === 'fullscreen') {
-                    this.$grid.parents('.grid-scrollable-container').css({
-                        maxHeight: this.getCssHeightCalcExpression()
-                    });
-                    this.trigger('layout:update');
-                }
-                return;
-            }
-            this.layout = newLayout;
-            switch (newLayout) {
-                case 'fullscreen':
-                    this.pluginManager.enable(FloatingHeaderPlugin);
-                    this.$grid.parents('.grid-scrollable-container').css({
-                        maxHeight: this.getCssHeightCalcExpression()
-                    });
-                    mediator.execute('layout:disablePageScroll', this.$el);
-                    break;
-                case 'scroll':
-                case 'default':
-                    this.pluginManager.disable(FloatingHeaderPlugin);
-                    this.$grid.parents('.grid-scrollable-container').css({
-                        maxHeight: ''
-                    });
-                    mediator.execute('layout:enablePageScroll', this.$el);
-                    break;
-                default:
-                    throw new Error('Unknown grid layout');
-            }
-            this.trigger('layout:update');
         }
     });
 

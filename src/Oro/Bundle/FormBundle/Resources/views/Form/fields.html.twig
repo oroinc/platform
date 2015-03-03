@@ -339,8 +339,8 @@
     {% set timeValidation = {'Time' : {}} %}
 
     {% if required %}
-        {% set dateValidation = dateValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
-        {% set timeValidation = timeValidation|merge({'NotBlank' : {'message': 'This value should not be blank.'}}) %}
+        {% set dateValidation = dateValidation|merge({'NotBlank' : {}}) %}
+        {% set timeValidation = timeValidation|merge({'NotBlank' : {}}) %}
     {% endif %}
 
     {% set options = {
