@@ -64,4 +64,30 @@ class TrueTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($message, $expected)
+    {
+        if ($message !== null) {
+            $this->condition->setMessage($message);
+        }
+        $actual = $this->condition->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'message'  => null,
+                'expected' => '$factory->create(\'true\', [])'
+            ],
+            [
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'true\', [])->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

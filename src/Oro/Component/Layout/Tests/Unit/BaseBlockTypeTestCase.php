@@ -107,15 +107,16 @@ abstract class BaseBlockTypeTestCase extends LayoutTestCase
      *
      * @param string $blockType
      * @param array  $options
+     * @param string $id
      *
      * @return TestBlockBuilder
      */
-    protected function getBlockBuilder($blockType, array $options = [])
+    protected function getBlockBuilder($blockType, array $options = [], $id = null)
     {
         return new TestBlockBuilder(
             $this->layoutFactory->createLayoutBuilder(),
             $this->context,
-            $blockType . '_id',
+            $id ?: $blockType . '_id',
             $blockType,
             $options
         );

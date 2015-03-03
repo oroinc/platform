@@ -112,4 +112,62 @@ abstract class AbstractExpression implements ExpressionInterface
 
         return ['@' . $this->getName() => $result];
     }
+
+    /**
+     * @param mixed  $params
+     * @param string $factoryAccessor
+     *
+     * @return array
+     */
+    protected function convertToPhpCode($params, $factoryAccessor)
+    {
+        $compiledParams = [];
+        if ($params !== null) {
+            if (!is_array($params)) {
+                $params = [$params];
+            }
+            foreach ($params as $param) {
+                if ($param instanceof PropertyPathInterface) {
+                    $compiledPathElements = implode(
+                        ', ',
+                        array_map(
+                            function ($val) {
+                                return '\'' . $val . '\'';
+                            },
+                            $param->getElements()
+                        )
+                    );
+                    $compiledParams[]     =
+                        'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\''
+                        . str_replace('\'', '\\\'', (string)$param)
+                        . '\', ['
+                        . $compiledPathElements
+                        . '])';
+                } elseif ($param instanceof ExpressionInterface) {
+                    $compiledParams[] = $param->compile($factoryAccessor);
+                } elseif (is_string($param)) {
+                    $compiledParams[] = '\'' . str_replace('\'', '\\\'', $param) . '\'';
+                } elseif (is_bool($param)) {
+                    $compiledParams[] = $param ? 'true' : 'false';
+                } else {
+                    $compiledParams[] = (string)$param;
+                }
+            }
+        }
+
+
+        $compiled =
+            $factoryAccessor
+            . '->create(\''
+            . $this->getName()
+            . '\', ['
+            . implode(', ', $compiledParams)
+            . '])';
+        $message  = $this->getMessage();
+        if ($message !== null) {
+            $compiled .= '->setMessage(\'' . str_replace('\'', '\\\'', $message) . '\')';
+        }
+
+        return $compiled;
+    }
 }

@@ -32,26 +32,25 @@ class DependencyInitializerTest extends \PHPUnit_Framework_TestCase
 
     public function testNoKnownDependenciesShouldNotDoAnything()
     {
-        $object = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionAssemblerLayoutUpdateInterface');
-        $object->expects($this->never())->method('setAssembler');
+        $object = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionFactoryLayoutUpdateInterface');
+        $object->expects($this->never())->method('setExpressionFactory');
 
         $this->initializer->initialize($object);
     }
 
     public function testShouldInitializeDependencies()
     {
-        $assembler = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionAssembler')
-            ->disableOriginalConstructor()->getMock();
+        $expressionFactory = $this->getMock('Oro\Component\ConfigExpression\ExpressionFactoryInterface');
 
-        $object = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionAssemblerLayoutUpdateInterface');
-        $object->expects($this->once())->method('setAssembler')->with($this->equalTo($assembler));
+        $object = $this->getMock('\Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\ExpressionFactoryLayoutUpdateInterface');
+        $object->expects($this->once())->method('setExpressionFactory')->with($this->equalTo($expressionFactory));
 
-        $this->container->set('oro.assembler.service_id', $assembler);
+        $this->container->set('factory_service_id', $expressionFactory);
 
         $this->initializer->addKnownDependency(
-            '\Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface',
-            'setAssembler',
-            'oro.assembler.service_id'
+            '\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface',
+            'setExpressionFactory',
+            'factory_service_id'
         );
 
         $this->initializer->initialize($object);

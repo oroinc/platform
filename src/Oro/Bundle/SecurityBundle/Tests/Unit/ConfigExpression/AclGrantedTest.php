@@ -263,4 +263,35 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->condition->initialize($options);
+        if ($message !== null) {
+            $this->condition->setMessage($message);
+        }
+        $actual = $this->condition->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => ['acme_product_view'],
+                'message'  => null,
+                'expected' => '$factory->create(\'acl\', [\'acme_product_view\'])'
+            ],
+            [
+                'options'  => ['VIEW', new PropertyPath('entity')],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'acl\', [\'VIEW\', '
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'entity\', [\'entity\'])'
+                    . '])->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

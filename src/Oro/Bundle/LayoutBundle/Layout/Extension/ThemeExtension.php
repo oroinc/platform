@@ -6,6 +6,8 @@ use Psr\Log\NullLogger;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 
+use Symfony\Component\HttpFoundation\Request;
+
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\Extension\AbstractExtension;
 use Oro\Component\Layout\ContextConfiguratorInterface;
@@ -15,13 +17,15 @@ use Oro\Bundle\LayoutBundle\Layout\Loader\FileResource;
 use Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator;
 use Oro\Bundle\LayoutBundle\Layout\Loader\ResourceFactoryInterface;
-use Oro\Bundle\LayoutBundle\Layout\Extension\Context\RouteContextConfigurator;
 
 class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, ContextConfiguratorInterface
 {
     use LoggerAwareTrait;
 
     const PARAM_THEME = 'theme';
+
+    /** @var Request|null */
+    protected $request;
 
     /** @var array */
     protected $resources;
@@ -61,6 +65,40 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
     }
 
     /**
+     * Synchronized DI method call, sets current request for further usage
+     *
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureContext(ContextInterface $context)
+    {
+        $context->getDataResolver()
+            ->setOptional([self::PARAM_THEME])
+            ->setAllowedTypes([self::PARAM_THEME => ['string', 'null']])
+            ->setNormalizers(
+                [
+                    self::PARAM_THEME => function ($options, $theme) {
+                        if (null === $theme && $this->request) {
+                            $theme = $this->request->query->get('_theme');
+                            if (null === $theme) {
+                                $theme = $this->request->attributes->get('_theme');
+                            }
+                        }
+
+                        return $theme;
+                    }
+                ]
+            );
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function loadLayoutUpdates(ContextInterface $context)
@@ -68,7 +106,7 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
         $result    = [];
         $themeName = $context->getOr(self::PARAM_THEME);
         if ($themeName) {
-            $updates = $skipped = [];
+            $updates = [];
             $theme   = $this->manager->getTheme($themeName);
 
             $path      = [$theme->getDirectory()];
@@ -81,27 +119,18 @@ class ThemeExtension extends AbstractExtension implements LoggerAwareInterface, 
             $iterator->setFilterPath($path);
             foreach ($iterator as $resource) {
                 if ($this->loader->supports($resource)) {
-                    $updates[] = $this->loader->load($resource);
+                    $update = $this->loader->load($resource);
+                    $this->dependencyInitializer->initialize($update);
+                    $updates[] = $update;
                 } else {
-                    $skipped[] = $resource;
+                    $this->logUnknownResource($resource);
                 }
             }
-
-            array_walk($skipped, [$this, 'logUnknownResource']);
-            array_walk($updates, [$this->dependencyInitializer, 'initialize']);
 
             $result = ['root' => $updates];
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureContext(ContextInterface $context)
-    {
-        $context->getDataResolver()->setOptional([self::PARAM_THEME]);
     }
 
     /**

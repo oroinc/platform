@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -95,21 +96,20 @@ class FormType extends AbstractContainerType
      */
     public function buildBlock(BlockBuilderInterface $builder, array $options)
     {
-        $form = $builder->getContext()->get($options['form_name']);
-        if ($form instanceof FormInterface) {
-            // replace the form with the form accessor because child blocks require the accessor
-            $builder->getContext()->set($options['form_name'], new FormAccessor($form));
-        } elseif ($form instanceof FormAccessorInterface) {
-            $form = $form->getForm();
-        } else {
+        $formAccessor = $builder->getContext()->get($options['form_name']);
+        if ($formAccessor instanceof FormInterface) {
+            // replace the form with the form accessor
+            $formAccessor = new FormAccessor($formAccessor);
+            $builder->getContext()->set($options['form_name'], $formAccessor);
+        } elseif (!$formAccessor instanceof FormAccessorInterface) {
             throw new UnexpectedTypeException(
-                $form,
+                $formAccessor,
                 'Symfony\Component\Form\FormInterface or Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface',
                 sprintf('context[%s]', $options['form_name'])
             );
         }
 
-        $this->formLayoutBuilder->build($form, $builder, $options);
+        $this->formLayoutBuilder->build($formAccessor, $builder, $options);
     }
 
     /**
@@ -125,8 +125,91 @@ class FormType extends AbstractContainerType
     /**
      * {@inheritdoc}
      */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        // prevent form fields rendering by form_rest() method,
+        // if the corresponding layout block has been removed
+        /** @var FormAccessorInterface $formAccessor */
+        $formAccessor = $block->getContext()->get($options['form_name']);
+        $rootView     = null;
+        foreach ($formAccessor->getProcessedFields() as $formFieldPath => $blockId) {
+            if (isset($view[$blockId])) {
+                $this->checkExistingFieldView($view, $view[$blockId], $formFieldPath);
+                continue;
+            }
+            if ($rootView === null) {
+                $rootView = $view->parent !== null
+                    ? $this->getRootView($view)
+                    : false;
+            }
+            if ($rootView !== false && isset($rootView[$blockId])) {
+                $this->checkExistingFieldView($view, $rootView[$blockId], $formFieldPath);
+                continue;
+            }
+
+            $this->getFormFieldView($view, $formFieldPath)->setRendered();
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return self::NAME;
+    }
+
+    /**
+     * @param BlockView $view
+     *
+     * @return BlockView
+     */
+    protected function getRootView(BlockView $view)
+    {
+        $result = $view;
+        while ($result->parent) {
+            $result = $result->parent;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns form field view
+     *
+     * @param BlockView $view
+     * @param string    $formFieldPath
+     *
+     * @return FormView
+     */
+    protected function getFormFieldView(BlockView $view, $formFieldPath)
+    {
+        /** @var FormView $form */
+        $form = $view->vars['form'];
+        foreach (explode('.', $formFieldPath) as $field) {
+            $form = $form[$field];
+        }
+
+        return $form;
+    }
+
+    /**
+     * Checks whether an existing field view is the view created in buildBlock method,
+     * and if it is another view mark the corresponding form field as rendered
+     *
+     * @param BlockView $view
+     * @param BlockView $childView
+     * @param string    $formFieldPath
+     */
+    protected function checkExistingFieldView(BlockView $view, BlockView $childView, $formFieldPath)
+    {
+        if (!isset($childView->vars['form'])) {
+            $this->getFormFieldView($view, $formFieldPath)->setRendered();
+        } else {
+            $formFieldView = $this->getFormFieldView($view, $formFieldPath);
+            if ($childView->vars['form'] !== $formFieldView) {
+                $formFieldView->setRendered();
+            }
+        }
     }
 }

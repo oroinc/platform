@@ -133,7 +133,7 @@ abstract class AbstractExtension implements ExtensionInterface
      */
     public function getLayoutUpdates(LayoutItemInterface $item)
     {
-        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+        $idOrAlias = $item->getAlias() ? : $item->getId();
 
         if (null === $this->layoutUpdates) {
             $this->initLayoutUpdates($item->getContext());
@@ -149,7 +149,7 @@ abstract class AbstractExtension implements ExtensionInterface
      */
     public function hasLayoutUpdates(LayoutItemInterface $item)
     {
-        $idOrAlias = $item->getAlias() ? $item->getAlias() : $item->getId();
+        $idOrAlias = $item->getAlias() ?: $item->getId();
 
         if (null === $this->layoutUpdates) {
             $this->initLayoutUpdates($item->getContext());

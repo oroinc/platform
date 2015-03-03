@@ -38,11 +38,13 @@ class PhpLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 <<<CLASS
 <?php
 
+/**
+ * Filename: testfilename.php
+ */
 class testClassName implements \Oro\Component\Layout\LayoutUpdateInterface
 {
     public function updateLayout(\Oro\Component\Layout\LayoutManipulatorInterface \$layoutManipulator, \Oro\Component\Layout\LayoutItemInterface \$item)
     {
-        // filename: testfilename.php
         echo 123;
     }
 }

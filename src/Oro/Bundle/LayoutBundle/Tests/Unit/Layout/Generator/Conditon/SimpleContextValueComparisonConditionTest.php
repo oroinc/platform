@@ -23,13 +23,21 @@ class SimpleContextValueComparisonConditionTest extends \PHPUnit_Framework_TestC
     public function testVisit($oldMethodBody, $value, $condition, $expectedMethodBody)
     {
         $condition = new SimpleContextValueComparisonCondition('valueToCompare', $condition, $value);
-        $visitor   = $this->setUpVisitContext($oldMethodBody);
 
-        $condition->visit($visitor);
+        $phpClass = PhpClass::create('LayoutUpdateClass');
+        $visitContext = new VisitContext($phpClass);
 
-        /** @var PhpMethod[] $methods */
-        $methods = $visitor->getClass()->getMethods();
-        $method  = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
+        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
+        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
+        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
+
+        $condition->startVisit($visitContext);
+        $visitContext->getWriter()->writeln($oldMethodBody);
+        $condition->endVisit($visitContext);
+
+        $method->setBody($visitContext->getWriter()->getContent());
+        $phpClass->setMethod($method);
+
         $this->assertSame($expectedMethodBody, $method->getBody());
     }
 
@@ -44,9 +52,12 @@ class SimpleContextValueComparisonConditionTest extends \PHPUnit_Framework_TestC
                 '$value'              => 'my_value',
                 '$condition'          => '===',
                 '$expectedMethodBody' => <<<CONTENT
-if (\$item->getContext()->getOr('valueToCompare') === 'my_value') {
+if (
+    \$item->getContext()->getOr('valueToCompare') === 'my_value'
+) {
     echo 123;
 }
+
 CONTENT
             ],
             'neq condition with array value' => [
@@ -54,32 +65,17 @@ CONTENT
                 '$value'              => ['testValue', 'testValue2'],
                 '$condition'          => '!==',
                 '$expectedMethodBody' => <<<CONTENT
-if (\$item->getContext()->getOr('valueToCompare') !== array (
-  0 => 'testValue',
-  1 => 'testValue2',
-)) {
+if (
+    \$item->getContext()->getOr('valueToCompare') !== array (
+      0 => 'testValue',
+      1 => 'testValue2',
+    )
+) {
     echo 123;
 }
+
 CONTENT
             ]
         ];
-    }
-
-    /**
-     * @param string $body
-     *
-     * @return VisitContext
-     */
-    protected function setUpVisitContext($body)
-    {
-        $phpClass = PhpClass::create(uniqid('LayoutUpdateClass'));
-
-        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
-        $method->setBody($body);
-        $phpClass->setMethod($method);
-
-        return new VisitContext($phpClass);
     }
 }

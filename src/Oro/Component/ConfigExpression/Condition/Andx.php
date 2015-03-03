@@ -18,14 +18,6 @@ class Andx extends AbstractComposite
     /**
      * {@inheritdoc}
      */
-    public function toArray()
-    {
-        return $this->convertToArray($this->operands);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function isConditionAllowed($context)
     {
         foreach ($this->operands as $operand) {

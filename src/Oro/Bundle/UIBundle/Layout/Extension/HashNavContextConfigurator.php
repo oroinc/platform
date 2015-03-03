@@ -34,6 +34,7 @@ class HashNavContextConfigurator implements ContextConfiguratorInterface
     {
         $context->getDataResolver()
             ->setOptional(['hash_navigation'])
+            ->setAllowedTypes(['hash_navigation' => 'bool'])
             ->setNormalizers(
                 [
                     'hash_navigation' => function (Options $options, $hashNavigation) {

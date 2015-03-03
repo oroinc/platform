@@ -198,8 +198,6 @@ class LayoutRegistry implements LayoutRegistryInterface
      *
      * @param ExtensionInterface $extension
      * @param int                $priority
-     *
-     * @return self
      */
     public function addExtension(ExtensionInterface $extension, $priority = 0)
     {

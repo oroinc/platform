@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Selenium\Pages;
 
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Class Calendar
@@ -63,6 +64,72 @@ class Calendar extends AbstractPage
         $this->$title = $this->test->byId('oro_calendar_event_form_title');
         $this->$title->clear();
         $this->$title->value($title);
+
+        return $this;
+    }
+
+    /**
+     * @param $date string Start date
+     * @return $this
+     * @throws \Exception
+     */
+    public function setStartDate($date)
+    {
+        $startDate = $this->test->byId('date_selector_oro_calendar_event_form_start');
+        $startTime = $this->test->byId('time_selector_oro_calendar_event_form_start');
+        $startDate->clear();
+        $startTime->clear();
+        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $date)) {
+            $this->test->execute(
+                array(
+                    'script' => "$('#date_selector_oro_calendar_event_form_start').val('$date[1]');" .
+                        "$('#date_selector_oro_calendar_event_form_start').trigger('change').trigger('blur')",
+                    'args' => array()
+                )
+            );
+            $this->test->execute(
+                array(
+                    'script' => "$('#time_selector_oro_calendar_event_form_start').val('$date[2]');" .
+                        "$('#time_selector_oro_calendar_event_form_start').trigger('change').trigger('blur')",
+                    'args' => array()
+                )
+            );
+        } else {
+            throw new Exception("Value {$date} is not a valid date");
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $date string End date
+     * @return $this
+     * @throws \Exception
+     */
+    public function setEndDate($date)
+    {
+        $startDate = $this->test->byId('date_selector_oro_calendar_event_form_end');
+        $startTime = $this->test->byId('time_selector_oro_calendar_event_form_end');
+        $startDate->clear();
+        $startTime->clear();
+        if (preg_match('/^(.+)\s(\d{2}\:\d{2}\s\w{2})$/', $date, $date)) {
+            $this->test->execute(
+                array(
+                    'script' => "$('#date_selector_oro_calendar_event_form_end').val('$date[1]');" .
+                        "$('#date_selector_oro_calendar_event_form_end').trigger('change').trigger('blur')",
+                    'args' => array()
+                )
+            );
+            $this->test->execute(
+                array(
+                    'script' => "$('#time_selector_oro_calendar_event_form_end').val('$date[2]');" .
+                        "$('#time_selector_oro_calendar_event_form_end').trigger('change').trigger('blur')",
+                    'args' => array()
+                )
+            );
+        } else {
+            throw new \Exception("Value {$date} is not a valid date");
+        }
 
         return $this;
     }

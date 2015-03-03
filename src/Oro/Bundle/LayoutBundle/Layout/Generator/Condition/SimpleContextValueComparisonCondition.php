@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Generator\Condition;
 
-use CG\Generator\PhpMethod;
-
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
@@ -21,7 +19,7 @@ class SimpleContextValueComparisonCondition implements ConditionInterface
     /**
      * @param string $contextValueName Context argument name
      * @param string $condition        Simple comparison condition for if clause such as '===', '!==', '>' etc..
-     * @param mixed $value             Value to compare with
+     * @param mixed  $value            Value to compare with
      */
     public function __construct($contextValueName, $condition, $value)
     {
@@ -33,31 +31,27 @@ class SimpleContextValueComparisonCondition implements ConditionInterface
     /**
      * {@inheritdoc}
      */
-    public function visit(VisitContext $visitContext)
+    public function startVisit(VisitContext $visitContext)
     {
-        /** @var PhpMethod[] $methods */
-        $methods       = $visitContext->getClass()->getMethods();
-        $method        = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
-        $bodyTemplate  = <<<CONTENT
-if ($%s->getContext()->getOr('%s') %s %s) {
-    %s
-}
-CONTENT;
+        $visitContext->getWriter()
+            ->writeln('if (')
+            ->indent()
+                ->write(sprintf('$%s->getContext()', LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM))
+                ->write(sprintf('->getOr(\'%s\')', $this->contextValueName))
+                ->write(sprintf(' %s ', $this->condition))
+                ->writeln(var_export($this->value, true))
+            ->outdent()
+            ->writeln(') {')
+            ->indent();
+    }
 
-        $method->setBody(
-            $visitContext
-                ->createWriter()
-                ->write(
-                    sprintf(
-                        $bodyTemplate,
-                        LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
-                        $this->contextValueName,
-                        $this->condition,
-                        var_export($this->value, true),
-                        $method->getBody()
-                    )
-                )
-                ->getContent()
-        );
+    /**
+     * {@inheritdoc}
+     */
+    public function endVisit(VisitContext $visitContext)
+    {
+        $visitContext->getWriter()
+            ->outdent()
+            ->writeln('}');
     }
 }

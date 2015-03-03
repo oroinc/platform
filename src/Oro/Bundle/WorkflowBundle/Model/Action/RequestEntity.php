@@ -86,13 +86,13 @@ class RequestEntity extends AbstractAction
         if (!empty($options['where']) && !is_array($options['where'])) {
             throw new InvalidParameterException('Parameter "where" must be array');
         } elseif (empty($options['where'])) {
-            $options['where'] = array();
+            $options['where'] = [];
         }
 
         if (!empty($options['order_by']) && !is_array($options['order_by'])) {
             throw new InvalidParameterException('Parameter "order_by" must be array');
         } elseif (empty($options['order_by'])) {
-            $options['order_by'] = array();
+            $options['order_by'] = [];
         }
 
         if (!isset($options['case_insensitive'])) {
@@ -257,7 +257,9 @@ class RequestEntity extends AbstractAction
 
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                $data[$key] = mb_strtolower($value);
+                if (is_string($value)) {
+                    $data[$key] = mb_strtolower($value);
+                }
             }
         } elseif (is_string($data)) {
             $data = mb_strtolower($data);
@@ -274,7 +276,9 @@ class RequestEntity extends AbstractAction
     {
         if (is_array($data)) {
             foreach ($data as $key => $value) {
-                $data[$key] = trim($value);
+                if (is_scalar($value)) {
+                    $data[$key] = trim($value);
+                }
             }
         } elseif (is_string($data)) {
             $data = trim($data);

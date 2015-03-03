@@ -22,7 +22,8 @@ class HeadType extends AbstractContainerType
         $resolver->setDefaults(
             [
                 'title'            => '',
-                'title_parameters' => []
+                'title_parameters' => [],
+                'translatable'     => true
             ]
         );
     }
@@ -34,6 +35,7 @@ class HeadType extends AbstractContainerType
     {
         $view->vars['title']            = $options['title'];
         $view->vars['title_parameters'] = $options['title_parameters'];
+        $view->vars['translatable']     = $options['translatable'];
     }
 
     /**

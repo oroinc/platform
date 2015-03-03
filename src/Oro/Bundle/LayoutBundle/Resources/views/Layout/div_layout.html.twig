@@ -34,7 +34,7 @@
 
 {% block head_widget %}
     <head{{ block('block_attributes') }}>
-        <title>{{ title|trans(title_parameters, translation_domain) }}</title>
+        <title>{{ translatable ? title|trans(title_parameters, translation_domain) : title|replace(title_parameters) }}</title>
         {{ block_widget(block) }}
     </head>
 {% endblock %}
@@ -79,13 +79,19 @@
 
 {% block fieldset_widget %}
     <fieldset{{ block('block_attributes') }}>
-        <legend>{{ title|trans(title_parameters, translation_domain) }}</legend>
+        <legend>{{ translatable ? title|trans(title_parameters, translation_domain) : title|replace(title_parameters) }}</legend>
         {{ block_widget(block) }}
     </fieldset>
 {% endblock %}
 
 {% block text_widget -%}
-    {{ text|trans(text_parameters, translation_domain) }}
+    {{ translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) }}
+{%- endblock %}
+
+{% block link_widget -%}
+    <a{{ block('block_attributes') }} href="{{ path ?: path(route_name, route_parameters) }}">
+        {{- translatable ? text|trans(text_parameters, translation_domain) : text|replace(text_parameters) -}}
+    </a>
 {%- endblock %}
 
 {% block external_resource_widget %}

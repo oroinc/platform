@@ -60,7 +60,13 @@ class ConfigExpressionExtension extends AbstractBlockTypeExtension implements Co
     {
         $context->getDataResolver()
             ->setDefaults([self::PARAM_EVALUATE => true])
-            ->setOptional([self::PARAM_ENCODING]);
+            ->setOptional([self::PARAM_ENCODING])
+            ->setAllowedTypes(
+                [
+                    self::PARAM_EVALUATE => 'bool',
+                    self::PARAM_ENCODING => ['string', 'null']
+                ]
+            );
     }
 
     /**

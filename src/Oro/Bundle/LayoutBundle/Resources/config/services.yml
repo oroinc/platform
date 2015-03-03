@@ -49,7 +49,6 @@ services:
         class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
 
     oro_layout.expression.factory:
-        public: false
         class: Oro\Component\ConfigExpression\ExpressionFactory
         arguments:
             - @oro_layout.expression.context_accessor
@@ -63,6 +62,13 @@ services:
         calls:
             - [addConfigurationPass, [@oro_layout.expression.pass.property_path]]
 
+    oro_layout.layout_context_configurator.route:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: layout.context_configurator }
+
     oro_layout.block_type_extension.visible:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\VisibleExtension
         tags:
@@ -75,7 +81,7 @@ services:
             - @service_container
             - {}
         tags:
-            - { name: layout.block_type_extension, alias: block }
+            - { name: layout.block_type_extension, alias: block, priority: 255 }
             - { name: layout.context_configurator }
 
     oro_layout.expression.json_encoder:

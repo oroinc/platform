@@ -4,24 +4,40 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Type;
 
 use Symfony\Component\Form\FormView;
 
+use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\Extension\PreloadedExtension;
 
 use Oro\Bundle\LayoutBundle\Layout\Block\Type\FormFieldType;
+use Oro\Bundle\LayoutBundle\Layout\Extension\VisibleExtension;
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class FormFieldTypeTest extends BlockTypeTestCase
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected function getExtensions()
+    {
+        return [
+            new PreloadedExtension(
+                [],
+                ['block' => [new VisibleExtension()]]
+            )
+        ];
+    }
+
     public function testBuildView()
     {
-        $formName  = 'test_form';
-        $formPath  = 'firstName';
-        $fieldView = new FormView();
+        $formName = 'test_form';
+        $formPath = 'firstName';
+        $formView = new FormView();
 
         $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
         $formAccessor->expects($this->once())
             ->method('getView')
             ->with($formPath)
-            ->will($this->returnValue($fieldView));
+            ->will($this->returnValue($formView));
 
         $this->context->getDataResolver()->setOptional([$formName]);
         $this->context->set($formName, $formAccessor);
@@ -30,7 +46,8 @@ class FormFieldTypeTest extends BlockTypeTestCase
             ['form_name' => $formName, 'field_path' => $formPath]
         );
 
-        $this->assertSame($fieldView, $view->vars['form']);
+        $this->assertSame($formView, $view->vars['form']);
+        $this->assertFalse($formView->isRendered());
     }
 
     /**
@@ -61,6 +78,75 @@ class FormFieldTypeTest extends BlockTypeTestCase
             FormFieldType::NAME,
             ['form_name' => $formName, 'field_path' => 'firstName']
         );
+    }
+
+    public function testFinishViewForVisibleField()
+    {
+        $formName = 'test_form';
+        $formPath = 'firstName';
+        $formView = new FormView();
+
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor->expects($this->once())
+            ->method('getView')
+            ->with($formPath)
+            ->will($this->returnValue($formView));
+
+        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->set($formName, $formAccessor);
+        $view = $this->getBlockView(
+            FormFieldType::NAME,
+            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => true]
+        );
+
+        $this->assertSame($formView, $view->vars['form']);
+        $this->assertFalse($formView->isRendered());
+    }
+
+    public function testFinishViewForInvisibleField()
+    {
+        $formName = 'test_form';
+        $formPath = 'firstName';
+        $formView = new FormView();
+
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor->expects($this->once())
+            ->method('getView')
+            ->with($formPath)
+            ->will($this->returnValue($formView));
+
+        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->set($formName, $formAccessor);
+        $view = $this->getBlockView(
+            FormFieldType::NAME,
+            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => false]
+        );
+
+        $this->assertSame($formView, $view->vars['form']);
+        $this->assertTrue($formView->isRendered());
+    }
+
+    public function testFinishViewForFieldWithVisibleOptionAsNotEvaluatedExpression()
+    {
+        $formName = 'test_form';
+        $formPath = 'firstName';
+        $formView = new FormView();
+
+        $formAccessor = $this->getMock('Oro\Bundle\LayoutBundle\Layout\Form\FormAccessorInterface');
+        $formAccessor->expects($this->once())
+            ->method('getView')
+            ->with($formPath)
+            ->will($this->returnValue($formView));
+
+        $this->context->getDataResolver()->setOptional([$formName]);
+        $this->context->set($formName, $formAccessor);
+        $view = $this->getBlockView(
+            FormFieldType::NAME,
+            ['form_name' => $formName, 'field_path' => $formPath, 'visible' => new Condition\False()]
+        );
+
+        $this->assertSame($formView, $view->vars['form']);
+        $this->assertFalse($formView->isRendered());
     }
 
     public function testGetName()

@@ -3,6 +3,7 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\DependencyInjection;
 
 use Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension;
+use Oro\Component\Layout\LayoutItemInterface;
 
 class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -105,19 +106,30 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue($this->extension->hasLayoutUpdates($this->getLayoutItem('test')));
         $this->assertFalse($this->extension->hasLayoutUpdates($this->getLayoutItem('unknown')));
+
+        // test by alias
+        $layoutItem = $this->getLayoutItem('unknown');
+        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $this->assertTrue($this->extension->hasLayoutUpdates($layoutItem));
     }
 
     public function testGetLayoutUpdates()
     {
         $layoutUpdate = $this->getMock('Oro\Component\Layout\LayoutUpdateInterface');
 
-        $this->container->expects($this->once())
+        $this->container->expects($this->exactly(2))
             ->method('get')
             ->with('layout_update_service')
             ->will($this->returnValue($layoutUpdate));
 
         $layoutUpdates = $this->extension->getLayoutUpdates($this->getLayoutItem('test'));
         $this->assertCount(1, $layoutUpdates);
+        $this->assertSame($layoutUpdate, $layoutUpdates[0]);
+
+        // test by alias
+        $layoutItem = $this->getLayoutItem('unknown');
+        $layoutItem->expects($this->once())->method('getAlias')->willReturn('test');
+        $this->assertCount(1, $this->extension->getLayoutUpdates($layoutItem));
         $this->assertSame($layoutUpdate, $layoutUpdates[0]);
     }
 
@@ -189,7 +201,7 @@ class DependencyInjectionExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $id
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|LayoutItemInterface
      */
     protected function getLayoutItem($id)
     {

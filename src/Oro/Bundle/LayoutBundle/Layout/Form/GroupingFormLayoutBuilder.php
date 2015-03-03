@@ -22,9 +22,12 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
     /**
      * {@inheritdoc}
      */
-    protected function initializeState(BlockBuilderInterface $builder, array $options)
-    {
-        parent::initializeState($builder, $options);
+    protected function initializeState(
+        FormAccessorInterface $formAccessor,
+        BlockBuilderInterface $builder,
+        array $options
+    ) {
+        parent::initializeState($formAccessor, $builder, $options);
         $this->groups          = $options['groups'];
         $this->fieldToGroupMap = [];
         foreach ($this->groups as $name => $group) {
@@ -55,16 +58,16 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
     /**
      * {@inheritdoc}
      */
-    protected function doBuild(FormInterface $form)
+    protected function doBuild()
     {
-        parent::doBuild($form);
+        parent::doBuild();
         $this->addGroups();
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function addField($fieldPath, $parentId = null)
+    protected function addField($fieldPath, $id, $parentId = null)
     {
         $groupName = $this->findGroupName($fieldPath);
         if ($groupName) {
@@ -72,7 +75,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
 
             $parentId = $this->groups[$groupName]['id'];
         }
-        parent::addField($fieldPath, $parentId);
+        parent::addField($fieldPath, $id, $parentId);
     }
 
     /**

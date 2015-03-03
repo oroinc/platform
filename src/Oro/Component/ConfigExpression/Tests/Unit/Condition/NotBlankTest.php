@@ -124,4 +124,33 @@ class NotBlankTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->condition->initialize($options);
+        if ($message !== null) {
+            $this->condition->setMessage($message);
+        }
+        $actual = $this->condition->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => ['value'],
+                'message'  => null,
+                'expected' => '$factory->create(\'not_empty\', [\'value\'])'
+            ],
+            [
+                'options'  => ['value'],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'not_empty\', [\'value\'])->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

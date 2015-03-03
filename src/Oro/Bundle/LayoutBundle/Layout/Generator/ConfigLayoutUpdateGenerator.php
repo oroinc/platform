@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Generator;
 
+use Oro\Component\ConfigExpression\AssemblerInterface;
+
 use Oro\Bundle\LayoutBundle\Exception\SyntaxException;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ArrayUtils;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Utils\ReflectionUtils;
@@ -23,6 +25,17 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     /** @var ReflectionUtils */
     protected $helper;
 
+    /** @var AssemblerInterface */
+    protected $expressionAssembler;
+
+    /**
+     * @param AssemblerInterface $expressionAssembler
+     */
+    public function __construct(AssemblerInterface $expressionAssembler)
+    {
+        $this->expressionAssembler = $expressionAssembler;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -30,10 +43,6 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
     {
         $body   = [];
         $source = $data->getSource();
-
-        if ($data->getFilename()) {
-            $body[] = '// filename: ' . $data->getFilename();
-        }
 
         foreach ($source[self::NODE_ACTIONS] as $actionDefinition) {
             $actionName = key($actionDefinition);
@@ -173,8 +182,19 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
             }
 
             // prepare condition collection
-            if (isset($source[self::NODE_CONDITION])) {
-                $conditionCollection->append(new ConfigExpressionCondition($source[self::NODE_CONDITION]));
+            if (!empty($source[self::NODE_CONDITION])) {
+                try {
+                    $expr = $this->expressionAssembler->assemble($source[self::NODE_CONDITION]);
+                    if ($expr) {
+                        $conditionCollection->append(new ConfigExpressionCondition($expr));
+                    }
+                } catch (\Exception $e) {
+                    throw new SyntaxException(
+                        'invalid conditions. ' . $e->getMessage(),
+                        $source[self::NODE_CONDITION],
+                        self::NODE_CONDITION
+                    );
+                }
             }
         }
 

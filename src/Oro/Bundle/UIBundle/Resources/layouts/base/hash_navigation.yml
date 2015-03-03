@@ -19,5 +19,5 @@ oro_layout:
             id:        before_content_addition
             parentId:  hash_navigation_data
 
-    condition:
+    conditions:
         @eq: [$context.hash_navigation, true]

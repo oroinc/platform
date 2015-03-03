@@ -148,4 +148,34 @@ class TrimTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->function->initialize($options);
+        if ($message !== null) {
+            $this->function->setMessage($message);
+        }
+        $actual = $this->function->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => ['test'],
+                'message'  => null,
+                'expected' => '$factory->create(\'trim\', [\'test\'])'
+            ],
+            [
+                'options'  => ['test', '_'],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'trim\', [\'test\', \'_\'])'
+                    . '->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }
