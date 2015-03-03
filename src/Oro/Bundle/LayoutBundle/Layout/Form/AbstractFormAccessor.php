@@ -9,6 +9,9 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
     /** @var FormView */
     private $formView;
 
+    /** @var array */
+    private $processedFields;
+
     /**
      * {@inheritdoc}
      */
@@ -22,6 +25,22 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProcessedFields()
+    {
+        return $this->processedFields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setProcessedFields($processedFields)
+    {
+        $this->processedFields = $processedFields;
     }
 
     /**
