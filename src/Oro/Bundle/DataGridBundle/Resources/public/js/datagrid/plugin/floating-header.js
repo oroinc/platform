@@ -63,7 +63,7 @@ define(function (require) {
                 otherScrollContainer: this.$grid.parents('.other-scroll-container'),
                 thead: this.$grid.find('thead:first'),
                 theadTr: this.$grid.find('thead:first tr:first')
-            }
+            };
         },
 
         fixHeaderCellWidth: function () {
@@ -315,7 +315,7 @@ define(function (require) {
                 };
             if (
                 (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
-                    (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible
+                (resultRect.top > this.documentHeight && this.currentFloatTheadMode === 'default') // grid is invisible
                 ) {
                 // no need to calculate anything
                 return resultRect;
@@ -331,7 +331,8 @@ define(function (require) {
                     /**
                      * Equals header height. Cannot calculate dynamically due to issues on ipad
                      */
-                    if (resultRect.top < 54 && current.id === 'top-page' && !this.cachedEls.body.hasClass('input-focused')) {
+                    if (resultRect.top < 54 && current.id === 'top-page' &&
+                        !this.cachedEls.body.hasClass('input-focused')) {
                         resultRect.top = 54;
                     } else if (resultRect.top < 44 && current.className === 'widget-content') {
                         resultRect.top = 44;
