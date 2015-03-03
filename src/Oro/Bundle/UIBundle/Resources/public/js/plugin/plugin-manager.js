@@ -15,19 +15,19 @@ define(function (require) {
         pluginList: null,
 
         getInstance: function (Constructor) {
-            var record = this.getRecord(Constructor);
-            if (!record) {
+            var item = this.getItem(Constructor);
+            if (!item) {
                 return null;
             }
-            return record.instance;
+            return item.instance;
         },
 
-        getRecord: function (Constructor) {
-            var i, record;
+        getItem: function (Constructor) {
+            var i, item;
             for (i = 0; i < this.pluginList.length; i++) {
-                record = this.pluginList[i];
-                if (record.constructor === Constructor) {
-                    return record;
+                item = this.pluginList[i];
+                if (item.constructor === Constructor) {
+                    return item;
                 }
             }
             return null;
@@ -45,53 +45,53 @@ define(function (require) {
 
         enable: function (Constructor, options) {
             var instance,
-                record = this.getRecord(Constructor);
-            if (record === null) {
-                instance = new Constructor(this.main, options);
-                if (!(instance instanceof BasePlugin)) {
-                    throw new Error('Constructor must be a child of BasePlugin');
-                }
-                this.registerInstance(Constructor, instance);
-                record = this.getRecord(Constructor);
+                item = this.getItem(Constructor);
+            if (!(Constructor.prototype instanceof BasePlugin)) {
+                throw new Error('Constructor must be a child of BasePlugin');
             }
-            if (!record.enabled) {
-                record.instance.enable();
-                record.enabled = true;
+            if (item === null) {
+                instance = new Constructor(this.main, options);
+                this.registerInstance(Constructor, instance);
+                item = this.getItem(Constructor);
+            }
+            if (!item.enabled) {
+                item.instance.enable();
+                item.enabled = true;
             }
         },
 
         disable: function (Constructor) {
-            var record = this.getRecord(Constructor);
-            if (record === null) {
+            var item = this.getItem(Constructor);
+            if (item === null) {
                 // nothing to do
                 return;
             }
-            if (record.enabled) {
-                record.instance.disable();
-                record.enabled = false;
+            if (item.enabled) {
+                item.instance.disable();
+                item.enabled = false;
             }
         },
 
         disableAll: function () {
-            var record, i;
+            var item, i;
             for (i = 0; i < this.pluginList.length; i++) {
-                record = this.pluginList[i];
-                if (record.enabled) {
-                    record.instance.disable();
-                    record.enabled = false;
+                item = this.pluginList[i];
+                if (item.enabled) {
+                    item.instance.disable();
+                    item.enabled = false;
                 }
             }
         },
 
         dispose: function () {
-            var record, i;
+            var item, i;
             for (i = 0; i < this.pluginList.length; i++) {
-                record = this.pluginList[i];
-                if (record.enabled) {
-                    record.instance.disable();
-                    record.enabled = false;
+                item = this.pluginList[i];
+                if (item.enabled) {
+                    item.instance.disable();
+                    item.enabled = false;
                 }
-                record.dispose();
+                item.instance.dispose();
             }
             this.pluginList = [];
         }
