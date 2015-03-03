@@ -8,15 +8,17 @@ define(['jquery', 'underscore'], function ($, _) {
             function prepareTinymce(textareas) {
                 if (textareas.length > 0) {
                     $(textareas).each(function (i, el){
-                        var tinymceInstance = $(el).tinymce();
-                        if (tinymceInstance) {
-                            if ($(el).prop('disabled')) {
-                                tinymceInstance.editorManager.activeEditor.hide()
-                                tinymceInstance.editorManager.activeEditor.setContent('')
-                                $(el).prop('value', '');
-                                $(el).empty();
-                            } else {
-                                tinymceInstance.editorManager.activeEditor.show();
+                        if ($(el).tinymce) {
+                            var tinymceInstance = $(el).tinymce();
+                            if (tinymceInstance) {
+                                if ($(el).prop('disabled')) {
+                                    tinymceInstance.editorManager.activeEditor.hide()
+                                    tinymceInstance.editorManager.activeEditor.setContent('')
+                                    $(el).prop('value', '');
+                                    $(el).empty();
+                                } else {
+                                    tinymceInstance.editorManager.activeEditor.show();
+                                }
                             }
                         }
                     });
