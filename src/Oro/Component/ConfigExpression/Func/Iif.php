@@ -37,7 +37,23 @@ class Iif extends AbstractFunction
      */
     public function toArray()
     {
-        return $this->convertToArray([$this->expression, $this->trueValue, $this->falseValue]);
+        $params = $this->isShort
+            ? [$this->expression, $this->falseValue]
+            : [$this->expression, $this->trueValue, $this->falseValue];
+
+        return $this->convertToArray($params);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile($factoryAccessor)
+    {
+        $params = $this->isShort
+            ? [$this->expression, $this->falseValue]
+            : [$this->expression, $this->trueValue, $this->falseValue];
+
+        return $this->convertToPhpCode($params, $factoryAccessor);
     }
 
     /**

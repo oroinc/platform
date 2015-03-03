@@ -49,7 +49,6 @@ services:
         class: Oro\Component\ConfigExpression\ConfigurationPass\ReplacePropertyPath
 
     oro_layout.expression.factory:
-        public: false
         class: Oro\Component\ConfigExpression\ExpressionFactory
         arguments:
             - @oro_layout.expression.context_accessor

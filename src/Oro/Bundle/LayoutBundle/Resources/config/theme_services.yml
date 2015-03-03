@@ -17,7 +17,7 @@ services:
         arguments:
             - @service_container
         calls:
-            - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface', 'setAssembler', 'oro_layout.expression.assembler']]
+            - [addKnownDependency, ['\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
     oro_layout.theme_factory:
         class: %oro_layout.theme_factory.class%
@@ -83,6 +83,8 @@ services:
     oro_layout.config_layout_update_generator:
         class:  Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator
         public: false
+        arguments:
+            - @oro_layout.expression.assembler
 
     oro_layout.php_layout_update_generator:
         class:  Oro\Bundle\LayoutBundle\Layout\Generator\PhpLayoutUpdateGenerator

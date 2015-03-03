@@ -88,4 +88,38 @@ class GetArrayTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->function->initialize($options);
+        if ($message !== null) {
+            $this->function->setMessage($message);
+        }
+        $actual = $this->function->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => [new PropertyPath('foo'), 'const', new Condition\True()],
+                'message'  => null,
+                'expected' => '$factory->create(\'array\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', \'const\', $factory->create(\'true\', [])])'
+            ],
+            [
+                'options'  => [new PropertyPath('foo'), 'const', new Condition\True()],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'array\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', \'const\', $factory->create(\'true\', [])])'
+                    . '->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

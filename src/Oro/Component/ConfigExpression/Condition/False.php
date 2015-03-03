@@ -28,6 +28,14 @@ class False extends AbstractCondition
     /**
      * {@inheritdoc}
      */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode(null, $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(array $options)
     {
         if (!empty($options)) {

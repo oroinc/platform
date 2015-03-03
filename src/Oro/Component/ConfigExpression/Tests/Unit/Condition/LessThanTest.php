@@ -92,4 +92,37 @@ class LessThanTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider compileDataProvider
+     */
+    public function testCompile($options, $message, $expected)
+    {
+        $this->condition->initialize($options);
+        if ($message !== null) {
+            $this->condition->setMessage($message);
+        }
+        $actual = $this->condition->compile('$factory');
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function compileDataProvider()
+    {
+        return [
+            [
+                'options'  => [new PropertyPath('foo'), 123],
+                'message'  => null,
+                'expected' => '$factory->create(\'lt\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', 123])'
+            ],
+            [
+                'options'  => [new PropertyPath('foo'), 123],
+                'message'  => 'Test',
+                'expected' => '$factory->create(\'lt\', ['
+                    . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'])'
+                    . ', 123])->setMessage(\'Test\')'
+            ]
+        ];
+    }
 }

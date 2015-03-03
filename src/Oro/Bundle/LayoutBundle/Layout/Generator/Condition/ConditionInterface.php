@@ -9,5 +9,10 @@ interface ConditionInterface
     /**
      * @param VisitContext $visitContext
      */
-    public function visit(VisitContext $visitContext);
+    public function startVisit(VisitContext $visitContext);
+
+    /**
+     * @param VisitContext $visitContext
+     */
+    public function endVisit(VisitContext $visitContext);
 }

@@ -6,72 +6,69 @@ use CG\Generator\PhpMethod;
 use CG\Generator\PhpProperty;
 use CG\Generator\PhpParameter;
 
+use Oro\Component\ConfigExpression\ExpressionInterface;
+
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
 
 class ConfigExpressionCondition implements ConditionInterface
 {
-    /** @var array */
-    protected $configuration;
+    /** @var ExpressionInterface */
+    protected $expression;
 
     /**
-     * @param array $configuration
+     * @param ExpressionInterface $expression
      */
-    public function __construct(array $configuration)
+    public function __construct(ExpressionInterface $expression)
     {
-        $this->configuration = $configuration;
+        $this->expression = $expression;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function visit(VisitContext $visitContext)
+    public function startVisit(VisitContext $visitContext)
     {
         $writer = $visitContext->createWriter();
         $class  = $visitContext->getClass();
 
-        $class->addInterfaceName('\Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface');
+        $class->addInterfaceName('\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface');
 
-        $setAssemblerMethod = PhpMethod::create('setAssembler');
-        $setAssemblerMethod->addParameter(
-            PhpParameter::create('assembler')
-                ->setType('\Oro\Component\ConfigExpression\ExpressionAssembler')
+        $setFactoryMethod = PhpMethod::create('setExpressionFactory');
+        $setFactoryMethod->addParameter(
+            PhpParameter::create('expressionFactory')
+                ->setType('\Oro\Component\ConfigExpression\ExpressionFactoryInterface')
         );
-        $setAssemblerMethod->setBody($writer->write('$this->expressionAssembler = $assembler;')->getContent());
-        $class->setMethod($setAssemblerMethod);
-        $writer->reset();
+        $setFactoryMethod->setBody($writer->write('$this->expressionFactory = $expressionFactory;')->getContent());
+        $class->setMethod($setFactoryMethod);
 
-        $assemblerProperty = PhpProperty::create('expressionAssembler');
-        $assemblerProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
-        $class->setProperty($assemblerProperty);
+        $factoryProperty = PhpProperty::create('expressionFactory');
+        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
+        $class->setProperty($factoryProperty);
 
-        /** @var PhpMethod[] $methods */
-        $methods = $class->getMethods();
-        $method = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
-
-        $bodyTemplate = <<<CONTENT
-    if (null === \$this->expressionAssembler) {
-        throw new \\RuntimeException('Missing expression assembler for layout update');
-    }
-
-    \$expr = \$this->expressionAssembler->assemble(%s);
-    \$context = ['context' => $%s->getContext()];
-    if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
-        %s
-    }
-CONTENT;
-
-        $method->setBody(
-            $writer
-                ->write(
-                    sprintf(
-                        $bodyTemplate,
-                        var_export($this->configuration, true),
-                        LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
-                        $method->getBody()
-                    )
+        $visitContext->getWriter()
+            ->writeln('if (null === $this->expressionFactory) {')
+            ->writeln('    throw new \\RuntimeException(\'Missing expression factory for layout update\');')
+            ->writeln('}')
+            ->writeln('')
+            ->writeln(sprintf('$expr = %s;', $this->expression->compile('$this->expressionFactory')))
+            ->writeln(
+                sprintf(
+                    '$context = [\'context\' => $%s->getContext()];',
+                    LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM
                 )
-                ->getContent()
-        );
+            )
+            ->writeln('if ($expr->evaluate($context)) {')
+            ->indent();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function endVisit(VisitContext $visitContext)
+    {
+        $visitContext->getWriter()
+            ->outdent()
+            ->writeln('}');
     }
 }

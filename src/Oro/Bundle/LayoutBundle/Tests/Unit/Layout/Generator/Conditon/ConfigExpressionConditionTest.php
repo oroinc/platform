@@ -7,6 +7,8 @@ use CG\Generator\PhpMethod;
 use CG\Generator\PhpParameter;
 use CG\Core\DefaultGeneratorStrategy;
 
+use Oro\Component\ConfigExpression\Condition;
+
 use Oro\Bundle\LayoutBundle\Layout\Generator\VisitContext;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConfigExpressionCondition;
 use Oro\Bundle\LayoutBundle\Layout\Generator\LayoutUpdateGeneratorInterface;
@@ -16,36 +18,44 @@ class ConfigExpressionConditionTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     public function testVisit()
     {
-        $condition    = new ConfigExpressionCondition(['@true' => null]);
-        $visitContext = $this->setUpVisitContext('echo 123;');
+        $condition    = new ConfigExpressionCondition(new Condition\True());
+        $phpClass = PhpClass::create('LayoutUpdateClass');
+        $visitContext = new VisitContext($phpClass);
 
-        $condition->visit($visitContext);
+        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
+        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
+        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
+
+        $condition->startVisit($visitContext);
+        $visitContext->getWriter()->writeln('echo 123;');
+        $condition->endVisit($visitContext);
+
+        $method->setBody($visitContext->getWriter()->getContent());
+        $phpClass->setMethod($method);
 
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
 <<<CLASS
-class LayoutUpdateClass implements \Oro\Component\ConfigExpression\ExpressionAssemblerAwareInterface
+class LayoutUpdateClass implements \Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface
 {
-    private \$expressionAssembler;
+    private \$expressionFactory;
 
     public function updateLayout(\$layoutManipulator, \$item)
     {
-            if (null === \$this->expressionAssembler) {
-                throw new \RuntimeException('Missing expression assembler for layout update');
-            }
+        if (null === \$this->expressionFactory) {
+            throw new \RuntimeException('Missing expression factory for layout update');
+        }
 
-            \$expr = \$this->expressionAssembler->assemble(array (
-          '@true' => NULL,
-        ));
-            \$context = ['context' => \$item->getContext()];
-            if (\$expr instanceof \Oro\Component\ConfigExpression\ExpressionInterface && \$expr->evaluate(\$context)) {
-                echo 123;
-            }
+        \$expr = \$this->expressionFactory->create('true', []);
+        \$context = ['context' => \$item->getContext()];
+        if (\$expr->evaluate(\$context)) {
+            echo 123;
+        }
     }
 
-    public function setAssembler(\Oro\Component\ConfigExpression\ExpressionAssembler \$assembler)
+    public function setExpressionFactory(\Oro\Component\ConfigExpression\ExpressionFactoryInterface \$expressionFactory)
     {
-        \$this->expressionAssembler = \$assembler;
+        \$this->expressionFactory = \$expressionFactory;
     }
 }
 CLASS
@@ -53,22 +63,4 @@ CLASS
         $strategy->generate($visitContext->getClass()));
     }
     //codingStandardsIgnoreEnd
-
-    /**
-     * @param string $body
-     *
-     * @return VisitContext
-     */
-    protected function setUpVisitContext($body)
-    {
-        $phpClass = PhpClass::create('LayoutUpdateClass');
-
-        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
-        $method->setBody($body);
-        $phpClass->setMethod($method);
-
-        return new VisitContext($phpClass);
-    }
 }

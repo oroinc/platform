@@ -47,4 +47,14 @@ interface ExpressionInterface
      * @return array
      */
     public function toArray();
+
+    /**
+     * Gets PHP code representation of the expression.
+     *
+     * @param string $factoryAccessor A piece of PHP code to get expression factory,
+     *                                for example "$expressionFactory"
+     *
+     * @return string
+     */
+    public function compile($factoryAccessor);
 }

@@ -65,6 +65,19 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
 
     /**
      * {@inheritdoc}
+     */
+    public function compile($factoryAccessor)
+    {
+        $params = [$this->attributes];
+        if ($this->object !== null) {
+            $params[] = $this->object;
+        }
+
+        return $this->convertToPhpCode($params, $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * Configuration example:
      *

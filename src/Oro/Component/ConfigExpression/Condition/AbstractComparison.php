@@ -19,6 +19,22 @@ abstract class AbstractComparison extends AbstractCondition implements ContextAc
     /**
      * {@inheritdoc}
      */
+    public function toArray()
+    {
+        return $this->convertToArray([$this->left, $this->right]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compile($factoryAccessor)
+    {
+        return $this->convertToPhpCode([$this->left, $this->right], $factoryAccessor);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function initialize(array $options)
     {
         if (2 !== count($options)) {
