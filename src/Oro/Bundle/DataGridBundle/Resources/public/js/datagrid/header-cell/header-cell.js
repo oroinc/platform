@@ -2,9 +2,8 @@
 /*global define*/
 define([
     'underscore',
-    'backgrid',
-    '../../pageable-collection'
-], function (_, Backgrid, PageableCollection) {
+    'backgrid'
+], function (_, Backgrid) {
     "use strict";
 
     var HeaderCell;
@@ -124,76 +123,38 @@ define([
         onClick: function (e) {
             e.preventDefault();
 
-            var columnName = this.column.get("name");
+            var column = this.column;
+            var collection = this.collection;
+            var event = "backgrid:sort";
 
-            if (this.column.get("sortable")) {
-                if (this.column.get('direction') === "ascending") {
-                    this.sort(columnName, "descending", function (left, right) {
-                        var leftVal, rightVal, res;
-                        leftVal = left.get(columnName);
-                        rightVal = right.get(columnName);
-                        res = 1;
-                        if (leftVal === rightVal) {
-                            res = 0;
-                        } else if (leftVal > rightVal) {
-                            res = -1;
-                        }
-                        return res;
-                    });
-                } else if (this.allowNoSorting && this.column.get('direction') === "descending") {
-                    this.sort(columnName, null);
+            var cycleSort = function (header, col) {
+                if (column.get("direction") === "ascending") {
+                    collection.trigger(event, col, "descending");
+                } else if (this.allowNoSorting && column.get("direction") === "descending") {
+                    collection.trigger(event, col, null);
+                }
+                else {
+                    collection.trigger(event, col, "ascending");
+                }
+            }.bind(this);
+
+            var toggleSort = function (header, col) {
+                if (column.get("direction") === "ascending") {
+                    collection.trigger(event, col, "descending");
                 } else {
-                    this.sort(columnName, "ascending", function (left, right) {
-                        var leftVal, rightVal, res;
-                        leftVal = left.get(columnName);
-                        rightVal = right.get(columnName);
-                        res = 1;
-                        if (leftVal === rightVal) {
-                            res = 0;
-                        } else if (leftVal < rightVal) {
-                            res = -1;
-                        }
-                        return res;
-                    });
+                    collection.trigger(event, col, "ascending");
+                }
+            };
+
+            var sortable = Backgrid.callByNeed(column.sortable(), column, this.collection);
+            if (sortable) {
+                var sortType = column.get("sortType");
+                if (sortType === "toggle") {
+                    toggleSort(this, column);
+                } else {
+                    cycleSort(this, column);
                 }
             }
-        },
-
-        /**
-         * @param {string} columnName
-         * @param {null|"ascending"|"descending"} direction
-         * @param {function(*, *): number} [comparator]
-         */
-        sort: function (columnName, direction, comparator) {
-            comparator = comparator || this._cidComparator;
-
-            var order, collection = this.collection;
-
-            if (collection instanceof PageableCollection) {
-                if (direction === "ascending") {
-                    order = -1;
-                } else if (direction === "descending") {
-                    order = 1;
-                } else {
-                    order = null;
-                }
-
-                collection.setSorting(columnName, order);
-
-                if (collection.mode === "client") {
-                    if (!collection.fullCollection.comparator) {
-                        collection.fullCollection.comparator = comparator;
-                    }
-                    collection.fullCollection.sort();
-                } else {
-                    collection.fetch({reset: true});
-                }
-            } else {
-                collection.comparator = comparator;
-                collection.sort();
-            }
-
-            this.collection.trigger("backgrid:sort", columnName, direction, comparator, this.collection);
         }
     });
 
