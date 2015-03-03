@@ -366,7 +366,8 @@ class Email
      */
     public function prependToBodyFooter($bodyFooter)
     {
-        $this->bodyFooter = $bodyFooter . $this->bodyFooter;
+        // body tag is used for tinymce plugin
+        $this->bodyFooter = '<body>' . $bodyFooter . $this->bodyFooter . '</body>';
 
         return $this;
     }

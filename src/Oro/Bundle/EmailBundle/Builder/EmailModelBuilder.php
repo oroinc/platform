@@ -7,11 +7,11 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 /**
  * Class EmailModelBuilder
@@ -19,7 +19,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
  * @package Oro\Bundle\EmailBundle\Builder
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- *
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class EmailModelBuilder
 {
@@ -239,6 +239,9 @@ class EmailModelBuilder
         }
     }
 
+    /**
+     * @param EmailModel $emailModel
+     */
     protected function applySignature(EmailModel $emailModel)
     {
         $signature = $this->configManager->get('oro_email.signature');
