@@ -29,11 +29,11 @@ class Configuration implements ConfigurationInterface
                 'type' => 'array',
             ],
             'google_sso_client_id' => [
-                'value' => 'changeMe',
+                'value' => null,
                 'type' => 'text',
             ],
             'google_sso_client_secret' => [
-                'value' => 'changeMe',
+                'value' => null,
                 'type' => 'text',
             ],
         ]);

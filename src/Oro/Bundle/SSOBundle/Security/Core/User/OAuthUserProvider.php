@@ -53,10 +53,11 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
             throw new BadCredentialsException('Bad credentials');
         }
 
-        $user = $this->userManager->findUserBy([$this->getOAuthProperty($response) => $username]);
-        if (!$user && !$this->isEmailEnabledForOauth($response->getEmail())) {
-            throw new EmailDomainNotAllowedException();
+        if (!$this->isEmailEnabledForOauth($response->getEmail())) {
+            throw new EmailDomainNotAllowedException('Bad credentials');
         }
+
+        $user = $this->userManager->findUserBy([$this->getOAuthProperty($response) => $username]);
 
         if (!$user) {
             $user = $this->userManager->findUserByEmail($response->getEmail());
@@ -82,7 +83,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
      */
     protected function isEmailEnabledForOauth($email)
     {
-        $enabledDomains = $this->cm->get('oro_user.google_sso_domains');
+        $enabledDomains = $this->cm->get('oro_sso.google_sso_domains');
         if (!$enabledDomains) {
             return true;
         }

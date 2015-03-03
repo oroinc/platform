@@ -13,20 +13,24 @@ oro_system_configuration:
             type: oro_config_checkbox
             options:
                 label: oro.sso.system_configuration.fields.enable_google_sso.label
+                required: false
+                resettable: false
             priority: 40
         oro_sso.google_sso_domains:
-            data_type: string
-            type: oro_collection
+            data_type: array
+            type: oro_textlist
             options:
                 label: oro.sso.system_configuration.fields.google_sso_domains.label
-                handle_primary: false
-                type: text
+                tooltip: oro.sso.system_configuration.fields.google_sso_domains.tooltip
+                required: false
+                resettable: false
             priority: 10
         oro_sso.google_sso_client_id:
             data_type: string
             type: text
             options:
                 label: oro.sso.system_configuration.fields.google_sso_client_id.label
+                resettable: false
                 constraints:
                     - NotBlank: ~
             priority: 30
@@ -35,6 +39,7 @@ oro_system_configuration:
             type: text
             options:
                 label: oro.sso.system_configuration.fields.google_sso_client_secret.label
+                resettable: false
                 constraints:
                     - NotBlank: ~
             priority: 20
