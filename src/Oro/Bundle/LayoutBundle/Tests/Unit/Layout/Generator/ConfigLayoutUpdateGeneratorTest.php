@@ -7,7 +7,6 @@ use Oro\Component\ConfigExpression\Condition;
 use Oro\Bundle\LayoutBundle\Layout\Generator\GeneratorData;
 use Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator;
 use Oro\Bundle\LayoutBundle\Layout\Generator\Condition\ConditionCollection;
-use Ratchet\Wamp\Exception;
 
 class ConfigLayoutUpdateGeneratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -309,7 +308,7 @@ CLASS
         $this->expressionAssembler->expects($this->once())
             ->method('assemble')
             ->with(['error'])
-            ->willThrowException(new Exception('assembling failed'));
+            ->willThrowException(new \Exception('assembling failed'));
 
         $collection = new ConditionCollection();
         $this->generator->generate(
