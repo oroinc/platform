@@ -34,10 +34,6 @@ This kind of form types appear in drop down list on the create and update embedd
 By default CSS and Success Message fields on the create new embedded form page are empty.
 To add default styles or default success message FormType must implement `Oro\Bundle\EmbeddedFormBundle\Form\Type\EmbeddedFormInterface`.
 
-## Custom form layout
-By default all forms have common layout `OroEmbeddedFormBundle:EmbedForm:formLayout.html.twig`
-If FormType has to have different layout then FormType must implement `Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface`.
-
 ## Changing FormType
 It is possible to change embedded form FormType on/after creation.
 Related default styles and default success message will be pulled. If current css and success message are changed - confirmation dialog will appear.
@@ -65,3 +61,37 @@ To add back link to success message use following syntax `{back_link|Back link t
 </script>
 ```
 `iframe` object properties will be directly mapped onto create iframe element properties. So, it possible to change iframe sizes or add/remove frame border.
+
+## Custom form layout
+For backward compatibility, the legacy mechanism of customizing embedded forms layout is supported:
+for this a FormType should implement `Oro\Bundle\EmbeddedFormBundle\Form\Type\CustomLayoutFormInterface`.
+
+However, it is advisable to use Layouts engine from OroLayoutBundle to customize the form layout.
+Embedded forms use `embedded_form` layout theme and layout update files should be placed in `Acme\Bundle\DemoBundle\Resources\layouts\embedded_form` directory.
+
+Layout update files can be placed in subdirectory corresponding to a route name (e.g. `oro_embedded_form_submit`) if it needs to be applied a specific action only.
+Please, refer to OroLayoutBundle documentation for more information.
+
+Let's consider an example when we need to move email field before first name field on the embedded form:
+
+**Example**
+```yml
+oro_layout:
+    actions:
+        - @move:
+            id:        embedded_form_email         # embedded_form_ is field prefix
+            parentId:  embedded_form               # target parent block
+            siblingId: embedded_form_firstName
+            prepend:   true                        # put moved block before sibling
+
+    conditions:
+        @eq:
+            - $context.embedded_form_type
+            - 'acme_demo_contact_us.embedded_form' # form type name in container
+```
+
+We need to specify layout update conditions since all embedded forms are using the same route.
+To make sure that layout updates are loading only for the certain embedded form we can check if the required FormType is the same as registered in context.
+
+
+
