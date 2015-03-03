@@ -26,7 +26,7 @@ define(function (require) {
 
         enable: function () {
             this.setupCache();
-            this.rescrollCb = this.rescroll();
+            this.rescrollCb = this.enableOtherScroll();
             this.headerHeight = this.cachedEls.theadTr.height();
             this.fixHeaderCellWidth();
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
@@ -48,6 +48,7 @@ define(function (require) {
             this.grid.off('layout:update', this.fixHeaderCellWidth, this);
 
             this.setFloatTheadMode('default');
+            this.disableOtherScroll();
             this.$grid.parents().add(document).off('scroll', this.reposition);
             // remove css
             this.cachedEls.headerCells.attr('style', '');
@@ -62,7 +63,10 @@ define(function (require) {
                 gridContainer: this.$grid.parent(),
                 headerCells: this.$grid.find('th:first').parent().find('th'),
                 firstRowCells: this.$grid.find('tbody tr:not(.thead-sizing-row):first td'),
-                otherScrollContainer: this.$grid.parents('.other-scroll-container'),
+                otherScrollContainer: this.$grid.parents('.other-scroll-container:first'),
+                gridScrollableContainer: this.$grid.parents('.grid-scrollable-container:first'),
+                otherScroll: this.$el.find('.other-scroll'),
+                otherScrollInner: this.$el.find('.other-scroll > div'),
                 thead: this.$grid.find('thead:first'),
                 theadTr: this.$grid.find('thead:first tr:first')
             };
@@ -200,14 +204,16 @@ define(function (require) {
             this.currentFloatTheadMode = mode;
         },
 
-        rescroll: function () {
+        enableOtherScroll: function () {
             var self = this,
-                scrollContainer = this.$el.find('.grid-scrollable-container'),
-                otherScroll = this.$el.find('.other-scroll'),
-                otherScrollInner = this.$el.find('.other-scroll > div'),
+                scrollContainer = this.cachedEls.gridScrollableContainer,
+                otherScroll = this.cachedEls.otherScroll,
+                otherScrollInner = this.cachedEls.otherScrollInner,
                 scrollBarWidth = mediator.execute('layout:scrollbarWidth'),
                 scrollStateModel = new Backbone.Model(),
                 heightDec;
+
+            this.scrollStateModel = scrollStateModel;
 
             if (scrollBarWidth === 0) {
                 // nothing to do
@@ -223,7 +229,7 @@ define(function (require) {
                 scrollStateModel.trigger('change:scrollHeight', scrollStateModel, scrollContainer[0].scrollHeight);
                 scrollStateModel.trigger('change:clientHeight', scrollStateModel, scrollContainer[0].clientHeight);
             }, this);
-            scrollStateModel.on('change:scrollVisible', function (model, val) {
+            scrollStateModel.on('change:visible', function (model, val) {
                 scrollContainer.css({
                     width: 'calc(100% + ' + (val ? scrollBarWidth : 0) + 'px)'
                 });
@@ -256,7 +262,7 @@ define(function (require) {
                 });
                 self.scrollVisible = scrollContainer[0].clientHeight + 1 /*IE fix*/ < scrollContainer[0].scrollHeight;
                 scrollStateModel.set({
-                    scrollVisible: self.scrollVisible,
+                    visible: self.scrollVisible,
                     scrollHeight:  scrollContainer[0].scrollHeight,
                     clientHeight:  scrollContainer[0].clientHeight,
                     clientWidth:   scrollContainer[0].clientWidth,
@@ -269,13 +275,19 @@ define(function (require) {
                     otherScrollTop = otherScroll.scrollTop();
                 if (mainScrollTop !== otherScrollTop) {
                     scrollContainer.scrollTop(otherScroll.scrollTop());
-                    if (self.currentFloatTheadMode === 'relative') {
-                        self.reposition();
-                    }
+                    self.reposition();
                 }
             });
             setup();
             return setup;
+        },
+
+        disableOtherScroll: function () {
+            this.cachedEls.gridScrollableContainer.off('scroll', this.rescrollCb);
+            this.cachedEls.otherScroll.off('scroll');
+            this.cachedEls.otherScroll.css({display: 'none'});
+            this.cachedEls.gridScrollableContainer.css({width: ''});
+            delete this.rescrollCb;
         },
 
         fixHeightInFloatTheadMode: function () {

@@ -4,8 +4,9 @@ define(function (require) {
     var _ = require('underscore'),
         Backbone = require('backbone');
 
-    function BasePlugin(main, options) {
+    function BasePlugin(main, manager, options) {
         this.main = main;
+        this.manager = manager;
         this.options = options;
         this.initialize(main, options);
     }

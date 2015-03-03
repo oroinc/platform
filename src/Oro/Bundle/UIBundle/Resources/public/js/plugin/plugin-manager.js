@@ -52,7 +52,7 @@ define(function (require) {
                 reenable = item.enabled;
                 this.remove(Constructor);
             }
-            instance = new Constructor(this.main, options);
+            instance = new Constructor(this.main, this, options);
             if (reenable) {
                 instance.enable();
                 item.enabled = true;
@@ -96,15 +96,14 @@ define(function (require) {
          * Creates and enables plugin
          *
          * @param {Function} Constructor Plugin constructor
-         * @param {Object=} options
          */
-        enable: function (Constructor, options) {
+        enable: function (Constructor) {
             var instance = this.getInstance(Constructor);
             if (!(Constructor.prototype instanceof BasePlugin)) {
                 throw new Error('Constructor must be a child of BasePlugin');
             }
             if (instance === null) {
-                this.create(Constructor, options);
+                this.create(Constructor, undefined);
                 instance = this.getInstance(Constructor);
             }
             if (!instance.enabled) {
