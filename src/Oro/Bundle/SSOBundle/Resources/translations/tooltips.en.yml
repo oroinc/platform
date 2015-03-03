@@ -1,0 +1,5 @@
+oro:
+    sso:
+        system_configuration:
+                fields:
+                    google_sso_domains.tooltip: Comma separated list of allowed domains
