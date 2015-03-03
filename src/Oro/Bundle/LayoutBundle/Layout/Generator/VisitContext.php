@@ -10,9 +10,13 @@ class VisitContext
     /** @var PhpClass */
     protected $class;
 
+    /** @var Writer */
+    protected $writer;
+
     public function __construct(PhpClass $class)
     {
-        $this->class = $class;
+        $this->class  = $class;
+        $this->writer = $this->createWriter();
     }
 
     /**
@@ -29,5 +33,13 @@ class VisitContext
     public function createWriter()
     {
         return new Writer();
+    }
+
+    /**
+     * @return Writer
+     */
+    public function getWriter()
+    {
+        return $this->writer;
     }
 }

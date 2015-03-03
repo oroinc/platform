@@ -19,9 +19,19 @@ class ConfigExpressionConditionTest extends \PHPUnit_Framework_TestCase
     public function testVisit()
     {
         $condition    = new ConfigExpressionCondition(new Condition\True());
-        $visitContext = $this->setUpVisitContext('echo 123;');
+        $phpClass = PhpClass::create('LayoutUpdateClass');
+        $visitContext = new VisitContext($phpClass);
 
-        $condition->visit($visitContext);
+        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
+        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
+        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
+
+        $condition->startVisit($visitContext);
+        $visitContext->getWriter()->writeln('echo 123;');
+        $condition->endVisit($visitContext);
+
+        $method->setBody($visitContext->getWriter()->getContent());
+        $phpClass->setMethod($method);
 
         $strategy = new DefaultGeneratorStrategy();
         $this->assertSame(
@@ -32,15 +42,15 @@ class LayoutUpdateClass implements \Oro\Bundle\LayoutBundle\Layout\Generator\Exp
 
     public function updateLayout(\$layoutManipulator, \$item)
     {
-            if (null === \$this->expressionFactory) {
-                throw new \RuntimeException('Missing expression factory for layout update');
-            }
+        if (null === \$this->expressionFactory) {
+            throw new \RuntimeException('Missing expression factory for layout update');
+        }
 
-            \$expr = \$this->expressionFactory->create('true', []);
-            \$context = ['context' => \$item->getContext()];
-            if (\$expr->evaluate(\$context)) {
-                echo 123;
-            }
+        \$expr = \$this->expressionFactory->create('true', []);
+        \$context = ['context' => \$item->getContext()];
+        if (\$expr->evaluate(\$context)) {
+            echo 123;
+        }
     }
 
     public function setExpressionFactory(\Oro\Component\ConfigExpression\ExpressionFactoryInterface \$expressionFactory)
@@ -53,22 +63,4 @@ CLASS
         $strategy->generate($visitContext->getClass()));
     }
     //codingStandardsIgnoreEnd
-
-    /**
-     * @param string $body
-     *
-     * @return VisitContext
-     */
-    protected function setUpVisitContext($body)
-    {
-        $phpClass = PhpClass::create('LayoutUpdateClass');
-
-        $method = PhpMethod::create(LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME);
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_MANIPULATOR));
-        $method->addParameter(PhpParameter::create(LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM));
-        $method->setBody($body);
-        $phpClass->setMethod($method);
-
-        return new VisitContext($phpClass);
-    }
 }

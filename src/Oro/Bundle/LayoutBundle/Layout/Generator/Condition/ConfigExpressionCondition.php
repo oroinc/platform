@@ -27,53 +27,48 @@ class ConfigExpressionCondition implements ConditionInterface
     /**
      * {@inheritdoc}
      */
-    public function visit(VisitContext $visitContext)
+    public function startVisit(VisitContext $visitContext)
     {
         $writer = $visitContext->createWriter();
         $class  = $visitContext->getClass();
 
         $class->addInterfaceName('\Oro\Bundle\LayoutBundle\Layout\Generator\ExpressionFactoryAwareInterface');
 
-        $setAssemblerMethod = PhpMethod::create('setExpressionFactory');
-        $setAssemblerMethod->addParameter(
+        $setFactoryMethod = PhpMethod::create('setExpressionFactory');
+        $setFactoryMethod->addParameter(
             PhpParameter::create('expressionFactory')
                 ->setType('\Oro\Component\ConfigExpression\ExpressionFactoryInterface')
         );
-        $setAssemblerMethod->setBody($writer->write('$this->expressionFactory = $expressionFactory;')->getContent());
-        $class->setMethod($setAssemblerMethod);
-        $writer->reset();
+        $setFactoryMethod->setBody($writer->write('$this->expressionFactory = $expressionFactory;')->getContent());
+        $class->setMethod($setFactoryMethod);
 
-        $assemblerProperty = PhpProperty::create('expressionFactory');
-        $assemblerProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
-        $class->setProperty($assemblerProperty);
+        $factoryProperty = PhpProperty::create('expressionFactory');
+        $factoryProperty->setVisibility(PhpProperty::VISIBILITY_PRIVATE);
+        $class->setProperty($factoryProperty);
 
-        /** @var PhpMethod[] $methods */
-        $methods = $class->getMethods();
-        $method = $methods[LayoutUpdateGeneratorInterface::UPDATE_METHOD_NAME];
-
-        $bodyTemplate = <<<CONTENT
-    if (null === \$this->expressionFactory) {
-        throw new \\RuntimeException('Missing expression factory for layout update');
-    }
-
-    \$expr = %s;
-    \$context = ['context' => $%s->getContext()];
-    if (\$expr->evaluate(\$context)) {
-        %s
-    }
-CONTENT;
-
-        $method->setBody(
-            $writer
-                ->write(
-                    sprintf(
-                        $bodyTemplate,
-                        $this->expression->compile('$this->expressionFactory'),
-                        LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM,
-                        $method->getBody()
-                    )
+        $visitContext->getWriter()
+            ->writeln('if (null === $this->expressionFactory) {')
+            ->writeln('    throw new \\RuntimeException(\'Missing expression factory for layout update\');')
+            ->writeln('}')
+            ->writeln('')
+            ->writeln(sprintf('$expr = %s;', $this->expression->compile('$this->expressionFactory')))
+            ->writeln(
+                sprintf(
+                    '$context = [\'context\' => $%s->getContext()];',
+                    LayoutUpdateGeneratorInterface::PARAM_LAYOUT_ITEM
                 )
-                ->getContent()
-        );
+            )
+            ->writeln('if ($expr->evaluate($context)) {')
+            ->indent();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function endVisit(VisitContext $visitContext)
+    {
+        $visitContext->getWriter()
+            ->outdent()
+            ->writeln('}');
     }
 }

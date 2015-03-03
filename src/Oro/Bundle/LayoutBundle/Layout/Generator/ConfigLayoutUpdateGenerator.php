@@ -44,10 +44,6 @@ class ConfigLayoutUpdateGenerator extends AbstractLayoutUpdateGenerator
         $body   = [];
         $source = $data->getSource();
 
-        if ($data->getFilename()) {
-            $body[] = '// filename: ' . $data->getFilename();
-        }
-
         foreach ($source[self::NODE_ACTIONS] as $actionDefinition) {
             $actionName = key($actionDefinition);
             $arguments  = isset($actionDefinition[$actionName]) && is_array($actionDefinition[$actionName])

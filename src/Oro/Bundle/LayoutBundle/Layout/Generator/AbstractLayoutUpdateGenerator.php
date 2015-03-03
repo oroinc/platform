@@ -21,7 +21,17 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
         $this->validate($data);
 
         $class   = PhpClass::create($className);
-        $visitor = new VisitContext($class);
+        $visitContext = new VisitContext($class);
+
+        if ($data->getFilename()) {
+            $writer = $visitContext->createWriter();
+            $writer
+                ->writeln('/**')
+                ->writeln(' * Filename: '.$data->getFilename())
+                ->writeln(' */');
+
+            $class->setDocblock($writer->getContent());
+        }
 
         $class->addInterfaceName('Oro\Component\Layout\LayoutUpdateInterface');
 
@@ -35,17 +45,25 @@ abstract class AbstractLayoutUpdateGenerator implements LayoutUpdateGeneratorInt
         $layoutItemParameter->setType('Oro\Component\Layout\LayoutItemInterface');
         $method->addParameter($layoutItemParameter);
 
-        $method->setBody($visitor->createWriter()->write(trim($this->doGenerateBody($data)))->getContent());
-        $class->setMethod($method);
+        /** @var ConditionInterface $condition */
+        foreach ($conditionCollection as $condition) {
+            $condition->startVisit($visitContext);
+        }
+
+        $writer = $visitContext->getWriter();
+        $writer->writeLn(trim($this->doGenerateBody($data)));
 
         /** @var ConditionInterface $condition */
         foreach ($conditionCollection as $condition) {
-            $condition->visit($visitor);
+            $condition->endVisit($visitContext);
         }
+
+        $method->setBody($writer->getContent());
+        $class->setMethod($method);
 
         $strategy = new DefaultGeneratorStrategy();
 
-        return "<?php\n\n" . $strategy->generate($class);
+        return "<?php\n\n".$strategy->generate($class);
     }
 
     /**
