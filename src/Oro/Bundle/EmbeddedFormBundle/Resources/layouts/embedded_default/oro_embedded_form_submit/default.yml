@@ -1,9 +1,13 @@
 oro_layout:
     actions:
         - @add:
-            id:        form
+            id:        embedded_form
             parentId:  content
-            blockType: embed_form_legacy_form
+            blockType: form
             options:
-                form:        { @value: $context.embedded_form.view }
-                form_layout: { @value: $context.embedded_form_custom_layout }
+                form_name: embedded_form
+
+    conditions:
+        @eq:
+            - ''
+            - $context.embedded_form_custom_layout
