@@ -36,25 +36,16 @@ define(function (require) {
          *
          * @param {Function} Constructor Plugin constructor
          * @param {Object=} options
-         * @param {boolean=} update
          */
-        create: function (Constructor, options, update) {
+        create: function (Constructor, options) {
             if (!(Constructor.prototype instanceof BasePlugin)) {
                 throw new Error('Constructor must be a child of BasePlugin');
             }
-            var reenable = false,
-                instance = this.getInstance(Constructor);
+            var instance = this.getInstance(Constructor);
             if (instance !== null) {
-                if (!update) {
-                    throw new Error('Plugin is already instantiated');
-                }
-                reenable = instance.enabled;
-                this.remove(Constructor);
+                throw new Error('Plugin is already instantiated');
             }
             instance = new Constructor(this.main, this, options);
-            if (reenable) {
-                instance.enable();
-            }
             this._pluginList.push(instance);
             return instance;
         },
@@ -66,11 +57,8 @@ define(function (require) {
          * @param {Object} options
          */
         updateOptions: function (Constructor, options) {
-            var instance = this.getInstance(Constructor);
-            if (!instance) {
-                throw new Error('Plugin is not instantiated yet');
-            }
-            this.create(Constructor, options, true);
+            this.remove(Constructor);
+            this.create(Constructor, options);
         },
 
         /**
