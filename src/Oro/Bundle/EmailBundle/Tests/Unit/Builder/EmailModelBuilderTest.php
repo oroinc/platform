@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
@@ -146,7 +148,7 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
                 'parentEmailId' => 1,
                 'helperDecodeClassNameCalls' => 1,
                 'emGetRepositoryCalls' => 0,
-                'helperPreciseFullEmailAddressCalls' => 2,
+                'helperPreciseFullEmailAddressCalls' => 1,
                 'helperGetUserCalls' => 0,
                 'helperBuildFullEmailAddress' => 0,
             ],
@@ -184,6 +186,10 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getUser')
             ->willReturn($getUserResult);
 
+        $getUserResult->expects($this->any())
+            ->method('getEmails')
+            ->willReturn([]);
+
         $parentEmailEntity = $this->getMock('Oro\Bundle\EmailBundle\Entity\Email');
 
         $parentEmailEntity->expects($this->once())
@@ -206,10 +212,8 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getEmailAddress')
             ->willReturn($emailAddress);
 
-        $to = $this->getMock('Doctrine\Common\Collections\Collection');
-        $to->expects($this->exactly($getToCalls))
-            ->method('first')
-            ->willReturn($emailRecipient);
+        $to = new ArrayCollection();
+        $to->add($emailRecipient);
 
         $parentEmailEntity->expects($this->exactly($getToCalls))
             ->method('getTo')
@@ -231,10 +235,10 @@ class EmailModelBuilderTest extends \PHPUnit_Framework_TestCase
         $entityTwo = $this->getMock('Oro\Bundle\UserBundle\Entity\User');
 
         return [
-            [$entityOne, $entityTwo, 0],
-            [$entityTwo, $entityOne, 0],
-            [$entityOne, $entityOne, 1],
-            [$entityTwo, $entityTwo, 1],
+            [$entityOne, $entityTwo, 1],
+            [$entityTwo, $entityOne, 1],
+            [$entityOne, $entityOne, 2],
+            [$entityTwo, $entityTwo, 2],
         ];
     }
 
