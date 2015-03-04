@@ -4,8 +4,8 @@ Layout update
 Overview
 --------
 
-A **layout update** is a set of actions that should be performed with the **layout** in order to customize the page look 
-depending on our needs. The **layout update** may be performed manually 
+A **layout update** is a set of actions that should be performed with the **[layout](what_is_layout.md)** in order to
+customize the page look depending on our needs. The **layout update** may be performed manually
 (via `\Oro\Component\Layout\LayoutBuilder`) or collected by *Oro Platform* loaders automatically.
 
 Loaders
@@ -132,7 +132,7 @@ oro_layout:
             - @gt:  [$call_timeout, 0]
 ```
 
-**Layout context** could be accessed through the condition expressions by referencing to `$context` variable.
+**[Layout context](./layout_context.md)** could be accessed through the condition expressions by referencing to `$context` variable.
 
 Please, refer to the [ConfigExpression component](../../../../Component/ConfigExpression/README.md) documentation for further detailed explanation.
 
@@ -156,7 +156,11 @@ Developer reference
 
 Here is a list of key classes involved in layout update loading mechanism and their responsibilities:
 
-@TODO
+ - `\Oro\Bundle\LayoutBundle\Layout\Loader\YamlFileLoader` - Loads layout update instructions based on *YAML* config.
+ - `\Oro\Bundle\LayoutBundle\Layout\Loader\PhpFileLoader` - *PHP* loader, takes *PHP* instructions and compiles it into layout update.
+ - `\Oro\Bundle\LayoutBundle\Layout\Generator\AbstractLayoutUpdateGenerator` - base class to implement generator for new format.
+ - `\Oro\Bundle\LayoutBundle\Layout\Generator\ConfigLayoutUpdateGenerator` - config based generator, now utilized by *YAML* loader,
+    but may be reused for other formats (such as *XML*, *PHP arrays*) as well.
 
 In order to implement loader for a format different form supported `\Oro\Bundle\LayoutBundle\Layout\Loader\LoaderInterface` 
 should be implemented, and added as a known loader to loaders chain (add `addLoader` *method call* 

@@ -27,7 +27,6 @@ The `active theme` could be set on application level in `app/configs/config.yml`
 You can find additional information if you execute `app/console config:dump-reference OroLayoutBundle` shell command.
 
 **Example:**
-
 ```yml
 # src/Acme/Bundle/DemoBundle/Resources/config/oro/layout.yml
 
@@ -42,12 +41,11 @@ oro_layout:
 Where `oro-gold` and `oro-default` are unique theme identifiers. `parent` option may contain `~(null)` in case 
 developer doesn't want `base` theme to be inherited.
 
-## Layout directory structure
+## Theme layout directory structure
 
 Each bundle could provide any number of layout updates for specific theme or for the `base` theme.
  
 **Example:**
-
 ```
 src/
     Acme/
@@ -70,7 +68,6 @@ Also there is possibility to introduce new updates in `app/Resources/layouts/` f
 could be also done on *application* level(*TODO coming soon*), or via bundle inheritance mechanism (for example updates from `base` theme needs to be modified)
 
 **Example:**
-
 ```
 app/
     Resources
@@ -94,3 +91,14 @@ The execution of layout update file depends on its location in directory structu
 set the **theme** for which this update is suitable(see `directory` option in theme config), the second level set the route name
 for which it suitable. If return back to the previous examples we may see, that for the `oro-gold` theme `update1.yml` and `update2.yml` will be 
 executed for every request, but `route_dependent_update.yml` will be executed only for page that has *route name* equals to `oro_user_edit`.
+
+
+Developer reference
+-------------------
+
+Here is a list of key classes involved in theme layout search process:
+
+ - `\Oro\Bundle\LayoutBundle\Layout\Extension\ThemeExtension` - the **layout extension** responsible for bringing 
+    updates depending on current context.
+ - `\Oro\Bundle\LayoutBundle\Layout\Loader\ResourceIterator` - iterates through known layout updates and accepts these 
+    that matched given criteria.
