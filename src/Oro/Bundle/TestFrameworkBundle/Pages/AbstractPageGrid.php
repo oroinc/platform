@@ -55,7 +55,7 @@ abstract class AbstractPageGrid extends AbstractPage
         $headers = $this->test
             ->elements(
                 $this->test->using('xpath')
-                    ->value("{$gridPath}/thead/tr/th[not(contains(@class,'floatThead-col'))]")
+                    ->value("{$gridPath}/thead[not(contains(@class,'thead-sizing'))]/tr/th")
             );
 
         $entityData = array();
@@ -382,11 +382,13 @@ abstract class AbstractPageGrid extends AbstractPage
                 $orderFull = $order;
         }
 
+        $theadPath = "{$this->gridPath}//table/thead[not(contains(@class,'thead-sizing'))]";
         //get current sort order status
-        $current = $this->test->byXPath("{$this->gridPath}//table/thead/tr/th[a[contains(., '{$columnName}')]]")
+        $current = $this->test->byXPath("{$theadPath}/tr/th[a[contains(., '{$columnName}')]]")
             ->attribute('class');
-        if (strpos($current, $orderFull) === false || $order == '') {
-            $this->test->byXPath("{$this->gridPath}//table/thead/tr/th/a[contains(., '{$columnName}')]")->click();
+        if (strpos($current, $orderFull) === false || $order == '') { echo "\n";
+            print_r("{$theadPath}/tr/th/a[contains(., '{$columnName}')]"); echo "\n";
+            $this->test->byXPath("{$theadPath}/tr/th/a[contains(., '{$columnName}')]")->click();
             $this->waitForAjax();
             if ($order != '') {
                 return $this->sortBy($columnName, $order);
