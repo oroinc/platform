@@ -4,7 +4,7 @@
 define(function (require) {
     'use strict';
 
-    var DataGridComponent,
+    var DataGridComponent, helpers,
         $ = require('jquery'),
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
@@ -16,15 +16,16 @@ define(function (require) {
         mapCellModuleName = require('orodatagrid/js/map-cell-module-name'),
         gridContentManager = require('orodatagrid/js/content-manager'),
         FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin'),
-        FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin'),
-        helpers = {
-            cellType: function (type) {
-                return type + 'Cell';
-            },
-            actionType: function (type) {
-                return type + 'Action';
-            }
-        };
+        FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
+    
+    helpers = {
+        cellType: function (type) {
+            return type + 'Cell';
+        },
+        actionType: function (type) {
+            return type + 'Action';
+        }
+    };
 
     /**
      * Runs passed builder
@@ -221,14 +222,13 @@ define(function (require) {
                 massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
-            /**
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
             } else {
                 if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
-            }*/
+            }
 
             return {
                 name: this.gridName,
