@@ -2,6 +2,13 @@
     <head{{ block('block_attributes') }}>
         <title>{% trans %}Loading...{% endtrans %}</title>
         <script id="page-title" type="text/html">{{ title|replace(title_parameters) }}</script>
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no"/>
+        {% if cache is same as(false) -%}
+        <meta http-equiv="cache-control" content="max-age=0" />
+        <meta http-equiv="cache-control" content="no-cache" />
+        <meta http-equiv="expires" content="0" />
+        <meta http-equiv="pragma" content="no-cache" />
+        {% endif -%}
         {{ block_widget(block) }}
     </head>
 {% endblock %}
@@ -181,12 +188,6 @@
             {{ block_widget(block) }}
         </div>
     </div>
-{% endblock %}
-
-{% block _theme_icon_widget %}
-    {% if oro_theme_icon() %}
-        <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
-    {% endif %}
 {% endblock %}
 
 {% block _application_script_widget %}

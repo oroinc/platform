@@ -8,33 +8,13 @@ oro_layout:
             items:
                 head:
                     blockType: head
-                meta_viewport:
-                    blockType: meta
                     options:
-                        name:    'viewport'
-                        content: 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no'
-                meta_cache_control_max_age:
-                    blockType: meta
-                    options:
-                        http_equiv: 'cache-control'
-                        content:    'max-age=0'
-                meta_cache_control_no_cache:
-                    blockType: meta
-                    options:
-                        http_equiv: 'cache-control'
-                        content:    'no-cache'
-                meta_expires:
-                    blockType: meta
-                    options:
-                        http_equiv: 'expires'
-                        content:    '0'
-                meta_pragma:
-                    blockType: meta
-                    options:
-                        http_equiv: 'pragma'
-                        content:    'no-cache'
+                        cache: false
                 theme_icon:
-                    blockType: block
+                    blockType: external_resource
+                    options:
+                        href: {@asset: $data.theme.icon}
+                        rel: shortcut icon
                 head_style_placeholder:
                     blockType: placeholder
                     options:
@@ -213,11 +193,6 @@ oro_layout:
             tree:
                 root:
                     head:
-                        meta_viewport: ~
-                        meta_cache_control_max_age: ~
-                        meta_cache_control_no_cache: ~
-                        meta_expires: ~
-                        meta_pragma: ~
                         theme_icon: ~
                         head_style_placeholder: ~
                         scripts_before_placeholder: ~
