@@ -259,7 +259,8 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $updateResources = $container->getParameter('oro_layout.theme_updates_resources');
         ksort($updateResources);
         array_walk(
-            $updateResources, function (&$resource) {
+            $updateResources,
+            function (&$resource) {
                 ksort($resource);
             }
         );
