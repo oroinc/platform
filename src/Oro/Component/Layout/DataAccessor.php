@@ -3,13 +3,13 @@
 namespace Oro\Component\Layout;
 
 /**
- * The data provider registry that falls back to the layout context if a data provider
+ * The data accessor that falls back to the layout context if a data provider
  * is not registered in the layout registry.
  * This means that at first a data provider is searched in the layout registry and
  * if it is not registered there a context variable with appropriate name is used
  * as data.
  */
-class DataProviderRegistry implements DataProviderRegistryInterface
+class DataAccessor implements DataAccessorInterface
 {
     /** @var LayoutRegistryInterface */
     private $registry;
@@ -17,8 +17,8 @@ class DataProviderRegistry implements DataProviderRegistryInterface
     /** @var ContextInterface */
     private $context;
 
-    /** @var ContextAwareDataProvider[] */
-    private $contextAwareDataProviders = [];
+    /** @var array */
+    private $dataProviders = [];
 
     /**
      * @param LayoutRegistryInterface $registry
@@ -28,6 +28,23 @@ class DataProviderRegistry implements DataProviderRegistryInterface
     {
         $this->registry = $registry;
         $this->context  = $context;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier($name)
+    {
+        $dataProvider = $this->getDataProvider($name);
+        if ($dataProvider === false) {
+            throw new Exception\InvalidArgumentException(
+                sprintf('Could not load the data provider "%s".', $name)
+            );
+        } elseif ($dataProvider instanceof DataProviderInterface) {
+            return $dataProvider->getIdentifier();
+        } else {
+            return $dataProvider;
+        }
     }
 
     /**
@@ -43,33 +60,24 @@ class DataProviderRegistry implements DataProviderRegistryInterface
      */
     public function offsetGet($name)
     {
-        if (isset($this->contextAwareDataProviders[$name])) {
-            return $this->contextAwareDataProviders[$name];
+        $dataProvider = $this->getDataProvider($name);
+        if ($dataProvider === false) {
+            throw new Exception\InvalidArgumentException(
+                sprintf('Could not load the data provider "%s".', $name)
+            );
+        } elseif ($dataProvider instanceof DataProviderInterface) {
+            return $dataProvider->getData();
+        } else {
+            return $this->context[$name];
         }
-
-        $dataProvider = $this->registry->findDataProvider($name);
-        if ($dataProvider === null) {
-            // try to use the layout context as a data provider
-            if (!isset($this->context[$name])) {
-                throw new Exception\InvalidArgumentException(sprintf('Could not load a data provider "%s".', $name));
-            }
-
-            $dataProvider = new ContextAwareDataProvider($this->context, $name);
-
-            $this->contextAwareDataProviders[$name] = $dataProvider;
-        }
-
-        return $dataProvider;
     }
 
     /**
-     * Implements \ArrayAccess
-     *
-     * @throws \BadMethodCallException always as checking existence of a data providers is not supported yet
+     * {@inheritdoc}
      */
     public function offsetExists($name)
     {
-        throw new \BadMethodCallException('Not supported');
+        return $this->getDataProvider($name) !== false;
     }
 
     /**
@@ -90,5 +98,34 @@ class DataProviderRegistry implements DataProviderRegistryInterface
     public function offsetUnset($name)
     {
         throw new \BadMethodCallException('Not supported');
+    }
+
+    /**
+     * @param string $name The name of the data provider
+     *
+     * @return mixed The returned values:
+     *               DataProviderInterface if the data provider is loaded
+     *               string if data should be loaded from the layout context
+     *               bool if the requested data cannot be loaded
+     */
+    protected function getDataProvider($name)
+    {
+        if (isset($this->dataProviders[$name])) {
+            return $this->dataProviders[$name];
+        }
+
+        $dataProvider = $this->registry->findDataProvider($name);
+        if ($dataProvider !== null) {
+            if ($dataProvider instanceof ContextAwareInterface) {
+                $dataProvider->setContext($this->context);
+            }
+        } elseif (isset($this->context[$name])) {
+            $dataProvider = 'context.' . $name;
+        } else {
+            $dataProvider = false;
+        }
+        $this->dataProviders[$name] = $dataProvider;
+
+        return $dataProvider;
     }
 }

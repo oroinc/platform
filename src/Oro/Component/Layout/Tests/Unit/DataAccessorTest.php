@@ -2,10 +2,10 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Oro\Component\Layout\DataProviderRegistry;
+use Oro\Component\Layout\DataAccessor;
 use Oro\Component\Layout\LayoutContext;
 
-class DataProviderRegistryTest extends \PHPUnit_Framework_TestCase
+class DataAccessorTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $registry;
@@ -13,93 +13,109 @@ class DataProviderRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutContext */
     protected $context;
 
-    /** @var DataProviderRegistry */
-    protected $dataProviderRegistry;
+    /** @var DataAccessor */
+    protected $dataAccessor;
 
     protected function setUp()
     {
         $this->registry = $this->getMock('Oro\Component\Layout\LayoutRegistryInterface');
         $this->context  = new LayoutContext();
 
-        $this->dataProviderRegistry = new DataProviderRegistry(
+        $this->dataAccessor = new DataAccessor(
             $this->registry,
             $this->context
         );
     }
 
-    public function testGetFromRegistry()
+    public function testGet()
     {
         $name         = 'foo';
+        $expectedId   = 'foo_id';
+        $expectedData = new \stdClass();
         $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+        $dataProvider->expects($this->any())
+            ->method('getIdentifier')
+            ->will($this->returnValue($expectedId));
+        $dataProvider->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue($expectedData));
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
             ->will($this->returnValue($dataProvider));
 
-        $this->assertSame($dataProvider, $this->dataProviderRegistry->get($name));
+        $this->assertSame($expectedData, $this->dataAccessor->get($name));
+        // test data provider identifier
+        $this->assertEquals($expectedId, $this->dataAccessor->getIdentifier($name));
+        // test that data provider is cached
+        $this->assertSame($expectedData, $this->dataAccessor->get($name));
     }
 
-    public function testArrayAccessGetFromRegistry()
+    public function testArrayAccessGet()
     {
         $name         = 'foo';
+        $expectedId   = 'foo_id';
+        $expectedData = new \stdClass();
         $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+        $dataProvider->expects($this->any())
+            ->method('getIdentifier')
+            ->will($this->returnValue($expectedId));
+        $dataProvider->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue($expectedData));
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
             ->will($this->returnValue($dataProvider));
 
-        $this->assertSame($dataProvider, $this->dataProviderRegistry[$name]);
+        $this->assertSame($expectedData, $this->dataAccessor[$name]);
+        // test data provider identifier
+        $this->assertEquals($expectedId, $this->dataAccessor->getIdentifier($name));
+        // test that data provider is cached
+        $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
 
     public function testGetFromContext()
     {
         $name                 = 'foo';
-        $data                 = new \stdClass();
-        $this->context[$name] = $data;
+        $expectedData         = new \stdClass();
+        $this->context[$name] = $expectedData;
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
             ->will($this->returnValue(null));
 
-        $dataProvider = $this->dataProviderRegistry->get($name);
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\ContextAwareDataProvider',
-            $dataProvider
-        );
-        $this->assertSame($data, $dataProvider->getData());
-
-        // test that context aware data provider is cached
-        $this->dataProviderRegistry->get($name);
+        $this->assertSame($expectedData, $this->dataAccessor->get($name));
+        // test data provider identifier
+        $this->assertEquals('context.' . $name, $this->dataAccessor->getIdentifier($name));
+        // test that context data provider is cached
+        $this->assertSame($expectedData, $this->dataAccessor->get($name));
     }
 
     public function testArrayAccessGetFromContext()
     {
         $name                 = 'foo';
-        $data                 = new \stdClass();
-        $this->context[$name] = $data;
+        $expectedData         = new \stdClass();
+        $this->context[$name] = $expectedData;
 
         $this->registry->expects($this->once())
             ->method('findDataProvider')
             ->with($name)
             ->will($this->returnValue(null));
 
-        $dataProvider = $this->dataProviderRegistry[$name];
-        $this->assertInstanceOf(
-            'Oro\Component\Layout\ContextAwareDataProvider',
-            $dataProvider
-        );
-        $this->assertSame($data, $dataProvider->getData());
-
-        // test that context aware data provider is cached
-        $this->dataProviderRegistry[$name];
+        $this->assertSame($expectedData, $this->dataAccessor[$name]);
+        // test data provider identifier
+        $this->assertEquals('context.' . $name, $this->dataAccessor->getIdentifier($name));
+        // test that context data provider is cached
+        $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load a data provider "foo".
+     * @expectedExceptionMessage Could not load the data provider "foo".
      */
     public function testGetFromContextThrowsExceptionIfContextVariableDoesNotExist()
     {
@@ -110,12 +126,28 @@ class DataProviderRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($name)
             ->will($this->returnValue(null));
 
-        $this->dataProviderRegistry->get($name);
+        $this->dataAccessor->get($name);
     }
 
     /**
      * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
-     * @expectedExceptionMessage Could not load a data provider "foo".
+     * @expectedExceptionMessage Could not load the data provider "foo".
+     */
+    public function testGetIdentifierFromContextThrowsExceptionIfContextVariableDoesNotExist()
+    {
+        $name = 'foo';
+
+        $this->registry->expects($this->once())
+            ->method('findDataProvider')
+            ->with($name)
+            ->will($this->returnValue(null));
+
+        $this->dataAccessor->getIdentifier($name);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Could not load the data provider "foo".
      */
     public function testArrayAccessGetFromContextThrowsExceptionIfContextVariableDoesNotExist()
     {
@@ -126,16 +158,38 @@ class DataProviderRegistryTest extends \PHPUnit_Framework_TestCase
             ->with($name)
             ->will($this->returnValue(null));
 
-        $this->dataProviderRegistry[$name];
+        $this->dataAccessor[$name];
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Not supported
-     */
-    public function testArrayAccessExistsThrowsException()
+    public function testArrayAccessExistsForUnknownDataProvider()
     {
-        $result = isset($this->dataProviderRegistry['foo']);
+        $name = 'foo';
+
+        $this->registry->expects($this->once())
+            ->method('findDataProvider')
+            ->with($name)
+            ->will($this->returnValue(null));
+
+        $this->assertFalse(isset($this->dataAccessor[$name]));
+    }
+
+    public function testArrayAccessExists()
+    {
+        $name         = 'foo';
+        $expectedData = new \stdClass();
+        $dataProvider = $this->getMock('Oro\Component\Layout\DataProviderInterface');
+        $dataProvider->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue($expectedData));
+
+        $this->registry->expects($this->once())
+            ->method('findDataProvider')
+            ->with($name)
+            ->will($this->returnValue($dataProvider));
+
+        $this->assertTrue(isset($this->dataAccessor[$name]));
+        // test that data provider is cached
+        $this->assertSame($expectedData, $this->dataAccessor[$name]);
     }
 
     /**
@@ -144,7 +198,7 @@ class DataProviderRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayAccessSetThrowsException()
     {
-        $this->dataProviderRegistry['foo'] = 'bar';
+        $this->dataAccessor['foo'] = 'bar';
     }
 
     /**
@@ -153,6 +207,6 @@ class DataProviderRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testArrayAccessRemoveThrowsException()
     {
-        unset($this->dataProviderRegistry['foo']);
+        unset($this->dataAccessor['foo']);
     }
 }

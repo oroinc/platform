@@ -24,8 +24,8 @@ class BlockFactory implements BlockFactoryInterface
     /** @var ContextInterface */
     protected $context;
 
-    /** @var DataProviderRegistryInterface */
-    protected $dataProviders;
+    /** @var DataAccessorInterface */
+    protected $dataAccessor;
 
     /** @var BlockBuilder */
     protected $blockBuilder;
@@ -80,7 +80,7 @@ class BlockFactory implements BlockFactoryInterface
         $this->rawLayout = $rawLayout;
         $this->context   = $context;
 
-        $this->dataProviders   = new DataProviderRegistry($this->registry, $this->context);
+        $this->dataAccessor    = new DataAccessor($this->registry, $this->context);
         $this->optionsResolver = new BlockOptionsResolver($this->registry);
         $this->typeHelper      = new BlockTypeHelper($this->registry);
         $this->blockBuilder    = new BlockBuilder(
@@ -93,7 +93,7 @@ class BlockFactory implements BlockFactoryInterface
             $this->rawLayout,
             $this->typeHelper,
             $this->context,
-            $this->dataProviders
+            $this->dataAccessor
         );
     }
 
@@ -104,7 +104,7 @@ class BlockFactory implements BlockFactoryInterface
     {
         $this->rawLayout       = null;
         $this->context         = null;
-        $this->dataProviders   = null;
+        $this->dataAccessor    = null;
         $this->optionsResolver = null;
         $this->typeHelper      = null;
         $this->blockBuilder    = null;

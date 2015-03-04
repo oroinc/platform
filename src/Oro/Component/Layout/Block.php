@@ -7,7 +7,7 @@ final class Block implements BlockInterface
     /** @var ContextInterface */
     private $context;
 
-    /** @var DataProviderRegistryInterface */
+    /** @var DataAccessorInterface */
     private $data;
 
     /** @var RawLayout */
@@ -23,16 +23,16 @@ final class Block implements BlockInterface
     private $parent = false;
 
     /**
-     * @param RawLayout                     $rawLayout
-     * @param BlockTypeHelperInterface      $typeHelper
-     * @param ContextInterface              $context
-     * @param DataProviderRegistryInterface $data
+     * @param RawLayout                $rawLayout
+     * @param BlockTypeHelperInterface $typeHelper
+     * @param ContextInterface         $context
+     * @param DataAccessorInterface    $data
      */
     public function __construct(
         RawLayout $rawLayout,
         BlockTypeHelperInterface $typeHelper,
         ContextInterface $context,
-        DataProviderRegistryInterface $data
+        DataAccessorInterface $data
     ) {
         $this->rawLayout  = $rawLayout;
         $this->typeHelper = $typeHelper;

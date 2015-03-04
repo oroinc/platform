@@ -54,9 +54,9 @@ interface BlockInterface
     public function getContext();
 
     /**
-     * Returns the data provider registry.
+     * Returns the data accessor.
      *
-     * @return DataProviderRegistryInterface
+     * @return DataAccessorInterface
      */
     public function getData();
 }
