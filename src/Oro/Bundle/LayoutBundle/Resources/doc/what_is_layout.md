@@ -1,0 +1,56 @@
+What is layout?
+===============
+
+A **layout** defines the visual structure of the user interface element such as a page or a widget. To put it simpler, **layout** is a
+recursive system that knows how an element should be positioned and drawn. The **layout component** provides an easy way to manipulate
+this structure.
+
+Let's take a look at any page in an application, what do we see? Usually, the content could be separated in
+a set of blocks grouped by content or structure. 
+
+So, imagine that we have the following page structure:
+
+![Layout example](./images/layout.png "Layout example")
+
+We split the page into the following blocks hierarchy:
+
+* root
+   * header
+   * body
+     * sidebar
+     * main content
+   * footer
+
+Each of these blocks will have children in the final structure, so they represent a *container*
+
+**Container** -- is a block type that is responsible for holding and rendering its children.
+**Final block** -- block type that renders content based on data, but it can not have children.
+
+Each block has a **type class** that is responsible for passing options and data into view, and building the
+inner structure of the block in *containers*.
+
+The **layout** should be built by providing a set of actions named a **[layout update](./layout_update.md)**.
+A layout update can be defined for a specific route and a specific [theme](./theme_definition.md).
+
+See the [Layout component](../../../../Component/Layout/README.md) documentation for further detailed explanation.
+
+Block types
+-----------
+
+The **OroLayoutBundle** introduces a set of block types that allow to easily build HTML layout structure.
+
+| Type name | Type class | Default HTML output |
+|-----------|------------|-------------|
+| `root` | [RootType.php](../../Layout/Block/Type/RootType.php) | `<html>` |
+| `head` | [HeadType.php](../../Layout/Block/Type/HeadType.php) | `<head>` |
+| `meta` | [MetaType.php](../../Layout/Block/Type/MetaType.php) | `<meta>` |
+| `style` | [StyleType.php](../../Layout/Block/Type/StyleType.php) | `<style>` with content or `<link>` with external resource |
+| `script` | [ScriptType.php](../../Layout/Block/Type/ScriptType.php) | `<script>` |
+| `external_resource` | [ExternalResourceType.php](../../Layout/Block/Type/ExternalResourceType.php) | `<link>` |
+| `body` | [BodyType.php](../../Layout/Block/Type/BodyType.php) | `<body>` |
+| `form` | [FormType.php](../../Layout/Block/Type/FormType.php) | `<form>` |
+| `form_field` | [FormFieldType.php](../../Layout/Block/Type/FormFieldType.php) |  Block will be rendered differently depending on the field type |
+| `fieldset` | [FieldsetType.php](../../Layout/Block/Type/FieldsetType.php) | `<fieldset>` |
+| `link` | [LinkType.php](../../Layout/Block/Type/LinkType.php) | `<a>` |
+| `list` | [ListType.php](../../Layout/Block/Type/ListType.php) | `<ul>` |
+| `text` | [TextType.php](../../Layout/Block/Type/TextType.php) | Text node |

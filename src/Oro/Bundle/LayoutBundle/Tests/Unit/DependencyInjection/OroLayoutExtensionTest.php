@@ -221,29 +221,29 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
-                        $bundle1Dir . '/Resources/layouts/base/route_name/update1.yml'
+                        $bundle1Dir . '/Resources/views/layouts/base/route_name/update1.yml'
                     ),
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
-                        $bundle2Dir . '/Resources/layouts/base/route_name/update1.yml'
+                        $bundle2Dir . '/Resources/views/layouts/base/route_name/update1.yml'
                     ),
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
-                        $bundle2Dir . '/Resources/layouts/base/route_name/update2.yml'
+                        $bundle2Dir . '/Resources/views/layouts/base/route_name/update2.yml'
                     ),
                 ],
                 'route_name2' => [
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
-                        $bundle1Dir . '/Resources/layouts/base/route_name2/update1.yml'
+                        $bundle1Dir . '/Resources/views/layouts/base/route_name2/update1.yml'
                     ),
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
-                        $bundle2Dir . '/Resources/layouts/base/route_name2/update1.yml'
+                        $bundle2Dir . '/Resources/views/layouts/base/route_name2/update1.yml'
                     ),
                 ],
             ],
@@ -252,12 +252,20 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
-                        $bundle2Dir . '/Resources/layouts/black/route_name/update1.php'
+                        $bundle2Dir . '/Resources/views/layouts/black/route_name/update1.php'
                     ),
                 ]
             ]
         ];
 
-        $this->assertSame($expectedResult, $container->getParameter('oro_layout.theme_updates_resources'));
+        $updateResources = $container->getParameter('oro_layout.theme_updates_resources');
+        ksort($updateResources);
+        array_walk(
+            $updateResources,
+            function (&$resource) {
+                ksort($resource);
+            }
+        );
+        $this->assertSame($expectedResult, $updateResources);
     }
 }

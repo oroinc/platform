@@ -1,7 +1,7 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroUIBundle:Layout:index.html.twig'
+            themes: 'OroUIBundle:layouts:base/index.html.twig'
         - @add:
             id:        index_before_content_addition
             parentId:  before_content_addition

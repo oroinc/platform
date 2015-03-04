@@ -7,3 +7,8 @@ oro_layout:
             options:
                 form:        { @value: $context.embedded_form.view }
                 form_layout: { @value: $context.embedded_form_custom_layout }
+
+    conditions:
+        @neq:
+            - ''
+            - $context.embedded_form_custom_layout
