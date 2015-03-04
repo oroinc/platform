@@ -2,9 +2,14 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
+use Oro\Bundle\DashboardBundle\Model\Manager;
+use Oro\Bundle\DashboardBundle\Model\StateManager;
+
 use Oro\Component\Config\Resolver\ResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+
+use Symfony\Component\HttpFoundation\Request;
 
 class WidgetConfigs
 {
@@ -17,19 +22,34 @@ class WidgetConfigs
     /** @var ResolverInterface */
     protected $resolver;
 
+    /** @var StateManager */
+    protected $stateManager;
+
+    /** @var Manager */
+    protected $dashboardManager;
+
+    /** @var Request|null */
+    protected $request;
+
     /**
      * @param ConfigProvider    $configProvider
      * @param SecurityFacade    $securityFacade
      * @param ResolverInterface $resolver
+     * @param Manager           $dashboardManager
+     * @param StateManager      $stateManager
      */
     public function __construct(
         ConfigProvider $configProvider,
         SecurityFacade $securityFacade,
-        ResolverInterface $resolver
+        ResolverInterface $resolver,
+        Manager $dashboardManager,
+        StateManager $stateManager
     ) {
-        $this->configProvider = $configProvider;
-        $this->securityFacade = $securityFacade;
-        $this->resolver       = $resolver;
+        $this->configProvider   = $configProvider;
+        $this->securityFacade   = $securityFacade;
+        $this->resolver         = $resolver;
+        $this->dashboardManager = $dashboardManager;
+        $this->stateManager     = $stateManager;
     }
 
     /**
@@ -91,6 +111,28 @@ class WidgetConfigs
     }
 
     /**
+     * Returns a list of options for current widget
+     *
+     * @return array
+     */
+    public function getCurrentWidgetOptions()
+    {
+        if (!$this->request) {
+            return [];
+        }
+
+        $widgetId = $this->request->query->get('_widgetId', null);
+        if (!$widgetId) {
+            return [];
+        }
+
+        $widget = $this->dashboardManager->findWidgetModel($widgetId);
+        $widgetState = $this->stateManager->getWidgetState($widget);
+
+        return $widgetState->getOptions();
+    }
+
+    /**
      * Filter widget configs based on acl enabled and applicable flag
      *
      * @param array $items
@@ -118,5 +160,13 @@ class WidgetConfigs
                 return $enabled && $accessGranted && $applicable;
             }
         );
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function setRequest(Request $request = null)
+    {
+        $this->request = $request;
     }
 }
