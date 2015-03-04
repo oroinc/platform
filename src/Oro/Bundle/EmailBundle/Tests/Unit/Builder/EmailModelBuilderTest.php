@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
