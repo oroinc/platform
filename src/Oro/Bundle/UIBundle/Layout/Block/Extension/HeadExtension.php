@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Layout\Extension;
+namespace Oro\Bundle\UIBundle\Layout\Block\Extension;
 
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\BlockInterface;
@@ -9,7 +9,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Bundle\NavigationBundle\Provider\TitleProvider;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
 
-class HeadBlockTypeExtension extends AbstractBlockTypeExtension
+class HeadExtension extends AbstractBlockTypeExtension
 {
     /** @var TitleProvider */
     protected $titleProvider;

@@ -1,13 +1,13 @@
 <?php
 
-namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Extension;
+namespace Oro\Bundle\UIBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutContext;
 
-use Oro\Bundle\UIBundle\Layout\Extension\HeadBlockTypeExtension;
+use Oro\Bundle\UIBundle\Layout\Block\Extension\HeadExtension;
 
-class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
+class HeadExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $titleProvider;
@@ -15,7 +15,7 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $titleTranslator;
 
-    /** @var HeadBlockTypeExtension */
+    /** @var HeadExtension */
     protected $extension;
 
     protected function setUp()
@@ -27,7 +27,7 @@ class HeadBlockTypeExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new HeadBlockTypeExtension(
+        $this->extension = new HeadExtension(
             $this->titleProvider,
             $this->titleTranslator
         );

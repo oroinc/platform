@@ -122,7 +122,7 @@ services:
             - { name: layout.context_configurator }
 
     oro_ui.block_type_extension.head:
-        class: Oro\Bundle\UIBundle\Layout\Extension\HeadBlockTypeExtension
+        class: Oro\Bundle\UIBundle\Layout\Block\Extension\HeadExtension
         arguments:
             - @oro_navigation.title_provider
             - @oro_navigation.title_translator
