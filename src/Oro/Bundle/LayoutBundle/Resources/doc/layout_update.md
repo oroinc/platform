@@ -119,7 +119,7 @@ does not allow to mix both approaches in the same array node, so we recommend to
 **Conditions** -- array node which contains conditions that must be satisfied for **layout update** to be executed.
 As a simple example let's imagine that some set of actions should be executed only for a page that currently served to a mobile device.
 The syntax of conditions declaration is very similar to *actions*, except that it should contain a single condition.
-Special grouping conditions (such as `@tree`, `@or`, `@and`) could be utilized in order to combine multiple conditions.
+Special grouping conditions (such as `@or`, `@and`) could be utilized in order to combine multiple conditions.
 
 **Example**
 ```yml

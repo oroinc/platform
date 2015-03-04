@@ -21,13 +21,13 @@ We split the page into following blocks hierarchy:
      * main content
    * footer
 
-Each of these blocks will have children in the final structure, so we can call them **container*
+Each of these blocks will have children in the final structure, so we can call them *container*
 
 **Container** -- is a block type that responsible for holding and rendering of its children.
-
 **Final block** -- block that renders a content based on data, but it couldn't have children.
 
-Each block has type that 
+Each block has a **type class** that is responsible for passing options and data into view, and build the 
+inner structure of the block for *containers*.
 
 The **layout** should be built by providing set of actions named **[layout update](./layout_update.md)**. 
 A layout update could be defined for specific route and for specific [theme](./theme_definition.md). 
