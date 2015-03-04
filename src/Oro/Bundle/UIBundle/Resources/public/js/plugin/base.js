@@ -19,12 +19,24 @@ define(function (require) {
         },
         disable: function () {
             this.enabled = false;
+            this.stopListening();
             this.trigger('disabled');
         },
         dispose: function () {
+            if (this.disposed) {
+                return;
+            }
+            this.disposed = true;
             this.trigger('disposed');
             this.off();
             this.stopListening();
+            for (var prop in this) {
+                if (this.hasOwnProperty(prop)) {
+                    delete this[prop];
+                }
+            }
+            this.disposed = true;
+            return typeof Object.freeze === 'function' ? Object.freeze(this) : void 0;
         }
     });
 

@@ -35,8 +35,8 @@ define(function (require) {
          * Creates plugin, also it is a way to update options
          *
          * @param {Function} Constructor Plugin constructor
-         * @param {Object} options
-         * @param {Boolean=} update
+         * @param {Object=} options
+         * @param {boolean=} update
          */
         create: function (Constructor, options, update) {
             var instance,
@@ -69,7 +69,7 @@ define(function (require) {
          */
         updateOptions: function (Constructor, options) {
             var item = this.getInstance(Constructor);
-            if (item) {
+            if (!item) {
                 throw new Error('Plugin is not instantiated yet');
             }
             this.create(Constructor, options, true);
@@ -83,7 +83,7 @@ define(function (require) {
         remove: function (Constructor) {
             var instance = this.getInstance(Constructor);
             if (instance === null) {
-                return;
+                throw new Error('Plugin is not instantiated yet');
             }
             if (instance.enabled) {
                 instance.disable();
@@ -98,13 +98,12 @@ define(function (require) {
          * @param {Function} Constructor Plugin constructor
          */
         enable: function (Constructor) {
-            var instance = this.getInstance(Constructor);
             if (!(Constructor.prototype instanceof BasePlugin)) {
                 throw new Error('Constructor must be a child of BasePlugin');
             }
+            var instance = this.getInstance(Constructor);
             if (instance === null) {
-                this.create(Constructor, undefined);
-                instance = this.getInstance(Constructor);
+                instance = this.create(Constructor);
             }
             if (!instance.enabled) {
                 instance.enable();
@@ -146,7 +145,6 @@ define(function (require) {
                 instance = this._pluginList[i];
                 if (instance.enabled) {
                     instance.disable();
-                    instance.enabled = false;
                 }
                 instance.dispose();
             }
