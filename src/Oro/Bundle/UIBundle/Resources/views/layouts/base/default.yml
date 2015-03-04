@@ -1,7 +1,7 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroUIBundle:layouts:base/layout.html.twig'
+            themes: 'OroUIBundle:layouts:base/default.html.twig'
         - @addTree:
             items:
                 head:
