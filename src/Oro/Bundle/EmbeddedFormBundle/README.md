@@ -39,8 +39,9 @@ It is possible to change the embedded form FormType on/after creation.
 The related default styles and the default success message will be pulled. If current css and success message are changed - a confirmation dialog will appear.
 
 ## Success Message
-This message will appear after a successful form submitting. And the form will disappear.
-To add a back link to the success message use following syntax `{back_link|Back link text}`.
+This message will appear after a successful form submitting.
+You can customize the success message on the create and update embedded form pages.
+It is possible to set your text for the back link by adding it in the in the `{back_link}` placeholder using following syntax `{back_link|Back link text}`.
 
 ## Get a Code
 The "Get code" section is located on the view embedded form page. Example:
@@ -79,10 +80,9 @@ Let's consider an example when we need to move the email field before the first 
 oro_layout:
     actions:
         - @move:
-            id:        embedded_form_email         # embedded_form_ is field prefix
-            parentId:  embedded_form               # target parent block
+            id:        embedded_form_email
             siblingId: embedded_form_firstName
-            prepend:   true                        # put moved block before sibling
+            prepend:   true                     # place moved block before sibling
 
     conditions:
         @eq:
