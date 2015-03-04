@@ -1,10 +1,8 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroUIBundle:Layout:layout.html.twig'
-
+            themes: 'OroEmbeddedFormBundle:layouts:base/layout.html.twig'
         - @addTree:
-
             items:
                 head:
                     blockType: head
@@ -209,7 +207,6 @@ oro_layout:
                     blockType: placeholder
                     options:
                         placeholder_name: 'before_body_end'
-
             tree:
                 root:
                     head:

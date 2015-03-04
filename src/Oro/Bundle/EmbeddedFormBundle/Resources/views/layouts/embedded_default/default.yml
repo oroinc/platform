@@ -38,4 +38,4 @@ oro_layout:
                         form_css: ~
                     content: ~
         - @setBlockTheme:
-            themes: 'OroEmbeddedFormBundle:layouts:embedded_default/oro_embedded_form_submit/form.html.twig'
+            themes: 'OroEmbeddedFormBundle:layouts:embedded_default/form.html.twig'
