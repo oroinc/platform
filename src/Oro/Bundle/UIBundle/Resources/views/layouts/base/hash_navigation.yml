@@ -1,7 +1,7 @@
 oro_layout:
     actions:
         - @setBlockTheme:
-            themes: 'OroEmbeddedFormBundle:layouts:base/hash_navigation.html.twig'
+            themes: 'OroUIBundle:layouts:base/hash_navigation.html.twig'
         - @add:
             id:        hash_navigation_data
             parentId:  root
