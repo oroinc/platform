@@ -109,3 +109,8 @@ services:
         class: Oro\Component\ConfigExpression\Func\Trim
         tags:
             - { name: oro_layout.expression, alias: trim }
+
+    oro_layout.expression.join:
+        class: Oro\Component\ConfigExpression\Func\Join
+        tags:
+            - { name: oro_layout.expression, alias: join }

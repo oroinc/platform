@@ -72,8 +72,7 @@ class Asset extends AbstractFunction
                 throw new InvalidArgumentException('Path must not be empty.');
             }
             if ($count > 1) {
-                next($options);
-                $this->packageName = current($options);
+                $this->packageName = next($options);
             }
         } else {
             throw new InvalidArgumentException(
