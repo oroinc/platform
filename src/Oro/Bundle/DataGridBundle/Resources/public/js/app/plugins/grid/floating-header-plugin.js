@@ -12,15 +12,26 @@ define(function (require) {
     FloatingHeaderPlugin = BasePlugin.extend({
         initialize: function (grid) {
             this.grid = grid;
-            this.$grid = grid.$grid;
-            this.$el = grid.$el;
+            this.grid.on('shown', _.bind(this.onGridShown, this));
 
             this.selectMode = _.bind(this.selectMode, this);
             this.checkLayout = _.bind(this.checkLayout, this);
             this.fixHeaderCellWidth = _.bind(this.fixHeaderCellWidth, this);
         },
 
+        onGridShown: function () {
+            if (this.enabled && !this.connected) {
+                this.enable();
+            }
+        },
+
         enable: function () {
+            if (!this.grid.rendered) {
+                // not ready to apply floatingHeader
+                FloatingHeaderPlugin.__super__.enable.call(this);
+                return;
+            }
+
             this.setupCache();
             this.rescrollCb = this.enableOtherScroll();
             this.headerHeight = this.domCache.theadTr.height();
@@ -35,10 +46,12 @@ define(function (require) {
             this.listenTo(this.grid, 'content:update', this.fixHeaderCellWidth);
             this.listenTo(this.grid, 'layout:update', this.fixHeaderCellWidth);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
+            this.connected = true;
             FloatingHeaderPlugin.__super__.enable.call(this);
         },
 
         disable: function () {
+            this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
 
             this.setFloatTheadMode('default');
@@ -52,6 +65,8 @@ define(function (require) {
         },
 
         setupCache: function () {
+            this.$grid = this.grid.$grid;
+            this.$el = this.grid.$el;
             this.documentHeight = $(document).height();
             this.domCache = {
                 body: $(document.body),

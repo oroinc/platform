@@ -44,6 +44,8 @@ define(function (require) {
                 clearTimeout(this.updateLayoutTimeoutId);
                 this.updateLayoutTimeoutId = _.delay(_.bind(this.updateLayout, this), 50);
                 return;
+            } else {
+                clearTimeout(this.updateLayoutTimeoutId);
             }
             if (tools.isMobile()) {
                 this.manager.enable(FloatingHeaderPlugin);

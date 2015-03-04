@@ -15,6 +15,7 @@ define(function (require) {
         mapActionModuleName = require('orodatagrid/js/map-action-module-name'),
         mapCellModuleName = require('orodatagrid/js/map-cell-module-name'),
         gridContentManager = require('orodatagrid/js/content-manager'),
+        FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin'),
         FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin'),
         helpers = {
             cellType: function (type) {
@@ -220,8 +221,12 @@ define(function (require) {
                 massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
-            if (this.metadata.enableFullScreenLayout) {
-                plugins.push(FullscreenPlugin);
+            if (tools.isMobile()) {
+                plugins.push(FloatingHeaderPlugin);
+            } else {
+                if (this.metadata.enableFullScreenLayout) {
+                    plugins.push(FullscreenPlugin);
+                }
             }
 
             return {
