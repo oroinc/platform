@@ -146,6 +146,7 @@ define(function (require) {
             this.setFloatTheadMode(mode, visibleRect, tableRect);
             // update _lastClientRect to prevent calling this function again
             this._lastClientRect = this.domCache.otherScrollContainer[0].getBoundingClientRect();
+            this._lastScrollLeft = this.domCache.gridScrollableContainer.scrollLeft();
             if (this.rescrollCb) {
                 this.rescrollCb();
             }
