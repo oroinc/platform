@@ -13,6 +13,22 @@
     </head>
 {% endblock %}
 
+{% block body_widget %}
+    <body{{ block('block_attributes') }}>
+        <div id="progressbar">
+            <h3>{% trans %}Loading...{% endtrans %}</h3>
+            <div class="progress progress-striped active">
+                <div class="bar" style="width: 90%;"></div>
+            </div>
+        </div>
+        <div id="page" style="display:none;">
+            <div id="top-page">
+                {{ block_widget(block) }}
+            </div>
+        </div>
+    </body>
+{% endblock %}
+
 {% block placeholder_widget %}
     {{ placeholder(placeholder_name, placeholder_parameters) }}
 {% endblock %}
@@ -25,6 +41,11 @@
         compressed: compressed,
         config_extend: requirejs_config_extend
     } %}
+    {% if not modules is empty %}
+    <script type="text/javascript">
+        require({{ modules|json_encode(constant('JSON_UNESCAPED_SLASHES'))|raw }});
+    </script>
+    {% endif %}
 {% endblock %}
 
 {% block link_widget -%}
@@ -48,17 +69,43 @@
     </div>
 {%- endblock %}
 
+{% block _debug_init_script_widget %}
+    {%- set content -%}
+        require(['oroui/js/tools'], function (tools) {tools.debug = true;});
+    {%- endset -%}
+    {{ block_widget(block, {'content': content}) }}
+{% endblock %}
+
+{% block _mobile_init_script_widget %}
+    {%- set content -%}
+        require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
+    {%- endset -%}
+    {{ block_widget(block, {'content': content}) }}
+{% endblock %}
+
 {% block _header_widget %}
     <header class="navbar" id="oroplatform-header">
         {{ block_widget(block) }}
     </header>
 {% endblock %}
 
-{% block _navbar_container_widget %}
+{% block _navigation_bar_widget %}
     <div class="navbar-inner">
         <div class="container">
             {{ block_widget(block) }}
         </div>
+    </div>
+{% endblock %}
+
+{% block _user_menu_widget %}
+    <ul class="nav pull-right user-menu">
+        {{ block_widget(block) }}
+    </ul>
+{% endblock %}
+
+{% block _navbar_menu_widget %}
+    <div class="nav top-search shortcuts">
+        {{ block_widget(block) }}
     </div>
 {% endblock %}
 
@@ -87,37 +134,13 @@
     </footer>
 {% endblock %}
 
-{% block _page_header_widget %}
-    <div class="container-fluid page-title">
-        <div class="navigation clearfix navbar-extra navbar-extra-right">
-            <div class="row">
-                {{ block_widget(block) }}
-            </div>
-        </div>
-    </div>
-{% endblock %}
-
-{% block _page_title_widget %}
-    <div class="pull-left pull-left-extra">
-        <div class="pull-left">
-            <h1 class="oro-subtitle">{{ block_widget(block) }}</h1>
-        </div>
-    </div>
-{% endblock %}
-
-{% block _page_title_buttons_widget %}
-    <div class="pull-right title-buttons-container">
-        {{ block_widget(block) }}
-    </div>
-{% endblock %}
-
-{% block _main_widget %}
+{% block _main_panel_widget %}
     <div id="main">
         {{ block_widget(block) }}
     </div>
 {% endblock %}
 
-{% block _before_content_widget %}
+{% block _main_header_widget %}
     <div class="breadcrumb-pin">
         {{ block_widget(block) }}
     </div>
@@ -167,67 +190,8 @@
     </div>
 {% endblock %}
 
-{% block _main_container_widget %}
+{% block _page_container_widget %}
     <div id="container" class="scrollable-container">
-        {{ block_widget(block) }}
-    </div>
-{% endblock %}
-
-{% block _progressbar_widget %}
-    <div id="progressbar">
-        <h3>{% trans %}Loading...{% endtrans %}</h3>
-        <div class="progress progress-striped active">
-            <div class="bar" style="width: 90%;"></div>
-        </div>
-    </div>
-{% endblock %}
-
-{% block _page_widget %}
-    <div id="page" style="display:none;">
-        <div id="top-page">
-            {{ block_widget(block) }}
-        </div>
-    </div>
-{% endblock %}
-
-{% block _application_script_widget %}
-    <script type="text/javascript">
-        require(['oroui/js/app']);
-    </script>
-{% endblock %}
-
-{% block _core_scripts_widget %}
-    <script type="text/javascript">
-        require(['oroui/js/init-layout', 'orouser/js/init-user', 'oroui/js/widget-manager']);
-    </script>
-{% endblock %}
-
-{% block _debug_scripts_widget %}
-    <script type="text/javascript">
-        require(['oroui/js/tools'], function (tools) {tools.debug = true;});
-    </script>
-{% endblock %}
-
-{% block _mobile_scripts_widget %}
-    <script type="text/javascript">
-        require(['oroui/js/mobile/layout'], function (layout) {layout.init();});
-    </script>
-{% endblock %}
-
-{% block _user_menu_widget %}
-    <ul class="nav pull-right user-menu">
-        {{ block_widget(block) }}
-    </ul>
-{% endblock %}
-
-{% block _navbar_widget %}
-    <div class="nav top-search shortcuts">
-        {{ block_widget(block) }}
-    </div>
-{% endblock %}
-
-{% block _stats_widget %}
-    <div class="clearfix">
         {{ block_widget(block) }}
     </div>
 {% endblock %}

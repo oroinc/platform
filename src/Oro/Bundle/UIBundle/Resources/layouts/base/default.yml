@@ -13,34 +13,39 @@ oro_layout:
                 theme_icon:
                     blockType: external_resource
                     options:
-                        href: {@asset: $data.theme.icon}
+                        href: { @asset: $data.theme.icon }
                         rel: shortcut icon
-                head_style_placeholder:
+                head_style:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'head_style'
-                scripts_before_placeholder:
+                        placeholder_name: head_style
+                scripts_before:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'scripts_before'
-                require_js:
+                        placeholder_name: scripts_before
+                require_js_init_script:
                     blockType: require_js
-                applicaton_script:
-                    blockType: block
-                core_scripts:
-                    blockType: block
-                debug_scripts:
-                    blockType: block
+                    options:
+                        compressed:
+                            @not:
+                              - { @value: $context.debug }
+                        modules:
+                            - 'oroui/js/app'
+                            - 'oroui/js/init-layout'
+                            - 'orouser/js/init-user'
+                            - 'oroui/js/widget-manager'
+                debug_init_script:
+                    blockType: script
                     options:
                         visible: { @value: $context.debug }
-                mobile_scripts:
-                    blockType: block
+                mobile_init_script:
+                    blockType: script
                     options:
                         visible: { @value: $context.user_agent.mobile }
-                scripts_after_placeholder:
+                scripts_after:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'scripts_after'
+                        placeholder_name: scripts_after
                 head_script:
                     blockType: container
                 body:
@@ -48,50 +53,34 @@ oro_layout:
                     options:
                         attr:
                             class:
-                                @iif:
-                                    - $context.user_agent.mobile
-                                    - 'mobile-version'
-                                    - 'desktop-version'
-                after_body_start_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'after_body_start'
-                progressbar:
-                    blockType: block
-                page:
-                    blockType: container
+                                @join:
+                                  - ' '
+                                  - { @iif: [$context.user_agent.mobile, 'mobile-version', 'desktop-version'] }
+                                  - { @iif: [$context.debug, 'dev-mode', ''] }
                 header:
                     blockType: container
-                before_navigation_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'before_navigation'
-                navbar_container:
+                navigation_bar:
                     blockType: container
-                header_logo_placeholder:
+                header_logo:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'header_logo'
+                        placeholder_name: header_logo
                 user_menu:
-                    blockType: container
-                user_menu_placeholder:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'user_menu'
-                dots_menu_placeholder:
+                        placeholder_name: user_menu
+                dots_menu:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'dots_menu'
-                navbar:
-                    blockType: container
-                navbar_placeholder:
+                        placeholder_name: dots_menu
+                navbar_menu:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'navbar'
-                pin_tabs_list_placeholder:
+                        placeholder_name: navbar
+                pin_tabs:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'pin_tabs_list'
+                        placeholder_name: pin_tabs_list
                 main_menu:
                     blockType: container
                     options:
@@ -99,149 +88,99 @@ oro_layout:
                             @or:
                               - @eq: [ $context.user_agent.mobile, true ]
                               - @eq: [ $context.navbar_position, 'top' ]
-                application_menu_placeholder:
+                main_application_menu:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'application_menu'
-                after_navigation_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'after_navigation'
+                        placeholder_name: application_menu
                 left_panel:
                     blockType: container
                     options:
                         visible: { @value: $context.user_agent.desktop }
-                left_panel_placeholder:
+                left_side_bar:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'left_panel'
+                        placeholder_name: left_panel
                         placeholder_parameters:
-                            placement: 'left'
-                main:
-                    blockType: container
-                before_content:
-                    blockType: container
-                breadcrumb:
-                    blockType: container
-                breadcrumb_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'breadcrumb'
-                pin_button_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'pin_button'
-                before_content_addition:
-                    blockType: container
-                flash_messages:
-                    blockType: block
-                main_container:
-                    blockType: container
-                content_before_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'content_before'
-                content:
-                    blockType: container
-                page_header:
-                    blockType: container
-                page_title:
-                    blockType: container
-                page_title_text:
-                    blockType: text
-                page_title_buttons:
-                    blockType: container
-                index_navButtons_before_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'index_navButtons_before'
-                        placeholder_parameters:
-                            entity_class: { @value: $context.entity_class }
-                nav_buttons:
-                    blockType: container
-                index_navButtons_after_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'index_navButtons_after'
-                        placeholder_parameters:
-                            entity_class: { @value: $context.entity_class }
-                content_after_placeholder:
-                    blockType: placeholder
-                    options:
-                        placeholder_name: 'content_after'
+                            placement: left
                 right_panel:
                     blockType: container
                     options:
                         visible: { @value: $context.user_agent.desktop }
-                right_panel_placeholder:
+                right_side_bar:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'right_panel'
+                        placeholder_name: right_panel
                         placeholder_parameters:
-                            placement: 'right'
+                            placement: right
                 footer:
                     blockType: container
-                footer_inner_placeholder:
+                footer_script:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'footer_inner'
-                before_body_end_placeholder:
+                        placeholder_name: footer_inner
+                main_panel:
+                    blockType: container
+                main_header:
+                    blockType: container
+                breadcrumb:
                     blockType: placeholder
                     options:
-                        placeholder_name: 'before_body_end'
+                        placeholder_name: breadcrumb
+                pin_buttons:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: pin_button
+                before_content_addition:
+                    blockType: container
+                flash_messages:
+                    blockType: block
+                page_container:
+                    blockType: container
+                content_before:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: content_before
+                content:
+                    blockType: container
+                content_after:
+                    blockType: placeholder
+                    options:
+                        placeholder_name: content_after
 
             tree:
                 root:
                     head:
                         theme_icon: ~
-                        head_style_placeholder: ~
-                        scripts_before_placeholder: ~
-                        require_js: ~
-                        applicaton_script: ~
-                        core_scripts: ~
-                        debug_scripts: ~
-                        mobile_scripts: ~
-                        scripts_after_placeholder: ~
+                        head_style: ~
+                        scripts_before: ~
+                        require_js_init_script: ~
+                        debug_init_script: ~
+                        mobile_init_script: ~
+                        scripts_after: ~
                         head_script: ~
                     body:
-                        after_body_start_placeholder: ~
-                        progressbar: ~
-                        page:
-                            header:
-                                before_navigation_placeholder: ~
-                                navbar_container:
-                                    header_logo_placeholder: ~
-                                    user_menu:
-                                        user_menu_placeholder: ~
-                                    dots_menu_placeholder: ~
-                                    navbar:
-                                        navbar_placeholder: ~
-                                    pin_tabs_list_placeholder: ~
-                                main_menu:
-                                    application_menu_placeholder: ~
-                                after_navigation_placeholder: ~
-                            left_panel:
-                                left_panel_placeholder: ~
-                            main:
-                                before_content:
-                                    breadcrumb:
-                                        breadcrumb_placeholder: ~
-                                    pin_button_placeholder: ~
-                                    before_content_addition: ~
-                                    flash_messages: ~
-                                main_container:
-                                    content_before_placeholder: ~
-                                    content:
-                                        page_header:
-                                            page_title:
-                                                page_title_text: ~
-                                            page_title_buttons:
-                                                index_navButtons_before_placeholder: ~
-                                                nav_buttons: ~
-                                                index_navButtons_after_placeholder: ~
-                                    content_after_placeholder: ~
-                            right_panel:
-                                right_panel_placeholder: ~
-                            footer:
-                                footer_inner_placeholder: ~
-                        before_body_end_placeholder: ~
+                        header:
+                            navigation_bar:
+                                header_logo: ~
+                                user_menu: ~
+                                dots_menu: ~
+                                navbar_menu: ~
+                                pin_tabs: ~
+                            main_menu:
+                                main_application_menu: ~
+                        left_panel:
+                            left_side_bar: ~
+                        main_panel:
+                            main_header:
+                                breadcrumb: ~
+                                pin_buttons: ~
+                                before_content_addition: ~
+                                flash_messages: ~
+                            page_container:
+                                content_before: ~
+                                content: ~
+                                content_after: ~
+                        right_panel:
+                            right_side_bar: ~
+                        footer:
+                            footer_script: ~

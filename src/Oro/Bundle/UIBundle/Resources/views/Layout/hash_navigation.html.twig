@@ -1,7 +1,7 @@
 {% block root_widget -%}
     {% set data = {
         'scripts': block_widget(block.hash_navigation_data.head_script),
-        'content': block_widget(block.hash_navigation_data.main_container),
+        'content': block_widget(block.hash_navigation_data.page_container),
         'breadcrumb': block_widget(block.hash_navigation_data.breadcrumb)|trim,
         'beforeContentAddition': block_widget(block.hash_navigation_data.before_content_addition)
     } -%}

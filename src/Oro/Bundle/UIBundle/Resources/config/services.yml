@@ -98,6 +98,11 @@ services:
         tags:
             - { name: oro_layout.expression, alias: asset }
 
+    oro_ui.layout_context_configurator.action:
+        class: Oro\Bundle\UIBundle\Layout\Extension\ActionContextConfigurator
+        tags:
+            - { name: layout.context_configurator }
+
     oro_ui.layout_context_configurator.user_agent:
         class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
         calls:
@@ -143,8 +148,6 @@ services:
 
     oro_ui.block_type.require_js:
         class: Oro\Bundle\UIBundle\Layout\Block\Type\RequireJsType
-        arguments:
-            - %kernel.debug%
         tags:
              - { name: layout.block_type, alias: require_js }
 

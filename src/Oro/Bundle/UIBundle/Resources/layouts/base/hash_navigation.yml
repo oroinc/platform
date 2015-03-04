@@ -10,7 +10,7 @@ oro_layout:
             id:        head_script
             parentId:  hash_navigation_data
         - @move:
-            id:        main_container
+            id:        page_container
             parentId:  hash_navigation_data
         - @move:
             id:        breadcrumb
