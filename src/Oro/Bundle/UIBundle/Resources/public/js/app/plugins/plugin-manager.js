@@ -1,7 +1,7 @@
 define(function (require) {
     'use strict';
 
-    var BasePlugin = require('./base');
+    var BasePlugin = require('./base/plugin');
 
     function PluginManager(main) {
         this.main = main;

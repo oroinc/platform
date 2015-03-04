@@ -20,8 +20,8 @@ define(function (require) {
         RefreshCollectionAction = require('oro/datagrid/action/refresh-collection-action'),
         ResetCollectionAction = require('oro/datagrid/action/reset-collection-action'),
         ExportAction = require('oro/datagrid/action/export-action'),
-        PluginManager = require('oroui/js/plugin/plugin-manager'),
-        FloatingHeaderPlugin = require('./plugin/floating-header'),
+        PluginManager = require('oroui/js/app/plugins/plugin-manager'),
+        FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin'),
         tools = require('oroui/js/tools');
 
     /**
