@@ -39,8 +39,7 @@ define(function (require) {
             this.$grid.on('click', 'thead:first .dropdown', _.bind(function () {
                 this.setFloatTheadMode('relative');
             }, this));
-            this.domCache.gridScrollableContainer.parents().add(document).on('scroll', this.checkLayout);
-            this.domCache.gridScrollableContainer.on('scroll', this.selectMode);
+            this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
 
             this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
             this.listenTo(this.grid, 'content:update', this.fixHeaderCellWidth);
@@ -56,8 +55,7 @@ define(function (require) {
 
             this.setFloatTheadMode('default');
             this.disableOtherScroll();
-            this.domCache.gridScrollableContainer.on('scroll', this.selectMode);
-            this.domCache.gridScrollableContainer.parents().add(document).off('scroll', this.checkLayout);
+            this.domCache.gridContainer.parents().add(document).off('scroll', this.checkLayout);
             // remove css
             this.domCache.headerCells.attr('style', '');
             this.domCache.firstRowCells.attr('style', '');
@@ -144,7 +142,8 @@ define(function (require) {
                 mode = 'fixed';
             }
             this.setFloatTheadMode(mode, visibleRect, tableRect);
-            // update _lastClientRect to prevent calling this function again
+
+            // update tracked values to prevent calling this function again
             this._lastClientRect = this.domCache.otherScrollContainer[0].getBoundingClientRect();
             this._lastScrollLeft = this.domCache.gridScrollableContainer.scrollLeft();
             if (this.rescrollCb) {
@@ -176,13 +175,17 @@ define(function (require) {
                             sizingThead.insertAfter(this.domCache.thead);
                         }
                     }
+                    theadRect = this.domCache.thead[0].getBoundingClientRect();
                     this.domCache.thead.css({
+                        width: '',
                         top: visibleRect.top - tableRect.top
                     });
-                    theadRect = this.domCache.thead[0].getBoundingClientRect();
                     this.domCache.theadTr.css({
                         marginLeft: tableRect.left - theadRect.left
                     });
+                    if (mode === 'relative') {
+                        this._lastScrollTop = this.domCache.gridScrollableContainer.scrollTop();
+                    }
                     break;
                 case 'fixed':
                     // provides good scroll experience
@@ -333,6 +336,11 @@ define(function (require) {
                     this.selectMode();
                     return;
                 }
+            }
+            if (this.currentFloatTheadMode === 'relative' &&
+                    this.domCache.gridScrollableContainer.scrollTop() !== this._lastScrollTop) {
+                this.selectMode();
+                return;
             }
             scrollContainerRect = this.domCache.otherScrollContainer[0].getBoundingClientRect();
             if (!this._lastClientRect || (this._lastClientRect.top !== scrollContainerRect.top ||
