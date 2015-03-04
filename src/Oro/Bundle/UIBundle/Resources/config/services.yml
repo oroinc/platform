@@ -91,6 +91,13 @@ services:
         calls:
             - [setRequest, ["@?request="]]
 
+    oro_ui.layout_expression.asset:
+        class: Oro\Bundle\UIBundle\ConfigExpression\Asset
+        arguments:
+            - @templating.helper.assets
+        tags:
+            - { name: oro_layout.expression, alias: asset }
+
     oro_ui.layout_context_configurator.user_agent:
         class: Oro\Bundle\UIBundle\Layout\Extension\UserAgentContextConfigurator
         calls:
