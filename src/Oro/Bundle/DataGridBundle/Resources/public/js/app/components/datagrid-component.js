@@ -16,15 +16,14 @@ define(function (require) {
         mapCellModuleName = require('orodatagrid/js/map-cell-module-name'),
         gridContentManager = require('orodatagrid/js/content-manager'),
         FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin'),
-
-    helpers = {
-        cellType: function (type) {
-            return type + 'Cell';
-        },
-        actionType: function (type) {
-            return type + 'Action';
-        }
-    };
+        helpers = {
+            cellType: function (type) {
+                return type + 'Cell';
+            },
+            actionType: function (type) {
+                return type + 'Action';
+            }
+        };
 
     /**
      * Runs passed builder
