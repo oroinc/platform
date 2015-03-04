@@ -32,7 +32,7 @@ define(function (require) {
      * @extends Backbone.View
      */
     return BaseView.extend({
-        MOMENT_BACKEND_FORMAT: localeSettings.getVendorDateTimeFormat('moment', 'backend', 'YYYY-MM-DD HH:mm:ssZZ'),
+        MOMENT_BACKEND_FORMAT: dateTimeFormatter.backendFormats.datetime,
         /** @property */
         eventsTemplate: _.template(
             '<div>' +
@@ -322,7 +322,7 @@ define(function (require) {
                 allDay: start.time().as('ms') === 0 && end.time().as('ms') === 0,
                 start: start.clone(),
                 end: end.clone()
-            }
+            };
             this.applyTzCorrection(-1, attrs);
             this.showAddEventDialog(attrs);
         },
