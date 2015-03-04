@@ -19,6 +19,9 @@ class ThemeFactory implements ThemeFactoryInterface
         if (isset($themeDefinition['screenshot'])) {
             $theme->setScreenshot($themeDefinition['screenshot']);
         }
+        if (isset($themeDefinition['icon'])) {
+            $theme->setIcon($themeDefinition['icon']);
+        }
         if (isset($themeDefinition['logo'])) {
             $theme->setLogo($themeDefinition['logo']);
         }

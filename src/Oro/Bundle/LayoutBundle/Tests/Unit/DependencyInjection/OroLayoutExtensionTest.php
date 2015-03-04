@@ -163,7 +163,8 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
             [
                 'themes'       => [
                     'gold' => [
-                        'label' => 'Gold theme'
+                        'label' => 'Gold theme',
+                        'icon'  => 'gold.ico'
                     ]
                 ],
                 'active_theme' => 'gold'
@@ -179,6 +180,7 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEmpty($result->getGroups());
         $this->assertSame(Configuration::BASE_THEME_IDENTIFIER, $result->getParentTheme());
         $this->assertSame('Gold theme', $result->getLabel());
+        $this->assertSame('gold.ico', $result->getIcon());
         $this->assertSame('gold', $result->getDirectory());
     }
 

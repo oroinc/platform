@@ -70,6 +70,13 @@ services:
             - { name: monolog.logger, channel: main }
             - { name: layout.context_configurator }
 
+    oro_layout.data_provider.theme:
+        class: Oro\Bundle\LayoutBundle\Layout\DataProvider\ThemeDataProvider
+        arguments:
+            - @oro_layout.theme_manager
+        tags:
+            - { name: layout.data_provider, alias: theme }
+
     oro_layout.yaml_updates_warmer:
         class: Oro\Bundle\LayoutBundle\CacheWarmer\LayoutUpdatesWarmer
         public: false

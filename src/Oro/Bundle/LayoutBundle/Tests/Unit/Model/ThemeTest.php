@@ -40,6 +40,13 @@ class ThemeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Oro Base theme', $this->theme->getLabel());
     }
 
+    public function testIconMethods()
+    {
+        $this->assertNull($this->theme->getIcon());
+        $this->theme->setIcon('icon.ico');
+        $this->assertEquals('icon.ico', $this->theme->getIcon());
+    }
+
     public function testLogoMethods()
     {
         $this->assertNull($this->theme->getLogo());
