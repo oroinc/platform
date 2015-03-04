@@ -31,8 +31,7 @@ oro_system_configuration:
             options:
                 label: oro.sso.system_configuration.fields.google_sso_client_id.label
                 resettable: false
-                constraints:
-                    - NotBlank: ~
+                required: false
             priority: 30
         oro_sso.google_sso_client_secret:
             data_type: string
@@ -40,8 +39,7 @@ oro_system_configuration:
             options:
                 label: oro.sso.system_configuration.fields.google_sso_client_secret.label
                 resettable: false
-                constraints:
-                    - NotBlank: ~
+                required: false
             priority: 20
 
     tree:
