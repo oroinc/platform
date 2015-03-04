@@ -4,7 +4,7 @@
 define(function (require) {
     'use strict';
 
-    var DataGridComponent, helpers,
+    var DataGridComponent,
         $ = require('jquery'),
         _ = require('underscore'),
         tools = require('oroui/js/tools'),
