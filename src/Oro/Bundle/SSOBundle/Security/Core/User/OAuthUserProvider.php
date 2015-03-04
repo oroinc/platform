@@ -67,7 +67,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
             }
         }
 
-        if (!$user) {
+        if (!$user || !$user->isEnabled()) {
             throw new BadCredentialsException('Bad credentials');
         }
 

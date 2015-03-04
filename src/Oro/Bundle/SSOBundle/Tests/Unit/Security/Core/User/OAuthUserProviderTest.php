@@ -131,6 +131,53 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($user, $loadedUser);
     }
 
+    /**
+     * @expectedException Symfony\Component\Security\Core\Exception\BadCredentialsException
+     */
+    public function testLoadUserByOAuthShouldReturnExceptionIfUserIsDisabled()
+    {
+        $this->cm
+            ->expects($this->at(0))
+            ->method('get')
+            ->with($this->equalTo('oro_sso.enable_google_sso'))
+            ->will($this->returnValue(true));
+
+        $this->cm
+            ->expects($this->at(1))
+            ->method('get')
+            ->with($this->equalTo('oro_sso.google_sso_domains'))
+            ->will($this->returnValue([]));
+
+        $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
+        $userResponse
+            ->expects($this->any())
+            ->method('getUsername')
+            ->will($this->returnValue('username'));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getResourceOwner')
+            ->will($this->returnValue($this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface')));
+
+        $userResponse
+            ->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue('username@example.com'));
+
+        $user = new TestingUser();
+        $user->addRole(new Role());
+        $user->setEnabled(false);
+
+        $this->repository
+            ->expects($this->once())
+            ->method('findOneBy')
+            ->with($this->equalTo(['Id' => 'username']))
+            ->will($this->returnValue($user))
+        ;
+
+        $this->oauthProvider->loadUserByOAuthUserResponse($userResponse);
+    }
+
     public function testLoadUserByOAuthShouldToFindUserByEmailIfLoadingByOauthIdFails()
     {
         $this->cm
