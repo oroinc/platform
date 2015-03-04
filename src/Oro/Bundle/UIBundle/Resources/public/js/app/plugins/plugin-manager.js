@@ -21,11 +21,11 @@ define(function (require) {
          * @returns {Object}
          */
         getInstance: function (Constructor) {
-            var i, item;
+            var i, instance;
             for (i = 0; i < this._pluginList.length; i++) {
-                item = this._pluginList[i];
-                if (item instanceof Constructor) {
-                    return item;
+                instance = this._pluginList[i];
+                if (instance instanceof Constructor) {
+                    return instance;
                 }
             }
             return null;
@@ -39,23 +39,21 @@ define(function (require) {
          * @param {boolean=} update
          */
         create: function (Constructor, options, update) {
-            var instance,
-                reenable = false,
-                item = this.getInstance(Constructor);
             if (!(Constructor.prototype instanceof BasePlugin)) {
                 throw new Error('Constructor must be a child of BasePlugin');
             }
-            if (item !== null) {
+            var reenable = false,
+                instance = this.getInstance(Constructor);
+            if (instance !== null) {
                 if (!update) {
                     throw new Error('Plugin is already instantiated');
                 }
-                reenable = item.enabled;
+                reenable = instance.enabled;
                 this.remove(Constructor);
             }
             instance = new Constructor(this.main, this, options);
             if (reenable) {
                 instance.enable();
-                item.enabled = true;
             }
             this._pluginList.push(instance);
             return instance;
@@ -68,8 +66,8 @@ define(function (require) {
          * @param {Object} options
          */
         updateOptions: function (Constructor, options) {
-            var item = this.getInstance(Constructor);
-            if (!item) {
+            var instance = this.getInstance(Constructor);
+            if (!instance) {
                 throw new Error('Plugin is not instantiated yet');
             }
             this.create(Constructor, options, true);

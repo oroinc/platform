@@ -68,15 +68,6 @@
     .forScreen(320px, height, 32px);
   }
 }
-.grid-container {
-  -webkit-overflow-scrolling: touch;
-  overflow-scrolling: touch;
-  table.grid {
-      width: auto;
-      max-width: none;
-      min-width: 100%;
-    }
-}
 
 .other-scroll-container {
   margin: 10px 10px 30px 10px;
@@ -90,10 +81,17 @@
   border: none;
   max-width: auto;
   width: auto;
-
   > .loader-mask {
     left: @verticalPadding;
     right: @verticalPadding;
     top: @topPadding;
+  }
+
+  .grid-container {
+    table.grid {
+      width: auto;
+      max-width: none;
+      min-width: 100%;
+    }
   }
 }

@@ -221,13 +221,14 @@ define(function (require) {
                 massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
             });
 
+            /**
             if (tools.isMobile()) {
                 plugins.push(FloatingHeaderPlugin);
             } else {
                 if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
-            }
+            }*/
 
             return {
                 name: this.gridName,
