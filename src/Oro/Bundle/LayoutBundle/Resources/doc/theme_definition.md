@@ -52,36 +52,39 @@ src/
         Bundle/
             AcmeDemoBundle/
                 Resources/
-                    layouts/
-                        base/
-                            update1.yml
-                            update2.yml
-                            ...
-                        oro-gold/
-                            update1.yml
-                            update2.yml
-                            oro_user_edit/
-                                route_dependent_update.yml
-                            ...
+                    views/
+                        layouts/
+                            base/
+                                update1.yml
+                                update2.yml
+                                ...
+                            oro-gold/
+                                update1.yml
+                                update2.yml
+                                oro_user_edit/
+                                    route_dependent_update.yml
+                                ...
 ```
-Also there is a possibility to introduce new updates in `app/Resources/layouts/` folder. Overriding existing files
-can be also done on the *application* level (*TODO coming soon*), or via the bundle inheritance mechanism (for example updates from the `base` theme need to be modified)
+Also there is a possibility to introduce new updates in `app/Resources/views/layouts/` folder. Overriding existing files
+can be also done on the *application* level (*TODO coming soon*), or via the bundle inheritance mechanism 
+(for example updates from the `base` theme need to be modified)
 
 **Example:**
 ```
 app/
     Resources
-        layouts/
-            new-theme/
-                update1.yml
-                update2.yml
         views/
+            layouts/
+                new-theme/
+                    update1.yml
+                    update2.yml
         ...
         AcmeDemoBundle/
-            layouts/
-                base/
-                    update1.yml # override of existing update in AcmeDemoBundle
-                    ...
+            views/
+                layouts/
+                    base/
+                        update1.yml # override of existing update in AcmeDemoBundle
+                        ...
         ...
 ```
 

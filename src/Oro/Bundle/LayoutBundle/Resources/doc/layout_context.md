@@ -12,6 +12,38 @@ $layoutBuilder = $layoutManager->getLayoutBuilder();
 $layoutBuilder->getLayout($layoutContext);
 ```
 
+Accessing context
+-----------------
+
+There are few ways how context could be accessed. Most common ways are the following:
+ 
+ - Access context from `BlockInterface` instance. For example when need to get values from context during view building.
+   Example:
+   ```php
+        /**
+         * {@inheritdoc}
+         */
+        public function buildView(BlockView $view, BlockInterface $block, array $options)
+        {
+            $value = $block->getContext()->get('value-key');
+        }
+   ```
+   
+ - Access context using [ConfigExpression component](../../../../Component/ConfigExpression/README.md) by providing 
+   expression as an option for some block.
+   Example:
+   ```yml
+        actions:
+            ...
+            - @add:
+                id: blockId
+                parent: parentId
+                blockType: typeName
+                options:
+                    optionName: { @value: $context.valueKey }
+   ```
+   
+
 Context configurators
 ---------------------
 
