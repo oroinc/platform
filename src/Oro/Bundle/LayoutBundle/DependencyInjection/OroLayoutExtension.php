@@ -64,7 +64,7 @@ class OroLayoutExtension extends Extension
         $foundThemeLayoutUpdates = [];
         $updatesLoader           = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            [new FolderContentCummulativeLoader('Resources/layouts/', -1, false)]
+            [new FolderContentCummulativeLoader('Resources/views/layouts/', -1, false)]
         );
 
         $resources = $updatesLoader->load($container);
