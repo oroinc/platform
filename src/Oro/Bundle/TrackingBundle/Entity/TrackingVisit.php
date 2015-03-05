@@ -24,6 +24,8 @@ use OroCRM\Bundle\MagentoBundle\Entity\Customer;
  */
 class TrackingVisit extends ExtendTrackingVisit
 {
+    const ENTITY_NAME = 'Oro\Bundle\TrackingBundle\Entity\TrackingVisit';
+
     /**
      * @var integer
      *
@@ -34,18 +36,11 @@ class TrackingVisit extends ExtendTrackingVisit
     protected $id;
 
     /**
-     * @var Customer
-     * @ORM\ManyToOne(targetEntity="OroCRM\Bundle\MagentoBundle\Entity\Customer", cascade={"persist"})
-     * @ORM\JoinColumn(name="customer_id", referencedColumnName="id")
-     */
-    protected $customer;
-
-    /**
      * @var string
      *
-     * @ORM\Column(name="visitor", type="string", length=255)
+     * @ORM\Column(name="visitor_uid", type="string", length=255)
      */
-    protected $visitor;
+    protected $visitorUid;
 
     /**
      * @var string
@@ -100,17 +95,17 @@ class TrackingVisit extends ExtendTrackingVisit
     /**
      * @return string
      */
-    public function getVisitor()
+    public function getVisitorUid()
     {
-        return $this->visitor;
+        return $this->visitorUid;
     }
 
     /**
-     * @param string $visitor
+     * @param string $visitorUid
      */
-    public function setVisitor($visitor)
+    public function setVisitorUid($visitorUid)
     {
-        $this->visitor = $visitor;
+        $this->visitorUid = $visitorUid;
     }
 
     /**

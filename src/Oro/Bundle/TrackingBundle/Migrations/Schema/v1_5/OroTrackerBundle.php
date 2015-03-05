@@ -18,11 +18,13 @@ class OroTrackerBundle implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-//        $this->createOroTrackingVisitTable($schema);
-//        $this->createOroTrackingVisitEventTable($schema);
-//        $this->addOroTrackingVisitEventForeignKeys($schema);
-//
-//       // $this->extension->addIdentifierAssociation($schema,'orocrm_magento_customer');
+        /** Tables generation **/
+        $this->createOroTrackingVisitTable($schema);
+        $this->createOroTrackingVisitEventTable($schema);
+        $this->createOroTrackingEventDictionaryTable($schema);
+
+        /** Foreign keys generation **/
+        $this->addOroTrackingVisitEventForeignKeys($schema);
     }
 
     /**
@@ -34,8 +36,13 @@ class OroTrackerBundle implements Migration
     {
         $table = $schema->createTable('oro_tracking_visit');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('visitor', 'string', ['length' => 255]);
-        $table->addColumn('ip', 'string', ['length' => 255]);
+        $table->addColumn('visitor_uid', 'string', ['length' => 255]);
+        $table->addColumn('ip', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('user_identifier', 'string', ['length' => 255]);
+        $table->addColumn('first_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('last_action_time', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('parsing_count', 'integer', ['notnull' => false]);
+        $table->addColumn('parsed_uid', 'integer', []);
         $table->setPrimaryKey(['id']);
     }
 
@@ -48,11 +55,25 @@ class OroTrackerBundle implements Migration
     {
         $table = $schema->createTable('oro_tracking_visit_event');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('web_event_id', 'integer', ['notnull' => false]);
+        $table->addColumn('event_id', 'integer', ['notnull' => false]);
         $table->addColumn('visit_id', 'integer', ['notnull' => false]);
-        $table->addColumn('event', 'integer', []);
+        $table->addColumn('web_event_id', 'integer', ['notnull' => false]);
+        $table->addIndex(['event_id'], 'idx_b39eee8f71f7e88b', []);
         $table->addIndex(['visit_id'], 'idx_b39eee8f75fa0ff2', []);
+        $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['web_event_id'], 'uniq_b39eee8f66a8f966');
+    }
+
+    /**
+     * Create oro_tracking_event_lib table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroTrackingEventDictionaryTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_tracking_event_dictionary');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('name', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
     }
 
@@ -65,8 +86,8 @@ class OroTrackerBundle implements Migration
     {
         $table = $schema->getTable('oro_tracking_visit_event');
         $table->addForeignKeyConstraint(
-            $schema->getTable('oro_tracking_event'),
-            ['web_event_id'],
+            $schema->getTable('oro_tracking_event_dictionary'),
+            ['event_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => null]
         );
@@ -75,6 +96,12 @@ class OroTrackerBundle implements Migration
             ['visit_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_tracking_event'),
+            ['web_event_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => null]
         );
     }
 }

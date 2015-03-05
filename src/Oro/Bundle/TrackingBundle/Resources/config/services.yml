@@ -10,6 +10,10 @@ parameters:
     oro_tracking.importexport.normalizer.data.class:     Oro\Bundle\TrackingBundle\ImportExport\DataNormalizer
     oro_tracking.importexport.data_converter.data.class: Oro\Bundle\TrackingBundle\ImportExport\DataConverter
     oro_tracking.config.listener:                        Oro\Bundle\TrackingBundle\EventListener\ConfigListener
+    oro_tracking.entity_config_dumper.visit_identifier.extension.class: Oro\Bundle\TrackingBundle\Tools\IdentifierVisitConfigDumperExtension
+    oro_tracking.entity_generator.visit_identifie.extension.class:     Oro\Bundle\TrackingBundle\Tools\IdentifierVisitGeneratorExtension
+    oro_tracking.provider.mapping_provider.class:        Oro\Bundle\TrackingBundle\Provider\TrackingEventMappingProvider
+
 services:
     oro_tracking.form.type.tracking_website:
         class: %oro_tracking.form.type.tracking_website.class%
@@ -88,3 +92,20 @@ services:
         class: Oro\Bundle\TrackingBundle\Migration\Extension\IdentifierEventExtension
         tags:
             - { name: oro_migration.extension, extension_name: tracking_identifier }
+
+    oro_tracking.entity_config_dumper.visit_identifier.extension:
+        class: %oro_tracking.entity_config_dumper.visit_identifier.extension.class%
+        arguments:
+            - @oro_tracking.provider.mapping_provider
+            - @oro_entity_config.config_manager
+            - @oro_entity_extend.association_builder
+        tags:
+            - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_tracking.entity_generator.visit_identifie.extension:
+        class: %oro_tracking.entity_generator.visit_identifie.extension.class%
+        tags:
+            - { name: oro_entity_extend.entity_generator_extension }
+
+    oro_tracking.provider.mapping_provider:
+        class: %oro_tracking.provider.mapping_provider.class%

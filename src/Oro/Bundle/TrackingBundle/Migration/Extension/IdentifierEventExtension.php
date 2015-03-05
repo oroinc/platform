@@ -12,6 +12,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class IdentifierEventExtension implements ExtendExtensionAwareInterface
 {
+    const ASSOCIATION_KIND = 'identifier';
     const VISIT_TABLE_NAME = 'oro_tracking_visit';
 
     /** @var ExtendExtension */
@@ -37,7 +38,7 @@ class IdentifierEventExtension implements ExtendExtensionAwareInterface
         $targetTableName,
         $targetColumnName = null
     ) {
-        $noteTable   = $schema->getTable(self::VISIT_TABLE_NAME);
+        $visitTable   = $schema->getTable(self::VISIT_TABLE_NAME);
         $targetTable = $schema->getTable($targetTableName);
 
         if (empty($targetColumnName)) {
@@ -46,16 +47,17 @@ class IdentifierEventExtension implements ExtendExtensionAwareInterface
         }
 
 //        $options = new OroOptions();
-//        $options->set('note', 'enabled', true);
+//        $options->set(self::ASSOCIATION_KIND, 'enabled', true);
 //        $targetTable->addOption(OroOptions::KEY, $options);
 
         $associationName = ExtendHelper::buildAssociationName(
-            $this->extendExtension->getEntityClassByTableName($targetTableName)
+            $this->extendExtension->getEntityClassByTableName($targetTableName),
+            self::ASSOCIATION_KIND
         );
 
         $this->extendExtension->addManyToOneRelation(
             $schema,
-            $noteTable,
+            $visitTable,
             $associationName,
             $targetTable,
             $targetColumnName

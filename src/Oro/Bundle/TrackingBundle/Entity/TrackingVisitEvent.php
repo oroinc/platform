@@ -21,14 +21,6 @@ use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisitEvent;
  */
 class TrackingVisitEvent extends ExtendTrackingVisitEvent
 {
-    const EV_VISTIT = 1;
-    const EV_LOGIN = 2;
-    const EV_ADD_CART = 3;
-    const EV_ORDER = 4;
-    const EV_LOGOUT = 5;
-    const EV_CHECKOUT = 6;
-    const EV_REGISTER = 7;
-
     /**
      * @var integer
      *
@@ -47,9 +39,10 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     protected $visit;
 
     /**
-     * @var string
+     * @var TrackingEventDictionary
      *
-     * @ORM\Column(name="event", type="integer")
+     * @ORM\ManyToOne(targetEntity="TrackingEventDictionary", fetch="EXTRA_LAZY", inversedBy="visitEvents")
+     * @ORM\JoinColumn(name="event_id", referencedColumnName="id")
      */
     protected $event;
 
@@ -94,22 +87,6 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     }
 
     /**
-     * @return string
-     */
-    public function getEvent()
-    {
-        return $this->event;
-    }
-
-    /**
-     * @param string $event
-     */
-    public function setEvent($event)
-    {
-        $this->event = $event;
-    }
-
-    /**
      * @return TrackingEvent
      */
     public function getWebEvent()
@@ -123,5 +100,21 @@ class TrackingVisitEvent extends ExtendTrackingVisitEvent
     public function setWebEvent($webEvent)
     {
         $this->webEvent = $webEvent;
+    }
+
+    /**
+     * @return TrackingEventLibrary
+     */
+    public function getEvent()
+    {
+        return $this->event;
+    }
+
+    /**
+     * @param TrackingEventLibrary $event
+     */
+    public function setEvent($event)
+    {
+        $this->event = $event;
     }
 }
